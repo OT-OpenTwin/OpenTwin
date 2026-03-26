@@ -78,12 +78,14 @@ private:
 
 	bool waitForClient(void);
 	bool sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response);
+	void writeData(const QByteArray& _data);
 
 	SubprocessManager* m_manager;
 	std::string m_serverName;
 
 	QLocalSocket* m_client;
 	ClientState m_clientState;
+	QDataStream m_stream;
 	bool m_isInitializingClient;
 
 	bool m_serviceAndSessionInfoSet;

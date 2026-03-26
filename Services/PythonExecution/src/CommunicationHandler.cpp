@@ -35,7 +35,7 @@
 CommunicationHandler::CommunicationHandler() 
 	: m_serverSocket(nullptr)
 {
-
+	m_stream.setVersion(QDataStream::Qt_6_5);
 }
 
 CommunicationHandler::~CommunicationHandler() {
@@ -48,6 +48,9 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 	}
 	
 	m_serverSocket = new QLocalSocket;
+
+	m_stream.abortTransaction();
+	m_stream.setDevice(m_serverSocket);
 
 	this->connect(m_serverSocket, &QLocalSocket::readyRead, this, &CommunicationHandler::slotDataReceived);
 	this->connect(m_serverSocket, &QLocalSocket::disconnected, this, &CommunicationHandler::slotDisconnected);
@@ -80,9 +83,26 @@ void CommunicationHandler::slotDataReceived(void) {
 		return;
 	}
 
-	std::string data = m_serverSocket->readAll().toStdString();
+	while (true) {
+		m_stream.startTransaction();
 
-	QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, data);
+		quint32 size;
+		m_stream >> size;
+
+		QByteArray data;
+		data.resize(int(size));
+
+		if (m_stream.readRawData(data.data(), int(size)) != int(size)) {
+			m_stream.rollbackTransaction();
+			return;
+		}
+
+		if (!m_stream.commitTransaction())
+			return;
+
+		std::string message = data.toStdString();
+		QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, message);
+	}
 }
 
 void CommunicationHandler::slotProcessMessage(std::string _message) {
@@ -120,16 +140,24 @@ void CommunicationHandler::slotDisconnected(void) {
 
 bool CommunicationHandler::writeToServer(const std::string& _message) {
 	QByteArray data = QByteArray::fromStdString(_message);
-	data.append("\n");
+
 	if (!m_serverSocket) {
 		OT_LOG_E("Not connected");
 		return false;
 	}
 
-	OT_LOG(_message, ot::OUTGOING_MESSAGE_LOG);
+	//OT_LOG(_message, ot::OUTGOING_MESSAGE_LOG);  // We should not log here, since otherwise the logging output will be sent again with control
+												   // statements OUTPUT:
 
-	m_serverSocket->write(data);
-	m_serverSocket->flush();
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+
+	out.setVersion(QDataStream::Qt_6_5);
+	out << quint32(data.size());						// Write the length of the message
+	out.writeRawData(data.constData(), data.size());	// Write the content of the message
+
+	m_serverSocket->write(block);
+
 	return true;
 }
 

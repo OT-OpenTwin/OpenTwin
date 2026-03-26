@@ -597,6 +597,7 @@ void StudioConnector::startSubprocess() {
 
 #ifdef DEBUG_PYTHON_SERVER
 	m_serverName = "TestServerPython";
+	assert(0); // Start the test server now
 #endif
 	m_server.listen(m_serverName.c_str());
 #ifndef DEBUG_PYTHON_SERVER
@@ -610,7 +611,7 @@ void StudioConnector::startSubprocess() {
 	// Send ping
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-	send(pingDoc.toJson());
+	send(pingDoc.toJson(), m_heartBeat);
 		
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Init, doc.GetAllocator()), doc.GetAllocator());
@@ -623,7 +624,7 @@ void StudioConnector::startSubprocess() {
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_LogFlags, flagsArr, doc.GetAllocator());
 
-	ot::ReturnMessage returnMessage = send(doc.toJson());
+	ot::ReturnMessage returnMessage = send(doc.toJson(), m_heartBeat);
 
 	if (returnMessage.getStatus() == ot::ReturnMessage::ReturnMessageStatus::Failed) {
 		OT_LOG_E("Failed to initialise Python subprocess");
@@ -725,6 +726,11 @@ void StudioConnector::connectWithSubprocess()
 	if (connected)
 	{
 		m_socket = m_server.nextPendingConnection();
+
+		m_stream.abortTransaction();
+		m_stream.setDevice(m_socket);
+		m_stream.setVersion(QDataStream::Qt_6_5);
+
 		m_socket->waitForConnected(m_timeoutServerConnect);
 		connected = m_socket->state() == QLocalSocket::ConnectedState;
 		if (connected)
@@ -751,10 +757,10 @@ ot::ReturnMessage StudioConnector::executeCommand(const std::string& command)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(command, doc.GetAllocator()), doc.GetAllocator());
 
-	return send(doc.toJson());
+	return send(doc.toJson(), -1);
 }
 
-ot::ReturnMessage StudioConnector::send(const std::string& message) {
+ot::ReturnMessage StudioConnector::send(const std::string& message, int timeoutMs) {
 	std::string errorMessage;
 	bool readyToWrite = checkSubprocessResponsive(errorMessage);
 	if (!readyToWrite)
@@ -764,17 +770,25 @@ ot::ReturnMessage StudioConnector::send(const std::string& message) {
 		closeSubprocess();
 		runSubprocess();
 	}
-	const std::string messageAsLine = message + "\n";
-	m_socket->write(messageAsLine.c_str());
-	m_socket->flush();
+
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+
+	out.setVersion(QDataStream::Qt_6_5);
+	out << quint32(message.size());						// Write the length of the message
+	out.writeRawData(message.c_str(), message.size());	// Write the content of the message
+
+	m_socket->write(block);
+
 	bool allIsWritten = m_socket->waitForBytesWritten(m_timeoutSendingMessage);
 
-	if (!waitForResponse())
+	std::string returnString = readMessage(timeoutMs);
+
+	if (returnString.empty())
 	{
-		return send(message);
+		return ot::ReturnMessage::failed("No response received");;
 	}
 
-	const std::string returnString(m_socket->readLine().data());
 	ot::ReturnMessage returnMessage = ot::ReturnMessage::fromJson(returnString);
 
 	return returnMessage;
@@ -822,27 +836,6 @@ void StudioConnector::closeSubprocess()
 	}
 }
 
-bool StudioConnector::waitForResponse()
-{
-	while (!m_socket->canReadLine())
-	{
-		bool receivedMessage = m_socket->waitForReadyRead(m_heartBeat);
-		if (!receivedMessage)
-		{
-			std::string errorMessage;
-			bool subprocessResponsive = checkSubprocessResponsive(errorMessage);
-			if (!subprocessResponsive)
-			{
-				const std::string message = "Python Subservice crashed while waiting for response: " + errorMessage;
-//				_uiComponent->displayMessage(message);
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-
 void StudioConnector::getProcessErrorOccured(std::string& message)
 {
 	message = m_subProcess.errorString().toStdString();
@@ -851,4 +844,49 @@ void StudioConnector::getProcessErrorOccured(std::string& message)
 void StudioConnector::getSocketErrorOccured(std::string& message)
 {
 	message = m_socket->errorString().toStdString();
+}
+
+std::string StudioConnector::readMessage(int timeoutMs)
+{
+	constexpr quint32 maxMessageSize = 16 * 1024 * 1024; // safety limit
+
+	while (true) {
+		// If no data is available yet, wait (blocking)
+		if (m_socket->bytesAvailable() == 0) {
+			if (!m_socket->waitForReadyRead(timeoutMs)) {
+				// Timeout or disconnected
+				return {};
+			}
+		}
+
+		// Try to read a complete message using a transaction
+		m_stream.startTransaction();
+
+		quint32 size = 0;
+		m_stream >> size;
+
+		// Protect against corrupted or unreasonable message sizes
+		if (size > maxMessageSize) {
+			m_stream.abortTransaction();
+			return {};
+		}
+
+		QByteArray data;
+		data.resize(int(size));
+
+		// Try to read the full payload
+		if (m_stream.readRawData(data.data(), int(size)) != int(size)) {
+			// Not enough data yet -> rollback and wait for more
+			m_stream.rollbackTransaction();
+			continue;
+		}
+
+		// Check if the full message was successfully read
+		if (!m_stream.commitTransaction()) {
+			continue;
+		}
+
+		// Successfully received -> return as std::string
+		return std::string(data.constData(), data.size());
+	}
 }

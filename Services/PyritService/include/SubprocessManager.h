@@ -65,9 +65,9 @@ public:
 	void endLogging(std::string &logText);
 
 	bool isConnected();
+	void shutdownSubprocess(void);
 
 private:
-	void shutdownSubprocess(void);
 
 	//! @brief Runs the subservice if needed and checks connection with a ping.
 	//! @return Return false if the connection could not be established.

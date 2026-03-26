@@ -92,6 +92,7 @@ private:
 	
 	//! @brief Danger? Waits infinitly for a response
 	bool sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response);
+	size_t writeData(const QByteArray& _data);
 
 	SubprocessManager* m_manager;
 	std::string m_serverName;
@@ -99,6 +100,7 @@ private:
 	QLocalSocket* m_client;
 	ClientState m_clientState; //State is accessed by two threads, use the threadsafe getter and setter
 	std::mutex m_clientStateMutex;
+	QDataStream m_stream;
 
 	bool m_isInitializingClient;
 

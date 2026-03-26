@@ -52,5 +52,5 @@ private:
 
 	std::string m_serverName;
 	QLocalSocket* m_serverSocket;
-
+	QDataStream m_stream;
 };

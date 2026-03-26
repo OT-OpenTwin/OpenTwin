@@ -478,6 +478,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	 
 	std::string logFileText;
 	m_subprocessManager->endLogging(logFileText);
+	m_subprocessManager->shutdownSubprocess();
 
 	// Store the output in a result item
 
@@ -660,6 +661,7 @@ std::string Application::buildScript()
 		"from openEMS import openEMS\n"
 		"from openEMS.physical_constants import *\n"
 		"\n"
+		"print(\"Start Simulation\")\n"
 		"### Setup the simulation\n"
 		"Sim_Path = os.path.join(tempfile.gettempdir(), 'Rect_WG')\n"
 		"print(Sim_Path)\n"

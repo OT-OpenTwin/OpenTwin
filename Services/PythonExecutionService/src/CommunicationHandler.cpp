@@ -41,6 +41,8 @@ CommunicationHandler::CommunicationHandler(SubprocessManager* _manager, const st
 {
 	OTAssertNullptr(m_manager);
 
+	m_stream.setVersion(QDataStream::Qt_6_5);
+
 	this->connect(this, &CommunicationHandler::newConnection, this, &CommunicationHandler::slotNewConnection);
 	this->listen(QString::fromStdString(_serverName));
 }
@@ -99,11 +101,26 @@ void CommunicationHandler::slotMessageReceived(void) {
 		return;
 	}
 
-	// Read message
-	std::string message;
-	message = m_client->readAll().toStdString();
-	
-	QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, message);
+	while (true) {
+		m_stream.startTransaction();
+
+		quint32 size;
+		m_stream >> size;
+
+		QByteArray data;
+		data.resize(int(size));
+
+		if (m_stream.readRawData(data.data(), int(size)) != int(size)) {
+			m_stream.rollbackTransaction();
+			return;
+		}
+
+		if (!m_stream.commitTransaction())
+			return;
+
+		std::string message = data.toStdString();;
+		QMetaObject::invokeMethod(this, &CommunicationHandler::slotProcessMessage, Qt::QueuedConnection, message);
+	}
 }
 
 void CommunicationHandler::slotClientDisconnected(void) {
@@ -316,7 +333,7 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 	OT_LOG("Message from client: \"" + _message + "\"", ot::INBOUND_MESSAGE_LOG);
 	while (_message.substr(0, 7) == "OUTPUT:")
 	{
-		std::string text = _message.substr(7, _message.length() - 1 - 7); // There is always an additional \n at the end of the message which needs to be removed here
+		std::string text = _message.substr(7, _message.length() - 7);
 		Application::instance()->getUiComponent()->displayMessage(text);
 		return;
 	}
@@ -382,7 +399,7 @@ bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectRes
 	OT_LOG("Writing to client: \"" + _data.toStdString() + "\"", ot::OUTGOING_MESSAGE_LOG);
 	
 	setClientState(ClientState::WaitForResponse);
-	uint64_t writteByte = m_client->write(_data);
+	uint64_t writteByte = writeData(_data);
 	bool flushSuccess = m_client->flush(); //Any data was written.
 
 	if (!flushSuccess && writteByte == -1)
@@ -442,7 +459,10 @@ void CommunicationHandler::slotNewConnection(void) {
 
 	// Store new client information and connect signals
 	m_client = newSocket;
-	
+
+	m_stream.abortTransaction();
+	m_stream.setDevice(newSocket);
+
 	// Send ping to ensure stable connection
 	setClientState(ClientState::WaitForPing);
 
@@ -451,6 +471,17 @@ void CommunicationHandler::slotNewConnection(void) {
 
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
-	m_client->write(QByteArray::fromStdString(pingDoc.toJson()));
-	m_client->flush();
+	writeData(QByteArray::fromStdString(pingDoc.toJson()));
+}
+
+size_t CommunicationHandler::writeData(const QByteArray& _data)
+{
+	QByteArray block;
+	QDataStream out(&block, QIODevice::WriteOnly);
+
+	out.setVersion(QDataStream::Qt_6_5);
+	out << quint32(_data.size());						// Write the length of the message
+	out.writeRawData(_data.constData(), _data.size());	// Write the content of the message
+
+	return m_client->write(block);
 }

@@ -478,6 +478,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	 
 	std::string logFileText;
 	m_subprocessManager->endLogging(logFileText);
+	m_subprocessManager->shutdownSubprocess();
 
 	// Store the output in a result item
 

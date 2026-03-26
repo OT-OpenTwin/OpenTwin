@@ -48,12 +48,13 @@ private:
     bool startProcess();
     void connectWithSubprocess();
     ot::ReturnMessage executeCommand(const std::string& command);
-    ot::ReturnMessage send(const std::string& message);
+    ot::ReturnMessage send(const std::string& message, int timeoutMs);
     bool checkSubprocessResponsive(std::string& errorMessage);
     void closeSubprocess();
     bool waitForResponse();
     void getProcessErrorOccured(std::string& message);
     void getSocketErrorOccured(std::string& message);
+    std::string readMessage(int timeoutMs);
 
     void determineStudioSuiteInstallation(int& version, std::string& studioPath);
     std::list<long long> getRunningDesignEnvironmentProcesses();
@@ -76,4 +77,5 @@ private:
     QProcess m_subProcess;
     QLocalServer m_server;
     QLocalSocket* m_socket = nullptr;
+    QDataStream m_stream;
 };

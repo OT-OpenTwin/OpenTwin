@@ -27,6 +27,10 @@
 #undef slots
 #include "Python.h"
 
+#include <cstdio>
+#include <stdexcept>
+#include <io.h>
+
 OutputPipeline::~OutputPipeline()
 {
 	if (m_outputWorkerThread)
@@ -77,14 +81,25 @@ void OutputPipeline::initiateRedirect()
 {
 	if (m_redirectionMode != RedirectionMode::off)
 	{
+		// Redirect output of embedded executables (child processes to stdout)
+		_dup2(m_pipe_fds[1], _fileno(stdout));
+		_dup2(m_pipe_fds[1], _fileno(stderr));
+
 		// Redirect output to pipe
 		std::string command =
-			"import sys\n"
-			"import os\n"
+			"import sys, os\n"
 			"import logging\n"
-			"sys.stdout = os.fdopen(" + std::to_string(m_pipe_fds[1]) + ", 'w')\n"
-			"sys.stdout.reconfigure(line_buffering = True)\n"
-			"logging.getLogger().addHandler(logging.StreamHandler(sys.stdout))\n";
+			"sys.stdout = os.fdopen(1, \"w\", buffering = 1, closefd = False)\n"
+			"sys.stderr = os.fdopen(2, \"w\", buffering = 1, closefd = False)\n"
+			"try:\n"
+			"    sys.stdout.reconfigure(line_buffering = True)\n"
+			"    sys.stderr.reconfigure(line_buffering = True)\n"
+			"except Exception:\n"
+			"    pass\n"
+			"logger = logging.getLogger()\n"
+			"logger.handlers.clear()\n"
+			"logger.addHandler(logging.StreamHandler(sys.stdout))\n"
+			"logger.setLevel(logging.INFO)\n";
 
 		PyRun_SimpleString(command.c_str());
 
@@ -136,18 +151,20 @@ void OutputPipeline::readOutput()
 	while (m_redirectionMode == RedirectionMode::sendToServer)
 	{
 		DWORD bytes_available = 0;
-		if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
-			if (bytes_available > 0) {
-				int count = _read(m_pipe_fds[0], buffer, sizeof(buffer) - 1);
-				if (count > 0) {
-					assert(count < 256);
-					buffer[count] = '\0';
-					//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
-					Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::string(buffer));
+		if (m_pipe_fds[0] == -1)
+		{
+			if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
+				if (bytes_available > 0) {
+					int count = _read(m_pipe_fds[0], buffer, sizeof(buffer) - 1);
+					if (count > 0) {
+						assert(count < 256);
+						buffer[count] = '\0';
+						//Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::to_string(strlen(buffer)) + ":" + std::string(buffer));
+						Application::instance().getCommunicationHandler().writeToServer("OUTPUT:" + std::string(buffer));
+					}
 				}
 			}
 		}
-
 		m_outputProcessingCount++;
 
 		std::this_thread::sleep_for(std::chrono::milliseconds(20));

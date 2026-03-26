@@ -163,7 +163,6 @@ SessionService::SessionService()
 	//Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_FDTD, OT_INFO_SERVICE_TYPE_FDTD));
 	//Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_ELMERFEM, OT_INFO_SERVICE_TYPE_ELMERFEM));
 	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_OPENEMS, OT_INFO_SERVICE_TYPE_OPENEMS));
-	Simulation3DSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE, OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_3DSIM, std::move(Simulation3DSessionServices));
 
 	//
