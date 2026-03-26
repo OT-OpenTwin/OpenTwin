@@ -151,7 +151,7 @@ void OutputPipeline::readOutput()
 	while (m_redirectionMode == RedirectionMode::sendToServer)
 	{
 		DWORD bytes_available = 0;
-		if (m_pipe_fds[0] == -1)
+		if (m_pipe_fds[0] != -1)
 		{
 			if (PeekNamedPipe((HANDLE)_get_osfhandle(m_pipe_fds[0]), NULL, 0, NULL, &bytes_available, NULL)) {
 				if (bytes_available > 0) {
