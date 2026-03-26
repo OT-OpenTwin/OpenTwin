@@ -3,6 +3,47 @@
 // OpenTwin header
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 
+ot::DataLakeAccessCfg::DataLakeAccessCfg(const DataLakeAccessCfg& _other)
+{
+	m_collectionToQueryMap = _other.m_collectionToQueryMap;
+	
+	for (auto& entry : _other.m_seriesMetadataMap)
+	{
+		ot::JsonDocument newDoc;
+		newDoc.CopyFrom(entry.second, newDoc.GetAllocator());
+		m_seriesMetadataMap.insert({ entry.first,std::move(newDoc) });
+	}
+	m_collectionNameBase = _other.m_collectionNameBase;
+	
+	m_fieldDecodersParameter = _other.m_fieldDecodersParameter;
+	m_fieldDecodersQuantity = _other.m_fieldDecodersQuantity;
+	m_fieldDecodersSeries = _other.m_fieldDecodersSeries;
+
+	m_valueTransformerByFieldKeyParameter = _other.m_valueTransformerByFieldKeyParameter;
+	m_valueTransformerByFieldKeyQuantity = _other.m_valueTransformerByFieldKeyQuantity;
+}
+
+ot::DataLakeAccessCfg& ot::DataLakeAccessCfg::operator=(const DataLakeAccessCfg& _other)
+{
+	m_collectionToQueryMap = _other.m_collectionToQueryMap;
+
+	for (auto& entry : _other.m_seriesMetadataMap)
+	{
+		ot::JsonDocument newDoc;
+		newDoc.CopyFrom(entry.second, newDoc.GetAllocator());
+		m_seriesMetadataMap.insert({ entry.first,std::move(newDoc) });
+	}
+	m_collectionNameBase = _other.m_collectionNameBase;
+
+	m_fieldDecodersParameter = _other.m_fieldDecodersParameter;
+	m_fieldDecodersQuantity = _other.m_fieldDecodersQuantity;
+	m_fieldDecodersSeries = _other.m_fieldDecodersSeries;
+
+	m_valueTransformerByFieldKeyParameter = _other.m_valueTransformerByFieldKeyParameter;
+	m_valueTransformerByFieldKeyQuantity = _other.m_valueTransformerByFieldKeyQuantity;
+	return *this;
+}
+
 void ot::DataLakeAccessCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const
 {
 	JsonArray collectionQueryArr;

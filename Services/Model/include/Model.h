@@ -74,7 +74,7 @@ public:
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
-	virtual ot::DataLakeAccessCfg requestDataLakeAccessConfig(const DataLakeQueryCfg & _queryCfg) override;
+	virtual void requestDatapointVisualisation(const DataLakeQueryCfg & _queryCfg, ot::UID _entityID, ot::UID _entityVersion) override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string& _collectionName);
 	virtual ~Model();

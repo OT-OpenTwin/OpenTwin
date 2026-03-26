@@ -154,14 +154,9 @@ void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shar
 	const std::string thisProjectsName = DataBase::instance().getCollectionName();
 
 	ResultCollectionMetadataAccess* newResultCollectionAccess;
-	if (thisProjectsName == projectName)
-	{
-		newResultCollectionAccess =new ResultCollectionMetadataAccess(_collectionName, modelComponent);
-	}
-	else //Crosscollection access
-	{
-		newResultCollectionAccess = new ResultCollectionMetadataAccess(_collectionName, modelComponent, sessionServiceURL);
-	}
+	bool isCrossCollection = thisProjectsName != projectName;
+	newResultCollectionAccess =new ResultCollectionMetadataAccess(_collectionName, modelComponent, isCrossCollection);
+	
 
 	return newResultCollectionAccess;
 }

@@ -120,28 +120,10 @@ bool EntityResult1DCurve::updateFromProperties()
 		cfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
 		cfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
 
-		ot::DataLakeAccessCfg accessCfg =  getObserver()->requestDataLakeAccessConfig(cfg);
+		getObserver()->requestDatapointVisualisation(cfg, getEntityID(),getEntityStorageVersion());
 	}
 
-	// Update the curve displayed in the frontend after the property change
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
 
-	const std::string plotName = getParent()->getName();
-	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(plotName, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::JsonObject curveCfgSerialised;
-	ot::Plot1DCurveCfg curveCfg = getCurve();
-	curveCfg.addToJsonObject(curveCfgSerialised, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised, doc.GetAllocator());
-
-	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
-	visualisationCfg.setOverrideViewerContent(false);
-	visualisationCfg.setAsActiveView(true);
-
-	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
-	getObserver()->sendMessageToViewer(doc);
 	getProperties().forceResetUpdateForAllProperties();
 	return refresh;
 }
@@ -405,6 +387,12 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 	m_queryInformation = _curve.getQueryInformation();
 }
 
+void EntityResult1DCurve::setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _cfg)
+{
+	 m_dataLakeAccessCfg = std::move(_cfg); 
+	 setModified();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected: Virtual methods
@@ -471,11 +459,13 @@ void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& stor
 		arrayOfSubDocs.append(parameterDescrDoc.extract());
 	}
 
+	const std::string serialisedDLA = m_dataLakeAccessCfg.toJson();
 	storage.append(
 		bsoncxx::builder::basic::kvp("Query", m_queryInformation.getQuery()),
 		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.getProjection()),
 		bsoncxx::builder::basic::kvp("QuantityDescription", quantityDescriptionSerialised.extract()),
-		bsoncxx::builder::basic::kvp("ParameterDescription", arrayOfSubDocs.extract())
+		bsoncxx::builder::basic::kvp("ParameterDescription", arrayOfSubDocs.extract()),
+		bsoncxx::builder::basic::kvp("DataLakeAccessCfg", serialisedDLA)
 	);
 
 
@@ -499,6 +489,14 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 		const auto& parameterDoc = parameterDescription->get_document();
 		ot::DataPointDecoder parameterDesc = deserialise(parameterDoc);
 		m_queryInformation.addParameterDescription(std::move(parameterDesc));
+	}
+
+	const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
+	if (!serialisedDLA.empty())
+	{
+		ot::JsonDocument doc;
+		doc.fromJson(serialisedDLA);
+		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
 	}
 }
 

@@ -67,7 +67,7 @@ public:
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt;	};
-	virtual ot::DataLakeAccessCfg requestDataLakeAccessConfig(const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); }
+	virtual void requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot::UID _entityID, ot::UID _entityVersion) {};
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

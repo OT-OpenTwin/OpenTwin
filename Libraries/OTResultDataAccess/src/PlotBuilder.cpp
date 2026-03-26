@@ -70,7 +70,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	}
 	curveEntity.setCurve(_config);
 	curveEntity.setTreeItemEditable(true);
-	m_curves.push_back(curveEntity);
+	m_curves.push_back(std::move(curveEntity));
 }
 
 void PlotBuilder::buildPlot(ot::Plot1DCfg& _plotCfg, bool _saveModelState)

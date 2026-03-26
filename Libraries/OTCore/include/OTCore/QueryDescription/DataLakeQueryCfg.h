@@ -17,6 +17,9 @@ public:
 	const ot::ValueComparisonDescription& getValueDescriptionQuantities() const;
 	const std::list<ot::ValueComparisonDescription>& getValueDescriptionSeriesMD() const;
 	
+	const std::string& getSeriesLabel() const { return m_seriesLabel; }
+	const std::string& getCollectionName() const { return m_collectionName; }
+
 	// Inherited via Serializable
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const override;
 	void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) override;

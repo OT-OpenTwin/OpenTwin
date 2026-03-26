@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: CrossCollectionAccess.cpp
 // 
 // License:
@@ -27,7 +27,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTResultDataAccess/ResultCollection/CrossCollectionAccess.h"
 
-CrossCollectionAccess::CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL)
+CrossCollectionAccess::CrossCollectionAccess(const std::string& collectionName, const std::string& modelServiceURL)
 	:_collectionName(collectionName), _modelServiceURL(modelServiceURL)
 {}
 

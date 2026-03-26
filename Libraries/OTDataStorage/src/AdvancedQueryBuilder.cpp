@@ -43,8 +43,8 @@ std::list<std::string> AdvancedQueryBuilder::extractMongoComparators(ot::ValueCo
 	{
 		noTupleAllowedCheck(_definition);
 	}
-
-	if (queryTargetsEntireTuple(_definition) && comparator != "=")
+	
+	if (!_definition.getTupleInstance().isSingle() && queryTargetsEntireTuple(_definition) && comparator != "=")
 	{
 		throw std::exception(("A query for a complex number requires both values specified and separated by a \"" + m_listSplitToken + "\".").c_str());
 	}

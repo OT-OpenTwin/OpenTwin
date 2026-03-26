@@ -62,7 +62,7 @@ public:
 	// The third parameter is a String containing the action name
 	// The last parameter are flags describing the allowed message types for this handler
 	//OT_HANDLER(myHandleFunctionName, Application, "actionToHandle", ot::SECURE_MESSAGE_TYPES);
-	OT_HANDLER(createDataLakeAccessCfg, Application, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(updateDataLakeAccessCfg, Application, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, ot::SECURE_MESSAGE_TYPES)
 
 	// ##################################################################################################################################################################################################################
 

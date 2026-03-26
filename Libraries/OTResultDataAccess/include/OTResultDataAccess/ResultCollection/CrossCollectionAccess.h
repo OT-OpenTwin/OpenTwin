@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: CrossCollectionAccess.h
 // 
 // License:
@@ -34,7 +34,7 @@
 class OT_RESULTDATAACCESS_API_EXPORT CrossCollectionAccess
 {
 public:
-	CrossCollectionAccess(const std::string& collectionName, const std::string& sessionServiceURL, const std::string& modelServiceURL);
+	CrossCollectionAccess(const std::string& collectionName, const std::string& modelServiceURL);
 	std::list<std::shared_ptr<EntityMetadataSeries>> getMeasurementMetadata(ot::components::ModelComponent& modelComponent);
 	std::shared_ptr<EntityMetadataCampaign> getMeasurementCampaignMetadata(ot::components::ModelComponent& modelComponent);
 

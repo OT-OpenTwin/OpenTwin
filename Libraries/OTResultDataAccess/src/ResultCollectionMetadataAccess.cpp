@@ -31,23 +31,24 @@
 // std header
 #include <vector>
 
-ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string& _collectionName, ot::components::ModelComponent* _modelComponent)
+ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string& _collectionName, ot::components::ModelComponent* _modelComponent, bool _crossCollectionAccess)
 	:m_modelComponent(_modelComponent), m_collectionName(_collectionName)
 {
-	loadExistingCampaignData();
-}
-
-ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string& _crossCollectionName, ot::components::ModelComponent* _modelComponent, const std::string& _sessionServiceURL)
-	:m_modelComponent(_modelComponent), m_collectionName(_crossCollectionName)
-{
-	CrossCollectionAccess crossCollectionAccess(_crossCollectionName, _sessionServiceURL, _modelComponent->getServiceURL());
-	std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity =	crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent);
-	if (campaignMetadataEntity != nullptr)
+	if (_crossCollectionAccess)
 	{
-		m_metadataExistInProject = true;
-		std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent);
-		MetadataEntityInterface campaignFactory;
-		m_metadataCampaign = campaignFactory.createCampaign(campaignMetadataEntity, seriesMetadataEntities);
+		CrossCollectionAccess crossCollectionAccess(_collectionName, _modelComponent->getServiceURL());
+		std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity = crossCollectionAccess.getMeasurementCampaignMetadata(*_modelComponent);
+		if (campaignMetadataEntity != nullptr)
+		{
+			m_metadataExistInProject = true;
+			std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent);
+			MetadataEntityInterface campaignFactory;
+			m_metadataCampaign = campaignFactory.createCampaign(campaignMetadataEntity, seriesMetadataEntities);
+		}
+	}
+	else
+	{
+		loadExistingCampaignData();
 	}
 }
 

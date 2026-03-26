@@ -12,9 +12,12 @@ namespace ot {
 
 	class OT_CORE_API_EXPORT DataLakeAccessCfg : public Serializable
 	{
-		OT_DECL_NOCOPY(DataLakeAccessCfg)
 		OT_DECL_DEFMOVE(DataLakeAccessCfg)
 	public:
+
+		DataLakeAccessCfg(const DataLakeAccessCfg& _other);
+		DataLakeAccessCfg& operator=(const DataLakeAccessCfg& _other);
+
 		DataLakeAccessCfg() = default;
 		virtual ~DataLakeAccessCfg() = default;
 

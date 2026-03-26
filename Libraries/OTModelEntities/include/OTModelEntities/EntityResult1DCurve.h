@@ -86,6 +86,8 @@ public:
 
 	const ot::QueryInformation& getQueryInformation() const { return m_queryInformation; }
 
+	void setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _dataLakeAccessCfg);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected: Virtual methods
@@ -106,6 +108,7 @@ protected:
 private:
 	ot::QueryInformation m_queryInformation;
 	PropertyBundleDataLakeQuery m_queryProperties;
+	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
 
 	bsoncxx::builder::basic::document serialise(const ot::DataPointDecoder& _quantityContainerEntryDescription);
 	ot::DataPointDecoder deserialise(bsoncxx::v_noabi::document::view _subDocument);

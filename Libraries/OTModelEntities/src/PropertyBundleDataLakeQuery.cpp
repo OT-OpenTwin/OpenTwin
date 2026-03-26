@@ -13,12 +13,14 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	// Basic properties
 	EntityPropertiesSelection* metadataProp = EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { "" }, "", "default", _thisObject->getProperties());
 	metadataProp->setAllowCustomValues(true);
+	metadataProp->setGroupChanges(true);
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0, 0, m_maxNbOfQueries, "default", _thisObject->getProperties());
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueriesMetadataSeries, 0, 0, m_maxNbOfQueriesMetadata, "default", _thisObject->getProperties());
 
 	// Quantity Settings
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 	groupQuantityProp->setAllowCustomValues(true);
+	groupQuantityProp->setGroupChanges(true);
 
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
@@ -35,7 +37,9 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	_thisObject->getProperties().createProperty(unitLabelProperty, m_groupQuantitySettings);
 
 	EntityPropertiesString::createProperty(m_groupQuantitySettings, m_propertyValue, "", "default", _thisObject->getProperties());
+	PropertyHelper::getStringProperty(_thisObject, m_propertyValue, m_groupQuantitySettings)->setGroupChanges(true);
 	EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyComparator, comparators, comparators.front(), "default", _thisObject->getProperties());
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, m_groupQuantitySettings)->setGroupChanges(true);
 
 	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleFormat, { }, "", "default", _thisObject->getProperties());
 	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupTupleSettings)->setVisible(false);
@@ -52,12 +56,15 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
 		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setGroupChanges(true);
 
 		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", _thisObject->getProperties());
 		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(false);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setGroupChanges(true);
 
 		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparators, comparators.front(), "default", _thisObject->getProperties());
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setGroupChanges(true);
 	}
 	//Add all query fields
 	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
@@ -66,6 +73,7 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 
 		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setGroupChanges(true);
 
 		EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 		typeLabelProperty->setReadOnly(true);
@@ -85,9 +93,12 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 
 		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", _thisObject->getProperties());
 		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(false);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setGroupChanges(true);
 
 		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparators, comparators.front(), "default", _thisObject->getProperties());
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setGroupChanges(true);
+
 	}
 }
 

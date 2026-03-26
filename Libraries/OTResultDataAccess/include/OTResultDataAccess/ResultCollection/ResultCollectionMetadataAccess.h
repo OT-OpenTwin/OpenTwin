@@ -33,8 +33,7 @@
 class OT_RESULTDATAACCESS_API_EXPORT ResultCollectionMetadataAccess
 {
 public:
-	ResultCollectionMetadataAccess(const std::string& collectionName, ot::components::ModelComponent* modelComponent);
-	ResultCollectionMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, const std::string& sessionServiceURL);
+	ResultCollectionMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, bool crossCollection = false);
 	ResultCollectionMetadataAccess(ResultCollectionMetadataAccess&& other) noexcept;
 	ResultCollectionMetadataAccess& operator=(ResultCollectionMetadataAccess&& other) noexcept;
 

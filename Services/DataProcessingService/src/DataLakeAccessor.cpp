@@ -19,10 +19,22 @@ void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 	m_queryDescriptionsParameters.clear();
 	m_queryDescriptionsQuantities.clear();
 	m_queryDescriptionsSeries.clear();
+	if (m_resultCollectionMetadataAccess != nullptr)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
+	}
+	
+	bool isCrossCollection = Application::instance()->getCollectionName() != _collectionName;
+	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_collectionName, Application::instance()->getModelComponent(), isCrossCollection);
 }
 
 void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel)
 {
+	if (m_resultCollectionMetadataAccess == nullptr)
+	{
+		throw std::exception(("Failed to access metadata of collection: " + m_collectionName).c_str());
+	}
 	const MetadataSeries* series = nullptr;
 
 	//First we search the series by name, or if it failes we assume a regex expression and conduct another search.
@@ -64,21 +76,21 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 		bool match = true;
 		for (auto& metadataQuery : _valueComparisons)
 		{
-			if (metadataQuery.getComparator() != "")
+			if (metadataQuery.getComparator() != "" && metadataQuery.getName() != "" && metadataQuery.getValue() != "")
 			{
 				const std::string fieldName = metadataQuery.getName();
 				const ot::JsonValue& fieldValue = JSONVectoriser::getValue(metadata, fieldName);
 				const std::string temp = ot::json::toJson(fieldValue);
 				if (fieldValue.IsString())
 				{
-					if (metadataQuery.getComparator() != "")
+					if (metadataQuery.getComparator() != "=")
 					{
 						throw std::exception(("Comparison of strings are only possible with an equality check. Field: " + metadataQuery.getName()).c_str());
 					}
 					else
 					{
 						const std::string actualSeriesMetadataValue = fieldValue.GetString();
-						match &= actualSeriesMetadataValue != metadataQuery.getValue();
+						match &= actualSeriesMetadataValue == metadataQuery.getValue();
 					}
 				}
 				else if (!fieldValue.IsObject() && !fieldValue.IsArray())
@@ -124,6 +136,10 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 
 void DataLakeAccessor::createQueryDescriptionsParameter(const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
+	if (m_resultCollectionMetadataAccess == nullptr)
+	{
+		throw std::exception(("Failed to access metadata of collection: " + m_collectionName).c_str());
+	}
 	const auto& parametersByLabel = m_resultCollectionMetadataAccess->getMetadataCampaign().getMetadataParameterByLabel();
 	std::list<ot::QueryDescription> allParameterQueries;
 	for (const ot::ValueComparisonDescription& query : _valueComparisons)
@@ -147,65 +163,71 @@ void DataLakeAccessor::createQueryDescriptionsParameter(const std::list<ot::Valu
 	addValueDescriptionsParameters(allParameterQueries);
 }
 
-void DataLakeAccessor::createQueryDescriptionQuantity(ot::ValueComparisonDescription& _valueComparisons)
+void DataLakeAccessor::createQueryDescriptionQuantity(const ot::ValueComparisonDescription& _valueComparisons)
 {
-	if (_valueComparisons.getName() == "")
+	if (m_resultCollectionMetadataAccess == nullptr)
 	{
-		throw std::exception("DatabaseAccessBlock has no quantity set.");
+		throw std::exception(("Failed to access metadata of collection: " + m_collectionName).c_str());
 	}
-
-	//First we try to find the corresponding metadata
-	std::list<const MetadataQuantity*> viableQuantities;
-	const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(_valueComparisons.getName());
-	if (selectedQuantity != nullptr)
+	if (_valueComparisons.getName() != "" && _valueComparisons.getComparator() != "" && _valueComparisons.getValue() != "")
 	{
-		viableQuantities.push_back(selectedQuantity);
+		//First we try to find the corresponding metadata
+		std::list<const MetadataQuantity*> viableQuantities;
+		const auto selectedQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(_valueComparisons.getName());
+		if (selectedQuantity != nullptr)
+		{
+			viableQuantities.push_back(selectedQuantity);
+		}
+		else
+		{
+			// The selected quantity name may be a regex expression
+			auto allQuantityLabel = m_resultCollectionMetadataAccess->listAllQuantityLabels();
+			RegexHelper::applyRegexFilter(allQuantityLabel, _valueComparisons.getName());
+			for (const std::string& viableQuantityLabel : allQuantityLabel)
+			{
+				auto viableQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(viableQuantityLabel);
+				viableQuantities.push_back(viableQuantity);
+			}
+		}
+
+		if (viableQuantities.size() == 0)
+		{
+			throw std::exception("Given quantity label expression does not match any of the possible options.");
+		}
+		else
+		{
+			std::list<ot::QueryDescription> allQuantityQueries;
+			ot::UIDList relatedParameterUIDs;
+			for (const MetadataQuantity* viableQuantity : viableQuantities)
+			{
+				relatedParameterUIDs.insert(relatedParameterUIDs.begin(), viableQuantity->dependingParameterIds.begin(), viableQuantity->dependingParameterIds.end());
+				ot::ValueComparisonDescription comparisonDescription = _valueComparisons;
+				comparisonDescription.setName(viableQuantity->quantityName);
+				ot::TupleInstance tupleInstance = _valueComparisons.getTupleInstance();
+				tupleInstance.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
+				comparisonDescription.setTupleInstance(tupleInstance);
+
+				ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, viableQuantity);
+				allQuantityQueries.push_back(queryDescription);
+			}
+			m_queryDescriptionsQuantities = allQuantityQueries;
+
+			std::list<ot::QueryDescription> allRelatedParameterQueries;
+			relatedParameterUIDs.sort();
+			relatedParameterUIDs.unique();
+			for (ot::UID parameterUID : relatedParameterUIDs)
+			{
+				const MetadataParameter* relatedParameter = m_resultCollectionMetadataAccess->findMetadataParameter(parameterUID);
+				ot::ValueComparisonDescription comparisonDescription;
+				ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, relatedParameter);
+				allRelatedParameterQueries.push_back(queryDescription);
+			}
+			addValueDescriptionsParameters(allRelatedParameterQueries);
+		}
 	}
 	else
 	{
-		// The selected quantity name may be a regex expression
-		auto allQuantityLabel = m_resultCollectionMetadataAccess->listAllQuantityLabels();
-		RegexHelper::applyRegexFilter(allQuantityLabel, _valueComparisons.getName());
-		for (const std::string& viableQuantityLabel : allQuantityLabel)
-		{
-			auto viableQuantity = m_resultCollectionMetadataAccess->findMetadataQuantity(viableQuantityLabel);
-			viableQuantities.push_back(viableQuantity);
-		}
-	}
-
-	if (viableQuantities.size() == 0)
-	{
-		throw std::exception("Given quantity label expression does not match any of the possible options.");
-	}
-	else
-	{
-		std::list<ot::QueryDescription> allQuantityQueries;
-		ot::UIDList relatedParameterUIDs;
-		for (const MetadataQuantity* viableQuantity : viableQuantities)
-		{
-			relatedParameterUIDs.insert(relatedParameterUIDs.begin(), viableQuantity->dependingParameterIds.begin(), viableQuantity->dependingParameterIds.end());
-			ot::ValueComparisonDescription comparisonDescription = _valueComparisons;
-			comparisonDescription.setName(viableQuantity->quantityName);
-			ot::TupleInstance tupleInstance = _valueComparisons.getTupleInstance();
-			tupleInstance.setTupleTypeName(viableQuantity->m_tupleDescription.getTupleTypeName());
-			comparisonDescription.setTupleInstance(tupleInstance);
-
-			ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, viableQuantity);
-			allQuantityQueries.push_back(queryDescription);
-		}
-		m_queryDescriptionsQuantities = allQuantityQueries;
-
-		std::list<ot::QueryDescription> allRelatedParameterQueries;
-		relatedParameterUIDs.sort();
-		relatedParameterUIDs.unique();
-		for (ot::UID parameterUID : relatedParameterUIDs)
-		{
-			const MetadataParameter* relatedParameter = m_resultCollectionMetadataAccess->findMetadataParameter(parameterUID);
-			ot::ValueComparisonDescription comparisonDescription;
-			ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, relatedParameter);
-			allRelatedParameterQueries.push_back(queryDescription);
-		}
-		addValueDescriptionsParameters(allRelatedParameterQueries);
+		//Maybe a log of some kind ?
 	}
 }
 
@@ -292,11 +314,23 @@ ot::JsonDocument DataLakeAccessor::executeQuery(mongocxx::options::find _options
 
 ot::DataLakeAccessCfg DataLakeAccessor::createConfig()
 {
+	if (m_queryDescriptionsQuantities.size() == 0)
+	{
+		//"No quantity to query selected."
+		return ot::DataLakeAccessCfg();
+	}
+
 	if (m_collectionName.empty())
 	{
 		throw std::exception("No collection name provided");
 	}
-	DataLakeHelper::createDefaultIndexes(m_collectionName);
+	
+	if (m_resultCollectionMetadataAccess == nullptr)
+	{
+		throw std::exception(("Failed to access metadata of collection: " + m_collectionName).c_str());
+	}
+
+	//DataLakeHelper::createDefaultIndexes(m_collectionName);
 
 	BsonViewOrValue resultCollectionQuery, transformedCollectionQuery;
 	createQueries(resultCollectionQuery, transformedCollectionQuery);

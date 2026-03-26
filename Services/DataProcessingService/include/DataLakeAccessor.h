@@ -14,7 +14,7 @@ public:
 	void accessPartition(const std::string& _collectionName);
 	void createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel);
 	void createQueryDescriptionsParameter(const std::list<ot::ValueComparisonDescription>& _valueComparisons);
-	void createQueryDescriptionQuantity(ot::ValueComparisonDescription& _valueComparisons);
+	void createQueryDescriptionQuantity(const ot::ValueComparisonDescription& _valueComparisons);
 	
 	ot::JsonDocument executeQuery(mongocxx::options::find _options);
 	ot::DataLakeAccessCfg createConfig();
