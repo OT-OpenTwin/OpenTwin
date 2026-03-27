@@ -509,8 +509,8 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			const ot::TableCfg::TableHeaderMode selectedTableOrientation =	tableRange->getTableHeaderMode();
 			if (selectedTableOrientation == ot::TableCfg::TableHeaderMode::Horizontal)
 			{
-				matrixPtr.m_row = 0;
-				for (matrixPtr.m_column = static_cast<uint32_t>(_ranges[i].getLeftColumn()); matrixPtr.m_column <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.m_column++)
+				matrixPtr.setRow(0);
+				for (matrixPtr.setColumn(static_cast<uint32_t>(_ranges[i].getLeftColumn())); matrixPtr.getColumn() <= static_cast<uint32_t>(_ranges[i].getRightColumn()); matrixPtr.moveColumn())
 				{
 					if (name == "")
 					{
@@ -527,8 +527,8 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 			}
 			else
 			{
-				matrixPtr.m_column = 0;
-				for (matrixPtr.m_row = static_cast<uint32_t>(_ranges[i].getTopRow()); matrixPtr.m_row  <= static_cast<uint32_t>(_ranges[i].getBottomRow()); matrixPtr.m_row++)
+				matrixPtr.setColumn(0);
+				for (matrixPtr.setRow(static_cast<uint32_t>(_ranges[i].getTopRow())); matrixPtr.getRow() <= static_cast<uint32_t>(_ranges[i].getBottomRow()); matrixPtr.moveRow())
 				{
 					if (name == "")
 					{
@@ -590,11 +590,11 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(ot::IV
 
 	while (rangeIt != _selectedRanges.end())
 	{
-		matrixPointer.m_row = static_cast<uint32_t>(rangeIt->getTopRow());
-		while (matrixPointer.m_row <= static_cast<uint32_t>(rangeIt->getBottomRow()))
+		matrixPointer.setRow(static_cast<uint32_t>(rangeIt->getTopRow()));
+		while (matrixPointer.getRow() <= static_cast<uint32_t>(rangeIt->getBottomRow()))
 		{
-			matrixPointer.m_column = static_cast<uint32_t>(rangeIt->getLeftColumn());
-			while (matrixPointer.m_column <= static_cast<uint32_t>(rangeIt->getRightColumn()))
+			matrixPointer.setColumn(static_cast<uint32_t>(rangeIt->getLeftColumn()));
+			while (matrixPointer.getColumn() <= static_cast<uint32_t>(rangeIt->getRightColumn()))
 			{
 				const ot::Variable& cellValue = tableContent.getValue(matrixPointer);
 				assert(cellValue.isConstCharPtr());
@@ -638,20 +638,20 @@ std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(ot::IV
 
 					if (dataTypeField[4] == 1)
 					{
-						ot::TableRange cellAsRange(matrixPointer.m_row, matrixPointer.m_column, matrixPointer.m_row, matrixPointer.m_column);
+						ot::TableRange cellAsRange(matrixPointer.getRow(), matrixPointer.getColumn(), matrixPointer.getRow(), matrixPointer.getColumn());
 						const ot::TableRange userCellCoordinates = ot::TableIndexSchemata::matrixToUserRange(cellAsRange, _headerMode);
 						_logMessagesByErrorType["String detected. A cast to numeric values must be selected manually, but a cast may fail."] += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
 					}
 				}
 				else
 				{
-					ot::TableRange cellAsRange(matrixPointer.m_row, matrixPointer.m_column, matrixPointer.m_row, matrixPointer.m_column);
+					ot::TableRange cellAsRange(matrixPointer.getRow(), matrixPointer.getColumn(), matrixPointer.getRow(), matrixPointer.getColumn());
 					const ot::TableRange userCellCoordinates = ot::TableIndexSchemata::matrixToUserRange(cellAsRange, _headerMode);
 					_logMessagesByErrorType["Empty field detected. If a numerical value is selected, empty fields are interpreted with a default (0 or 0.0)"] += "row " + std::to_string(userCellCoordinates.getBottomRow()) + " column " + std::to_string(userCellCoordinates.getLeftColumn()) + "\n";
 				}
-				matrixPointer.m_column++;
+				matrixPointer.moveColumn();
 			}
-			matrixPointer.m_row++;
+			matrixPointer.moveRow();
 		}
 		rangeIt++;
 	}

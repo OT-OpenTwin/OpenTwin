@@ -1,10 +1,12 @@
-﻿#include "OTCore/JSON/JSONVectoriser.h"
+﻿// @otlicense
 
+// OpenTwin header
 #include "OTCore/String.h"
+#include "OTCore/JSON/JSONVectoriser.h"
 
-const std::string JSONVectoriser::m_separator = "~";
+const std::string ot::JSONVectoriser::m_separator = "~";
 
-void JSONVectoriser::vectorise(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase)
+void ot::JSONVectoriser::vectorise(const JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase, const VectorisationFlags& _flags)
 {
     if (_value.IsObject())
     {
@@ -13,18 +15,30 @@ void JSONVectoriser::vectorise(const ot::JsonValue& _value, std::list<std::strin
         {
             std::string name = _nameBase + separator + element.name.GetString();
             ot::String::removeControlCharacters(name);
-            _allEntries.push_back(name);
+
             if (element.value.IsObject())
             {
-                vectorise(element.value, _allEntries, name);
+                if (!_flags.has(VectorisationFlag::AddLeavesOnly))
+                {
+                    _allEntries.push_back(name);
+                }
+
+                if (!_flags.has(VectorisationFlag::TopLevelOnly))
+                {
+                    vectorise(element.value, _allEntries, name, _flags);
+                }
+            }
+            else
+            {
+				_allEntries.push_back(name);
             }
         }
     }
 }
 
-const ot::JsonValue& JSONVectoriser::getValue(const ot::JsonDocument& _structure, const std::string& _fieldName)
+const ot::JsonValue& ot::JSONVectoriser::getValue(const JsonDocument& _structure, const std::string& _fieldName)
 {
-    std::list<std::string> entries = ot::String::split(_fieldName, m_separator);
+    std::list<std::string> entries = String::split(_fieldName, m_separator);
 
     const ot::JsonValue* cur = &_structure;
     for (const std::string& entry : entries)
@@ -35,12 +49,12 @@ const ot::JsonValue& JSONVectoriser::getValue(const ot::JsonDocument& _structure
         }
 
         auto obj = cur->GetObject();
-        if (!ot::json::exists(obj, entry))
+        if (!json::exists(obj, entry))
         {
             throw std::exception("Failed to find selected metadata.");
         }
 
-        const ot::JsonValue& value = obj[entry.c_str()];
+        const JsonValue& value = obj[entry.c_str()];
 
         if (entry == entries.back()) {
             return value;

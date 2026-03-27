@@ -19,8 +19,10 @@
 
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/DataStruct/GenericDataStructMatrixMerger.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
+#include "OTCore/Variable/VariableToStringConverter.h"
 
 static ot::GenericDataStruct::Registrar<ot::GenericDataStructMatrix> registrar(ot::GenericDataStructMatrix::className());
 
@@ -31,7 +33,7 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _c
 }
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _dimensions)
-	: m_numberOfColumns(_dimensions.m_column), m_numberOfRows(_dimensions.m_row)
+	: m_numberOfColumns(_dimensions.getColumn()), m_numberOfRows(_dimensions.getRow())
 {
 	m_values.resize(m_numberOfRows * m_numberOfColumns, ot::Variable());
 }
@@ -43,7 +45,7 @@ ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _c
 }
 
 ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _dimensions, const ot::Variable& _defaultValue)
-	: m_numberOfColumns(_dimensions.m_column), m_numberOfRows(_dimensions.m_row)
+	: m_numberOfColumns(_dimensions.getColumn()), m_numberOfRows(_dimensions.getRow())
 {
 	m_values.resize(m_numberOfRows * m_numberOfColumns, _defaultValue);
 }
@@ -52,6 +54,18 @@ ot::GenericDataStructMatrix::~GenericDataStructMatrix()
 {
 }
 
+ot::GenericDataStructMatrix ot::GenericDataStructMatrix::tableMerge(const GenericDataStructMatrix& _other, bool _horizontalHeader) const
+{
+	std::list<GenericDataStructMatrix> others = { _other };
+	return tableMerge(others, _horizontalHeader);
+}
+
+ot::GenericDataStructMatrix ot::GenericDataStructMatrix::tableMerge(const std::list<GenericDataStructMatrix>& _others, bool _horizontalHeader) const
+{
+	std::list<GenericDataStructMatrix> lst(_others);
+	lst.push_front(*this);
+	return GenericDataStructMatrixMerger::tableMerge(lst, _horizontalHeader);
+}
 void ot::GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value)
 {
 	const uint32_t index = getIndex(_matrixEntryPointer);
@@ -77,12 +91,42 @@ void ot::GenericDataStructMatrix::setValues(const std::list<ot::Variable>& _valu
 	m_values = { _values.begin(), _values.end() };
 }
 
-const ot::Variable& ot::GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer) const
+ot::Variable& ot::GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer)
 {
-	assert(_matrixEntryPointer.m_column < m_numberOfColumns);
-	assert(_matrixEntryPointer.m_row < m_numberOfRows);
+	OTAssert(isValid(_matrixEntryPointer), "Matrix entry pointer is out of bounds.");
 	const uint32_t index = getIndex(_matrixEntryPointer);
 	return m_values[index];
+}
+
+const ot::Variable& ot::GenericDataStructMatrix::getValue(const MatrixEntryPointer& _matrixEntryPointer) const
+{
+	OTAssert(isValid(_matrixEntryPointer), "Matrix entry pointer is out of bounds.");
+	const uint32_t index = getIndex(_matrixEntryPointer);
+	return m_values[index];
+}
+
+std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> ot::GenericDataStructMatrix::toTableColumns(const GenericDataStructMatrix& _matrix, bool _horizontalHeader)
+{
+	std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> columns;
+	
+	auto headerIt = _matrix.getHeaderIterator(_horizontalHeader);
+	while (headerIt.isValid())
+	{
+		Variable header = headerIt.get();
+		std::vector<Variable> columnValues;
+
+		auto colIt = _matrix.getDataColumnIterator(headerIt.getDataColumnIndex(), _horizontalHeader);
+		while (colIt.isValid())
+		{
+			columnValues.push_back(colIt.get());
+			++colIt;
+		}
+
+		columns.emplace_back(std::move(header), std::move(columnValues));
+		++headerIt;
+	}
+
+	return columns;
 }
 
 void ot::GenericDataStructMatrix::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const

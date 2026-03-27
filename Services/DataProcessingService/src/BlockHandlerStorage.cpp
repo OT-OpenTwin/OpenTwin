@@ -135,8 +135,8 @@ bool BlockHandlerStorage::executeSpecialized()
 										if (pipelineQuantity->dataDimensions.size() > 1) // We got a matrix
 										{
 											ot::MatrixEntryPointer matrixDimensions;
-											matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
-											matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
+											matrixDimensions.setRow(pipelineQuantity->dataDimensions[0]);
+											matrixDimensions.setColumn(pipelineQuantity->dataDimensions[1]);
 
 											quantityDescription.reset(new QuantityDescriptionMatrix(matrixDimensions));
 										}
@@ -161,8 +161,8 @@ bool BlockHandlerStorage::executeSpecialized()
 									{
 										QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(datasetDescription->second.getQuantityDescription());
 										ot::MatrixEntryPointer matrixDimensions;
-										matrixDimensions.m_row = pipelineQuantity->dataDimensions[0];
-										matrixDimensions.m_column = pipelineQuantity->dataDimensions[1];
+										matrixDimensions.setRow(pipelineQuantity->dataDimensions[0]);
+										matrixDimensions.setColumn(pipelineQuantity->dataDimensions[1]);
 
 										ot::GenericDataStructMatrix matrixValues(matrixDimensions);
 										ot::ConstJsonArray linearMatrix = fieldValue.GetArray();

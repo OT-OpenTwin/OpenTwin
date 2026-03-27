@@ -47,9 +47,11 @@ std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix&
 	uint32_t numberOfColumns =	_matrix.getNumberOfColumns();
 	uint32_t numberOfRows = _matrix.getNumberOfRows();
 	std::string csvText("");
-	for (matrixEntry.m_row = 0; matrixEntry.m_row < numberOfRows; matrixEntry.m_row++)
+	matrixEntry.setRow(0);
+	for (; matrixEntry.getRow() < numberOfRows; matrixEntry.moveRow())
 	{
-		for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
+		matrixEntry.setColumn(0);
+		for (; matrixEntry.getColumn() < numberOfColumns; matrixEntry.moveColumn())
 		{
 			const ot::Variable& cellValue =	_matrix.getValue(matrixEntry);
 			if (cellValue.isConstCharPtr()) {
@@ -61,12 +63,12 @@ std::string CSVToTableTransformer::operator()(const ot::GenericDataStructMatrix&
 				}
 				
 			}			
-			if (matrixEntry.m_column < numberOfColumns - 1)
+			if (matrixEntry.getColumn() < numberOfColumns - 1)
 			{
 				csvText += _properties.m_columnDelimiter;
 			}
 		}
-		if (matrixEntry.m_row< numberOfRows - 1)
+		if (matrixEntry.getRow() < numberOfRows - 1)
 		{
 			csvText += _properties.m_rowDelimiter;
 		}
@@ -84,17 +86,19 @@ ot::GenericDataStructMatrix CSVToTableTransformer::transformRawMatrixToGenericDa
 		size_t  numberOfColumns = row.size();
 		maxNumberOfColumns = maxNumberOfColumns > numberOfColumns ? maxNumberOfColumns : numberOfColumns;
 	}
-	matrixDimensions.m_column = (uint32_t) maxNumberOfColumns;
-	matrixDimensions.m_row = (uint32_t)_rawMatrix.size();
+	matrixDimensions.setColumn((uint32_t)maxNumberOfColumns);
+	matrixDimensions.setRow((uint32_t)_rawMatrix.size());
 	ot::GenericDataStructMatrix matrix(matrixDimensions);
 
 	ot::MatrixEntryPointer entryPointer;
 	auto rowPointer = _rawMatrix.begin();
-	for (entryPointer.m_row = 0; entryPointer.m_row < _rawMatrix.size(); entryPointer.m_row++, rowPointer++)
+	entryPointer.setRow(0);
+	for (; entryPointer.getRow() < _rawMatrix.size() && rowPointer != _rawMatrix.end(); entryPointer.moveRow(), rowPointer++)
 	{
-		for (entryPointer.m_column = 0; entryPointer.m_column < rowPointer->size(); entryPointer.m_column++)
+		entryPointer.setColumn(0);
+		for (; entryPointer.getColumn() < rowPointer->size(); entryPointer.moveColumn())
 		{
-			std::string rawValue = (*rowPointer)[entryPointer.m_column];
+			std::string rawValue = (*rowPointer)[entryPointer.getColumn()];
 			//rawValue.erase(remove(rawValue.begin(), rawValue.end(), m_maskingChar), rawValue.end());
 			ot::Variable cellValue(rawValue);
 			matrix.setValue(entryPointer, cellValue);

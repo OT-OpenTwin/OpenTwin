@@ -419,10 +419,10 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 		
 		ot::MatrixEntryPointer matrixEntry;
 
-		for (matrixEntry.m_row= 0; matrixEntry.m_row < numberOfPorts; matrixEntry.m_row++)
+		for (matrixEntry.setRow(0); matrixEntry.getRow() < numberOfPorts; matrixEntry.moveRow())
 		{
-			uint32_t index = matrixEntry.m_row * numberOfPorts;
-			for (matrixEntry.m_column = 0; matrixEntry.m_column < numberOfPorts; matrixEntry.m_column++)
+			uint32_t index = matrixEntry.getRow() * numberOfPorts;
+			for (matrixEntry.setColumn(0); matrixEntry.getColumn() < numberOfPorts; matrixEntry.moveColumn())
 			{
 				if (sParameterValues[index] != nullptr)
 				{

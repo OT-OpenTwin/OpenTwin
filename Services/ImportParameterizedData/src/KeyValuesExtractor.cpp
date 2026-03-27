@@ -184,36 +184,37 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 	if (_range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal)
 	{
 		fieldKeys.reserve(maxColumn - minColumn + 1);
-		for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
+		matrixEntry.setColumn(minColumn);
+		for (; matrixEntry.getColumn() <= maxColumn; matrixEntry.moveColumn())
 		{
-			matrixEntry.m_row = 0;
+			matrixEntry.setRow(0);
 			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
 			std::string fieldKey = entry.getConstCharPtr();
 			cleanFieldKey(fieldKey);
 			fieldKeys.push_back(fieldKey);
-			for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
+			for (matrixEntry.setRow(minRow); matrixEntry.getRow() <= maxRow; matrixEntry.moveRow())
 			{
 				const ot::Variable& entry = _tableData.getValue(matrixEntry);
-				_outAllSortedFields[fieldKey].insert({matrixEntry.m_row, entry});
+				_outAllSortedFields[fieldKey].insert({matrixEntry.getRow(), entry});
 			}
 		}
 	}
 	else
 	{
 		fieldKeys.reserve(maxRow - minRow + 1);
-		for (matrixEntry.m_row = minRow; matrixEntry.m_row <= maxRow; matrixEntry.m_row++)
+		for (matrixEntry.setRow(minRow); matrixEntry.getRow() <= maxRow; matrixEntry.moveRow())
 		{
-			matrixEntry.m_column = 0;
+			matrixEntry.setColumn(0);
 			const ot::Variable& entry = _tableData.getValue(matrixEntry);
 			assert(entry.isConstCharPtr());
 			std::string fieldKey = entry.getConstCharPtr();
 			cleanFieldKey(fieldKey);
 			fieldKeys.push_back(fieldKey);
-			for (matrixEntry.m_column = minColumn; matrixEntry.m_column <= maxColumn; matrixEntry.m_column++)
+			for (matrixEntry.setColumn(minColumn); matrixEntry.getColumn() <= maxColumn; matrixEntry.moveColumn())
 			{
 				const ot::Variable& value = _tableData.getValue(matrixEntry);
-				_outAllSortedFields[fieldKey].insert({ matrixEntry.m_column, value});
+				_outAllSortedFields[fieldKey].insert({ matrixEntry.getColumn(), value});
 			}
 		}
 	}

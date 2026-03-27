@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSONVectoriser.h"
+#include "OTCore/DataStruct/GenericDataStructMatrixMerger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityDatasetInfo.h"
@@ -65,26 +66,33 @@ ot::GenericDataStructMatrix ot::EntityDatasetInfo::getTable()
 		return GenericDataStructMatrix();
 	}
 
-	std::list<std::string> rows;
+	JSONToVariableConverter jsonVar;
 
-	size_t colCount = 0;
+	std::list<GenericDataStructMatrix> matrices;
 
 	for (const auto& seriesMetadata : campaign->getSeriesMetadata())
 	{
+		const JsonDocument& metadata = seriesMetadata.getMetadata();
+		std::string dooc = json::toJson(metadata);
 		std::list<std::string> columnHeader;
-		JSONVectoriser::vectorise(seriesMetadata.getMetadata(), columnHeader, "");
-		rows.splice(rows.end(), std::move(columnHeader));
+		JSONVectoriser::vectorise(metadata, columnHeader, "", JSONVectoriser::AddLeavesOnly);
+		
+		GenericDataStructMatrix matrix(2, static_cast<uint32_t>(columnHeader.size()));
+		uint32_t columnIndex = 0;
+		for (const std::string& col : columnHeader)
+		{
+			matrix.setValue(MatrixEntryPointer(0, columnIndex), ot::Variable(col));
+			const JsonValue& val = JSONVectoriser::getValue(metadata, col);
+			const std::string dbg = json::toJson(val);
+			matrix.setValue(MatrixEntryPointer(1, columnIndex), jsonVar(val));
+
+			columnIndex++;
+		}
+
+		matrices.push_back(std::move(matrix));
 	}
 
-	GenericDataStructMatrix matrix(static_cast<uint32_t>(rows.size()), 1);
-	uint32_t rowIndex = 0;
-	for (const std::string& row : rows)
-	{
-		matrix.setValue({ 0, rowIndex }, ot::Variable(row));
-		rowIndex++;
-	}
-	
-	return matrix;
+	return GenericDataStructMatrixMerger::tableMerge(matrices, getHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal);
 }
 
 void ot::EntityDatasetInfo::setTable(const ot::GenericDataStructMatrix& _table)

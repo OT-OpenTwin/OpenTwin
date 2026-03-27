@@ -40,10 +40,10 @@ void QuantityDescriptionSParameter::setNumberOfPorts(uint32_t _portNumber)
 void QuantityDescriptionSParameter::initiateZeroFilledValueMatrices(uint64_t _numberOfValues)
 {
 	m_quantityValuesFirst.reserve(_numberOfValues);
-	uint32_t numberOfPorts =	m_metadataQuantity.dataDimensions[0];
+	uint32_t numberOfPorts = m_metadataQuantity.dataDimensions[0];
 	ot::MatrixEntryPointer matrixPointer;
-	matrixPointer.m_column = numberOfPorts;
-	matrixPointer.m_row = numberOfPorts;
+	matrixPointer.setColumn(numberOfPorts);
+	matrixPointer.setRow(numberOfPorts);
 	for (uint64_t i = 0; i < _numberOfValues; i++)
 	{
 		m_quantityValuesFirst.push_back(ot::GenericDataStructMatrix(matrixPointer));
@@ -83,13 +83,13 @@ void QuantityDescriptionSParameter::pushBackSecondValue(ot::GenericDataStructMat
 
 void QuantityDescriptionSParameter::setFirstValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value)
 {
-	PRE(firstValueAccessValid(_index, _matrixPointer.m_row , _matrixPointer.m_column));
+	PRE(firstValueAccessValid(_index, _matrixPointer.getRow(), _matrixPointer.getColumn()));
 	m_quantityValuesFirst[_index].setValue(_matrixPointer, std::move(_value));
 }
 
 void QuantityDescriptionSParameter::setSecondValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixPointer, ot::Variable&& _value)
 {
-	PRE(secondValueAccessValid(_index, _matrixPointer.m_row, _matrixPointer.m_column));
+	PRE(secondValueAccessValid(_index, _matrixPointer.getRow(), _matrixPointer.getColumn()));
 	m_quantityValuesSecond[_index].setValue(_matrixPointer, std::move(_value));
 }
 

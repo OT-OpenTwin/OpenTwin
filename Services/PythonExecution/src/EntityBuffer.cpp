@@ -46,8 +46,8 @@ PyObject* EntityBuffer::getTableCellValue(const std::string& _absoluteEntityName
 	auto tableData = m_bufferedTableEntities[_absoluteEntityName]->getTable(); 
 	
 	ot::MatrixEntryPointer matrixEntry;
-	matrixEntry.m_column = _column;
-	matrixEntry.m_row = _row;
+	matrixEntry.setColumn(_column);
+	matrixEntry.setRow(_row);
 	if(_row < tableData.getNumberOfRows() && _column < tableData.getNumberOfColumns())
 	{
 		tableData.getNumberOfColumns();

@@ -28,13 +28,13 @@ TEST(GenericDataStructMatrix, FillingWithOneValue)
 {
 	ot::Variable expectedValue(5);
 	ot::MatrixEntryPointer entry;
-	entry.m_column = 3;
-	entry.m_row = 3;
+	entry.setColumn(3);
+	entry.setRow(3);
 	ot::GenericDataStructMatrix matrix(entry);
 	{
 		ot::Variable value(5);
-		entry.m_column = 2;
-		entry.m_row = 2;
+		entry.setColumn(2);
+		entry.setRow(2);
 		matrix.setValue(entry, std::move(value));
 	}
 	const ot::Variable& actualValue = matrix.getValue(entry);
@@ -45,15 +45,15 @@ TEST(GenericDataStructMatrix, FillingWithOneValue)
 TEST(GenericDataStructMatrix, Serialization)
 {
 	ot::MatrixEntryPointer entry;
-	entry.m_column = 4;
-	entry.m_row = 4;
+	entry.setColumn(4);
+	entry.setRow(4);
 	ot::GenericDataStructMatrix expectedMatrix(entry);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			entry.m_column = j;
-			entry.m_row = i;
+			entry.setColumn(j);
+			entry.setRow(i);
 			expectedMatrix.setValue(entry, ot::Variable(i * 4 + j));
 		}
 	}
@@ -65,8 +65,8 @@ TEST(GenericDataStructMatrix, Serialization)
 	
 	auto serActualMatrix = ot::json::getObject(doc, "Matrix");
 	
-	entry.m_column = 4;
-	entry.m_row = 4;
+	entry.setColumn(4);
+	entry.setRow(4);
 
 	ot::GenericDataStructMatrix actualMatrix(entry);
 	actualMatrix.setFromJsonObject(serActualMatrix);
@@ -74,8 +74,8 @@ TEST(GenericDataStructMatrix, Serialization)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			entry.m_column = j;
-			entry.m_row = i;
+			entry.setColumn(j);
+			entry.setRow(i);
 			const ot::Variable actVal = actualMatrix.getValue(entry);
 			const ot::Variable expectVal = expectedMatrix.getValue(entry);
 			EXPECT_EQ(actVal, expectVal );
@@ -141,15 +141,15 @@ TEST(GenericDataStruct, TypeDetectionVector)
 TEST(GenericDataStruct, TypeDetectionMatrix)
 {
 	ot::MatrixEntryPointer entry;
-	entry.m_column = 4;
-	entry.m_row = 4;
+	entry.setColumn(4);
+	entry.setRow(4);
 	ot::GenericDataStructMatrix expectedMatrix(entry);
 	for (int i = 0; i < 4; i++)
 	{
 		for (int j = 0; j < 4; j++)
 		{
-			entry.m_column = j;
-			entry.m_row = i;
+			entry.setColumn(j);
+			entry.setRow(i);
 			expectedMatrix.setValue(entry, ot::Variable(i * 4 + j));
 		}
 	}

@@ -93,31 +93,44 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 
 	//First we set the column header, if the header mode is set accordingly
 	if (rowStarter <= _matrix.getNumberOfRows() && rowStarter > 0) {
-		matrixPointer.m_row = 0;
-		for (matrixPointer.m_column = 0; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
+		matrixPointer.setRow(0);
+		matrixPointer.setColumn(0);
+		while (matrixPointer.getColumn() < _matrix.getNumberOfColumns()) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
-			this->setColumnHeaderText(matrixPointer.m_column, entry);
+			this->setColumnHeaderText(matrixPointer.getColumn(), entry);
+
+			matrixPointer.move(0, 1);
 		}
 	}
 	
 	//Next comes the column header
 	if (columnStarter <= _matrix.getNumberOfColumns() && columnStarter > 0) {
-		matrixPointer.m_column = 0;
-		for (matrixPointer.m_row = 0; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+		matrixPointer.setRow(0);
+		matrixPointer.setColumn(0);
+		while (matrixPointer.getRow() < _matrix.getNumberOfRows()) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);
-			this->setRowHeader(matrixPointer.m_row, entry);
+			this->setRowHeader(matrixPointer.getRow(), entry);
+
+			matrixPointer.move(1, 0);
 		}
 	}
 
 	//Now we add the table content
-	for(matrixPointer.m_column = columnStarter; matrixPointer.m_column < _matrix.getNumberOfColumns(); matrixPointer.m_column++) {
-		for (matrixPointer.m_row = rowStarter; matrixPointer.m_row < _matrix.getNumberOfRows(); matrixPointer.m_row++) {
+	matrixPointer.setColumn(columnStarter);
+
+	while(matrixPointer.getColumn() < _matrix.getNumberOfColumns()) {
+		matrixPointer.setRow(rowStarter);
+		while(matrixPointer.getRow() < _matrix.getNumberOfRows()) {
 			const Variable& variable = _matrix.getValue(matrixPointer);
 			const std::string entry = converter(variable);	
-			this->setCellText(matrixPointer.m_row - rowStarter, matrixPointer.m_column - columnStarter, entry);
+			this->setCellText(matrixPointer.getRow() - rowStarter, matrixPointer.getColumn() - columnStarter, entry);
+
+			matrixPointer.move(1, 0);
 		}
+
+		matrixPointer.move(0, 1);
 	}	
 }
 
@@ -314,14 +327,14 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
 	MatrixEntryPointer dimensions;
-	dimensions.m_row = m_rows;
-	dimensions.m_column = m_columns;
+	dimensions.setRow(m_rows);
+	dimensions.setColumn(m_columns);
 
 	bool hasRowHeader = false;
 	for (const TableHeaderItemCfg* itm : m_rowHeader) {
 		if (itm) {
 			hasRowHeader = true;
-			dimensions.m_column++;
+			dimensions.moveColumn(1);
 			break;
 		}
 	}
@@ -330,28 +343,28 @@ ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
 	for (const TableHeaderItemCfg* itm : m_columnHeader) {
 		if (itm) {
 			hasColumnHeader = true;
-			dimensions.m_row++;
+			dimensions.moveRow(1);
 			break;
 		}
 	}
 
-	if ((dimensions.m_column * dimensions.m_row) == 0) {
+	if ((dimensions.getColumn() * dimensions.getRow()) == 0) {
 		return GenericDataStructMatrix();
 	}
 	
 	ot::GenericDataStructMatrix matrix(dimensions);
 	MatrixEntryPointer destPtr;
-	destPtr.m_column = 0;
-	destPtr.m_row = 0;
+	destPtr.setColumn(0);
+	destPtr.setRow(0);
 
 	// If column header exists, make it the first row
 	if (hasColumnHeader) {
 		if (hasRowHeader) {
 			matrix.setValue(destPtr, ot::Variable(std::string()));
-			destPtr.m_column++;
+			destPtr.moveColumn(1);
 		}
 
-		for (size_t c = 0; c < m_columns; c++, destPtr.m_column++) {
+		for (size_t c = 0; c < m_columns; c++, destPtr.moveColumn()) {
 			if (m_columnHeader[c]) {
 				matrix.setValue(destPtr, Variable(m_columnHeader[c]->getText()));
 			}
@@ -360,11 +373,11 @@ ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
 			}
 		}
 
-		destPtr.m_row++;
+		destPtr.moveRow();
 	}
 
-	for (size_t r = 0; r < m_rows; r++, destPtr.m_row++) {
-		destPtr.m_column = 0;
+	for (size_t r = 0; r < m_rows; r++, destPtr.moveRow()) {
+		destPtr.setColumn(0);
 		if (hasRowHeader) {
 			OTAssert(r < m_rowHeader.size(), "Index out of range");
 			if (m_rowHeader[r]) {
@@ -373,10 +386,10 @@ ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
 			else {
 				matrix.setValue(destPtr, ot::Variable(std::string()));
 			}
-			destPtr.m_column++;
+			destPtr.moveColumn();
 		}
 
-		for (int c = 0; c < m_columns; c++, destPtr.m_column++) {
+		for (int c = 0; c < m_columns; c++, destPtr.moveColumn()) {
 			matrix.setValue(destPtr, Variable(m_data[r][c]));
 		}
 	}

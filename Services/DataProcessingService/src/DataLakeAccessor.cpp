@@ -81,7 +81,7 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 			if (metadataQuery.getComparator() != "" && metadataQuery.getName() != "" && metadataQuery.getValue() != "")
 			{
 				const std::string fieldName = metadataQuery.getName();
-				const ot::JsonValue& fieldValue = JSONVectoriser::getValue(metadata, fieldName);
+				const ot::JsonValue& fieldValue = ot::JSONVectoriser::getValue(metadata, fieldName);
 				const std::string temp = ot::json::toJson(fieldValue);
 				if (fieldValue.IsString())
 				{

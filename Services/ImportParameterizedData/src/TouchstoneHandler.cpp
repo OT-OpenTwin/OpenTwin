@@ -152,8 +152,8 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 				if (m_firstValues == nullptr)
 				{
 					ot::MatrixEntryPointer matrixDef;
-					matrixDef.m_column = m_portNumber;
-					matrixDef.m_row = m_portNumber;
+					matrixDef.setColumn(m_portNumber);
+					matrixDef.setRow(m_portNumber);
 					m_firstValues = new ot::GenericDataStructMatrix(matrixDef);
 					m_secondValues = new ot::GenericDataStructMatrix(matrixDef);
 					m_frequencyParameter.values.push_back(turnLineSegmentToVariable(segment));
@@ -167,12 +167,12 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 					else
 					{
 						m_secondValues->setValue(m_matrixEntry, turnLineSegmentToVariable(segment));
-						if (m_matrixEntry.m_column== m_portNumber - 1)
+						if (m_matrixEntry.getColumn() == m_portNumber - 1)
 						{
-							m_matrixEntry.m_column = 0;
-							if (m_matrixEntry.m_row == m_portNumber - 1)
+							m_matrixEntry.setColumn(0);
+							if (m_matrixEntry.getRow() == m_portNumber - 1)
 							{
-								m_matrixEntry.m_row = 0;
+								m_matrixEntry.setRow(0);
 								m_quantityDescription->pushBackFirstValue(std::move(*m_firstValues));
 								m_firstValues = nullptr;
 								m_quantityDescription->pushBackSecondValue(std::move(*m_secondValues));
@@ -180,12 +180,12 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 							}
 							else
 							{
-								m_matrixEntry.m_row++;
+								m_matrixEntry.moveRow();
 							}
 						}
 						else
 						{
-							m_matrixEntry.m_column++;
+							m_matrixEntry.moveColumn();
 						}
 					}
 					m_firstValueOfTuple ^= true; //flip

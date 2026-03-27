@@ -55,15 +55,17 @@ std::string ot::toString(const ot::GenericDataStruct* _dataStruct)
 		uint32_t columns = matrix->getNumberOfColumns();
 
 		ot::MatrixEntryPointer matrixEntry;
-		for (matrixEntry.m_row = 0; matrixEntry.m_row < rows; matrixEntry.m_row++)
+		matrixEntry.setRow(0);
+		for (; matrixEntry.getRow() < rows; matrixEntry.moveRow())
 		{
 			dataStructAsString += "[";
-			for (matrixEntry.m_column = 0; matrixEntry.m_column < columns; matrixEntry.m_column++)
+			matrixEntry.setColumn(0);
+			for (; matrixEntry.getColumn() < columns; matrixEntry.moveColumn())
 			{
 				const ot::Variable& var = matrix->getValue(matrixEntry);
 				const std::string stringVal = converter(var);
 				dataStructAsString += stringVal;
-				if (matrixEntry.m_column != columns - 1)
+				if (matrixEntry.getColumn() != columns - 1)
 				{
 					dataStructAsString += ", ";
 				}

@@ -28,7 +28,7 @@ class OT_RESULTDATAACCESS_API_EXPORT QuantityDescriptionMatrix : public Quantity
 public:
 	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions)
 	{
-		m_metadataQuantity.dataDimensions = { _matrixDimensions.m_row, _matrixDimensions.m_column };
+		m_metadataQuantity.dataDimensions = { _matrixDimensions.getRow(), _matrixDimensions.getColumn() };
 	}
 	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions, uint64_t _reserveNumberOfEntries)
 		:QuantityDescriptionMatrix(_matrixDimensions)

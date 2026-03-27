@@ -48,8 +48,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 	else if (value.IsObject())
 	{
-		assert(ot::json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_real));
-		assert(ot::json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_imag));
+		if (!json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_real) || !json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_imag))
+		{
+			throw std::exception("Not supported type for rapidjson::Value to variable_t conversion. Object does not contain the required members for complex number conversion.");
+		}
 		const double realPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_real);
 		const double imagPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_imag);
 
@@ -57,6 +59,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 	else if (value.IsArray())
 	{
+		if (value.Size() != 2)
+		{
+			throw std::exception("Not supported type for rapidjson::Value to variable_t conversion. Array does not have the required size for complex number conversion.");
+		}
 		const double realPart = ot::json::getDouble(value.GetArray(), 0);
 		const double imagPart = ot::json::getDouble(value.GetArray(), 1);
 

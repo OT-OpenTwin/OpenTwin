@@ -62,14 +62,16 @@ TEST_P(FixtureCSVToTableTransformer, TestColumnDelimiter)
 
 	ot::MatrixEntryPointer matrixPointer;
 	
-	for (matrixPointer.m_row = 0; matrixPointer.m_row < table.getNumberOfRows(); matrixPointer.m_row++)
+	matrixPointer.setRow(0);
+	for (; matrixPointer.getRow() < table.getNumberOfRows(); matrixPointer.moveRow())
 	{
 		std::string row("");
-		for (matrixPointer.m_column = 0; matrixPointer.m_column < table.getNumberOfColumns(); matrixPointer.m_column++)
+		matrixPointer.setColumn(0);
+		for (; matrixPointer.getColumn() < table.getNumberOfColumns(); matrixPointer.moveColumn())
 		{
 			ot::Variable value = table.getValue(matrixPointer);
 			const std::string stringValue = value.getConstCharPtr();
-			if (matrixPointer.m_column == table.getNumberOfColumns() - 1)
+			if (matrixPointer.getColumn() == table.getNumberOfColumns() - 1)
 			{
 				row += stringValue;
 			}
@@ -78,7 +80,7 @@ TEST_P(FixtureCSVToTableTransformer, TestColumnDelimiter)
 				row += stringValue + csvProperties.m_columnDelimiter;
 			}
 		}
-		EXPECT_EQ(expectedLines[matrixPointer.m_row], row);
+		EXPECT_EQ(expectedLines[matrixPointer.getRow()], row);
 	}
 }
 
@@ -129,12 +131,13 @@ TEST_P(FixtureCSVToTableTransformer, TestRowDelimiter)
 	};
 
 	ot::MatrixEntryPointer matrixEntry;
-	matrixEntry.m_row = 0;
-	for (matrixEntry.m_column= 0; matrixEntry.m_column < numberOfColumns; matrixEntry.m_column++)
+	matrixEntry.setRow(0);
+	matrixEntry.setColumn(0);
+	for (; matrixEntry.getColumn() < numberOfColumns; matrixEntry.moveColumn())
 	{
 		ot::Variable entry = table.getValue(matrixEntry);
 		std::string cellValue( entry.getConstCharPtr());
-		EXPECT_EQ(cellValue, expectedLines[matrixEntry.m_column]);
+		EXPECT_EQ(cellValue, expectedLines[matrixEntry.getColumn()]);
 	}
 }
 
@@ -164,12 +167,12 @@ TEST_F(FixtureCSVToTableTransformer, TestMaskedDelimiter)
 	EXPECT_EQ(table.getNumberOfColumns(), numberOfColumns);
 
 	ot::MatrixEntryPointer matrixEntry;
-	matrixEntry.m_row = 0;
+	matrixEntry.setRow(0);
 	
-	for (matrixEntry.m_column= 0; matrixEntry.m_column< numberOfColumns; matrixEntry.m_column++)
+	for (matrixEntry.setRow(0); matrixEntry.getColumn() < numberOfColumns; matrixEntry.moveColumn())
 	{
 		ot::Variable value = table.getValue(matrixEntry);
 		std::string cellEntry(value.getConstCharPtr());
-		EXPECT_EQ(cellEntry, expectedLines[matrixEntry.m_column]);
+		EXPECT_EQ(cellEntry, expectedLines[matrixEntry.getColumn()]);
 	}
 }
