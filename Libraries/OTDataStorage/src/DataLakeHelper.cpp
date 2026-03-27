@@ -7,7 +7,7 @@
 
 const std::string DataLakeHelper::m_resultDataField = "Data";
 
-ot::JsonDocument DataLakeHelper::executeQuery(ot::DataLakeAccessCfg& _config, mongocxx::options::find _options)
+ot::JsonDocument DataLakeHelper::executeQuery(const ot::DataLakeAccessCfg& _config, mongocxx::options::find _options)
 {
 	ot::JsonDocument result;
 	ot::JsonArray data;
@@ -66,7 +66,7 @@ void DataLakeHelper::createDefaultIndexes(const std::string& _collectionName)
 	createDefaultIndexes(transformed);
 }
 
-ot::JsonDocument DataLakeHelper::createClearTextResult(ot::DataLakeAccessCfg& _config, const ot::JsonDocument& _databaseResults)
+ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessCfg& _config, const ot::JsonDocument& _databaseResults)
 {
 	ot::ConstJsonArray encodedEntries = ot::json::getArray(_databaseResults, m_resultDataField);
 	ot::JsonDocument clearTextDoc;

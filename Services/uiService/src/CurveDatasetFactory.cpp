@@ -33,6 +33,7 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
+#include "OTDataStorage/DataLakeHelper.h"
 
 // BSONCXX header
 #include "bsoncxx/json.hpp"
@@ -42,7 +43,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
 
-	ot::JsonDocument entireResult ;
+	mongocxx::options::find options;
+	 
+	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options);
 	if (!entireResult.HasMember("Documents"))
 	{
 		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");

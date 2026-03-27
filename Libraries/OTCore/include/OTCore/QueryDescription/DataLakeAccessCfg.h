@@ -36,7 +36,7 @@ namespace ot {
 		void addCollection(const std::string& _collection, std::string&& _query) { m_collectionToQueryMap.insert_or_assign(_collection, std::move(_query)); };
 		bool hasCollection(const std::string& _collection) const { return m_collectionToQueryMap.find(_collection) != m_collectionToQueryMap.end(); };
 		const std::string& getQueryForCollection(const std::string& _collection) const { return m_collectionToQueryMap.at(_collection); };
-		const std::map<std::string, std::string>& getQueriesByCollection() { return m_collectionToQueryMap; }
+		const std::map<std::string, std::string>& getQueriesByCollection() const { return m_collectionToQueryMap; }
 
 
 		void addSeriesMetadata(const std::string& _series, JsonDocument&& _metadata) { m_seriesMetadataMap.insert_or_assign(_series, std::move(_metadata)); };
@@ -49,7 +49,7 @@ namespace ot {
 			m_fieldDecodersQuantity.insert_or_assign(_decoder.getFieldName(), _decoder);
 		};		
 
-		std::optional<DataPointDecoder> getFieldDecoderQuantity(const std::string& _fieldKey) 
+		std::optional<DataPointDecoder> getFieldDecoderQuantity(const std::string& _fieldKey) const 
 		{ 
 			auto decoder = m_fieldDecodersQuantity.find(_fieldKey);
 			if (decoder != m_fieldDecodersQuantity.end())
@@ -97,7 +97,7 @@ namespace ot {
 			}
 		}
 
-		const std::map<std::string, DataPointDecoder>& getAllFieldDecoderParameter()
+		const std::map<std::string, DataPointDecoder>& getAllFieldDecoderParameter() const
 		{
 			return m_fieldDecodersParameter;
 		}
@@ -111,7 +111,7 @@ namespace ot {
 		void addQuantityValueTransformer(const std::string& _fieldKey, const std::list<ValueProcessing>& _valueTransformers) { m_valueTransformerByFieldKeyQuantity.insert_or_assign(_fieldKey, _valueTransformers); }
 		std::list<ValueProcessing> getQuantityValueTransformer(const std::string& _key) const { return m_valueTransformerByFieldKeyQuantity.at(_key); }
 	
-		std::string& getCollectionName() { return m_collectionNameBase; }
+		const std::string& getCollectionName() const { return m_collectionNameBase; }
 		void setCollectionName(const std::string& _collectionName) { m_collectionNameBase = _collectionName; }
 	private:
 		std::map<std::string, std::string> m_collectionToQueryMap;
