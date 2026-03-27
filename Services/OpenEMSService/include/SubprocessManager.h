@@ -61,7 +61,7 @@ public:
 	void stopConnectionHandlingAfterCrash(void);
 
 	void startLogging();
-	void addLogText(const std::string& text);
+	void addLogText(const std::string& text, bool sendToGui = false);
 	void endLogging(std::string &logText);
 
 	bool isConnected();

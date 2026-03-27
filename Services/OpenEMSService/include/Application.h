@@ -27,6 +27,7 @@
 #include <string>
 
 class SubprocessManager;
+class EntityMeshCartesian;
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 public:
@@ -78,16 +79,17 @@ public:
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity);
 	void deleteSingleSolverResults(EntityBase* solverEntity);
-	std::string problemTypeScript(EntityBase* solverEntity);
-
-	void addScalarResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
-	void addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity);
-
 
 private:
-	std::string buildScript();
+	EntityMeshCartesian* updateAndLoadMeshEntity(const std::string& meshName, std::list<ot::EntityInformation>& meshInfo);
+	std::string getUniqueTempDir(void);
+	std::string getSystemTempDir(void);
+	std::string readEnvironmentVariable(const std::string& variableName);
+	bool checkFileOrDirExists(const std::string& path);
+	bool deleteDirectory(const std::string& pathName);
+	std::string getOpenEMSDir();
 
-	SubprocessManager*		m_subprocessManager;
+	SubprocessManager*	 m_subprocessManager;
 	ot::ToolBarButtonCfg m_addSolverButton;
 	ot::ToolBarButtonCfg m_runSolverButton;
 };

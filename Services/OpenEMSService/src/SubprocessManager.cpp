@@ -27,6 +27,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 // Qt header
 #include <QtCore/qcoreapplication.h>
@@ -226,10 +227,15 @@ void SubprocessManager::startLogging()
 	m_isLogging = true;
 }
 
-void SubprocessManager::addLogText(const std::string& text)
+void SubprocessManager::addLogText(const std::string& text, bool sendToGui)
 {
 	if (!m_isLogging) return;
 	m_logText.push_back(text);
+
+	if (sendToGui)
+	{
+		m_app->getUiComponent()->displayMessage(text);
+	}
 }
 
 void SubprocessManager::endLogging(std::string& logText)

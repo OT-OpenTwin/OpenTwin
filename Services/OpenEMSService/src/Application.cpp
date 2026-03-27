@@ -22,6 +22,7 @@
 #include "Application.h"
 #include "ModelNotifier.h"
 #include "SubprocessManager.h"
+#include "FDTDSolver.h"
 
 // Open twin header
 #include "OTCore/Variable/Variable.h"
@@ -40,8 +41,12 @@
 #include "OTModelEntities/EntityResultUnstructuredMeshVtk.h"
 #include "OTModelEntities/EntityVisUnstructuredScalarSurface.h"
 #include "OTModelEntities/EntityVisUnstructuredVectorSurface.h"
+#include "OTModelEntities/EntityMeshCartesian.h"
+#include "OTSystem/OperatingSystem.h"
 
 #include <fstream>
+#include <direct.h>
+#include <windows.h>
 
 Application * g_instance{ nullptr };
 
@@ -256,7 +261,6 @@ void Application::handleRunSolver()
 		return;
 	}
 
-
 	// Here we first need to check which solvers are selected and then run them one by one.
 	std::map<std::string, bool> solverRunMap;
 	for (auto& entity : this->getSelectedEntityInfos())
@@ -334,11 +338,17 @@ void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std:
 		runSingleSolver(solver, meshInfo, solverMap[solver.getEntityName()]);
 	}
 
+	for (auto solver : solverMap)
+	{
+		delete solver.second;
+	}
+
 	this->getUiComponent()->unlockUI(lock);
 }
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity)
 {
+	// Load the solver entity
 	std::string solverName = solver.getEntityName();
 	if (solverName.substr(0, 8) == "Solvers/")
 	{
@@ -354,94 +364,48 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		return;
 	}
 
-	//EntityPropertiesSelection* problemType = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Problem type"));
-	//assert(problemType != nullptr);
+	// Load the mesh entity
+	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
+	assert(mesh != nullptr);
 
-	//if (problemType == nullptr)
-	//{
-	//	this->getUiComponent()->displayMessage("ERROR: Unable to read problem type for solver.\n");
-	//	return;
-	//}
+	if (mesh == nullptr)
+	{
+		this->getUiComponent()->displayMessage("ERROR: Unable to read mesh information for solver.\n");
+		return;
+	}
 
-	//std::string command;
+	// Update and load the mesh, if possible
+	std::unique_ptr<EntityMeshCartesian> meshEntity(updateAndLoadMeshEntity(mesh->getValueName(), meshInfo));
+	if (meshEntity == nullptr) return;
 
-	//if (problemType->getValue() == "Custom")
-	//{
-	//	command = problemTypeScript(solverEntity);
-	//}
-	//else if (problemType->getValue() == "Electrostatics")
-	//{
-
-
-	//}
-	//else
-	//{
-	//	this->getUiComponent()->displayMessage("ERROR: Unknown problem type.\n");
-	//	return;
-	//}
-
-	//if (command.empty())
-	//{
-	//	return;
-	//}
-
-	std::string command = buildScript();
-
-	//EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Mesh"));
-	//assert(mesh != nullptr);
-
-	//if (mesh == nullptr)
-	//{
-	//	this->getUiComponent()->displayMessage("ERROR: Unable to read mesh information for solver.\n");
-	//	return;
-	//}
-
-	//// First check whether a mesh with the given ID exists
-	//bool meshFound = false;
-	//ot::UID meshEntityID = mesh->getValueID();
-
-	//for (auto meshItem : meshInfo)
-	//{
-	//	if (meshItem.getEntityID() == meshEntityID)
-	//	{
-	//		meshFound = true;
-	//		break;
-	//	}
-	//}
-
-	//// If the mesh with the given ID does not exist anymore, we search for a mesh with the same name as the last selected one.
-	//if (!meshFound)
-	//{
-	//	meshEntityID = 0;
-	//	for (auto meshItem : meshInfo)
-	//	{
-	//		if (meshItem.getEntityName() == mesh->getValueName())
-	//		{
-	//			meshEntityID = meshItem.getEntityID();
-	//			break;
-	//		}
-	//	}
-	//}
-
-	//if (meshEntityID == 0)
-	//{
-	//	this->getUiComponent()->displayMessage("ERROR: The specified mesh does not exist: " + mesh->getValueName() + "\n");
-	//	return;
-	//}
-
+	// Delete previous solver results
 	deleteSingleSolverResults(solverEntity);
 
-	//std::string command =   "import time\n"
-	//						"for i in range(5):\n"
-	//						"    print(f'Python schreibt: {i}')\n"
-	//						"    time.sleep(1)";
+	// Create the temp file for running the solver
+	std::string tempDirPath = getUniqueTempDir();
 
+	if (tempDirPath.empty())
+	{
+		this->getUiComponent()->displayMessage("ERROR: Unable to create temporary working directory (TMP environment variable needs to be set).\n");
+		return;
+	}
+
+	if (_mkdir(tempDirPath.c_str()) == -1)
+	{
+		this->getUiComponent()->displayMessage("ERROR: Unable to create temporary working directory (TMP environment variable needs to be set).\n");
+		return;
+	}
+
+	// Start logging and solver execution
+	m_subprocessManager->startLogging();
+
+	FDTDSolver fdtdSolver(solverEntity, meshEntity.get(), getOpenEMSDir(), tempDirPath);
+
+	std::string solverCommand = fdtdSolver.generateRunCommand();
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(command, doc.GetAllocator()), doc.GetAllocator());
-
-	m_subprocessManager->startLogging();
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(solverCommand, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string returnMessage;
 	if (!m_subprocessManager->sendRequest(doc, returnMessage)) {
@@ -450,149 +414,70 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
 	
+	bool success = true;
+
 	if (returnValue.getStatus() == ot::ReturnMessage::Ok)
 	{
 		std::string message = "\nOpenEMS solver successfully completed.\n";
-		this->getUiComponent()->displayMessage(message);
-		m_subprocessManager->addLogText(message);
+		m_subprocessManager->addLogText(message, true);
 	}
 	else if (returnValue.getStatus() == ot::ReturnMessage::Failed)
 	{
 		ot::StyledTextBuilder message;
 		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "OpenEMS solver failed : (" << returnValue.getWhat() << ")\n";
 
-		this->getUiComponent()->displayStyledMessage(message);
-		m_subprocessManager->addLogText("ERROR: OpenEMS solver failed : (" + returnValue.getWhat() + ")\n");
+		m_subprocessManager->addLogText("ERROR: OpenEMS solver failed : (" + returnValue.getWhat() + ")\n", true);
+		success = false;
 	}
 	else
 	{
 		std::string message = "ERROR: Unknown return status: " + returnValue.getStatusString() + "\n";
-		this->getUiComponent()->displayMessage(message);
-		m_subprocessManager->addLogText(message);
+		m_subprocessManager->addLogText(message, true);
+		success = false;
 	}
 	 
+	// Convert and store the results
+	if (success)
+	{
+		fdtdSolver.convertAndStoreResults();
+	}
+
+	// Remove the temp dir if requested
+	EntityPropertiesBoolean* debug = dynamic_cast<EntityPropertiesBoolean*>(solverEntity->getProperties().getProperty("Debug"));
+	assert(debug != nullptr);
+
+	bool debugFlag = false;
+	if (debug != nullptr) debugFlag = debug->getValue();
+
+	if (debugFlag)
+	{
+		m_subprocessManager->addLogText("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath, true);
+	}
+	else
+	{
+		if (!deleteDirectory(tempDirPath))
+		{
+			m_subprocessManager->addLogText("ERROR: Unable to remove the temporary working directory: " + tempDirPath, true);
+		}
+	}
+
 	std::string logFileText;
 	m_subprocessManager->endLogging(logFileText);
 	m_subprocessManager->shutdownSubprocess();
 
-	// Store the output in a result item
-
+	// Store the log text in a result item
 	EntityResultText* text = this->getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
 
 	getModelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	getModelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
 
-	// TEMPORARY: Read the result data file and create a new result entity
-	std::ifstream file("result.vtu", std::ios::binary | std::ios::ate);
-	int data_length = (int)file.tellg();
-
-	if (data_length != -1)
-	{
-		file.seekg(0, std::ios::beg);
-
-		char* fileData = new char[data_length + 1];
-		file.read(fileData, data_length);
-		fileData[data_length] = 0;
-
-		addScalarResult("energy_density", fileData, data_length, solverEntity);
-		addScalarResult("region IDs", fileData, data_length, solverEntity);
-		addScalarResult("reluctivity", fileData, data_length, solverEntity);
-		addScalarResult("vector_potential", fileData, data_length, solverEntity);
-
-		addVectorResult("flux_density", fileData, data_length, solverEntity);
-		addVectorResult("magnetic_field", fileData, data_length, solverEntity);
-
-		delete[] fileData;
-		fileData = nullptr;
-	}
+	delete text;
+	text = nullptr;
 
 	// Store the newly created items in the data base
 	this->getModelComponent()->storeNewEntities("added solver results");
 }
 
-void Application::addScalarResult(const std::string &resultName, char* fileData, int data_length, EntityBase* solverEntity)
-{
-	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkData->setData(fileData, data_length + 1);
-	vtkData->storeToDataBase();
-
-	ot::UID vtkDataEntityID = vtkData->getEntityID();
-	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
-
-	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::SCALAR, vtkData);
-	vtkResult->storeToDataBase();
-
-	EntityVisUnstructuredScalarSurface* visualizationEntity = new EntityVisUnstructuredScalarSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
-	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_SCALAR);
-	visualizationEntity->setTreeItemEditable(true);
-	visualizationEntity->setInitiallyHidden(true);
-	visualizationEntity->registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
-		OT_INFO_SERVICE_TYPE_VisualizationService
-	);
-
-	visualizationEntity->createProperties();
-
-	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
-
-	visualizationEntity->storeToDataBase();
-
-	getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
-	getModelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());
-	getModelComponent()->addNewDataEntity(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion(), visualizationEntity->getEntityID());
-
-	delete visualizationEntity;
-	visualizationEntity = nullptr;
-
-	delete vtkResult;
-	vtkResult = nullptr;
-}
-
-void Application::addVectorResult(const std::string& resultName, char* fileData, int data_length, EntityBase* solverEntity)
-{
-	EntityBinaryData* vtkData = new EntityBinaryData(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkData->setData(fileData, data_length + 1);
-	vtkData->storeToDataBase();
-
-	ot::UID vtkDataEntityID = vtkData->getEntityID();
-	ot::UID vtkDataEntityVersion = vtkData->getEntityStorageVersion();
-
-	EntityResultUnstructuredMeshVtk* vtkResult = new EntityResultUnstructuredMeshVtk(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkResult->setData(resultName, EntityResultUnstructuredMeshVtk::VECTOR, vtkData);
-	vtkResult->storeToDataBase();
-
-	EntityVisUnstructuredVectorSurface* visualizationEntity = new EntityVisUnstructuredVectorSurface(getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
-	visualizationEntity->setResultType(EntityResultBase::UNSTRUCTURED_VECTOR);
-	visualizationEntity->setTreeItemEditable(true);
-	visualizationEntity->setInitiallyHidden(true);
-	visualizationEntity->registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection |
-		ot::EntityCallbackBase::Callback::DataNotify,
-		OT_INFO_SERVICE_TYPE_VisualizationService
-	);
-
-	visualizationEntity->createProperties();
-
-	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
-
-	visualizationEntity->storeToDataBase();
-
-	getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
-	getModelComponent()->addNewDataEntity(vtkDataEntityID, vtkDataEntityVersion, vtkResult->getEntityID());
-	getModelComponent()->addNewDataEntity(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion(), visualizationEntity->getEntityID());
-
-	delete visualizationEntity;
-	visualizationEntity = nullptr;
-
-	delete vtkResult;
-	vtkResult = nullptr;
-}
 
 void Application::deleteSingleSolverResults(EntityBase* solverEntity)
 {
@@ -603,147 +488,161 @@ void Application::deleteSingleSolverResults(EntityBase* solverEntity)
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entityNameList, false);
 }
 
-std::string Application::problemTypeScript(EntityBase* solverEntity)
+EntityMeshCartesian* Application::updateAndLoadMeshEntity(const std::string &meshName, std::list<ot::EntityInformation>& meshInfo)
 {
-	EntityPropertiesEntityList* script = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Script"));
-	assert(script != nullptr);
+	ot::UID meshEntityID = 0;
+	ot::UID meshEntityVersion = 0;
 
-	if (script == nullptr)
+	for (auto meshItem : meshInfo)
 	{
-		this->getUiComponent()->displayMessage("ERROR: Unable to read script information for solver.\n");
-		return "";
-	}
-
-	ot::EntityInformation scriptInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(script->getValueName(), scriptInfo))
-	{
-		if (script == nullptr)
+		if (meshItem.getEntityName() == meshName)
 		{
-			this->getUiComponent()->displayMessage("ERROR: Unable to read script.\n");
-			return "";
+			meshEntityID = meshItem.getEntityID();
+			meshEntityVersion = meshItem.getEntityVersion();
+
+			break;
 		}
 	}
 
-	EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(scriptInfo.getEntityID(), scriptInfo.getEntityVersion());
-
-	if (entity == nullptr)
+	if (meshEntityID == 0)
 	{
-		this->getUiComponent()->displayMessage("ERROR: Unable to read script.\n");
-		return "";
+		this->getUiComponent()->displayMessage("ERROR: The specified mesh does not exist: " + meshName + "\n");
+		return nullptr;
 	}
 
-	EntityFileText* scriptEntity = dynamic_cast<EntityFileText*>(entity);
+	// Load the mesh entity
+	EntityBase* meshEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(meshEntityID, meshEntityVersion);
 
-	if (scriptEntity == nullptr)
+	if (dynamic_cast<EntityMeshCartesian*>(meshEntity) == nullptr)
 	{
-		delete entity;
-		this->getUiComponent()->displayMessage("ERROR: Unable to read script (wrong data type).\n");
-		return "";
+		delete meshEntity;
+		meshEntity = nullptr;
+
+		this->getUiComponent()->displayMessage("ERROR: The specified mesh is not a valid cartesian mesh: " + meshName + "\n");
+		return nullptr;
 	}
 
-	std::string command = scriptEntity->getText();
+	delete meshEntity;
+	meshEntity = nullptr;
 
-	return command;
+	// Now update the mesh
+	getModelComponent()->updateCartesianMesh(meshName);
+
+	// And finally load the updated mesh
+	ot::EntityInformation entityInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(meshName, entityInfo))
+	{
+		this->getUiComponent()->displayMessage("ERROR: The specified mesh is not a valid cartesian mesh: " + meshName + "\n");
+		return nullptr;
+	}
+
+	meshEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
+
+	if (dynamic_cast<EntityMeshCartesian*>(meshEntity) == nullptr)
+	{
+		delete meshEntity;
+		meshEntity = nullptr;
+
+		this->getUiComponent()->displayMessage("ERROR: The specified mesh is not a valid cartesian mesh: " + meshName + "\n");
+		return nullptr;
+	}
+
+	return dynamic_cast<EntityMeshCartesian*>(meshEntity);
 }
 
-std::string Application::buildScript()
+std::string Application::getUniqueTempDir(void)
 {
-	std::string text =
-		"import os, tempfile\n"
-		"import numpy as np\n"
-		"os.environ[\"OPENEMS_INSTALL_PATH\"] = \"C:\\OT\\OpenTwin\\Deployment\\openEMSSolver\"\n"
-		"\n"
-		"from CSXCAD  import ContinuousStructure\n"
-		"from openEMS import openEMS\n"
-		"from openEMS.physical_constants import *\n"
-		"\n"
-		"print(\"Start Simulation\")\n"
-		"### Setup the simulation\n"
-		"Sim_Path = os.path.join(tempfile.gettempdir(), 'Rect_WG')\n"
-		"print(Sim_Path)\n"
-		"\n"
-		"post_proc_only = False\n"
-		"unit = 1e-6; #drawing unit in um\n"
-		"\n"
-		"# waveguide dimensions\n"
-		"# WR42\n"
-		"a = 10700;   #waveguide width\n"
-		"b = 4300;    #waveguide height\n"
-		"length = 50000;\n"
-		"\n"
-		"# frequency range of interest\n"
-		"f_start = 20e9;\n"
-		"f_0     = 24e9;\n"
-		"f_stop  = 26e9;\n"
-		"lambda0 = C0/f_0/unit;\n"
-		"\n"
-		"#waveguide TE-mode definition\n"
-		"TE_mode = 'TE10';\n"
-		"\n"
-		"#targeted mesh resolution\n"
-		"mesh_res = lambda0/30\n"
-		"\n"
-		"### Setup FDTD parameter & excitation function\n"
-		"FDTD = openEMS(NrTS=1e4);\n"
-		"FDTD.SetGaussExcite(0.5*(f_start+f_stop),0.5*(f_stop-f_start));\n"
-		"\n"
-		"# boundary conditions\n"
-		"FDTD.SetBoundaryCond([0, 0, 0, 0, 3, 3]);\n"
-		"\n"
-		"### Setup geometry & mesh\n"
-		"CSX = ContinuousStructure()\n"
-		"FDTD.SetCSX(CSX)\n"
-		"mesh = CSX.GetGrid()\n"
-		"mesh.SetDeltaUnit(unit)\n"
-		"\n"
-		"mesh.AddLine('x', [0, a])\n"
-		"mesh.AddLine('y', [0, b])\n"
-		"mesh.AddLine('z', [0, length])\n"
-		"\n"
-		"## Apply the waveguide port\n"
-		"ports = []\n"
-		"start=[0, 0, 10*mesh_res];\n"
-		"stop =[a, b, 15*mesh_res];\n"
-		"mesh.AddLine('z', [start[2], stop[2]])\n"
-		"ports.append(FDTD.AddRectWaveGuidePort( 0, start, stop, 'z', a*unit, b*unit, TE_mode, 1))\n"
-		"\n"
-		"start=[0, 0, length-10*mesh_res];\n"
-		"stop =[a, b, length-15*mesh_res];\n"
-		"mesh.AddLine('z', [start[2], stop[2]])\n"
-		"ports.append(FDTD.AddRectWaveGuidePort( 1, start, stop, 'z', a*unit, b*unit, TE_mode))\n"
-		"\n"
-		"mesh.SmoothMeshLines('all', mesh_res, ratio=1.4)\n"
-		"\n"
-		"### Define dump box...\n"
-		"#Et = CSX.AddDump('Et', dump_type=10, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop], sub_sampling=[2,2,2])\n"
-		"Et = CSX.AddDump('Et', dump_type=10, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop],opt_resolution=[0,90,2])\n"
-		"start = [0, 0, 0];\n"
-		"stop  = [a, b, length];\n"
-		"Et.AddBox(start, stop);\n"
-		"\n"
-		"### Run the simulation\n"
-		"if 1:  # debugging only\n"
-		"    CSX_file = os.path.join(Sim_Path, 'rect_wg.xml')\n"
-		"    if not os.path.exists(Sim_Path):\n"
-		"        os.mkdir(Sim_Path)\n"
-		"    print(CSX_file)\n"
-		"    CSX.Write2XML(CSX_file)\n"
-		"    #from CSXCAD import AppCSXCAD_BIN\n"
-		"    #os.system(AppCSXCAD_BIN + ' \"{}\"'.format(CSX_file))\n"
-		"\n"
-		"if not post_proc_only:\n"
-		"    FDTD.Run(Sim_Path, cleanup=False)\n"
-		"\n"
-		"### Postprocessing & plotting\n"
-		"freq = np.linspace(f_start,f_stop,201)\n"
-		"for port in ports:\n"
-		"    port.CalcPort(Sim_Path, freq)\n"
-		"\n"
-		"s11 = ports[0].uf_ref / ports[0].uf_inc\n"
-		"s21 = ports[1].uf_ref / ports[0].uf_inc\n"
-		"ZL  = ports[0].uf_tot / ports[0].if_tot\n"
-		"ZL_a = ports[0].ZL # analytic waveguide impedance\n"
-		"\n";
+	std::string tempDir = getSystemTempDir();
 
-	return text;
+	size_t count = 1;
+	std::string uniqueTempDir;
+
+	do
+	{
+		uniqueTempDir = tempDir + "\\GETDP_WORK" + std::to_string(count);
+		count++;
+
+	} while (checkFileOrDirExists(uniqueTempDir));
+
+	return uniqueTempDir;
 }
+
+std::string Application::getSystemTempDir(void)
+{
+	return readEnvironmentVariable("TMP");
+}
+
+std::string Application::readEnvironmentVariable(const std::string& variableName)
+{
+	std::string variableValue;
+
+	const int nSize = 32767;
+	char* buffer = new char[nSize];
+
+	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
+	{
+		variableValue = buffer;
+	}
+
+	return variableValue;
+}
+
+bool Application::checkFileOrDirExists(const std::string& path)
+{
+	struct stat info;
+
+	if (stat(path.c_str(), &info) != 0)
+		return false;
+	else if (info.st_mode & S_IFDIR)
+		return true;   // This is a directoy
+	else
+		return true;   // This might be a file
+}
+
+bool Application::deleteDirectory(const std::string& pathName)
+{
+	// First delete all files in the directoy
+	WIN32_FIND_DATAA FindFileData;
+	HANDLE hFind;
+
+	std::string fileNamePattern = pathName + "\\*";
+
+	hFind = FindFirstFileA(fileNamePattern.c_str(), &FindFileData);
+	if (hFind != INVALID_HANDLE_VALUE)
+	{
+		std::string fileName = FindFileData.cFileName;
+		if (fileName != "." && fileName != "..")
+		{
+			fileName = pathName + "\\" + fileName;
+			if (!DeleteFileA(fileName.c_str())) std::cout << "ERROR: Unable to delete file: " << fileName << std::endl;
+		}
+
+		while (FindNextFileA(hFind, &FindFileData))
+		{
+			std::string fileName = FindFileData.cFileName;
+			if (fileName != "." && fileName != "..")
+			{
+				fileName = pathName + "\\" + fileName;
+				if (!DeleteFileA(fileName.c_str())) std::cout << "ERROR: Unable to delete file: " << fileName << std::endl;
+			}
+		}
+
+		FindClose(hFind);
+	}
+
+	// Now remove the empty directory
+	bool success = RemoveDirectoryA(pathName.c_str());
+	return success;
+}
+
+std::string Application::getOpenEMSDir()
+{
+#ifdef _DEBUG
+	const std::string otRootFolder = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	assert(otRootFolder != "");
+	return otRootFolder + "\\Deployment\\openEMSSolver";
+#else
+		return ".\\openEMSSolver";
+#endif // DEBUG
+}
+
