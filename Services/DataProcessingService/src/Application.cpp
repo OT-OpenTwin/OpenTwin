@@ -152,7 +152,7 @@ std::string Application::updateDataLakeAccessCfg(ot::JsonDocument& _document)
 			curve->storeToDataBase();
 			ot::NewModelStateInfo updatedCurve;
 			updatedCurve.addTopologyEntity(*curve.get());
-			ot::ModelServiceAPI::updateTopologyEntities(updatedCurve, "Performed update on the data lake access cfg.", false);
+			ot::ModelServiceAPI::updateTopologyEntities(updatedCurve, "Performed update on the data lake access cfg.");
 
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
