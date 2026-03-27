@@ -83,6 +83,8 @@ public:
 	ot::UID				createEntityUID();
 	void			addEntityToMap(EntityBase *entity);
 	void			removeEntityFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, bool considerChildren = true);
+	void			updateMapEntries(EntityBase* entity);
+
 	void		    removeEntityWithChildrenFromMap(EntityBase *entity, bool keepInProject, bool keepParameterDependency, std::list<EntityBase*> &removedEntities);
 
 	bool			entityExists(ot::UID uID);

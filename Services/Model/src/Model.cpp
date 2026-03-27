@@ -785,6 +785,45 @@ void Model::removeEntityFromMap(EntityBase *entity, bool keepInProject, bool kee
 	setModified();
 }
 
+void Model::updateMapEntries(EntityBase* _entity)
+{
+	m_entityMap.erase(_entity->getEntityID());
+	m_entityMap.insert({ _entity->getEntityID(),_entity });
+	
+	getStateManager()->modifyEntityVersion(_entity->getEntityID(), _entity->getEntityStorageVersion());
+	
+	EntityBase* base =	_entity->getParent();
+	if (base != nullptr)
+	{
+		EntityContainer* container = dynamic_cast<EntityContainer*>(base);
+		if (container != nullptr)
+		{
+			container->replaceChild(_entity);
+		}
+		else
+		{
+			assert(false); // parent entities should always be container 
+		}
+	}
+
+
+	for (const auto& entityByID : m_entityMap)
+	{
+		EntityBase* entity = entityByID.second;
+		if (entity->getEntityType() == EntityBase::DATA)
+		{
+			if (entity->getParent()->getEntityID() == _entity->getEntityID())
+			{
+				entity->setParent(_entity);
+			}
+		}
+	}
+	
+	 //Removed entity from blockHandler map
+	//Application::instance()->getBlockHandler().removeFromMap(entity);
+
+}
+
 bool Model::entityExists(ot::UID uID)
 {
 	return (m_entityMap.count(uID) > 0);
@@ -4838,11 +4877,11 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 	}
 	DataBase::instance().prefetchDocumentsFromStorage(prefetchIdandVersion);
 
-	auto topoEntityVersion = _topoEntityVersion.begin();
-	std::list<ot::UID> removeFromDisplay;
+	//std::list<bool> topologyEntityForceVisible;
+	//std::list<ot::UID> removeFromDisplay;
 	std::list<EntityBase*> entityList;
-	std::list<bool> topologyEntityForceVisible;
 	const bool considerDependingDataEntities = false;
+	auto topoEntityVersion = _topoEntityVersion.begin();
 	for (ot::UID topoEntityID : _topoEntityID)
 	{
 		std::map<ot::UID, EntityBase*> map;
@@ -4854,73 +4893,60 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 
 		topoEntityVersion++;
 		EntityBase* oldEntity = findEntityFromName(newEntity->getName());
-
 		if (oldEntity != nullptr)
 		{
-			removeFromDisplay.push_back(oldEntity->getEntityID());
-
-			//If we have a container entity, we need to adjust the parent/child relationship here in the ModelService. This may not deal with all data entities.
-			EntityContainer*  oldContainer =	dynamic_cast<EntityContainer*>(oldEntity);
+			newEntity->setParent(oldEntity->getParent());
+			oldEntity->setParent(nullptr);
+			oldEntity->setObserver(nullptr);
+			updateMapEntries(newEntity);
+			EntityContainer* oldContainer = dynamic_cast<EntityContainer*>(oldEntity);
 			if (oldContainer != nullptr)
 			{
-				EntityContainer*  newContainer =	dynamic_cast<EntityContainer*>(newEntity);
+				EntityContainer* newContainer = dynamic_cast<EntityContainer*>(newEntity);
 				assert(newContainer != nullptr);
-				for (EntityBase* child : oldContainer->getChildrenList())
-				{
-					newContainer->addChild(child);
-					child->setParent(newContainer);
-				}
-
-				for (EntityBase* child : newContainer->getChildrenList())
-				{
-					oldContainer->removeChild(child);
-				}
+				newContainer->takeOverChildren(oldContainer);
 			}
-
-			//First we remove possible data entities from the entity map that have the old entity as their parent.
-			//ot::UIDList dataChildren;
-			for (const auto& entityByID : m_entityMap)
-			{
-				EntityBase* entity = entityByID.second;
-				if (entity->getEntityType() == EntityBase::DATA)
-				{
-					if (entity->getParent() == oldEntity)
-					{
-						entity->setParent(newEntity);
-						//dataChildren.push_back(entity->getEntityID());
-					}
-				}
-			}
-			/*for (ot::UID dataChild : dataChildren)
-			{
-				entityMap.erase(dataChild);
-			}*/
-			
-			// Remove the topo entity from the entity map and also from the model state
-			removeEntityFromMap(oldEntity, false, false, considerDependingDataEntities);
-
-
-
-			delete oldEntity;
-
-			entityList.push_back(newEntity);
-			topologyEntityForceVisible.push_back(false);
 		}
-		else
-		{
-			//Was actually a new entity. HEre is no special handling necessary.
-			entityList.push_back(newEntity);
-			topologyEntityForceVisible.push_back(false);
-		}
+
+		delete oldEntity;
+		oldEntity = nullptr;
+
+		entityList.push_back(newEntity);
+		//topologyEntityForceVisible.push_back(false);
 	}
-
-	if (!removeFromDisplay.empty() && _considerVisualization)
+	ot::UIDList entityIDs = _topoEntityID;
+	if (!entityList.empty() && _considerVisualization)
 	{
-		removeShapesFromVisualization(removeFromDisplay);
+		removeShapesFromVisualization(entityIDs);
 	}
 
-	//Now we can add the new version of the topology entities to the model state
-	addTopologyEntitiesToModel(entityList, topologyEntityForceVisible, _considerVisualization);
+	std::list<EntityBase*> topLevelEntities = getTopLevelEntitiesByName(entityList);
+	
+	// Required vis steps from addTopologyEntitiesToModel(entityList, topologyEntityForceVisible, _considerVisualization);
+	if (_considerVisualization) {
+		for (EntityBase* entity : topLevelEntities) {
+			entity->addVisualizationNodes();
+		}
+	}
+
+
+	// Here we need to ensure that the entities with the force visible flag are visible
+
+	//ot::UIDList visibleEntityID;
+	//for (EntityBase* entity : entityList)
+	//{
+	//	if (forceEntityVisible[entity] && entity->getInitiallyHidden())
+	//	{
+	//		// Ensure that this entity is visible
+	//		visibleEntityID.push_back(entity->getEntityID());
+	//	}
+	//}
+
+	//if (!visibleEntityID.empty())
+	//{
+	//	ot::UIDList hiddenEntityID;
+	//	setShapeVisibility(visibleEntityID, hiddenEntityID);
+	//}
 
 
 	refreshAllViews();

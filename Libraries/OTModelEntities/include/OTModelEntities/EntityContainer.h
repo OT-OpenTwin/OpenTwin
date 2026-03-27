@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityContainer.h
 // 
 // License:
@@ -45,6 +45,10 @@ public:
 	 * \param child
 	 */
 	virtual void removeChild(EntityBase *child) override;
+
+	bool replaceChild(EntityBase* _child);
+	void takeOverChildren(EntityContainer* _other);
+
 
 	const std::list<EntityBase *> &getChildrenList(void);
 

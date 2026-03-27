@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityContainer.cpp
 // 
 // License:
@@ -106,6 +106,34 @@ void EntityContainer::removeChild(EntityBase *child)
 	children.remove(child);
 
 	setModified();
+}
+
+bool EntityContainer::replaceChild(EntityBase* _child)
+{
+	EntityBase* currentEntry = nullptr;
+	for (EntityBase* child : children)
+	{
+		if (child->getEntityID() == _child->getEntityID())
+		{
+			currentEntry = child;
+			break;
+		}
+	}
+	if (currentEntry == nullptr)
+	{
+		return false;
+	}
+	else
+	{
+		children.remove(currentEntry);
+		children.push_back(_child);
+	}
+}
+
+void EntityContainer::takeOverChildren(EntityContainer* _other)
+{
+	children = _other->children;
+	_other->children.clear();
 }
 
 const std::list<EntityBase *> &EntityContainer::getChildrenList(void)
