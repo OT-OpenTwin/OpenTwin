@@ -146,7 +146,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 	parameterIndices.insert(parameterIndices.end(), parameterIndicesNonConstant.begin(), parameterIndicesNonConstant.end());
 	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
 
-	DataLakeHelper::createDefaultIndexes(m_collectionName);
+	//DataLakeHelper::createDefaultIndexes(m_collectionName);
 }
 
 void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata)
