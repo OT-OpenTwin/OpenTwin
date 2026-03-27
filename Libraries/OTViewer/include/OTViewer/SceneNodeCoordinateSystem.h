@@ -40,7 +40,8 @@ public:
 
 	void updateTransformationMatrix();
 
-	osg::Matrix getTransformation() { return transformation; }
+	virtual bool hasTransformationMatrix() override { return true; }
+	virtual osg::Matrix getTransformationMatrix() override { return transformation;	}
 
 private:
 	osg::Matrix makeOrthonormalFrame(const osg::Vec3d& origin, osg::Vec3d xAxis, osg::Vec3d zAxis);

@@ -88,7 +88,7 @@ namespace ViewerAPI {
 														double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
 													    bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation);
 	
-	__declspec(dllexport) void addVisualizationContainerNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
+	__declspec(dllexport) void addVisualizationContainerNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, bool _requiresGlobalTransformationMatrix);
 	
 	__declspec(dllexport) void addCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings, bool isActive);
 	__declspec(dllexport) void updateCoordinateSystemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive);

@@ -2944,7 +2944,12 @@ void ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& _docume
 	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
 	ot::VisualisationTypes visTypes(ot::json::getObject(_document, OT_ACTION_PARAM_VisualizationTypes));
 
-	ViewerAPI::addVisualizationContainerNode(visModelID, item, visTypes);
+	bool requiresGlobalTransformationMatrix = false;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ITM_RequiresGlobalTransformation)) {
+		requiresGlobalTransformationMatrix = ot::json::getBool(_document, OT_ACTION_PARAM_MODEL_ITM_RequiresGlobalTransformation);
+	}
+
+	ViewerAPI::addVisualizationContainerNode(visModelID, item, visTypes, requiresGlobalTransformationMatrix);
 }
 
 void ExternalServicesComponent::handleAddCoordinateSystemNode(ot::JsonDocument& _document) {

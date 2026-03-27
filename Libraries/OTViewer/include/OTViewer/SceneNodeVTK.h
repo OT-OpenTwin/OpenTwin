@@ -54,6 +54,8 @@ public:
 
 	void updateVTKNode(const std::string &projName, unsigned long long visualizationDataID, unsigned long long visualizationDataVersion, const std::string& colorRampData, const std::string& unit);
 
+	virtual bool requiresGlobalTransformationMatrix() override { return true; }
+
 private:
 	void deleteShapeNode(void);
 	osg::Node *createOSGNodeFromVTK();

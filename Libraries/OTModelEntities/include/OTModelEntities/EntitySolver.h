@@ -41,6 +41,8 @@ public:
 
 	virtual bool updateFromProperties(void) override;
 
+	virtual void addVisualizationNodes(void) override;
+
 protected:
 	virtual int getSchemaVersion(void) override  { return 1; } ;
 

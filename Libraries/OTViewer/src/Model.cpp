@@ -498,7 +498,7 @@ void Model::centerMouseCursor()
 	}
 }
 
-void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes)
+void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, bool requiresGlobalTransformationMatrix)
 {
 	// Check whether we already have a container node
 	if (m_nameToSceneNodesMap.count(_treeItem.getEntityName()) != 0)
@@ -514,6 +514,7 @@ void Model::addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, c
 	SceneNodeBase *containerNode = new SceneNodeContainer;
 
 	containerNode->setTreeItem(_treeItem);
+	containerNode->setRequiresGlobalTransformationMatrix(requiresGlobalTransformationMatrix);
 	
 	VisualiserHelper::addVisualizer(containerNode, _visualisationTypes);
 
@@ -1596,31 +1597,23 @@ bool Model::compareTransformations(osg::Matrix &matrix1, osg::Matrix &matrix2)
 	return true;  // The transformations are the same (within the selected tolerance)
 }
 
-bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix)
+void Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, bool &useGlobalMatrix, osg::Matrix &matrix)
 {
+	if (useGlobalMatrix) return;  // We have already decided to use the global coordinate system
+
 	if (root->isSelected())
 	{
-		osg::Matrix transformationMatrix;
-
-		SceneNodeGeometry *geometryNode = dynamic_cast<SceneNodeGeometry *>(root);
-		SceneNodeCoordinateSystem* csNode = dynamic_cast<SceneNodeCoordinateSystem*>(root);
-		SceneNodeVTK* vtkNode = dynamic_cast<SceneNodeVTK*>(root);
-
-		if (geometryNode != nullptr)
+		if (root->requiresGlobalTransformationMatrix())
 		{
-			transformationMatrix = geometryNode->getTransformation();
-		}
-		else if (csNode != nullptr)
-		{
-			transformationMatrix = csNode->getTransformation();
-		}
-		else if (vtkNode != nullptr)
-		{
-			transformationMatrix = osg::Matrix().identity();
+			useGlobalMatrix = true;
+			matrix = osg::Matrix().identity();
+			return; // We have found the transformation matrix
 		}
 
-		if (geometryNode != nullptr || csNode != nullptr || vtkNode != nullptr)
+		if (root->hasTransformationMatrix())
 		{
+			osg::Matrix transformationMatrix = root->getTransformationMatrix();
+
 			if (first)
 			{
 				matrix = transformationMatrix;
@@ -1630,21 +1623,18 @@ bool Model::getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, 
 			{
 				if (!compareTransformations(matrix, transformationMatrix))
 				{
-					return false;
+					matrix = getActiveCoordinateSystemTransform();  // We have incompatible matrices, so we use the currently active coordinate system
 				}
 			}
+
 		}
 	}
 
 	for (auto child : root->getChildren())
 	{
-		if (!getTransformationOfSelectedShapes(child, first, matrix))
-		{
-			return false;
-		}
+		getTransformationOfSelectedShapes(child, first, useGlobalMatrix, matrix);
+		if (useGlobalMatrix) return;
 	}
-
-	return true;
 }
 
 osg::Matrix Model::getActiveCoordinateSystemTransform()
@@ -1655,19 +1645,16 @@ osg::Matrix Model::getActiveCoordinateSystemTransform()
 
 	if (csNode == nullptr) return osg::Matrix::identity(); // The active LCS does no longer exist
 
-	return csNode->getTransformation();
+	return csNode->getTransformationMatrix();
 }
 
 void Model::updateWorkingPlaneTransform() 
 {
-	osg::Matrix matrix = getActiveCoordinateSystemTransform();
+	osg::Matrix matrix = getActiveCoordinateSystemTransform();  // In case that no entity is selected at all.
 	bool first = true;
+	bool useGlobalMatrix = false;
 
-	if (!getTransformationOfSelectedShapes(m_sceneNodesRoot, first, matrix))
-	{
-		// The transformations are not the same for all selected scene nodes -> we use the transformation of the currently active coordinate system
-		matrix = getActiveCoordinateSystemTransform();
-	}
+	getTransformationOfSelectedShapes(m_sceneNodesRoot, first, useGlobalMatrix, matrix);
 
 	for (auto v : m_viewerList) {
 		v->setWorkingPlaneTransform(matrix);

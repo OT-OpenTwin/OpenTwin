@@ -122,6 +122,12 @@ public:
 
 	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
+	virtual bool hasTransformationMatrix() { return false; }
+	virtual osg::Matrix getTransformationMatrix() { return osg::Matrix().identity(); }
+	virtual bool requiresGlobalTransformationMatrix() { return m_requiresGlobalTransformationMatrix; }
+
+	void setRequiresGlobalTransformationMatrix(bool flag) { m_requiresGlobalTransformationMatrix = flag; };
+
 protected:
 	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
 	//osg::Switch* m_shapeNode = nullptr;
@@ -141,6 +147,7 @@ private:
 	bool			   m_manageVisibilityOfParent = true;
 	bool			   m_manageVisibilityOfChildren = true;
 	bool               m_selectionHandled = false;
+	bool			   m_requiresGlobalTransformationMatrix = false;
 	std::string        m_errors = "";
 	SceneNodeBase *    m_parent = nullptr;
 	std::list<SceneNodeBase*> m_children;

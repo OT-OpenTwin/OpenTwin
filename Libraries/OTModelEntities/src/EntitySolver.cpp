@@ -50,3 +50,27 @@ bool EntitySolver::updateFromProperties(void)
 
 	return false; // No property grid update necessary
 }
+
+void EntitySolver::addVisualizationNodes(void)
+{
+	if (!getCreateVisualizationItem()) return;
+
+	if (!getName().empty())
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
+
+		doc.AddMember(OT_ACTION_PARAM_TreeItem, ot::JsonObject(this->getTreeItem(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_RequiresGlobalTransformation, true, doc.GetAllocator());
+
+		getObserver()->sendMessageToViewer(doc);
+	}
+
+	for (auto child : getChildrenList())
+	{
+		child->addVisualizationNodes();
+	}
+
+	EntityBase::addVisualizationNodes();
+}

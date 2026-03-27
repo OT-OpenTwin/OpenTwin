@@ -64,7 +64,9 @@ public:
 	void setTransformation(const std::vector<double>& _transformation);
 	void setHighlightNode(osg::Node* highlight);
 
-	osg::Matrix getTransformation(void);
+	virtual bool hasTransformationMatrix() override { return true; }
+	virtual osg::Matrix getTransformationMatrix() override;
+
 	osg::Matrix getParentTransformation(void);
 	osg::Matrix getOwnTransformation(void) { return m_transformationMatrix; }
 	void		setOwnTransformation(const osg::Matrix &matrix) { m_transformationMatrix = matrix; }

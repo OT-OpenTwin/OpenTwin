@@ -135,7 +135,7 @@ osg::Matrix SceneNodeGeometry::getParentTransformation(void)
 
 	if (geometryParent != nullptr)
 	{
-		osg::Matrix parentMatrix = geometryParent->getTransformation();
+		osg::Matrix parentMatrix = geometryParent->getTransformationMatrix();
 
 		return parentMatrix;
 	}
@@ -143,14 +143,14 @@ osg::Matrix SceneNodeGeometry::getParentTransformation(void)
 	return osg::Matrix(); 
 }
 
-osg::Matrix SceneNodeGeometry::getTransformation(void) 
+osg::Matrix SceneNodeGeometry::getTransformationMatrix(void)
 { 
 	// Check whether we have a SceneNodeGeometry as parent. If so, we need to combine the transforms
 	SceneNodeGeometry *geometryParent = dynamic_cast<SceneNodeGeometry *>(getParent());
 
 	if (geometryParent != nullptr)
 	{
-		osg::Matrix parentMatrix = geometryParent->getTransformation();
+		osg::Matrix parentMatrix = geometryParent->getTransformationMatrix();
 
 		return m_transformationMatrix * parentMatrix;
 	}
@@ -456,7 +456,7 @@ void SceneNodeGeometry::applyParentTransform(void)
 
 	if (geometryParent != nullptr)
 	{
-		osg::Matrix parentMatrix = geometryParent->getTransformation();
+		osg::Matrix parentMatrix = geometryParent->getTransformationMatrix();
 
 		applyTransform(parentMatrix);
 	}

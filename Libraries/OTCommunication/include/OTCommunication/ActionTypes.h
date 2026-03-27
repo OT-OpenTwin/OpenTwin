@@ -622,6 +622,7 @@
 #define OT_ACTION_PARAM_MODEL_ITM_ManageChildVis "Model.Item.ManageChildVis"
 #define OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected "Model.Item.ShowWhenSelected"
 #define OT_ACTION_PARAM_MODEL_ITM_Transformation "Model.Item.Transformation"
+#define OT_ACTION_PARAM_MODEL_ITM_RequiresGlobalTransformation "Model.Item.RequiresGlobalTransformation"
 #define OT_ACTION_PARAM_MODEL_ITM_Nodes "Model.Item.Nodes"
 #define OT_ACTION_PARAM_MODEL_ITM_FacesList "Model.Item.FacesList"
 #define OT_ACTION_PARAM_MODEL_ITM_Triangles "Model.Item.Triangles"

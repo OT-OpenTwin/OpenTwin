@@ -82,7 +82,7 @@ public:
 
 	void addSceneNode(const ot::EntityTreeItem& _treeItem, ot::VisualisationTypes _visualisationTypes);
 	
-	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes);
+	void addVisualizationContainerNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, bool requiresGlobalTransformationMatrix);
 	void addCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, std::vector<double>& coordinateSettings, bool isActive);
 	void updateCoordinateSystemNode(const ot::EntityTreeItem& _treeItem, std::vector<double>& coordinateSettings, bool isActive);
 	bool activateCoordinateSystemNode(const std::string &csName, bool isActive);
@@ -273,7 +273,7 @@ private:
 	bool       isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId);
 	void       manageParentVisibility(SceneNodeBase *item);
 	void	   updateWorkingPlaneTransform();
-	bool       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, osg::Matrix &matrix);
+	void       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, bool& useGlobalMatrix, osg::Matrix &matrix);
 	bool       compareTransformations(osg::Matrix &matrix1, osg::Matrix &matrix2);
 	void       updateCapGeometryForSceneNodes(SceneNodeBase* root, const osg::Vec3d& normal, const osg::Vec3d& point, double radius);
 	void       deleteCapGeometryForSceneNodes(SceneNodeBase* root);
