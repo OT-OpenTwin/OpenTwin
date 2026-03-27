@@ -13,6 +13,8 @@
 #include "OTCore/JSON/JSONVectoriser.h"
 #include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTDataStorage/DataLakeHelper.h"
+#include "OTCore/EntityName.h"
+
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
 	m_collectionName = _collectionName;
@@ -104,7 +106,7 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 			}
 			else
 			{
-				OT_LOG_W("Skipping metadata query since no comparator was selected. Field: " + metadataQuery.getName());
+				//OT_LOG_W("Skipping metadata query since no comparator was selected. Field: " + metadataQuery.getName());
 			}
 			if (!match)
 			{
@@ -378,8 +380,10 @@ ot::DataLakeAccessCfg DataLakeAccessor::createConfig()
 	for (auto& seriesQueryDescription : m_queryDescriptionsSeries)
 	{
 		ot::DataPointDecoder dataPointDecoder;
-		dataPointDecoder.setFieldName(seriesQueryDescription.getQueryTargetDescription().getMongoDBFieldName());
-		dataPointDecoder.setLabel(seriesQueryDescription.getQueryTargetDescription().getLabel());
+		dataPointDecoder.setFieldName(seriesQueryDescription.getValueComparisonDescription().getValue());
+		std::string label = m_resultCollectionMetadataAccess->findMetadataSeries(std::stoull(seriesQueryDescription.getValueComparisonDescription().getValue()))->getName();
+		label = ot::EntityName::getSubName(label).value();
+		dataPointDecoder.setLabel(label);
 		dataPointDecoder.setDimension(seriesQueryDescription.getQueryTargetDescription().getDimensions());
 		dataPointDecoder.setTupleInstance(seriesQueryDescription.getQueryTargetDescription().getTupleInstance());
 		config.addFieldDecoderSeries(dataPointDecoder);
