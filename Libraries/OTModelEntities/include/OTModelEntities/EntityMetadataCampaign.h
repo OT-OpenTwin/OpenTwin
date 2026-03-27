@@ -27,7 +27,8 @@ public:
 	EntityMetadataCampaign() : EntityMetadataCampaign(0, nullptr, nullptr, nullptr) {};
 	EntityMetadataCampaign(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms);
 
-	std::string getClassName() const override { return "EntityMetadataCampaign"; };
+	static std::string className() { return "EntityMetadataCampaign"; };
+	std::string getClassName() const override { return EntityMetadataCampaign::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
 };

@@ -31,7 +31,7 @@
 // std header
 #include <vector>
 
-MetadataCampaign MetadataEntityInterface::createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds)
+MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*> _msmds)
 {
 	MetadataCampaign measurementCampaign;
 	extractCampaignMetadata(measurementCampaign, _rmd);
@@ -357,7 +357,7 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(std::list<const Met
 	return newEntitiesInfos;
 }
 
-void MetadataEntityInterface::extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd)
+void MetadataEntityInterface::extractCampaignMetadata(MetadataCampaign& _measurementCampaign, EntityMetadataCampaign* _rmd)
 {
 	const GenericDocument* topLevel= _rmd->getDocumentTopLevel();
 	auto fieldList = extractMetadataFields(*topLevel);
@@ -543,7 +543,7 @@ std::list<std::shared_ptr<MetadataEntry>> MetadataEntityInterface::extractMetada
 	return metadata;
 }
 
-void MetadataEntityInterface::extractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds)
+void MetadataEntityInterface::extractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<EntityMetadataSeries*> _msmds)
 {
 	for (auto msmd : _msmds)
 	{

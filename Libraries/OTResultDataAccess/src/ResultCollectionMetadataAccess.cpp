@@ -41,9 +41,14 @@ ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string
 		if (campaignMetadataEntity != nullptr)
 		{
 			m_metadataExistInProject = true;
-			std::list<std::shared_ptr<EntityMetadataSeries>> seriesMetadataEntities = crossCollectionAccess.getMeasurementMetadata(*_modelComponent);
+			std::list<EntityMetadataSeries*> seriesMetadataEntities;
+			auto lst = crossCollectionAccess.getMeasurementMetadata(*_modelComponent);
+			for (auto& ptr : lst)
+			{
+				seriesMetadataEntities.push_back(ptr.get());
+			}
 			MetadataEntityInterface campaignFactory;
-			m_metadataCampaign = campaignFactory.createCampaign(campaignMetadataEntity, seriesMetadataEntities);
+			m_metadataCampaign = campaignFactory.createCampaign(campaignMetadataEntity.get(), seriesMetadataEntities);
 		}
 	}
 	else
@@ -288,7 +293,12 @@ void ResultCollectionMetadataAccess::loadExistingCampaignData()
 	{
 		throw std::exception("Accessing result storage requires a campaign entity.");
 	}
-	m_metadataCampaign =	campaignFactory.createCampaign(metadataCampaignEntity, metadataSeriesEntities);
+	std::list<EntityMetadataSeries*> tmp;
+	for (auto& seriesEntity : metadataSeriesEntities)
+	{
+		tmp.push_back(seriesEntity.get());
+	}
+	m_metadataCampaign = campaignFactory.createCampaign(metadataCampaignEntity.get(), tmp);
 }
 
 std::vector<EntityBase*> ResultCollectionMetadataAccess::findAllExistingMetadata()

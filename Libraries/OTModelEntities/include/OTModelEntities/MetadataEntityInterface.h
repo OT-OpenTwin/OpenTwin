@@ -30,11 +30,11 @@
 // std header
 #include <stdint.h>
 
-class  OT_MODELENTITIES_API_EXPORT MetadataEntityInterface : public ot::EntityCallbackBase
+class OT_MODELENTITIES_API_EXPORT MetadataEntityInterface : public ot::EntityCallbackBase
 {
 public:
 	MetadataEntityInterface() = default;
-	MetadataCampaign createCampaign(std::shared_ptr<EntityMetadataCampaign> _rmd, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
+	MetadataCampaign createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*> _msmds);
 	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
 	MetadataSeries createSeries(EntityMetadataSeries* _seriesMetadataEntity);
 	ot::NewModelStateInfo storeCampaign(MetadataCampaign& _metaDataCampaign);
@@ -55,8 +55,8 @@ private:
 		
 	const std::string m_valuesField = "Values";
 
-	void extractCampaignMetadata(MetadataCampaign& _measurementCampaign, std::shared_ptr<EntityMetadataCampaign> _rmd);
-	void extractSeriesMetadata(MetadataCampaign& _measurementCampaign, std::list<std::shared_ptr<EntityMetadataSeries>> _msmds);
+	void extractCampaignMetadata(MetadataCampaign& _measurementCampaign, EntityMetadataCampaign* _rmd);
+	void extractSeriesMetadata(MetadataCampaign& _measurementCampaign, std::list<EntityMetadataSeries*> _msmds);
 	
 	void insertMetadata(EntityWithDynamicFields* _entity, MetadataEntry* _metadata, const std::string _documentName = "");
 
