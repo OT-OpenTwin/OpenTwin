@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCore/InClassFactory.h"
 
 #pragma warning(disable:4251)
 
@@ -29,21 +30,20 @@ namespace ot
 	
 	class OT_CORE_API_EXPORT GenericDataStruct : public Serializable
 	{
+		OT_DECL_DEFCOPY(GenericDataStruct)
+		OT_DECL_DEFMOVE(GenericDataStruct)
+		OT_DECL_INCLASS_FACTORY(GenericDataStruct, GenericDataStruct, Registrar)
 	public:
-		GenericDataStruct(const std::string& _typeName = "", uint32_t _numberOfEntries = 0) :m_numberOfEntries(_numberOfEntries), m_typeName(_typeName) {}
-		virtual ~GenericDataStruct() {
+		static GenericDataStruct* fromJson(const ot::ConstJsonObject& _object);
 
-		};
+		GenericDataStruct() = default;
+		virtual ~GenericDataStruct() = default;
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-		const uint32_t getNumberOfEntries() const { return m_numberOfEntries; }
 		
-		std::string	getTypeIdentifyer() { return m_typeName; }
-
-	protected:
-		uint32_t m_numberOfEntries;
-		std::string m_typeName;
+		virtual size_t getNumberOfEntries() const = 0;
+		virtual std::string getClassName() const = 0;
 	};
 
 	using GenericDataStructList = std::list<ot::GenericDataStruct*>;

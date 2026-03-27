@@ -35,8 +35,8 @@ std::string ot::toString(const ot::GenericDataStruct* _dataStruct)
 	{
 		dataStructAsString = "[";
 		const std::vector<ot::Variable>& values = vector->getValues();
-		const uint32_t numberOfEntries = vector->getNumberOfEntries();
-		for (uint32_t index = 0; index < numberOfEntries; index++)
+		const size_t numberOfEntries = vector->getNumberOfEntries();
+		for (size_t index = 0; index < numberOfEntries; index++)
 		{
 			const std::string stringVal = converter(values[index]);
 			dataStructAsString += stringVal;

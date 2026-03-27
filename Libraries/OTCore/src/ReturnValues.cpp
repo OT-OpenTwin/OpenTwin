@@ -22,7 +22,6 @@
 #include "OTCore/DataStruct/GenericDataStructSingle.h"
 #include "OTCore/DataStruct/GenericDataStructVector.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
-#include "OTCore/DataStruct/GenericDataStructFactory.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 

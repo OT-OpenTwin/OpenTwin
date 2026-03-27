@@ -22,69 +22,56 @@
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 
-ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns) 
-	: GenericDataStruct(getClassName(), _rows * _columns), m_numberOfColumns(_columns), m_numberOfRows(_rows)
+static ot::GenericDataStruct::Registrar<ot::GenericDataStructMatrix> registrar(ot::GenericDataStructMatrix::className());
+
+ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns)
+	: m_numberOfColumns(_columns), m_numberOfRows(_rows)
 {
-	allocateValueMemory();
+	m_values.resize(m_numberOfRows * m_numberOfColumns, ot::Variable());
 }
 
-ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer)
-	: GenericDataStruct(getClassName(), _matrixEntryPointer.m_row * _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
+ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _dimensions)
+	: m_numberOfColumns(_dimensions.m_column), m_numberOfRows(_dimensions.m_row)
 {
-	allocateValueMemory();
+	m_values.resize(m_numberOfRows * m_numberOfColumns, ot::Variable());
 }
 
-ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns, ot::Variable _defaultValue)
-	: GenericDataStruct(getClassName(), _rows* _columns), m_numberOfColumns(_columns), m_numberOfRows(_rows) 
+ot::GenericDataStructMatrix::GenericDataStructMatrix(uint32_t _rows, uint32_t _columns, const ot::Variable& _defaultValue)
+	: m_numberOfColumns(_columns), m_numberOfRows(_rows)
 {
-	allocateValueMemory(_defaultValue);
+	m_values.resize(m_numberOfRows * m_numberOfColumns, _defaultValue);
 }
 
-ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable _defaultValue)
-	: GenericDataStruct(getClassName(), _matrixEntryPointer.m_row * _matrixEntryPointer.m_column), m_numberOfColumns(_matrixEntryPointer.m_column), m_numberOfRows(_matrixEntryPointer.m_row)
+ot::GenericDataStructMatrix::GenericDataStructMatrix(const MatrixEntryPointer& _dimensions, const ot::Variable& _defaultValue)
+	: m_numberOfColumns(_dimensions.m_column), m_numberOfRows(_dimensions.m_row)
 {
-	allocateValueMemory(_defaultValue);
+	m_values.resize(m_numberOfRows * m_numberOfColumns, _defaultValue);
 }
-
-ot::GenericDataStructMatrix::GenericDataStructMatrix()
-	: GenericDataStruct(getClassName())
-{}
 
 ot::GenericDataStructMatrix::~GenericDataStructMatrix()
-{}
-
-ot::GenericDataStructMatrix::GenericDataStructMatrix(const GenericDataStructMatrix& _other)
-	: GenericDataStruct(getClassName(),_other.m_numberOfEntries),m_values(_other.m_values), m_numberOfColumns(_other.m_numberOfColumns), m_numberOfRows(_other.m_numberOfRows)
 {
-}
-
-ot::GenericDataStructMatrix::GenericDataStructMatrix(GenericDataStructMatrix&& _other)noexcept
-	: GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_values(std::move(_other.m_values)), m_numberOfColumns(std::move(_other.m_numberOfColumns)), m_numberOfRows(std::move(_other.m_numberOfRows))
-{
-	_other.m_numberOfEntries = 0;
 }
 
 void ot::GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, ot::Variable&& _value)
 {
-	const uint32_t index = getIndex(_matrixEntryPointer.m_column, _matrixEntryPointer.m_row);
+	const uint32_t index = getIndex(_matrixEntryPointer);
 	m_values[index] = std::move(_value);
 }
 
 void ot::GenericDataStructMatrix::setValue(const MatrixEntryPointer& _matrixEntryPointer, const ot::Variable& _value)
 {
-	const uint32_t index = getIndex(_matrixEntryPointer.m_column,_matrixEntryPointer.m_row);
+	const uint32_t index = getIndex(_matrixEntryPointer);
 	m_values[index] = _value;
 }
 
 void ot::GenericDataStructMatrix::setValues(const ot::Variable* _values, uint32_t _size)
 {
-	assert(_size == getNumberOfEntries());
 	m_values.clear();
 	m_values.reserve(_size);
 	m_values.insert(m_values.begin(), &_values[0], &_values[_size]);
 }
 
-void ot::GenericDataStructMatrix::setValues(std::list<ot::Variable> _values)
+void ot::GenericDataStructMatrix::setValues(const std::list<ot::Variable>& _values)
 {
 	assert(_values.size() == getNumberOfEntries());
 	m_values = { _values.begin(), _values.end() };
@@ -94,13 +81,8 @@ const ot::Variable& ot::GenericDataStructMatrix::getValue(const MatrixEntryPoint
 {
 	assert(_matrixEntryPointer.m_column < m_numberOfColumns);
 	assert(_matrixEntryPointer.m_row < m_numberOfRows);
-	const uint32_t index =  getIndex(_matrixEntryPointer.m_column,_matrixEntryPointer.m_row);
+	const uint32_t index = getIndex(_matrixEntryPointer);
 	return m_values[index];
-}
-
-const ot::Variable* ot::GenericDataStructMatrix::getValues() const
-{
-	return &m_values.front();
 }
 
 void ot::GenericDataStructMatrix::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
@@ -112,10 +94,9 @@ void ot::GenericDataStructMatrix::addToJsonObject(ot::JsonValue& _object, ot::Js
 	VariableToJSONConverter converter;
 	ot::JsonArray jArr;
 
-	for (uint32_t index = 0;index < m_numberOfEntries; index++)
+	for (const Variable& var : m_values)
 	{
-		const ot::Variable& value = m_values[index];
-		jArr.PushBack(converter(value,_allocator),_allocator);
+		jArr.PushBack(converter(var, _allocator), _allocator);
 	}
 	_object.AddMember("values", jArr, _allocator);
 }
@@ -125,30 +106,16 @@ void ot::GenericDataStructMatrix::setFromJsonObject(const ot::ConstJsonObject& _
 	GenericDataStruct::setFromJsonObject(_object);
 	m_numberOfColumns = ot::json::getUInt(_object, "numberOfColumns");
 	m_numberOfRows = ot::json::getUInt(_object, "numberOfRows");
-	m_numberOfEntries = m_numberOfColumns * m_numberOfRows;
 	
-	JSONToVariableConverter converter;
-	auto jArray = ot::json::getArray(_object, "values");
-	allocateValueMemory();
+	const size_t nrEntries = m_numberOfRows * m_numberOfColumns;
 
-	for (uint32_t index = 0; index < m_numberOfEntries; index++)
+	JSONToVariableConverter converter;
+	const ConstJsonArray jArray = ot::json::getArray(_object, "values");
+	OTAssert(jArray.Size() == nrEntries, "Number of entries in JSON does not match the expected number of entries based on the number of rows and columns.");
+	m_values.resize(nrEntries);
+	for (uint32_t index = 0; index < nrEntries; index++)
 	{
 		const ot::Variable& var = converter(jArray[index]);
 		m_values[index] = var;
 	}
-}
-
-void ot::GenericDataStructMatrix::allocateValueMemory()
-{
-	m_values.resize(m_numberOfEntries);
-}
-
-void ot::GenericDataStructMatrix::allocateValueMemory(const ot::Variable& _defaultValue)
-{
-	m_values.resize(m_numberOfEntries,_defaultValue);
-}
-
-void ot::GenericDataStructMatrix::allocateValueMemory(ot::Variable&& _defaultValue)
-{
-	m_values.resize(m_numberOfEntries, std::move(_defaultValue));
 }

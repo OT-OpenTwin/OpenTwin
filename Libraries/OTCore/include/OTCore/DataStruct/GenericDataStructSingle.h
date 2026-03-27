@@ -27,25 +27,26 @@ namespace ot
 {
 	class OT_CORE_API_EXPORT GenericDataStructSingle : public GenericDataStruct
 	{
-	
+		OT_DECL_DEFCOPY(GenericDataStructSingle)
+		OT_DECL_DEFMOVE(GenericDataStructSingle)
 	public:
-		GenericDataStructSingle();
-		GenericDataStructSingle(const GenericDataStructSingle& _other);
-		GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept;
-		GenericDataStructSingle& operator=(const GenericDataStructSingle& _other) = default;
-		GenericDataStructSingle& operator=(GenericDataStructSingle&& _other) noexcept = default;
-		~GenericDataStructSingle();
+		GenericDataStructSingle() = default;
+		GenericDataStructSingle(const ot::Variable& _value);
+		GenericDataStructSingle(ot::Variable&& _value) noexcept;
+		virtual ~GenericDataStructSingle() = default;
 
-		void setValue(const ot::Variable& _value);
-		void setValue(ot::Variable&& _value);
-
-		const ot::Variable& getValue() const;
+		virtual size_t getNumberOfEntries() const override { return 1; };
+		static std::string className() { return "GenericDataStructSingle"; }
+		virtual std::string getClassName() const override { return GenericDataStructSingle::className(); };
 
 		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
-		static std::string getClassName() { return "GenericDataStructSingle"; }
-	
+		void setValue(const ot::Variable& _value) { m_value = _value; };
+		void setValue(ot::Variable&& _value) noexcept { m_value = std::move(_value); };
+
+		const ot::Variable& getValue() const { return m_value; };
+
 	private:
 		ot::Variable m_value;
 	};

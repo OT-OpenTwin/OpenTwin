@@ -21,40 +21,15 @@
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 
-ot::GenericDataStructSingle::GenericDataStructSingle()
-	:ot::GenericDataStruct(getClassName(), 1)
-{
-}
+static ot::GenericDataStruct::Registrar<ot::GenericDataStructSingle> registrar(ot::GenericDataStructSingle::className());
 
-ot::GenericDataStructSingle::GenericDataStructSingle(const GenericDataStructSingle& _other)
-	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_value(_other.m_value)
-{
-}
+ot::GenericDataStructSingle::GenericDataStructSingle(const ot::Variable& _value)
+	: m_value(_value)
+{}
 
-ot::GenericDataStructSingle::GenericDataStructSingle(GenericDataStructSingle&& _other) noexcept
-	:GenericDataStruct(getClassName(), _other.m_numberOfEntries), m_value(std::move(_other.m_value))
-{
-	_other.m_numberOfEntries = 0;
-}
-
-ot::GenericDataStructSingle::~GenericDataStructSingle()
-{
-}
-
-void ot::GenericDataStructSingle::setValue(const ot::Variable& _value)
-{
-	m_value = _value;
-}
-
-void ot::GenericDataStructSingle::setValue(ot::Variable&& _value)
-{
-	m_value = std::move(_value);
-}
-
-const ot::Variable& ot::GenericDataStructSingle::getValue() const
-{
-	return m_value;
-}
+ot::GenericDataStructSingle::GenericDataStructSingle(ot::Variable&& _value) noexcept
+	: m_value(std::move(_value))
+{}
 
 void ot::GenericDataStructSingle::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {

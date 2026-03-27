@@ -24,8 +24,6 @@
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
-#include "OTCore/DataStruct/GenericDataStruct.h"
-#include "OTCore/DataStruct/GenericDataStructFactory.h"
 #include "DataBuffer.h"
 
 #include "Application.h"

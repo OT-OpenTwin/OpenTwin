@@ -133,13 +133,9 @@ TEST(GenericDataStruct, TypeDetectionVector)
 
 	auto serActualVector = ot::json::getObject(doc, "Vector");
 
-	ot::GenericDataStruct dataStruct;
-	dataStruct.setFromJsonObject(serActualVector);
-
-	EXPECT_EQ(dataStruct.getTypeIdentifyer(), ot::GenericDataStructVector::getClassName());
-
-	ot::GenericDataStructVector actualVector;
-	EXPECT_NO_THROW(actualVector.setFromJsonObject(serActualVector));
+	std::unique_ptr<ot::GenericDataStruct> dataStruct;
+	EXPECT_NO_THROW(dataStruct.reset(ot::GenericDataStruct::fromJson(serActualVector)));
+	EXPECT_EQ(dataStruct->getClassName(), ot::GenericDataStructVector::className());
 }
 
 TEST(GenericDataStruct, TypeDetectionMatrix)
@@ -165,11 +161,7 @@ TEST(GenericDataStruct, TypeDetectionMatrix)
 
 	auto serActualMatrix = ot::json::getObject(doc, "Matrix");
 
-	ot::GenericDataStruct dataStruct;
-	dataStruct.setFromJsonObject(serActualMatrix);
-
-	EXPECT_EQ(dataStruct.getTypeIdentifyer(), ot::GenericDataStructMatrix::getClassName());
-
-	ot::GenericDataStructMatrix actualMatrix;
-	EXPECT_NO_THROW(actualMatrix.setFromJsonObject(serActualMatrix));
+	std::unique_ptr<ot::GenericDataStruct> dataStruct;
+	EXPECT_NO_THROW(dataStruct.reset(ot::GenericDataStruct::fromJson(serActualMatrix)));
+	EXPECT_EQ(dataStruct->getClassName(), ot::GenericDataStructMatrix::className());
 }

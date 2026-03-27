@@ -253,7 +253,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 
 		ot::GenericDataStructMatrix& quantityValueMatrix = quantityValueMatrices[i];
 		
-		const ot::Variable* quantityValueMatrixEntry = quantityValueMatrix.getValues();
+		const std::vector<ot::Variable>& quantityValueMatrixEntry = quantityValueMatrix.getValues();
 		for (uint32_t j = 0; j < quantityValueMatrix.getNumberOfEntries(); j++)
 		{
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, quantityValueMatrixEntry[j]);

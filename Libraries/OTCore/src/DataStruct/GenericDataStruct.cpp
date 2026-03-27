@@ -20,14 +20,37 @@
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStruct.h"
 
+OT_DECL_INCLASS_FACTORY_CPP(ot::GenericDataStruct)
+
+ot::GenericDataStruct* ot::GenericDataStruct::fromJson(const ot::ConstJsonObject& _object)
+{
+	std::string className = json::getString(_object, "ClassName");
+	const auto& factory = GenericDataStruct::getRegisteredClasses();
+	auto it = factory.find(className);
+	if (it == factory.end())
+	{
+		OT_LOG_E("Unknown class name \"" + className + "\". Cannot create GenericDataStruct instance.");
+		return nullptr;
+	}
+	else
+	{
+		GenericDataStruct* instance = it->second();
+		if (!instance)
+		{
+			OT_LOG_E("Failed to create instance of class \"" + className + "\".");
+			return nullptr;
+		}
+		instance->setFromJsonObject(_object);
+		return instance;
+	}
+}
+
 void ot::GenericDataStruct::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
-	_object.AddMember("numberOfEntries", ot::JsonValue(m_numberOfEntries), _allocator);
-	_object.AddMember("ClassName", ot::JsonString(m_typeName, _allocator), _allocator);
+	_object.AddMember("ClassName", ot::JsonString(getClassName(), _allocator), _allocator);
 }
 
 void ot::GenericDataStruct::setFromJsonObject(const ot::ConstJsonObject& _object)
 {
-	m_numberOfEntries = ot::json::getUInt(_object, "numberOfEntries");
-	m_typeName = ot::json::getString(_object, "ClassName");
+	OTAssert(json::getString(_object, "ClassName") == getClassName(), "JSON object class name does not match the expected class name");
 }

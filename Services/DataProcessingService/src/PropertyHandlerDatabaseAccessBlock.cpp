@@ -34,7 +34,6 @@
 
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {
-
 	const std::string projectName = _dbAccessEntity->getSelectedProjectName();
 	EntityPropertiesSelection* selectionSeries = _dbAccessEntity->getSeriesSelection();
 	std::string selectedSeries = selectionSeries->getValue();

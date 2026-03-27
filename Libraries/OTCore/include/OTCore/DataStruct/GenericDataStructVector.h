@@ -30,20 +30,22 @@ namespace ot
 {
 	class OT_CORE_API_EXPORT GenericDataStructVector : public GenericDataStruct
 	{
-
+		OT_DECL_DEFCOPY(GenericDataStructVector)
+		OT_DECL_DEFMOVE(GenericDataStructVector)
 	public:
-		GenericDataStructVector();
-		GenericDataStructVector(const GenericDataStructVector& _other);
-		GenericDataStructVector(GenericDataStructVector&& _other) noexcept;
-		
+		GenericDataStructVector() = default;
+		GenericDataStructVector(size_t _numberOfEntries);
 		GenericDataStructVector(const std::vector<ot::Variable>& _values);
 		GenericDataStructVector(std::vector<ot::Variable>&& _values) noexcept;
-		GenericDataStructVector(uint32_t _numberOfEntries);
 
-		GenericDataStructVector& operator=(const GenericDataStructVector& _other) = default;
-		GenericDataStructVector& operator=(GenericDataStructVector&& _other) noexcept = default;
+		virtual size_t getNumberOfEntries() const override { return m_values.size(); };
+		static std::string className() { return "GenericDataStructVector"; }
+		virtual std::string getClassName() const override { return GenericDataStructVector::className(); };
 
-		ot::Variable getValue(uint32_t _index) { assert(_index < m_numberOfEntries); return m_values[_index]; };
+		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+		ot::Variable getValue(uint32_t _index) { assert(_index < getNumberOfEntries()); return m_values[_index]; };
 		const std::vector<ot::Variable>& getValues() const { return m_values; }
 		
 		void setValue(uint32_t _index, const ot::Variable& _value);
@@ -51,13 +53,7 @@ namespace ot
 		void setValues(const std::vector<ot::Variable>& _values);
 		void setValues(std::vector<ot::Variable>&& _values);
 
-		virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
-		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
-
-		static std::string getClassName() { return "GenericDataStructVector"; }
 	private:
 		std::vector<ot::Variable> m_values;
-
-		void allocateValueMemory();
 	};
 }

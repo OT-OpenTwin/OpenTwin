@@ -93,30 +93,18 @@ void QuantityDescriptionSParameter::setSecondValue(uint64_t _index, const ot::Ma
 	m_quantityValuesSecond[_index].setValue(_matrixPointer, std::move(_value));
 }
 
-//const ot::Variable& QuantityDescriptionSParameter::getFirstValue(uint64_t _index, uint32_t _row, uint32_t _column)
-//{
-//	PRE(firstValueAccessValid(_index, _row, _column));
-//	return m_quantityValuesFirst[_index].getValue(_row, _column);
-//}
-
-const std::vector<ot::Variable> QuantityDescriptionSParameter::getFirstValues(uint64_t _index)
+std::vector<ot::Variable> QuantityDescriptionSParameter::getFirstValues(uint64_t _index) const
 {
 	PRE(m_quantityValuesFirst.size() > _index);
-	const ot::Variable* values =m_quantityValuesFirst[_index].getValues();
-	return std::vector<ot::Variable>(&values[0], &values[m_numberOfMatrixEntries]);
+	const std::vector<ot::Variable>& values = m_quantityValuesFirst[_index].getValues();
+	return std::vector<ot::Variable>(values);
 }
 
-//const ot::Variable& QuantityDescriptionSParameter::getSecondValue(uint64_t _index, uint32_t _row, uint32_t _column)
-//{
-//	PRE(secondValueAccessValid(_index, _row, _column));
-//	return m_quantityValuesSecond[_index].getValue(_row, _column);
-//}
-
-const std::vector<ot::Variable> QuantityDescriptionSParameter::getSecondValues(uint64_t _index)
+std::vector<ot::Variable> QuantityDescriptionSParameter::getSecondValues(uint64_t _index) const
 {
 	PRE(m_quantityValuesSecond.size() > _index);
-	const ot::Variable* values = m_quantityValuesSecond[_index].getValues();
-	return std::vector<ot::Variable>(&values[0], &values[m_numberOfMatrixEntries]);
+	const std::vector<ot::Variable>& values = m_quantityValuesSecond[_index].getValues();
+	return std::vector<ot::Variable>(values);
 }
 
 inline bool QuantityDescriptionSParameter::firstValueAccessValid(uint64_t _index, uint32_t _row, uint32_t _column)
