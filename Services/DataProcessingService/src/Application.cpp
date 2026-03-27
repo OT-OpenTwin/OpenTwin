@@ -141,14 +141,18 @@ std::string Application::updateDataLakeAccessCfg(ot::JsonDocument& _document)
 		if (!accessConfig.getQueriesByCollection().empty())
 		{
 			ot::UID curveEntityID =	ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-			ot::UID curveEntityVersion =	ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityVersion);
+			std::list<ot::EntityInformation> entityInfos;
+			ot::ModelServiceAPI::getEntityInformation({ curveEntityID }, entityInfos);
+			
+			assert(entityInfos.size() == 1);
+			ot::UID curveEntityVersion = entityInfos.front().getEntityVersion();
 			EntityBase* base = ot::EntityAPI::readEntityFromEntityIDandVersion(curveEntityID, curveEntityVersion);
 			std::unique_ptr< EntityResult1DCurve> curve(dynamic_cast<EntityResult1DCurve*>(base));
 			curve->setDataLakeAccessCfg(std::move(accessConfig));
 			curve->storeToDataBase();
 			ot::NewModelStateInfo updatedCurve;
 			updatedCurve.addTopologyEntity(*curve.get());
-			ot::ModelServiceAPI::addEntitiesToModel(updatedCurve, "Performed update on the data lake access cfg.");
+			ot::ModelServiceAPI::updateTopologyEntities(updatedCurve, "Performed update on the data lake access cfg.", false);
 
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
