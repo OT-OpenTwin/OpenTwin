@@ -77,9 +77,18 @@ ot::TableCfg::TableCfg(const ot::GenericDataStructMatrix& _matrix, TableCfg::Tab
 	MatrixEntryPointer matrixPointer;
 	ot::VariableToStringConverter converter;
 
-	uint32_t rowStarter = (_headerMode == TableHeaderMode::Horizontal ? 1 : 0);
-	uint32_t columnStarter = (_headerMode == TableHeaderMode::Vertical ? 1 : 0);
-	
+	auto rowCount = _matrix.getNumberOfRows();
+	auto columnCount = _matrix.getNumberOfColumns();
+	uint32_t rowStarter = 0;
+	uint32_t columnStarter = 0;
+
+	if (_headerMode == TableHeaderMode::Horizontal && rowCount > 0) {
+		rowStarter = 1;
+	}
+	if (_headerMode == TableHeaderMode::Vertical && columnCount > 0) {
+		columnStarter = 1;
+	}
+
 	this->initialize(_matrix.getNumberOfRows() - rowStarter, _matrix.getNumberOfColumns() - columnStarter);
 
 	//First we set the column header, if the header mode is set accordingly
