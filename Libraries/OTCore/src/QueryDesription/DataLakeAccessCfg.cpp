@@ -46,6 +46,7 @@ ot::DataLakeAccessCfg& ot::DataLakeAccessCfg::operator=(const DataLakeAccessCfg&
 
 void ot::DataLakeAccessCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const
 {
+	_jsonObject.AddMember("CollectionNameBase", ot::JsonString(m_collectionNameBase, _allocator), _allocator);
 	JsonArray collectionQueryArr;
 	for (const auto& it : m_collectionToQueryMap)
 	{
@@ -67,29 +68,70 @@ void ot::DataLakeAccessCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocato
 	_jsonObject.AddMember("SeriesMetadataMap", std::move(seriesMetadataArr), _allocator);
 	
 
-	JsonArray fieldDecoderArr;
-	/*for (const auto& it : m_fieldDecoders)
+	JsonArray fieldDecoderParamArr;
+	for (const auto& it : m_fieldDecodersParameter)
 	{
 		JsonObject kvp;
 		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
 		kvp.AddMember("Decoder", JsonObject(it.second, _allocator), _allocator);
-		fieldDecoderArr.PushBack(std::move(kvp), _allocator);
-	}*/
-	_jsonObject.AddMember("FieldDecoders", std::move(fieldDecoderArr), _allocator);
+		fieldDecoderParamArr.PushBack(std::move(kvp), _allocator);
+	}
+	_jsonObject.AddMember("FieldDecodersParam", std::move(fieldDecoderParamArr), _allocator);
 
-	JsonArray valueTransformerArr;
-	/*for (const auto& it : m_valueTransformerByFieldKey)
+	JsonArray fieldDecoderQuantArr;
+	for (const auto& it : m_fieldDecodersQuantity)
+	{
+		JsonObject kvp;
+		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
+		kvp.AddMember("Decoder", JsonObject(it.second, _allocator), _allocator);
+		fieldDecoderQuantArr.PushBack(std::move(kvp), _allocator);
+	}
+	_jsonObject.AddMember("FieldDecodersQuant", std::move(fieldDecoderQuantArr), _allocator);
+
+	JsonArray fieldDecoderSeriesArr;
+	for (const auto& it : m_fieldDecodersSeries)
+	{
+		JsonObject kvp;
+		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
+		kvp.AddMember("Decoder", JsonObject(it.second, _allocator), _allocator);
+		fieldDecoderSeriesArr.PushBack(std::move(kvp), _allocator);
+	}
+	_jsonObject.AddMember("FieldDecodersSer", std::move(fieldDecoderSeriesArr), _allocator);
+
+	JsonArray valueTransformerParamArr;
+	for (const auto& it : m_valueTransformerByFieldKeyParameter)
 	{
 		JsonObject kvp;
 		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
 		kvp.AddMember("Transformer", JsonObject(it.second, _allocator), _allocator);
-		valueTransformerArr.PushBack(std::move(kvp), _allocator);
-	}*/
-	_jsonObject.AddMember("ValueTransformers", std::move(valueTransformerArr), _allocator);
+		valueTransformerParamArr.PushBack(std::move(kvp), _allocator);
+	}
+	_jsonObject.AddMember("ValueTransformersParam", std::move(valueTransformerParamArr), _allocator);
+
+	JsonArray valueTransformerQuant;
+	for (const auto& it : m_valueTransformerByFieldKeyQuantity)
+	{
+		JsonArray transformer;
+		for (auto& processor : it.second)
+		{
+			ot::JsonObject entry;
+			processor.addToJsonObject(entry, _allocator);
+			transformer.PushBack(entry, _allocator);
+		}
+
+
+		JsonObject kvp;
+		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
+		kvp.AddMember("Transformer", transformer, _allocator);
+		valueTransformerQuant.PushBack(std::move(kvp), _allocator);
+	}
+	_jsonObject.AddMember("ValueTransformersQuant", std::move(valueTransformerQuant), _allocator);
 }
 
 void ot::DataLakeAccessCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonObject)
 {
+	m_collectionNameBase = ot::json::getString(_jsonObject, "CollectionNameBase");
+	
 	m_collectionToQueryMap.clear();
 	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "CollectionQueryMap"))
 	{
@@ -107,20 +149,49 @@ void ot::DataLakeAccessCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonOb
 		m_seriesMetadataMap.emplace(std::move(series), std::move(metadata));
 	}
 
-
-	/*m_fieldDecoders.clear();
-	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "FieldDecoders"))
+	m_fieldDecodersParameter.clear();
+	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "FieldDecodersParam"))
 	{
 		std::string fieldKey = json::getString(kvp, "Field");
 		DataPointDecoder decoder(json::getObject(kvp, "Decoder"));
-		m_fieldDecoders.emplace(std::move(fieldKey), std::move(decoder));
+		m_fieldDecodersParameter.emplace(std::move(fieldKey), std::move(decoder));
 	}
 
-	m_valueTransformerByFieldKey.clear();
-	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "ValueTransformers"))
+	m_fieldDecodersQuantity.clear();
+	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "FieldDecodersQuant"))
+	{
+		std::string fieldKey = json::getString(kvp, "Field");
+		DataPointDecoder decoder(json::getObject(kvp, "Decoder"));
+		m_fieldDecodersQuantity.emplace(std::move(fieldKey), std::move(decoder));
+	}
+
+	m_fieldDecodersSeries.clear();
+	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "FieldDecodersSer"))
+	{
+		std::string fieldKey = json::getString(kvp, "Field");
+		DataPointDecoder decoder(json::getObject(kvp, "Decoder"));
+		m_fieldDecodersSeries.emplace(std::move(fieldKey), std::move(decoder));
+	}
+	
+	m_valueTransformerByFieldKeyParameter.clear();
+	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "ValueTransformersParam"))
 	{
 		std::string fieldKey = json::getString(kvp, "Field");
 		ValueProcessing transformer(json::getObject(kvp, "Transformer"));
-		m_valueTransformerByFieldKey.emplace(std::move(fieldKey), std::move(transformer));
-	}*/
+		m_valueTransformerByFieldKeyParameter.emplace(std::move(fieldKey), std::move(transformer));
+	}
+
+	m_valueTransformerByFieldKeyQuantity.clear();
+	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "ValueTransformersQuant"))
+	{
+		std::string fieldKey = json::getString(kvp, "Field");
+		auto processors = 	json::getArray(_jsonObject, "Transformer");
+		std::list<ValueProcessing> procList;
+		for (uint32_t i = 0 ; i < processors.Size(); i++)
+		{
+			ValueProcessing transformer(json::getObject(processors, i));
+			procList.push_back(transformer);
+		}
+		m_valueTransformerByFieldKeyQuantity.emplace(std::move(fieldKey), std::move(procList));
+	}
 }

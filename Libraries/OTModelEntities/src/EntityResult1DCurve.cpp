@@ -308,8 +308,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 		assert(false); //Failed to get the short name which should always be possible
 		curveLabel = "";
 	}
-
-
+	auto dlAccessCfg = m_dataLakeAccessCfg;
+	curveCfg.setDataAccessConfig(std::move(dlAccessCfg));
 	curveCfg.setTitle(curveLabel);
 	curveCfg.setQueryInformation(m_queryInformation);
 

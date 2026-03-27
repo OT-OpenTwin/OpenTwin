@@ -63,11 +63,13 @@ namespace ot {
 
 		};
 		
+
 		void addFieldDecoderParameter(const DataPointDecoder& _decoder) 
 		{ 
 			m_fieldDecodersParameter.insert_or_assign(_decoder.getFieldName(), _decoder);
 		}
-		std::optional<DataPointDecoder> getFieldDecoderParameter(const std::string& _fieldKey) 
+
+		std::optional<DataPointDecoder> getFieldDecoderParameter(const std::string& _fieldKey) const
 		{
 			auto decoder = m_fieldDecodersParameter.find(_fieldKey);
 			if (decoder != m_fieldDecodersParameter.end())
@@ -84,7 +86,7 @@ namespace ot {
 		{ 
 			m_fieldDecodersSeries.insert_or_assign(_decoder.getFieldName(), _decoder);
 		}
-		std::optional<DataPointDecoder> getFieldDecoderSeries(const std::string& _fieldKey) 
+		std::optional<DataPointDecoder> getFieldDecoderSeries(const std::string& _fieldKey) const
 		{
 			auto decoder = m_fieldDecodersSeries.find(_fieldKey);
 			if (decoder != m_fieldDecodersSeries.end())
