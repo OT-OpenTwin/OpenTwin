@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityAPI.cpp
 // 
 // License:
@@ -32,14 +32,22 @@ EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _
 	auto doc_view = doc.view()["Found"].get_document().view();
 
 	std::string entityType = doc_view["SchemaType"].get_utf8().value.data();
-
-	EntityBase* entity = EntityFactory::instance().create(entityType);
-
-	if (entity != nullptr) {
-		std::map<UID, EntityBase*> entityMap;
-		entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);
+	
+	// Model entities are not loaded like the usual project entities, so they are not part of the factory. 
+	// However, analysing entities from another collection currently goes through all topo entities of the modelstate, which includes the model entity. 
+	if (entityType != "Model")
+	{
+		EntityBase* entity = EntityFactory::instance().create(entityType);
+		if (entity != nullptr) {
+			std::map<UID, EntityBase*> entityMap;
+			entity->restoreFromDataBase(nullptr, nullptr, nullptr, doc_view, entityMap);
+		}
+		return entity;
+	}
+	else
+	{
+		return nullptr;
 	}
 
-	return entity;
 }
 
