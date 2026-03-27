@@ -1496,6 +1496,18 @@ void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& 
 	m_value = ot::json::getString(_object, "Value");
 }
 
+EntityPropertiesProjectList* EntityPropertiesProjectList::createProperty(const std::string& group, const std::string& name, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Finally create the new property
+	EntityPropertiesProjectList* newProperty = new EntityPropertiesProjectList(name);
+	newProperty->setValue(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue));
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
 // ################################################################################################################################################################
 
 EntityPropertiesGuiPainter::EntityPropertiesGuiPainter()
