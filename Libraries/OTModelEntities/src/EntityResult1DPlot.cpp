@@ -487,10 +487,8 @@ void EntityResult1DPlot::setQuerySelections()
 			}
 		}
 	}
-	if (std::find(filterOptions.begin(), filterOptions.end(), "") == filterOptions.end())
-	{
-		filterOptions.push_back("");
-	}
+	filterOptions.sort();
+	filterOptions.unique();
 
 	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->resetOptions(parameterOptions);
 	if (parameterOptions.size() != 0)
