@@ -216,7 +216,7 @@ void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, co
 	EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr);
 	std::list<std::string> takenNames = model->getListOfFolderItems(_nameBase,false);
 	const std::string fullName = ot::EntityName::createUniqueEntityName(_nameBase, shortName, takenNames);
-	newCurve.setName(_nameBase + "/" + shortName);
+	newCurve.setName(fullName);
 	newCurve.createProperties();
 	newCurve.setCurve(curveConfig);
 	newCurve.storeToDataBase();
