@@ -66,7 +66,7 @@ public:
 	virtual void requestLibraryElement(ot::JsonDocument& _doc) {};
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
-	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt;	};
+	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
 	virtual void requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot::UID _entityID, ot::UID _entityVersion) {};
 };
 

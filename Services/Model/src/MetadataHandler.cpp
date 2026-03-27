@@ -16,12 +16,12 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 
 	if (!_projectName.empty())
 	{
-		EntityMetadataSeries tempS;
-		const std::string classNameSeries = tempS.getClassName();
-		EntityMetadataCampaign tempC;
-		const std::string classNameCampaign = tempC.getClassName();
-		std::shared_ptr<EntityMetadataCampaign> campaignMetadataEntity;
-		std::list<std::shared_ptr<EntityMetadataSeries>> measurementMetadataEntity;
+		const std::string classNameSeries = EntityMetadataSeries::className();
+		const std::string classNameCampaign = EntityMetadataCampaign::className();
+
+		EntityMetadataCampaign* campaignMetadataEntity = nullptr;
+		std::list<EntityMetadataSeries*> measurementMetadataEntity;
+		std::list<std::unique_ptr<EntityBase>> garbage;
 
 		Model* model = Application::instance()->getModel();
 		if (Application::instance()->getProjectName() != _projectName)
@@ -31,7 +31,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			const std::string pswd = Application::instance()->getLogInUserPassword();
 			
 			// Getting information of session service. Potential to reduce communication with buffer.
-			_collectionName =	m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
+			_collectionName = m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
 			CrossCollectionDatabaseWrapper wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
@@ -53,49 +53,55 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			{
 				std::unique_ptr<EntityBase> baseEnt;
 				baseEnt.reset(ot::EntityAPI::readEntityFromEntityIDandVersion(identifier.first, identifier.second));
-
-				if (baseEnt != nullptr)
+				
+				if (baseEnt == nullptr)
 				{
-					if (baseEnt->getClassName() == classNameCampaign)
-					{
-						EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt.release());
-						campaignMetadataEntity.reset(campaign);
-					}
-					else if (baseEnt->getClassName() == classNameSeries)
-					{
-						EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.release());
-						measurementMetadataEntity.push_back(std::shared_ptr<EntityMetadataSeries>(series));
-					}
+					continue;
 				}
+
+				if (baseEnt->getClassName() == classNameCampaign)
+				{
+					EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt.get());
+					OTAssertNullptr(campaign);
+					campaignMetadataEntity = campaign;
+				}
+				else if (baseEnt->getClassName() == classNameSeries)
+				{
+					EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.get());
+					OTAssertNullptr(series);
+					measurementMetadataEntity.push_back(series);
+				}
+
+				garbage.push_back(std::move(baseEnt));
 			}
 		}
 		else
 		{
 			_collectionName = Application::instance()->getCollectionName();
-			ot::UIDList entityIDs = model->getIDsOfFolderItems(ot::FolderNames::DatasetFolder,true);
+			ot::UIDList entityIDs = model->getIDsOfFolderItems(ot::FolderNames::DatasetFolder, true);
 			model->prefetchDocumentsFromStorage(entityIDs);
 			for (ot::UID entityID : entityIDs)
 			{
-				std::unique_ptr<EntityBase> baseEnt;
-				baseEnt.reset(model->readEntityFromEntityID(nullptr, entityID, model->getAllEntitiesByUID()));
+				EntityBase* baseEnt = model->readEntityFromEntityID(nullptr, entityID, model->getAllEntitiesByUID());
 				
 				assert(baseEnt != nullptr);
 				if (baseEnt->getClassName() == classNameSeries)
 				{
-					EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.release());
-					measurementMetadataEntity.push_back(std::shared_ptr<EntityMetadataSeries>(series));
+					EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt);
+					measurementMetadataEntity.push_back(series);
 				}
 				else if(baseEnt->getClassName() == classNameCampaign)
 				{
-					EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt.release());
-					campaignMetadataEntity.reset(campaign);
-				}
-				else
-				{
-					assert(false);
+					EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt);
+					campaignMetadataEntity = campaign;
 				}
 			}
-			
+		}
+
+		if (!campaignMetadataEntity)
+		{
+			OT_LOG_E("Campaign metadata entity for for project \"" + _projectName + "\" not found");
+			return MetadataCampaign();
 		}
 
 		MetadataEntityInterface campaignFactory;

@@ -204,7 +204,7 @@ void EntityFileCSV::readSpecificDataFromDataBase(const bsoncxx::document::view &
 	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
 }
 
-const ot::GenericDataStructMatrix EntityFileCSV::getTable()
+ot::GenericDataStructMatrix EntityFileCSV::getTable()
 {
 	OT_TEST_ENTITYFILECSV_Interval("Get table");
 
@@ -245,7 +245,7 @@ ot::TableCfg EntityFileCSV::getTableConfig(bool _includeData)
 	if (_includeData)
 	{
 		OT_TEST_ENTITYFILECSV_Interval("Get table config");
-		ot::GenericDataStructMatrix matrix = getTable();
+		const ot::GenericDataStructMatrix matrix = getTable();
 		ot::TableCfg::TableHeaderMode headerMode = getHeaderMode();
 		tableCfg = ot::TableCfg(matrix, headerMode);
 	}

@@ -1144,6 +1144,7 @@ void Model::handleShowDatasetInformation()
 		newStateInfo.addTopologyEntity(infoEntity);
 
 		addEntitiesToModel(newStateInfo, "Add dataset info view", true, true, true);
+		Application::instance()->handleProjectSave();
 	}
 }
 
