@@ -107,7 +107,7 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 		clearTextEntry.AddMember(ot::JsonString("Values", clearTextDoc.GetAllocator()), quantityValue, clearTextDoc.GetAllocator());
 
 		std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());
-		auto dataPointDecoderSer = _config.getFieldDecoderQuantity(seriesID);
+		auto dataPointDecoderSer = _config.getFieldDecoderSeries(seriesID);
 		if (!dataPointDecoderSer.has_value())
 		{
 			assert(false);

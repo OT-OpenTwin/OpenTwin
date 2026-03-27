@@ -46,12 +46,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	mongocxx::options::find options;
 	 
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options);
-	if (!entireResult.HasMember("Documents"))
+	if (!ot::json::exists(entireResult, DataLakeHelper::getDataFieldName()))
 	{
 		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
-	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
+	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, DataLakeHelper::getDataFieldName());
 	if (allMongoDocuments.Size() == 0)
 	{
 		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
