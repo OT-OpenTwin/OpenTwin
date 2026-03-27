@@ -3827,7 +3827,7 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 	}
 	else
 	{
-		OT_LOG_E("Requested curve update could not identify the corresponding plot");
+		OT_LOG_E("Requested curve update could not identify the corresponding plot. { \"Plot\": \"" + plotName + "\" }");
 	}
 }
 

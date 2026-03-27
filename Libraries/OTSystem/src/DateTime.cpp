@@ -31,6 +31,9 @@
 
 namespace ot {
     namespace intern {
+
+        static inline const std::regex getDurationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
+
         std::string toTimeStamp(std::chrono::system_clock::time_point _timePoint, ot::DateTime::DateFormat _format) {
             auto timeT = std::chrono::system_clock::to_time_t(_timePoint);
             auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(_timePoint.time_since_epoch()) % 1000;
@@ -218,7 +221,7 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
 {
     std::smatch match;
 
-    if (!std::regex_match(_duration, match, m_durationRe)) {
+    if (!std::regex_match(_duration, match, intern::getDurationRegex())) {
         throw std::runtime_error("Invalid duration format: " + _duration);
     }
 
@@ -435,7 +438,7 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
     case Msec:
         return true;
     case Duration:
-        return std::regex_match(_timestamp, m_durationRe);
+        return std::regex_match(_timestamp, intern::getDurationRegex());
     default:
         return false;
     }
