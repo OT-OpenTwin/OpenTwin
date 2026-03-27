@@ -104,7 +104,7 @@ void ot::EntityBlockHierarchicalDocumentItem::setText(const std::string& _text) 
 	setModified();
 }
 
-ot::TextEditorCfg ot::EntityBlockHierarchicalDocumentItem::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
+ot::TextEditorCfg ot::EntityBlockHierarchicalDocumentItem::getTextConfig(const ot::VisualisationCfg& _visualizationConfig) {
 	ot::TextEditorCfg result;
 	result.setDocumentSyntax(ot::DocumentSyntax::PlainText);
 	result.setEntityInformation(getBasicEntityInformation());

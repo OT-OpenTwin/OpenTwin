@@ -691,7 +691,7 @@ ot::ReturnMessage Application::requestToOpenTextDocument(ot::UID _visualizingEnt
 	ot::BasicServiceInformation modelInfo(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 	modelInfo.addToJsonObject(doc, doc.GetAllocator());
 
-	const ot::TextEditorCfg configuration = _block->createConfig(visCfg);
+	const ot::TextEditorCfg configuration = _block->getTextConfig(visCfg);
 	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(configuration, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string tmp;

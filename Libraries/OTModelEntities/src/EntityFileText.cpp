@@ -157,7 +157,7 @@ void EntityFileText::setText(const std::string& _text)
 	}
 }
 
-ot::TextEditorCfg EntityFileText::createConfig(const ot::VisualisationCfg& _visualizationConfig) {
+ot::TextEditorCfg EntityFileText::getTextConfig(const ot::VisualisationCfg& _visualizationConfig) {
 	OT_TEST_ENTITYFILETEXT_Interval("Create config");
 
 	ot::TextEditorCfg result;

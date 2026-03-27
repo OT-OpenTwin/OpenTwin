@@ -76,7 +76,7 @@ void EntityPythonManifest::setText(const std::string& _text)
 }
 
 
-ot::TextEditorCfg EntityPythonManifest::createConfig(const ot::VisualisationCfg& _visualizationConfig)
+ot::TextEditorCfg EntityPythonManifest::getTextConfig(const ot::VisualisationCfg& _visualizationConfig)
 {
 	ot::TextEditorCfg result;
 	result.setEntityName(this->getName());

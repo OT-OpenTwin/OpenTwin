@@ -21,9 +21,9 @@
 
 // OpenTwin header
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/IVisualisationImage.h"
+#include "OTModelEntities/Visualization/IVisualisationImage.h"
 
-class OT_MODELENTITIES_API_EXPORT EntityFileImage : public EntityFile, public IVisualisationImage {
+class OT_MODELENTITIES_API_EXPORT EntityFileImage : public EntityFile, public ot::IVisualisationImage {
 public:
 	EntityFileImage() : EntityFileImage(0, nullptr, nullptr, nullptr) {};
 	EntityFileImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);

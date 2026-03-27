@@ -21,11 +21,11 @@
 #pragma warning(disable : 4251)
 
 #include "OTModelEntities/EntityContainer.h"
-#include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
 
 class EntityResultTextData;
 
-class __declspec(dllexport) EntityResultText : public EntityBase, public IVisualisationText
+class __declspec(dllexport) EntityResultText : public EntityBase, public ot::IVisualisationText
 {
 public:
 	EntityResultText() : EntityResultText(0, nullptr, nullptr, nullptr) {};
@@ -61,7 +61,7 @@ public:
 	void setText(const std::string &text) override;
 	std::string getText() override;
 	bool visualiseText() override;
-	ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
+	ot::TextEditorCfg getTextConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 	
 private:
 	void ensureTextDataLoaded(void);

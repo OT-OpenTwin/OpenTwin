@@ -24,7 +24,6 @@
 #include "PythonObjectBuilder.h"
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelEntities/EntityAPI.h"
-#include "OTModelEntities/IVisualisationTable.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 
 #include "OTBlockEntities/EntityBlock.h"
@@ -140,7 +139,7 @@ void EntityBuffer::ensureTableToBeLoaded(const std::string& _absoluteEntityName)
 	if (m_bufferedTableEntities.find(_absoluteEntityName) == m_bufferedTableEntities.end())
 	{
 		std::shared_ptr<EntityBase> entity = loadEntity(_absoluteEntityName);
-		IVisualisationTable* newResultTable(dynamic_cast<IVisualisationTable*>(entity.get()));
+		ot::IVisualisationTable* newResultTable(dynamic_cast<ot::IVisualisationTable*>(entity.get()));
 		if (newResultTable == nullptr)
 		{
 			throw std::exception(("Requested table " + _absoluteEntityName + " is not a table.").c_str());
@@ -166,7 +165,7 @@ void EntityBuffer::ensureValidRangeSelections(EntityBase* _entityBase) {
 		else {
 
 			auto tableByName = m_bufferedTableEntities.find(tableName);
-			IVisualisationTable* table = tableByName->second;
+			ot::IVisualisationTable* table = tableByName->second;
 			ot::GenericDataStructMatrix tableContent =	table->getTable();
 			int32_t maxNumberOfRows = static_cast<int32_t>(tableContent.getNumberOfRows());
 			int32_t maxNumberOfColumns = static_cast<int32_t>(tableContent.getNumberOfColumns());

@@ -25,13 +25,13 @@
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
 
-void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<IVisualisationTable>>& _allTablesByName)
+void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName)
 {
 	bool allEntriesSuccessfullyTransformed = true;
 	for (auto tableByName : _allTablesByName)
 	{
 		const std::string& tableName = tableByName.first;
-		const std::shared_ptr<IVisualisationTable> table = tableByName.second;
+		const std::shared_ptr<ot::IVisualisationTable> table = tableByName.second;
 
 		ot::GenericDataStructMatrix tableContent =	table->getTable();
 

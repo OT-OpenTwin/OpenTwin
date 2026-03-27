@@ -19,11 +19,11 @@
 
 #pragma once
 #include "OTModelEntities/EntityBase.h"
-#include "OTModelEntities/IVisualisationCurve.h"
+#include "OTModelEntities/Visualization/IVisualisationCurve.h"
 #include "OTGui/QueryInformation.h"
 #include "OTModelEntities/PropertyBundleDataLakeQuery.h"
 
-class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public IVisualisationCurve
+class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve
 {
 public:
 	enum DefaultCurveStyle {

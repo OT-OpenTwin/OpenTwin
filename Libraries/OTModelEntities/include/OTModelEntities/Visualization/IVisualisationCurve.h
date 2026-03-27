@@ -1,5 +1,5 @@
 // @otlicense
-// File: IVisualisationPlot1D.h
+// File: IVisualisationCurve.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,12 +20,16 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot/Plot1DCfg.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
 
-class IVisualisationPlot1D
-{
-public:
-	virtual const ot::Plot1DCfg getPlot() = 0;
-	virtual void setPlot(const ot::Plot1DCfg& _config) = 0;
-	virtual bool visualisePlot() = 0;
-};
+namespace ot {
+
+	class IVisualisationCurve
+	{
+	public:
+		virtual bool visualiseCurve() = 0;
+		virtual ot::Plot1DCurveCfg getCurve() = 0;
+		virtual void setCurve(const ot::Plot1DCurveCfg& _curve) = 0;
+	};
+
+}

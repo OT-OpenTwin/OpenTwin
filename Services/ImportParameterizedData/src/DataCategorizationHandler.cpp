@@ -99,7 +99,7 @@ bool DataCategorizationHandler::isValidSelection(std::list<std::unique_ptr<Entit
 	uint32_t selectedTables(0);
 	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
+		ot::IVisualisationTable* table = dynamic_cast<ot::IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			selectedTables++;
@@ -121,7 +121,7 @@ std::string DataCategorizationHandler::getTableFromSelection(std::list<std::uniq
 	std::string tableEntityName("");
 	for (std::unique_ptr<EntityBase>& entity : _selectedEntities)
 	{
-		IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entity.get());
+		ot::IVisualisationTable* table = dynamic_cast<ot::IVisualisationTable*>(entity.get());
 		if (table != nullptr)
 		{
 			tableEntityName = entity->getName();
@@ -422,13 +422,13 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	auto tableBase = ot::EntityAPI::readEntityFromEntityIDandVersion(m_bufferedTableID, m_bufferedTableVersion);
 	m_bufferedTableID = -1;
 	m_bufferedTableVersion = -1;
-	auto tableEntity = dynamic_cast<IVisualisationTable*>(tableBase);
+	auto tableEntity = dynamic_cast<ot::IVisualisationTable*>(tableBase);
 	if (tableEntity == nullptr)
 	{
 		assert(0);
 		return;
 	}
-	std::unique_ptr<IVisualisationTable> tableEntPtr(tableEntity);
+	std::unique_ptr<ot::IVisualisationTable> tableEntPtr(tableEntity);
 	ot::NewModelStateInfo entityInfos;
 	
 	std::list<std::string> takenNames;
@@ -563,7 +563,7 @@ void DataCategorizationHandler::storeSelectionRanges(const std::vector<ot::Table
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "added new table selection range");
 }
 
-std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode)
+std::string DataCategorizationHandler::determineDataTypeOfSelectionRanges(ot::IVisualisationTable* _table, const std::vector<ot::TableRange>& _selectedRanges, std::map<std::string, std::string>& _logMessagesByErrorType, ot::TableCfg::TableHeaderMode _headerMode)
 {
 	ot::StringToVariableConverter converter;
 	std::bitset<6> dataTypeOverall;

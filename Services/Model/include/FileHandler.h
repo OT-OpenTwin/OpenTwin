@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/IVisualisationText.h"
-#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTGui/Widgets/TableCfg.h"
@@ -90,8 +90,8 @@ private:
 	void addTextFilesToModel();
 	void clearBuffer();
 	
-	void storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex);
-	void storeChangedTable(IVisualisationTable* _entity, const ot::TableCfg& _cfg);
+	void storeChangedText(ot::IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex);
+	void storeChangedTable(ot::IVisualisationTable* _entity, const ot::TableCfg& _cfg);
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.

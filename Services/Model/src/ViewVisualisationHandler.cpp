@@ -21,11 +21,11 @@
 #include "ViewVisualisationHandler.h"
 #include "Application.h"
 #include "Model.h"
-#include "OTModelEntities/IVisualisationText.h"
-#include "OTModelEntities/IVisualisationTable.h"
-#include "OTModelEntities/IVisualisationPlot1D.h"
-#include "OTModelEntities/IVisualisationCurve.h"
-#include "OTModelEntities/IVisualisationGraphicsView.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationPlot1D.h"
+#include "OTModelEntities/Visualization/IVisualisationCurve.h"
+#include "OTModelEntities/Visualization/IVisualisationGraphicsView.h"
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTCore/RuntimeTests.h"
@@ -59,7 +59,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	{
 
 		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize table");
-		IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
+		ot::IVisualisationTable* tableEntity = dynamic_cast<ot::IVisualisationTable*>(baseEntity);
 		assert(tableEntity != nullptr);
 		if (tableEntity != nullptr && tableEntity->visualiseTable())
 		{
@@ -83,13 +83,13 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	{
 		OT_TEST_VISUALIZATIONHANDLER_Interval("Visualize text");
 
-		IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
+		ot::IVisualisationText* textEntity = dynamic_cast<ot::IVisualisationText*>(baseEntity);
 		assert(textEntity != nullptr);
 		if (textEntity != nullptr && (textEntity->visualiseText() || _visualisationCfg.getIsAppend()))
 		{
 			document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_TEXTEDITOR_Setup, document.GetAllocator());
 
-			ot::TextEditorCfg configuration = textEntity->createConfig(_visualisationCfg);
+			ot::TextEditorCfg configuration = textEntity->getTextConfig(_visualisationCfg);
 
 			if (_visualisationCfg.getCustomViewFlags().has_value()) {
 				configuration.setViewFlags(_visualisationCfg.getCustomViewFlags().value());
@@ -105,7 +105,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	}
 	else if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_VIEW1D_Setup)
 	{
-		IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
+		ot::IVisualisationPlot1D* plotEntity = dynamic_cast<ot::IVisualisationPlot1D*>(baseEntity);
 		if (plotEntity != nullptr && plotEntity->visualisePlot())
 		{
 			EntityContainer* containerEntity = dynamic_cast<EntityContainer*>(plotEntity);
@@ -128,7 +128,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 				ot::JsonArray curveCfgs;
 				for (EntityBase* curveEntity : curveEntities)
 				{
-					IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(curveEntity);
+					ot::IVisualisationCurve* curve = dynamic_cast<ot::IVisualisationCurve*>(curveEntity);
 					ot::Plot1DCurveCfg curveCfg = curve->getCurve();
 					ot::JsonObject curveCfgSerialised;
 					curveCfg.addToJsonObject(curveCfgSerialised, document.GetAllocator());
@@ -147,7 +147,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	}
 	else if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor)
 	{
-		IVisualisationGraphicsView* graphicsView = dynamic_cast<IVisualisationGraphicsView*>(baseEntity);
+		ot::IVisualisationGraphicsView* graphicsView = dynamic_cast<ot::IVisualisationGraphicsView*>(baseEntity);
 		if (graphicsView != nullptr && graphicsView->visualiseGraphicsView())
 		{
 			document.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, document.GetAllocator()), document.GetAllocator());
@@ -175,8 +175,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 	assert(baseEntity != nullptr);
 	const bool includeData = false;
 	
-
-	IVisualisationTable* tableEntity = dynamic_cast<IVisualisationTable*>(baseEntity);
+	ot::IVisualisationTable* tableEntity = dynamic_cast<ot::IVisualisationTable*>(baseEntity);
 	
 	ot::JsonDocument documentBase;
 	ot::VisualisationCfg visualisationCfg;
@@ -202,7 +201,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 		Application::instance()->queuedRequestToFrontend(singleRequest);
 	}
 
-	IVisualisationText* textEntity = dynamic_cast<IVisualisationText*>(baseEntity);
+	ot::IVisualisationText* textEntity = dynamic_cast<ot::IVisualisationText*>(baseEntity);
 	if (textEntity != nullptr && textEntity->visualiseText())
 	{
 		ot::JsonDocument singleRequest;
@@ -213,7 +212,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 		ot::VisualisationCfg vizCfg;
 		vizCfg.setOverrideViewerContent(false);
 
-		ot::TextEditorCfg configuration = textEntity->createConfig(vizCfg);
+		ot::TextEditorCfg configuration = textEntity->getTextConfig(vizCfg);
 		ot::JsonObject cfgObj;
 		configuration.addToJsonObject(cfgObj, singleRequest.GetAllocator());
 
@@ -222,7 +221,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 		Application::instance()->queuedRequestToFrontend(singleRequest);
 	}
 
-	IVisualisationPlot1D* plotEntity = dynamic_cast<IVisualisationPlot1D*>(baseEntity);
+	ot::IVisualisationPlot1D* plotEntity = dynamic_cast<ot::IVisualisationPlot1D*>(baseEntity);
 	if (plotEntity != nullptr && plotEntity->visualisePlot())
 	{
 		ot::JsonDocument singleRequest;
@@ -238,7 +237,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 		Application::instance()->queuedRequestToFrontend(singleRequest);
 	}
 
-	IVisualisationCurve* curve = dynamic_cast<IVisualisationCurve*>(baseEntity);
+	ot::IVisualisationCurve* curve = dynamic_cast<ot::IVisualisationCurve*>(baseEntity);
 	if (curve != nullptr && curve->visualiseCurve())
 	{
 		ot::JsonDocument singleRequest;

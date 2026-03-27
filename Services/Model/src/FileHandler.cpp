@@ -166,7 +166,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	uiComponent->displayMessage(std::to_string(passedTime) + " ms\n");
 }
 
-void FileHandler::storeChangedTable(IVisualisationTable* _entity, const ot::TableCfg& _cfg)
+void FileHandler::storeChangedTable(ot::IVisualisationTable* _entity, const ot::TableCfg& _cfg)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
@@ -188,7 +188,7 @@ ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entit
 	{
 		ot::UID entityID = entityIDByName->second;
 		EntityBase* entityBase = model->getEntityByID(entityID);
-		IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
+		ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
 		if(textVisualisationEntity != nullptr)
 		{
 			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
@@ -241,7 +241,7 @@ ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
 	if (entityIDByName != entityIDsByName.end()) {
 		ot::UID entityID = entityIDByName->second;
 		EntityBase* entityBase = model->getEntityByID(entityID);
-		IVisualisationTable* tableVisualisationEntity = dynamic_cast<IVisualisationTable*>(entityBase);
+		ot::IVisualisationTable* tableVisualisationEntity = dynamic_cast<ot::IVisualisationTable*>(entityBase);
 		if (tableVisualisationEntity != nullptr) {
 			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
 
@@ -293,7 +293,7 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 		return ret;
 	}
 
-	IVisualisationText* textVisualisationEntity = dynamic_cast<IVisualisationText*>(entityBase);
+	ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
 	if (!textVisualisationEntity) {
 		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity has no text visualization interface { \"Name\": \"" + entityName + "\", \"Type\": \"" + entityBase->getClassName() + "\" }");
 		OT_LOG_E(ret.getWhat());
@@ -314,7 +314,7 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
 }
 
-void FileHandler::storeChangedText(IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)
+void FileHandler::storeChangedText(ot::IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);

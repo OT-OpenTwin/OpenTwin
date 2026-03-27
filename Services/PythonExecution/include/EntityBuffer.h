@@ -20,7 +20,7 @@
 #pragma once
 #include "CPythonObjectNew.h"
 #include "OTModelEntities/EntityBase.h"
-#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
 #include <string>
 #include <memory>
@@ -46,7 +46,7 @@ private:
 	EntityBuffer();
 
 	std::map<std::string, std::shared_ptr<EntityBase>> m_bufferedEntities;
-	std::map<std::string, IVisualisationTable*> m_bufferedTableEntities;
+	std::map<std::string, ot::IVisualisationTable*> m_bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
 		
 	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);

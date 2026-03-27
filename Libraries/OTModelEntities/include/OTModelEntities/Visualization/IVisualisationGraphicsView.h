@@ -1,5 +1,5 @@
 // @otlicense
-// File: IVisualisationTable.h
+// File: IVisualisationGraphicsView.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,20 +20,19 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/DataStruct/GenericDataStructMatrix.h"
-#include "OTGui/Widgets/TableCfg.h"
+#include "OTGui/Graphics/GraphicsPackage.h"
 
-// std header
-#include <string>
+namespace ot {
 
-class __declspec(dllexport) IVisualisationTable
-{
-public:
-	virtual ~IVisualisationTable() {}
-	virtual const ot::GenericDataStructMatrix getTable() = 0;
-	virtual void setTable(const ot::GenericDataStructMatrix& _table) = 0;
-	virtual ot::TableCfg getTableConfig(bool _includeData) = 0;
-	virtual char getDecimalDelimiter() = 0; //Needed for text to numeric conversions
-	virtual bool visualiseTable() = 0;
-	virtual ot::TableCfg::TableHeaderMode getHeaderMode(void) = 0;
-};
+	class IVisualisationGraphicsView
+	{
+	public:
+
+		virtual ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() = 0;
+		virtual bool visualiseGraphicsView() = 0;
+
+		virtual void setGraphicsPickerKey(const std::string& _key) = 0;
+		virtual std::string getGraphicsPickerKey() const = 0;
+	};
+
+}

@@ -19,7 +19,7 @@
 
 #pragma once
 #include "OTModelEntities/EntityTableSelectedRanges.h"
-#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
 #include <map>
 #include <list>
@@ -40,7 +40,7 @@ public:
 
 	//! @brief Tries to transforms the selections into the selected data types.
 	//! @throws If a failure accures in the data transformation
-	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, std::map<std::string, std::shared_ptr<IVisualisationTable>>& _allTablesByName);
+	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName);
 
 
 	std::map<std::string, std::list<ot::Variable>>* getFields() { return &m_fields; };

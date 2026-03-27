@@ -20,9 +20,9 @@
 #pragma once
 
 #include "OTModelEntities/EntityFileText.h"
-#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
-class __declspec(dllexport) EntityFileCSV : public EntityFileText, public IVisualisationTable
+class __declspec(dllexport) EntityFileCSV : public EntityFileText, public ot::IVisualisationTable
 {
 public:
 	EntityFileCSV() : EntityFileCSV(0, nullptr, nullptr, nullptr) {};

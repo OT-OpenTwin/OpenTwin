@@ -118,7 +118,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	if (rmdAssemblyData == nullptr) { throw std::exception("RMD categorization entity could not be found."); }
 	_uiComponent->displayMessage("Updating Campaign metadata\n");
 	std::list<std::string> requiredTables;
-	std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables;
+	std::map<std::string, std::shared_ptr<ot::IVisualisationTable>> loadedTables;
 	addRequiredTables(*rmdAssemblyData, requiredTables);
 	requiredTables.unique();
 	if (requiredTables.size() == 0)
@@ -514,7 +514,7 @@ void TabledataToResultdataHandler::rangeData2Json(ot::JsonDocument& _doc, KeyVal
 }
 
 
-std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> _loadedTables, KeyValuesExtractor& _outSeriesMetadata)
+std::list<DatasetDescription> TabledataToResultdataHandler::extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>> _loadedTables, KeyValuesExtractor& _outSeriesMetadata)
 {
 	std::list<std::string> requiredTables;
 	
@@ -625,7 +625,7 @@ void TabledataToResultdataHandler::addRequiredTables(const MetadataAssemblyData&
 	}
 }
 
-void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<IVisualisationTable>>& _loadedTables)
+void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _loadedTables)
 {
 	//Deleting all loaded tables that are not needed anymore
 	auto it = _loadedTables.begin();
@@ -693,8 +693,8 @@ void TabledataToResultdataHandler::loadRequiredTables(std::list<string>& _requir
 		for (ot::UID tableID : tableToLoadIDs)
 		{
 			auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(tableID, Application::instance()->getPrefetchedEntityVersion(tableID));
-			IVisualisationTable* visEnt = dynamic_cast<IVisualisationTable*>(baseEnt);
-			std::shared_ptr<IVisualisationTable>tableEntity(visEnt);
+			ot::IVisualisationTable* visEnt = dynamic_cast<ot::IVisualisationTable*>(baseEnt);
+			std::shared_ptr<ot::IVisualisationTable>tableEntity(visEnt);
 			_loadedTables.insert({ baseEnt->getName(), tableEntity });
 		}
 	}

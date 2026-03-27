@@ -233,7 +233,7 @@ bool RangeSelectionVisualisationHandler::requestToOpenTable(const std::string& _
 	ot::EntityInformation entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(_tableName, entityInfo);
 	EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
-	IVisualisationTable* table = dynamic_cast<IVisualisationTable*>(entityBase);
+	ot::IVisualisationTable* table = dynamic_cast<ot::IVisualisationTable*>(entityBase);
 	if (table == nullptr)
 	{
 		return false;

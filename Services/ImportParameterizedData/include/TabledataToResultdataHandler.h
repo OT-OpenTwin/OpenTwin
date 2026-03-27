@@ -29,7 +29,7 @@
 #include "OTCore/MetadataEntry/MetadataEntry.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
-#include "OTModelEntities/IVisualisationTable.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
 //! @brief Handler for storring data in the result collection.
 class TabledataToResultdataHandler : public BusinessLogicHandler
@@ -50,7 +50,7 @@ private:
 
 	std::map<std::string, MetadataAssemblyData> getAllMetadataAssemblies();
 	void addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables);
-	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<IVisualisationTable>>& _loadedTables);
+	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _loadedTables);
 
 	void extractRMDAndAllMSMD(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
 	void extractAllParameter(std::map<std::string, MetadataAssemblyData>& _allMetadataAssembliesByName, std::list<std::shared_ptr<EntityTableSelectedRanges>>& _allRangeEntities);
@@ -61,6 +61,6 @@ private:
 	std::list<std::shared_ptr<MetadataEntry>> rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData);
 	void rangeData2Json(ot::JsonDocument& _doc, KeyValuesExtractor&& _assembyRangeData);
 
-	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<IVisualisationTable>> loadedTables, KeyValuesExtractor& _outSeriesMetadata);
+	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>> loadedTables, KeyValuesExtractor& _outSeriesMetadata);
 	std::string extractUnitFromName(std::string& _name);
 };

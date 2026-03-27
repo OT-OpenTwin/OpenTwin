@@ -20,10 +20,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
 #include "OTModelEntities/EntityBase.h"
 
-class __declspec(dllexport) EntityPythonManifest : public IVisualisationText, public EntityBase
+class __declspec(dllexport) EntityPythonManifest : public ot::IVisualisationText, public EntityBase
 {
 	friend class FixturePythonManifest;
 public:
@@ -44,7 +44,7 @@ public:
 	
 	//! @brief Replaces the manifest text. If the environment has changed a new manifest ID is generated.
 	void setText(const std::string& _text) override;
-	ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
+	ot::TextEditorCfg getTextConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 	bool visualiseText() override { return true; }
 	
 	ot::UID getManifestID() const { return m_manifestID; }

@@ -1,5 +1,5 @@
 // @otlicense
-// File: IVisualisationGraphicsView.h
+// File: IVisualisationPlot1D.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,15 +20,16 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Plot/Plot1DCfg.h"
 
-class IVisualisationGraphicsView
-{
-public:
+namespace ot {
 
-	virtual ot::GraphicsNewEditorPackage* getGraphicsEditorPackage() = 0;
-	virtual bool visualiseGraphicsView() = 0;
+	class IVisualisationPlot1D
+	{
+	public:
+		virtual const ot::Plot1DCfg getPlot() = 0;
+		virtual void setPlot(const ot::Plot1DCfg& _config) = 0;
+		virtual bool visualisePlot() = 0;
+	};
 
-	virtual void setGraphicsPickerKey(const std::string& _key) = 0;
-	virtual std::string getGraphicsPickerKey() const = 0;
-};
+}

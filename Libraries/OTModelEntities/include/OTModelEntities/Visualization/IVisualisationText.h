@@ -26,12 +26,16 @@
 // std header
 #include <string>
 
-class __declspec(dllexport) IVisualisationText
-{
-public:
-	virtual ~IVisualisationText() {}
-	virtual std::string getText() = 0;
-	virtual void setText(const std::string& _text) = 0;
-	virtual bool visualiseText() = 0;
-	virtual ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) = 0;
-};
+namespace ot {
+
+	class __declspec(dllexport) IVisualisationText
+	{
+	public:
+		virtual ~IVisualisationText() {}
+		virtual std::string getText() = 0;
+		virtual void setText(const std::string& _text) = 0;
+		virtual bool visualiseText() = 0;
+		virtual ot::TextEditorCfg getTextConfig(const ot::VisualisationCfg& _visualizationConfig) = 0;
+	};
+
+}

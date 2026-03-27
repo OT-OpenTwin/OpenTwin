@@ -20,14 +20,14 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalBase.h"
 
 class EntityBinaryData;
 
 namespace ot {
 
-	class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlockHierarchicalBase, public IVisualisationText
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockHierarchicalDocumentItem : public EntityBlockHierarchicalBase, public ot::IVisualisationText
 	{
 	public:
 		EntityBlockHierarchicalDocumentItem() : EntityBlockHierarchicalDocumentItem(0, nullptr, nullptr, nullptr) {};
@@ -62,7 +62,7 @@ namespace ot {
 		virtual std::string getText() override;
 		virtual void setText(const std::string& _text) override;
 		virtual bool visualiseText() override { return false; };
-		virtual ot::TextEditorCfg createConfig(const ot::VisualisationCfg& _visualizationConfig) override;
+		virtual ot::TextEditorCfg getTextConfig(const ot::VisualisationCfg& _visualizationConfig) override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

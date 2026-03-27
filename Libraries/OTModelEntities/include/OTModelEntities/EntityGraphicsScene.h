@@ -19,9 +19,9 @@
 
 #pragma once
 #include "OTModelEntities/EntityContainer.h"
-#include "OTModelEntities/IVisualisationGraphicsView.h"
+#include "OTModelEntities/Visualization/IVisualisationGraphicsView.h"
 
-class __declspec(dllexport) EntityGraphicsScene : public EntityContainer, public IVisualisationGraphicsView
+class __declspec(dllexport) EntityGraphicsScene : public EntityContainer, public ot::IVisualisationGraphicsView
 {
 public:
 	enum SceneFlag : int64_t {

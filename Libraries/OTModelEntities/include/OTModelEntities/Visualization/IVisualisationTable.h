@@ -1,5 +1,5 @@
 // @otlicense
-// File: IVisualisationCurve.h
+// File: IVisualisationTable.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -20,12 +20,24 @@
 #pragma once
 
 // OpenTwin header
-#include "OTGui/Plot/Plot1DCurveCfg.h"
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTGui/Widgets/TableCfg.h"
 
-class IVisualisationCurve
-{
+// std header
+#include <string>
+
+namespace ot {
+
+	class __declspec(dllexport) IVisualisationTable
+	{
 	public:
-		virtual bool visualiseCurve() = 0;
-		virtual ot::Plot1DCurveCfg getCurve() = 0;
-		virtual void setCurve(const ot::Plot1DCurveCfg& _curve) = 0;
-};
+		virtual ~IVisualisationTable() {}
+		virtual const ot::GenericDataStructMatrix getTable() = 0;
+		virtual void setTable(const ot::GenericDataStructMatrix& _table) = 0;
+		virtual ot::TableCfg getTableConfig(bool _includeData) = 0;
+		virtual char getDecimalDelimiter() = 0; //Needed for text to numeric conversions
+		virtual bool visualiseTable() = 0;
+		virtual ot::TableCfg::TableHeaderMode getHeaderMode() = 0;
+	};
+
+}
