@@ -4914,6 +4914,12 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 		entityList.push_back(newEntity);
 		//topologyEntityForceVisible.push_back(false);
 	}
+
+	if (_topoEntityID.size() > 0)
+	{
+		setModified();
+	}
+
 	ot::UIDList entityIDs = _topoEntityID;
 	if (!entityList.empty() && _considerVisualization)
 	{
@@ -4948,7 +4954,7 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 	//	setShapeVisibility(visibleEntityID, hiddenEntityID);
 	//}
 
-
+	
 	refreshAllViews();
 	enableQueuingHttpRequests(false);
 	modelChangeOperationCompleted(_comment);
