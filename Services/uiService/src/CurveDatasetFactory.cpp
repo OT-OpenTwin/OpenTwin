@@ -42,7 +42,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
 
-	ot::JsonDocument entireResult = queryCurveData(queryInformation, _valueComparisons);
+	ot::JsonDocument entireResult ;
+	if (!entireResult.HasMember("Documents"))
+	{
+		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
+		return {};
+	}
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, "Documents");
 	if (allMongoDocuments.Size() == 0)
 	{
