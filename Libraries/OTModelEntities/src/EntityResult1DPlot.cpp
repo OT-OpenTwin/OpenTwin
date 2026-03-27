@@ -487,10 +487,16 @@ void EntityResult1DPlot::setQuerySelections()
 			}
 		}
 	}
-	filterOptions.push_back("");
+	if (std::find(filterOptions.begin(), filterOptions.end(), "") == filterOptions.end())
+	{
+		filterOptions.push_back("");
+	}
 
 	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->resetOptions(parameterOptions);
-	PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->setValue(*parameterOptions.begin());
+	if (parameterOptions.size() != 0)
+	{
+		PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->setValue(*parameterOptions.begin());
+	}
 	m_querySettings.updateQuerySettings(this, filterOptions);
 }
 
