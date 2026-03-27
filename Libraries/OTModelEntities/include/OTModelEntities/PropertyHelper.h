@@ -93,6 +93,7 @@ public:
 	OT_DECL_NODISCARD static void setColourPropertyValue(const ot::Color& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setIntegerPropertyValue(int32_t _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	OT_DECL_NODISCARD static void setProjectPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -123,6 +124,7 @@ public:
 	OT_DECL_NODISCARD static EntityPropertiesInteger* getIntegerProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static EntityPropertiesGuiPainter* getPainterProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static EntityPropertiesEntityList* getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	OT_DECL_NODISCARD static EntityPropertiesProjectList* getEntityProjectListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

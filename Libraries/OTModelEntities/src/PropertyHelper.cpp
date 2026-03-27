@@ -213,6 +213,11 @@ void PropertyHelper::setIntegerPropertyValue(int32_t _value, EntityBase* _base, 
 	intProperty->setValue(_value);
 }
 
+void PropertyHelper::setProjectPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
+	EntityPropertiesProjectList* projectProperty = getEntityProjectListProperty(_base, _name, _groupName);
+	projectProperty->setValue(_value);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Writable property access
@@ -255,6 +260,11 @@ EntityPropertiesGuiPainter* PropertyHelper::getPainterProperty(EntityBase* _base
 EntityPropertiesEntityList* PropertyHelper::getEntityListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
 {
 	return getProperty<EntityPropertiesEntityList>(_base, _name, _groupName);
+}
+
+EntityPropertiesProjectList* PropertyHelper::getEntityProjectListProperty(EntityBase* _base, const std::string& _name, const std::string& _groupName)
+{
+	return getProperty<EntityPropertiesProjectList>(_base, _name, _groupName);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
