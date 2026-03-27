@@ -90,6 +90,9 @@ namespace ot {
 		void setRowSortingEnabled(bool _enable = true) { m_rowsSortable = _enable; };
 		bool getRowSortingEnabled() const { return m_rowsSortable; };
 
+		void setReadOnly(bool _readOnly = true) { m_readOnly = _readOnly; };
+		bool getReadOnly() const { return m_readOnly; };
+
 	private:
 		void initialize();
 		void initialize(int _rows, int _columns);
@@ -105,6 +108,8 @@ namespace ot {
 		std::vector<TableHeaderItemCfg*> m_columnHeader;
 
 		std::vector<std::vector<std::string>> m_data;
+
+		bool m_readOnly = false;
 	};
 
 }

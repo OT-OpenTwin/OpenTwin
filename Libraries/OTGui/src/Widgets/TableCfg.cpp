@@ -130,6 +130,8 @@ ot::TableCfg::TableCfg(TableCfg&& _other) noexcept
 
 	m_columnsSortable = _other.m_columnsSortable;
 	m_rowsSortable = _other.m_rowsSortable;
+
+	m_readOnly = _other.m_readOnly;
 }
 
 ot::TableCfg::~TableCfg() {
@@ -152,6 +154,8 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 
 	m_columnsSortable = _other.m_columnsSortable;
 	m_rowsSortable = _other.m_rowsSortable;
+
+	m_readOnly = _other.m_readOnly;
 
 	this->initialize();
 
@@ -185,8 +189,14 @@ ot::TableCfg& ot::TableCfg::operator=(TableCfg&& _other) noexcept {
 		m_columns = _other.m_columns;
 
 		m_rowHeader = std::move(_other.m_rowHeader);
+		m_rowsSortable = _other.m_rowsSortable;
+		
 		m_columnHeader = std::move(_other.m_columnHeader);
+		m_columnsSortable = _other.m_columnsSortable;
+
 		m_data = std::move(_other.m_data);
+
+		m_readOnly = _other.m_readOnly;
 	}
 	return *this;
 }
@@ -200,6 +210,7 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 	_object.AddMember("Columns", m_columns, _allocator);
 	_object.AddMember("ColumnSorting", m_columnsSortable, _allocator);
 	_object.AddMember("RowSorting", m_rowsSortable, _allocator);
+	_object.AddMember("ReadOnly", m_readOnly, _allocator);
 
 	// Row header
 	JsonArray rowHeaderArr;
@@ -249,6 +260,8 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	
 	m_rowsSortable = json::getBool(_object, "RowSorting");
 	m_columnsSortable = json::getBool(_object, "ColumnSorting");
+
+	m_readOnly = json::getBool(_object, "ReadOnly");
 
 	this->initialize();
 
