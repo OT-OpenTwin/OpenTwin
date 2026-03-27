@@ -321,6 +321,7 @@ private:
 	ot::ToolBarButtonCfg m_saveButton;
 	ot::ToolBarButtonCfg m_createParameterButton;
 	ot::ToolBarButtonCfg m_createGroupButton;
+	ot::ToolBarButtonCfg m_datasetInfoButton;
 
 	void handleUndoLastOperation();
 	void handleRedoNextOperation();
@@ -328,6 +329,7 @@ private:
 	void handleShowSelectedShapeInformation();
 	void handleCreateNewParameter();
 	void handleCreateNewGroup();
+	void handleShowDatasetInformation();
 
 	MetadataHandler m_metadataHandler;
 

@@ -359,7 +359,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="src\TableReader.cpp" />
-    <ClCompile Include="src\UIControlsHandler.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
     <ClCompile Include="src\ViewVisualisationHandler.cpp" />
   </ItemGroup>
@@ -389,7 +388,6 @@
     <ClInclude Include="include\stdafx.h" />
     <ClInclude Include="include\TableReader.h" />
     <ClInclude Include="include\TriangleBoxOverlapTest.h" />
-    <ClInclude Include="include\UIControlsHandler.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\ViewVisualisationHandler.h" />
   </ItemGroup>

@@ -46,6 +46,7 @@
 #include "OTModelEntities/EntityMaterial.h"
 #include "OTModelEntities/EntityParameter.h"
 #include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityDatasetInfo.h"
 #include "OTModelEntities/EntityMeshTetItem.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
@@ -161,6 +162,10 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_deleteButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Delete));
 	m_deleteButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonHandler.connectToolBarButton(m_deleteButton, this, &Model::handleDeleteSelectedShapes);
+
+	m_datasetInfoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Edit", "Dataset Info", "ToolBar/Hint");
+	m_datasetInfoButton.setButtonLockFlags(ot::LockType::ModelWrite);
+	m_buttonHandler.connectToolBarButton(m_datasetInfoButton, this, &Model::handleShowDatasetInformation);
 
 	m_createGroupButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Create Group", "Default/CreateGroup");
 	m_createGroupButton.setButtonLockFlags(ot::LockType::ModelRead);
@@ -527,8 +532,10 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 	_ui->addMenuButton(m_deleteButton);
 
 	if (this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL &&
-		this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT) {
+		this->getProjectType() != OT_ACTION_PARAM_SESSIONTYPE_FILEMANAGEMENT) 
+	{
 		// Add pages, groups and buttons for non-hierarchical projects
+		_ui->addMenuButton(m_datasetInfoButton);
 
 		_ui->addMenuPage("View");
 
@@ -1082,6 +1089,62 @@ void Model::handleCreateNewGroup()
 	modelChangeOperationCompleted("create new group: " + groupName);
 
 	Application::instance()->getNotifier()->selectObject(getVisualizationModel(), groupEntity->getEntityID());
+}
+
+void Model::handleShowDatasetInformation()
+{
+	const std::string datasetInfoRootName = ot::FolderNames::DatasetFolder + "/Views";
+	const std::string datasetInfoEntityName = datasetInfoRootName + "/Dataset Info";
+
+	EntityBase* ent = findEntityFromName(datasetInfoEntityName);
+	if (ent)
+	{
+		// Entity exists, switch to current project and show it
+
+		ot::EntityDatasetInfo* infoEntity = dynamic_cast<ot::EntityDatasetInfo*>(ent);
+		if (infoEntity)
+		{
+			infoEntity->setProjectName(Application::instance()->getProjectName());
+		}
+		else
+		{
+			OT_LOG_E("Unable to show dataset information. Dataset info entity is not of the expected type.");
+		}
+		updateEntity(infoEntity);
+	}
+	else
+	{
+		// Entity does not exist, create it and show it
+
+		ot::NewModelStateInfo newStateInfo;
+
+		std::unique_ptr<EntityBase> cont;
+		EntityBase* containerBase = findEntityFromName(datasetInfoRootName);
+		if (containerBase == nullptr)
+		{
+			containerBase = new EntityContainer(createEntityUID(), nullptr, nullptr, nullptr);
+			containerBase->setName(datasetInfoRootName);
+			containerBase->storeToDataBase();
+			cont.reset(containerBase);
+			newStateInfo.addTopologyEntity(*containerBase);
+		}
+
+		EntityContainer* container = dynamic_cast<EntityContainer*>(containerBase);
+		if (!container)
+		{
+			OT_LOG_E("Unable to show dataset information. Dataset info root entity is not of the expected type.");
+			return;
+		}
+
+		ot::EntityDatasetInfo infoEntity(createEntityUID(), nullptr, nullptr, nullptr);
+		infoEntity.setName(datasetInfoEntityName);
+		infoEntity.createProperties(Application::instance()->getProjectName());
+		infoEntity.storeToDataBase();
+
+		newStateInfo.addTopologyEntity(infoEntity);
+
+		addEntitiesToModel(newStateInfo, "Add dataset info view", true, true, true);
+	}
 }
 
 EntityParameter* Model::createNewParameterItem(const std::string &parameterName)

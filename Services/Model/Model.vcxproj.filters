@@ -75,9 +75,6 @@
     <ClCompile Include="src\CrossCollectionDatabaseWrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\UIControlsHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\QueuingDatabaseWritingRAII.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -159,9 +156,6 @@
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\FileHandler.h">
-      <Filter>Header Files\Handler</Filter>
-    </ClInclude>
-    <ClInclude Include="include\UIControlsHandler.h">
       <Filter>Header Files\Handler</Filter>
     </ClInclude>
     <ClInclude Include="include\QueuingHttpRequestsRAII.h">
