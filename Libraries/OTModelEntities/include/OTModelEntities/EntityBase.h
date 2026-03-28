@@ -120,6 +120,8 @@ public:
 
 	virtual void removeChild(EntityBase *child) {};
 
+	virtual void propertiesAboutToBeShown() {};
+
 	//! @brief Will be called whenever a property of the entity has changed.
 	//! The function needs to update the entity accordingly.
 	//! @return Returns true if the property grid needs to be updated.

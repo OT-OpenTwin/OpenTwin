@@ -1719,7 +1719,10 @@ void Model::addCommonPropertiesToConfig(const std::list<ot::UID> &entityIDList, 
 	std::list<EntityBase *> entities;
 	for (auto entityID : entityIDList)
 	{
-		entities.push_back(getEntityByID(entityID));
+		EntityBase* entity = getEntityByID(entityID);
+		OTAssertNullptr(entity);
+		entity->propertiesAboutToBeShown();
+		entities.push_back(entity);
 	}
 
 	EntityProperties props;

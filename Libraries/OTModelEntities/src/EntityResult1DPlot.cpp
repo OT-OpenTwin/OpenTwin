@@ -183,6 +183,11 @@ void EntityResult1DPlot::removeChild(EntityBase* _child)
 	setQuerySelections();
 }
 
+void EntityResult1DPlot::propertiesAboutToBeShown()
+{
+	
+}
+
 void EntityResult1DPlot::createProperties()
 {
 	// Query options are set in the addChild and removeChild methods

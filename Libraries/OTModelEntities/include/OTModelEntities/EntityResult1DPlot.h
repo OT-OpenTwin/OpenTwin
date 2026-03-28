@@ -48,6 +48,8 @@ public:
 	virtual void addChild(EntityBase* _child) override;
 	virtual void removeChild(EntityBase* _child) override;
 
+	virtual void propertiesAboutToBeShown() override;
+
 	void createProperties();
 	
 	// Inherited via IVisualisationPlot1D
