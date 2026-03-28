@@ -127,6 +127,7 @@ bool EntityContainer::replaceChild(EntityBase* _child)
 	{
 		children.remove(currentEntry);
 		children.push_back(_child);
+		return true;
 	}
 }
 
