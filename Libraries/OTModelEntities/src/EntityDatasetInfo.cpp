@@ -35,10 +35,12 @@ void ot::EntityDatasetInfo::addVisualizationNodes()
 
 bool ot::EntityDatasetInfo::updateFromProperties()
 {
-	assert(getProperties().anyPropertyNeedsUpdate());
 	setModified();
+
+	// Here we need to update the plot (send a message to the visualization service)
 	getProperties().forceResetUpdateForAllProperties();
 
+	// No changes
 	return false; 
 }
 
@@ -130,6 +132,7 @@ ot::TableCfg::TableHeaderMode ot::EntityDatasetInfo::getHeaderMode()
 void ot::EntityDatasetInfo::setProjectName(const std::string& _projectName)
 {
 	PropertyHelper::setProjectPropertyValue(_projectName, this, "Project", "General");
+	setModified();
 }
 
 std::string ot::EntityDatasetInfo::getProjectName() const

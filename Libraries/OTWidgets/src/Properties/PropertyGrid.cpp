@@ -186,13 +186,15 @@ void ot::PropertyGrid::applyChanges()
 }
 
 void ot::PropertyGrid::slotPropertyChanged(const Property* _property) {
-	if (m_state.has(GridState::GroupChanges) || _property->getPropertyFlags().has(Property::GroupChanges)) {
+	if (_property->getPropertyFlags().has(Property::GroupChanges)) {
 		groupPropertyChange(_property);
 	}
 	else {
-		std::list<const Property*> props;
+		std::list<const Property*> props = getGroupedChangedProperties();
 		props.push_back(_property);
+
 		Q_EMIT propertiesChanged(props);
+		clearPropertyChangeBuffer();
 	}
 }
 
