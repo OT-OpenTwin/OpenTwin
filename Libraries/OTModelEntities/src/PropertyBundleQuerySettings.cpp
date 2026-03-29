@@ -115,14 +115,11 @@ void ot::PropertyBundleQuerySettings::updateQuerySettings(EntityBase* _entity, c
 
 		resetNameOptions(_entity);
 
-		for (uint32_t i = 1; i <= m_maxNumberOfQueryDefinitions; i++)
-		{
-			
-		}
 		if (_queryOptions.size() > m_maxNumberOfQueryDefinitions)
 		{
 			for (int i = m_maxNumberOfQueryDefinitions + 1; i <= _queryOptions.size(); i++)
 			{
+				createPropertiesForIndex(_entity, i);
 				setPropertiesVisible(_entity, i, false);
 			}
 

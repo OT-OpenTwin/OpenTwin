@@ -122,9 +122,6 @@ namespace ot {
 		void setYAxis(Plot1DAxisCfg&& _yAxis) { m_yAxis = std::move(_yAxis); };
 		const Plot1DAxisCfg& getYAxis() const { return m_yAxis; };
 
-		void setXAxisParameter(const std::string _parameterName) { m_xAxisParameter = _parameterName; };
-		std::string getXAxisParameter() const { return m_xAxisParameter; };
-
 		void setXAxisLabelAutoDetermine(bool _autoDetermine) { m_xAxis.setAutoDetermineAxisLabel(_autoDetermine); };
 		bool getXAxisLabelAutoDetermine() const { return m_xAxis.getAutoDetermineAxisLabel(); };
 
@@ -176,6 +173,12 @@ namespace ot {
 		void setQueries(const std::list<ValueComparisonDescription>& _queries) { m_queries = _queries; };
 		void setQueries(std::list<ValueComparisonDescription>&& _queries) { m_queries = std::move(_queries); };
 
+		void setQueryParameter(const std::string& _parameterName) { m_queryParameter = _parameterName; };
+		const std::string& getQueryParameter() const { return m_queryParameter; };
+
+		void setQueryQuantity(const std::string& _quantity) { m_queryQuantity = _quantity; };
+		const std::string& getQueryQuantity() const { return m_queryQuantity; };
+
 		void setUseLimitNbOfCurves(bool _useLimit) { m_useLimit = _useLimit; };
 		bool getUseLimitNbOfCurves() const { return m_useLimit; };
 
@@ -212,8 +215,6 @@ namespace ot {
 		std::string m_collectionName;
 		PlotType m_type = Plot1DCfg::Cartesian;
 
-		std::string m_xAxisParameter;
-
 		bool m_gridVisible = true;
 		Painter2DContainer m_gridColor;
 		double m_gridWidth = .4;
@@ -229,6 +230,9 @@ namespace ot {
 
 		NavigationTreeItemIcon m_treeIcons;
 		std::list<ValueComparisonDescription> m_queries;
+
+		std::string m_queryParameter;
+		std::string m_queryQuantity;
 
 		std::string m_dataLabelX;
 		std::string m_dataLabelY;

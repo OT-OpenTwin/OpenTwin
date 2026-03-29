@@ -69,7 +69,7 @@ public:
 	// Private helper
 
 private:
-	PropertyBundleQuerySettings m_querySettings;
+	ot::PropertyBundleQuerySettings m_querySettings;
 
 	static std::string getXAxisPropertyGroupName() { return "X axis"; };
 	static std::string getYAxisPropertyGroupName() { return "Y axis"; };

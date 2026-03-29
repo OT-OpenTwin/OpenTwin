@@ -38,7 +38,8 @@
 // BSONCXX header
 #include "bsoncxx/json.hpp"
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
+
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
@@ -47,6 +48,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	 
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options);
 	std::string temp = ot::json::toJson(entireResult);
+
+	// @jan: here are the user selected query options for parameter and quantity
+	const std::string queryParameterOption = _plotCfg.getQueryParameter();
+	const std::string queryQuantityOption = _plotCfg.getQueryQuantity();
 
 	//xLabel = _plotCfg.getXAxisLabel();
 	////e.g. "Frequency"
@@ -72,6 +77,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
+
 	ot::ConstJsonArray allMongoDocuments = ot::json::getArray(entireResult, DataLakeHelper::getDataFieldName());
 	uint32_t numberOfDocuments = allMongoDocuments.Size();
 	if (numberOfDocuments == 0)
@@ -90,7 +96,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	else
 	{
 		assert(curveType == CurveType::m_familyCurve);
-		dataSets = createCurveFamily(_plotCfg, _config, _xAxisParameter, allMongoDocuments);
+		dataSets = createCurveFamily(_plotCfg, _config, allMongoDocuments);
 	}
 	return dataSets;
 }
@@ -347,7 +353,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 	return allCurves;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisParameter, ot::ConstJsonArray& _allMongoDBDocuments)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	std::list<ot::PlotDataset*> dataSets;
 		
@@ -356,7 +362,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurveFamily(ot::Plot1DCfg
 	const ot::DataPointDecoder& quantityInformation = queryInformation.getQuantityDescription();
 
 	size_t numberOfDocuments = _allMongoDBDocuments.Size();
-	std::string xAxisParameterLabel = _xAxisParameter;
+
+	// @jan: Here the xAxis parameter field was used before
+	std::string xAxisParameterLabel = _plotCfg.getQueryParameter();
 	//Auto selection
 	if (xAxisParameterLabel == "")
 	{

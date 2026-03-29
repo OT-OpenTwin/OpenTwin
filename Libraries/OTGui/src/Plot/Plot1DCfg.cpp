@@ -97,7 +97,8 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("UnitLabelX", ot::JsonString(m_unitLabelX, _allocator), _allocator);
 	_object.AddMember("UnitLabelY", ot::JsonString(m_unitLabelY, _allocator), _allocator);
 
-	_object.AddMember("XAxisParameter", ot::JsonString(m_xAxisParameter, _allocator), _allocator);
+	_object.AddMember("QueryParameter", ot::JsonString(m_queryParameter, _allocator), _allocator);
+	_object.AddMember("QueryQuantity", ot::JsonString(m_queryQuantity, _allocator), _allocator);
 
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
 	_object.AddMember("NbCurveLimit", m_curveLimit, _allocator);
@@ -142,7 +143,8 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_unitLabelX = ot::json::getString(_object, "UnitLabelX");
 	m_unitLabelY = ot::json::getString(_object, "UnitLabelY");
 
-	m_xAxisParameter = ot::json::getString(_object, "XAxisParameter");
+	m_queryParameter = ot::json::getString(_object, "QueryParameter");
+	m_queryQuantity = ot::json::getString(_object, "QueryQuantity");
 
 	m_showEntireMatrix = ot::json::getBool(_object, "ShowEntireMatrix");
 	m_showMatrixRowEntry = ot::json::getInt(_object, "ShowMatrixRow");
@@ -178,6 +180,9 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 		(m_legendVisible == _other.m_legendVisible) &&
 
 		(m_treeIcons == _other.m_treeIcons) &&
+
+		(m_queryParameter == _other.m_queryParameter) &&
+		(m_queryQuantity == _other.m_queryQuantity) &&
 
 		(m_dataLabelX == _other.m_dataLabelX) &&
 		(m_dataLabelY == _other.m_dataLabelY) &&

@@ -29,6 +29,7 @@
 #include "OTModelEntities/EntityResult1DCurve.h"
 
 // std header
+#include <set>
 #include <algorithm>
 
 static EntityFactoryRegistrar<EntityResult1DPlot> registrar("EntityResult1DPlot");
@@ -80,7 +81,7 @@ bool EntityResult1DPlot::updateFromProperties()
 	requiresDataToBeFetched |= numberOfCurves->needsUpdate();
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
-	requiresDataToBeFetched |= m_querySettings.requiresUpdate(this);
+	requiresDataToBeFetched |= m_querySettings.needsUpdate(this);
 
 	auto showFullMatrixProp = PropertyHelper::getBoolProperty(this, "Show full matrix");
 	requiresDataToBeFetched |= showFullMatrixProp->needsUpdate();
@@ -96,6 +97,8 @@ bool EntityResult1DPlot::updateFromProperties()
 
 	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "X axis parameter", "Curve set")->needsUpdate();
 
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Quantity", m_querySettings.getGroupQuerySettingsName())->needsUpdate();
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Parameter", m_querySettings.getGroupQuerySettingsName())->needsUpdate();
 
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
@@ -185,7 +188,60 @@ void EntityResult1DPlot::removeChild(EntityBase* _child)
 
 void EntityResult1DPlot::propertiesAboutToBeShown()
 {
+	EntityContainer::propertiesAboutToBeShown();
+
+	EntityObserver* obs = getObserver();
+	if (!obs)
+	{
+		OTAssert(false, "Observer not set while perparing for property grid");
+		return;
+	}
+
+	std::set<std::string> queryParameters;
+	std::set<std::string> queryQuantities;
+
+	std::list<EntityBase*> children = getChildrenList();
 	
+	for (EntityBase* child : children)
+	{
+		EntityResult1DCurve* curve = dynamic_cast<EntityResult1DCurve*>(child);
+		if (curve)
+		{
+			// @jan: options are empty
+			for (const std::string& param : curve->getParameterOptions())
+			{
+				queryParameters.insert(param);
+			}
+			for (const std::string& quantity : curve->getQuantityOptions())
+			{
+				queryQuantities.insert(quantity);
+			}
+		}
+	}
+
+	bool isModified = getModified();
+	bool anyPropertyNeedsUpdate = getProperties().anyPropertyNeedsUpdate();
+
+	std::vector<std::string> queryParameterList(queryParameters.begin(), queryParameters.end());
+	std::vector<std::string> queryQuantityList(queryQuantities.begin(), queryQuantities.end());
+
+	// @jan: Add all/none options?
+
+	auto* queryQuantityProp = PropertyHelper::getSelectionProperty(this, "Quantity", m_querySettings.getGroupQuerySettingsName());
+	OTAssertNullptr(queryQuantityProp);
+	if (queryQuantityProp && queryQuantityProp->getOptions() != queryQuantityList)
+	{
+		queryQuantityProp->resetOptions(queryQuantityList);
+	}
+	
+	auto* queryParameterProp = PropertyHelper::getSelectionProperty(this, "Parameter", m_querySettings.getGroupQuerySettingsName());
+	OTAssertNullptr(queryParameterProp);
+	if (queryParameterProp && queryParameterProp->getOptions() != queryParameterList)
+	{
+		queryParameterProp->resetOptions(queryParameterList);
+	}
+	
+	// @jan: Save state here?
 }
 
 void EntityResult1DPlot::createProperties()
@@ -200,6 +256,9 @@ void EntityResult1DPlot::createProperties()
 	EntityPropertiesInteger::createProperty(m_querySettings.getGroupQuerySettingsName(), "Show matrix row entry", 1, 1, 60, "", getProperties());
 	EntityPropertiesInteger::createProperty(m_querySettings.getGroupQuerySettingsName(), "Show matrix column entry", 1, 1, 60, "", getProperties());
 
+	EntityPropertiesSelection::createProperty(m_querySettings.getGroupQuerySettingsName(), "Parameter", {}, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty(m_querySettings.getGroupQuerySettingsName(), "Quantity", {}, "", "default", getProperties());
+	
 	// General settings
 
 	const std::list<std::string> plotTypeOptions = ot::Plot1DCfg::getPlotTypeStringList();
@@ -254,8 +313,6 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
-	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "X axis parameter", "Curve set");
-
 	const bool showEntireMatrix = PropertyHelper::getBoolPropertyValue(this, "Show full matrix");
 	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
 	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
@@ -270,8 +327,6 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setTitle(title);
 	config.setCollectionName(DataBase::instance().getCollectionName());
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
-
-	config.setXAxisParameter(xAxisParameter);
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
 

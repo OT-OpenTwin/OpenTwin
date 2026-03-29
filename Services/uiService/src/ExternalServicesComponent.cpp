@@ -4705,7 +4705,8 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		std::list<ot::PlotDataset*> dataSets;
 		std::list<std::string> curveIDDescriptions;
 
-		const std::string xAxisParameter = _plotConfig.getXAxisParameter();
+		// @jan: here the xAxis parameter was get before, now its the query parameter which should be the same (was removed from plot config)
+		const std::string xAxisParameter = _plotConfig.getQueryParameter();
 		const std::list<ot::ValueComparisonDescription>& queries = _plotConfig.getQueries();
 		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
 		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
@@ -4718,6 +4719,8 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			curveCfg.setFromJsonObject(curveCfgSerialised);
 
 			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
+			
+			// @jan: here the parameter was checked
 			bool curveHasDataToVisualise = false;
 			if (xAxisParameter != "") {
 				for (const auto& parameter : queryInformation.getParameterDescriptions()) {
@@ -4731,7 +4734,7 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			}
 
 			if (curveHasDataToVisualise) {
-				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, xAxisParameter, queries);
+				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, queries);
 				dataSets.splice(dataSets.begin(), newCurveDatasets);
 
 				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
