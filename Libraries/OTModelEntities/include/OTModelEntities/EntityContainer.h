@@ -49,31 +49,33 @@ public:
 	bool replaceChild(EntityBase* _child);
 	void takeOverChildren(EntityContainer* _other);
 
+	const std::list<EntityBase *>& getChildrenList();
 
-	const std::list<EntityBase *> &getChildrenList(void);
+	//! @brief Returns a list of all children of the container recursivly.
+	std::list<EntityBase*> getAllChildren() const;
 
 	virtual bool getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax) override;
 
 	virtual EntityBase *getEntityFromName(const std::string &n) override;
 
-	virtual bool considerForPropertyFilter(void) const override { return false; };
-	virtual bool considerChildrenForPropertyFilter(void) const override { return true; };
+	virtual bool considerForPropertyFilter() const override { return false; };
+	virtual bool considerChildrenForPropertyFilter() const override { return true; };
 
-	virtual void storeToDataBase(void) override;
+	virtual void storeToDataBase() override;
 
-	virtual void addVisualizationNodes(void) override;
+	virtual void addVisualizationNodes() override;
 
 	static std::string className() { return "EntityContainer"; };
-	virtual std::string getClassName(void) const override { return EntityContainer::className(); } ;
+	virtual std::string getClassName() const override { return EntityContainer::className(); } ;
 
 	virtual void addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) override;
 
-	virtual entityType getEntityType(void) const override;
+	virtual entityType getEntityType() const override;
 
 	void setCreateVisualizationItem(bool flag);
-	bool getCreateVisualizationItem(void) { return createVisualizationItem; }
+	bool getCreateVisualizationItem() { return m_createVisualizationItem; };
 
-	virtual void detachFromHierarchy(void) override;
+	virtual void detachFromHierarchy() override;
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept;
@@ -81,14 +83,14 @@ public:
 	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
 
 protected:
-	virtual int getSchemaVersion(void) override  { return 1; } ;
+	virtual int getSchemaVersion() override  { return 1; } ;
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 
 
 private:
-	std::list<EntityBase *> children;
-	bool createVisualizationItem;
+	std::list<EntityBase *> m_children;
+	bool m_createVisualizationItem;
 };
 
 

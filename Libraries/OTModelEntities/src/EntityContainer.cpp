@@ -37,30 +37,30 @@ ot::EntityTreeItem EntityContainer::createDefaultTreeItem() {
 
 EntityContainer::EntityContainer(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms) :
 	EntityBase(ID, parent, obs, ms),
-	createVisualizationItem(true)
+	m_createVisualizationItem(true)
 {
 	this->setDefaultTreeItem(createDefaultTreeItem());
 }
 
 EntityContainer::~EntityContainer()
 {
-	std::list<EntityBase *> allChildren = children;  // Create a backup of the list, since the delete operation of an entity will modify the parent list
+	std::list<EntityBase *> allChildren = m_children;  // Create a backup of the list, since the delete operation of an entity will modify the parent list
 
-	for (auto child : allChildren)
+	for (EntityBase* child : allChildren)
 	{
 		delete child;
 	}
 
-	children.clear();
+	m_children.clear();
 }
 
 void EntityContainer::addChild(EntityBase *child)
 {
-	assert(std::find(children.begin(), children.end(), child) == children.end());  // Check that the child does not yet exist in the container
+	assert(std::find(m_children.begin(), m_children.end(), child) == m_children.end());  // Check that the child does not yet exist in the container
 
-	children.push_back(child);
+	m_children.push_back(child);
 
-	if (!createVisualizationItem)
+	if (!m_createVisualizationItem)
 	{
 		// Let's check whether a child needs the visualitation item. If so, turn it on and also inform our parents
 		if (child->getEntityType() != DATA)
@@ -85,9 +85,9 @@ void EntityContainer::addChild(EntityBase *child)
 
 void EntityContainer::setCreateVisualizationItem(bool flag)
 {
-	if (createVisualizationItem == flag) return;
+	if (m_createVisualizationItem == flag) return;
 
-	createVisualizationItem = flag;
+	m_createVisualizationItem = flag;
 	
 	if (flag)
 	{
@@ -101,9 +101,9 @@ void EntityContainer::setCreateVisualizationItem(bool flag)
 
 void EntityContainer::removeChild(EntityBase *child)
 {
-	assert(std::find(children.begin(), children.end(), child) != children.end());  // Check that the child does exist in the container
+	assert(std::find(m_children.begin(), m_children.end(), child) != m_children.end());  // Check that the child does exist in the container
 
-	children.remove(child);
+	m_children.remove(child);
 
 	setModified();
 }
@@ -111,7 +111,7 @@ void EntityContainer::removeChild(EntityBase *child)
 bool EntityContainer::replaceChild(EntityBase* _child)
 {
 	EntityBase* currentEntry = nullptr;
-	for (EntityBase* child : children)
+	for (EntityBase* child : m_children)
 	{
 		if (child->getEntityID() == _child->getEntityID())
 		{
@@ -125,21 +125,38 @@ bool EntityContainer::replaceChild(EntityBase* _child)
 	}
 	else
 	{
-		children.remove(currentEntry);
-		children.push_back(_child);
+		m_children.remove(currentEntry);
+		m_children.push_back(_child);
 		return true;
 	}
 }
 
 void EntityContainer::takeOverChildren(EntityContainer* _other)
 {
-	children = _other->children;
-	_other->children.clear();
+	m_children = _other->m_children;
+	_other->m_children.clear();
 }
 
-const std::list<EntityBase *> &EntityContainer::getChildrenList(void)
+const std::list<EntityBase *> &EntityContainer::getChildrenList()
 {
-	return children;
+	return m_children;
+}
+
+std::list<EntityBase*> EntityContainer::getAllChildren() const
+{
+	std::list<EntityBase *> allChildren;
+	for (EntityBase* child : m_children)
+	{
+		allChildren.push_back(child);
+		EntityContainer *childContainer = dynamic_cast<EntityContainer *>(child);
+		if (childContainer != nullptr)
+		{
+			std::list<EntityBase *> childChildren = childContainer->getAllChildren();
+			allChildren.splice(allChildren.end(), std::move(childChildren));
+		}
+	}
+
+	return allChildren;
 }
 
 bool EntityContainer::getEntityBox(double &xmin, double &xmax, double &ymin, double &ymax, double &zmin, double &zmax)
@@ -148,7 +165,7 @@ bool EntityContainer::getEntityBox(double &xmin, double &xmax, double &ymin, dou
 
 	bool boxSet = false;
 
-	for (auto entity : children)
+	for (EntityBase* entity : m_children)
 	{
 		double exmin(0.0), exmax(0.0), eymin(0.0), eymax(0.0), ezmin(0.0), ezmax(0.0);
 
@@ -190,7 +207,7 @@ EntityBase *EntityContainer::getEntityFromName(const std::string &n)
 	{
 		// At least the first part of the name matches, so it could be one of our children
 
-		for (auto child : children)
+		for (EntityBase* child : m_children)
 		{
 			EntityBase *entity = child->getEntityFromName(n);
 			if (entity != nullptr) return entity;
@@ -200,10 +217,10 @@ EntityBase *EntityContainer::getEntityFromName(const std::string &n)
 	return nullptr;
 }
 
-void EntityContainer::storeToDataBase(void)
+void EntityContainer::storeToDataBase()
 {
 	// First, we need to store all the child items
-	for (auto child : children)
+	for (EntityBase* child : m_children)
 	{
 		child->storeToDataBase();
 	}
@@ -221,13 +238,13 @@ void EntityContainer::addStorageData(bsoncxx::builder::basic::document &storage)
 
 	auto childID = bsoncxx::builder::basic::array{};
 
-	for (auto child : children)
+	for (EntityBase* child : m_children)
 	{
 		childID.append((long long) child->getEntityID());
 	}
 
 	storage.append(bsoncxx::builder::basic::kvp("ChildID", childID));
-	storage.append(bsoncxx::builder::basic::kvp("VisualizationItem", createVisualizationItem));
+	storage.append(bsoncxx::builder::basic::kvp("VisualizationItem", m_createVisualizationItem));
 }
 
 void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap)
@@ -237,7 +254,7 @@ void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view
 
 	if (getModelState() != nullptr)	// We can only read the children, if we have the model state information (otherwise we can not determine the current version)
 	{
-		children.clear();
+		m_children.clear();
 
 		// Now we read the information about the children
 		try
@@ -252,28 +269,28 @@ void EntityContainer::readSpecificDataFromDataBase(const bsoncxx::document::view
 
 				if (childEntity != nullptr)
 				{
-					children.push_back(childEntity);
+					m_children.push_back(childEntity);
 				}
 			}
 		}
 		catch (std::exception) 
 		{
-			children.clear();
+			m_children.clear();
 		}
 	}
 
-	createVisualizationItem = true;
+	m_createVisualizationItem = true;
 	auto docIt = doc_view.find("VisualizationItem");
 	if (docIt != doc_view.end()) {
-		createVisualizationItem = docIt->get_bool();
+		m_createVisualizationItem = docIt->get_bool();
 	}
 
 	resetModified();
 }
 
-void EntityContainer::addVisualizationNodes(void) 
+void EntityContainer::addVisualizationNodes() 
 {
-	if (!createVisualizationItem) return;
+	if (!m_createVisualizationItem) return;
 
 	if (!getName().empty())
 	{
@@ -286,7 +303,7 @@ void EntityContainer::addVisualizationNodes(void)
 		getObserver()->sendMessageToViewer(doc);
 	}
 	
-	for (EntityBase* child : children)
+	for (EntityBase* child : m_children)
 	{
 		child->addVisualizationNodes();
 	}
@@ -298,15 +315,15 @@ void EntityContainer::addPrefetchingRequirementsForTopology(std::list<ot::UID> &
 {
 	EntityBase::addPrefetchingRequirementsForTopology(prefetchIds);
 
-	for (auto child : children)
+	for (EntityBase* child : m_children)
 	{
 		child->addPrefetchingRequirementsForTopology(prefetchIds);
 	}
 }
 
-EntityContainer::entityType EntityContainer::getEntityType(void) const
+EntityContainer::entityType EntityContainer::getEntityType() const
 {
-	if (createVisualizationItem)
+	if (m_createVisualizationItem)
 	{
 		return TOPOLOGY;
 	}
@@ -315,7 +332,7 @@ EntityContainer::entityType EntityContainer::getEntityType(void) const
 
 	bool anyTopologyChild = false;
 
-	for (auto child : children)
+	for (EntityBase* child : m_children)
 	{
 		if (child->getEntityType() == TOPOLOGY)
 		{
@@ -326,7 +343,7 @@ EntityContainer::entityType EntityContainer::getEntityType(void) const
 	return DATA;
 }
 
-void EntityContainer::detachFromHierarchy(void)
+void EntityContainer::detachFromHierarchy()
 {
 	// Here we detach the entity from the hierarcy which means detaching from the parent and removing all references to the children.
 	// The actual children are not deleted.
@@ -334,13 +351,13 @@ void EntityContainer::detachFromHierarchy(void)
 	EntityBase::detachFromHierarchy();  // Detach from parent
 
 	// Detach children
-	for (auto child : children)
+	for (EntityBase* child : m_children)
 	{
 		assert(child->getParent() == this);
 		child->setParent(nullptr);
 	}
 
-	children.clear();   // Clear child references
+	m_children.clear();   // Clear child references
 }
 
 std::string EntityContainer::serialiseAsJSON()
