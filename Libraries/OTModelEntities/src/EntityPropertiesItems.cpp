@@ -892,25 +892,12 @@ void EntityPropertiesSelection::copySettings(EntityPropertiesBase* other, Entity
 
 void EntityPropertiesSelection::resetOptions(const std::list<std::string>& _options)
 {
-	resetOptions(std::vector<std::string>(_options.begin(), _options.end()));
+	resetOptionsImpl(_options);
 }
 
 void EntityPropertiesSelection::resetOptions(const std::vector<std::string>& _options)
 {
-	m_options.clear();
-	m_options.reserve(_options.size());
-	for (auto& item : _options)
-	{
-		addOption(item);
-	}
-	if (m_options.size() == 0)
-	{
-		m_value = "";
-	}
-	else
-	{
-		m_value = m_options.front();
-	}
+	resetOptionsImpl(_options);
 }
 
 bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const

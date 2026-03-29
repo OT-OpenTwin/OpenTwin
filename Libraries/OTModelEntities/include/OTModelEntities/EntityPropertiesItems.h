@@ -367,6 +367,14 @@ public:
 	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, const std::list<std::string>& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 	static EntityPropertiesSelection* createProperty(const std::string &group, const std::string &name, std::list<std::string>&& options, const std::string &defaultValue, const std::string &defaultCategory, EntityProperties &properties);
 
+protected:
+	//! @brief Resets the options for this property and checks whether the settings of the property are still compatible with the new options.
+	//! Clears the current options and iterates through the provided options adding them to the property.
+	//! @tparam TContainer Type of the container providing the options. Needs to be iterable and provide std::string elements.
+	//! @param _options Container providing the new options for the property.
+	template <typename TContainer>
+	void resetOptionsImpl(const TContainer& _options);
+
 private:
 	bool checkCompatibilityOfSettings(const EntityPropertiesSelection &other) const;
 
@@ -638,3 +646,5 @@ private:
 	std::vector<std::string> m_prefixOptions;
 	std::vector<std::string> m_suffixOptions;
 };
+
+#include "OTModelEntities/EntityPropertiesItems.hpp"
