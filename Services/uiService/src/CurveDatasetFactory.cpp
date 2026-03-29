@@ -37,7 +37,7 @@
 
 // BSONCXX header
 #include "bsoncxx/json.hpp"
-
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::string& _xAxisParameter, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
 {
 	m_curveIDDescriptions.clear();
@@ -47,6 +47,26 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	 
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options);
 	std::string temp = ot::json::toJson(entireResult);
+
+	//xLabel = _plotCfg.getXAxisLabel();
+	////e.g. "Frequency"
+
+
+
+	//yLabel = _plotCfg.getYAxisLabel();
+	////e.g. "Magnitude"
+	//const std::string fieldName = MetadataQuantity::getFieldName();
+	//for (auto entry : entireResult)
+	//{
+	//	if (ot::json::exists(xLabel))
+	//	{
+	//		addToCurveDataset(entry);
+	//	}
+	//}
+
+
+	
+
 	if (!ot::json::exists(entireResult, DataLakeHelper::getDataFieldName()))
 	{
 		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
@@ -222,6 +242,7 @@ std::list <ot::PlotDataset*> CurveDatasetFactory::createSingleCurve(ot::Plot1DCf
 
 	for (uint32_t i = 0; i < numberOfDocuments; i++) {
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);		
+		// has x and y axis value
 
 		// Get quantity value
 		if (numberOfQuantityEntries == 1) {
