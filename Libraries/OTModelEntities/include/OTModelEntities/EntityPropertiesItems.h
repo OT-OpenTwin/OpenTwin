@@ -352,7 +352,7 @@ public:
 	void addOption(const std::string &option) { assert(std::find(m_options.begin(), m_options.end(), option) == m_options.end());  m_options.push_back(option); }
 	void resetOptions(const std::list<std::string>& _options);
 	void resetOptions(const std::vector<std::string>& _options);
-	const std::vector<std::string> &getOptions() { return m_options; };
+	const std::vector<std::string>& getOptions() const { return m_options; };
 
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 

@@ -393,6 +393,16 @@ void EntityResult1DCurve::setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _cfg)
 	 setModified();
 }
 
+std::list<std::string> EntityResult1DCurve::getParameterOptions() const
+{
+	return m_queryProperties.getParameterOptions(this);
+}
+
+std::list<std::string> EntityResult1DCurve::getQuantityOptions() const
+{
+	return m_queryProperties.getQuantityOptions(this);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected: Virtual methods

@@ -16,8 +16,8 @@ public:
 	std::list<ot::ValueComparisonDescription> getParameterQueries(EntityBase* _entity) const;
 	std::list<ot::ValueComparisonDescription> getMetadataQueries(EntityBase* _entity) const;
 
-	std::list<std::string> getParameterOptions(EntityBase* _thisObject);
-	std::list<std::string> getQuantityOptions(EntityBase* _thisObject);
+	std::list<std::string> getParameterOptions(const EntityBase* _thisObject) const;
+	std::list<std::string> getQuantityOptions(const EntityBase* _thisObject) const;
 
 private:
 	const uint32_t m_maxNbOfQueries = 40;

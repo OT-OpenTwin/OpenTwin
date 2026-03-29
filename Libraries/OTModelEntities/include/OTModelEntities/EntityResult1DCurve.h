@@ -89,6 +89,9 @@ public:
 
 	void setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _dataLakeAccessCfg);
 
+	std::list<std::string> getParameterOptions() const;
+	std::list<std::string> getQuantityOptions() const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Protected: Virtual methods
