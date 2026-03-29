@@ -138,6 +138,19 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 }
 
 
+std::list <std::string> PropertyBundleDataLakeQuery::getParameterOptions(EntityBase* _thisObject)
+{
+	const auto& options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuerySettings + "_" + std::to_string(1))->getOptions();
+	return { options.begin(), options.end() };
+}
+
+std::list <std::string> PropertyBundleDataLakeQuery::getQuantityOptions(EntityBase* _thisObject)
+{
+	const auto& options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptions();
+	return { options.begin(), options.end() };
+}
+
+
 std::string PropertyBundleDataLakeQuery::getSelectedProject(EntityBase* _thisObject)
 {
 	return PropertyHelper::getProjectPropertyValue(_thisObject, m_propertyNameProjectName);
