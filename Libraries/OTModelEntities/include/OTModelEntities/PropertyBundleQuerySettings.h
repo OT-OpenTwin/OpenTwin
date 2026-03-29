@@ -18,38 +18,54 @@
 // @otlicense-end
 
 #pragma once
-#include "OTModelEntities/PropertyBundle.h"
+
+// OpenTwin header
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
+#include "OTModelEntities/PropertyBundle.h"
 
-class __declspec(dllexport) PropertyBundleQuerySettings : public PropertyBundle
-{
-public:
-	virtual void setProperties(EntityBase* _thisObject) override;
-	virtual bool updatePropertyVisibility(EntityBase* _thisObject) override;
-	void setQueryDefinitions(const std::list<std::string>& _queryOptions);
-	void reload(EntityBase* _thisObject);
+namespace ot {
 
-	std::list<ot::ValueComparisonDescription> getValueComparisonDefinitions(EntityBase* _thisObject);
-	
-	//! @brief Checks if parameter that determine the query have changed.
-	bool requiresUpdate(EntityBase* _thisObject);
+	class OT_MODELENTITIES_API_EXPORT PropertyBundleQuerySettings : public PropertyBundle
+	{
+	public:
+		virtual void setProperties(EntityBase* _entity) override;
+		virtual bool updatePropertyVisibility(EntityBase* _entity) override;
+		void setQueryDefinitions(const std::list<std::string>& _queryOptions);
+		void reload(EntityBase* _entity);
 
-	EntityPropertiesInteger* getNumberOfQueriesProperty(EntityBase* _thisObject);
+		std::list<ot::ValueComparisonDescription> getValueComparisonDefinitions(const EntityBase* _entity) const;
+		ValueComparisonDescription getValueComparisonDefinition(const EntityBase* _entity, uint32_t _queryIndex) const { return getValueComparisonDefinition(_entity, getGroupName(_queryIndex)); };
 
-	void updateQuerySettings(EntityBase* _thisObject,const std::list<std::string>& _queryOptions);
+		//! @brief Checks if parameter that determine the query have changed.
+		bool needsUpdate(const EntityBase* _entity) const;
 
-	const std::string& getGroupQuerySettingsName() const { return m_groupQuerySettings; };
+		int32_t getNumberOfQueries(const EntityBase* _entity) const;
 
-private:
-	const std::string m_groupQuerySettings = "Query settings";
-	const std::string m_propertyNbOfComparisions = "Number of queries";
+		void updateQuerySettings(EntityBase* _entity, const std::list<std::string>& _queryOptions);
 
-	const std::string m_groupQueryDefinition = "Query definition";
-	const std::string m_propertyName = "Name";
-	const std::string m_propertyComparator = "Comparator";
-	const std::string m_propertyValue = "Value";
+		const std::string& getGroupQuerySettingsName() const { return m_groupQuerySettings; };
 
-	std::string m_quantityName = "";
-	uint32_t m_maxNumberOfQueryDefinitions = 0;
-	std::list<std::string> m_selectionOptions;
-};
+	private:
+		const std::string m_groupQuerySettings = "Query settings";
+		const std::string m_propertyNbOfComparisions = "Number of queries";
+
+		const std::string m_groupQueryDefinition = "Query definition";
+		const std::string m_propertyName = "Name";
+		const std::string m_propertyComparator = "Comparator";
+		const std::string m_propertyValue = "Value";
+
+		inline std::string getGroupName(uint32_t _index) const { return m_groupQueryDefinition + "_" + std::to_string(_index); };
+
+		void createPropertiesForIndex(EntityBase* _entity, uint32_t _queryIndex);
+		void deletePropertiesForIndex(EntityBase* _entity, uint32_t _queryIndex);
+		void setPropertiesVisible(EntityBase* _entity, uint32_t _queryIndex, bool _visible);
+		bool needsUpdate(const EntityBase* _entity, uint32_t _queryIndex) const;
+		ValueComparisonDescription getValueComparisonDefinition(const EntityBase* _entity, const std::string& _groupName) const;
+		void resetNameOptions(EntityBase* _entity);
+
+		std::string m_quantityName = "";
+		uint32_t m_maxNumberOfQueryDefinitions = 0;
+		std::list<std::string> m_nameSelectionOptions;
+	};
+
+}

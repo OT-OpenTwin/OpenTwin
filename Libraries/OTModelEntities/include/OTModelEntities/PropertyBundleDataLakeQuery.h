@@ -6,18 +6,18 @@
 class __declspec(dllexport) PropertyBundleDataLakeQuery : public PropertyBundle
 {
 public:
-	void setProperties(EntityBase* _thisObject) override;
-	bool updatePropertyVisibility(EntityBase* _thisObject) override;
+	void setProperties(EntityBase* _entity) override;
+	bool updatePropertyVisibility(EntityBase* _entity) override;
 
-	std::string getSelectedProject(EntityBase* _thisObject);
-	std::string getSelectedSeries(EntityBase* _thisObject);
-	bool updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign);
-	ot::ValueComparisonDescription getQuantityQuery (EntityBase* _thisObject) const;
-	std::list<ot::ValueComparisonDescription> getParameterQueries(EntityBase* _thisObject) const;
-	std::list<ot::ValueComparisonDescription> getMetadataQueries(EntityBase* _thisObject) const;
+	std::string getSelectedProject(EntityBase* _entity);
+	std::string getSelectedSeries(EntityBase* _entity);
+	bool updateOptions(EntityBase* _entity, MetadataCampaign& _campaign);
+	ot::ValueComparisonDescription getQuantityQuery (EntityBase* _entity) const;
+	std::list<ot::ValueComparisonDescription> getParameterQueries(EntityBase* _entity) const;
+	std::list<ot::ValueComparisonDescription> getMetadataQueries(EntityBase* _entity) const;
 
-	std::list <std::string> getParameterOptions(EntityBase* _thisObject);
-	std::list <std::string> getQuantityOptions(EntityBase* _thisObject);
+	std::list<std::string> getParameterOptions(EntityBase* _thisObject);
+	std::list<std::string> getQuantityOptions(EntityBase* _thisObject);
 
 private:
 	const uint32_t m_maxNbOfQueries = 40;
@@ -46,7 +46,6 @@ private:
 	const std::string m_propertyComparator = "Comparator";
 	const std::string m_propertyValue = "Value";
 	const std::string m_propertyUnit = "Unit";
-
 
 	void setNameOptions(EntityBase* _thisObject, const std::list<std::string>& _options, const std::string& _group, const std::string& _name);
 	void setValueProperties(EntityBase* _thisObject, const std::string& _groupName, const ot::TupleInstance& _tupleInstance);
