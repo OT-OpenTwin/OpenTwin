@@ -1,0 +1,69 @@
+// @otlicense
+// File: VtkDriverCartesianVectorVolume.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+#include "VisualizationServiceTypes.h"
+#include "VtkDriverWithScaling.h"
+#include "vtkRectilinearGrid.h"
+#include "OTModelEntities/EntityResultBase.h"
+#include "OTModelEntities/PropertyBundleDataHandlePlane.h"
+#include "OTModelEntities/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/PropertyBundleDataHandleVisCartesianVector.h"
+#include "DataSourceUnstructuredMesh.h"
+
+#include <string>
+#include <ctime>
+#include <vector>
+#include <list>
+#include <vtkAlgorithmOutput.h>
+#include <vtkDataSetMapper.h>
+
+namespace osg {
+	class Node;
+}
+
+class VtkDriverCartesianVectorVolume : public VtkDriverWithScaling {
+public:
+	VtkDriverCartesianVectorVolume();
+	virtual ~VtkDriverCartesianVectorVolume();
+
+	virtual void setProperties(EntityVis2D3D *visEntity) override;
+	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
+	
+private:
+	PropertyBundleDataHandlePlane * planeData = nullptr;
+	PropertyBundleDataHandleVisCartesianVector * visData = nullptr;
+
+	vtkAlgorithmOutput* ApplyCutplane(osg::Node *parent);
+	void Assemble2DNode(osg::Node *parent);
+	void Assemble3DNode(osg::Node* parent);
+
+	void AddNodeVectors(vtkAlgorithmOutput* input, osg::Node* parent);
+	vtkAlgorithmOutput* SetScalarValues(void);
+	vtkAlgorithmOutput* GetArrowSource(void);
+
+	void CheckForModelUpdates();
+	virtual void DeletePropertyData(void) override;
+
+	DataSourceUnstructuredMesh* dataSource;
+	vtkAlgorithmOutput* dataConnection;
+
+	std::list<vtkObject*> objectsToDelete;
+};

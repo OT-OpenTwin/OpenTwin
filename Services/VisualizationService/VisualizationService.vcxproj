@@ -186,6 +186,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
+    <ClCompile Include="src\DataSourceCartesianMesh.cpp" />
     <ClCompile Include="src\DataSourceCartesianVector.cpp" />
     <ClCompile Include="src\DataSourceItemFactory.cpp" />
     <ClCompile Include="src\DataSourceManager.cpp" />
@@ -199,6 +200,7 @@
     <ClCompile Include="src\VtkDriver.cpp" />
     <ClCompile Include="src\VtkDriverCartesianFaceScalar.cpp" />
     <ClCompile Include="src\VtkDriverCartesianVectorfield.cpp" />
+    <ClCompile Include="src\VtkDriverCartesianVectorVolume.cpp" />
     <ClCompile Include="src\VtkDriverFactory.cpp" />
     <ClCompile Include="src\VtkDriverGeneric.cpp" />
     <ClCompile Include="src\VtkDriverUnstructuredScalarSurface.cpp" />
@@ -209,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\DataSourceCartesianMesh.h" />
     <ClInclude Include="include\DataSourceCartesianVector.h" />
     <ClInclude Include="include\DataSourceItemFactory.h" />
     <ClInclude Include="include\DataSourceManager.h" />
@@ -222,6 +225,7 @@
     <ClInclude Include="include\VtkDriver.h" />
     <ClInclude Include="include\VtkDriverCartesianFaceScalar.h" />
     <ClInclude Include="include\VtkDriverCartesianVectorfield.h" />
+    <ClInclude Include="include\VtkDriverCartesianVectorVolume.h" />
     <ClInclude Include="include\VtkDriverFactory.h" />
     <ClInclude Include="include\VtkDriverGeneric.h" />
     <ClInclude Include="include\VtkDriverUnstructuredScalarSurface.h" />

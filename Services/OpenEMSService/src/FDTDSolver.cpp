@@ -29,7 +29,7 @@
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityResultCartesianMeshVtk.h"
-#include "OTModelEntities/EntityVisUnstructuredVectorVolume.h"
+#include "OTModelEntities/EntityVisCartesianVectorVolume.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -262,7 +262,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	vtkResult->setComplexData(resultName, EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
 	vtkResult->storeToDataBase();
 
-	EntityVisUnstructuredVectorVolume* visualizationEntity = new EntityVisUnstructuredVectorVolume(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	EntityVisCartesianVectorVolume* visualizationEntity = new EntityVisCartesianVectorVolume(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);
