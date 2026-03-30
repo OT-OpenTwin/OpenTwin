@@ -100,7 +100,7 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 			assert(false);
 		}
 
-		std::string label = dataPointDecoderQu.value().getFieldName();
+		std::string label = dataPointDecoderQu.value().getLabel();
 		clearTextEntry.AddMember(std::move(quantityName), ot::JsonString(label, clearTextDoc.GetAllocator()), clearTextDoc.GetAllocator());
 
 		ot::JsonValue quantityValue(singleMongoDocument["Values"], clearTextDoc.GetAllocator());
