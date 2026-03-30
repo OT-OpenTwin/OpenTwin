@@ -69,8 +69,6 @@ public:
 	// Private helper
 
 private:
-	ot::PropertyBundleQuerySettings m_querySettings;
-
 	static std::string getXAxisPropertyGroupName() { return "X axis"; };
 	static std::string getYAxisPropertyGroupName() { return "Y axis"; };
 	static std::string getRadiusAxisPropertyGroupName() { return "r axis"; };
@@ -80,8 +78,6 @@ private:
 	void setAxisFromProperties(const std::string& _axisName, ot::Plot1DAxisCfg& _axis);
 	bool setAxisPropertiesVisibility(const std::string& _axisName, bool _visible);
 	bool updateAxisPropertiesVisibility(const std::string& _axisName);
-
-	void setQuerySelections();
 
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
