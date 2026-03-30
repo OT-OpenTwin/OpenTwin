@@ -585,7 +585,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     endif()
 
     # Include-only tokens
-    if(DEP STREQUAL "RJSON")
+    if(DEP STREQUAL "RJSON" OR DEP STREQUAL "BASE64")
         return()
     endif()
 
