@@ -21,7 +21,7 @@
 #include "OTCore/MetadataEntry/MetadataEntryObject.h"
 #include "OTCore/MetadataEntry/MetadataEntryComperator.h"
 
-bool MetadataEntryObject::operator==(const MetadataEntryObject& _other)
+bool MetadataEntryObject::operator==(const MetadataEntryObject& _other) const
 {
 	if (getEntryName() != _other.getEntryName() || _other.m_values.size() != m_values.size())
 	{

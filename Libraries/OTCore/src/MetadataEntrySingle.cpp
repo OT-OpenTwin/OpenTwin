@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 
-bool MetadataEntrySingle::operator==(const MetadataEntrySingle& other)
+bool MetadataEntrySingle::operator==(const MetadataEntrySingle& other) const
 {
 	return getEntryName() == other.getEntryName() && _value == other.getValue();
 }

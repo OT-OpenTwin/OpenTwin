@@ -33,7 +33,7 @@ public:
 	const std::list<std::shared_ptr<MetadataEntry>>& getEntries() const { return m_values; };
 	void AddMetadataEntry(std::shared_ptr<MetadataEntry> _entry) { m_values.push_back(_entry); }
 	void AddMetadataEntry(std::list<std::shared_ptr<MetadataEntry>> _entries) { m_values.splice(m_values.end(), _entries); }
-	bool operator==(const MetadataEntryObject& _other);
+	bool operator==(const MetadataEntryObject& _other) const;
 private:
 	std::list<std::shared_ptr<MetadataEntry>> m_values;
 };
