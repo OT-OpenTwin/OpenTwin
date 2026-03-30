@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityResultBase.h
+// File: PropertyBundleVisCartesianVectorVolume.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,37 +18,22 @@
 // @otlicense-end
 
 #pragma once
-#pragma warning(disable : 4251)
+#include "OTModelEntities/PropertyBundle.h"
 
-#include <list>
-#include <vector>
+#include "OTModelEntities/PropertiesVisCartesianVector.h"
 
-class __declspec(dllexport) EntityResultBase
+class __declspec(dllexport) PropertyBundleVisCartesianVectorVolume : public PropertyBundle
 {
 public:
-	enum tResultType
-	{
-		UNKNOWN = 0,
-		CARTESIAN_EDGES_3D = 1,
-		CARTESIAN_FACES_3D = 2,
-		CARTESIAN_DUAL_EDGES_3D = 3,
-		CARTESIAN_DUAL_FACES_3D = 4,
-		CARTESIAN_NODE_VECTORS = 5,
-		CARTESIAN_DUAL_NODE_VECTORS = 6,
-		UNSTRUCTURED_SCALAR = 7,
-		UNSTRUCTURED_VECTOR = 8,
-		CARTESIAN_CELL = 9,
-		CARTESIAN_NODE = 10
-	};
+	virtual void setProperties(EntityBase * _thisObject) override;
+	virtual bool updatePropertyVisibility(EntityBase * _thisObject) override;
 
-	EntityResultBase() : resultType(UNKNOWN) {};
-	virtual ~EntityResultBase() {};
-
-	void setResultType(tResultType type) { resultType = type; }
-	tResultType getResultType(void) { return resultType; }
+	bool is2dType(EntityBase* thisObject);
 
 private:
-	tResultType resultType;
+	PropertiesVisCartesianVector m_properties;
+	const std::string m_defaultCategory = "3D Visualization";
+	const std::string m_groupNameGeneral = "General";
+	const std::string m_groupNameArrows = "Arrows";
+	const std::string m_groupNameContour = "Contour";
 };
-
-

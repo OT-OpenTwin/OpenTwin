@@ -50,6 +50,17 @@ public:
 	void TurnToSICapacitance(double& value, std::string& formerUnit);
 	void TurnToSIConductivity(double& value, std::string& formerUnit);
 
+	double getScaleToSIDimension();
+	double getScaleToSIFrequency();
+	double getScaleToSITime();
+	double getScaleToSIVoltage();
+	double getScaleToSICurrent();
+	double getScaleToSIConductance();
+	double getScaleToSIResistance();
+	double getScaleToSIInductance();
+	double getScaleToSICapacitance();
+	double getScaleToSIConductivity();
+
 private:
 	
 	const std::string unitGroupname = "Units";

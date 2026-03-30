@@ -154,6 +154,76 @@ void EntityUnits::TurnToSIConductivity(double& value, std::string& formerUnit)
 	value *= conductivity[formerUnit];
 }
 
+double EntityUnits::getScaleToSIDimension()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameDimension));
+	assert(entity != nullptr);
+	return dimensions[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIFrequency()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameFrequency));
+	assert(entity != nullptr);
+	return frequency[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSITime()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameTime));
+	assert(entity != nullptr);
+	return time[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIVoltage()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameVoltage));
+	assert(entity != nullptr);
+	return voltage[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSICurrent()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameCurrent));
+	assert(entity != nullptr);
+	return current[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIConductance()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameConductance));
+	assert(entity != nullptr);
+	return conductance[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIResistance()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameResistance));
+	assert(entity != nullptr);
+	return resistance[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIInductance()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameInductance));
+	assert(entity != nullptr);
+	return inductance[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSICapacitance()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameCapacitance));
+	assert(entity != nullptr);
+	return capacitance[entity->getValue()];
+}
+
+double EntityUnits::getScaleToSIConductivity()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameConductivity));
+	assert(entity != nullptr);
+	return conductivity[entity->getValue()];
+}
+
 bool EntityUnits::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
@@ -184,9 +254,9 @@ void EntityUnits::addVisualizationNodes(void) {
 
 void EntityUnits::setUnitLists()
 {
-	dimensionsList = { {"nm", pow(10,-6)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.1}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
+	dimensionsList = { {"nm", pow(10,-9)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.1}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
 	temperatureList = { {"degC",1.}, {"K",1.}, {"degF",1.} };
-	frequencyList = { {"Hz", 1.}, {"kHz", pow(10,3)}, {"MHz", pow(10,6)}, {"GHz", pow(10,6)}, {"THz", pow(10,9)}, {"PHz", pow(10,12)} };
+	frequencyList = { {"Hz", 1.}, {"kHz", pow(10,3)}, {"MHz", pow(10,6)}, {"GHz", pow(10,9)}, {"THz", pow(10,12)}, {"PHz", pow(10,15)} };
 	timeList = { {"fs", pow(10,-15)}, {"ps", pow(10,-12)}, {"ns", pow(10,-9)}, {"us", pow(10,-6)}, {"ms", pow(10,-3)}, {"s", 1.} };
 	voltageList = { {"nV", pow(10,-9)}, {"uV", pow(10,-6)}, {"mV", pow(10,-3)}, {"V",1.}, {"kV", pow(10,3)}, {"MV", pow(10,6)} };
 	currentList = { {"nA", pow(10,-9)}, {"uA", pow(10,-6)}, {"mA", pow(10,-3)}, {"A",1.}, {"kA", pow(10,3)}, {"MA", pow(10,6)} };

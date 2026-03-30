@@ -399,17 +399,26 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	// Start logging and solver execution
 	m_subprocessManager->startLogging();
 
-	FDTDSolver fdtdSolver(solverEntity, meshEntity.get(), getOpenEMSDir(), tempDirPath);
-
-	std::string solverCommand = fdtdSolver.generateRunCommand();
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(solverCommand, doc.GetAllocator()), doc.GetAllocator());
+	FDTDSolver fdtdSolver(this, solverEntity, meshEntity.get(), getOpenEMSDir(), tempDirPath);
 
 	std::string returnMessage;
-	if (!m_subprocessManager->sendRequest(doc, returnMessage)) {
-		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute OpenEMS script").toJson();
+	std::string solverCommand;
+
+	try
+	{
+		solverCommand = fdtdSolver.generateRunCommand();
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_CMD_PYTHON_Command, ot::JsonString(solverCommand, doc.GetAllocator()), doc.GetAllocator());
+
+		if (!m_subprocessManager->sendRequest(doc, returnMessage)) {
+			returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to execute OpenEMS script").toJson();
+		}
+	}
+	catch (std::string& error)
+	{
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, error).toJson();
 	}
 
 	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
@@ -451,6 +460,10 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 
 	if (debugFlag)
 	{
+		std::ofstream inputCommand(tempDirPath + "\\input.py");
+		inputCommand << solverCommand;
+		inputCommand.close();
+
 		m_subprocessManager->addLogText("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath, true);
 	}
 	else
@@ -559,7 +572,7 @@ std::string Application::getUniqueTempDir(void)
 
 	do
 	{
-		uniqueTempDir = tempDir + "\\GETDP_WORK" + std::to_string(count);
+		uniqueTempDir = tempDir + "\\OPENEMS_WORK" + std::to_string(count);
 		count++;
 
 	} while (checkFileOrDirExists(uniqueTempDir));

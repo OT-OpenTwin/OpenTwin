@@ -20,23 +20,41 @@
 #pragma once
 
 #include <string>
+#include <vector>
+
+class Application;
 
 class EntityBase;
 class EntityMeshCartesian;
+class EntityUnits;
 
 class FDTDSolver
 {
 public:
-	FDTDSolver(EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string &_openEMSPath, const std::string& _tempDirPath);
+	FDTDSolver(Application *_application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string &_openEMSPath, const std::string& _tempDirPath);
 	virtual ~FDTDSolver() {};
 
 	std::string generateRunCommand();
 	void convertAndStoreResults();
 
 private:
+	void addPreparationData(std::stringstream& runCommand);
+	void addSolverRun(std::stringstream& runCommand);
+	void addUnits(std::stringstream& runCommand);
+	std::string escapeBackslashes(const std::string& input);
+	void convertAndStoreFrequencyDomainDumps();
+	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName);
+	std::string toLower(std::string s);
+	std::vector<char> readFile(const std::string& filename);
+	std::string parseComplexResultFileName(const std::string& input);
+	bool toDouble(const std::string& s, double& value);
+	std::string doubleToString(double value);
+
+	Application* application;
 	EntityBase *solverEntity;
 	EntityMeshCartesian *meshEntity;
 	std::string openEMSPath;
 	std::string tempDirPath;
 
+	EntityUnits* entityUnits;
 };
