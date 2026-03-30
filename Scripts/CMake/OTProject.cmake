@@ -54,7 +54,7 @@ include_guard(GLOBAL)
 include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
 if(MSVC)
-    add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP)
+    add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP /external:anglebrackets)
 endif()
 
 # ------------------------------------------------------------
@@ -256,7 +256,7 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     target_compile_definitions(${_core} PRIVATE
         $<$<CONFIG:Debug>:_DEBUG>
         $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
-)
+    )
 
     target_include_directories(${_core} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -413,6 +413,15 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
 
     if(DEP STREQUAL "EARCUT")
         _ot_apply_tp_to_core("${CORE_TARGET}" "EARCUT")
+        return()
+    endif()
+
+    if(DEP STREQUAL "BASE64")
+        set(_b64_src "$ENV{BASE64_ROOT}/base64.c")
+        set_source_files_properties("${_b64_src}" PROPERTIES LANGUAGE CXX)
+
+        target_sources("${CORE_TARGET}" PRIVATE "${_b64_src}")
+        target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{BASE64_ROOT}")
         return()
     endif()
 
@@ -697,15 +706,17 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
 
     target_include_directories(${TEST_TARGET_NAME} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/../include"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
-    )
-
-    target_compile_definitions(${TEST_TARGET_NAME} PRIVATE
-        $<$<CONFIG:Debug>:_DEBUG>
-        $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+        "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
     target_link_libraries(${TEST_TARGET_NAME} PRIVATE ${MAIN_TARGET_NAME})
+
+    target_include_directories(${TEST_TARGET_NAME} PRIVATE 
+        $<TARGET_PROPERTY:${MAIN_TARGET_NAME},INCLUDE_DIRECTORIES>
+        $<TARGET_PROPERTY:${MAIN_TARGET_NAME}_core,INCLUDE_DIRECTORIES>
+    )
 
     if(DEFINED ENV{GOOGLE_TEST_INC} AND NOT "$ENV{GOOGLE_TEST_INC}" STREQUAL "")
         target_include_directories(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_INC}")
