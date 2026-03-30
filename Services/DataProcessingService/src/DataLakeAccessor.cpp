@@ -171,7 +171,7 @@ void DataLakeAccessor::createQueryDescriptionQuantity(const ot::ValueComparisonD
 	{
 		throw std::exception(("Failed to access metadata of collection: " + m_collectionName).c_str());
 	}
-	if (_valueComparisons.getName() != "" && _valueComparisons.getComparator() != "" && _valueComparisons.getValue() != "")
+	if (_valueComparisons.getName() != "" && _valueComparisons.getComparator() != "" && _valueComparisons.getValue() != "" || _valueComparisons.getName() != "" && _valueComparisons.getComparator() == "")
 	{
 		//First we try to find the corresponding metadata
 		std::list<const MetadataQuantity*> viableQuantities;
@@ -851,50 +851,85 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		ot::ValueComparisonDescription quantitySelection(MetadataQuantity::getFieldName(), "=", fieldValue, instance);
 		queryElements.push_back(builder.createComparison(quantitySelection));
 
-		//Now we create the value comparison
+		//Now we create the value comparison, if set
 		const ot::QueryTargetDescription& targetDescription = queryDescription.getQueryTargetDescription();
 		auto storedTupleDescription = targetDescription.getTupleInstance();
 		const ot::ValueComparisonDescription& comparisonDescription = queryDescription.getValueComparisonDescription();
+		
 		auto queryTupleDescription = comparisonDescription.getTupleInstance();
-
-		auto valueQueryDescription = createQuantityValueQueryDescription(queryDescription);
-		if (transformationNecessary(queryTupleDescription, storedTupleDescription))
+		bool targetTransformedCollection = transformationNecessary(queryTupleDescription, storedTupleDescription);
+		// If the query has no comparator set, we simply target all documents with the named quantity. 
+		if (!comparisonDescription.getComparator().empty())
 		{
-			// If transform necessary :
-			// 1) Storage tuple format to SIBase -> Store all data points as SIBase in new format in transformed db
-			// 2) target tuple format to SIBase -> Adjust query value accordingly
-			// 3) Determine unit transformation from target tuple format to SIBase -> Take inverse and use it for the resulting data 
-			if (!alreadyStoredTransformation(queryDescription))
+			auto valueQueryDescription = createQuantityValueQueryDescription(queryDescription);
+			if (targetTransformedCollection)
 			{
-				storeTransformation(queryDescription);
+				// If transform necessary :
+				// 1) Storage tuple format to SIBase -> Store all data points as SIBase in new format in transformed db
+				// 2) target tuple format to SIBase -> Adjust query value accordingly
+				// 3) Determine unit transformation from target tuple format to SIBase -> Take inverse and use it for the resulting data 
+				if (!alreadyStoredTransformation(queryDescription))
+				{
+					storeTransformation(queryDescription);
+				}
+				std::optional<BsonViewOrValue> valueQuery = generateQueryFromSIBaseToTarget(valueQueryDescription);
+				if (valueQuery.has_value())
+				{
+					// Value comparison was viable for creating a query.
+					queryElements.push_back(valueQuery.value());
+				}
+				else
+				{
+					assert(false);
+				}
 			}
-			std::optional<BsonViewOrValue> valueQuery = generateQueryFromSIBaseToTarget(valueQueryDescription);
-			if (valueQuery.has_value())
+			else
 			{
-				// Value comparison was viable for creating a query.
-				queryElements.push_back(valueQuery.value());
+				std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription);
+
+				if (valueQuery.has_value())
+				{
+					// Value comparison was viable for creating a query.
+					queryElements.push_back(valueQuery.value());
+				}
+				else
+				{
+					assert(false);
+				}
 			}
+
+		}
+		// Depending on wether or not a comparator was set, we have two components that need to be and connected or not.
+		BsonViewOrValue finalQuery;
+		if (queryElements.size() > 1)
+		{
+			finalQuery = builder.connectWithAND(std::move(queryElements));
+			const std::string debugQuery = bsoncxx::to_json(finalQuery.view());
+			// Without transformation: Simple transformation from target format to storage format
+			
+		}
+		else if(queryElements.size() == 1)
+		{
+			finalQuery = queryElements.front();
 		}
 		else
 		{
-			std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription);
-
-			if (valueQuery.has_value())
-			{
-				// Value comparison was viable for creating a query.
-				queryElements.push_back(valueQuery.value());
-			}
+			assert(false);
 		}
-	
-		BsonViewOrValue combinedQuery = builder.connectWithAND(std::move(queryElements));
-		const std::string debugQuery = bsoncxx::to_json(combinedQuery.view());
 
-		// Without transformation: Simple transformation from target format to storage format
-		resultCollectionQueries.push_back(combinedQuery);
+		if (targetTransformedCollection)
+		{
+			transformedCollectionQueries.push_back(std::move(finalQuery));
+		}
+		else
+		{
+			resultCollectionQueries.push_back(std::move(finalQuery));
+		}
+
 	}
 
 
-
+	//Finally, if we query multiple quantities, they need to be or connected.
 	if (resultCollectionQueries.size() == 1)
 	{
 		_resultCollectionQuery = std::move(resultCollectionQueries.front());
