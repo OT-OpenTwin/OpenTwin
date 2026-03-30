@@ -317,6 +317,9 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const int32_t showMatrixRowValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix row entry");
 	const int32_t showMatrixColumnValue = PropertyHelper::getIntegerPropertyValue(this, "Show matrix column entry");
 
+	const std::string parameterSetting = PropertyHelper::getSelectionPropertyValue(this, "Parameter", m_querySettings.getGroupQuerySettingsName());
+	const std::string quantitySetting = PropertyHelper::getSelectionPropertyValue(this, "Quantity", m_querySettings.getGroupQuerySettingsName());
+
 	std::list<ot::ValueComparisonDescription> queries = m_querySettings.getValueComparisonDefinitions(this);
 
 	ot::Plot1DCfg config;
@@ -329,6 +332,9 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
+
+	config.setQueryParameter(parameterSetting);
+	config.setQueryQuantity(quantitySetting);
 
 	config.setGridColor(gridColour->createCopy());
 	config.setGridVisible(gridVisible);

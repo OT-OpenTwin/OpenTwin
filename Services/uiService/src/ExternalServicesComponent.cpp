@@ -4720,19 +4720,8 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 
 			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
 			
-			// @jan: here the parameter was checked
-			bool curveHasDataToVisualise = false;
-			if (xAxisParameter != "") {
-				for (const auto& parameter : queryInformation.getParameterDescriptions()) {
-					if (parameter.getLabel() == xAxisParameter) {
-						curveHasDataToVisualise = true;
-					}
-				}
-			}
-			else {
-				curveHasDataToVisualise = true;
-			}
-
+			bool curveHasDataToVisualise = true;
+			
 			if (curveHasDataToVisualise) {
 				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, queries);
 				dataSets.splice(dataSets.begin(), newCurveDatasets);

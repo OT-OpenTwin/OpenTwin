@@ -244,7 +244,7 @@
     <ClInclude Include="include\Datapoints.h">
       <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
-    <ClInclude Include="include\ShortParameterDescription.h">
+    <ClInclude Include="include\AdditionalDependencies.h">
       <Filter>Header Files\CurveHelper</Filter>
     </ClInclude>
     <ClInclude Include="include\UITestLogs.h">

@@ -104,7 +104,7 @@
     <QtMoc Include="include\ProjectOverviewPreviewBox.h" />
     <QtMoc Include="include\ProjectOverviewTree.h" />
     <QtMoc Include="include\ScriptEngine.h" />
-    <ClInclude Include="include\ShortParameterDescription.h" />
+    <ClInclude Include="include\AdditionalDependencies.h" />
     <ClInclude Include="include\StartArgumentParser.h" />
     <ClInclude Include="include\UITestLogs.h" />
     <ClInclude Include="include\ViewStateCfg.h" />

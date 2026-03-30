@@ -24,6 +24,8 @@
 #include "OTCore/Variable/Variable.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTDataStorage/DataLakeAPI.h"
+#include "Datapoints.h"
+#include "AdditionalDependencies.h"
 
 // std header
 #include <vector>
@@ -52,14 +54,10 @@ private:
 	DataStorageAPI::DataLakeAPI m_dataAccess;
 
 	std::string createUnitLabel(const std::string& _unit);
-
-	ot::JsonDocument queryCurveData(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisons);
-	const std::list<ot::ValueComparisonDescription> extractValidValueDescriptions(const ot::QueryInformation& _queryInformation, const std::list<ot::ValueComparisonDescription>& _valueComparisions);
-	CurveType determineCurveType(const ot::QueryInformation& _curveCfg);
-	std::list <ot::PlotDataset*> createSingleCurve(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
-	std::list<ot::PlotDataset*> createCurveFamily(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
 	
-	std::optional<ot::ValueComparisonDescription> createValidValueComparison(const ot::DataPointDecoder& _desciption, const ot::ValueComparisonDescription& _comparision);
+	std::unordered_map<DependencyList, std::list<Datapoints>>  createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
+	std::map<std::string, std::list<Datapoints>>  createNamedCurveFamilies(std::unordered_map<DependencyList, std::list<Datapoints>>& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg);
+	std::list<ot::PlotDataset*> createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);

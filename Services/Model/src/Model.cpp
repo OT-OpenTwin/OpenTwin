@@ -812,6 +812,7 @@ void Model::updateMapEntries(EntityBase* _entity)
 		EntityBase* entity = entityByID.second;
 		if (entity->getEntityType() == EntityBase::DATA)
 		{
+			assert(false); // data entities should not be directly stored in the map.
 			if (entity->getParent()->getEntityID() == _entity->getEntityID())
 			{
 				entity->setParent(_entity);
