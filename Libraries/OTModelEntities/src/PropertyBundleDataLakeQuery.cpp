@@ -13,14 +13,14 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	// Basic properties
 	EntityPropertiesSelection* metadataProp = EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { "" }, "", "default", _thisObject->getProperties());
 	metadataProp->setAllowCustomValues(true);
-	metadataProp->setGroupChanges(true);
+	//metadataProp->setGroupChanges(true);
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0, 0, m_maxNbOfQueries, "default", _thisObject->getProperties());
 	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueriesMetadataSeries, 0, 0, m_maxNbOfQueriesMetadata, "default", _thisObject->getProperties());
 
 	// Quantity Settings
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 	groupQuantityProp->setAllowCustomValues(true);
-	groupQuantityProp->setGroupChanges(true);
+	//groupQuantityProp->setGroupChanges(true);
 
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
@@ -73,7 +73,7 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 
 		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
-		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setGroupChanges(true);
+		//PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setGroupChanges(true);
 
 		EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 		typeLabelProperty->setReadOnly(true);
