@@ -199,7 +199,6 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 		}
 	}
 
-	bool isModified = getModified();
 	bool anyPropertyNeedsUpdate = getProperties().anyPropertyNeedsUpdate();
 
 	std::vector<std::string> queryParameterList(queryParameters.begin(), queryParameters.end());

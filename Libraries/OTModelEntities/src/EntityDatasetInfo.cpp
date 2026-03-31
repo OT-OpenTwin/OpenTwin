@@ -17,6 +17,8 @@ ot::EntityDatasetInfo::EntityDatasetInfo(ot::UID _ID, EntityBase* _parent, Entit
 	treeItem.setHiddenIcon("Tree/Hint");
 	this->setDefaultTreeItem(treeItem);
 
+	this->setDeletable(true);
+
 	ot::VisualisationTypes visTypes = this->getVisualizationTypes();
 	visTypes.addTableVisualisation();
 	this->setDefaultVisualizationTypes(visTypes);
