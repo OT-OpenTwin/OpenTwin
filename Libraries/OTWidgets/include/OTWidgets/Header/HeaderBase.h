@@ -16,6 +16,7 @@ namespace ot {
 
 	class OT_WIDGETS_API_EXPORT HeaderBase : public QHeaderView
 	{
+		Q_OBJECT
 		OT_DECL_NOCOPY(HeaderBase)
 		OT_DECL_NOMOVE(HeaderBase)
 		OT_DECL_NODEFAULT(HeaderBase)
@@ -41,7 +42,6 @@ namespace ot {
 		virtual void paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const override;
 		virtual QSize sectionSizeFromContents(int _logicalIndex) const override;
 		virtual void mousePressEvent(QMouseEvent* _event) override;
-		virtual void mouseReleaseEvent(QMouseEvent* _event) override;
 		virtual void mouseMoveEvent(QMouseEvent* _event) override;
 		virtual void leaveEvent(QEvent* _event) override;
 
@@ -76,10 +76,12 @@ namespace ot {
 
 	protected Q_SLOTS:
 		virtual void sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder);
-
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
+
+	private Q_SLOTS:
+		void slotSectionClicked(int _logicalIndex);
 
 	private:
 		struct FilterState
@@ -94,6 +96,7 @@ namespace ot {
 		};
 		FilterState m_filterState;
 
+		QPoint m_lastMousePressPos;
 		QSize m_buttonSize;
 		QSize m_buttonPadding;
 	};

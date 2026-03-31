@@ -11,19 +11,16 @@
 #include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 
-ot::HeaderBase::HeaderBase(Orientation _orientation, QWidget* _parent)
-	: HeaderBase(_orientation == Orientation::Horizontal ? Qt::Horizontal : Qt::Vertical, _parent)
-{
-	setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-	setMouseTracking(true);
-	setSectionsClickable(true);
-}
+ot::HeaderBase::HeaderBase(Orientation _orientation, QWidget* _parent) : HeaderBase(_orientation == Orientation::Horizontal ? Qt::Horizontal : Qt::Vertical, _parent) {}
 
 ot::HeaderBase::HeaderBase(Qt::Orientation _orientation, QWidget* _parent)
 	: QHeaderView(_orientation, _parent),
 	m_buttonSize(14, 14), m_buttonPadding(4, 4)
 {
-	
+	setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+	setMouseTracking(true);
+	setSectionsClickable(true);
+	connect(this, &QHeaderView::sectionClicked, this, &HeaderBase::slotSectionClicked);
 }
 
 int ot::HeaderBase::sizeHintForColumn(int _column) const
@@ -121,48 +118,8 @@ QSize ot::HeaderBase::sectionSizeFromContents(int _logicalIndex) const
 
 void ot::HeaderBase::mousePressEvent(QMouseEvent* _event)
 {
-	int ix = logicalIndexAt(_event->pos());
-	if (ix >= 0 && getFilterFeatures(ix))
-	{
-		QRect iconRect = filterIconRect(ix);
-		if (iconRect.contains(_event->pos()))
-		{
-			update();
-			QHeaderView::mousePressEvent(_event);
-
-			showFilterMenu(ix);
-			return;
-		}
-		else
-		{
-			ix = -1;
-		}
-	}
-	else
-	{
-		ix = -1;
-	}
-
-	if (ix == m_filterState.pressedFilter)
-	{
-		return;
-	}
-
-	m_filterState.pressedFilter = ix;
-	update();
+	m_lastMousePressPos = _event->pos();
 	QHeaderView::mousePressEvent(_event);
-}
-
-void ot::HeaderBase::mouseReleaseEvent(QMouseEvent* _event)
-{
-	if (m_filterState.pressedFilter == -1)
-	{
-		return;
-	}
-
-	m_filterState.pressedFilter = -1;
-	update();
-	QHeaderView::mouseReleaseEvent(_event);
 }
 
 void ot::HeaderBase::mouseMoveEvent(QMouseEvent* _event)
@@ -191,13 +148,12 @@ void ot::HeaderBase::mouseMoveEvent(QMouseEvent* _event)
 
 void ot::HeaderBase::leaveEvent(QEvent* _event)
 {
-	if (m_filterState.hoveredFilter == -1 && m_filterState.pressedFilter == -1)
+	if (m_filterState.hoveredFilter == -1)
 	{
 		return;
 	}
 
 	m_filterState.hoveredFilter = -1;
-	m_filterState.pressedFilter = -1;
 	update();
 	QHeaderView::leaveEvent(_event);
 }
@@ -301,3 +257,21 @@ void ot::HeaderBase::filterOptionsChanged(int _logicalIndex, const QStringList& 
 
 void ot::HeaderBase::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder)
 {}
+
+void ot::HeaderBase::slotSectionClicked(int _logicalIndex)
+{
+	if (!getFilterFeatures(_logicalIndex))
+	{
+		return;
+		
+	}
+
+	QRect iconRect = filterIconRect(_logicalIndex);
+	if (iconRect.contains(m_lastMousePressPos))
+	{
+		m_filterState.pressedFilter = _logicalIndex;
+		update();
+		showFilterMenu(_logicalIndex);
+		m_filterState.pressedFilter = -1;
+	}
+}
