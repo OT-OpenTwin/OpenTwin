@@ -42,7 +42,7 @@
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config, const std::list<ot::ValueComparisonDescription>& _valueComparisons)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config)
 {
 	m_curveIDDescriptions.clear();
 	const auto& queryInformation = _config.getQueryInformation();
@@ -94,16 +94,16 @@ std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::
 	CurveColourSetter colourSetting(_curveCfg, numberOfQuantities);
 
 	const std::string displayParameterLabel = _plotCfg.getQueryParameter();
-	const std::string displayQuantityLabel = _plotCfg.getQueryQuantity();
+
 	const ot::DataLakeAccessCfg& dataLakeAccessCfg = _curveCfg.getDataAccessConfig();
 	ot::JSONToVariableConverter converter;
 
-	std::optional<ot::DataPointDecoder> decoderQuantity = dataLakeAccessCfg.getFieldDecoderQuantityByLabel(displayQuantityLabel);
 	std::optional<ot::DataPointDecoder> decoderParameter = dataLakeAccessCfg.getFieldDecoderParameterByLabel(displayParameterLabel);
+	
 	std::map<std::string, ot::DataPointDecoder*> additionalParameterDecoders = dataLakeAccessCfg.getAllFieldDecoderParameterByLabel();
 	additionalParameterDecoders.erase(displayParameterLabel);
 
-	if (!decoderQuantity.has_value() || !decoderParameter.has_value())
+	if (!decoderParameter.has_value())
 	{
 		throw std::exception("Plot axis selection did not work.");
 	}
@@ -114,12 +114,27 @@ std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::
 
 		const std::string temp = ot::json::toJson(singleMongoDocument);
 		// Document contains the quantity which the plot shall show
-		const std::string quantityName =	singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetString();
-		if (ot::json::exists(singleMongoDocument, displayParameterLabel) && quantityName == displayQuantityLabel)
+		if (ot::json::exists(singleMongoDocument, displayParameterLabel))
 		{
+			DependencyList dependencies;
+			const std::string quantityName =	singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetString();
+			std::optional<ot::DataPointDecoder> decoder = 	dataLakeAccessCfg.getFieldDecoderQuantityByLabel(quantityName);
+			if(decoder.has_value())
+			{
+				AdditionalDependency additionalParameterInfo;
+				additionalParameterInfo.m_label = MetadataQuantity::getFieldName();
+				additionalParameterInfo.m_value = decoder.value().getLabel();
+				additionalParameterInfo.m_unit = decoder.value().getTupleInstance().getTupleUnits().front();
+
+				dependencies.push_back(additionalParameterInfo);
+			}
+			else
+			{
+				assert(false);
+			}
+
 			//Get series label and use it to form a unique curve name depending on the values of the document
 			//Get all other dependencies and build a unique curve name depending on their values.
-			DependencyList dependencies;
 			
 			const auto& allSeriesDecoder = dataLakeAccessCfg.getAllFieldDecoderSeriesByLabel();
 			auto series = singleMongoDocument.FindMember(MetadataSeries::getFieldName().c_str());
@@ -215,10 +230,21 @@ std::map<std::string, std::list<Datapoints>>  CurveDatasetFactory::createNamedCu
 	{
 		// Here all dependencies are the same for all datapoints. 
 		const DependencyList& dependencies = _datasetsByDependencies.begin()->first;
-		if (dependencies.size() == 1)
+		if (dependencies.size() == 2)
 		{
+			// Here we have the series and the quantity as dependencies. No other additional dependencies.
 			//If there is only one dependency, we create the curve name such that it includes the value of the dependency.
-			_curveCfg.setTitle(simpleNameBase + " (" + dependencies.front().m_label + "=" + dependencies.front().m_value + " " + dependencies.front().m_unit + ")");
+			for(auto dependency : dependencies)
+			{
+				if(dependency.m_label == MetadataQuantity::getFieldName())
+				{
+					_curveCfg.setTitle(dependency.m_value);
+				}
+			}
+		}
+		else if (numberOfDependencies == 3)
+		{
+
 		}
 		else
 		{

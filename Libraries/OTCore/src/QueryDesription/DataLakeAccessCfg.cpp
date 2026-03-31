@@ -342,6 +342,11 @@ const std::map<std::string, DataPointDecoder*>& ot::DataLakeAccessCfg::getAllFie
 	return m_fieldDecodersParameterByLabel;
 }
 
+const std::map<std::string, DataPointDecoder*>& ot::DataLakeAccessCfg::getAllFieldDecoderQuantityByLabel() const
+{
+	return m_fieldDecodersQuantityByLabel;
+}
+
 const std::map<std::string, DataPointDecoder*>& ot::DataLakeAccessCfg::getAllFieldDecoderSeriesByLabel() const
 {
 	return m_fieldDecodersSeriesByLabel;

@@ -62,6 +62,7 @@ namespace ot {
 
 		const std::map<std::string, DataPointDecoder>& getAllFieldDecoderParameter() const;
 		const std::map<std::string, DataPointDecoder*>& getAllFieldDecoderParameterByLabel() const;
+		const std::map<std::string, DataPointDecoder*>& getAllFieldDecoderQuantityByLabel() const;
 		const std::map<std::string, DataPointDecoder*>& getAllFieldDecoderSeriesByLabel() const;
 
 		ValueProcessing& addParameterValueTransformer(const std::string& _fieldKey, const ValueProcessing& _valueTransformer);

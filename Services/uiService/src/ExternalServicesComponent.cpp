@@ -4705,9 +4705,6 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		std::list<ot::PlotDataset*> dataSets;
 		std::list<std::string> curveIDDescriptions;
 
-		// @jan: here the xAxis parameter was get before, now its the query parameter which should be the same (was removed from plot config)
-		const std::string xAxisParameter = _plotConfig.getQueryParameter();
-		const std::list<ot::ValueComparisonDescription>& queries = _plotConfig.getQueries();
 		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
 		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 
@@ -4717,25 +4714,18 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			ot::Plot1DCurveCfg curveCfg;
 
 			curveCfg.setFromJsonObject(curveCfgSerialised);
-
-			const ot::QueryInformation& queryInformation = curveCfg.getQueryInformation();
 			
-			bool curveHasDataToVisualise = true;
-			
-			if (curveHasDataToVisualise) {
-				std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg, queries);
-				dataSets.splice(dataSets.begin(), newCurveDatasets);
+			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
+			dataSets.splice(dataSets.begin(), newCurveDatasets);
 
-				std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-				curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
+			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+			curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
 
-				if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) {
-					break;
-				}
+			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) 
+			{
+				break;
 			}
-			else {
-				ot::WindowAPI::appendOutputMessage("Curve " + curveCfg.getTitle() + " cannot be visualised since it does not have data for the selected X-Axis parameter: " + xAxisParameter + "\n");
-			}
+
 		}
 
 		auto endTime = ot::DateTime::msSinceEpoch();

@@ -38,7 +38,7 @@ public:
 	CurveDatasetFactory(const std::string& _collectionName)
 		: m_dataAccess(_collectionName){ }
 	
-	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, const std::list<ot::ValueComparisonDescription>& _valueComparisions);
+	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg);
 
 	const std::list<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
 private:
