@@ -28,9 +28,11 @@ void MetadataExtender::extendWithJsonFile()
 			{
 				currentJson = jsonFile->getName();
 				const std::string& content = jsonFile->getText();
-				ot::JsonDocument subDoc;
+				ot::JsonDocument subDoc, cleanedSubDoc;
 				subDoc.fromJson(content);
-				ot::json::mergeObjects(newMetadata, subDoc, newMetadata.GetAllocator());
+
+				sanitiseKeys(subDoc, cleanedSubDoc, cleanedSubDoc.GetAllocator());
+				ot::json::mergeObjects(newMetadata, cleanedSubDoc, newMetadata.GetAllocator());
 			}
 		}
 		catch (std::exception& _e)
@@ -126,4 +128,41 @@ std::list<std::unique_ptr<EntityFileText>> MetadataExtender::getSelectedJsonFile
 		}
 	}
 	return jsonFiles;
+}
+
+void MetadataExtender::sanitiseKeys(const ot::JsonValue& _src, ot::JsonValue& _dest, ot::JsonAllocator& _alloc)
+{
+	if (_src.IsObject())
+	{
+		_dest.SetObject();
+		for (auto& member : _src.GetObject())
+		{
+			// Copy and sanitise the key
+			std::string key = member.name.GetString();
+			ot::String::removeControlCharacters(key);
+
+			// Recursively sanitise the value
+			ot::JsonValue sanitisedValue;
+			sanitiseKeys(member.value, sanitisedValue, _alloc);
+
+			// Add the sanitised key/value pair to the destination object
+			ot::JsonString keyJson(key, _alloc);
+			_dest.AddMember(keyJson, sanitisedValue, _alloc);
+		}
+	}
+	else if (_src.IsArray())
+	{
+		_dest.SetArray();
+		for (auto& element : _src.GetArray())
+		{
+			ot::JsonValue sanitisedElement;
+			sanitiseKeys(element, sanitisedElement, _alloc);
+			_dest.PushBack(sanitisedElement, _alloc);
+		}
+	}
+	else
+	{
+		// Leaf value — deep copy as-is (strings, numbers, bools, null)
+		_dest.CopyFrom(_src, _alloc);
+	}
 }
