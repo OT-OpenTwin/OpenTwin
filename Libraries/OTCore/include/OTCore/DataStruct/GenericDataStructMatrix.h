@@ -74,74 +74,47 @@ namespace ot {
 		const uint32_t getNumberOfColumns() const { return m_numberOfColumns; }
 		const uint32_t getNumberOfRows() const { return m_numberOfRows; }
 
+		//! @brief Creates an iterator for the matrix entries.
+		//! @param _horizontalAdvance Determines the iteration order.
+		//! If true, the iterator will advance horizontally (column-wise) first, then vertically (row-wise).
+		MatrixEntryIterator<false> createIterator(bool _horizontalAdvance);
 
-		MatrixEntryIterator<false> createIterator(bool _horizontalAdvance)
-		{
-			return MatrixEntryIterator<false>(this,
-				MatrixEntryPointer(0, 0),
-				MatrixEntryPointer(m_numberOfRows, m_numberOfColumns),
-				_horizontalAdvance
-			);
-		}
-		MatrixEntryIterator<true> createIterator(bool _horizontalAdvance) const
-		{
-			return MatrixEntryIterator<true>(this,
-				MatrixEntryPointer(0, 0),
-				MatrixEntryPointer(m_numberOfRows, m_numberOfColumns),
-				_horizontalAdvance
-			);
-		}
+		//! @brief Creates a const iterator for the matrix entries.
+		//! @param _horizontalAdvance Determines the iteration order.
+		//! If true, the iterator will advance horizontally (column-wise) first, then vertically (row-wise).
+		MatrixEntryIterator<true> createIterator(bool _horizontalAdvance) const;
 
-		MatrixEntryIterator<false> getDataIterator(bool _horizontalHeader)
-		{
-			return MatrixEntryIterator<false>(this,
-				_horizontalHeader ? MatrixEntryPointer(1, 0) : MatrixEntryPointer(0, 1),
-				MatrixEntryPointer(m_numberOfRows, m_numberOfColumns),
-				_horizontalHeader
-			);
-		}
-		MatrixEntryIterator<true> getDataIterator(bool _horizontalHeader) const
-		{
-			return MatrixEntryIterator<true>(this,
-				_horizontalHeader ? MatrixEntryPointer(1, 0) : MatrixEntryPointer(0, 1),
-				MatrixEntryPointer(m_numberOfRows, m_numberOfColumns),
-				_horizontalHeader
-			);
-		}
+		//! @brief Creates an iterator for the matrix data entries.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will start at the first data entry after the horizontal header and advance horizontally (column-wise) first, then vertically (row-wise).
+		MatrixEntryIterator<false> createDataIterator(bool _horizontalHeader);
 
-		MatrixEntryIterator<false> getDataColumnIterator(uint32_t _columnIndex, bool _horizontalHeader)
-		{
-			return MatrixEntryIterator<false>(this,
-				_horizontalHeader ? MatrixEntryPointer(1, _columnIndex) : MatrixEntryPointer(_columnIndex, 1),
-				MatrixEntryPointer(m_numberOfRows, _columnIndex + 1),
-				_horizontalHeader
-			);
-		}
-		MatrixEntryIterator<true> getDataColumnIterator(uint32_t _columnIndex, bool _horizontalHeader) const
-		{
-			return MatrixEntryIterator<true>(this,
-				_horizontalHeader ? MatrixEntryPointer(1, _columnIndex) : MatrixEntryPointer(_columnIndex, 1),
-				MatrixEntryPointer(m_numberOfRows, _columnIndex + 1),
-				_horizontalHeader
-			);
-		}
+		//! @brief Creates a const iterator for the matrix data entries.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will start at the first data entry after the horizontal header and advance horizontally (column-wise) first, then vertically (row-wise).
+		MatrixEntryIterator<true> createDataIterator(bool _horizontalHeader) const;
 
-		MatrixEntryIterator<false> getHeaderIterator(bool _horizontalHeader)
-		{
-			return MatrixEntryIterator<false>(this,
-				MatrixEntryPointer(0, 0),
-				_horizontalHeader ? MatrixEntryPointer(1, m_numberOfColumns) : MatrixEntryPointer(m_numberOfRows, 1),
-				_horizontalHeader
-			);
-		}
-		MatrixEntryIterator<true> getHeaderIterator(bool _horizontalHeader) const
-		{
-			return MatrixEntryIterator<true>(this,
-				MatrixEntryPointer(0, 0),
-				_horizontalHeader ? MatrixEntryPointer(1, m_numberOfColumns) : MatrixEntryPointer(m_numberOfRows, 1),
-				_horizontalHeader
-			);
-		}
+		//! @brief Creates an iterator for the matrix data entries of a specific column.
+		//! @param _columnIndex The index of the column to iterate over.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will advance horizontally (column-wise), otherwise it will advance vertically (row-wise).
+		MatrixEntryIterator<false> createDataColumnIterator(uint32_t _columnIndex, bool _horizontalHeader);
+
+		//! @brief Creates a const iterator for the matrix data entries of a specific column.
+		//! @param _columnIndex The index of the column to iterate over.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will advance horizontally (column-wise), otherwise it will advance vertically (row-wise).
+		MatrixEntryIterator<true> createDataColumnIterator(uint32_t _columnIndex, bool _horizontalHeader) const;
+
+		//! @brief Creates an iterator for the matrix header entries.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will advance horizontally (column-wise), otherwise it will advance vertically (row-wise).
+		MatrixEntryIterator<false> createHeaderIterator(bool _horizontalHeader);
+
+		//! @brief Creates a const iterator for the matrix header entries.
+		//! @param _horizontalHeader Determines the iteration order and the starting point of the iterator.
+		//! If true, the iterator will advance horizontally (column-wise), otherwise it will advance vertically (row-wise).
+		MatrixEntryIterator<true> createHeaderIterator(bool _horizontalHeader) const;
 
 		std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> toTableColumns(bool _horizontalHeader = true) const { return GenericDataStructMatrix::toTableColumns(*this, _horizontalHeader); };
 		static std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> toTableColumns(const GenericDataStructMatrix& _matrix, bool _horizontalHeader = true);
@@ -161,3 +134,5 @@ namespace ot {
 	};
 	
 }
+
+#include "OTCore/DataStruct/GenericDataStructMatrix.hpp"

@@ -109,13 +109,13 @@ std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> ot::GenericDataS
 {
 	std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> columns;
 	
-	auto headerIt = _matrix.getHeaderIterator(_horizontalHeader);
+	auto headerIt = _matrix.createHeaderIterator(_horizontalHeader);
 	while (headerIt.isValid())
 	{
 		Variable header = headerIt.get();
 		std::vector<Variable> columnValues;
 
-		auto colIt = _matrix.getDataColumnIterator(headerIt.getDataColumnIndex(), _horizontalHeader);
+		auto colIt = _matrix.createDataColumnIterator(headerIt.getDataColumnIndex(), _horizontalHeader);
 		while (colIt.isValid())
 		{
 			columnValues.push_back(colIt.get());

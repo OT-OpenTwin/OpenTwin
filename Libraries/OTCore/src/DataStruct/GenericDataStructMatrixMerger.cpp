@@ -61,8 +61,14 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 		uint32_t nextRow = currentRow + 1;
 
 		// For each column
-		for (const std::pair<ot::Variable, std::vector<ot::Variable>>& column : matrix.toTableColumns())
+		for (const auto& column : tableColumns)
 		{
+			// Check if we have values to add
+			if (column.second.empty())
+			{
+				continue;
+			}
+
 			nextRow = std::max(nextRow, currentRow + static_cast<uint32_t>(column.second.size()));
 
 			intern::TableColumn* col = nullptr;
@@ -70,6 +76,7 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 			// Find existing column
 			for (intern::TableColumn& existingCol : finalTable)
 			{
+				// Check if name is equal and current value count is equal to current row (no new values added from current matrix)
 				if (existingCol.getHeader() == column.first && existingCol.getValueCount() == currentRow)
 				{
 					col = &existingCol;
@@ -79,19 +86,19 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 			
 			if (col == nullptr)
 			{
-				// No existing column, create new on
+				// No existing column, create new one
 				finalTable.push_back(intern::TableColumn(column.first, currentRow));
 				col = &finalTable.back();
 			}
 
 			OTAssertNullptr(col);
+			OTAssert(col->getValueCount() == currentRow, "Data mismatch");
 
 			// Add values to column
 			for (const ot::Variable& value : column.second)
 			{
 				col->addVariable(value);
 			}
-
 		}
 
 		// Expand all existing columns to the new row count if necessary
@@ -106,23 +113,28 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 		currentRow = nextRow;
 	}
 
-	GenericDataStructMatrix result(currentRow + 1, static_cast<uint32_t>(finalTable.size()));
-	MatrixEntryIterator<false> resultIt = result.createIterator(_horizontalHeader);
+	uint32_t tableColumnCount = static_cast<uint32_t>(finalTable.size());
+	uint32_t tableRowCount = currentRow + 1;
+
+	GenericDataStructMatrix result(_horizontalHeader ? tableRowCount : tableColumnCount, _horizontalHeader ? tableColumnCount : tableRowCount);
+
+	auto headerIt = result.createHeaderIterator(_horizontalHeader);
 
 	for (intern::TableColumn& column : finalTable)
 	{
-		OTAssert(resultIt.isValid(), "Result iterator is not valid. This should never happen, check the logic of the table merger");
-		(*resultIt) = column.getHeader();
-		++resultIt;
-	}
-	for (intern::TableColumn& column : finalTable)
-	{
+		OTAssert(headerIt.isValid(), "Result iterator is not valid. This should never happen, check the logic of the table merger");
+		(*headerIt) = column.getHeader();
+
+		auto dataIt = result.createDataColumnIterator(headerIt.getDataColumnIndex(), _horizontalHeader);
 		for (Variable& value : column.getValues())
 		{
-			OTAssert(resultIt.isValid(), "Result iterator is not valid. This should never happen, check the logic of the table merger");
-			(*resultIt) = std::move(value);
-			++resultIt;
+			OTAssert(dataIt.isValid(), "Result iterator is not valid. This should never happen, check the logic of the table merger");
+			(*dataIt) = std::move(value);
+			++dataIt;
 		}
+		OTAssert(!dataIt.isValid(), "Result data iterator is still valid after writing all data. This should never happen, check the logic of the table merger");
+
+		++headerIt;
 	}
 
 	return result;

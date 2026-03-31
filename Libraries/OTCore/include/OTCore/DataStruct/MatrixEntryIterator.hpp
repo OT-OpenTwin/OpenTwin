@@ -6,14 +6,14 @@
 #include "OTCore/DataStruct/MatrixEntryIterator.h"
 
 template<bool isConst>
-inline ot::MatrixEntryIterator<isConst>::MatrixEntryIterator(MatrixType* _matrix, const MatrixEntryPointer& _start, const MatrixEntryPointer& _end, bool _horizontalHeader)
-	: m_matrix(_matrix), m_pointer(_start), m_start(_start), m_end(_end), m_horizontalHeader(_horizontalHeader)
+inline ot::MatrixEntryIterator<isConst>::MatrixEntryIterator(MatrixType* _matrix, const MatrixEntryPointer& _start, const MatrixEntryPointer& _end, bool _columnMajor)
+	: m_matrix(_matrix), m_pointer(_start), m_start(_start), m_end(_end), m_columnMajor(_columnMajor)
 {}
 
 template<bool isConst>
 ot::MatrixEntryIterator<isConst>::MatrixEntryIterator(MatrixEntryIterator<isConst>&& _other) noexcept
 	: m_matrix(_other.m_matrix), m_pointer(_other.m_pointer), m_end(_other.m_end),
-	m_horizontalHeader(_other.m_horizontalHeader)
+	m_columnMajor(_other.m_columnMajor)
 {
 	_other.m_matrix = nullptr;
 }
@@ -26,7 +26,7 @@ ot::MatrixEntryIterator<isConst>& ot::MatrixEntryIterator<isConst>::operator=(Ma
 		m_pointer = _other.m_pointer;
 		m_end = _other.m_end;
 
-		m_horizontalHeader = _other.m_horizontalHeader;
+		m_columnMajor = _other.m_columnMajor;
 
 		m_matrix = _other.m_matrix;
 		_other.m_matrix = nullptr;
