@@ -99,6 +99,9 @@ namespace ot {
 		void slotSortDescending();
 		void slotCheckedChanged(QListWidgetItem* _item);
 
+	protected:
+		bool isIncludedInTextFilter(QListWidgetItem* _item) const;
+
 	private:
 		int m_logicalIndex;
 		bool m_isConfirmed;

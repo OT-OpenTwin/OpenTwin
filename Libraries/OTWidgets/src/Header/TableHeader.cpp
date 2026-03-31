@@ -183,6 +183,8 @@ QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const
 	}
 
 	options.removeDuplicates();
+	options.shrink_to_fit();
+
 	options.sort();
 
 	return options;

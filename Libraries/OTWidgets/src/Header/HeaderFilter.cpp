@@ -216,14 +216,10 @@ void ot::HeaderFilter::slotTextChanged()
 {
 	OTAssertNullptr(m_optionsList);
 
-	const QString filterText = m_filterEdit->text().toLower();
-
 	for (int i = 1; i < m_optionsList->count(); i++)
 	{
 		QListWidgetItem* item = m_optionsList->item(i);
-		const QString itemText = item->text().toLower();
-		const bool shouldShow = itemText.contains(filterText) || filterText.isEmpty();
-		item->setHidden(!shouldShow);
+		item->setHidden(!isIncludedInTextFilter(item));
 	}
 }
 
@@ -246,11 +242,15 @@ void ot::HeaderFilter::slotCheckedChanged(QListWidgetItem* _item)
 	bool shouldAllSelect = false;
 	if (_item == m_optionsList->item(0))
 	{
-		shouldAllSelect = (_item->checkState() == Qt::Checked);
+		Qt::CheckState state = _item->checkState();
+
 		for (int i = 1; i < m_optionsList->count(); ++i)
 		{
 			QListWidgetItem* item = m_optionsList->item(i);
-			item->setCheckState(shouldAllSelect ? Qt::Checked : Qt::Unchecked);
+			if (state == Qt::Unchecked || isIncludedInTextFilter(item))
+			{
+				item->setCheckState(state);
+			}
 		}
 	}
 	else
@@ -268,4 +268,11 @@ void ot::HeaderFilter::slotCheckedChanged(QListWidgetItem* _item)
 
 		m_optionsList->item(0)->setCheckState((allChecked ? Qt::Checked : Qt::Unchecked));
 	}
+}
+
+bool ot::HeaderFilter::isIncludedInTextFilter(QListWidgetItem* _item) const
+{
+	const QString filterText = m_filterEdit->text().toLower();
+	const QString itemText = _item->text().toLower();
+	return filterText.isEmpty() || itemText.contains(filterText);
 }
