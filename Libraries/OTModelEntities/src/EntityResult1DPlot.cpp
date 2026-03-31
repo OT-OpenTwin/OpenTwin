@@ -87,10 +87,11 @@ bool EntityResult1DPlot::updateFromProperties()
 	visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
 	visualisationCfg.setAsActiveView(true);
 	getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
-
+	
+	bool gridRefresh = updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 
-	return updatePropertyVisibilities();
+	return gridRefresh;
 }
 
 bool EntityResult1DPlot::updatePropertyVisibilities()
@@ -103,14 +104,8 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 	if (gridVisibility->getValue() != gridColor->getVisible())
 	{
 		gridColor->setVisible(gridVisibility->getValue());
-		gridColor->resetNeedsUpdate();
 		updatePropertiesGrid = true;
 	}
-
-	updatePropertiesGrid |= updateAxisPropertiesVisibility(getXAxisPropertyGroupName());
-	updatePropertiesGrid |= updateAxisPropertiesVisibility(getYAxisPropertyGroupName());
-	updatePropertiesGrid |= updateAxisPropertiesVisibility(getRadiusAxisPropertyGroupName());
-	updatePropertiesGrid |= updateAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName());
 
 	ot::Plot1DCfg::PlotType plotType = getPlotType();
 	switch (plotType)
@@ -120,6 +115,10 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), true);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), false);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), false);
+		
+		// Here we set the conditional visibilities.
+		updatePropertiesGrid |= updateAxisPropertiesVisibility(getXAxisPropertyGroupName());
+		updatePropertiesGrid |= updateAxisPropertiesVisibility(getYAxisPropertyGroupName());
 		break;
 
 	case ot::Plot1DCfg::Polar:
@@ -127,12 +126,17 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), false);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), true);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), true);
+	
+		// Here we set the conditional visibilities.
+		updatePropertiesGrid |= updateAxisPropertiesVisibility(getRadiusAxisPropertyGroupName());
+		updatePropertiesGrid |= updateAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName());
 		break;
 
 	default:
 		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(getPlotType())) + ")");
 		break;
 	}
+
 
 	EntityPropertiesDouble* originProp = PropertyHelper::getDoubleProperty(this, "Origin", "General");
 	OTAssertNullptr(originProp);
@@ -205,13 +209,7 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 	if (parameterSelection  != nullptr && parameterSelection->getOptions() != queryParameterList)
 	{
 		parameterSelection->resetOptions(queryParameterList);
-	}
-	auto quantitySelection = PropertyHelper::getSelectionProperty(this, "Quantity", getYAxisPropertyGroupName());
-	if(quantitySelection != nullptr && quantitySelection->getOptions() != queryQuantityList)
-	{
-		quantitySelection->resetOptions(queryQuantityList);
-	}
-	
+	}	
 }
 
 void EntityResult1DPlot::createProperties()
@@ -234,18 +232,14 @@ void EntityResult1DPlot::createProperties()
 
 	// Axis settings
 	EntityPropertiesSelection::createProperty(getXAxisPropertyGroupName(), "Parameter", {}, "", "default", getProperties());
-	EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity", {}, "", "default", getProperties());
-	
-	//QuantityComponent
+		
+	// ToDo: "Quantity component" for the tuple elements.
 	createAxisProperties(getXAxisPropertyGroupName());
 	createAxisProperties(getYAxisPropertyGroupName());
-
-
 	createAxisProperties(getAzimuthAxisPropertyGroupName());
 	createAxisProperties(getRadiusAxisPropertyGroupName());
 
 	// Curve limit settings
-
 	EntityPropertiesBoolean::createProperty("Curve limit", "Number of curves", true, "default", getProperties());
 	EntityPropertiesInteger::createProperty("Curve limit", "Max", 25, "default", getProperties());
 
@@ -352,7 +346,6 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 	const std::list<std::string> quantityScalingOptions = ot::Plot1DAxisCfg::getQuantityScalingStringList();
 	EntityPropertiesSelection::createProperty(_axisName, "Value scaling", quantityScalingOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::NoQuantityScaling), "", getProperties());
 
-
 	EntityPropertiesBoolean::createProperty(_axisName, "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty(_axisName, "Autoscale", true, "", getProperties());
 
@@ -403,6 +396,8 @@ void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot:
 
 bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisName, bool _visible)
 {
+
+	getProperties().getProperty("Value scaling", _axisName)->setVisible(_visible);
 	getProperties().getProperty("Logscale", _axisName)->setVisible(_visible);
 	getProperties().getProperty("Autoscale", _axisName)->setVisible(_visible);
 
@@ -432,11 +427,8 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 	if (minProp->getVisible() != minMaxVisible)
 	{
 		minProp->setVisible(minMaxVisible);
-		minProp->resetNeedsUpdate();
-
 		maxProp->setVisible(minMaxVisible);
-		maxProp->resetNeedsUpdate();
-
+		
 		changed = true;
 	}
 
@@ -446,7 +438,6 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 	if (autoLabelProp->getValue() == labelOverrideProp->getVisible())
 	{
 		labelOverrideProp->setVisible(!autoLabelProp->getValue());
-		labelOverrideProp->resetNeedsUpdate();
 		changed = true;
 	}
 
@@ -458,7 +449,6 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 	if (precisionVisible != displayNumberPrecisionProp->getVisible())
 	{
 		displayNumberPrecisionProp->setVisible(precisionVisible);
-		displayNumberPrecisionProp->resetNeedsUpdate();
 		changed = true;
 	}
 
@@ -520,8 +510,7 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
 	updatePropertyVisibilities();
-	updateAxisPropertiesVisibility(xAxisPropGroup);
-	updateAxisPropertiesVisibility(yAxisPropGroup);
+	getProperties().forceResetUpdateForAllProperties();
 }
 
 
