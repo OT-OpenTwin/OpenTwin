@@ -284,6 +284,7 @@ void VtkDriverUnstructuredScalarSurface::AddNodePoints(osg::Node* parent)
 	else downSampling->SetInputData(dataSource->GetVtkGrid());
 
 	downSampling->SetMaximumNumberOfPoints(std::max(1, visData->GetMaxPoints()));
+	downSampling->RandomModeOn();
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 

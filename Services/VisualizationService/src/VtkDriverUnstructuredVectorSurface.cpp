@@ -236,6 +236,7 @@ void VtkDriverUnstructuredVectorSurface::AddNodeVectors(vtkAlgorithmOutput *inpu
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
 	downSampling->SetMaximumNumberOfPoints(std::max(1, visData->getMaxArrows()));
+	downSampling->RandomModeOn();
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 

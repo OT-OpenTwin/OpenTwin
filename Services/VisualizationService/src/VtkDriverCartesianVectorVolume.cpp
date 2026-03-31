@@ -335,6 +335,8 @@ void VtkDriverCartesianVectorVolume::Assemble3DNode(osg::Node* parent)
 {
 	vtkAlgorithmOutput* data = SetScalarValues();
 
+	if (scalarRange[0] > scalarRange[1]) return; // Empty data
+
 	AddNodeVectors(data, parent);
 }
 
@@ -346,11 +348,15 @@ void VtkDriverCartesianVectorVolume::Assemble2DNode(osg::Node *parent)
 	{
 		vtkAlgorithmOutput* data = SetScalarValues();
 
+		if (scalarRange[0] > scalarRange[1]) return; // Empty data
+
 		AddNodeVectors(data, parent);
 	}
 	else if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Contour2D)
 	{
 		vtkAlgorithmOutput* scalar = SetScalarValues();
+
+		if (scalarRange[0] > scalarRange[1]) return; // Empty data
 
 		vtkNew<vtkBandedPolyDataContourFilter> bf;
 		bf->SetInputConnection(scalar);
@@ -445,6 +451,7 @@ void VtkDriverCartesianVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, o
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
 	downSampling->SetMaximumNumberOfPoints(std::max(1, visData->getMaxArrows()));
+	downSampling->RandomModeOn();
 	downSampling->SetRandomModeType(5);
 	downSampling->Update();
 
