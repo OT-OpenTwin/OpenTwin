@@ -655,7 +655,15 @@ std::string Application::getOpenEMSDir()
 	assert(otRootFolder != "");
 	return otRootFolder + "\\Deployment\\openEMSSolver";
 #else
-		return ".\\openEMSSolver";
+	char path[MAX_PATH];
+	GetModuleFileNameA(NULL, path, MAX_PATH);
+
+	std::string fullPath(path);
+
+	size_t pos = fullPath.find_last_of("\\/");
+	std::string directory = fullPath.substr(0, pos);
+
+	return directory + "\\openEMSSolver";
 #endif // DEBUG
 }
 
