@@ -44,10 +44,10 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 
 void EntityBlockPython::createProperties()
 {
-	EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());
-	/*EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, "default", getProperties());
-	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1, "default", getProperties());*/
-	EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());
+	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1, "default", getProperties());
+	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());
 }
 
 std::string EntityBlockPython::getSelectedScript()
