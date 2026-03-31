@@ -93,7 +93,7 @@ std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::
 
 	CurveColourSetter colourSetting(_curveCfg, numberOfQuantities);
 
-	const std::string displayParameterLabel = _plotCfg.getQueryParameter();
+	const std::string displayParameterLabel = _plotCfg.getXAxisParameter();
 
 	const ot::DataLakeAccessCfg& dataLakeAccessCfg = _curveCfg.getDataAccessConfig();
 	ot::JSONToVariableConverter converter;

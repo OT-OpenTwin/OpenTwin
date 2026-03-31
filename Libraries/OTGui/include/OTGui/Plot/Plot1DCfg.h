@@ -173,8 +173,8 @@ namespace ot {
 		void setQueries(const std::list<ValueComparisonDescription>& _queries) { m_queries = _queries; };
 		void setQueries(std::list<ValueComparisonDescription>&& _queries) { m_queries = std::move(_queries); };
 
-		void setQueryParameter(const std::string& _parameterName) { m_queryParameter = _parameterName; };
-		const std::string& getQueryParameter() const { return m_queryParameter; };
+		void setXAxisParameter(const std::string& _parameterName) { m_xAxisParameter = _parameterName; };
+		const std::string& getXAxisParameter() const { return m_xAxisParameter; };
 
 		void setQueryQuantity(const std::string& _quantity) { m_queryQuantity = _quantity; };
 		const std::string& getQueryQuantity() const { return m_queryQuantity; };
@@ -231,7 +231,7 @@ namespace ot {
 		NavigationTreeItemIcon m_treeIcons;
 		std::list<ValueComparisonDescription> m_queries;
 
-		std::string m_queryParameter;
+		std::string m_xAxisParameter;
 		std::string m_queryQuantity;
 
 		std::string m_dataLabelX;

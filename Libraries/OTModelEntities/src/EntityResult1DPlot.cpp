@@ -272,11 +272,15 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
+	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Parameter", getXAxisPropertyGroupName());
+	
 
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
 	config.setEntityVersion(getEntityStorageVersion());
+
+	config.setXAxisParameter(xAxisParameter);
 
 	config.setTitle(title);
 	config.setCollectionName(DataBase::instance().getCollectionName());
