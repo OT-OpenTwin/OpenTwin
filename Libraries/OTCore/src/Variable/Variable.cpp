@@ -330,9 +330,9 @@ bool ot::Variable::operator==(const Variable& other) const
 {
 	const bool equal =
 		other.isBool() && this->isBool() && (other.getBool() == this->getBool()) ||
-		other.isConstCharPtr() && this->isConstCharPtr() && (*other.getConstCharPtr() == *this->getConstCharPtr()) ||
-		other.isDouble() && this->isDouble() && (DoubleCompare(other.getDouble(),this->getDouble())) ||
-		other.isFloat() && this->isFloat() && (FloatCompare(other.getFloat(),this->getFloat())) ||
+		other.isConstCharPtr() && this->isConstCharPtr() && (std::string(other.getConstCharPtr()) == std::string(this->getConstCharPtr())) ||
+		other.isDouble() && this->isDouble() && (DoubleCompare(other.getDouble(), this->getDouble())) ||
+		other.isFloat() && this->isFloat() && (FloatCompare(other.getFloat(), this->getFloat())) ||
 		other.isInt32() && this->isInt32() && (other.getInt32() == this->getInt32()) ||
 		other.isInt64() && this->isInt64() && (other.getInt64() == this->getInt64());
 	return equal;
