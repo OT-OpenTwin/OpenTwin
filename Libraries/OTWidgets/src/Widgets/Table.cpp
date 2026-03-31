@@ -102,9 +102,6 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	OT_TEST_TABLE_Interval("Setup from config: Total");
 
 	QSignalBlocker blocker(this);
-	m_headerBuffer.clear();
-	m_headerBuffer.reserve(0);
-
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Clear");
 		this->clear();
@@ -129,22 +126,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
 			if (headerItem) {
 				m_verticalHeaderItemCfgs.push_back(headerItem->createCopy());
-
-				if (m_headerBuffer.capacity() == 0)
-				{
-					m_headerBuffer.reserve(_config.getRowCount());
-				}
-				std::string headerContent = headerItem->getText();
-				m_headerBuffer.push_back(headerContent); //Here we store the original value
-				
-				//Here we create the beautified version to display
-				headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-				headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
-				if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
-				{
-					headerContent = headerContent.substr(1, headerContent.size() -2);
-				}
-				this->setVerticalHeaderItem(r, new QTableWidgetItem(QString::fromStdString(headerContent)));
+				this->setVerticalHeaderItem(r, createHeaderItem(headerItem));
 			}
 			else
 			{
@@ -161,24 +143,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			if (headerItem) 
 			{
 				m_horizontalHeaderItemCfgs.push_back(headerItem->createCopy());
-
-				if (m_headerBuffer.capacity() == 0)
-				{
-					m_headerBuffer.reserve(_config.getColumnCount());
-				}
-
-				std::string headerContent = headerItem->getText();
-				m_headerBuffer.push_back(headerContent); // Here we store the original value
-
-				//Here we create the beautified version to display
-				headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-				headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
-				if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
-				{
-					headerContent = headerContent.substr(1, headerContent.size() - 2);
-				}
-
-				this->setHorizontalHeaderItem(c, new QTableWidgetItem(QString::fromStdString(headerContent)));
+				this->setHorizontalHeaderItem(c, createHeaderItem(headerItem));
 			}
 			else
 			{
@@ -216,30 +181,17 @@ ot::TableCfg ot::Table::createConfig() const {
 	
 	bool hasColumnHeader = false;
 	for (int column = 0; column < columnCount(); column++) {
-		const auto item = horizontalHeaderItem(column);
-		if (item != nullptr) {
+		if (column < m_horizontalHeaderItemCfgs.size() && m_horizontalHeaderItemCfgs[column]) {
 			hasColumnHeader = true;
-
-			const std::string text = m_headerBuffer[column]; //We take the value from the buffer, not the displayed value. The displayed value is beautified.
-			cfg.setColumnHeaderText(column, text);
+			cfg.setColumnHeader(column, m_horizontalHeaderItemCfgs[column]->createCopy());
 		}
 	}
 
 	bool hasRowHeader = false;
 	for (int row = 0; row < this->rowCount(); row++) {
-		const auto item = verticalHeaderItem(row);
-		if (item != nullptr) {
+		if (row < m_verticalHeaderItemCfgs.size() && m_verticalHeaderItemCfgs[row]) {
 			hasRowHeader = true;
-			
-			const std::string text = m_headerBuffer[row]; //We take the value from the buffer, not the displayed value. The displayed value is beautified.
-			cfg.setRowHeader(row, text);
-		}
-
-		for (int column = 0; column < this->columnCount(); column++) {
-			QTableWidgetItem* itm = this->item(row, column);
-			if (itm) {
-				cfg.setCellText(row, column, itm->text().toStdString());
-			}
+			cfg.setRowHeader(row, m_verticalHeaderItemCfgs[row]->createCopy());
 		}
 	}
 
@@ -544,4 +496,24 @@ void ot::Table::clearHeaderConfigs()
 		}
 	}
 	m_horizontalHeaderItemCfgs.clear();
+}
+
+QTableWidgetItem* ot::Table::createHeaderItem(const TableHeaderItemCfg* _cfg) const
+{
+	QTableWidgetItem* item = new QTableWidgetItem;
+
+	std::string headerContent = _cfg->getText();
+
+	headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+	headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
+
+	if (headerContent.size() > 1) {
+		if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
+		{
+			headerContent = headerContent.substr(1, headerContent.size() - 2);
+		}
+	}
+
+	item->setText(QString::fromStdString(headerContent));
+	return item;
 }

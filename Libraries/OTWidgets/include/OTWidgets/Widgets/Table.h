@@ -31,6 +31,8 @@
 // std header
 #include <vector>
 
+class QTableWidgetItem;
+
 namespace ot {
 
 	class TableItem;
@@ -116,6 +118,7 @@ namespace ot {
 		void resizeRowsToContentIfNeeded();
 		void setResizeRequired();
 		void clearHeaderConfigs();
+		QTableWidgetItem* createHeaderItem(const TableHeaderItemCfg* _cfg) const;
 
 		TableItemDelegate* m_itemDelegate;
 
@@ -134,8 +137,6 @@ namespace ot {
 
 		TableHeader* m_verticalHeader;
 		std::vector<TableHeaderItemCfg*> m_verticalHeaderItemCfgs;
-
-		std::vector<std::string> m_headerBuffer; //The displayed strings are not correct, they don't correspond with the text file. This is because the displayed headers are freed of "-characters
 	};
 
 }

@@ -56,7 +56,7 @@ void ot::HeaderBase::paintSection(QPainter* _painter, const QRect& _rect, int _l
 	opt.textAlignment = Qt::AlignLeft | Qt::AlignVCenter;
 	opt.rect = _rect;
 	opt.section = _logicalIndex;
-	opt.text = model() ? model()->headerData(_logicalIndex, Qt::Horizontal).toString() : QString();
+	opt.text = model() ? model()->headerData(_logicalIndex, orientation()).toString() : QString();
 	opt.state |= QStyle::State_Raised;
 
 	// Call style to draw base header
