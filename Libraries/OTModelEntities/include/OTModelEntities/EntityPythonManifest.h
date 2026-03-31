@@ -60,7 +60,9 @@ public:
 	void replaceManifest(const std::string& _newManifestText);
 
 	// Set Library element
-	void setLibraryElement(const ot::LibraryElement& _libraryElement) override;
+	void setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) override;
+	//! @brief Check if the content of the library element already imported in the project
+	bool checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) override;
 
 private:
 	ot::UID m_manifestID = ot::invalidUID;

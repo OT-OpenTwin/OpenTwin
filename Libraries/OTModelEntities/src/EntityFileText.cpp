@@ -207,7 +207,7 @@ bool EntityFileText::updateFromProperties()
 	return false;
 }
 
-void EntityFileText::setLibraryElement(const ot::LibraryElement& _libraryElement) {
+void EntityFileText::setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) {
 	std::string newEntityFolder = _libraryElement.getNewEntityFolder();
 	std::string newEntityName = _libraryElement.getName();
 
@@ -227,6 +227,9 @@ void EntityFileText::setLibraryElement(const ot::LibraryElement& _libraryElement
 
 	// Now update this entity to reference the stored data entity
 	this->setDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+
+	// Add the data entity to model entities list
+	_modelState.addDataEntity(*this, *dataEntity);
 
 	// Set file properties
 	this->setFileProperties("", "", "");
@@ -271,6 +274,11 @@ std::list<std::pair<ot::UID, ot::UID>> EntityFileText::getDataEntities() const {
 	return result;
 }
 
+bool EntityFileText::checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement){
+	const std::string plainText = getText();
+	const std::string libraryElementText = _libraryElement.getData();
+	return plainText == libraryElementText;
+}
 void EntityFileText::setSpecializedProperties()
 {
 	ot::TextEncoding encoding;

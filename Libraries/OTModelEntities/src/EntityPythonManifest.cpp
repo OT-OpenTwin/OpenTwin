@@ -106,7 +106,7 @@ void EntityPythonManifest::replaceManifest(const std::string& _newManifestText)
 	setModified();
 }
 
-void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryElement) {
+void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) {
 	this->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection,
@@ -126,6 +126,12 @@ void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryE
 		);
 		additionalInfoProp->setReadOnly(true);
 	}
+}
+
+bool EntityPythonManifest::checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) {
+	std::string newContent = _libraryElement.getData();
+	std::string currentContent = this->getText();
+	return currentContent == newContent;
 }
 
 bool EntityPythonManifest::environmentHasChanged(const std::string& _newContent)

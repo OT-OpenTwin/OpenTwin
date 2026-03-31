@@ -28,7 +28,7 @@ public:
 	EntityPythonScript() = default;
 	virtual ~EntityPythonScript() = default;
 
-	virtual void setLibraryElement(const ot::LibraryElement& _libraryElement) override;
+	virtual void setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) override;
 	static std::string className() { return "EntityPythonScript"; };
 	virtual std::string getClassName(void) const override { return EntityPythonScript::className(); };
 };

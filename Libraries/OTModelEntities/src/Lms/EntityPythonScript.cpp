@@ -26,7 +26,7 @@
 
 static EntityFactoryRegistrar<EntityPythonScript> registrar(EntityPythonScript::className());
 
-void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryElement) {
+void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) {
 	std::string newEntityFolder = _libraryElement.getNewEntityFolder();
 	std::string newEntityName = _libraryElement.getName();
 
@@ -52,6 +52,9 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 
 	// Now update this entity to reference the stored data entity
 	this->setDataEntity(dataEntity->getEntityID(), dataEntity->getEntityStorageVersion());
+
+	// Add the data entity to model entities list
+	_modelState.addDataEntity(*this, *dataEntity);
 
 	ot::EncodingGuesser guesser;
 	this->setFileProperties(path, name, type);

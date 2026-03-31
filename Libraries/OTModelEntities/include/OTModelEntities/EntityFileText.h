@@ -50,9 +50,12 @@ public:
 	bool updateFromProperties() override;
 
 	// Set Library element
-	void setLibraryElement(const ot::LibraryElement& _libraryElement) override;
+	void setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) override;
 	//! @brief Get the binary data entity associated with this file
 	std::list<std::pair<ot::UID, ot::UID>> getDataEntities() const override;
+	//! @brief Check if the content of the library element already imported in the project
+	bool checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) override;
+
 protected:
 	void setSpecializedProperties() override;
 	
