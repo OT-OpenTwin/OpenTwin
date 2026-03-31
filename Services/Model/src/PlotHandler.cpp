@@ -70,6 +70,7 @@ void PlotHandler::handleCreatePlot()
 	//Finally we create the plot entity
 	Model* model = Application::instance()->getModel();
 	EntityResult1DPlot newPlot(model->createEntityUID(), nullptr, nullptr, nullptr);
+	newPlot.setTreeItemEditable(true);
 	newPlot.setName(plotName);
 
 	ot::Plot1DCfg plotCfg;
@@ -217,6 +218,7 @@ void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, co
 	std::list<std::string> takenNames = model->getListOfFolderItems(_nameBase,false);
 	const std::string fullName = ot::EntityName::createUniqueEntityName(_nameBase, shortName, takenNames);
 	newCurve.setName(fullName);
+	newCurve.setTreeItemEditable(true);
 	newCurve.createProperties();
 	newCurve.setCurve(curveConfig);
 	newCurve.storeToDataBase();
