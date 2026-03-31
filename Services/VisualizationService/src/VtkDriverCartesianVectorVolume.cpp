@@ -70,15 +70,16 @@
 #include <vtkFeatureEdges.h>
 #include <vtkExtractVectorComponents.h>
 #include <vtkVectorNorm.h>
-#include <vtkLookupTable.h>
 #include <vtkMaskPoints.h>
 #include <vtkBandedPolyDataContourFilter.h>
 #include <vtkGeometryFilter.h>
 #include <vtkPolyDataNormals.h>
 #include <vtkPlaneCutter.h>
 #include <vtkHedgeHog.h>
+#include <vtkTransform.h>
+#include <vtkTransformFilter.h>
 
-VtkDriverCartesianVectorVolume::VtkDriverCartesianVectorVolume() {}
+VtkDriverCartesianVectorVolume::VtkDriverCartesianVectorVolume() : dataSource(nullptr), dataConnection(nullptr) {}
 
 VtkDriverCartesianVectorVolume::~VtkDriverCartesianVectorVolume() 
 {
@@ -128,7 +129,7 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 
 	osg::Node *node = new osg::Switch;
 	
-	dataSource = dynamic_cast<DataSourceUnstructuredMesh*>(dataItem);
+	dataSource = dynamic_cast<DataSourceCartesianMesh*>(dataItem);
 
 	if (dataSource != nullptr)
 	{
@@ -138,12 +139,14 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 
 		if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
 		{
-			cellToPoint->SetInputData(dataSource->GetVtkGrid());
+			cellToPoint->SetInputData(dataSource->GetVtkGridAbs());
 			cellToPoint->ProcessAllArraysOn();
 			cellToPoint->Update();
 
 			dataConnection = cellToPoint->GetOutputPort();
 		}
+
+		prepareComplexData();
 
 		if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Arrows3D)
 		{
@@ -178,6 +181,25 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 	reportTime("VTK data serialized", timer);
 
 	return dataOut.str();
+}
+
+void VtkDriverCartesianVectorVolume::prepareComplexData()
+{
+	// Here we combine the magnitude / phase data according to the current complex settings. In addition, we scale it according to the geometry scale
+	auto transform = vtkTransform::New();
+	objectsToDelete.push_back(transform);
+	transform->Scale(dataSource->getScaleFactor(), dataSource->getScaleFactor(), dataSource->getScaleFactor());
+
+	// TransformFilter
+	auto transformFilter = vtkTransformFilter::New();
+	objectsToDelete.push_back(transformFilter);
+	transformFilter->SetTransform(transform);
+	if (dataConnection != nullptr) transformFilter->SetInputConnection(dataConnection);
+	else transformFilter->SetInputData(dataSource->GetVtkGridAbs());
+
+	transformFilter->Update();
+
+	dataConnection = transformFilter->GetOutputPort();
 }
 
 vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::ApplyCutplane(osg::Node * parent)
@@ -238,7 +260,7 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::ApplyCutplane(osg::Node * p
 	objectsToDelete.push_back(planeCut);
 
 	if (dataConnection != nullptr) planeCut->SetInputConnection(dataConnection);
-	else planeCut->SetInputData(dataSource->GetVtkGrid());
+	else planeCut->SetInputData(dataSource->GetVtkGridAbs());
 
 	planeCut->SetCutFunction(plane);
 	planeCut->Update();
@@ -378,7 +400,7 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::SetScalarValues()
 		objectsToDelete.push_back(vectorNorm);
 		
 		if (dataConnection != nullptr) vectorNorm->SetInputConnection(dataConnection);
-		else vectorNorm->SetInputData(dataSource->GetVtkGrid());
+		else vectorNorm->SetInputData(dataSource->GetVtkGridAbs());
 
 		vectorNorm->SetNormalize(false);
 		vectorNorm->Update();
@@ -395,7 +417,7 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::SetScalarValues()
 		objectsToDelete.push_back(vectorComponent);
 
 		if (dataConnection != nullptr) vectorComponent->SetInputConnection(dataConnection);
-		else vectorComponent->SetInputData(dataSource->GetVtkGrid());
+		else vectorComponent->SetInputData(dataSource->GetVtkGridAbs());
 
 		vectorComponent->Update();
 		vectorComponent->SetExtractToFieldData(false);
@@ -441,19 +463,19 @@ void VtkDriverCartesianVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, o
 		glyph->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
 
-		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
-		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
-		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+		double dx = dataSource->GetVtkGridAbs()->GetBounds()[1] - dataSource->GetVtkGridAbs()->GetBounds()[0];
+		double dy = dataSource->GetVtkGridAbs()->GetBounds()[3] - dataSource->GetVtkGridAbs()->GetBounds()[2];
+		double dz = dataSource->GetVtkGridAbs()->GetBounds()[5] - dataSource->GetVtkGridAbs()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 
 		if (normalization != 0)
 		{
-			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale() / normalization);
+			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale() * dataSource->getScaleFactor() / normalization);
 		}
 		else
 		{
-			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale());
+			glyph->SetScaleFactor(pointRadius * visData->GetArrowScale() * dataSource->getScaleFactor());
 		}
 		glyph->OrientOn();
 		glyph->Update();
@@ -466,19 +488,19 @@ void VtkDriverCartesianVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, o
 		hedgehog->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
 
-		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
-		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
-		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+		double dx = dataSource->GetVtkGridAbs()->GetBounds()[1] - dataSource->GetVtkGridAbs()->GetBounds()[0];
+		double dy = dataSource->GetVtkGridAbs()->GetBounds()[3] - dataSource->GetVtkGridAbs()->GetBounds()[2];
+		double dz = dataSource->GetVtkGridAbs()->GetBounds()[5] - dataSource->GetVtkGridAbs()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 
 		if (normalization != 0)
 		{
-			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale() / normalization);
+			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale() * dataSource->getScaleFactor() / normalization);
 		}
 		else
 		{
-			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale());
+			hedgehog->SetScaleFactor(pointRadius * visData->GetArrowScale() * dataSource->getScaleFactor());
 		}
 		hedgehog->Update();
 

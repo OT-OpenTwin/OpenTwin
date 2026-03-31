@@ -26,7 +26,7 @@
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
 #include "OTModelEntities/PropertyBundleDataHandleScaling.h"
 #include "OTModelEntities/PropertyBundleDataHandleVisCartesianVector.h"
-#include "DataSourceUnstructuredMesh.h"
+#include "DataSourceCartesianMesh.h"
 
 #include <string>
 #include <ctime>
@@ -51,6 +51,7 @@ private:
 	PropertyBundleDataHandlePlane * planeData = nullptr;
 	PropertyBundleDataHandleVisCartesianVector * visData = nullptr;
 
+	void prepareComplexData();
 	vtkAlgorithmOutput* ApplyCutplane(osg::Node *parent);
 	void Assemble2DNode(osg::Node *parent);
 	void Assemble3DNode(osg::Node* parent);
@@ -62,7 +63,7 @@ private:
 	void CheckForModelUpdates();
 	virtual void DeletePropertyData(void) override;
 
-	DataSourceUnstructuredMesh* dataSource;
+	DataSourceCartesianMesh* dataSource;
 	vtkAlgorithmOutput* dataConnection;
 
 	std::list<vtkObject*> objectsToDelete;

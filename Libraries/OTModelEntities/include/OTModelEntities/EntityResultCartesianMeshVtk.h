@@ -46,6 +46,9 @@ public:
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setComplexData(const std::string &quantityName, eQuantityType quantityType, EntityBinaryData*& dataAbs, EntityBinaryData*& dataArg);
 
+	void setScaleFactor(double value) { _scaleFactor = value; }
+	double getScaleFactor(void) { return _scaleFactor; }
+
 private:
 	
 	std::string _quantityName;
@@ -59,6 +62,8 @@ private:
 
 	long long _vtkDataIDArg = -1;
 	long long _vtkDataVersionArg = -1;
+
+	double _scaleFactor = 1.0;
 
 	void clearAllBinaryData(void);
 

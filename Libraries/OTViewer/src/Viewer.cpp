@@ -2152,7 +2152,7 @@ osg::Geometry* Viewer::createFilledRect(const osg::Vec3& bottomLeft, float width
 std::string Viewer::formatValue(double v, int precision)
 {
 	std::ostringstream os;
-	os << std::fixed << std::setprecision(precision) << v;
+	os << std::setprecision(precision) << std::defaultfloat << v;
 	return os.str();
 }
 

@@ -52,6 +52,8 @@ public:
 	bool GetHasCellScalar() { return hasCellScalar; }
 	bool GetHasCellVector() { return hasCellVector; }
 
+	double getScaleFactor() { return scaleFactor; }
+
 private:
 	bool loadData(EntityResultCartesianMeshVtk* resultData);
 
@@ -59,6 +61,8 @@ private:
 
 	vtkRectilinearGrid* vtkGridAbs;
 	vtkRectilinearGrid* vtkGridArg;
+
+	double scaleFactor = 1.0;
 
 	bool hasPointScalar = false;
 	bool hasCellScalar = false;

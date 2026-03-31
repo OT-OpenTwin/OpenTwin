@@ -54,6 +54,13 @@ DataSourceCartesianMesh::~DataSourceCartesianMesh()
 
 bool DataSourceCartesianMesh::loadData(EntityBase* resultEntity, EntityBase* meshEntity)
 {
+	EntityResultCartesianMeshVtk* cartesianMesh = dynamic_cast<EntityResultCartesianMeshVtk *>(resultEntity);
+
+	if (cartesianMesh != nullptr)
+	{
+		return loadData(cartesianMesh);
+	}
+
 	assert(0);
 	return false;
 }
@@ -70,6 +77,7 @@ bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
 	std::vector<char> dataArg;
 
 	resultData->getComplexData(quantityName, quantityType, dataAbs, dataArg);
+	scaleFactor = resultData->getScaleFactor();
 
 	if (dataAbs.empty() || dataArg.empty()) return false;
 
@@ -93,51 +101,44 @@ bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
 	vtkGridArg->Delete();
 	vtkGridArg = gridReaderArg->GetOutput();
 
-	//for (int index = 0; index < vtkGrid->GetCellData()->GetNumberOfArrays(); index++)
-	//{
-	//	std::string name = vtkGrid->GetCellData()->GetArrayName(index);
+	// In the following, we assume that the structure of the abs and the arg data is identical. Therefore it is sufficient to chek the abs part only.
+	for (int index = 0; index < vtkGridAbs->GetCellData()->GetNumberOfArrays(); index++)
+	{
+		std::string name = vtkGridAbs->GetCellData()->GetArrayName(index);
 
-	//	if (name == quantityName)
-	//	{
-	//		if (quantityType == EntityResultCartesianMeshVtk::SCALAR)
-	//		{
-	//			vtkGrid->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::SCALARS);
-	//			hasCellScalar = true;
-	//		}
-	//		else if (quantityType == EntityResultCartesianMeshVtk::VECTOR)
-	//		{
-	//			vtkGrid->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
-	//			hasCellVector = true;
-	//		}
-	//		else
-	//		{
-	//			assert(0); // Unknown data type
-	//		}
-	//	}
-	//}
+		if (name == quantityName)
+		{
+			if (quantityType == EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE)
+			{
+				vtkGridAbs->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				vtkGridArg->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				hasCellVector = true;
+			}
+			else
+			{
+				assert(0); // Unknown data type
+			}
+		}
+	}
 
-	//for (int index = 0; index < vtkGrid->GetPointData()->GetNumberOfArrays(); index++)
-	//{
-	//	std::string name = vtkGrid->GetPointData()->GetArrayName(index);
+	for (int index = 0; index < vtkGridAbs->GetPointData()->GetNumberOfArrays(); index++)
+	{
+		std::string name = vtkGridAbs->GetPointData()->GetArrayName(index);
 
-	//	if (name == quantityName)
-	//	{
-	//		if (quantityType == EntityResultCartesianMeshVtk::SCALAR)
-	//		{
-	//			vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::SCALARS);
-	//			hasPointScalar = true;
-	//		}
-	//		else if (quantityType == EntityResultCartesianMeshVtk::VECTOR)
-	//		{
-	//			vtkGrid->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
-	//			hasPointVector = true;
-	//		}
-	//		else
-	//		{
-	//			assert(0); // Unknown data type
-	//		}
-	//	}
-	//}
+		if (name == quantityName)
+		{
+			if (quantityType == EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE)
+			{
+				vtkGridAbs->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				vtkGridArg->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
+				hasPointVector = true;
+			}
+			else
+			{
+				assert(0); // Unknown data type
+			}
+		}
+	}
 
 	return true;
 }
@@ -170,30 +171,30 @@ void DataSourceCartesianMesh::FreeMemory(void)
 
 double DataSourceCartesianMesh::GetXMinCoordinate()
 {
-	return vtkGridAbs->GetBounds()[0];
+	return vtkGridAbs->GetBounds()[0] * scaleFactor;
 }
 
 double DataSourceCartesianMesh::GetYMinCoordinate()
 {
-	return vtkGridAbs->GetBounds()[2];
+	return vtkGridAbs->GetBounds()[2] * scaleFactor;
 }
 
 double DataSourceCartesianMesh::GetZMinCoordinate()
 {
-	return vtkGridAbs->GetBounds()[4];
+	return vtkGridAbs->GetBounds()[4] * scaleFactor;
 }
 
 double DataSourceCartesianMesh::GetXMaxCoordinate()
 {
-	return vtkGridAbs->GetBounds()[1];
+	return vtkGridAbs->GetBounds()[1] * scaleFactor;
 }
 
 double DataSourceCartesianMesh::GetYMaxCoordinate()
 {
-	return vtkGridAbs->GetBounds()[3];
+	return vtkGridAbs->GetBounds()[3] * scaleFactor;
 }
 
 double DataSourceCartesianMesh::GetZMaxCoordinate()
 {
-	return vtkGridAbs->GetBounds()[5];
+	return vtkGridAbs->GetBounds()[5] * scaleFactor;
 }

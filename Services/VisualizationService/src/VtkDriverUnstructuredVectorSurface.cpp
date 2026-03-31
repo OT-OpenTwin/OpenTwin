@@ -256,7 +256,7 @@ void VtkDriverUnstructuredVectorSurface::AddNodeVectors(vtkAlgorithmOutput *inpu
 
 		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
 		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
-		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 
@@ -281,7 +281,7 @@ void VtkDriverUnstructuredVectorSurface::AddNodeVectors(vtkAlgorithmOutput *inpu
 
 		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
 		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
-		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[5];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 

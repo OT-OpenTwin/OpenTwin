@@ -254,7 +254,7 @@ void EntityUnits::addVisualizationNodes(void) {
 
 void EntityUnits::setUnitLists()
 {
-	dimensionsList = { {"nm", pow(10,-9)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.1}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
+	dimensionsList = { {"nm", pow(10,-9)}, {"um", pow(10,-6)}, {"mm",0.001}, {"cm",0.01}, {"m",1.}, {"mil", pow(2.54, -5)}, {"in",0.0254}, {"ft",0.3048} };
 	temperatureList = { {"degC",1.}, {"K",1.}, {"degF",1.} };
 	frequencyList = { {"Hz", 1.}, {"kHz", pow(10,3)}, {"MHz", pow(10,6)}, {"GHz", pow(10,9)}, {"THz", pow(10,12)}, {"PHz", pow(10,15)} };
 	timeList = { {"fs", pow(10,-15)}, {"ps", pow(10,-12)}, {"ns", pow(10,-9)}, {"us", pow(10,-6)}, {"ms", pow(10,-3)}, {"s", 1.} };

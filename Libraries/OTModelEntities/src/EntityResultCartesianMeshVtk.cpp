@@ -124,7 +124,8 @@ void EntityResultCartesianMeshVtk::addStorageData(bsoncxx::builder::basic::docum
 		bsoncxx::builder::basic::kvp("vtkDataVersionAbs",	_vtkDataVersionAbs),
 		bsoncxx::builder::basic::kvp("vtkDataIDArg",		_vtkDataIDArg),
 		bsoncxx::builder::basic::kvp("vtkDataVersionArg",	_vtkDataVersionArg),
-		bsoncxx::builder::basic::kvp("resultType",			(long long)getResultType())
+		bsoncxx::builder::basic::kvp("resultType", (long long)getResultType()),
+		bsoncxx::builder::basic::kvp("scaleFactor",			_scaleFactor)
 	);
 }
 
@@ -138,6 +139,7 @@ void EntityResultCartesianMeshVtk::readSpecificDataFromDataBase(const bsoncxx::d
 	_vtkDataVersionAbs	= doc_view["vtkDataVersionAbs"].get_int64().value;
 	_vtkDataIDArg		= doc_view["vtkDataIDArg"].get_int64().value;
 	_vtkDataVersionArg	= doc_view["vtkDataVersionArg"].get_int64().value;
+	_scaleFactor		= doc_view["scaleFactor"].get_double();
 
 	setResultType(static_cast<tResultType>((long long)doc_view["resultType"].get_int64()));
 }

@@ -46,7 +46,7 @@ private:
 	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName);
 	std::string toLower(std::string s);
 	std::vector<char> readFile(const std::string& filename);
-	std::string parseComplexResultFileName(const std::string& input);
+	std::string parseComplexResultFileName(const std::string& input, std::string &quantityName);
 	bool toDouble(const std::string& s, double& value);
 	std::string doubleToString(double value);
 

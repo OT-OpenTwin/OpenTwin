@@ -70,9 +70,9 @@ std::string FDTDSolver::generateRunCommand()
 	std::string text =
 		"# waveguide dimensions\n"
 		"# WR42\n"
-		"a = 10700;   #waveguide width\n"
-		"b = 4300;    #waveguide height\n"
-		"length = 50000;\n"
+		"a = 10.7;   #waveguide width\n"
+		"b = 4.3;    #waveguide height\n"
+		"length = 50.0;\n"
 		"\n"
 		"# frequency range of interest\n"
 		"f_start = 20e9;\n"
@@ -228,7 +228,8 @@ void FDTDSolver::convertAndStoreFrequencyDomainDumps()
 void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName)
 {
 	// Extract result folder name from result file name
-	std::string resultName = parseComplexResultFileName(absFileName);
+	std::string quantityName;
+	std::string resultName = parseComplexResultFileName(absFileName, quantityName);
 	if (resultName.empty())
 	{
 		assert(0);
@@ -250,7 +251,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	std::vector<char> argFileData = readFile(argFileName);
 
 	EntityBinaryData* vtkArgData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkArgData->setData(absFileData.data(), absFileData.size());
+	vtkArgData->setData(argFileData.data(), argFileData.size());
 	vtkArgData->storeToDataBase();
 
 	ot::UID vtkArgDataEntityID = vtkArgData->getEntityID();
@@ -259,7 +260,8 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	argFileData.clear();
 
 	EntityResultCartesianMeshVtk* vtkResult = new EntityResultCartesianMeshVtk(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkResult->setComplexData(resultName, EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
+	vtkResult->setComplexData(quantityName, EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
+	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
 	vtkResult->storeToDataBase();
 
 	EntityVisCartesianVectorVolume* visualizationEntity = new EntityVisCartesianVectorVolume(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
@@ -334,7 +336,7 @@ std::vector<char> FDTDSolver::readFile(const std::string& filename)
 	return buffer;
 }
 
-std::string FDTDSolver::parseComplexResultFileName(const std::string& input) 
+std::string FDTDSolver::parseComplexResultFileName(const std::string& input, std::string& quantityName)
 {
 	// The input name has the format: <name>_f=<frequency>_abs.vtr
 
@@ -377,6 +379,8 @@ std::string FDTDSolver::parseComplexResultFileName(const std::string& input)
 	{
 		name = name.substr(pos + 1);
 	}
+
+	quantityName = name;
 
 	// Build new name with scaled frequency
 	name = name + "(f=" + doubleToString(frequency / entityUnits->getScaleToSIFrequency()) + ")";
