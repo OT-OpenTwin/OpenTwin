@@ -1,6 +1,7 @@
 ﻿#include "OTModelEntities/PropertyBundleDataLakeQuery.h"
 #include "OTCore/ComparisonSymbols.h"
 #include "OTModelEntities/PropertyHelper.h"
+#include "OTCore/DataFilter/RegexHelper.h"
 
 void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 {
@@ -162,21 +163,26 @@ std::string PropertyBundleDataLakeQuery::getSelectedSeries(EntityBase* _thisObje
 
 bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign)
 {
-	bool refreshNecessary = false;
 	bool projectChanged = PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName)->needsUpdate();
+	auto seriesSelection = PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameSeriesMetadata);
+	bool seriesChanged = seriesSelection->needsUpdate();
 
-	const auto& allParameterByLabel = _campaign.getMetadataParameterByLabel();
-	auto allQuantityByLabel = _campaign.getMetadataQuantitiesByLabel();
+	bool refreshNecessary = projectChanged;
 
+	const std::list<MetadataSeries>& allSeries = _campaign.getSeriesMetadata();
+	std::list<std::string> seriesNames;
+	for (const MetadataSeries& series : allSeries)
+	{
+		seriesNames.push_back(series.getName());
+	}
+	seriesNames.push_front("");
+
+	// reset all series metadata options
 	if (projectChanged)
 	{
-		refreshNecessary = true;
-		const std::list<MetadataSeries>& allSeries = _campaign.getSeriesMetadata();
-		std::list<std::string> seriesNames;
 		ot::JsonDocument overView;
 		for (const MetadataSeries& series : allSeries)
 		{
-			seriesNames.push_back(series.getName());
 			const ot::JsonDocument& metadata = series.getMetadata();
 			ot::json::mergeObjects(overView, metadata, overView.GetAllocator());
 		}
@@ -187,37 +193,144 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 			const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
 			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->resetOptions(allOptions);
 		}
-
-
-
-		seriesNames.push_front("");
 		setNameOptions(_thisObject, seriesNames, m_groupMetadataFilter, m_propertyNameSeriesMetadata);
-
-		//Could be used to filter the quantity and parameter options
-		bool seriesChanged = PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameSeriesMetadata)->needsUpdate();
-
-		// First the label options for quantity and parameter. 
-		// Available quantity could be filtered by the series selection, parameter selection by series and quantity selection.
-		std::list<std::string> allParameterLabel;;
-		for (const auto& parameterByLabel : allParameterByLabel)
-		{
-			allParameterLabel.push_back(parameterByLabel.first);
-		}
-		allParameterLabel.push_front("");
-		for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
-		{
-			const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
-			setNameOptions(_thisObject,allParameterLabel, groupName, m_propertyName);
-		}
-
-		std::list<std::string> allQuantityLabel;;
-		for (const auto& quantityByLabel : allQuantityByLabel)
-		{
-			allQuantityLabel.push_back(quantityByLabel.first);
-		}
-		allQuantityLabel.push_front("");
-		setNameOptions(_thisObject, allQuantityLabel, m_groupQuantitySettings, m_propertyName);
 	}
+
+	// Now we filter the quantity and parameter options
+	std::list<std::string> parameterLabel, quantityLabels;
+	const auto& allParameterByLabel = _campaign.getMetadataParameterByLabel();
+	auto allQuantityByLabel = _campaign.getMetadataQuantitiesByLabel();
+
+	// Depending on the selected series, the quantity options will change.
+	if (projectChanged || seriesChanged)
+	{
+		refreshNecessary = true;
+		const std::string selectedSeries = seriesSelection->getValue();
+
+		if (selectedSeries == "")
+		{
+			// reset to all possible quantities
+			for (const auto& quantityByLabel : allQuantityByLabel)
+			{
+				quantityLabels.push_back(quantityByLabel.first);
+			}
+		}
+		else
+		{
+			// We have a series filter set. 
+			// First we check if the value is a valid series name
+			if (std::find(seriesNames.begin(), seriesNames.end(), selectedSeries) == seriesNames.end())
+			{
+				// Its not a valid name, thus we check if it is a regex expression.
+				RegexHelper::applyRegexFilter(seriesNames, selectedSeries);
+				if (seriesNames.size() > 0)
+				{
+					for (const MetadataSeries& series : allSeries)
+					{
+						if (std::find(seriesNames.begin(), seriesNames.end(), series.getName()) != seriesNames.end())
+						{
+							for (auto& quantity : series.getQuantities())
+							{
+								quantityLabels.push_back(quantity.quantityLabel);
+							}
+						}
+					}
+					quantityLabels.sort();
+					quantityLabels.unique();
+				}
+				else
+				{
+					// Here we set the options to emptry. 
+				}
+			}
+			else
+			{
+				for (const MetadataSeries& series : allSeries)
+				{
+					if (series.getName() == selectedSeries)
+					{
+						for (auto& quantity : series.getQuantities())
+						{
+							quantityLabels.push_back(quantity.quantityLabel);
+						}
+					}
+				}
+			}
+		}
+		quantityLabels.push_front("");
+
+		auto temp = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings);
+		std::list<std::string> currentOptions = { temp->getOptions().begin(), temp->getOptions().end() };
+		if (currentOptions != quantityLabels)
+		{
+			temp->resetOptions(quantityLabels);
+			temp->setNeedsUpdate();
+		}
+	}
+
+
+	bool quantityChanged = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
+	const auto& availableQuantityLabels = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptions();
+	std::list<std::string> availableQuantityLabelsList = { availableQuantityLabels.begin(), availableQuantityLabels.end() };
+	if (projectChanged || seriesChanged || quantityChanged)
+	{
+		// Depending on the filtered quantity options, the parameter options need to be set to the depending parameters of the available quantity options.
+		//If any of the above options have changed, we need to update the parameter options.
+		const std::string currentQuantity = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
+		if (currentQuantity == "")
+		{
+			// If the quantity is empty we set the parameter options to all possible parameters.
+			for (auto& parameterByLabel : allParameterByLabel)
+			{
+				parameterLabel.push_back(parameterByLabel.first);
+			}
+		}
+		else if (allQuantityByLabel.find(currentQuantity) == allQuantityByLabel.end())
+		//else if (std::find(avaliableQuantityLabels.begin(), avaliableQuantityLabels.end(), currentQuantity) == avaliableQuantityLabels.end())
+		{
+			// It may still be a regex expression. 
+			RegexHelper::applyRegexFilter(availableQuantityLabelsList, currentQuantity);
+
+			for (const std::string& quantityLabel : availableQuantityLabelsList)
+			{
+				if (quantityLabel != "")
+				{
+					const auto& dependentParameterLabel = allQuantityByLabel.find(quantityLabel)->second->dependingParameterLabels;
+					parameterLabel.insert(parameterLabel.end(), dependentParameterLabel.begin(), dependentParameterLabel.end());
+				}
+			}
+			parameterLabel.sort();
+			parameterLabel.unique();
+		}
+		else
+		{
+			assert(allQuantityByLabel.find(currentQuantity) != allQuantityByLabel.end());
+			const auto& dependentParameterLabel = allQuantityByLabel.find(currentQuantity)->second->dependingParameterLabels;
+			parameterLabel.insert(parameterLabel.end(), dependentParameterLabel.begin(), dependentParameterLabel.end());
+			
+		}
+		parameterLabel.push_front("");
+
+		// If the parameter options have changed, we need to update them.
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(1);
+		auto& temp = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->getOptions();
+		std::list<std::string> currentOptions = { temp.begin(),temp.end() };
+		if (currentOptions != parameterLabel)
+		{
+			refreshNecessary = true;
+			for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+			{
+				const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+				setNameOptions(_thisObject, parameterLabel, groupName, m_propertyName);
+			}
+		}
+	}
+
+	
+	
+
+	
+
 
 	bool refreshQuantityDescription = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
 	refreshNecessary |= refreshQuantityDescription;

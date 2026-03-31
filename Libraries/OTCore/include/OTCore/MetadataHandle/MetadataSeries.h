@@ -55,6 +55,7 @@ public:
 	
 	const std::list<MetadataParameter>& getParameter() const { return m_parameter; }
 	const std::list<MetadataQuantity>& getQuantities() const { return m_quantity; }
+	
 	const ot::JsonDocument& getMetadata() const { return m_metaData; }
 
 	const std::string getName()const { return m_name; }

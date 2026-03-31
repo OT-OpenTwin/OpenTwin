@@ -57,8 +57,9 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 		}
 	}
 	
-	auto allQuanties = seriesMetadata.getQuantities();
-	for (auto& quantity : allQuanties)
+	const std::list<MetadataQuantity>& allQuantities = seriesMetadata.getQuantities();
+	auto& temp = const_cast<std::list<MetadataQuantity>&>(allQuantities);
+	for (MetadataQuantity& quantity : temp)
 	{
 		assert(quantity.quantityIndex != 0);
 		auto existingQuantityEntry = m_quantityOverviewByUID.find(quantity.quantityIndex);
@@ -70,6 +71,24 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 		else
 		{
 			//assert(0); //Each quantity should only be added once.
+		}
+		
+		MetadataQuantity& quantityInOverview = m_quantityOverviewByUID[quantity.quantityIndex];
+		for (ot::UID parameterID : quantity.dependingParameterIds)
+		{
+			auto dependingParameter = m_parameterOverviewByUID.find(parameterID);
+			if (dependingParameter != m_parameterOverviewByUID.end())
+			{
+				if (std::find(quantity.dependingParameterLabels.begin(), quantity.dependingParameterLabels.end(), dependingParameter->second.parameterLabel) == quantity.dependingParameterLabels.end())
+				{
+					quantity.dependingParameterLabels.push_back(dependingParameter->second.parameterLabel);
+				}
+				
+				if (std::find(quantityInOverview.dependingParameterLabels.begin(), quantityInOverview.dependingParameterLabels.end(), dependingParameter->second.parameterLabel) == quantityInOverview.dependingParameterLabels.end())
+				{
+					quantityInOverview.dependingParameterLabels.push_back(dependingParameter->second.parameterLabel);
+				}
+			}
 		}
 	}
 }
