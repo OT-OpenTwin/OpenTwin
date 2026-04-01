@@ -39,6 +39,7 @@
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTModelEntities/EntityFactory.h"
 #include "OTModelEntities/Lms/LibraryEntityInterface.h"
+#include "OTBlockEntities/EntityBlockLibraryInterface.h"
 
 
 std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
@@ -186,7 +187,7 @@ std::string LibraryManagementWrapper::requestCreateConfig(const ot::JsonDocument
 	return lmsResonse;
 }
 
-void LibraryManagementWrapper::createLibraryEntity(ot::LibraryElement& _importCfg) {
+void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _importCfg) {
 	Model* modelPtr = Application::instance()->getModel();
 	if (!modelPtr) {
 		OT_LOG_E("Model is null");
@@ -195,23 +196,42 @@ void LibraryManagementWrapper::createLibraryEntity(ot::LibraryElement& _importCf
 	
 	// Create and initialize entity
 	ot::NewModelStateInfo newStateInfo;
-	EntityBase* entity = createAndInitializeEntity(_importCfg, newStateInfo ,modelPtr);
-	if (!entity) return;
-
-	// Here get the requesting block
-	// This triggers with an additional interface if needed a second request to LMS
-	// Instantly return of the requested information 
-	// Then with requested information the entity can be created 
-	// updatePropertyOfEntity is being triggered in function of the additional interface after receiving the requested information
-	//ot::UID requestingEntityID = _importCfg.getRequestingEntityID();
-
+	createLibraryEntity(_importCfg, modelPtr, newStateInfo);
 
 	// Add entity to model
 	addEntityToModel(newStateInfo, modelPtr);
 	return;
 }
 
-void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed) {
+void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _importCfg, Model* _model, ot::NewModelStateInfo& _newStateInfo) {
+	EntityBase* entity = createAndInitializeEntity(_importCfg, _newStateInfo, _model);
+	if (!entity) return;
+
+	
+	updatePropertyOfEntity(_importCfg,entity ,true);
+
+	// Here get the requesting block
+	// This triggers with an additional interface if needed a second request to LMS
+	// Instantly return of the requested information 
+	// Then with requested information the entity can be created 
+	// updatePropertyOfEntity is being triggered in function of the additional interface after receiving the requested information
+	ot::UID requestingEntityID = _importCfg.getRequestingEntityID();
+	EntityBase* requestingEntity = _model->getEntityByID(requestingEntityID);
+	if (!requestingEntity) {
+		OT_LOG_E("Requesting entity not found: " + std::to_string(requestingEntityID));
+	}
+
+	ot::EntityBlockLibraryInterface* blockLibInterface = dynamic_cast<ot::EntityBlockLibraryInterface*>(requestingEntity);
+	if (blockLibInterface) {
+		std::list<ot::LibraryElement> additionalConfigs = blockLibInterface->libraryElementWasSet(_importCfg, entity, _newStateInfo);
+
+		for (const auto& additionalConfig : additionalConfigs) {
+			createLibraryEntity(additionalConfig, _model, _newStateInfo);
+		}
+	}
+}
+
+void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& _importCfg, EntityBase* _entity, bool _dialogConfirmed) {
 	Model* model = Application::instance()->getModel();
 	if (!model) {
 		OT_LOG_E("Model is null");
@@ -236,20 +256,19 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 		return;
 	}
 
-	EntityBase* circuitModelEntity = model->findEntityFromName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
-	if(!circuitModelEntity) {
-		OT_LOG_E("Circuit model entity not found: " + _importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
+	if(!_entity) {
+		OT_LOG_E("Circuit model entity not found: " + _entity->getName());
 	}
 
-	EntityBase* circuitModelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
-	if(!circuitModelFolderEntity) {
+	EntityBase* ModelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
+	if(!ModelFolderEntity) {
 		OT_LOG_E("Circuit model folder entity not found: " + _importCfg.getNewEntityFolder());
 	}
 
-	if (_dialogConfirmed && circuitModelEntity && circuitModelFolderEntity) {
+	if (_dialogConfirmed && _entity && ModelFolderEntity) {
 		modelProperty->setValueName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
-		modelProperty->setValueID(circuitModelEntity->getEntityID());
-		modelProperty->setEntityContainerID(circuitModelFolderEntity->getEntityID());
+		modelProperty->setValueID(_entity->getEntityID());
+		modelProperty->setEntityContainerID(ModelFolderEntity->getEntityID());
 		entBase->updateFromProperties();
 		entBase->setModified();
 	}
@@ -262,10 +281,12 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	const std::string comment = "Property Updated";
 	ot::UIDList topoList{entBase->getEntityID()};
 	ot::UIDList versionList{entBase->getEntityStorageVersion()};
+
+	//! @todo No option in updateTopologyEntities to disable save model state
 	model->updateTopologyEntities(topoList, versionList, comment, true, false);
 }
 
-EntityBase* LibraryManagementWrapper::createAndInitializeEntity(ot::LibraryElement& _importCfg, ot::NewModelStateInfo& _createdEntities ,Model* _model) {
+EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::LibraryElement& _importCfg, ot::NewModelStateInfo& _createdEntities ,Model* _model) {
 
 	// Create entity from factory
 	EntityFactory& factory = EntityFactory::instance();

@@ -135,6 +135,7 @@ set(OTBLOCKENTITIES_HEADER_FILES
     include/OTBlockEntities/Pipeline/EntityBlockPython.h
     include/OTBlockEntities/Pipeline/EntityBlockStorage.h
     include/OTBlockEntities/Pipeline/PythonHeaderInterpreter.h
+    include/OTBlockEntities/EntityBlockLibraryInterface.h
 )
 
 set(OTBLOCKENTITIES_SOURCE_FILES
@@ -167,6 +168,7 @@ set(OTBLOCKENTITIES_SOURCE_FILES
     src/Pipeline/EntityBlockPython.cpp
     src/Pipeline/EntityBlockStorage.cpp
     src/Pipeline/PythonHeaderInterpreter.cpp
+    src/EntityBlockLibraryInterface.cpp
 )
 
 # ============================================================
