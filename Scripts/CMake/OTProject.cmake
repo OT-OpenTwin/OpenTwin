@@ -54,6 +54,9 @@ include_guard(GLOBAL)
 include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
+set(_OT_CFG_DEBUG   "$<CONFIG:Debug>")
+set(_OT_CFG_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
+
 if(MSVC)
     add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP /external:anglebrackets)
 endif()
@@ -83,15 +86,13 @@ endfunction()
 function(_ot_add_debug_release_link_dirs TARGET_NAME DEBUG_DIR RELEASE_DIR)
     if(NOT "${DEBUG_DIR}" STREQUAL "")
         target_link_directories(${TARGET_NAME} PRIVATE
-            $<$<CONFIG:Debug>:${DEBUG_DIR}>
+            $<${_OT_CFG_DEBUG}:${DEBUG_DIR}>
         )
     endif()
 
     if(NOT "${RELEASE_DIR}" STREQUAL "")
         target_link_directories(${TARGET_NAME} PRIVATE
-            $<$<CONFIG:Release>:${RELEASE_DIR}>
-            $<$<CONFIG:RelWithDebInfo>:${RELEASE_DIR}>
-            $<$<CONFIG:MinSizeRel>:${RELEASE_DIR}>
+            $<${_OT_CFG_RELEASE}:${RELEASE_DIR}>
         )
     endif()
 endfunction()
@@ -188,13 +189,13 @@ function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
 
     if(NOT "${_incd}" STREQUAL "")
         target_include_directories("${CORE_TARGET}" PRIVATE
-            $<$<CONFIG:Debug>:${_incd}>
+            $<${_OT_CFG_DEBUG}:${_incd}>
         )
     endif()
 
     if(NOT "${_incr}" STREQUAL "")
         target_include_directories("${CORE_TARGET}" PRIVATE
-            $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:${_incr}>
+            $<${_OT_CFG_RELEASE}:${_incr}>
         )
     endif()
 endfunction()
@@ -205,13 +206,13 @@ function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
 
     if(NOT "${_libpathd}" STREQUAL "")
         target_link_directories("${FINAL_TARGET}" PRIVATE
-            $<$<CONFIG:Debug>:${_libpathd}>
+            $<${_OT_CFG_DEBUG}:${_libpathd}>
         )
     endif()
 
     if(NOT "${_libpathr}" STREQUAL "")
         target_link_directories("${FINAL_TARGET}" PRIVATE
-            $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:${_libpathr}>
+            $<${_OT_CFG_RELEASE}:${_libpathr}>
         )
     endif()
 
@@ -221,13 +222,13 @@ function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
 
     if(NOT "${_libd}" STREQUAL "")
         target_link_libraries("${FINAL_TARGET}" PRIVATE
-            $<$<CONFIG:Debug>:${_libd}>
+            $<${_OT_CFG_DEBUG}:${_libd}>
         )
     endif()
 
     if(NOT "${_libr}" STREQUAL "")
         target_link_libraries("${FINAL_TARGET}" PRIVATE
-            $<$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>:${_libr}>
+            $<${_OT_CFG_RELEASE}:${_libr}>
         )
     endif()
 
@@ -285,8 +286,8 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
         )
     endif()
     target_compile_definitions(${_core} PRIVATE
-        $<$<CONFIG:Debug>:_DEBUG>
-        $<$<NOT:$<CONFIG:Debug>>:NDEBUG>
+        $<${_OT_CFG_DEBUG}:_DEBUG>
+        $<${_OT_CFG_RELEASE}:NDEBUG>
     )
 
     target_include_directories(${_core} PRIVATE
@@ -603,10 +604,10 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         endif()
 
         if(DEFINED ENV{QT_ADS_LIBD} AND NOT "$ENV{QT_ADS_LIBD}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:$ENV{QT_ADS_LIBD}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:$ENV{QT_ADS_LIBD}>)
         endif()
         if(DEFINED ENV{QT_ADS_LIBR} AND NOT "$ENV{QT_ADS_LIBR}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<NOT:$<CONFIG:Debug>>:$ENV{QT_ADS_LIBR}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:$ENV{QT_ADS_LIBR}>)
         endif()
         return()
     endif()
@@ -614,26 +615,22 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     # QWT libs
     if(DEP STREQUAL "QWT")
         if(QWT_LIB_LIBPATHD_PATH)
-            target_link_directories("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:${QWT_LIB_LIBPATHD_PATH}>)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${QWT_LIB_LIBPATHD_PATH}>)
         endif()
         if(QWT_LIB_LIBPATHR_PATH)
-            target_link_directories("${FINAL_TARGET}" PRIVATE
-                $<$<CONFIG:Release>:${QWT_LIB_LIBPATHR_PATH}>
-                $<$<CONFIG:RelWithDebInfo>:${QWT_LIB_LIBPATHR_PATH}>
-                $<$<CONFIG:MinSizeRel>:${QWT_LIB_LIBPATHR_PATH}>
-            )
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${QWT_LIB_LIBPATHR_PATH}>)
         endif()
 
         if(QWT_LIB_LIBD_NAME AND NOT "${QWT_LIB_LIBD_NAME}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:${QWT_LIB_LIBD_NAME}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${QWT_LIB_LIBD_NAME}>)
         elseif(DEFINED ENV{QWT_LIB_LIBD} AND NOT "$ENV{QWT_LIB_LIBD}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:$ENV{QWT_LIB_LIBD}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:$ENV{QWT_LIB_LIBD}>)
         endif()
 
         if(QWT_LIB_LIBR_NAME AND NOT "${QWT_LIB_LIBR_NAME}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<NOT:$<CONFIG:Debug>>:${QWT_LIB_LIBR_NAME}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${QWT_LIB_LIBR_NAME}>)
         elseif(DEFINED ENV{QWT_LIB_LIBR} AND NOT "$ENV{QWT_LIB_LIBR}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<NOT:$<CONFIG:Debug>>:$ENV{QWT_LIB_LIBR}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:$ENV{QWT_LIB_LIBR}>)
         endif()
 
         return()
@@ -642,21 +639,17 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     # OSG libs
     if(DEP STREQUAL "OSG")
         if(OSG_LIBPATHD_PATH)
-            target_link_directories("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:${OSG_LIBPATHD_PATH}>)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OSG_LIBPATHD_PATH}>)
         endif()
         if(OSG_LIBPATHR_PATH)
-            target_link_directories("${FINAL_TARGET}" PRIVATE
-                $<$<CONFIG:Release>:${OSG_LIBPATHR_PATH}>
-                $<$<CONFIG:RelWithDebInfo>:${OSG_LIBPATHR_PATH}>
-                $<$<CONFIG:MinSizeRel>:${OSG_LIBPATHR_PATH}>
-            )
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${OSG_LIBPATHR_PATH}>)
         endif()
 
         if(OSG_LIBD_NAME AND NOT "${OSG_LIBD_NAME}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<CONFIG:Debug>:${OSG_LIBD_NAME}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OSG_LIBD_NAME}>)
         endif()
         if(OSG_LIBR_NAME AND NOT "${OSG_LIBR_NAME}" STREQUAL "")
-            target_link_libraries("${FINAL_TARGET}" PRIVATE $<$<NOT:$<CONFIG:Debug>>:${OSG_LIBR_NAME}>)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${OSG_LIBR_NAME}>)
         endif()
 
         return()
@@ -818,10 +811,10 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
         target_link_libraries(${TEST_TARGET_NAME} PRIVATE $ENV{GOOGLE_TEST_LIB})
     endif()
     if(DEFINED ENV{GOOGLE_TEST_LIBPATHD} AND NOT "$ENV{GOOGLE_TEST_LIBPATHD}" STREQUAL "")
-        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<$<CONFIG:Debug>:$ENV{GOOGLE_TEST_LIBPATHD}>)
+        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<${_OT_CFG_DEBUG}:$ENV{GOOGLE_TEST_LIBPATHD}>)
     endif()
     if(DEFINED ENV{GOOGLE_TEST_LIBPATHR} AND NOT "$ENV{GOOGLE_TEST_LIBPATHR}" STREQUAL "")
-        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<$<NOT:$<CONFIG:Debug>>:$ENV{GOOGLE_TEST_LIBPATHR}>)
+        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<${_OT_CFG_RELEASE}:$ENV{GOOGLE_TEST_LIBPATHR}>)
     endif()
 
     add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})
