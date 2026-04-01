@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.20)
 project(OTWidgets LANGUAGES CXX)
 
-include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTWidgets OT_WIDGETS_ROOT_PATH)
+ot_add_export(OTWidgets OT_WIDGETS_EXPORTS)
+
 target_compile_definitions(OTWidgets_core PRIVATE
-    OT_WIDGETS_EXPORTS
     QWT_DLL
 )
 
