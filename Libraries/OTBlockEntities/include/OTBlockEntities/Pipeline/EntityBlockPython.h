@@ -21,8 +21,10 @@
 
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockLibraryInterface.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockPython : public EntityBlock
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockPython : public EntityBlock, public ot::EntityBlockLibraryInterface
 {
 public:
 	EntityBlockPython() : EntityBlockPython(0, nullptr, nullptr, nullptr) {};
@@ -43,6 +45,9 @@ public:
 	void setManifestFolder(ot::UID _manifestFolderID);
 
 	static const std::string getIconName() { return "Script.svg"; }
+
+	// Special library interface function
+	virtual std::list<ot::LibraryElement> libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity,ot::NewModelStateInfo& _newStateInfo) override;
 private:
 	const std::string m_propertyNameScripts = "Scripts";
 	const std::string m_propertyNameEnvironments = "Environment";

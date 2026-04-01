@@ -64,7 +64,7 @@ public:
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
-	virtual void requestLibraryElement(ot::JsonDocument& _doc) {};
+	virtual std::string requestLibraryElement(ot::JsonDocument& _doc) { return ""; };
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };

@@ -1015,9 +1015,6 @@ void Application::handleModelDialogConfirmed(ot::JsonDocument& _document) {
 
 	/* First add the model entity to the Project*/
 	m_libraryManagementWrapper.createLibraryEntity(importCfg);
-	/* Now update the property according to the dialog (confirm or cancel)*/
-	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg, true);
-	
 }
 
 void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
@@ -1025,7 +1022,7 @@ void Application::handleModelDialogCanceled(ot::JsonDocument& _document) {
 	importCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
 	// Now update the property according to the dialog (confirm or cancel)
-	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg,false);
+	m_libraryManagementWrapper.updatePropertyOfEntity(importCfg, nullptr,false);
 }
 
 // ##################################################################################################################################################################################################################

@@ -74,28 +74,4 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 		additionalInfoProp->setReadOnly(true);
 	}
 
-	std::string environmentInfo = _libraryElement.getAdditionalInfoValue("Environment");
-	if (!environmentInfo.empty()) {
-		// Create the LibraryElementRequest configuration
-		ot::LibraryElementRequest request;
-		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
-		request.setCollectionName("PythonEnvironments");
-		request.setCallBackAction(OT_ACTION_CMD_LMS_LibraryElementRequest);
-		request.setEntityType(EntityPythonManifest::className());
-		request.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-		request.setPropertyName("Environment");
-		request.setCallBackService(_libraryElement.getCallBackService());
-		request.setValue(environmentInfo);  // Now passing string directly
-
-		// Build the document
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_LibraryElementRequest, doc.GetAllocator()), doc.GetAllocator());
-		// Add the config information to the document
-		ot::JsonObject configObj;
-		request.addToJsonObject(configObj, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
-		// Send the document to the observer (Model Service)
-		getObserver()->requestLibraryElement(doc);
-	}
 }

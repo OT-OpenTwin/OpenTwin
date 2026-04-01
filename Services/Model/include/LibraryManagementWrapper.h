@@ -37,13 +37,14 @@ public:
 	std::list<std::string> getCircuitModels();
 	std::string getCircuitModel(std::string _modelName);
 	std::string requestCreateConfig(const ot::JsonDocument& _doc);
-	void createLibraryEntity(ot::LibraryElement& _importCfg);
-	void updatePropertyOfEntity(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);
+	void createLibraryEntity(const ot::LibraryElement& _importCfg);
+	void createLibraryEntity(const ot::LibraryElement& _importCfg, Model* _model, ot::NewModelStateInfo& _newStateInfo);
+	void updatePropertyOfEntity(const ot::LibraryElement& _importCfg, EntityBase* _entity, bool _dialogConfirmed);
 	/*void createLibraryEntityAndUpdateProperty(const ot::LibraryElement& _importCfg, bool _dialogConfirmed);*/
 private:
 
 	// Helper methods
-	EntityBase* createAndInitializeEntity(ot::LibraryElement& _importCfg, ot::NewModelStateInfo& _createdEntities, Model* _model);
+	EntityBase* createAndInitializeEntity(const ot::LibraryElement& _importCfg, ot::NewModelStateInfo& _createdEntities, Model* _model);
 	EntityBase* checkAndHandleIfEntityExists(const std::string& _fullPath, const ot::LibraryElement& _importCfg, Model* _model);
 	void addEntityToModel(const ot::NewModelStateInfo& _toBeAddedEntities, Model* _model);
 

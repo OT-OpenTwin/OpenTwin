@@ -460,10 +460,7 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	libraryElement.addToJsonObject(libraryElementObj, responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_Config, libraryElementObj, responseDoc.GetAllocator());
 
-	// Send the response asynchronously to the callback service
-	sendAsyncMessageToModel(responseDoc, libraryElement.getCallBackService());
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

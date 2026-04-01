@@ -71,7 +71,7 @@ public:
 	virtual void entityModified(EntityBase *entity) override;
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
-	virtual void requestLibraryElement(ot::JsonDocument& _doc) override;
+	virtual std::string requestLibraryElement(ot::JsonDocument& _doc) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual void requestDatapointVisualisation(const DataLakeQueryCfg & _queryCfg, ot::UID _entityID, ot::UID _entityVersion) override;
