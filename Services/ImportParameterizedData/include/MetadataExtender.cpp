@@ -19,7 +19,20 @@ void MetadataExtender::extendWithJsonFile()
 		{
 			throw std::exception("Extending a metadata series requires the selection of a json file and a series metadata");
 		}
-		
+		std::string seriesNames, jsonFileNames;
+		for (auto& seriesEntity : seriesEntities)
+		{
+			seriesNames +=  seriesEntity->getName() + ", ";
+		}
+		for(auto& jsonFileEntity : jsonFileEntities)
+		{
+			jsonFileNames += jsonFileEntity->getName() + ", ";
+		}
+		seriesNames = seriesNames.substr(0, seriesNames.size() - 2);
+		jsonFileNames = jsonFileNames.substr(0, jsonFileNames.size() - 2);
+		const std::string message = "Extending metadata series: \"" + seriesNames + "\" with json file(s): \"" + jsonFileNames + "\"\n";
+		Application::instance()->getUiComponent()->displayMessage(message);
+
 		ot::JsonDocument newMetadata;
 		std::string currentJson;
 		try
@@ -66,6 +79,7 @@ void MetadataExtender::extendWithJsonFile()
 			newEntities.addTopologyEntity(*series.get());
 		}
 		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Extended metadata of series metadata");
+		Application::instance()->getUiComponent()->displayMessage("Successfully extended series metadata.\n");
 	}
 	catch (std::exception& _e)
 	{
