@@ -51,6 +51,7 @@ include_guard(GLOBAL)
 #   ot_add_test(<APP_NAME>)
 
 # Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
+include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
 if(MSVC)
@@ -285,10 +286,20 @@ function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
 endfunction()
 
 function(ot_add_export TARGET_NAME)
-    string(REGEX REPLACE "^OT" "" _lib "${TARGET_NAME}")
-    string(TOUPPER "${_lib}" _lib_upper)
-    set(_export_macro "OPENTWIN${_lib_upper}_EXPORTS")
-    target_compile_definitions(${TARGET_NAME}_core PRIVATE ${_export_macro})
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT "${ARGV1}" STREQUAL "")
+        set(_selected_macro "${ARGV1}")
+    else()
+        string(REGEX REPLACE "^OT" "" _lib_raw "${TARGET_NAME}")
+        string(TOUPPER "${_lib_raw}" _lib_upper)
+        set(_selected_macro "OPENTWIN${_lib_upper}_EXPORTS")
+    endif()
+
+    # 2. Apply ONLY that one macro
+    target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
+    
+    # Optional: Log it so you can verify during CMake configuration
+    message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
 endfunction()
 
 # ------------------------------------------------------------
@@ -717,6 +728,14 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
         $<TARGET_PROPERTY:${MAIN_TARGET_NAME},INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:${MAIN_TARGET_NAME}_core,INCLUDE_DIRECTORIES>
     )
+
+    _ot_target_core_name(_coreName ${MAIN_TARGET_NAME})
+    if(TARGET ${_coreName})
+        get_target_property(_main_deps ${_coreName} OT_DEPS)
+        if(_main_deps)
+            _ot_apply_all_deps(${TEST_TARGET_NAME} ${TEST_TARGET_NAME} "${_main_deps}")
+        endif()
+    endif()
 
     if(DEFINED ENV{GOOGLE_TEST_INC} AND NOT "$ENV{GOOGLE_TEST_INC}" STREQUAL "")
         target_include_directories(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_INC}")
