@@ -272,6 +272,13 @@ function(ot_define_qt6_targets COMPONENTS_LIST)
     ot_qt_force_autogen_recognition()
 
     foreach(c IN LISTS COMPONENTS_LIST)
+        if(TARGET Qt6::${c})
+            get_target_property(_already_defined Qt6::${c} OT_Qt_INITIALIZED)
+            if(_already_defined)
+                continue()
+            endif()
+        endif()
+
         if(c STREQUAL "Core")
             ot_import_qt6_module(Core Qt6Core)
 
@@ -319,6 +326,10 @@ function(ot_define_qt6_targets COMPONENTS_LIST)
 
         else()
             message(FATAL_ERROR "ot_define_qt6_targets: unsupported Qt component '${c}'")
+        endif()
+
+        if(TARGET Qt6::${c})
+            set_target_properties(Qt6::${c} PROPERTIES OT_Qt_INITIALIZED TRUE)
         endif()
     endforeach()
 endfunction()
