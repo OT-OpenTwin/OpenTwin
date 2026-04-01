@@ -295,10 +295,8 @@ function(ot_add_export TARGET_NAME)
         set(_selected_macro "OPENTWIN${_lib_upper}_EXPORTS")
     endif()
 
-    # 2. Apply ONLY that one macro
     target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
     
-    # Optional: Log it so you can verify during CMake configuration
     message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
 endfunction()
 
