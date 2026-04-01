@@ -315,6 +315,10 @@ function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
 endfunction()
 
+# Usage:
+#
+# - ot_add_export(target_name)              -> this will default to: "OPENTWINTARGET_EXPORT"
+# - ot_add_export(target_name EXPORT_MACRO) -> this will apply and overwrite the default export macro
 function(ot_add_export TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
     if(NOT "${ARGV1}" STREQUAL "")
