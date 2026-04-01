@@ -143,36 +143,6 @@ function(ot_join_paths OUT_VAR BASE SUBDIR)
     endif()
 endfunction()
 
-# ot_add_debug_release_link_dirs(<target> <debug-dir> <release-dir>)
-#
-# Adds configuration-specific link directories to <target>.
-#   - <debug-dir> is used only for Debug
-#   - <release-dir> is used for Release, RelWithDebInfo, and MinSizeRel
-#
-# Both inputs are expected to be already resolved directory paths, not
-# environment variable names.
-#
-# Example:
-#   ot_add_debug_release_link_dirs(OTViewer
-#     "${OT_SYSTEM_DEBUG_LIB_DIR}"
-#     "${OT_SYSTEM_RELEASE_LIB_DIR}"
-#   )
-function(ot_add_debug_release_link_dirs TARGET_NAME DEBUG_DIR RELEASE_DIR)
-    if(NOT "${DEBUG_DIR}" STREQUAL "")
-        target_link_directories(${TARGET_NAME} PRIVATE
-            $<$<CONFIG:Debug>:${DEBUG_DIR}>
-        )
-    endif()
-
-    if(NOT "${RELEASE_DIR}" STREQUAL "")
-        target_link_directories(${TARGET_NAME} PRIVATE
-            $<$<CONFIG:Release>:${RELEASE_DIR}>
-            $<$<CONFIG:RelWithDebInfo>:${RELEASE_DIR}>
-            $<$<CONFIG:MinSizeRel>:${RELEASE_DIR}>
-        )
-    endif()
-endfunction()
-
 # ============================================================
 # setup checks
 # ============================================================

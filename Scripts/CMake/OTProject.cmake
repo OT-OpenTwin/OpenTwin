@@ -66,6 +66,36 @@ function(_ot_target_core_name OUT_VAR TARGET_NAME)
     set(${OUT_VAR} "${TARGET_NAME}_core" PARENT_SCOPE)
 endfunction()
 
+# ot_add_debug_release_link_dirs(<target> <debug-dir> <release-dir>)
+#
+# Adds configuration-specific link directories to <target>.
+#   - <debug-dir> is used only for Debug
+#   - <release-dir> is used for Release, RelWithDebInfo, and MinSizeRel
+#
+# Both inputs are expected to be already resolved directory paths, not
+# environment variable names.
+#
+# Example:
+#   _ot_add_debug_release_link_dirs(OTViewer
+#     "${OT_SYSTEM_DEBUG_LIB_DIR}"
+#     "${OT_SYSTEM_RELEASE_LIB_DIR}"
+#   )
+function(_ot_add_debug_release_link_dirs TARGET_NAME DEBUG_DIR RELEASE_DIR)
+    if(NOT "${DEBUG_DIR}" STREQUAL "")
+        target_link_directories(${TARGET_NAME} PRIVATE
+            $<$<CONFIG:Debug>:${DEBUG_DIR}>
+        )
+    endif()
+
+    if(NOT "${RELEASE_DIR}" STREQUAL "")
+        target_link_directories(${TARGET_NAME} PRIVATE
+            $<$<CONFIG:Release>:${RELEASE_DIR}>
+            $<$<CONFIG:RelWithDebInfo>:${RELEASE_DIR}>
+            $<$<CONFIG:MinSizeRel>:${RELEASE_DIR}>
+        )
+    endif()
+endfunction()
+
 # ------------------------------------------------------------
 # OT token -> env var mapping
 # ------------------------------------------------------------
@@ -296,8 +326,50 @@ function(ot_add_export TARGET_NAME)
     endif()
 
     target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
-    
     message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
+endfunction()
+
+# ------------------------------------------------------------
+# Compiler definitons and options wrappers
+# ------------------------------------------------------------
+function(_ot_apply_compile_option_internal CORE_TARGET OPTION)
+    if(MSVC)
+        if(OPTION MATCHES "^[0-9]+$")
+            target_compile_options(${CORE_TARGET} PRIVATE "/wd${OPTION}")
+        else()
+            target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
+        endif()
+    else()
+        target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
+    endif()
+endfunction()
+
+function(ot_add_compile_options TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    foreach(opt IN LISTS ARGN)
+        _ot_apply_compile_option_internal(${_core} "${opt}")
+    endforeach()
+endfunction()
+
+function(ot_disable_warnings TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    foreach(warn_id IN LISTS ARGN)
+        if(NOT warn_id MATCHES "^[0-9]+$")
+            message(AUTHOR_WARNING "ot_disable_warnings(${TARGET_NAME}): '${warn_id}' is not a numeric ID. Use ot_add_compile_options for flags.")
+        endif()
+        _ot_apply_compile_option_internal(${_core} "${warn_id}")
+    endforeach()
+endfunction()
+
+function(ot_add_compile_definitions TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_add_compile_definitions: target '${_core}' not found.")
+    endif()
+
+    foreach(def IN LISTS ARGN)
+        target_compile_definitions(${_core} PRIVATE "${def}")
+    endforeach()
 endfunction()
 
 # ------------------------------------------------------------
@@ -451,21 +523,21 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
     endif()
 
     if(OT_CLIBD_PATH AND OT_CLIBR_PATH)
-        ot_add_debug_release_link_dirs("${FINAL_TARGET}"
+        _ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_CLIBD_PATH}"
             "${ROOT_DIR}/${OT_CLIBR_PATH}"
         )
     endif()
 
     if(OT_LIBD_PATH AND OT_LIBR_PATH)
-        ot_add_debug_release_link_dirs("${FINAL_TARGET}"
+        _ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_LIBD_PATH}"
             "${ROOT_DIR}/${OT_LIBR_PATH}"
         )
     endif()
 
     if(OT_CDLLD_PATH AND OT_CDLLR_PATH)
-        ot_add_debug_release_link_dirs("${FINAL_TARGET}"
+        _ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_CDLLD_PATH}"
             "${ROOT_DIR}/${OT_CDLLR_PATH}"
         )

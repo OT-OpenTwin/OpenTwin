@@ -70,7 +70,7 @@ endfunction()
 
 # ------------------------------------------------------------
 # Tell CMake's AUTOGEN where Qt tools are (moc/uic/rcc)
-# AND provide Qt6::moc imported target (required by some CMake versions)
+# AND provide Qt6::moc imported target
 # ------------------------------------------------------------
 function(ot_qt_setup_autogen_tools)
     if(NOT DEFINED ENV{QT_DLLR} OR "$ENV{QT_DLLR}" STREQUAL "")
@@ -87,7 +87,6 @@ function(ot_qt_setup_autogen_tools)
         message(FATAL_ERROR "Qt moc.exe not found at: ${_moc}")
     endif()
 
-    # --- Imported tool targets expected by AUTOGEN in some CMake versions ---
     if(NOT TARGET Qt6::moc)
         add_executable(Qt6::moc IMPORTED GLOBAL)
         set_target_properties(Qt6::moc PROPERTIES
@@ -109,7 +108,6 @@ function(ot_qt_setup_autogen_tools)
         )
     endif()
 
-    # --- Variables used by different CMake AUTOGEN implementations ---
     set(Qt6Core_MOC_EXECUTABLE "${_moc}" CACHE FILEPATH "Qt moc executable" FORCE)
     set(QT_MOC_EXECUTABLE      "${_moc}" CACHE FILEPATH "Qt moc executable (legacy)" FORCE)
 
@@ -129,7 +127,7 @@ function(ot_qt_setup_autogen_tools)
 endfunction()
 
 # ------------------------------------------------------------
-# Force AUTOGEN recognition (avoid "No valid Qt version found")
+# Force AUTOGEN recognition
 # ------------------------------------------------------------
 function(ot_qt_force_autogen_recognition)
     if(NOT DEFINED ENV{QTDIR} OR "$ENV{QTDIR}" STREQUAL "")

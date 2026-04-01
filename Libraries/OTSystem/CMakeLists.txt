@@ -5,12 +5,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTSystem OT_SYSTEM_ROOT_PATH)
 ot_add_export(OTSystem)
-
-target_compile_options(OTSystem_core PRIVATE
-    /W3
-    /wd4996
-    /sdl
-)
+ot_add_compile_options(OTSystem /W3 /sdl 4996)
 
 ot_add_dependency(OTSystem
     WINLIB:secur32
