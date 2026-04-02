@@ -585,6 +585,9 @@ namespace ot {
 		OT_CORE_API_EXPORT void mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
 		OT_CORE_API_EXPORT void mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& _srcArray, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
 
+
+		OT_CORE_API_EXPORT bool isOfType(const JsonValue& _value, const std::string& _typeName);
+		OT_CORE_API_EXPORT std::string getTypeName(const JsonValue& _value);
 	} // namespace json
 
 }

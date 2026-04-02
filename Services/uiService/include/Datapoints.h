@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Datapoints.h
 // 
 // License:
@@ -19,11 +19,12 @@
 
 #pragma once
 #include <vector>
+#include "OTCore/Variable/Variable.h"
 
 struct Datapoints
 {
 	std::vector<double> m_xData;
-	std::vector<double> m_yData;
+	std::vector<ot::Variable> m_yData;
 	void reserve(size_t numberOfDataPoints)
 	{
 		m_xData.reserve(numberOfDataPoints);

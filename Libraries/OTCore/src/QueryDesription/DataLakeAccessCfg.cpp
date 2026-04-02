@@ -120,7 +120,6 @@ void ot::DataLakeAccessCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocato
 			transformer.PushBack(entry, _allocator);
 		}
 
-
 		JsonObject kvp;
 		kvp.AddMember("Field", JsonString(it.first, _allocator), _allocator);
 		kvp.AddMember("Transformer", transformer, _allocator);
@@ -189,13 +188,16 @@ void ot::DataLakeAccessCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonOb
 	for (const ConstJsonObject& kvp : json::getObjectList(_jsonObject, "ValueTransformersQuant"))
 	{
 		std::string fieldKey = json::getString(kvp, "Field");
-		auto processors = 	json::getArray(_jsonObject, "Transformer");
 		std::list<ValueProcessing> procList;
-		for (uint32_t i = 0 ; i < processors.Size(); i++)
+		
+		auto singleTransformer = json::getArray(kvp, "Transformer");
+		for (uint32_t i = 0 ; i < singleTransformer.Size(); i++)
 		{
-			ValueProcessing transformer(json::getObject(processors, i));
+			ValueProcessing transformer(json::getObject(singleTransformer, i));
 			procList.push_back(transformer);
 		}
+		
+		
 		m_valueTransformerByFieldKeyQuantity.emplace(std::move(fieldKey), std::move(procList));
 	}
 }
@@ -367,11 +369,6 @@ bool ot::DataLakeAccessCfg::hasParameterValueTransformer(const std::string& _fie
 	 return m_valueTransformerByFieldKeyParameter.find(_fieldKey) != m_valueTransformerByFieldKeyParameter.end();
 }
 
-ot::ValueProcessing& ot::DataLakeAccessCfg::getParameterValueTransformer(const std::string& _fieldKey)
-{
-	 return m_valueTransformerByFieldKeyParameter.at(_fieldKey);
-}
-
 const ot::ValueProcessing& ot::DataLakeAccessCfg::getParameterValueTransformer(const std::string& _fieldKey) const
 {
 	 return m_valueTransformerByFieldKeyParameter.at(_fieldKey); 
@@ -380,6 +377,11 @@ const ot::ValueProcessing& ot::DataLakeAccessCfg::getParameterValueTransformer(c
 void ot::DataLakeAccessCfg::addQuantityValueTransformer(const std::string& _fieldKey, const std::list<ValueProcessing>& _valueTransformers)
 {
 	m_valueTransformerByFieldKeyQuantity.insert_or_assign(_fieldKey, _valueTransformers);
+}
+
+bool ot::DataLakeAccessCfg::hasQuantityValueTransformer(const std::string& _fieldKey) const
+{
+	return m_valueTransformerByFieldKeyQuantity.find(_fieldKey) != m_valueTransformerByFieldKeyQuantity.end();
 }
 
 std::list<ot::ValueProcessing> ot::DataLakeAccessCfg::getQuantityValueTransformer(const std::string& _key) const

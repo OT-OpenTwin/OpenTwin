@@ -28,13 +28,13 @@
 #include "OTCore/TypeNames.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/Variable/ExplicitStringValueConverter.h"
+
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTDataStorage/DataLakeHelper.h"
-
+#include "OTCore/Variable/JSONToVariableConverter.h"
 #include <unordered_map>
 
 // BSONCXX header
@@ -48,8 +48,8 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	const auto& queryInformation = _config.getQueryInformation();
 
 	mongocxx::options::find options;
-	 
-	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options);
+	std::string log;
+	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options, log);
 	std::string temp = ot::json::toJson(entireResult);
 
 	if (!ot::json::exists(entireResult, DataLakeHelper::getDataFieldName()))
@@ -108,6 +108,7 @@ std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::
 		throw std::exception("Plot axis selection did not work.");
 	}
 
+	ot::JSONToVariableConverter jsonToVariableConverter;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
 	{
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
@@ -186,13 +187,13 @@ std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::
 			}
 
 			//Get quantity value
-			double quantityValue = jsonToDouble("Values",singleMongoDocument,ot::TypeNames::getDoubleTypeName());
-			//double quantityValue = jsonToDouble(displayQuantityLabel,singleMongoDocument,decoderQuantity.value().getTupleInstance().getTupleElementDataTypes().front());
-
+			const ot::JsonValue& entryQuantityValue =	singleMongoDocument["Values"];
+			ot::Variable quantityValue =	jsonToVariableConverter(entryQuantityValue);
+			
 			// Get parameter value
-			double parameterValue = jsonToDouble(displayParameterLabel, singleMongoDocument, ot::TypeNames::getDoubleTypeName());
-			//double parameterValue = jsonToDouble(displayParameterLabel, singleMongoDocument, decoderParameter.value().getTupleInstance().getTupleElementDataTypes().front());
-
+			const ot::JsonValue& entryParameterValue = singleMongoDocument[displayParameterLabel.c_str()];
+			double parameterValue = jsonToDouble(entryParameterValue);
+		
 			dataPoints.front().m_yData.push_back(quantityValue);
 			dataPoints.front().m_xData.push_back(parameterValue);
 		}
@@ -299,7 +300,19 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
 		newCurveCfg.setTitle(curveTitle);
 		auto curveData = singleCurve.second.begin();
-		ot::PlotDatasetData datasetData(std::move(curveData->m_xData), std::move(curveData->m_yData));
+				
+		ot::PlotDatasetData datasetData;
+		if (curveData->m_yData.front().isComplex())
+		{
+			std::vector<std::complex<double>> complexData = toComplexVector(curveData->m_yData);
+			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(complexData));
+		}
+		else
+		{
+			std::vector<double> doubleData = toDoubleVector(curveData->m_yData);
+			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(doubleData));
+		}
+		
 		auto dataset = new ot::PlotDataset(nullptr, newCurveCfg, std::move(datasetData));
 		dataset->setCurveNameBase(curveTitle);
 		dataSets.push_back(dataset);
@@ -358,6 +371,29 @@ double CurveDatasetFactory::jsonToDouble(const rapidjson::Value& _jsonEntry, con
 	}
 
 	return value;
+}
+
+double CurveDatasetFactory::jsonToDouble(const rapidjson::Value& _jesonEntry)
+{
+	if (_jesonEntry.IsFloat()) {
+		float serialisedVal = _jesonEntry.GetFloat();
+		return static_cast<double>(serialisedVal);
+	}
+	else if (_jesonEntry.IsDouble()) {
+		return _jesonEntry.GetDouble();
+	}
+	else if (_jesonEntry.IsInt()) {
+		int32_t serialisedVal = _jesonEntry.GetInt();
+		return static_cast<double>(serialisedVal);
+	}
+	else if (_jesonEntry.IsInt64()) {
+		int64_t serialisedVal = _jesonEntry.GetInt64();
+		return static_cast<double>(serialisedVal);
+	}
+	else
+	{
+		throw std::invalid_argument("Curve data has not supported type");
+	}
 }
 
 ot::PlotDatasetData CurveDatasetFactory::createCurveData(const std::vector<double>& _xData, const std::vector<ot::Variable>& _yData, bool _yDataIsComplex, const ot::Plot1DCfg& _plotCfg) {

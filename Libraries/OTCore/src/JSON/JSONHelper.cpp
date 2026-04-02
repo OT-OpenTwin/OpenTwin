@@ -22,6 +22,8 @@
 #include "OTCore/JSON/JSONHelper.h"
 #include "rapidjson/prettywriter.h"
 #include "rapidjson/stringbuffer.h"
+#include "OTCore/TypeNames.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
 #undef Object
 #undef ObjectW
@@ -1625,3 +1627,94 @@ void ot::json::mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& 
 		destArray.PushBack(arrayEntry, _allocator);
 	}
 }
+
+bool ot::json::isOfType(const JsonValue& _value, const std::string& _typeName)
+{
+	if (ot::TypeNames::getBoolTypeName() == _typeName)
+	{
+		return _value.IsBool();
+	}
+	else if (ot::TypeNames::getCharTypeName() == _typeName)
+	{
+		return _value.IsString() && _value.GetStringLength() == 1;
+	}
+	else if (ot::TypeNames::getDateTimeTypeName() == _typeName)
+	{
+		return _value.IsInt64();
+	}
+	else if (ot::TypeNames::getDoubleTypeName() == _typeName)
+	{
+		return _value.IsDouble();
+	}
+	else if (ot::TypeNames::getFloatTypeName() == _typeName)
+	{
+		return _value.IsFloat();
+	}
+	else if (ot::TypeNames::getInt32TypeName() == _typeName)
+	{
+		return _value.IsInt();
+	}
+	else if (ot::TypeNames::getInt64TypeName() == _typeName)
+	{
+		return _value.IsInt64();
+	}
+	else if (ot::TypeNames::getStringTypeName() == _typeName)
+	{
+		return _value.IsString();
+	}
+	else if (ot::ComplexNumbers::getTypeName() == _typeName)
+	{
+		return _value.IsArray() && _value.Size() == 2;
+	}
+	else
+	{
+		throw std::exception(("Unknown type name: " + _typeName).c_str());
+	}
+}
+
+
+std::string ot::json::getTypeName(const JsonValue& _value)
+{
+	auto type = _value.GetType();
+	if(_value.IsBool())
+	{
+		return ot::TypeNames::getBoolTypeName();
+	}
+	else if(_value.IsString())
+	{
+		return ot::TypeNames::getStringTypeName();
+	}
+	else if(_value.IsInt())
+	{
+		return ot::TypeNames::getInt32TypeName();
+	}
+	else if(_value.IsInt64())
+	{
+		return ot::TypeNames::getInt64TypeName();
+	}
+	else if(_value.IsFloat())
+	{
+		return ot::TypeNames::getFloatTypeName();
+	}
+	else if(_value.IsDouble())
+	{
+		return ot::TypeNames::getDoubleTypeName();
+	}
+	else if(_value.IsObject())
+	{
+		return "Object";
+	}
+	else if(_value.IsArray())
+	{
+		return "Array";
+	}
+	else if(_value.IsNull())
+	{
+		return "Null";
+	}
+	else
+	{
+		throw std::exception("Unknown JSON value type");
+	}
+}
+

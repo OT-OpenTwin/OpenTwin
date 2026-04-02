@@ -61,6 +61,7 @@ private:
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);
+	double jsonToDouble(const rapidjson::Value& _jesonEntry);
 
 	ot::PlotDatasetData createCurveData(const std::vector<double>& _xData, const std::vector<ot::Variable>& _yData, bool _yDataIsComplex, const ot::Plot1DCfg& _plotCfg);
 	static std::vector<double> toDoubleVector(const std::vector<ot::Variable>& _values);

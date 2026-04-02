@@ -8,6 +8,9 @@
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 
+#include <functional>
+#include <string>
+
 class DataLakeAccessor
 {
 public:
@@ -68,8 +71,7 @@ private:
 
 	ot::QueryDescription createQuantityValueQueryDescription(ot::QueryDescription _queryDescription);
 
-	std::optional<BsonViewOrValue> generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription);
-
-	std::optional<BsonViewOrValue> generateQueryFromSIBaseToTarget(ot::QueryDescription& _queryDescription);
+	using ChainBuilder = std::function<ot::ValueProcessing(const std::string&, const std::string&)>;
+	std::optional<BsonViewOrValue> generateComparisonConsideringUnits(ot::QueryDescription& _queryDescription, bool _quantity, ChainBuilder& _chainBuilder);
 
 };

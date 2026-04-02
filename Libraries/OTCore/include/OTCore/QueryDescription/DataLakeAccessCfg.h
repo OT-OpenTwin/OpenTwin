@@ -68,12 +68,12 @@ namespace ot {
 		ValueProcessing& addParameterValueTransformer(const std::string& _fieldKey, const ValueProcessing& _valueTransformer);
 		ValueProcessing& addParameterValueTransformer(const std::string& _fieldKey, ValueProcessing&& _valueTransformer);
 		bool hasParameterValueTransformer(const std::string& _fieldKey) const;
-		ValueProcessing& getParameterValueTransformer(const std::string& _fieldKey);
 		const ValueProcessing& getParameterValueTransformer(const std::string& _fieldKey) const;
 
 		void addQuantityValueTransformer(const std::string& _fieldKey, const std::list<ValueProcessing>& _valueTransformers);
+		bool hasQuantityValueTransformer(const std::string& _fieldKey) const;
 		std::list<ValueProcessing> getQuantityValueTransformer(const std::string& _key) const;
-	
+
 		const std::string& getCollectionName() const;
 		void setCollectionName(const std::string& _collectionName);
 
