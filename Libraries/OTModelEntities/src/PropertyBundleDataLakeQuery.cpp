@@ -491,12 +491,42 @@ void PropertyBundleDataLakeQuery::vectorize(const ot::JsonValue& _value, std::li
 
 ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(EntityBase* _thisObject) const
 {
-	const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, m_groupQuantitySettings);
-	const std::string unit = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyUnit, m_groupQuantitySettings);
 	const std::string value = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyValue, m_groupQuantitySettings);
 	const std::string name = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
 	const std::string comparator = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyComparator, m_groupQuantitySettings);
-	const ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value, dataType, unit);
+	
+	ot::TupleInstance instance;
+	ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value,instance);
+	if (PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings)->getVisible())
+	{
+		//In this case we have a tuple
+		const std::string tupleTargetElement = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+		valueComparisonDefinition.setTupleTarget(tupleTargetElement);
+		
+		const std::string tupleTargetUnit = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings);
+		std::vector<std::string> units = ot::TupleDescription::separateCombinedUnitString(tupleTargetUnit);
+		instance.setTupleUnits(units);
+
+		EntityPropertiesSelection* componentSelection = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
+		const std::string tupleName = *componentSelection->getOptions().begin();
+		instance.setTupleTypeName(tupleName);
+
+		const std::string tupleTargetFormat = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings);
+		instance.setTupleFormatName(tupleTargetFormat);
+
+		instance.setTupleElementDataTypes({ ot::TypeNames::getDoubleTypeName(),ot::TypeNames::getDoubleTypeName() });
+		
+		valueComparisonDefinition.setTupleInstance(instance);
+	}
+	else
+	{
+		const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, m_groupQuantitySettings);
+		const std::string unit = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyUnit, m_groupQuantitySettings);
+		instance.setTupleElementDataTypes({ dataType });
+		instance.setTupleUnits({ unit });
+		valueComparisonDefinition.setTupleInstance(instance);
+
+	}
 	return valueComparisonDefinition;
 }
 

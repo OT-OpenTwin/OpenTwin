@@ -917,6 +917,14 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 			}
 
 		}
+		else
+		{
+			for (size_t tupleSize = 0; tupleSize < queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits().size(); tupleSize++)
+			{
+				m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(ot::ValueProcessing());
+			}
+		}
+		
 		// Depending on wether or not a comparator was set, we have two components that need to be and connected or not.
 		BsonViewOrValue finalQuery;
 		if (queryElements.size() > 1)
