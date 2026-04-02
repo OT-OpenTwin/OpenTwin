@@ -919,9 +919,20 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		}
 		else
 		{
-			for (size_t tupleSize = 0; tupleSize < queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits().size(); tupleSize++)
+			const auto& units = queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
+			ValueProcessingChainBuilder builder;
+			for (size_t i = 0; i < units.size(); i++)
 			{
-				m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(ot::ValueProcessing());
+				if (targetTransformedCollection)
+				{
+					ot::ValueProcessing transformer = builder.buildToSIChain(units[i]);
+					m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(transformer);
+				}
+				else
+				{
+					m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(ot::ValueProcessing());
+
+				}
 			}
 		}
 		
