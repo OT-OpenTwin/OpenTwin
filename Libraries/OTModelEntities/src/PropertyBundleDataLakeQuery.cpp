@@ -2,6 +2,8 @@
 #include "OTCore/ComparisonSymbols.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTCore/DataFilter/RegexHelper.h"
+#include <set>
+#include "OTCore/Tuple/TupleFactory.h"
 
 void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 {
@@ -22,6 +24,12 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 	groupQuantityProp->setAllowCustomValues(true);
 	//groupQuantityProp->setGroupChanges(true);
+	EntityPropertiesSelection* quantityComponentProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyQuantityComponent, { "" }, "", "default", _thisObject->getProperties());
+	quantityComponentProp->setVisible(false);
+	EntityPropertiesSelection* tupleFormat = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyTupleFormat, { "" }, "", "default", _thisObject->getProperties());
+	tupleFormat->setVisible(false);
+	EntityPropertiesSelection* tupleUnits = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyTupleUnit, { "" }, "", "default", _thisObject->getProperties());
+	tupleUnits->setVisible(false);
 
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
@@ -41,13 +49,6 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	PropertyHelper::getStringProperty(_thisObject, m_propertyValue, m_groupQuantitySettings)->setGroupChanges(true);
 	EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyComparator, comparators, comparators.front(), "default", _thisObject->getProperties());
 	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, m_groupQuantitySettings)->setGroupChanges(true);
-
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleFormat, { }, "", "default", _thisObject->getProperties());
-	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupTupleSettings)->setVisible(false);
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleTarget, { }, "", "default", _thisObject->getProperties());
-	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleTarget, m_groupTupleSettings)->setVisible(false);
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleUnit, {}, "", "default", _thisObject->getProperties());
-	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupTupleSettings)->setVisible(false);
 
 	EntityPropertiesBoolean::createProperty(m_groupQuerySettings, m_propertyOrder, true, "default", _thisObject->getProperties());
 
@@ -276,6 +277,10 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 	{
 		// Depending on the filtered quantity options, the parameter options need to be set to the depending parameters of the available quantity options.
 		//If any of the above options have changed, we need to update the parameter options.
+		
+		//We need to check if the selected quantities matching the entered value are tuples. If so, and they are all of the same type, we need the option to target a specific component of the tuple.
+		std::set<std::string> tupleTypes;
+
 		const std::string currentQuantity = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
 		if (currentQuantity == "")
 		{
@@ -284,19 +289,27 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 			{
 				parameterLabel.push_back(parameterByLabel.first);
 			}
+			
+			// The component selection shall only be visible if the selected quantity is a tuple.
+			refreshNecessary |= setTuplePropertyVisibility(_thisObject,false);
 		}
 		else if (allQuantityByLabel.find(currentQuantity) == allQuantityByLabel.end())
-		//else if (std::find(avaliableQuantityLabels.begin(), avaliableQuantityLabels.end(), currentQuantity) == avaliableQuantityLabels.end())
 		{
 			// It may still be a regex expression. 
 			RegexHelper::applyRegexFilter(availableQuantityLabelsList, currentQuantity);
-
 			for (const std::string& quantityLabel : availableQuantityLabelsList)
 			{
 				if (quantityLabel != "")
 				{
-					const auto& dependentParameterLabel = allQuantityByLabel.find(quantityLabel)->second->dependingParameterLabels;
+					auto matchingQuantityByLabel = allQuantityByLabel.find(quantityLabel);
+					assert(matchingQuantityByLabel != allQuantityByLabel.end()); 
+					const auto& dependentParameterLabel = matchingQuantityByLabel->second->dependingParameterLabels;
 					parameterLabel.insert(parameterLabel.end(), dependentParameterLabel.begin(), dependentParameterLabel.end());
+					ot::TupleInstance& quantityTupleDesc = matchingQuantityByLabel->second->m_tupleDescription;
+					if (!quantityTupleDesc.isSingle())
+					{
+						tupleTypes.insert(quantityTupleDesc.getTupleTypeName());
+					}
 				}
 			}
 			parameterLabel.sort();
@@ -305,9 +318,15 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		else
 		{
 			assert(allQuantityByLabel.find(currentQuantity) != allQuantityByLabel.end());
-			const auto& dependentParameterLabel = allQuantityByLabel.find(currentQuantity)->second->dependingParameterLabels;
+			const MetadataQuantity* matchingQuantity =	allQuantityByLabel.find(currentQuantity)->second;
+			const auto& dependentParameterLabel = matchingQuantity->dependingParameterLabels;
 			parameterLabel.insert(parameterLabel.end(), dependentParameterLabel.begin(), dependentParameterLabel.end());
-			
+
+			const ot::TupleInstance& quantityTuple = matchingQuantity->m_tupleDescription;
+			if (!quantityTuple.isSingle())
+			{
+				tupleTypes.insert(quantityTuple.getTupleTypeName());
+			}
 		}
 		parameterLabel.push_front("");
 
@@ -324,13 +343,72 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 				setNameOptions(_thisObject, parameterLabel, groupName, m_propertyName);
 			}
 		}
+
+		// Here we set the tuple options, depending on the selected quantity. If valid
+		if (tupleTypes.size() == 0)
+		{
+			refreshNecessary |= setTuplePropertyVisibility(_thisObject, false);
+		}
+		else if (tupleTypes.size() == 1)
+		{
+			refreshNecessary |= setTuplePropertyVisibility(_thisObject, true);
+
+			const std::string tupleType = *tupleTypes.begin();
+			ot::TupleDescription* tupleDescription = TupleFactory::create(tupleType);
+
+
+			assert(tupleDescription != nullptr);
+			const std::vector<std::string>& formatNames = tupleDescription->getAllTupleFormatNames();
+			std::string selectedFormat =  PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings);
+			if (selectedFormat == "")
+			{
+				// Happens if the options are filled the first time
+				selectedFormat = formatNames.front();
+			}
+			std::vector<std::string> targetElements = tupleDescription->getTupleElementNames(selectedFormat);
+			targetElements.insert(targetElements.begin(), tupleType); // This is for performing a query on the entire tuple
+			std::vector<std::string> unitOptions =tupleDescription->getUnitCombinations(selectedFormat);
+			refreshNecessary |=	setTupleSelectionOptions(_thisObject, formatNames, targetElements, unitOptions);
+
+			size_t numberOfQuantityOptions = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptions().size() -1 ;// -1 since the empty option "" was already added.
+			if (numberOfQuantityOptions != 1)
+			{
+				OT_LOG_W("Selected quantities are not exclusively tuples. Inconsistent tuple properties of the quantity cannot be queried.");
+			}
+		}
+		else
+		{
+			refreshNecessary |= setTuplePropertyVisibility(_thisObject, false);
+			OT_LOG_W("Selected quantities are different types of tuple and cannot be queried simultaneously.");
+		}
 	}
 
-	
-	
-
-	
-
+	// Much of the tuple update logic is already handled when the quantity has changed. However, a format change also requires some updates
+	if (!quantityChanged)
+	{
+		EntityPropertiesSelection* formatSelection = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings));
+		if (formatSelection->needsUpdate())
+		{
+			EntityPropertiesSelection* componentSelection = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
+			const std::string tupleName = *componentSelection->getOptions().begin();
+			ot::TupleDescription* tupleDescription = TupleFactory::create(tupleName);
+			if (tupleDescription != nullptr)
+			{
+				auto tupleFormats = tupleDescription->getAllTupleFormatNames();
+				const std::string newFormat = formatSelection->getValue();
+				auto componentNames =	tupleDescription->getTupleElementNames(newFormat);
+				componentNames.insert(componentNames.begin(), tupleName);
+				auto units = tupleDescription->getUnitCombinations(newFormat);
+				setTupleSelectionOptions(_thisObject, tupleFormats, componentNames, units);	
+				PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->setValue(newFormat);
+			}
+			else
+			{
+				// When setting the component options, the first entry should be the tuple type name. This serves as a way to target the entire tuple, e.g. query for a complex number.
+				assert(false); 
+			}
+		}
+	}
 
 	bool refreshQuantityDescription = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
 	refreshNecessary |= refreshQuantityDescription;
@@ -453,4 +531,39 @@ std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getMetada
 		definitions.push_back(definition);
 	}
 	return definitions;
+}
+
+bool PropertyBundleDataLakeQuery::setTuplePropertyVisibility(EntityBase* _thisObject, bool _visible)
+{
+	bool requiresRefreshing;
+	EntityPropertiesBase* selection = PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+	requiresRefreshing = selection->getVisible() != _visible;
+	selection->setVisible(_visible);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->setVisible(_visible);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings)->setVisible(_visible);
+
+	// The tuple unit property is a selection prop, while the regular unit prop is a string prop, so we switch between them.
+	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, m_groupQuantitySettings)->setVisible(!_visible);
+	
+	return requiresRefreshing;
+}
+
+bool PropertyBundleDataLakeQuery::setTupleSelectionOptions(EntityBase* _thisObject, const std::vector<std::string>& _formatOptions, const std::vector<std::string>& _elementOptions, const std::vector<std::string>& _unitOptions)
+{
+	bool refresh = false;
+	EntityPropertiesSelection* selectionComponent = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
+	refresh |= selectionComponent->getOptions() != _elementOptions;
+	selectionComponent->resetOptions(_elementOptions);
+	selectionComponent->setNeedsUpdate();
+	
+	EntityPropertiesSelection* selectionFormat =dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings));
+	refresh |= selectionFormat->getOptions() != _formatOptions;
+	selectionFormat->resetOptions(_formatOptions);
+	selectionFormat->setNeedsUpdate();
+
+	EntityPropertiesSelection* selectionUnits = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings));
+	refresh |= selectionUnits->getOptions() != _unitOptions;
+	selectionUnits->resetOptions(_unitOptions);
+	selectionUnits->setNeedsUpdate();
+	return refresh;
 }

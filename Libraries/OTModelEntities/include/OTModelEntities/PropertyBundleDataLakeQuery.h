@@ -29,17 +29,17 @@ private:
 	const std::string m_groupMetadataFilter = "Dataset";
 	const std::string m_groupQuantitySettings = "Quantity settings";
 	const std::string m_groupQuerySettings = "Query settings";
-	const std::string m_groupTupleSettings = "Tuple settings";
-
+	
 	const std::string m_groupSeriesMetadata = "Series metadata";
 
 	const std::string m_propertyNumberOfQueries = "Number of parameter queries";
 	const std::string m_propertyNumberOfQueriesMetadataSeries = "Number of metadata queries";
 
 	const std::string m_propertyName = "Name";
+	const std::string m_propertyQuantityComponent = "Component";
 	const std::string m_propertyTupleFormat = "Format";
-	const std::string m_propertyTupleTarget = "Target";
 	const std::string m_propertyTupleUnit = "Units";
+	
 	const std::string m_propertyOrder = "Order reproducible";
 
 	const std::string m_propertyDataType = "Data type";
@@ -52,4 +52,7 @@ private:
 	void setValuePropertiesEmpty(EntityBase* _thisObject, const std::string& _groupName);
 
 	void vectorize(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase);
+
+	bool setTuplePropertyVisibility(EntityBase* _thisObject, bool _visible);
+	bool setTupleSelectionOptions(EntityBase* _thisObject, const std::vector<std::string>& _formatOptions, const std::vector<std::string>& _elementOptions, const std::vector<std::string>& _unitOptions);
 };
