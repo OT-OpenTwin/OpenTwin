@@ -75,6 +75,12 @@ ot::ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitS
 
 ot::ValueProcessing ValueProcessingChainBuilder::buildToSIChain(const std::string& _unitExpr)
 {
+    // Unit is dimensionless.
+    if (_unitExpr.empty())
+    {
+        return ot::ValueProcessing();
+    }
+
     ot::ValueProcessing processing;
 
     UnitTokenizer tokenizer;
