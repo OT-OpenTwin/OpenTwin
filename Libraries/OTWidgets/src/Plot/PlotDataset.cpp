@@ -566,15 +566,19 @@ void ot::PlotDataset::updateCurveVisualization()
 		}
 	}
 
+	const QString curveTitle = QString::fromStdString(m_config.getTitle());
+
+	//OT_LOG_T("Applying config with title \"" + curveTitle.toStdString() + "\"");
+
 	if (m_cartesianCurve)
 	{
-		m_cartesianCurve->setTitle(QString::fromStdString(m_config.getTitle()));
+		m_cartesianCurve->setTitle(curveTitle);
 		m_cartesianCurve->setVisible(m_config.getVisible());
 		m_cartesianCurve->setPointInterval(m_config.getPointInterval());
 	}
 	if (m_polarCurve)
 	{
-		m_polarCurve->setTitle(QString::fromStdString(m_config.getTitle()));
+		m_polarCurve->setTitle(curveTitle);
 		m_polarCurve->setVisible(m_config.getVisible());
 		m_polarCurve->setPointInterval(m_config.getPointInterval());
 	}
@@ -628,7 +632,7 @@ void ot::PlotDataset::createLegendItem()
 
 		m_legendItem = new PlotLegendItem(this);
 		m_legendItem->setLegend(m_ownerPlot->getLegend());
-		m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+		m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
 	}
 }
 
@@ -642,7 +646,7 @@ void ot::PlotDataset::updateLegendVisualization()
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
 
-	m_legendItem->setLabel(QString::fromStdString(m_config.getEntityName()));
+	m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
 	if (m_config.getToolTip().empty())
 	{
 		m_legendItem->setToolTip(QString::fromStdString(m_config.getTitle()));

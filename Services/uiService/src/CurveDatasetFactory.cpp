@@ -82,7 +82,7 @@ std::string CurveDatasetFactory::createUnitLabel(const std::string& _unit) {
 	return result;
 }
 
-std::unordered_map<DependencyList, std::list<Datapoints>>  CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const int numberOfQuantities = 1;
@@ -315,6 +315,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std
 		
 		auto dataset = new ot::PlotDataset(nullptr, newCurveCfg, std::move(datasetData));
 		dataset->setCurveNameBase(curveTitle);
+		//OT_LOG_T("Curve created { \"Title\": \"" + curveTitle + "\", \"EntityName\": \"" + dataset->getEntityName() + "\", \"DatasetTitle\": \"" + dataset->getConfig().getTitle() + "\" }");
 		dataSets.push_back(dataset);
 
 	}
