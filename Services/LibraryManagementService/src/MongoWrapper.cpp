@@ -193,6 +193,94 @@ void MongoWrapper::migrateLibraryEntryDataToGridFS(const std::string& _collectio
         return;
     }
 }
+
+void MongoWrapper::updateGridFSContent(const std::string& _collectionName, 
+                                       const std::string& _dbUserName, 
+                                       const std::string& _dbUserPassword, 
+                                       const std::string& _dbServerUrl, 
+                                       const std::string& _selectedDocument, 
+                                       const std::string& _newContent) {
+    // Initialization of MongoDB connection
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        OT_LOG_E("Failed to initialize database connection for updating GridFS content");
+        return;
+    }
+
+    // Check if collection exists
+    if (!checkCollectionExists(_collectionName)) {
+        return;
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        // Get the document
+        auto queryResult = fetchDocumentByName(docBase, _selectedDocument);
+        if (!queryResult) {
+            OT_LOG_E("Document '" + _selectedDocument + "' not found in collection '" + _collectionName + "'");
+            return;
+        }
+
+        bsoncxx::document::view documentView = queryResult->view();
+
+        // Check if DataID exists
+        auto dataIdElement = documentView["DataID"];
+        if (!dataIdElement || dataIdElement.type() != bsoncxx::type::k_oid) {
+            OT_LOG_E("Document '" + _selectedDocument + "' does not have valid DataID for GridFS");
+            return;
+        }
+
+        // Extract the existing GridFS ID for deletion
+        bsoncxx::oid existingGridFSId = dataIdElement.get_oid().value;
+
+        DataStorageAPI::DocumentAPI api;
+
+        // Delete the old GridFS data
+        try {
+            bsoncxx::types::value oldId{ bsoncxx::types::b_oid{existingGridFSId} };
+            api.DeleteGridFSData(oldId, _collectionName);
+            OT_LOG_I("Deleted old GridFS data for document '" + _selectedDocument + "'");
+        }
+        catch (const std::exception& deleteEx) {
+            OT_LOG_W("Warning: Could not delete old GridFS data: " + std::string(deleteEx.what()));
+            // Continue anyway - the main update should still proceed
+        }
+
+        // Convert the new content to binary and insert into GridFS
+        const uint8_t* newDataBuffer = reinterpret_cast<const uint8_t*>(_newContent.c_str());
+        size_t newDataSize = _newContent.size();
+
+        // Insert new binary data into GridFS
+        bsoncxx::types::value newGridfsId = api.InsertBinaryDataUsingGridFs(newDataBuffer, newDataSize, _collectionName, dbName);
+
+        // Build the update document with the NEW DataID
+        auto updateBuilder = bsoncxx::builder::basic::document{};
+        updateBuilder.append(bsoncxx::builder::basic::kvp("DataID", newGridfsId.get_oid().value));
+
+        // Create the filter query to find the document
+        auto filterBuilder = bsoncxx::builder::basic::document{};
+        filterBuilder.append(bsoncxx::builder::basic::kvp("Name", _selectedDocument));
+
+        auto updateDoc = bsoncxx::builder::basic::document{};
+        updateDoc.append(bsoncxx::builder::basic::kvp("$set", updateBuilder.view()));
+
+        // Update the document in the collection with the new DataID
+        auto collection = docBase.getCollection();
+        auto result = collection.update_one(filterBuilder.view(), updateDoc.view());
+
+        if (result && result->modified_count() > 0) {
+            OT_LOG_I("Successfully updated GridFS content for document '" + _selectedDocument + 
+                     "' with new DataID: " + newGridfsId.get_oid().value.to_string());
+        }
+        else {
+            OT_LOG_W("Document update completed but no documents were modified for '" + _selectedDocument + "'");
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error updating GridFS content: " + std::string(e.what()));
+        return;
+    }
+}
 // Private helper methods
 
 bool MongoWrapper::initializeConnection(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
