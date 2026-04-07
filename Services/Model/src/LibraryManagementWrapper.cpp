@@ -270,7 +270,7 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	}
 
 	if (_dialogConfirmed && _entity && ModelFolderEntity) {
-		modelProperty->setValueName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
+		modelProperty->setValueName(_entity->getName());
 		modelProperty->setValueID(_entity->getEntityID());
 		modelProperty->setEntityContainerID(ModelFolderEntity->getEntityID());
 		entBase->updateFromProperties();
