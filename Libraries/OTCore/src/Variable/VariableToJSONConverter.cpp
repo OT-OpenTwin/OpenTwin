@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: VariableToJSONConverter.cpp
 // 
 // License:
@@ -65,7 +65,7 @@ ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, Jso
 		const auto complexValue = value.getComplex();
 		ot::JsonObject rJValue;
 		ot::JsonString realKey(ot::ComplexNumbers::SerialisationKeys::g_real, jsonAllocator);
-		rJValue.AddMember(realKey, complexValue.imag(), jsonAllocator);
+		rJValue.AddMember(realKey, complexValue.real(), jsonAllocator);
 		ot::JsonString imagKey(ot::ComplexNumbers::SerialisationKeys::g_imag, jsonAllocator);
 		rJValue.AddMember(imagKey, complexValue.imag(), jsonAllocator);
 		return rJValue;

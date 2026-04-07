@@ -924,7 +924,7 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		}
 		else
 		{
-			const auto& units = queryDescription.getQueryTargetDescription().getTupleInstance().getTupleUnits();
+			const auto& units = queryDescription.getValueComparisonDescription().getTupleInstance().getTupleUnits();
 			ValueProcessingChainBuilder builder;
 			for (size_t i = 0; i < units.size(); i++)
 			{
