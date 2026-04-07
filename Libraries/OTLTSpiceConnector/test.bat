@@ -54,12 +54,10 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
 	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LTSPICE_CONNECTOR_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
 	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LTSPICE_CONNECTOR_ROOT%" RELEASE
 ) 
   
