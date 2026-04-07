@@ -47,6 +47,7 @@ buildLog_Release.txt
 
 # Output directory
 x64
+build/
 
 # VS internal build directory
 /**/.vs

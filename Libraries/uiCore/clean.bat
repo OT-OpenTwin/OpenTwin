@@ -32,6 +32,7 @@ ECHO Building Project
 RMDIR /S /Q "%OT_UICORE_ROOT%\.vs"
 RMDIR /S /Q "%OT_UICORE_ROOT%\x64"
 RMDIR /S /Q "%OT_UICORE_ROOT%\packages"
+RMDIR /S /Q "%OT_UICORE_ROOT%\build"
 
 GOTO END
 
