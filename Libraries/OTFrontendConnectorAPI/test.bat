@@ -54,21 +54,11 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_FRONTEND_CONNECTOR_API_ROOT%\OTFrontendConnectorAPI.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OT_FRONTEND_CONNECTOR_API_ROOT%\x64\Debug\OTFrontendConnectorAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTFrontendConnectorAPIDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTFrontendConnectorAPIDebugReport.xml" "OTFrontendConnectorAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTFrontendConnectorAPIDebugReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_FRONTEND_CONNECTOR_API_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_FRONTEND_CONNECTOR_API_ROOT%\OTFrontendConnectorAPI.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OT_FRONTEND_CONNECTOR_API_ROOT%\x64\Release\OTFrontendConnectorAPITest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTFrontendConnectorAPIReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTFrontendConnectorAPIReleaseReport.xml" "OTFrontendConnectorAPI" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTFrontendConnectorAPIReleaseReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_FRONTEND_CONNECTOR_API%" RELEASE
 ) 
   
 GOTO END
