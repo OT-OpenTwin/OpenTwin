@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\OTStudioSuiteConnector.sln" %1 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CMakeBuildSingleProject.bat" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%" %1 %2 
 
 GOTO END
 

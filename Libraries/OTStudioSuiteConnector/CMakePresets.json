@@ -1,0 +1,66 @@
+{
+  "version": 6,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 20,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "windows-debug",
+      "displayName": "Windows Debug",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/windows-debug",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "BUILD_TESTING": "ON"
+      },
+      "environment": {
+        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+      }
+    },
+    {
+      "name": "windows-release",
+      "displayName": "Windows Release",
+      "generator": "Visual Studio 17 2022",
+      "binaryDir": "${sourceDir}/build/windows-release",
+      "cacheVariables": {
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "BUILD_TESTING": "ON"
+      },
+      "environment": {
+        "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "build-windows-debug",
+      "configurePreset": "windows-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "build-windows-release",
+      "configurePreset": "windows-release",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "test-windows-debug",
+      "configurePreset": "windows-debug",
+      "configuration": "Debug",
+      "environment": {
+        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+      }
+    },
+    {
+      "name": "test-windows-release",
+      "configurePreset": "windows-release",
+      "configuration": "Release",
+      "environment": {
+        "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+      }
+    }
+  ]
+}

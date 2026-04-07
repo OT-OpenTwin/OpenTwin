@@ -54,22 +54,15 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\OTStudioSuiteConnector.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Debug\OTStudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorDebugReport.xml" "OTStudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTStudioSuiteConnectorDebugReport.xml"
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%\OTStudioSuiteConnector.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OT_STUDIO_SUITE_CONNECTOR_ROOT%\x64\Release\OTStudioSuiteConnectorTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\OTStudioSuiteConnectorReleaseReport.xml" "OTStudioSuiteConnector" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\OTStudioSuiteConnectorReleaseReport.xml"
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_STUDIO_SUITE_CONNECTOR_ROOT%" RELEASE
 ) 
+
   
 GOTO END
 
