@@ -39,7 +39,7 @@
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTModelEntities/EntityFactory.h"
 #include "OTModelEntities/Lms/LibraryEntityInterface.h"
-#include "OTBlockEntities/EntityBlockLibraryInterface.h"
+#include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 
 
 std::list<std::string> LibraryManagementWrapper::getCircuitModels() {

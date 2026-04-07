@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
-#include "OTBlockEntities/EntityBlockLibraryInterface.h"
+#include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 
 class OT_BLOCKENTITIES_API_EXPORT EntityBlockPython : public EntityBlock, public ot::EntityBlockLibraryInterface

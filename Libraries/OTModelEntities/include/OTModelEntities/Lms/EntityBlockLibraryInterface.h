@@ -19,12 +19,12 @@
 
 #pragma once
 // OpenTwin header
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 
 namespace ot {
-	class OT_BLOCKENTITIES_API_EXPORT EntityBlockLibraryInterface {
+	class OT_MODELENTITIES_API_EXPORT EntityBlockLibraryInterface {
 	public:
 		EntityBlockLibraryInterface();
 		virtual ~EntityBlockLibraryInterface() = default;

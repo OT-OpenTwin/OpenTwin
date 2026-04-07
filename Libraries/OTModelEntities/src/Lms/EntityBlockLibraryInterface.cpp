@@ -1,4 +1,4 @@
-#include "OTBlockEntities/EntityBlockLibraryInterface.h"
+#include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 
 
 ot::EntityBlockLibraryInterface::EntityBlockLibraryInterface() {
