@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsStackItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Graphics/GraphicsStackItem.h"
@@ -53,7 +53,7 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 
 	const GraphicsStackItemCfg* cfg = dynamic_cast<const GraphicsStackItemCfg*>(_cfg);
 	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		OT_LOG_E("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
@@ -70,11 +70,11 @@ bool ot::GraphicsStackItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 				this->addItem(i, itm.isMaster, itm.isSlave);
 			}
 			else {
-				OT_LOG_EA("Failed to created graphics item from factory");
+				OT_LOG_E("Failed to created graphics item from factory");
 			}
 		}
 		catch (const std::exception& _e) {
-			OT_LOG_EAS("Failed to create child item: " + std::string(_e.what()));
+			OT_LOG_E("Failed to create child item: " + std::string(_e.what()));
 			if (i) delete i;
 			this->setBlockConfigurationNotifications(false);
 			throw _e;
@@ -303,7 +303,7 @@ void ot::GraphicsStackItem::notifyChildsAboutTransformChange(const QTransform& _
 			itm->parentItemTransformChanged(_newTransform);
 		}
 		else {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 		}
 	}
 }
@@ -322,7 +322,7 @@ bool ot::GraphicsStackItem::adjustChildItems(void) {
 	}
 
 	if (masterSize.width() < 0. || masterSize.height() < 0.) {
-		OT_LOG_WA("It appears that no master item was provided to this stack item");
+		OT_LOG_W("It appears that no master item was provided to this stack item");
 		return false;
 	}
 

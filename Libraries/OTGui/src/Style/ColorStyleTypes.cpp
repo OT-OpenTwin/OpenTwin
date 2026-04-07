@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 
 // std header
@@ -266,7 +266,7 @@ std::string ot::toString(ColorStyleName _colorStyleName) {
 	case ot::ColorStyleName::DarkStyle: return "Dark";
 	case ot::ColorStyleName::BlueStyle: return "Blue";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleName (" + std::to_string((int)_colorStyleName) + ")");
+		OT_LOG_E("Unknown ColorStyleName (" + std::to_string((int)_colorStyleName) + ")");
 		return "Bright";
 	}
 }
@@ -276,7 +276,7 @@ ot::ColorStyleName ot::stringToColorStyleName(const std::string& _colorStyleName
 	else if (_colorStyleName == toString(ColorStyleName::DarkStyle)) return ColorStyleName::DarkStyle;
 	else if (_colorStyleName == toString(ColorStyleName::BlueStyle)) return ColorStyleName::BlueStyle;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleName \"" + _colorStyleName + "\"");
+		OT_LOG_E("Unknown ColorStyleName \"" + _colorStyleName + "\"");
 		return ColorStyleName::BrightStyle;
 	}
 }
@@ -291,7 +291,7 @@ std::string ot::toString(ColorStyleFileKey _colorStyleFileKey) {
 	case ot::ColorStyleFileKey::PainterKey: return "painter:";
 	case ot::ColorStyleFileKey::SheetKey: return "sheet:";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleFileKey (" + std::to_string((int)_colorStyleFileKey) + ")");
+		OT_LOG_E("Unknown ColorStyleFileKey (" + std::to_string((int)_colorStyleFileKey) + ")");
 		return "name:";
 	}
 }
@@ -304,7 +304,7 @@ ot::ColorStyleFileKey ot::stringToColorStyleFileKey(const std::string& _colorSty
 	else if (_colorStyleFileKey == toString(ColorStyleFileKey::PainterKey)) return ColorStyleFileKey::PainterKey;
 	else if (_colorStyleFileKey == toString(ColorStyleFileKey::SheetKey)) return ColorStyleFileKey::SheetKey;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleFileKey \"" + _colorStyleFileKey + "\"");
+		OT_LOG_E("Unknown ColorStyleFileKey \"" + _colorStyleFileKey + "\"");
 		return ColorStyleFileKey::NameKey;
 	}
 }
@@ -314,7 +314,7 @@ std::string ot::toString(ColorStyleFileMacro _colorStyleFileMacro) {
 	{
 	case ot::ColorStyleFileMacro::RootMacro: return "%root%";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleFileMacro (" + std::to_string((int)_colorStyleFileMacro) + ")");
+		OT_LOG_E("Unknown ColorStyleFileMacro (" + std::to_string((int)_colorStyleFileMacro) + ")");
 		return "%root%";
 	}
 }
@@ -322,7 +322,7 @@ std::string ot::toString(ColorStyleFileMacro _colorStyleFileMacro) {
 ot::ColorStyleFileMacro ot::stringToColorStyleFileMacro(const std::string& _colorStyleFileMacro) {
 	if (_colorStyleFileMacro == toString(ColorStyleFileMacro::RootMacro)) return ColorStyleFileMacro::RootMacro;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleFileMacro \"" + _colorStyleFileMacro + "\"");
+		OT_LOG_E("Unknown ColorStyleFileMacro \"" + _colorStyleFileMacro + "\"");
 		return ColorStyleFileMacro::RootMacro;
 	}
 }
@@ -334,7 +334,7 @@ std::string ot::toString(ColorStyleFileValue _colorStyleFileValue) {
 	case ot::ColorStyleFileValue::PathValue: return "Path";
 	case ot::ColorStyleFileValue::ValueValue: return "Value";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleFileValue (" + std::to_string((int)_colorStyleFileValue) + ")");
+		OT_LOG_E("Unknown ColorStyleFileValue (" + std::to_string((int)_colorStyleFileValue) + ")");
 		return "Name";
 	}
 }
@@ -344,7 +344,7 @@ ot::ColorStyleFileValue ot::stringToColorStyleFileValue(const std::string& _colo
 	else if (_colorStyleFileValue == toString(ColorStyleFileValue::PathValue)) return ColorStyleFileValue::PathValue;
 	else if (_colorStyleFileValue == toString(ColorStyleFileValue::ValueValue)) return ColorStyleFileValue::ValueValue;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleFileValue \"" + _colorStyleFileValue + "\"");
+		OT_LOG_E("Unknown ColorStyleFileValue \"" + _colorStyleFileValue + "\"");
 		return ColorStyleFileValue::NameValue;
 	}
 }
@@ -357,7 +357,7 @@ std::string ot::toString(ColorStyleBaseFileMacro _colorStyleBaseFileMacro) {
 	case ot::ColorStyleBaseFileMacro::IntMacro: return "int";
 	case ot::ColorStyleBaseFileMacro::DoubleMacro: return "double";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleBaseFileMacro (" + std::to_string((int)_colorStyleBaseFileMacro) + ")");
+		OT_LOG_E("Unknown ColorStyleBaseFileMacro (" + std::to_string((int)_colorStyleBaseFileMacro) + ")");
 		return "color";
 	}
 }
@@ -368,7 +368,7 @@ ot::ColorStyleBaseFileMacro ot::stringToColorStyleBaseFileMacro(const std::strin
 	else if (_colorStyleBaseFileMacro == toString(ColorStyleBaseFileMacro::IntMacro)) return ColorStyleBaseFileMacro::IntMacro;
 	else if (_colorStyleBaseFileMacro == toString(ColorStyleBaseFileMacro::DoubleMacro)) return ColorStyleBaseFileMacro::DoubleMacro;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleBaseFileMacro \"" + _colorStyleBaseFileMacro + "\"");
+		OT_LOG_E("Unknown ColorStyleBaseFileMacro \"" + _colorStyleBaseFileMacro + "\"");
 		return ColorStyleBaseFileMacro::PainterMacro;
 	}
 }
@@ -379,7 +379,7 @@ std::string ot::toString(ColorStyleFileEntry _colorStyleFileEntry) {
 		return it->second;
 	}
 	else {
-		OT_LOG_EAS("Unknown ColorStyleFileEntry (" + std::to_string((int)_colorStyleFileEntry) + ")");
+		OT_LOG_E("Unknown ColorStyleFileEntry (" + std::to_string((int)_colorStyleFileEntry) + ")");
 		return "Transparent Icon";
 	}
 }
@@ -391,7 +391,7 @@ ot::ColorStyleFileEntry ot::stringToColorStyleFileEntry(const std::string& _colo
 		}
 	}
 
-	OT_LOG_EAS("Unknown ColorStyleFileEntry \"" + _colorStyleFileEntry + "\"");
+	OT_LOG_E("Unknown ColorStyleFileEntry \"" + _colorStyleFileEntry + "\"");
 	return ColorStyleFileEntry::TransparentIcon;
 }
 
@@ -401,7 +401,7 @@ std::string ot::toString(ColorStyleValueEntry _colorStyleValueEntry) {
 		return it->second;
 	}
 	else {
-		OT_LOG_EAS("Unknown ColorStyleValueEntry (" + std::to_string((int)_colorStyleValueEntry) + ")");
+		OT_LOG_E("Unknown ColorStyleValueEntry (" + std::to_string((int)_colorStyleValueEntry) + ")");
 		return "Transparent";
 	}
 }
@@ -418,7 +418,7 @@ ot::ColorStyleValueEntry ot::stringToColorStyleValueEntry(const std::string& _co
 		return ColorStyleValueEntry::HeaderForeground;
 	}
 
-	OT_LOG_EAS("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
+	OT_LOG_E("Unknown ColorStyleValueEntry \"" + _colorStyleValueEntry + "\"");
 	return ColorStyleValueEntry::Transparent;
 }
 
@@ -444,7 +444,7 @@ std::string ot::toString(ColorStyleIntegerEntry _colorStyleIntegerEntry) {
 	case ot::ColorStyleIntegerEntry::SplitterHandleWidth: return "Splitter Handle Width";
 	case ot::ColorStyleIntegerEntry::SplitterBorderRadius: return "Splitter Border Radius";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleIntegerEntry (" + std::to_string((int)_colorStyleIntegerEntry) + ")");
+		OT_LOG_E("Unknown ColorStyleIntegerEntry (" + std::to_string((int)_colorStyleIntegerEntry) + ")");
 		return "Splitter Handle Width";
 	}
 }
@@ -453,7 +453,7 @@ ot::ColorStyleIntegerEntry ot::stringToColorStyleIntegerEntry(const std::string&
 	if (_colorStyleIntegerEntry == toString(ColorStyleIntegerEntry::SplitterHandleWidth)) return ColorStyleIntegerEntry::SplitterHandleWidth;
 	else if (_colorStyleIntegerEntry == toString(ColorStyleIntegerEntry::SplitterBorderRadius)) return ColorStyleIntegerEntry::SplitterBorderRadius;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleIntegerEntry \"" + _colorStyleIntegerEntry + "\"");
+		OT_LOG_E("Unknown ColorStyleIntegerEntry \"" + _colorStyleIntegerEntry + "\"");
 		return ColorStyleIntegerEntry::SplitterHandleWidth;
 	}
 }
@@ -466,7 +466,7 @@ std::string ot::toString(ColorStyleDoubleEntry _colorStyleDoubleEntry) {
 	case ot::ColorStyleDoubleEntry::BorderRadiusSmall: return "Border Radius Small";
 	case ot::ColorStyleDoubleEntry::ToolTipOpacity: return "ToolTip Opacity";
 	default:
-		OT_LOG_EAS("Unknown ColorStyleDoubleEntry (" + std::to_string((int)_colorStyleDoubleEntry) + ")");
+		OT_LOG_E("Unknown ColorStyleDoubleEntry (" + std::to_string((int)_colorStyleDoubleEntry) + ")");
 		return "Splitter Handle Width";
 	}
 }
@@ -477,7 +477,7 @@ ot::ColorStyleDoubleEntry ot::stringToColorStyleDoubleEntry(const std::string& _
 	else if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::BorderRadiusSmall)) return ColorStyleDoubleEntry::BorderRadiusSmall;
 	else if (_colorStyleDoubleEntry == toString(ColorStyleDoubleEntry::ToolTipOpacity)) return ColorStyleDoubleEntry::ToolTipOpacity;
 	else {
-		OT_LOG_EAS("Unknown ColorStyleDoubleEntry \"" + _colorStyleDoubleEntry + "\"");
+		OT_LOG_E("Unknown ColorStyleDoubleEntry \"" + _colorStyleDoubleEntry + "\"");
 		return ColorStyleDoubleEntry::BorderRadiusBig;
 	}
 }

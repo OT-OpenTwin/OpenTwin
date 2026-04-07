@@ -21,7 +21,7 @@
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTWidgets/Widgets/TextEditor.h"
 #include "OTWidgets/WidgetView/TextEditorView.h"

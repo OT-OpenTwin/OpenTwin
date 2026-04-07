@@ -98,7 +98,7 @@ bool otoolkit::api::initialize(APIInterface* _interface) {
 
 	// Check if at least one style directory was found
 	if (stylePathCounter == 0) {
-		OT_LOG_EA("No color style path found");
+		OT_LOG_E("No color style path found");
 		return false;
 	}
 

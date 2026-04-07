@@ -19,7 +19,7 @@
 
 // OpenTwin Core header
 #include "OTCore/Math.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/RAII/ValueRAII.h"
 
 // OpenTwin Gui header
@@ -153,7 +153,7 @@ void ot::GraphicsItem::removeAllConnections() {
 
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (scene == nullptr) {
-		OT_LOG_EA("No graphics scene set");
+		OT_LOG_E("No graphics scene set");
 		return;
 	}
 	GraphicsView* view = scene->getGraphicsView();
@@ -197,7 +197,7 @@ void ot::GraphicsItem::handleMousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsSelectable) && !this->getQGraphicsItem()->isSelected()) {
 		GraphicsScene* sc = this->getGraphicsScene();
 		if (!sc) {
-			OT_LOG_EA("No scene set");
+			OT_LOG_E("No scene set");
 			return;
 		}
 
@@ -278,7 +278,7 @@ QSizeF ot::GraphicsItem::handleGetGraphicsItemSizeHint(Qt::SizeHint _hint, const
 	case Qt::MaximumSize:
 		return this->getGraphicsItemMaximumSize();
 	default:
-		OT_LOG_WA("Unknown Qt SizeHint");
+		OT_LOG_W("Unknown Qt SizeHint");
 	}
 	return this->applyGraphicsItemMargins(adjustedSize.boundedTo(this->getGraphicsItemMaximumSize()));
 }
@@ -634,7 +634,7 @@ ot::ConnectionDirection ot::GraphicsItem::getConnectionDirection() const {
 	case ConnectionDirection::Out: return this->calculateOutwardsConnectionDirection();
 	case ConnectionDirection::In: return ot::inversedConnectionDirection(this->calculateOutwardsConnectionDirection());
 	default:
-		OT_LOG_EA("Unknown connection direction");
+		OT_LOG_E("Unknown connection direction");
 		return this->calculateOutwardsConnectionDirection();
 	}
 }
@@ -807,7 +807,7 @@ void ot::GraphicsItem::notifyConnectionsMove(GraphicsChangeEvent& _changeEvent) 
 void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsSnapInfo& _result) {
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (!scene) {
-		OT_LOG_EA("No graphics scene set");
+		OT_LOG_E("No graphics scene set");
 		return;
 	}
 
@@ -830,7 +830,7 @@ void ot::GraphicsItem::checkConnectionSnapRequest(GraphicsSnapInfo& _result) {
 void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConnectorRect, const GraphicsConnectionItem* _connection, GraphicsSnapInfo& _result) {
 	GraphicsScene* scene = this->getGraphicsScene();
 	if (!scene) {
-		OT_LOG_EA("No graphics scene set");
+		OT_LOG_E("No graphics scene set");
 		return;
 	}
 

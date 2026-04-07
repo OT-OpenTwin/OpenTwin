@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTGui/VersionGraphCfg.h"
 #include "OTGui/VersionGraphVersionCfg.h"
@@ -145,10 +145,10 @@ ot::VersionGraphVersionCfg::VersionNumberType ot::VersionGraphVersionCfg::getVer
 
 	if (failed) {
 		if (ix == std::string::npos) {
-			OT_LOG_EAS("Failed to convert version \"" + _version + "\" to number");
+			OT_LOG_E("Failed to convert version \"" + _version + "\" to number");
 		}
 		else {
-			OT_LOG_EAS("Failed to convert version \"" + _version.substr(ix + 1) + "\" to number");
+			OT_LOG_E("Failed to convert version \"" + _version.substr(ix + 1) + "\" to number");
 		}
 	}
 
@@ -171,7 +171,7 @@ std::vector<ot::VersionGraphVersionCfg::VersionNumberType> ot::VersionGraphVersi
 			// Last version number (e.g. (1 = 1) or (1.2.2 = 1.2.>2<, ...) 
 			number = String::toNumber<VersionNumberType>(_version.substr(fromIx), failed);
 			if (failed) {
-				OT_LOG_EAS("Invalid version syntax \"" + _version.substr(fromIx) + "\"");
+				OT_LOG_E("Invalid version syntax \"" + _version.substr(fromIx) + "\"");
 			}
 			else {
 				result.push_back(number);
@@ -182,7 +182,7 @@ std::vector<ot::VersionGraphVersionCfg::VersionNumberType> ot::VersionGraphVersi
 			// Mid version/branch number (e.g. (1.2.2 = >1<.2.2, or 1.>2<.2, ...)
 			number = String::toNumber<VersionNumberType>(_version.substr(fromIx, ix - fromIx), failed);
 			if (failed) {
-				OT_LOG_EAS("Invalid version syntax \"" + _version.substr(fromIx, ix - fromIx) + "\"");
+				OT_LOG_E("Invalid version syntax \"" + _version.substr(fromIx, ix - fromIx) + "\"");
 				break;
 			}
 			else {

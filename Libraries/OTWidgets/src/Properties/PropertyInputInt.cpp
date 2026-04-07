@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyInt.h"
 #include "OTWidgets/Widgets/SpinBox.h"
 #include "OTWidgets/Widgets/LineEdit.h"

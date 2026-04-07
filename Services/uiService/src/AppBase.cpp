@@ -59,7 +59,7 @@
 #include "OTCore/String.h"
 #include "OTCore/Geometry/Point2D.h"
 #include "OTCore/RuntimeTests.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
@@ -780,7 +780,7 @@ void AppBase::frontendSettingsChanged(const ot::Property* _property) {
 	if (_property->getPropertyPath() == "Appearance/Color Style") {
 		const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList *>(_property);
 		if (!actualProperty) {
-			OT_LOG_EA("Property cast failed");
+			OT_LOG_E("Property cast failed");
 			return;
 		}
 		if (ot::GlobalColorStyle::instance().hasStyle(actualProperty->getCurrent())) {
@@ -811,7 +811,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 
 	ServiceDataUi* serviceInfo = m_ExternalServicesComponent->getServiceFromName(_owner);
 	if (!serviceInfo) {
-		OT_LOG_EAS("Service \"" + _owner + "\" not found");
+		OT_LOG_E("Service \"" + _owner + "\" not found");
 		return;
 	}
 
@@ -831,7 +831,7 @@ void AppBase::settingsChanged(const std::string& _owner, const ot::Property* _pr
 	m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::QUEUE, serviceInfo->getServiceURL(), doc, responseStr);
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 	if (response != ot::ReturnMessage::Ok) {
-		OT_LOG_EAS("Sending settings change to service \"" + _owner + "\" failed: " + response.getWhat());
+		OT_LOG_E("Sending settings change to service \"" + _owner + "\" failed: " + response.getWhat());
 	}
 }
 
@@ -855,7 +855,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	if (graphicsIt != m_graphicsViews.end()) {
 		auto check = m_graphicsViews.find(_toPath);
 		if (check != m_graphicsViews.end()) {
-			OT_LOG_EAS("A graphics view with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+			OT_LOG_E("A graphics view with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
 		}
 		else {
 			m_graphicsViews.insert_or_assign(_toPath, graphicsIt->second);
@@ -873,7 +873,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	if (textIt != m_textEditors.end()) {
 		auto check = m_textEditors.find(_toPath);
 		if (check != m_textEditors.end()) {
-			OT_LOG_EAS("A text edit with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+			OT_LOG_E("A text edit with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
 		}
 		else {
 			m_textEditors.insert_or_assign(_toPath, textIt->second);
@@ -886,7 +886,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	if (tableIt != m_tables.end()) {
 		auto check = m_tables.find(_toPath);
 		if (check != m_tables.end()) {
-			OT_LOG_EAS("A table with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+			OT_LOG_E("A table with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
 		}
 		else {
 			m_tables.insert_or_assign(_toPath, tableIt->second);
@@ -899,7 +899,7 @@ void AppBase::renameEntity(const std::string& _fromPath, const std::string& _toP
 	if (plotIt != m_plots.end()) {
 		auto check = m_plots.find(_toPath);
 		if (check != m_plots.end()) {
-			OT_LOG_EAS("A plot with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
+			OT_LOG_E("A plot with the new name already exists. Renaming entity partially failed { \"From\": \"" + _fromPath + "\", \"To\": \"" + _toPath + "\" }");
 		}
 		else {
 			m_plots.insert_or_assign(_toPath, plotIt->second);
@@ -1332,7 +1332,7 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	
 	{
 		if (m_versionGraph) {
-			OT_LOG_EA("Version graph already exists");
+			OT_LOG_E("Version graph already exists");
 		
 			this->lockManager()->uiElementDestroyed(m_versionGraph->getVersionGraphManager()->getGraph());
 			
@@ -1827,7 +1827,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	}
 
 	if (ot::GlobalWidgetViewManager::instance().findView(_entityName, ot::WidgetViewBase::ViewGraphics)) {
-		OT_LOG_EAS("GraphicsEditor managed data mismatch { \"Entity\": \"" + _entityName + "\" }");
+		OT_LOG_E("GraphicsEditor managed data mismatch { \"Entity\": \"" + _entityName + "\" }");
 		return nullptr;
 	}
 
@@ -1926,7 +1926,7 @@ ot::TextEditorView* AppBase::createNewTextEditor(const ot::TextEditorCfg& _confi
 	}
 
 	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewText)) {
-		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		OT_LOG_E("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
@@ -2003,7 +2003,7 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Wi
 	}
 
 	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewTable)) {
-		OT_LOG_EAS("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		OT_LOG_E("TextEditor managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
@@ -2073,7 +2073,7 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Wid
 	}
 
 	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::View1D)) {
-		OT_LOG_EAS("Plot managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
+		OT_LOG_E("Plot managed data mismatch { \"Entity\": \"" + _config.getEntityName() + "\" }");
 		return nullptr;
 	}
 
@@ -2196,7 +2196,7 @@ AppBase* AppBase::instance() {
 
 bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const std::string& _customVersion) {
 	if (!(m_state & AppState::LoggedInState)) {
-		OT_LOG_EA("Can not open a new instance if not logged in");
+		OT_LOG_E("Can not open a new instance if not logged in");
 		return false;
 	}
 
@@ -2253,7 +2253,7 @@ void AppBase::slotCopyRequested(const ot::CopyInformation& _info) {
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
-		OT_LOG_EA("Failed to send http request");
+		OT_LOG_E("Failed to send http request");
 		return;
 	}
 
@@ -2309,7 +2309,7 @@ void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 	std::string response;
 	ot::BasicServiceInformation modelService(OT_INFO_SERVICE_TYPE_MODEL);
 	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, modelService, doc, response)) {
-		OT_LOG_EA("Failed to send http request");
+		OT_LOG_E("Failed to send http request");
 		return;
 	}
 
@@ -2810,7 +2810,7 @@ void AppBase::slotTextEditorSaveRequested() {
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-			OT_LOG_EA("Failed to send http request");
+			OT_LOG_E("Failed to send http request");
 			return;
 		}
 
@@ -2827,10 +2827,10 @@ void AppBase::slotTextEditorSaveRequested() {
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 	}
 }
 
@@ -2892,7 +2892,7 @@ void AppBase::slotTableSaveRequested() {
 
 		std::string response;
 		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response)) {
-			OT_LOG_EA("Failed to send http request");
+			OT_LOG_E("Failed to send http request");
 			return;
 		}
 
@@ -2909,10 +2909,10 @@ void AppBase::slotTableSaveRequested() {
 
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 	}
 }
 
@@ -3254,7 +3254,7 @@ void AppBase::slotOpenProject() {
 	}
 
 	if (selectedProjects.size() != 1) {
-		OT_LOG_EA("Can not open multiple projects");
+		OT_LOG_E("Can not open multiple projects");
 		return;
 	}
 	this->slotOpenSpecificProject(QString::fromStdString(selectedProjects.front().getProjectName()), QString());
@@ -3262,7 +3262,7 @@ void AppBase::slotOpenProject() {
 
 void AppBase::slotOpenProjectFromIndex(int _index) {
 	if (!m_welcomeScreen) {
-		OT_LOG_EA("No welcome screen available");
+		OT_LOG_E("No welcome screen available");
 		return;
 	}
 
@@ -3274,7 +3274,7 @@ void AppBase::slotOpenProjectFromIndex(int _index) {
 
 void AppBase::slotRefreshProjectOverivew() {
 	if (!m_welcomeScreen) {
-		OT_LOG_EA("No welcome screen available");
+		OT_LOG_E("No welcome screen available");
 		return;
 	}
 
@@ -3354,7 +3354,7 @@ void AppBase::slotOpenSpecificProject(const QString& _projectName, const QString
 void AppBase::slotCopyProject() {
 	auto lst = m_welcomeScreen->getSelectedProjects();
 	if (lst.size() != 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 
@@ -3374,7 +3374,7 @@ void AppBase::slotCopyProject() {
 	{
 		if (!canBeDeleted)
 		{
-			OT_LOG_EA("Copy project: Existing project should be overwritten, but could not.");
+			OT_LOG_E("Copy project: Existing project should be overwritten, but could not.");
 			return;
 		}
 	
@@ -3386,7 +3386,7 @@ void AppBase::slotCopyProject() {
 	// Now we add the copied project to the recently used projects list
 	UserManagement userManager(m_loginData);
 	if (!userManager.checkConnection()) {
-		OT_LOG_EA("Failed to connect");
+		OT_LOG_E("Failed to connect");
 		return;
 	}
 	userManager.addRecentProject(newProjectName);
@@ -3398,7 +3398,7 @@ void AppBase::slotCopyProject() {
 void AppBase::slotRenameProject() {
 	auto lst = m_welcomeScreen->getSelectedProjects();
 	if (lst.size() != 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 
@@ -3417,7 +3417,7 @@ void AppBase::slotRenameProject() {
 	bool canBeDeleted = false;
 	if (projectManager.projectExists(newProjectName, canBeDeleted))
 	{
-		OT_LOG_EA("Rename project: A project with the new name already exists");
+		OT_LOG_E("Rename project: A project with the new name already exists");
 		return;
 	}
 
@@ -3448,7 +3448,7 @@ void AppBase::slotRenameProject() {
 	// Now we add the copied project to the recently used projects list
 	UserManagement userManager(m_loginData);
 	if (!userManager.checkConnection()) {
-		OT_LOG_EA("Failed to establish connection");
+		OT_LOG_E("Failed to establish connection");
 	}
 	userManager.addRecentProject(newProjectName);
 	userManager.removeRecentProject(selectedProjectName);
@@ -3480,7 +3480,7 @@ void AppBase::slotDeleteProject() {
 	ProjectManagement projectManager(m_loginData);
 	UserManagement userManager(m_loginData);
 	if (!userManager.checkConnection()) {
-		OT_LOG_EA("User manager failed to connect");
+		OT_LOG_E("User manager failed to connect");
 		return;
 	}
 
@@ -3518,7 +3518,7 @@ void AppBase::slotDeleteProject() {
 void AppBase::slotExportProject() {
 	auto lst = m_welcomeScreen->getSelectedProjects();
 	if (lst.size() != 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 
@@ -3547,7 +3547,7 @@ void AppBase::slotExportProject() {
 void AppBase::slotManageProjectAccess() {
 	auto lst = m_welcomeScreen->getSelectedProjects();
 	if (lst.size() != 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 
@@ -3565,7 +3565,7 @@ void AppBase::slotManageProjectAccess() {
 void AppBase::slotManageProjectOwner() {
 	auto lst = m_welcomeScreen->getSelectedProjects();
 	if (lst.size() != 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 
@@ -3589,7 +3589,7 @@ void AppBase::slotManageProjectOwner() {
 		// Remove the project from the recent project list
 		UserManagement userManager(AppBase::instance()->getCurrentLoginData());
 		if (!userManager.checkConnection()) {
-			OT_LOG_EA("User manager connection failed");
+			OT_LOG_E("User manager connection failed");
 			return;
 		}
 		userManager.removeRecentProject(selectedProjectName);
@@ -3612,7 +3612,7 @@ QStringList AppBase::getAvailableProjectNames() const {
 		result.sort();
 	}
 	else {
-		OT_LOG_EA("No welcome screen available");
+		OT_LOG_E("No welcome screen available");
 	}
 	return result;
 }
@@ -3784,7 +3784,7 @@ void AppBase::slotTreeItemTextChanged(QTreeWidgetItem* _item, int _column) {
 		m_ExternalServicesComponent->itemRenamed(modelEntityID, newName.toStdString());
 	}
 	else {
-		OT_LOG_EA("Item cast failed");
+		OT_LOG_E("Item cast failed");
 	}
 }
 
@@ -3794,7 +3794,7 @@ void AppBase::slotTreeItemFocused(QTreeWidgetItem* _item) {
 		ViewerAPI::setHoverTreeItem(actualItem->id());
 	}
 	else {
-		OT_LOG_EA("Item cast failed");
+		OT_LOG_E("Item cast failed");
 	}
 	
 }
@@ -3836,7 +3836,7 @@ void AppBase::slotPlotResetItemSelectionRequest() {
 	OT_SLECTION_TEST_LOG("Plot reset item selection request");
 	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
 	if (!plot) {
-		OT_LOG_EA("Plot cast failed");
+		OT_LOG_E("Plot cast failed");
 		return;
 	}
 	
@@ -3861,7 +3861,7 @@ void AppBase::slotPlotCurveDoubleClicked(ot::PlotDataset* _dataset, bool _hasCon
 
 	ot::Plot* plot = dynamic_cast<ot::Plot*>(sender());
 	if (!plot) {
-		OT_LOG_EA("Plot cast failed");
+		OT_LOG_E("Plot cast failed");
 		return;
 	}
 	

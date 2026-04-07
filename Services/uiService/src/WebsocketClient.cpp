@@ -30,7 +30,7 @@
 // OpenTwin header
 #include "OTSystem/DateTime.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -146,12 +146,12 @@ bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, 
 	uint64_t messageId = 0;
 	switch (_type) {
 	case ot::RelayedMessageHandler::Response:
-		OT_LOG_EA("Manual trigger of response message is forbidden");
+		OT_LOG_E("Manual trigger of response message is forbidden");
 		break;
 
 	case ot::RelayedMessageHandler::Execute:
 		if (!m_messageHandler.createExecuteRequest(_receiverUrl, _message, request, messageId)) {
-			OT_LOG_EAS("Could not create relayed message");
+			OT_LOG_E("Could not create relayed message");
 			return false;
 		}
 		break;
@@ -293,7 +293,7 @@ void WebsocketClient::slotMessageReceived(const QString& _message) {
 		break;
 
 	default:
-		OT_LOG_EAS("Invalid message type received (" + std::to_string(static_cast<int>(request.messageType)) + ")");
+		OT_LOG_E("Invalid message type received (" + std::to_string(static_cast<int>(request.messageType)) + ")");
 		break;
 	}
 }

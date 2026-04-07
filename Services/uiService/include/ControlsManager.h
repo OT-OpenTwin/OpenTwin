@@ -24,7 +24,7 @@
 
 // Open twin header
 #include "OTSystem/Flags.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/GuiTypes.h"
 

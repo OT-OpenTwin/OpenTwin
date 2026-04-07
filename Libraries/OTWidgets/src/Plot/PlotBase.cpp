@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Symbol.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/PlotLegend.h"
@@ -126,7 +126,7 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 			break;
 
 		default:
-			OT_LOG_EAS("Unknown plot type (" + std::to_string((int)m_currentPlotType) + ")");
+			OT_LOG_E("Unknown plot type (" + std::to_string((int)m_currentPlotType) + ")");
 			return;
 		}
 	}
@@ -184,7 +184,7 @@ void ot::PlotBase::setErrorState(bool _isError, const QString & _message)
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown plot type (" + std::to_string((int)m_currentPlotType) + ")");
+		OT_LOG_E("Unknown plot type (" + std::to_string((int)m_currentPlotType) + ")");
 		return;
 	}
 

@@ -18,8 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogTypes.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 void ot::addLogFlagsToJsonArray(const LogFlags& _flags, JsonArray& _flagsArray, JsonAllocator& _allocator) {
 	if (_flags & INFORMATION_LOG) _flagsArray.PushBack(JsonString("Information", _allocator), _allocator);
@@ -49,7 +48,8 @@ ot::LogFlags ot::logFlagsFromJsonArray(const ConstJsonArray& _flagsArray) {
 		else if (f == "OutgoingMessage") result |= OUTGOING_MESSAGE_LOG;
 		else if (f == "Test") result |= TEST_LOG;
 		else {
-			OT_LOG_EAS("Unknown log flag \"" + f + "\"");
+			OTAssert(0, "Unknown log flag");
+			OT_LOG_E("Unknown log flag \"" + f + "\"");
 		}
 	}
 

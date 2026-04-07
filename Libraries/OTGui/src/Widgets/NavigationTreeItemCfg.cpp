@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Widgets/NavigationTreeItemCfg.h"
 
 ot::NavigationTreeItemCfg::NavigationTreeItemCfg() : m_flags(NoItemFlags), m_parent(nullptr) {}
@@ -117,7 +117,7 @@ void ot::NavigationTreeItemCfg::merge(const NavigationTreeItemCfg& _other) {
 
 	if (m_text != _other.m_text) return;
 	if (m_icon != _other.m_icon) {
-		OT_LOG_WA("Icon path differs on merge. Ignoring");
+		OT_LOG_W("Icon path differs on merge. Ignoring");
 	}
 
 	// Merge with other

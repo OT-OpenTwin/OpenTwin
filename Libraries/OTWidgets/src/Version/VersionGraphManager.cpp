@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTWidgets/Version/VersionGraphManager.h"
 #include "OTWidgets/Widgets/Label.h"
@@ -97,7 +97,7 @@ std::string ot::VersionGraphManager::viewModeToString(ViewMode _mode) {
 	case ot::VersionGraphManager::LabeledOnly: return "Labeled Only";
 	case ot::VersionGraphManager::Iterator: return "Iterator";
 	default:
-		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_mode) + ")");
+		OT_LOG_E("Unknown view mode (" + std::to_string((int)_mode) + ")");
 		return "View All";
 	}
 }
@@ -109,7 +109,7 @@ ot::VersionGraphManager::ViewMode ot::VersionGraphManager::stringToViewMode(cons
 	else if (_mode == viewModeToString(ViewMode::LabeledOnly)) return ViewMode::LabeledOnly;
 	else if (_mode == viewModeToString(ViewMode::Iterator)) return ViewMode::Iterator;
 	else {
-		OT_LOG_EAS("Unknown view mode \"" + _mode + "\"");
+		OT_LOG_E("Unknown view mode \"" + _mode + "\"");
 		return ViewMode::ViewAll;
 	}
 }
@@ -180,7 +180,7 @@ ot::VersionGraphVersionCfg* ot::VersionGraphManager::insertVersion(const ConstJs
 	VersionGraphVersionCfg newVersion;
 	newVersion.setFromJsonObject(_versionConfig);
 	if (newVersion.getName().empty()) {
-		OT_LOG_EA("Invalid version configuration");
+		OT_LOG_E("Invalid version configuration");
 		return nullptr;
 	}
 	else {
@@ -252,7 +252,7 @@ void ot::VersionGraphManager::updateCurrentGraph(void) {
 				parentInfo.setConfig(nullptr);
 
 				if (!this->findParentVersionInOtherBranches(currentInfo.getConfig()->getName(), newConfig.getBranches(), parentInfo)) {
-					OT_LOG_EAS("Failed to find parent branch of version \"" + currentInfo.getConfig()->getName() + "\"");
+					OT_LOG_E("Failed to find parent branch of version \"" + currentInfo.getConfig()->getName() + "\"");
 				}
 				parentInfo.applyActiveAndBranchFlags(m_config);
 
@@ -439,7 +439,7 @@ bool ot::VersionGraphManager::filterVersion(ViewMode _viewMode, const std::strin
 	case ot::VersionGraphManager::LabeledOnly: return this->filterModeLabeledOnly(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	case ot::VersionGraphManager::Iterator: return this->filterModeIterator(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	default:
-		OT_LOG_EAS("Unknown view mode (" + std::to_string((int)_viewMode) + ")");
+		OT_LOG_E("Unknown view mode (" + std::to_string((int)_viewMode) + ")");
 		return this->filterModeAll(_activeVersionName, _filterText, _parentInfo, _versionInfo, _childsInfo);
 	}
 }

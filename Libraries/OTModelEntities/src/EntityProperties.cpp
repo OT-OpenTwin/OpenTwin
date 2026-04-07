@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTModelEntities/EntityProperties.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyInt.h"
@@ -363,7 +363,7 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 
 			else
 			{
-				OT_LOG_EAS("Unknown property type \"" + type + "\"");
+				OT_LOG_E("Unknown property type \"" + type + "\"");
 				return;
 			}
 
@@ -382,7 +382,7 @@ void EntityProperties::buildFromJSON(const std::string& prop, EntityBase* root)
 				this->createProperty(newSetting, group);
 			}
 			else {
-				OT_LOG_EA("Failed to create property");
+				OT_LOG_E("Failed to create property");
 			}
 		}
 		else

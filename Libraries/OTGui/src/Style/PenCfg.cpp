@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/PenCfg.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"

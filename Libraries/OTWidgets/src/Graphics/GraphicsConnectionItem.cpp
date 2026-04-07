@@ -19,7 +19,7 @@
 
 // OpenTwin Core header
 #include "OTCore/Math.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // OpenTwin Gui header
 #include "OTGui/Graphics/GraphicsConnectionCalculationData.h"
@@ -141,7 +141,7 @@ void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _even
 	if (_event->button() == Qt::LeftButton && this->flags() & QGraphicsItem::ItemIsSelectable) {
 		GraphicsScene* sc = dynamic_cast<GraphicsScene*>(this->scene());
 		if (!sc) {
-			OT_LOG_EA("Scene cast failed");
+			OT_LOG_E("Scene cast failed");
 			return;
 		}
 		bool ignored = sc->getIgnoreEvents();
@@ -198,7 +198,7 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF
 		distance = this->calculateShortestDistanceToPointAutoXY(_pt);
 		break;
 	default:
-		OT_LOG_EA("Unknown line shape");
+		OT_LOG_E("Unknown line shape");
 		break;
 	}
 
@@ -274,7 +274,7 @@ void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
 	this->prepareGeometryChange();
 
 	if (m_origin) {
-		OT_LOG_WA("Origin item already set. Replacing...");
+		OT_LOG_W("Origin item already set. Replacing...");
 		m_origin->forgetConnection(this);
 	}
 
@@ -289,7 +289,7 @@ void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
 
 void ot::GraphicsConnectionItem::setOriginPos(const Point2DD& _pos) {
 	if (m_origin) {
-		OT_LOG_WA("Origin item is set. Ignoring position change.");
+		OT_LOG_W("Origin item is set. Ignoring position change.");
 		return;
 	}
 	else {
@@ -309,7 +309,7 @@ void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
 	this->prepareGeometryChange();
 	
 	if (m_dest) {
-		OT_LOG_WA("Destination item already set. Replacing...");
+		OT_LOG_W("Destination item already set. Replacing...");
 		m_dest->forgetConnection(this);
 	}
 
@@ -324,7 +324,7 @@ void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
 
 void ot::GraphicsConnectionItem::setDestPos(const Point2DD& _pos) {
 	if (m_dest) {
-		OT_LOG_WA("Destination item is set. Ignoring position change.");
+		OT_LOG_W("Destination item is set. Ignoring position change.");
 		return;
 	}
 	else {
@@ -405,7 +405,7 @@ void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _di
 		view->notifyConnectionConfigurationChanged(this);
 	}
 	else {
-		OT_LOG_EA("Unknown disconnector");
+		OT_LOG_E("Unknown disconnector");
 	}
 }
 
@@ -702,7 +702,7 @@ void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin,
 		_control = QPointF(_origin.x(), _origin.y() + _halfdistY);
 		break;
 	default:
-		OT_LOG_EA("Unknown connection direction");
+		OT_LOG_E("Unknown connection direction");
 		break;
 	}
 }
@@ -745,7 +745,7 @@ void ot::GraphicsConnectionItem::calculateAutoXYLinePath(QPainterPath& _path) co
 		break;
 
 	default:
-		OT_LOG_WA("Invalid calculated shape");
+		OT_LOG_W("Invalid calculated shape");
 		this->calculateDirectLinePath(_path);
 		break;
 	}
@@ -806,7 +806,7 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointAutoXY(const Q
 	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine:
 		return this->calculateShortestDistanceToPointYX(_pt);
 	default:
-		OT_LOG_WA("Invalid calculated shape");
+		OT_LOG_W("Invalid calculated shape");
 		return this->calculateShortestDistanceToPointDirect(_pt);
 	}
 }

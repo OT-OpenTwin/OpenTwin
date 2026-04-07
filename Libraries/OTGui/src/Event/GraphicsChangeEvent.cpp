@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 
@@ -129,7 +129,7 @@ void ot::GraphicsChangeEvent::setFromJsonObject(const ConstJsonObject& _object) 
 			m_changedItems.push_back(item);
 		}
 		else {
-			OT_LOG_EA("Failed to deserialize GraphicsItem");
+			OT_LOG_E("Failed to deserialize GraphicsItem");
 		}
 	}
 

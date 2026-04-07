@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/EntityBlock.h"
@@ -265,7 +265,7 @@ ot::JsonDocument EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& 
 	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
 
 	if (!blockCfg) {
-		OT_LOG_EAS("Failed to create block configuration for block entity  { \"EntityID\": " + std::to_string(getEntityID()) + " }");
+		OT_LOG_E("Failed to create block configuration for block entity  { \"EntityID\": " + std::to_string(getEntityID()) + " }");
 		throw ot::Exception::General("Failed to create block configuration for block entity { \"EntityID\": " + std::to_string(getEntityID()) + " }");
 	}
 
@@ -299,7 +299,9 @@ void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) 
 	{
 		const ot::Connector& connector = connectorByName.second;
 		ot::ConnectorType connectorType = connector.getConnectorType();
-		if (connectorType == ot::ConnectorType::UNKNOWN) { OT_LOG_EAS(""); };
+		if (connectorType == ot::ConnectorType::UNKNOWN) {
+			OT_LOG_E("Unknown connector type");
+		}
 		const std::string connectorName = connector.getConnectorName();
 		const std::string connectorTitle = connector.getConnectorTitle();
 		if (connectorType == ot::ConnectorType::In)

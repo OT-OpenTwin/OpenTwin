@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -42,12 +42,12 @@ namespace ot {
 				response = ot::intern::ExternalServicesComponent::instance().dispatchAction(_json, _senderUrl, _messageType);
 			}
 			catch (const std::exception& _e) {
-				OT_LOG_EAS(_e.what());
+				OT_LOG_E(_e.what());
 
 				response = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, _e.what());
 			}
 			catch (...) {
-				OT_LOG_EAS("[FATAL] Unknown error occured. Shutting down...");
+				OT_LOG_E("[FATAL] Unknown error occured. Shutting down...");
 				exit(ot::AppExitCode::UnknownError);
 			}
 
@@ -66,11 +66,11 @@ namespace ot {
 				ot::ActionDispatcher::instance().dispatch(OT_ACTION_CMD_Init, iniDoc, ot::EXECUTE);
 			}
 			catch (const std::exception& _e) {
-				OT_LOG_EAS(_e.what());
+				OT_LOG_E(_e.what());
 				exit(ot::AppExitCode::GeneralError);
 			}
 			catch (...) {
-				OT_LOG_EA("Unknown error");
+				OT_LOG_E("Unknown error");
 				exit(ot::AppExitCode::UnknownError);
 			}
 		}
@@ -103,7 +103,7 @@ const char* ot::foundation::getServiceURL(void)
 		return retVal;
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		exit(ot::AppExitCode::GeneralError);
 	}
 	char* retVal = new char[1] { 0 };
@@ -150,13 +150,13 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 				std::string info(inBuffer);
 
 				if (info.empty()) {
-					OT_LOG_EA("Configuration not found");
+					OT_LOG_E("Configuration not found");
 					return -21;
 				}
 				// Parse doc
 				JsonDocument params;
 				if (!params.fromJson(info)) {
-					OT_LOG_EA("Configuration not valid JSON");
+					OT_LOG_E("Configuration not valid JSON");
 					return -22;
 				}
 
@@ -189,11 +189,11 @@ int ot::foundation::init(const std::string& _ownURL, ApplicationBase* _applicati
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		exit(ot::AppExitCode::GeneralError);
 	}
 	catch (...) {
-		OT_LOG_EA("Unknown error");
+		OT_LOG_E("Unknown error");
 		exit(ot::AppExitCode::UnknownError);
 	}
 }

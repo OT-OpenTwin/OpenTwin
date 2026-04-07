@@ -20,7 +20,7 @@
 #include "ActionHandler.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable/Variable.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
@@ -59,7 +59,7 @@ ot::ReturnMessage ActionHandler::handleAction(const ot::JsonDocument& doc) {
 		}
 	}
 	else {
-		OT_LOG_EAS("Action \"" + action + "\" not supported. Document: " + doc.toJson());
+		OT_LOG_E("Action \"" + action + "\" not supported. Document: " + doc.toJson());
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Action \"" + action + "\" not supported.");
 	}
 	
@@ -171,7 +171,7 @@ ot::ReturnMessage ActionHandler::initialise(const ot::JsonDocument& doc)
 	}
 	catch (std::exception& e)
 	{
-		OT_LOG_EAS("Initialisation failed: " + std::string(e.what()));
+		OT_LOG_E("Initialisation failed: " + std::string(e.what()));
 		exit(ot::AppExitCode::GeneralError);
 	}
 }

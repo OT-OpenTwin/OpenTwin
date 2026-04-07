@@ -1,7 +1,7 @@
 // @otlicense
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Event/MenuRequestData.h"
 
 namespace ot {
@@ -9,7 +9,8 @@ namespace ot {
 	{
 		if (getRegisteredClasses().find(_className) != getRegisteredClasses().end())
 		{
-			ot::LogDispatcher::instance().dispatch("Class with name \"" + _className + "\" is already registered.", __FUNCTION__, ot::ERROR_LOG); return;
+			OT_LOG_E("Class with name \"" + _className + "\" is already registered.");
+			return;
 		}
 		else
 		{

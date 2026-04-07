@@ -52,7 +52,7 @@ ot::GraphicsImageItem::~GraphicsImageItem() {
 bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	const GraphicsImageItemCfg* cfg = dynamic_cast<const GraphicsImageItemCfg*>(_cfg);
 	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		OT_LOG_E("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
@@ -71,7 +71,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			{
 				QPixmap pix;
 				if (!pix.loadFromData(QtFactory::toQByteArray(cfg->getImageData()), "PNG")) {
-					OT_LOG_EAS("Failed to load image from data");
+					OT_LOG_E("Failed to load image from data");
 				}
 				else {
 					m_painter = new PixmapImagePainter(pix);
@@ -83,7 +83,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			{
 				QPixmap pix;
 				if (!pix.loadFromData(QtFactory::toQByteArray(cfg->getImageData()), "JPEG")) {
-					OT_LOG_EAS("Failed to load image from data");
+					OT_LOG_E("Failed to load image from data");
 				}
 				else {
 					m_painter = new PixmapImagePainter(pix);
@@ -96,7 +96,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 				QByteArray svgData = QtFactory::toQByteArray(cfg->getImageData());
 				SvgImagePainter* newPainter = new SvgImagePainter(svgData);
 				if (!newPainter->isValid()) {
-					OT_LOG_EAS("Failed to load svg image from data");
+					OT_LOG_E("Failed to load svg image from data");
 					delete newPainter;
 				}
 				else {
@@ -106,7 +106,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			break;
 
 			default:
-				OT_LOG_EAS("Unsupported image format \"" + ot::toString(cfg->getImageFileFormat()) + "\"");
+				OT_LOG_E("Unsupported image format \"" + ot::toString(cfg->getImageFileFormat()) + "\"");
 			}
 		}
 		else if (!cfg->getImagePath().empty()) {
@@ -117,7 +117,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			}
 		}
 		else {
-			OT_LOG_EA("No image data or path provided");
+			OT_LOG_E("No image data or path provided");
 		}
 
 		this->setBlockConfigurationNotifications(false);
@@ -129,7 +129,7 @@ bool ot::GraphicsImageItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 		
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		this->setBlockConfigurationNotifications(false);
 		return false;
 	}
@@ -151,7 +151,7 @@ QMarginsF ot::GraphicsImageItem::getOutlineMargins() const {
 QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize(void) const {
 	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
 	if (!config) {
-		OT_LOG_EA("Config not set");
+		OT_LOG_E("Config not set");
 		return QSizeF();
 	}
 
@@ -166,7 +166,7 @@ QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize(void) const {
 void ot::GraphicsImageItem::setImagePath(const std::string& _imagePath) {
 	GraphicsImageItemCfg* config = dynamic_cast<GraphicsImageItemCfg*>(this->getConfiguration());
 	if (!config) {
-		OT_LOG_EA("Config not set");
+		OT_LOG_E("Config not set");
 		return;
 	}
 
@@ -176,7 +176,7 @@ void ot::GraphicsImageItem::setImagePath(const std::string& _imagePath) {
 void ot::GraphicsImageItem::paintCustomItem(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget, const QRectF& _rect) {
 	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
 	if (!config) {
-		OT_LOG_EA("Config not set");
+		OT_LOG_E("Config not set");
 		return;
 	}
 

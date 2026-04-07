@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyString.h"
 #include "OTWidgets/Properties/PropertyInputString.h"
 #include "OTWidgets/Properties/PropertyInputFactoryRegistrar.h"
@@ -115,7 +115,7 @@ ot::Property* ot::PropertyInputString::createPropertyConfiguration(void) const {
 		newProperty->setMultiline(true);
 	}
 	else {
-		OT_LOG_EA("No widget created");
+		OT_LOG_E("No widget created");
 	}
 	
 	return newProperty;

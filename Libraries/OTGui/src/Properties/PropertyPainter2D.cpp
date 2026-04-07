@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"

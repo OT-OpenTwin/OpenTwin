@@ -20,8 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/Flags.h"		// Add flag fuctions
-#include "OTCore/Logging/LogDispatcher.h"	// LogFlag type
+#include "OTSystem/Flags.h"
+#include "OTCore/Logging/LogTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 
 namespace ot {

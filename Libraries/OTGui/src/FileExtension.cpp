@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/FileExtension.h"
 
 std::string ot::FileExtension::toFilterString(const std::list<DefaultFileExtension>& _extensions) {

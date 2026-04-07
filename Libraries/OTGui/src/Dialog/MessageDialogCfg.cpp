@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Dialog/MessageDialogCfg.h"
 
 std::string ot::MessageDialogCfg::toString(BasicButton _button) {
@@ -44,7 +44,7 @@ std::string ot::MessageDialogCfg::toString(BasicButton _button) {
 	case ot::MessageDialogCfg::Reset: return "Reset";
 	case ot::MessageDialogCfg::RestoreDefaults: return "RestoreDefaults";
 	default:
-		OT_LOG_EAS("Unknown button (" + std::to_string((int)_button) + ")");
+		OT_LOG_E("Unknown button (" + std::to_string((int)_button) + ")");
 		return "<null>";
 	}
 }
@@ -70,7 +70,7 @@ ot::MessageDialogCfg::BasicButton ot::MessageDialogCfg::stringToButton(const std
 	else if (_button == toString(MessageDialogCfg::Reset)) { return MessageDialogCfg::Reset; }
 	else if (_button == toString(MessageDialogCfg::RestoreDefaults)) { return MessageDialogCfg::RestoreDefaults; }
 	else {
-		OT_LOG_EAS("Unknown button \"" + _button + "\"");
+		OT_LOG_E("Unknown button \"" + _button + "\"");
 		return MessageDialogCfg::NoButtons;
 	}
 }
@@ -115,7 +115,7 @@ std::string ot::MessageDialogCfg::iconToString(BasicIcon _icon) {
 	case ot::MessageDialogCfg::Warning: return "Warning";
 	case ot::MessageDialogCfg::Critical: return "Critical";
 	default:
-		OT_LOG_EAS("Unknown icon (" + std::to_string((int)_icon) + ")");
+		OT_LOG_E("Unknown icon (" + std::to_string((int)_icon) + ")");
 		return "NoIcon";
 	}
 }
@@ -127,7 +127,7 @@ ot::MessageDialogCfg::BasicIcon ot::MessageDialogCfg::stringToIcon(const std::st
 	else if (_icon == iconToString(MessageDialogCfg::Warning)) return MessageDialogCfg::Warning;
 	else if (_icon == iconToString(MessageDialogCfg::Critical)) return MessageDialogCfg::Critical;
 	else {
-		OT_LOG_EAS("Unknown icon \"" + _icon + "\"");
+		OT_LOG_E("Unknown icon \"" + _icon + "\"");
 		return MessageDialogCfg::NoIcon;
 	}
 }

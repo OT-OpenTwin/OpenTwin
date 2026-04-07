@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/DebugHelper.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 void ot::DebugHelper::serviceSetupCompleted(const ot::ServiceDebugInformation& _serviceInfo) {
 	std::string message = getSetupCompletedMessagePrefix();

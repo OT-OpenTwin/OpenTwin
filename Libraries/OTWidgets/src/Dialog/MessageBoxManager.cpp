@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Dialog/MessageBoxManager.h"
 #include "OTWidgets/Dialog/MessageBoxHandler.h"
 
@@ -59,7 +59,7 @@ ot::MessageDialogCfg::BasicButton ot::MessageBoxManager::forwardPromt(const Mess
 		return m_handler->showPrompt(_config, _parent);
 	}
 	else {
-		OT_LOG_EA("No message box handler set");
+		OT_LOG_E("No message box handler set");
 		return ot::MessageDialogCfg::Cancel;
 	}
 }

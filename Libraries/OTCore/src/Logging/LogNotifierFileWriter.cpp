@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/Logging/LogNotifierFileWriter.h"
 
 // std header
@@ -51,7 +51,8 @@ ot::LogNotifierFileWriter::LogNotifierFileWriter(const std::string& _filePath) {
 		delete m_stream;
 		m_stream = nullptr;
 
-		OT_LOG_EAS("Unable to create file \"" + _filePath + "\"");
+		OTAssert(0, "Unable to create file");
+		OT_LOG_E("Unable to create file \"" + _filePath + "\"");
 	}
 }
 

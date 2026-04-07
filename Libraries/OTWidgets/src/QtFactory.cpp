@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -83,7 +83,7 @@ Qt::Alignment ot::QtFactory::toQAlignment(ot::Alignment _alignment) {
 	case Alignment::Left: return Qt::AlignLeft | Qt::AlignVCenter;
 	case Alignment::TopLeft: return Qt::AlignTop | Qt::AlignLeft;
 	default:
-		OT_LOG_EA("Unknown alignment");
+		OT_LOG_E("Unknown alignment");
 		return Qt::AlignCenter;
 	}
 }
@@ -95,7 +95,7 @@ QGradient::Spread ot::QtFactory::toQGradientSpread(ot::GradientSpread _spread) {
 	case GradientSpread::Repeat: return QGradient::RepeatSpread;
 	case GradientSpread::Reflect: return QGradient::ReflectSpread;
 	default:
-		OT_LOG_EA("Unknown gradient spread");
+		OT_LOG_E("Unknown gradient spread");
 		return QGradient::PadSpread;
 	}
 }
@@ -153,7 +153,7 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
 		const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 
 		if (!cs.hasValue(painter->getReferenceKey())) {
-			OT_LOG_WAS("Failed to create brush from ColorStyleValue reference. Value not found (" + std::to_string((int)painter->getReferenceKey()) + ")");
+			OT_LOG_W("Failed to create brush from ColorStyleValue reference. Value not found (" + std::to_string((int)painter->getReferenceKey()) + ")");
 			return QBrush();
 		}
 		else {
@@ -187,7 +187,7 @@ QBrush ot::QtFactory::toQBrush(const ot::Painter2D* _painter) {
         return QBrush(checkerboard);
     }
 	else {
-		OT_LOG_EAS("Unknown Painter2D provided \"" + _painter->getFactoryKey() + "\"");
+		OT_LOG_E("Unknown Painter2D provided \"" + _painter->getFactoryKey() + "\"");
 		return QBrush();
 	}
 }

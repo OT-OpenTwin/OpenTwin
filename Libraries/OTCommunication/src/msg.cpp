@@ -21,7 +21,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/ArchitectureInfo.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTCommunication/Msg.h"			// Corresponding header
@@ -131,7 +131,7 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 	// Ensure receiver url was provided
 	if (_receiverUrl.empty()) {
 		if (_flags & msg::CreateLogMessage) {
-			OT_LOG_WA("Receiver url is empty. Ignoring message...");
+			OT_LOG_W("Receiver url is empty. Ignoring message...");
 		}
 		return false;
 	}
@@ -175,7 +175,7 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 
 	auto curl = curl_easy_init();
 	if (!curl) {
-		OT_LOG_EA("Failed to initialize curl");
+		OT_LOG_E("Failed to initialize curl");
 		return false;
 	}
 
@@ -187,7 +187,7 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 	case EXECUTE: curlURL.append("execute"); break;
 	case EXECUTE_ONE_WAY_TLS: curlURL.append("execute-one-way-tls"); break;
 	default:
-		OT_LOG_EA("Unknown message type");
+		OT_LOG_E("Unknown message type");
 		return false;
 	}
 

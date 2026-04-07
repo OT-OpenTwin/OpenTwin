@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "DataBuffer.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "PythonObjectBuilder.h"
 
 DataBuffer& DataBuffer::instance(void) {

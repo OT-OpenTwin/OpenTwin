@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/Exception.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTFrontendConnectorAPI/CurrentProjectAPI.h"
 
 // Public API
@@ -32,7 +32,7 @@ void ot::CurrentProjectAPI::activateModelVersion(const std::string& _versionName
 
 ot::CurrentProjectAPI::CurrentProjectAPI() {
 	if (getInstanceReference()) {
-		OT_LOG_EA("CurrentProjectAPI instance already exists");
+		OT_LOG_E("CurrentProjectAPI instance already exists");
 		throw Exception::ObjectAlreadyExists("CurrentProjectAPI instance already exists");
 	}
 	getInstanceReference() = this;
@@ -50,7 +50,7 @@ ot::CurrentProjectAPI::~CurrentProjectAPI() {
 ot::CurrentProjectAPI* ot::CurrentProjectAPI::instance() {
 	CurrentProjectAPI* instance = getInstanceReference();
 	if (!instance) {
-		OT_LOG_EA("CurrentProjectAPI instance not available");
+		OT_LOG_E("CurrentProjectAPI instance not available");
 		throw Exception::ObjectNotFound("CurrentProjectAPI instance not available");
 	}
 	return instance;

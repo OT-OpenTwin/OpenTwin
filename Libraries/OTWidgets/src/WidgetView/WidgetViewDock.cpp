@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/WidgetView/WidgetViewTab.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 
@@ -32,7 +32,7 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view, QWidget* _parent) :
 		this->connect(m_tab, &WidgetViewTab::viewPinnedChanged, this, &WidgetViewDock::slotPinnedChanged);
 	}
 	else {
-		OT_LOG_EA("Unexpected tab");
+		OT_LOG_E("Unexpected tab");
 	}
 
 	this->setFeature(ads::CDockWidget::CustomCloseHandling, true);

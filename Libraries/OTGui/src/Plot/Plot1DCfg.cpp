@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -33,7 +33,7 @@ std::string ot::Plot1DCfg::toString(PlotType _type) {
 	case ot::Plot1DCfg::Polar: 
 		return ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar);
 	default:
-		OT_LOG_EAS("Unknown plot type (" + std::to_string((int)_type) + ")");
+		OT_LOG_E("Unknown plot type (" + std::to_string((int)_type) + ")");
 		return "Cartesian";
 	}
 	
@@ -51,7 +51,7 @@ ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type
 	}
 	else 
 	{
-		OT_LOG_EAS("Unknown plot type \"" + _type + "\"");
+		OT_LOG_E("Unknown plot type \"" + _type + "\"");
 		return Plot1DCfg::Cartesian;
 	}
 }

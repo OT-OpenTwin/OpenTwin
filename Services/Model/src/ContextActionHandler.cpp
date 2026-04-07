@@ -29,7 +29,7 @@ MenuCfg ContextActionHandler::menuRequested(const MenuRequestEvent& _event)
 	Model* model = Application::instance()->getModel();
 	if (!model)
 	{
-		OT_LOG_EA("Model is not available.");
+		OT_LOG_E("Model is not available.");
 		return menu;
 	}
 

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -401,7 +401,7 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 				newHoverElements.push_back(actualConnection);
 			}
 			else if (itm != m_connectionPreview) {
-				OT_LOG_WA("Unknown item in scene");
+				OT_LOG_W("Unknown item in scene");
 			}
 		}
 	}

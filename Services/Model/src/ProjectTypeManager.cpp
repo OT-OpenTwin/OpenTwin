@@ -25,7 +25,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/FolderNames.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 {
@@ -76,7 +76,7 @@ ProjectTypeManager::ProjectTypeManager(const std::string& projectType)
 	}
 	else
 	{
-		OT_LOG_WAS("Unknown project type \"" + projectType + "\". Defaulting to project type: \"" OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "\"...");
+		OT_LOG_W("Unknown project type \"" + projectType + "\". Defaulting to project type: \"" OT_ACTION_PARAM_SESSIONTYPE_DEVELOPMENT "\"...");
 	}
 }
 

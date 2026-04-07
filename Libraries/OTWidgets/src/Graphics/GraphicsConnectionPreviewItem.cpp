@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Graphics/GraphicsItem.h"
@@ -68,7 +68,7 @@ QRectF ot::GraphicsConnectionPreviewItem::boundingRect(void) const {
 	}
 	break;
 	default:
-		OT_LOG_EA("Unknown connection style");
+		OT_LOG_E("Unknown connection style");
 	}
 
 	return result;
@@ -97,7 +97,7 @@ void ot::GraphicsConnectionPreviewItem::paint(QPainter* _painter, const QStyleOp
 	}
 	break;
 	default:
-		OT_LOG_EA("Unknown connection style");
+		OT_LOG_E("Unknown connection style");
 		break;
 	}
 }
@@ -174,7 +174,7 @@ void ot::GraphicsConnectionPreviewItem::calculateSmoothLineStep(const QPointF& _
 		_control = QPointF(_origin.x(), _origin.y() + _halfdistY);
 		break;
 	default:
-		OT_LOG_EA("Unknown connection direction");
+		OT_LOG_E("Unknown connection direction");
 		break;
 	}
 }

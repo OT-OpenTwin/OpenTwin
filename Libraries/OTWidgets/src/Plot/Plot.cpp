@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Plot/Plot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"

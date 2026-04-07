@@ -23,7 +23,7 @@
 #include "LocalDirectoryService.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
 
 // std header

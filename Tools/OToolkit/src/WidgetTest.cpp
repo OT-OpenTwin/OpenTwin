@@ -20,7 +20,7 @@
 #include "WidgetTest.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/RuntimeTests.h"
 
 #include "OTGui/Dialog/PropertyDialogCfg.h"

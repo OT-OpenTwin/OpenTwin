@@ -27,6 +27,7 @@
 // std header
 #include <list>
 #include <string>
+#include <memory>
 #include <functional>
 
 namespace ot {

@@ -23,7 +23,7 @@
 #include "CommunicationHandler.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "DataBuffer.h"
 // Qt header
 #include <QtCore/qeventloop.h>
@@ -79,7 +79,7 @@ bool CommunicationHandler::ensureConnectionToServer(void) {
 
 void CommunicationHandler::slotDataReceived(void) {
 	if (!m_serverSocket) {
-		OT_LOG_EA("No socket set");
+		OT_LOG_E("No socket set");
 		return;
 	}
 

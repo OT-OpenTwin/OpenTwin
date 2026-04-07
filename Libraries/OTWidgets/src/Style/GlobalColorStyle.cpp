@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -119,7 +119,7 @@ const ot::ColorStyle& ot::GlobalColorStyle::getCurrentStyle(void) const {
 
 bool ot::GlobalColorStyle::addStyleRootSearchPath(const QString& _path) {
 	if (_path.isEmpty()) {
-		OT_LOG_WA("Empty search path provided. Ignoring");
+		OT_LOG_W("Empty search path provided. Ignoring");
 		return false;
 	}
 

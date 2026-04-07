@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTFMC/FMProjectPath.h"
 #include "OTFMC/FMNewProjectDialog.h"
 #include "OTWidgets/ToolTipHandler.h"

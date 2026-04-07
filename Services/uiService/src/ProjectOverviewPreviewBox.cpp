@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "ProjectOverviewPreviewBox.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/TextEdit.h"
 #include "OTWidgets/Widgets/ImagePainterWidget.h"

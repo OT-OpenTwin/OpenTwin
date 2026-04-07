@@ -25,7 +25,7 @@
 #include <Windows.h>
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTServiceFoundation/Foundation.h"
 
 // Service header

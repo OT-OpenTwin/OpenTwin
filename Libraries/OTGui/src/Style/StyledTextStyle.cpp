@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/StyledTextStyle.h"
 
 std::string ot::StyledTextStyle::toString(TextSize _size) {
@@ -28,7 +28,7 @@ std::string ot::StyledTextStyle::toString(TextSize _size) {
 	case ot::StyledTextStyle::TextSize::Header2: return "Header2";
 	case ot::StyledTextStyle::TextSize::Header3: return "Header3";
 	default:
-		OT_LOG_EAS("Unknown text size (" + std::to_string((int)_size) + ")");
+		OT_LOG_E("Unknown text size (" + std::to_string((int)_size) + ")");
 		return "Regular";
 	}
 }
@@ -39,7 +39,7 @@ ot::StyledTextStyle::TextSize ot::StyledTextStyle::stringToTextSize(const std::s
 	else if (_size == StyledTextStyle::toString(TextSize::Header2)) return TextSize::Header2;
 	else if (_size == StyledTextStyle::toString(TextSize::Header3)) return TextSize::Header3;
 	else {
-		OT_LOG_EAS("Unknown text size \"" + _size + "\"");
+		OT_LOG_E("Unknown text size \"" + _size + "\"");
 		return TextSize::Regular;
 	}
 }

@@ -25,7 +25,7 @@
 // OpenTwin header
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // std header
 #include <thread>
@@ -122,7 +122,7 @@ void SubprocessHandler::shutdownSubprocess(void) {
 		OT_LOG_D("Subprocess terminated");
 	}
 	else {
-		OT_LOG_EA("Failed to terminate subproces");
+		OT_LOG_E("Failed to terminate subproces");
 	}
 }
 

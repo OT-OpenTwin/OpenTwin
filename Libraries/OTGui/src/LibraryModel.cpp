@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/LibraryModel.h"
 
 #define OT_JSON_MEMBER_Name "Name"

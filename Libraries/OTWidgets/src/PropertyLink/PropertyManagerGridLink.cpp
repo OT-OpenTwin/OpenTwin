@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
@@ -86,5 +86,5 @@ void ot::PropertyManagerGridLink::slotPropertiesChanged(const std::list<const Pr
 }
 
 void ot::PropertyManagerGridLink::slotPropertyDeleteRequested(const Property* _property) {
-	OT_LOG_EA("Removeable entities are not supported yet");
+	OT_LOG_E("Removeable entities are not supported yet");
 }

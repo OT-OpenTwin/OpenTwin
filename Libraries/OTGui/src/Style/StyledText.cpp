@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/StyledText.h"
 
 std::string ot::StyledText::toString(SubstitutionToken _substitutionToken) {
@@ -28,7 +28,7 @@ std::string ot::StyledText::toString(SubstitutionToken _substitutionToken) {
 	case ot::StyledText::TimeHHMMSS: return "TIME_HHMMSS";
 	case ot::StyledText::TimeHHMMSSZZZZ: return "TIME_HHMMSSZZZZ";
 	default:
-		OT_LOG_EAS("Unknown substitution token (" + std::to_string(static_cast<int>(_substitutionToken)) + ")");
+		OT_LOG_E("Unknown substitution token (" + std::to_string(static_cast<int>(_substitutionToken)) + ")");
 		return "";
 	}
 }
@@ -39,7 +39,7 @@ ot::StyledText::SubstitutionToken ot::StyledText::stringToSubstitutionToken(cons
 	else if (_substitutionToken == toString(SubstitutionToken::TimeHHMMSS)) return SubstitutionToken::TimeHHMMSS;
 	else if (_substitutionToken == toString(SubstitutionToken::TimeHHMMSSZZZZ)) return SubstitutionToken::TimeHHMMSSZZZZ;
 	else {
-		OT_LOG_EAS("Unknown substitution token \"" + _substitutionToken + "\"");
+		OT_LOG_E("Unknown substitution token \"" + _substitutionToken + "\"");
 		return SubstitutionToken::EmptyToken;
 	}
 }
@@ -53,7 +53,7 @@ std::string ot::StyledText::toString(ColorReference _colorReference) {
 	case ColorReference::Warning: return "Warning";
 	case ColorReference::Error: return "Error";
 	default:
-		OT_LOG_EAS("Unknown ColorReference (" + std::to_string((int)_colorReference) + ")");
+		OT_LOG_E("Unknown ColorReference (" + std::to_string((int)_colorReference) + ")");
 		return "Default";
 	}
 }
@@ -66,7 +66,7 @@ ot::StyledText::ColorReference ot::StyledText::stringToColorReference(const std:
 	else if (_colorReference == toString(ColorReference::Warning)) return ColorReference::Warning;
 	else if (_colorReference == toString(ColorReference::Error)) return ColorReference::Error;
 	else {
-		OT_LOG_EAS("Unknown ColorReference \"" + _colorReference + "\"");
+		OT_LOG_E("Unknown ColorReference \"" + _colorReference + "\"");
 		return ColorReference::Default;
 	}
 }

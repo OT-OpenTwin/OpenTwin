@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"
@@ -41,7 +41,7 @@ std::string ot::GraphicsTriangleItemCfg::triangleDirectionToString(TriangleDirec
 	case ot::GraphicsTriangleItemCfg::Right: return "Right";
 	case ot::GraphicsTriangleItemCfg::Down: return "Down";
 	default:
-		OT_LOG_WA("Unknown triangle direction");
+		OT_LOG_W("Unknown triangle direction");
 		return "Right";
 	}
 }
@@ -52,7 +52,7 @@ ot::GraphicsTriangleItemCfg::TriangleDirection ot::GraphicsTriangleItemCfg::stri
 	else if (_str == triangleDirectionToString(ot::GraphicsTriangleItemCfg::Right)) return ot::GraphicsTriangleItemCfg::Right;
 	else if (_str == triangleDirectionToString(ot::GraphicsTriangleItemCfg::Down)) return ot::GraphicsTriangleItemCfg::Down;
 	else {
-		OT_LOG_WAS("Unknown triangle direction \"" + _str + "\"");
+		OT_LOG_W("Unknown triangle direction \"" + _str + "\"");
 		return ot::GraphicsTriangleItemCfg::Right;
 	}
 }
@@ -64,7 +64,7 @@ std::string ot::GraphicsTriangleItemCfg::triangleShapeToString(TriangleShape _sh
 	case ot::GraphicsTriangleItemCfg::Kite: return "Kite";
 	case ot::GraphicsTriangleItemCfg::IceCone: return "IceCone";
 	default:
-		OT_LOG_WA("Unknown triangle shape");
+		OT_LOG_W("Unknown triangle shape");
 		return "Triangle";
 	}
 }
@@ -74,7 +74,7 @@ ot::GraphicsTriangleItemCfg::TriangleShape ot::GraphicsTriangleItemCfg::stringTo
 	else if (_shape == triangleShapeToString(GraphicsTriangleItemCfg::Kite)) return GraphicsTriangleItemCfg::Kite;
 	else if (_shape == triangleShapeToString(GraphicsTriangleItemCfg::IceCone)) return GraphicsTriangleItemCfg::IceCone;
 	else {
-		OT_LOG_WA("Unknown triangle shape");
+		OT_LOG_W("Unknown triangle shape");
 		return GraphicsTriangleItemCfg::Triangle;
 	}
 }

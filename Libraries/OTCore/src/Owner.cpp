@@ -19,5 +19,5 @@
 
 // OpenTwin header
 #include "OTCore/Owner.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 

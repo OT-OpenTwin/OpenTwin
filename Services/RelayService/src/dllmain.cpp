@@ -24,7 +24,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON/JSON.h"					// rapidjson wrapper
 #include "OTCore/DebugHelper.h"
-#include "OTCore/Logging/LogDispatcher.h"				// Logger
+#include "OTCore/Logging/Logger.h"				// Logger
 #include "OTCore/ServiceBase.h"			// Logger initialization
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"	// action member and types definition
@@ -99,10 +99,10 @@ void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort
 		OT_LOG_D("Closing realay service");
 	}
 	catch (const std::exception & e) {
-		OT_LOG_EAS(std::string(e.what()));
+		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_EA("Unknown error");
+		OT_LOG_E("Unknown error");
 	}
 }
 
@@ -178,11 +178,11 @@ extern "C"
 			}
 		}
 		catch (const std::exception & e) {
-			OT_LOG_EAS(e.what());
+			OT_LOG_E(e.what());
 			exit(ot::AppExitCode::GeneralError);
 		}
 		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
+			OT_LOG_E("[FATAL] Unknown error");
 			exit(ot::AppExitCode::UnknownError);
 		}
 		return 0;
@@ -195,10 +195,10 @@ extern "C"
 			QMetaObject::invokeMethod(&SocketServer::instance(), &SocketServer::performAction, Qt::DirectConnection, qReturnArg(retVal), std::string(_json), std::string(_senderIP));
 		}
 		catch (const std::exception & e) {
-			OT_LOG_EAS(e.what());
+			OT_LOG_E(e.what());
 		}
 		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
+			OT_LOG_E("[FATAL] Unknown error");
 		}
 
 		char *retval = new char[retVal.length() + 1];
@@ -215,10 +215,10 @@ extern "C"
 			QMetaObject::invokeMethod(&SocketServer::instance(), &SocketServer::queueAction, Qt::QueuedConnection, std::string(_json), std::string(_senderIP));
 		}
 		catch (const std::exception & e) {
-			OT_LOG_EAS(e.what());
+			OT_LOG_E(e.what());
 		}
 		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
+			OT_LOG_E("[FATAL] Unknown error");
 		}
 		return retval;
 	}
@@ -241,10 +241,10 @@ extern "C"
 			}
 		}
 		catch (const std::exception & e) {
-			OT_LOG_EAS(e.what());
+			OT_LOG_E(e.what());
 		}
 		catch (...) {
-			OT_LOG_EA("[FATAL] Unknown error");
+			OT_LOG_E("[FATAL] Unknown error");
 		}
 	}
 }

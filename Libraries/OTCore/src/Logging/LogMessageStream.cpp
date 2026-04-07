@@ -1,21 +1,19 @@
 // @otlicense
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTCore/Logging/LogMessageStream.h"
 
-ot::LogMessageStream::LogMessageStream(const LogMessage& _initialMessage)
-	: m_message(_initialMessage)
+// std header
+#include <iomanip>
+
+ot::LogMessageStream::LogMessageStream(const std::string& _functionName, const LogFlags& _flags)
+	: m_functionName(_functionName), m_logFlags(_flags)
 {}
 
-ot::LogMessageStream::LogMessageStream(LogMessage&& _initialMessage) 
-	: m_message(std::move(_initialMessage))
-{}
-
-ot::LogMessage ot::LogMessageStream::getLogMessage() const
+std::string ot::LogMessageStream::getText() const
 {
-	LogMessage msg(m_message);
-	msg.setText(m_message.getText() + m_stream.str());
-	return msg;
+	return m_stream.str();
 }
 
 ot::LogMessageStream& ot::LogMessageStream::operator<<(bool _value)
@@ -24,7 +22,13 @@ ot::LogMessageStream& ot::LogMessageStream::operator<<(bool _value)
 	return *this;
 }
 
-ot::LogMessageStream& ot::LogMessageStream::operator<<(const char* _plainText)
+ot::LogMessageStream& ot::LogMessageStream::operator<<(char _character)
+{
+	m_stream << _character;
+	return *this;
+}
+
+ot::LogMessageStream& ot::LogMessageStream::operator<<(const char* const _plainText)
 {
 	m_stream << _plainText;
 	return *this;
@@ -54,15 +58,33 @@ ot::LogMessageStream& ot::LogMessageStream::operator<<(uint64_t _value)
 	return *this;
 }
 
+ot::LogMessageStream& ot::LogMessageStream::operator<<(float _value)
+{
+	m_stream << _value;
+	return *this;
+}
+
+ot::LogMessageStream& ot::LogMessageStream::operator<<(double _value)
+{
+	m_stream << _value;
+	return *this;
+}
+
 ot::LogMessageStream& ot::LogMessageStream::operator<<(const std::string& _plainText)
 {
 	m_stream << _plainText;
 	return *this;
 }
 
-ot::LogMessageStream& ot::LogMessageStream::operator<<(const Serializable * _serializableObject) {
+ot::LogMessageStream& ot::LogMessageStream::operator<<(const Serializable* const _serializableObject) {
 	JsonDocument doc;
 	_serializableObject->addToJsonObject(doc, doc.GetAllocator());
 	m_stream << doc.toJson();
+	return *this;
+}
+
+ot::LogMessageStream& ot::LogMessageStream::operator<<(const Pointer& _pointer)
+{
+	m_stream << "0x" << String::ptrToHexString(_pointer.ptr);
 	return *this;
 }

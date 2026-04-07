@@ -19,7 +19,7 @@
 
 
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTViewer/Model.h"

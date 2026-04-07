@@ -38,7 +38,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 

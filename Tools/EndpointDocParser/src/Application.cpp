@@ -21,7 +21,7 @@
 #include "OTSystem/FileSystem/FileSystem.h"
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // project header
 #include "Application.h"

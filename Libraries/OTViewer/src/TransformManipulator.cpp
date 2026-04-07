@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
@@ -247,7 +247,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		if (_property->getPropertyName() == PROP_Item_AxisX) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			m_lastPropertyAxis = osg::Vec3d(actualProperty->getValue(), m_lastPropertyAxis.y(), m_lastPropertyAxis.z());
@@ -255,7 +255,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		else if (_property->getPropertyName() == PROP_Item_AxisY) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), actualProperty->getValue(), m_lastPropertyAxis.z());
@@ -263,7 +263,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		else if (_property->getPropertyName() == PROP_Item_AxisZ) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			m_lastPropertyAxis = osg::Vec3d(m_lastPropertyAxis.x(), m_lastPropertyAxis.y(), actualProperty->getValue());
@@ -271,7 +271,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		else if (_property->getPropertyName() == PROP_Item_Angle) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			m_lastPropertyAngle = actualProperty->getValue();
@@ -284,7 +284,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		if (_property->getPropertyName() == PROP_Item_TranslateX) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			offset.set(actualProperty->getValue(), offset.y(), offset.z());
@@ -292,7 +292,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		else if (_property->getPropertyName() == PROP_Item_TranslateY) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			offset.set(offset.x(), actualProperty->getValue(), offset.z());
@@ -300,7 +300,7 @@ bool TransformManipulator::handlePropertyGridValueChanged(const ot::Property* _p
 		else if (_property->getPropertyName() == PROP_Item_TranslateZ) {
 			const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
 			if (!actualProperty) {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 				return false;
 			}
 			offset.set(offset.x(), offset.y(), actualProperty->getValue());

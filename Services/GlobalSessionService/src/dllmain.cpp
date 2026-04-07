@@ -31,7 +31,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/DebugHelper.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/ServiceLogNotifier.h"
@@ -71,15 +71,15 @@ extern "C"
 
 		// Ensure arguments were passed
 		if (_ownIP == nullptr) {
-			OT_LOG_EA("Service URL not provided");
+			OT_LOG_E("Service URL not provided");
 			exit(ot::AppExitCode::ServiceUrlMissing);
 		}
 		if (_databaseUrl == nullptr) {
-			OT_LOG_EA("Data Base URL not provided");
+			OT_LOG_E("Data Base URL not provided");
 			exit(ot::AppExitCode::DataBaseUrlMissing);
 		}
 		if (_authURL == nullptr) {
-			OT_LOG_EA("Authorization Service URL not provided");
+			OT_LOG_E("Authorization Service URL not provided");
 			exit(ot::AppExitCode::AuthUrlMissing);
 		}
 
@@ -92,15 +92,15 @@ extern "C"
 
 		// Ensure data is somewhat valid
 		if (gss.getServiceURL().empty()) {
-			OT_LOG_EA("Empty Service URL provided");
+			OT_LOG_E("Empty Service URL provided");
 			exit(ot::AppExitCode::ServiceUrlInvalid);
 		}
 		if (gss.getDatabaseUrl().empty()) {
-			OT_LOG_EA("Empty Data Base URL provided");
+			OT_LOG_E("Empty Data Base URL provided");
 			exit(ot::AppExitCode::DataBaseUrlInvalid);
 		}
 		if (gss.getAuthorizationUrl().empty()) {
-			OT_LOG_EA("Empty Authorization Service URL provided");
+			OT_LOG_E("Empty Authorization Service URL provided");
 			exit(ot::AppExitCode::AuthUrlInvalid);
 		}
 

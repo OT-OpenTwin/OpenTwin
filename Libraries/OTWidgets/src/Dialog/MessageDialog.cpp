@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
 
 ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDialogCfg& _config, QWidget* _parent) {
@@ -58,7 +58,7 @@ ot::MessageDialogCfg::BasicButton ot::MessageDialog::showDialog(const MessageDia
 	case QMessageBox::Reset: return MessageDialogCfg::Reset;
 	case QMessageBox::RestoreDefaults: return MessageDialogCfg::RestoreDefaults;
 	default:
-		OT_LOG_EAS("Unknown button (" + std::to_string((int)btn) + ")");
+		OT_LOG_E("Unknown button (" + std::to_string((int)btn) + ")");
 		return MessageDialogCfg::Cancel;
 	}
 }
@@ -72,7 +72,7 @@ QMessageBox::Icon ot::MessageDialog::convertIcon(MessageDialogCfg::BasicIcon _ic
 	case ot::MessageDialogCfg::Warning: return QMessageBox::Warning;
 	case ot::MessageDialogCfg::Critical: return QMessageBox::Critical;
 	default:
-		OT_LOG_EAS("Unknown icon (" + std::to_string((int)_icon) + ")");
+		OT_LOG_E("Unknown icon (" + std::to_string((int)_icon) + ")");
 		return QMessageBox::NoIcon;
 	}
 }

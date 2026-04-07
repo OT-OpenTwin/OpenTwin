@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCommunication/ActionTypes.h"

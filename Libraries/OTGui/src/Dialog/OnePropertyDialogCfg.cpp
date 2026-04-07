@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyFactory.h"
 #include "OTGui/Dialog/OnePropertyDialogCfg.h"
@@ -41,7 +41,7 @@ void ot::OnePropertyDialogCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonA
 		_object.AddMember("Property", propertyObj, _allocator);
 	}
 	else {
-		OT_LOG_EA("Property not set");
+		OT_LOG_E("Property not set");
 		JsonNullValue propertyObj;
 		_object.AddMember("Property", propertyObj, _allocator);
 	}

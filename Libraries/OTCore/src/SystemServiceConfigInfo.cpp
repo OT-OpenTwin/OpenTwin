@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/ArchitectureInfo.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/SystemServiceConfigInfo.h"
 
 #ifdef OT_OS_WINDOWS
@@ -118,7 +118,7 @@ bool ot::SystemServiceConfigInfo::loadSystemServiceConfig(const char* _serviceNa
                     m_configPath = String::removePrefixSuffix(trimmed.substr(configKeyword.length()), " \t\n\"\'");
                 }
                 else {
-                    OT_LOG_EA("BinaryPath syntax error: Config path duplicate");
+                    OT_LOG_E("BinaryPath syntax error: Config path duplicate");
                 }
             }
             else if (trimmed.find(serviceKeyword) == 0) {
@@ -126,14 +126,14 @@ bool ot::SystemServiceConfigInfo::loadSystemServiceConfig(const char* _serviceNa
                     m_servicePath = String::removePrefixSuffix(trimmed.substr(serviceKeyword.length()), " \t\n\"\'");
                 }
                 else {
-                    OT_LOG_EA("BinaryPath syntax error: Service path duplicate");
+                    OT_LOG_E("BinaryPath syntax error: Service path duplicate");
                 }
             }
             else if (m_binaryPath.empty()) {
                 m_binaryPath = trimmed;
             }
             else {
-                OT_LOG_EA("BinaryPath syntax error: Binary path duplicate");
+                OT_LOG_E("BinaryPath syntax error: Binary path duplicate");
             }
         }
     } // queryOk

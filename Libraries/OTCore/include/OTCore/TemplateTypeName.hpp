@@ -20,14 +20,15 @@
 #pragma once
 
 #include "OTCore/TemplateTypeName.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 namespace ot
 {
 	template <class T>
 	static std::string TemplateTypeName<T>::getTypeName()
 	{
-		OT_LOG_EA("Not supported type");
+		OTAssert(0, "Not supported type");
+		OT_LOG_E("Not supported type");
 	}
 
 	template <>

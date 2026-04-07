@@ -25,7 +25,7 @@
 #include "ProjectOverviewWidget.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Widgets/Label.h"

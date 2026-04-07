@@ -27,7 +27,7 @@
 #include "OTCore/CoreTypes.h"                        // Core types
 #include "OTCore/ServiceBase.h"                      // Base class for services
 #include "OTCore/ReturnMessage.h"                    // Return message related methods and types
-#include "OTCore/Logging/LogDispatcher.h"                    // Logging related methods and types
+#include "OTCore/Logging/Logger.h"                    // Logging related methods and types
 
 // OpenTwin Gui header
 #include "OTGui/Properties/PropertyGridCfg.h"                   // Property grid configuration

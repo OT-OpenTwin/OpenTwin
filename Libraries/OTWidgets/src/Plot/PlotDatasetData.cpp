@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTWidgets/Plot/PlotDatasetData.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotDatasetData.h"
@@ -58,11 +58,11 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<s
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
 {
 	if (_initialXQuantity == Plot1DAxisCfg::Undefined) {
-		OT_LOG_EAS("Undefined initial X quantity (" + std::to_string(static_cast<int>(_initialXQuantity)) + "). Defaulting to XData");
+		OT_LOG_E("Undefined initial X quantity (" + std::to_string(static_cast<int>(_initialXQuantity)) + "). Defaulting to XData");
 		_initialXQuantity = Plot1DAxisCfg::XData;
 	}
 	if (_initialYQuantity == Plot1DAxisCfg::Undefined) {
-		OT_LOG_EAS("Undefined initial Y quantity (" + std::to_string(static_cast<int>(_initialYQuantity)) + "). Defaulting to Real");
+		OT_LOG_E("Undefined initial Y quantity (" + std::to_string(static_cast<int>(_initialYQuantity)) + "). Defaulting to Real");
 		_initialYQuantity = Plot1DAxisCfg::Real;
 	}
 
@@ -249,7 +249,7 @@ bool ot::PlotDatasetData::applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantity _
 
 	switch (_quantity) {
 	case Plot1DAxisCfg::XData:
-		OT_LOG_EA("Invalid data state. This should not happen!");
+		OT_LOG_E("Invalid data state. This should not happen!");
 		break;
 
 	case Plot1DAxisCfg::Magnitude:

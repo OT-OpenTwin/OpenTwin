@@ -26,7 +26,7 @@
 #include "DataSourceResult3D.h"
 #include "DataSourceUnstructuredMesh.h"
 #include "DataSourceCartesianMesh.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
 {
@@ -52,7 +52,7 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	}
 	else
 	{
-		OT_LOG_EAS("Invalid entity type: \"" + resultEntity->getClassName() + "\"");
+		OT_LOG_E("Invalid entity type: \"" + resultEntity->getClassName() + "\"");
 	}
 
 	return nullptr;

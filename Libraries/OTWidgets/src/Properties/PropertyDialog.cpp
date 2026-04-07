@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
@@ -154,7 +154,7 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 	QStringList currentFocus;
 	if (!m_navigation->getTreeWidget()->selectedItems().isEmpty()) {
 		if (m_navigation->getTreeWidget()->selectedItems().count() > 1) {
-			OT_LOG_EA("Multiselection is not supported");
+			OT_LOG_E("Multiselection is not supported");
 		}
 		else {
 			QTreeWidgetItem* itm = m_navigation->getTreeWidget()->selectedItems().front();
@@ -254,7 +254,7 @@ void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const Proper
 	if (_group->isEmpty()) return;
 
 	if (this->childItemExists(_parentTreeItem, QString::fromStdString(_group->getTitle()))) {
-		OT_LOG_EA("Child item already exists");
+		OT_LOG_E("Child item already exists");
 		return;
 	}
 

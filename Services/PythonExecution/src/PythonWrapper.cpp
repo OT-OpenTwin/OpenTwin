@@ -22,7 +22,7 @@
 #include "PythonExtension.h"
 #include "Application.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 #include <thread>
 

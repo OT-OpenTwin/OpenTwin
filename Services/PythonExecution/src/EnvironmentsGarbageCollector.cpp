@@ -24,7 +24,7 @@
 
 #include <assert.h>
 #include "PredefinedEnvironments.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 void EnvironmentsGarbageCollector::markForCleanup()
 {

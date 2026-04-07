@@ -4,7 +4,7 @@
 #include "ScriptRunner.h"
 #include "OToolkitAPI/OToolkitAPI.h"
 #include "OTSystem/SystemProcess.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // Qt header
 #include <QtCore/qdir.h>

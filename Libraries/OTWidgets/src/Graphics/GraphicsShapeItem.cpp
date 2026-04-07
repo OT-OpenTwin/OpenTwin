@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsShapeItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Graphics/GraphicsShapeItem.h"
@@ -48,7 +48,7 @@ bool ot::GraphicsShapeItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	const GraphicsShapeItemCfg* cfg = dynamic_cast<const GraphicsShapeItemCfg*>(_cfg);
 	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		OT_LOG_E("Invalid configuration provided: Cast failed");
 		return false;
 	}
 

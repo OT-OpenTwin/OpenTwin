@@ -24,7 +24,7 @@
 #include "GraphicsItemDesignerImageExportDialog.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/CheckBox.h"

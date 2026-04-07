@@ -27,7 +27,7 @@
 
 // OpenTwin header
 #include "OTSystem/SystemInformation.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCommunication/Msg.h"
@@ -123,12 +123,12 @@ ot::ReturnMessage GlobalSessionService::handleCreateSession(ot::JsonDocument& _d
 
 		if (newSession.getUserName() == lss.getSessionUser(newSession.getId())) {
 			// Session open by same user in a different instance
-			OT_LOG_WAS("Session already opened by same user. Session: \"" + newSession.getId() + "\"");
+			OT_LOG_W("Session already opened by same user. Session: \"" + newSession.getId() + "\"");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Session already open in another instance");
 		}
 		else {
 			// Session open by different user
-			OT_LOG_WAS("Session already opened by other user. Session: \"" + newSession.getId() + "\"");
+			OT_LOG_W("Session already opened by other user. Session: \"" + newSession.getId() + "\"");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Session open by other user");
 		}
 	}
@@ -138,7 +138,7 @@ ot::ReturnMessage GlobalSessionService::handleCreateSession(ot::JsonDocument& _d
 		// Determine LSS
 		LocalSessionService* lss = determineLeastLoadedLSS();
 		if (!lss) {
-			OT_LOG_EAS("Failed to determine least loaded LSS");
+			OT_LOG_E("Failed to determine least loaded LSS");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to determine least loaded LSS");
 		}
 
@@ -520,13 +520,13 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 	for (const auto& lss : m_lssMap) {
 		std::string responseStr;
 		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
+			OT_LOG_E("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send message to Local Session Service { \"Lss.Url\": \"" + lss.second.getUrl() + "\" }");
 		}
 
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 		if (response != ot::ReturnMessage::Ok) {
-			OT_LOG_EAS("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
+			OT_LOG_E("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
 		}
 	}
 
@@ -548,7 +548,7 @@ ot::ReturnMessage GlobalSessionService::handleShutdownSession(ot::JsonDocument& 
 	if (id != m_sessionMap.end()) {
 		auto lss = m_lssMap.find(id->second);
 		if (lss == m_lssMap.end()) {
-			OT_LOG_EA("LSS data mismatch");
+			OT_LOG_E("LSS data mismatch");
 			throw std::out_of_range("LSS entry not found for existing session");
 		}
 
@@ -562,7 +562,7 @@ ot::ReturnMessage GlobalSessionService::handleShutdownSession(ot::JsonDocument& 
 
 		std::string response;
 		if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, gdsDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to Global Directory Service (url = " + m_globalDirectoryUrl + ")");
+			OT_LOG_E("Failed to send message to Global Directory Service (url = " + m_globalDirectoryUrl + ")");
 		}
 		
 		m_sessionMap.erase(sessionID);
@@ -605,13 +605,13 @@ ot::ReturnMessage GlobalSessionService::handleNewGlobalDirectoryService(ot::Json
 	for (const auto& lss : m_lssMap) {
 		responseStr.clear();
 		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
+			OT_LOG_E("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send message to Local Session Service { \"Lss.Url\": \"" + lss.second.getUrl() + "\" }");
 		}
 
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 		if (!response.isOk()) {
-			OT_LOG_EAS("Error response from LSS { \"Lss.Url\": \"" + lss.second.getUrl() + "\", \"Error\": \"" + response.getWhat() + "\" }");
+			OT_LOG_E("Error response from LSS { \"Lss.Url\": \"" + lss.second.getUrl() + "\", \"Error\": \"" + response.getWhat() + "\" }");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Error response from LSS { \"Lss.Url\": \"" + lss.second.getUrl() + "\", \"Error\": \"" + response.getWhat() + "\" }");
 		}
 	}
@@ -635,22 +635,22 @@ void GlobalSessionService::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	for (const auto& it : m_lssMap) {
 		std::string response;
 		if (!ot::msg::send("", it.second.getUrl(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to LSS at \"" + it.second.getUrl() + "\"");
+			OT_LOG_E("Failed to send message to LSS at \"" + it.second.getUrl() + "\"");
 		}
 	}
 
 	std::string tmp;
 	if (!ot::msg::send("", m_globalDirectoryUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_EAS("Failed to send message to GDS at \"" + m_globalDirectoryUrl + "\"");
+		OT_LOG_E("Failed to send message to GDS at \"" + m_globalDirectoryUrl + "\"");
 	}
 
 	if (!ot::msg::send("", m_authorizationUrl, ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_EAS("Failed to send message to Authorization Service at \"" + m_authorizationUrl + "\"");
+		OT_LOG_E("Failed to send message to Authorization Service at \"" + m_authorizationUrl + "\"");
 	}
 
 	if (!ot::ServiceLogNotifier::instance().loggingServiceURL().empty()) {
 		if (!ot::msg::send("", ot::ServiceLogNotifier::instance().loggingServiceURL(), ot::EXECUTE, json, tmp, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to Logging Service at \"" + ot::ServiceLogNotifier::instance().loggingServiceURL() + "\"");
+			OT_LOG_E("Failed to send message to Logging Service at \"" + ot::ServiceLogNotifier::instance().loggingServiceURL() + "\"");
 		}
 	}
 }
@@ -695,7 +695,7 @@ bool GlobalSessionService::addSessionService(LocalSessionService&& _service, ot:
 		if (it->second.getUrl() == _service.getUrl()) {
 			// LSS with given URL already registered, check if "old" LSS is still alive
 			if (it->second.ping()) {
-				OT_LOG_WAS("LSS with given url already registered and alive. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
+				OT_LOG_W("LSS with given url already registered and alive. { \"Lss.Url\": \"" + _service.getUrl() + "\" }");
 				return false;
 			}
 
@@ -807,11 +807,11 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		return;
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 		return;
 	}
 
@@ -826,7 +826,7 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 			std::string briefDescription;
 
 			if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists("ProjectTemplates", name)) {
-				OT_LOG_EAS("Template collection \"" + name + "\" can not be accessed");
+				OT_LOG_E("Template collection \"" + name + "\" can not be accessed");
 				continue;
 			}
 
@@ -841,7 +841,7 @@ void GlobalSessionService::getCustomProjectTemplates(ot::JsonDocument& _resultAr
 			auto result = docManager.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
 
 			if (!result.getSuccess()) {
-				OT_LOG_EAS("Grabbing template collection \"" + name + "\" failed");
+				OT_LOG_E("Grabbing template collection \"" + name + "\" failed");
 				continue;
 			}
 

@@ -69,7 +69,7 @@ void GraphicsItemDesignerNavigationRoot::propertyChanged(const ot::Property* con
 
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
-		OT_LOG_EA("Data mismatch");
+		OT_LOG_E("Data mismatch");
 		return;
 	}
 

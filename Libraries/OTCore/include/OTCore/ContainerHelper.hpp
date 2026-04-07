@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ContainerHelper.h"
+#include "OTCore/Logging/Logger.h"
 
 // std header
 #include <set>

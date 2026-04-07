@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/OTSVGDataParser.h"
 #include "OTWidgets/Style/IconManager.h"
 
@@ -38,7 +38,7 @@ ot::IconManager& ot::IconManager::instance(void) {
 bool ot::IconManager::addSearchPath(const QString& _path) {
 	IconManager& manager = IconManager::instance();
 	if (_path.isEmpty()) {
-		OT_LOG_WA("Empty search path provided. Ignoring");
+		OT_LOG_W("Empty search path provided. Ignoring");
 		return false;
 	}
 

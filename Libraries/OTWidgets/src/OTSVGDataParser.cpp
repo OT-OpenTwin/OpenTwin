@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTWidgets/OTSVGDataParser.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -61,7 +61,7 @@ QByteArray ot::OTSVGDataParser::parse(const QByteArray& _rawData, const ColorSty
 				processedData.insert(svgTagIx + 5, defsContent);
 			}
 			else {
-				OT_LOG_EA("Invalid SVG data: svg start tag not found.");
+				OT_LOG_E("Invalid SVG data: svg start tag not found.");
 			}
 		}
 	}
@@ -86,7 +86,7 @@ void ot::OTSVGDataParser::processPlaceholders(const QByteArray& _data, const Col
 		placeholderTypeStr = "double";
 		break;
 	default:
-		OT_LOG_EAS("Unknown placeholder type (" + std::to_string(static_cast<int>(_type)) + ")");
+		OT_LOG_E("Unknown placeholder type (" + std::to_string(static_cast<int>(_type)) + ")");
 		return;
 	}
 
@@ -94,7 +94,7 @@ void ot::OTSVGDataParser::processPlaceholders(const QByteArray& _data, const Col
 	while (ix != -1) {
 		int endIx = _data.indexOf(')', ix);
 		if (endIx == -1) {
-			OT_LOG_EAS("Invalid " + placeholderTypeStr + " placeholder in SVG data at position " + std::to_string(ix) + ": Closing bracket missing");
+			OT_LOG_E("Invalid " + placeholderTypeStr + " placeholder in SVG data at position " + std::to_string(ix) + ": Closing bracket missing");
 			break;
 		}
 

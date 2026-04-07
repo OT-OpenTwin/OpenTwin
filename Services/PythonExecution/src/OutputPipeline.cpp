@@ -72,7 +72,7 @@ void OutputPipeline::setupOutputPipeline()
 	{
 		// Create a pipe for getting the standard output
 		if (_pipe(m_pipe_fds, 4096, _O_TEXT) == -1) {
-			OT_LOG_EA("Creating pipe for capturing Python output failed.");
+			OT_LOG_E("Creating pipe for capturing Python output failed.");
 		}
 	}
 }

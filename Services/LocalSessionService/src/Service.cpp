@@ -22,7 +22,7 @@
 #include "Session.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -78,7 +78,7 @@ std::list<ot::port_t> Service::getPortNumbers(void) const {
 	}
 
 	if (ports.empty()) {
-		OT_LOG_EA("Failed to excract port numbers");
+		OT_LOG_E("Failed to excract port numbers");
 	}
 
 	return ports;

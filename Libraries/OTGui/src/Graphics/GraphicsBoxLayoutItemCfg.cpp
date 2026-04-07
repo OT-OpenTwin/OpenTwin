@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTGui/Graphics/GraphicsBoxLayoutItemCfg.h"
 
@@ -86,7 +86,7 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _obj
 
 	for (rapidjson::SizeType i = 0; i < itemArr.Size(); i++) {
 		ConstJsonObject pairObj = json::getObject(itemArr, i);
-		if (!pairObj.HasMember(OT_JSON_MEMBER_Item)) { OT_LOG_EA("Invalid item entry"); return; }
+		if (!pairObj.HasMember(OT_JSON_MEMBER_Item)) { OT_LOG_E("Invalid item entry"); return; }
 
 		if (pairObj[OT_JSON_MEMBER_Item].IsNull()) {
 			m_items.push_back(itemStrechPair_t(nullptr, pairObj[OT_JSON_MEMBER_Stretch].GetInt()));
@@ -101,7 +101,7 @@ void ot::GraphicsBoxLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _obj
 			m_items.push_back(itemStrechPair_t(itm, json::getInt(pairObj, OT_JSON_MEMBER_Stretch)));
 		}
 		else {
-			OT_LOG_EAS("Invalid JSON Object type");
+			OT_LOG_E("Invalid JSON Object type");
 		}
 	}
 }

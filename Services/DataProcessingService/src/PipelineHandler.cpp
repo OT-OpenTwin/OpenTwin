@@ -30,7 +30,7 @@
 #include "BlockHandlerFileWriter.h"
 #include "BlockHandlerStorage.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include <string>
 #include <ctime>
 #include "SolverReport.h"

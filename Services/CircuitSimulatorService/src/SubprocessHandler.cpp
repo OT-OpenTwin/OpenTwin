@@ -22,7 +22,7 @@
 #include "SimulationResults.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 #include "QtCore/qcoreapplication.h"
 #include "QtCore/qtimer.h"

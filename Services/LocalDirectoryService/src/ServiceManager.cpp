@@ -23,7 +23,7 @@
 #include "ServiceManager.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTSystem/PortManager.h"
 #include "OTCommunication/ActionTypes.h"
@@ -679,7 +679,7 @@ void ServiceManager::cleanUpIniList(const std::string& _sessionID) {
 			// Send shutdown message to the service
 			std::string response;
 			if (!ot::msg::send("", it->getUrl(), ot::EXECUTE, cmd, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_EAS("Failed to send shutdown message to service { " + logInfo(*it) + " }");
+				OT_LOG_E("Failed to send shutdown message to service { " + logInfo(*it) + " }");
 			}
 
 			std::lock_guard<std::mutex> stopLock(m_mutexStoppingServices);
@@ -737,7 +737,7 @@ void ServiceManager::workerServiceStarter() {
 			
 			// Check if max restarts is reached
 			if (info.incrStartCounter() > info.getMaxStartupRestarts()) {
-				OT_LOG_EAS("Maximum number of start attempts (" + std::to_string(info.getMaxStartupRestarts()) +
+				OT_LOG_E("Maximum number of start attempts (" + std::to_string(info.getMaxStartupRestarts()) +
 					") reached for service  { " + logInfo(info) + " }");
 				
 				// Notify and skip

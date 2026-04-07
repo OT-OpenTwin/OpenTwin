@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Widgets/ToolButton.h"
 #include "OTWidgets/WidgetView/WidgetViewTab.h"

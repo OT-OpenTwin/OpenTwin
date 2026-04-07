@@ -68,7 +68,7 @@ Application::~Application()
 
 void Application::run(void) {
 	if (m_subprocessManager) {
-		OT_LOG_EA("Application already in run mode");
+		OT_LOG_E("Application already in run mode");
 		return;
 	}
 

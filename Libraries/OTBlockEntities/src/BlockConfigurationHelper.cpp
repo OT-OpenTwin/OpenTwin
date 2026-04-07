@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/EntityName.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTBlockEntities/BlockConfigurationHelper.h"
 
 std::string ot::BlockConfigurationHelper::getGraphicSceneName(const std::string& _entityName, const std::string& _graphicsSceneChildName) {

@@ -207,10 +207,10 @@ void SubprocessManager::worker(std::string _projectName) {
 		app.exec();
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS("Fatal Error: " + std::string(_e.what()));
+		OT_LOG_E("Fatal Error: " + std::string(_e.what()));
 	}
 	catch (...) {
-		OT_LOG_EA("Fatal Error: Unknown error");
+		OT_LOG_E("Fatal Error: Unknown error");
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);

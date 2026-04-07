@@ -25,7 +25,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"

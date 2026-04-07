@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTGui/Widgets/TableCfg.h"
@@ -49,7 +49,7 @@ std::string ot::TableCfg::toString(ot::TableCfg::TableHeaderMode _headerMode) {
 	case ot::TableCfg::TableHeaderMode::Horizontal: return TableHeaderModeNames::ModeNameHorizontal;
 	case ot::TableCfg::TableHeaderMode::Vertical: return TableHeaderModeNames::ModeNameVertical;
 	default:
-		OT_LOG_EAS("Unknown header mode (" + std::to_string((int)_headerMode) + ")");
+		OT_LOG_E("Unknown header mode (" + std::to_string((int)_headerMode) + ")");
 		return TableHeaderModeNames::ModeNameNone;
 	}
 }
@@ -59,7 +59,7 @@ ot::TableCfg::TableHeaderMode ot::TableCfg::stringToHeaderMode(const std::string
 	else if (_headerMode == ot::TableHeaderModeNames::ModeNameHorizontal) return TableHeaderMode::Horizontal;
 	else if (_headerMode == TableHeaderModeNames::ModeNameVertical) return TableHeaderMode::Vertical;
 	else {
-		OT_LOG_EAS("Unknown header mode \"" + _headerMode + "\"");
+		OT_LOG_E("Unknown header mode \"" + _headerMode + "\"");
 		return TableHeaderMode::NoHeader;
 	}
 }

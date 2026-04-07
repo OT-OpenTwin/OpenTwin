@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTWidgets/ImagePainter/ImagePainter.h"
 #include "OTWidgets/ImagePainter/PixmapImagePainter.h"
@@ -37,7 +37,7 @@ ot::ImagePainterManager& ot::ImagePainterManager::instance(void) {
 const ot::ImagePainter* ot::ImagePainterManager::getPainter(const std::string& _key) const {
 	const auto& it = m_painter.find(_key);
 	if (it == m_painter.end()) {
-		OT_LOG_EAS("ImagePainter \"" + _key + "\" not found");
+		OT_LOG_E("ImagePainter \"" + _key + "\" not found");
 		return nullptr;
 	}
 	else return it->second;
@@ -70,7 +70,7 @@ ot::ImagePainter* ot::ImagePainterManager::createFromRawData(const std::vector<c
 		QByteArray svgData = QByteArray::fromRawData(_data.data(), static_cast<int>(_data.size()));
 		SvgImagePainter* newPainter = new SvgImagePainter(svgData);
 		if (!newPainter->isValid()) {
-			OT_LOG_EA("Invalid svg data");
+			OT_LOG_E("Invalid svg data");
 			delete newPainter;
 			return nullptr;
 		}
@@ -194,12 +194,12 @@ ot::ImagePainter* ot::ImagePainterManager::importPng(const std::string& _subPath
 ot::ImagePainter* ot::ImagePainterManager::importSvg(const std::string& _subPath) {
 	QByteArray data = IconManager::getSvgData(QString::fromStdString(_subPath));
 	if (data.isEmpty()) {
-		OT_LOG_EA("Empty svg data");
+		OT_LOG_E("Empty svg data");
 		return nullptr;
 	}
 	SvgImagePainter* newPainter = new SvgImagePainter(data);
 	if (!newPainter->isValid()) {
-		OT_LOG_EA("Invalid svg data");
+		OT_LOG_E("Invalid svg data");
 		delete newPainter;
 		return nullptr;
 	}

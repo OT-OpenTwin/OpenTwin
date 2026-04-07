@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/AbstractPlot.h"
 
@@ -57,7 +57,7 @@ bool ot::AbstractPlot::hasPlotAxis(AbstractPlotAxis::AxisID _id) const
 	case ot::AbstractPlotAxis::xBottom: return m_axisXBottom != nullptr;
 	case ot::AbstractPlotAxis::xTop:    return m_axisXTop != nullptr;
 	default:
-		OT_LOG_EAS("Invalid plot axis (" + std::to_string(_id) + ")");
+		OT_LOG_E("Invalid plot axis (" + std::to_string(_id) + ")");
 		return false;
 	}
 }
@@ -86,13 +86,13 @@ ot::AbstractPlotAxis* ot::AbstractPlot::getPlotAxis(AbstractPlotAxis::AxisID _id
 
 	default:
 		const std::string msg = "Invalid plot axis (" + std::to_string(_id) + ")";
-		OT_LOG_EAS(msg);
+		OT_LOG_E(msg);
 		throw Exception::InvalidArgument(msg);
 	}
 
 	if (result == nullptr)
 	{
-		OT_LOG_EAS("Plot axis not set for axis id " + std::to_string(_id));
+		OT_LOG_E("Plot axis not set for axis id " + std::to_string(_id));
 		throw Exception::ObjectNotFound("Plot axis not set for axis id " + std::to_string(_id));
 	}
 

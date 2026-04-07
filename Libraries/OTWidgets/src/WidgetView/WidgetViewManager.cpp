@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/ContainerHelper.h"
@@ -62,7 +62,7 @@ ot::WidgetViewManager::~WidgetViewManager() {
 
 void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
 	if (m_dockManager) {
-		OT_LOG_WA("WidgetViewManager already initialized");
+		OT_LOG_W("WidgetViewManager already initialized");
 		return;
 	}
 
@@ -311,7 +311,7 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 		}
 	}
 	else {
-		OT_LOG_EAS("ViewNameTypeList not found");
+		OT_LOG_E("ViewNameTypeList not found");
 	}
 	
 	ViewEntry viewsEntry;
@@ -320,7 +320,7 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 
 	auto viewIterator = std::find(m_views.begin(), m_views.end(), viewsEntry);
 	if (viewIterator == m_views.end()) {
-		OT_LOG_EA("View entry not found");
+		OT_LOG_E("View entry not found");
 	}
 	else {
 		m_views.erase(viewIterator);
@@ -490,7 +490,7 @@ ot::BasicServiceInformation ot::WidgetViewManager::getOwnerFromView(WidgetView* 
 		}
 	}
 
-	OT_LOG_EA("View not found");
+	OT_LOG_E("View not found");
 	return BasicServiceInformation();
 }
 

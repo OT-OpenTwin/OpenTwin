@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTViewer/MaterialRough.h"
 #include "OTViewer/MaterialPlastic.h"
 #include "OTViewer/MaterialPolished.h"
@@ -45,6 +45,6 @@ MaterialBase* SceneNodeMaterialFactory::createMaterial(const std::string& matTyp
 		return new MaterialMetal;
 	}
 
-	OT_LOG_WAS("Unknown material \"" + matType + "\"");
+	OT_LOG_W("Unknown material \"" + matType + "\"");
 	return nullptr;
 }

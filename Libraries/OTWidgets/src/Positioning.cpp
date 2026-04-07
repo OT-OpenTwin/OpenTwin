@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/Widgets/WidgetBase.h"
 
@@ -65,7 +65,7 @@ QRect ot::Positioning::calculateChildRect(const QRect& _parentRect, const QSize&
 	case Alignment::TopLeft:
 		break;
 	default:
-		OT_LOG_EA("Unknown Alignment");
+		OT_LOG_E("Unknown Alignment");
 		break;
 	}
 
@@ -110,7 +110,7 @@ QRectF ot::Positioning::calculateChildRect(const QRectF& _parentRect, const QSiz
 	case Alignment::TopLeft:
 		break;
 	default:
-		OT_LOG_EA("Unknown Alignment");
+		OT_LOG_E("Unknown Alignment");
 		break;
 	}
 
@@ -268,7 +268,7 @@ QRect ot::Positioning::fitOnScreen(const QRect& _sourceRect, FitMode _mode) {
 		referencePoint = _sourceRect.center();
 		break;
 	default:
-		OT_LOG_EAS("Unknown FitMode (" + std::to_string(static_cast<int>(_mode)) + ")");
+		OT_LOG_E("Unknown FitMode (" + std::to_string(static_cast<int>(_mode)) + ")");
 		referencePoint = _sourceRect.topLeft();
 		break;
 	}
@@ -355,7 +355,7 @@ QRect ot::Positioning::getCenterWidgetOnParentRect(const QWidget* _parentWidget,
 			return Positioning::calculateChildRect(screen->geometry(), _childRect.size(), Alignment::Center);
 		}
 		else {
-			OT_LOG_EA("Primary screen not found");
+			OT_LOG_E("Primary screen not found");
 			return _childRect;
 		}
 	}

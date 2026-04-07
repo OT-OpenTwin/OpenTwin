@@ -554,7 +554,7 @@ void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 		getCoordinateSystemManager()->edgePicked(selectionInfo);
 	}
 	else {
-		OT_LOG_EAS("Unsupported selection action \"" + selectionAction + "\" received.");
+		OT_LOG_E("Unsupported selection action \"" + selectionAction + "\" received.");
 	}
 }
 

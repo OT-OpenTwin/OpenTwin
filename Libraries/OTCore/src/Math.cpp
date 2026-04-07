@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Math.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // std header
 

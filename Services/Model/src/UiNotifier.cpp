@@ -22,7 +22,7 @@
 #include "UiNotifier.h"
 #include "Application.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 void UiNotifier::shortcutActivated(const std::string& _keySquence) {
 	Model* model = Application::instance()->getModel();

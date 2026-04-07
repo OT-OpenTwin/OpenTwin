@@ -750,32 +750,32 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 			QJsonArray arr = doc.array();
 			for (int i = 0; i < arr.count(); i++) {
 				if (!arr[i].isObject()) {
-					OT_LOG_EA("GSS data entry is not an object");
+					OT_LOG_E("GSS data entry is not an object");
 					continue;
 				}
 				QJsonObject obj = arr[i].toObject();
 				if (!obj.contains("Name")) {
-					OT_LOG_EA("JSON member \"Name\" is missing");
+					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
 				if (!obj.contains("IP")) {
-					OT_LOG_EA("JSON member \"Name\" is missing");
+					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
 				if (!obj.contains("Port")) {
-					OT_LOG_EA("JSON member \"Name\" is missing");
+					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
 				if (!obj["Name"].isString()) {
-					OT_LOG_EA("JSON member \"Name\" is not a string");
+					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
 				if (!obj["IP"].isString()) {
-					OT_LOG_EA("JSON member \"Name\" is not a string");
+					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
 				if (!obj["Port"].isString()) {
-					OT_LOG_EA("JSON member \"Name\" is not a string");
+					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
 
@@ -793,7 +793,7 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
 			}
 		}
 		else {
-			OT_LOG_EA("SessionService list is not a JSON array");
+			OT_LOG_E("SessionService list is not a JSON array");
 		}
 	}
 
@@ -880,7 +880,7 @@ void LogInDialog::setControlsForRegister() {
 }
 
 void LogInDialog::setControlsForChangePassword() {
-	OT_LOG_WA("Not implemented yet");
+	OT_LOG_W("Not implemented yet");
 }
 
 void LogInDialog::setControlsForSSO() {

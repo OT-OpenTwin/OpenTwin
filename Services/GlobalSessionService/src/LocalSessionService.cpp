@@ -22,7 +22,7 @@
 #include "LocalSessionService.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -190,7 +190,7 @@ bool LocalSessionService::confirmSession(const std::string& _sessionId) {
 		}
 	}
 
-	OT_LOG_EAS("Session not found in initialize list. Session id: \"" + _sessionId + "\"");
+	OT_LOG_E("Session not found in initialize list. Session id: \"" + _sessionId + "\"");
 	return false;
 }
 

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsGridLayoutItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Graphics/GraphicsItemFactory.h"
@@ -47,7 +47,7 @@ ot::GraphicsGridLayoutItem::~GraphicsGridLayoutItem() {
 bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	const GraphicsGridLayoutItemCfg* cfg = dynamic_cast<const GraphicsGridLayoutItemCfg*>(_cfg);
 	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		OT_LOG_E("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
@@ -62,7 +62,7 @@ bool ot::GraphicsGridLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 			if (c) {
 				ot::GraphicsItem* i = ot::GraphicsItemFactory::itemFromConfig(c);
 				if (i == nullptr) {
-					OT_LOG_EA("GraphicsFactory failed");
+					OT_LOG_E("GraphicsFactory failed");
 					this->setBlockConfigurationNotifications(false);
 					return false;
 				}

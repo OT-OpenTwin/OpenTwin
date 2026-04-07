@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Menu/MenuButtonCfg.h"
 #include "OTGui/Menu/MenuEntryCfgFactory.h"
 
@@ -40,7 +40,7 @@ std::string ot::MenuButtonCfg::toString(ButtonAction _action) {
 	case ButtonAction::TriggerButton: return "Trigger Button";
 	case ButtonAction::NotifyOwner: return "Notify Owner";
 	default:
-		OT_LOG_EAS("Unknown button action (" + std::to_string((int)_action) + ")");
+		OT_LOG_E("Unknown button action (" + std::to_string((int)_action) + ")");
 		return "No Action";
 	}
 }
@@ -60,7 +60,7 @@ ot::MenuButtonCfg::ButtonAction ot::MenuButtonCfg::stringToButtonAction(const st
 	else if (_action == MenuButtonCfg::toString(ButtonAction::TriggerButton)) return ButtonAction::TriggerButton;
 	else if (_action == MenuButtonCfg::toString(ButtonAction::NotifyOwner)) return ButtonAction::NotifyOwner;
 	else {
-		OT_LOG_EAS("Unknown button action \"" + _action + "\"");
+		OT_LOG_E("Unknown button action \"" + _action + "\"");
 		return ButtonAction::NotifyOwner;
 	}
 }

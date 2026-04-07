@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/Geometry/Point2D.h"
 
 ot::Point2D::Point2D(const ConstJsonObject& _jsonObject) : Point2D() {

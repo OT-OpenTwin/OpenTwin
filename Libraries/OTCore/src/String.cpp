@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // ThirdParty header
 #include <zlib.h>

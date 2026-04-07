@@ -18,16 +18,16 @@
 // @otlicense-end
 
 #include "OTCore/OwnerService.h"
-
+#include "OTCore/Logging/Logger.h"
 
 bool ot::OwnerService::getIdFromJson(JsonValue& _object, ot::serviceID_t& _id) {
 	if (!_object.HasMember(m_jsonMemberName.c_str())) {
-		OT_LOG_EA("JSON object member for owner Id is missing ");
+		OT_LOG_E("JSON object member for owner Id is missing ");
 		return false;
 	}
 
 	if (!_object[m_jsonMemberName.c_str()].IsUint()) {
-		OT_LOG_EA("JSON object member for owner Id has wrong format");
+		OT_LOG_E("JSON object member for owner Id has wrong format");
 		return false;
 	}
 
@@ -37,12 +37,12 @@ bool ot::OwnerService::getIdFromJson(JsonValue& _object, ot::serviceID_t& _id) {
 
 ot::OwnerService ot::OwnerService::ownerFromJson(JsonValue& _object) {
 	if (!_object.HasMember(m_jsonMemberName.c_str())) {
-		OT_LOG_EA("JSON object member for owner Id is missing ");
+		OT_LOG_E("JSON object member for owner Id is missing ");
 		return false;
 	}
 
 	if (!_object[m_jsonMemberName.c_str()].IsUint()) {
-		OT_LOG_EA("JSON object member for owner Id has wrong format");
+		OT_LOG_E("JSON object member for owner Id has wrong format");
 		return false;
 	}
 	return ot::OwnerService((ot::serviceID_t)_object[m_jsonMemberName.c_str()].GetUint());

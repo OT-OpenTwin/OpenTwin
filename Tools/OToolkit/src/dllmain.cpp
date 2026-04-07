@@ -26,7 +26,7 @@
 
 // Open Twin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/Style/IconManager.h"
@@ -114,7 +114,7 @@ void mainApplicationThread()
 
 		// Check if at least one icon directory was found
 		if (iconPathCounter == 0) {
-			OT_LOG_EA("No icon path found");
+			OT_LOG_E("No icon path found");
 			QMessageBox msg(QMessageBox::Critical, "Error", "No icon path was found. Try to reinstall the application", QMessageBox::Ok);
 			msg.exec();
 			exit(-1);
@@ -122,7 +122,7 @@ void mainApplicationThread()
 
 		// Check if at least one style directory was found
 		if (stylePathCounter == 0) {
-			OT_LOG_EA("No color style path found");
+			OT_LOG_E("No color style path found");
 			QMessageBox msg(QMessageBox::Critical, "Error", "No color style path was found. Try to reinstall the application", QMessageBox::Ok);
 			msg.exec();
 			exit(-2);

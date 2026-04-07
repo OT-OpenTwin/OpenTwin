@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 #include "OTCore/ComplexNumbers/ComplexNumberDefinition.h"
 #include "OTCore/Variable/VariableHelper.h"
@@ -416,7 +416,7 @@ std::string ot::Variable::getTypeName() const
 	}
 	else
 	{
-		OT_LOG_EAS("[FATAL] Unknown variant index (" + std::to_string(index) + ")");
+		OT_LOG_E("[FATAL] Unknown variant index (" + std::to_string(index) + ")");
 		return "";
 	}
 }

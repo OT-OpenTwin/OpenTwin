@@ -108,7 +108,7 @@ void WrappedCircleItem::propertyChanged(const ot::Property* _property) {
 
 	const ot::PropertyGroup* group = _property->getParentGroup();
 	if (!group) {
-		OT_LOG_EA("Data mismatch");
+		OT_LOG_E("Data mismatch");
 		return;
 	}
 

@@ -21,7 +21,7 @@
 #undef min
 
 #include "OTModelEntities/ModelState.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityBase.h"
@@ -183,7 +183,7 @@ void ModelState::addNewEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID 
 	addEntityToParent(entityID, parentEntityID);
 
 	if (m_entities.find(entityID) != m_entities.end()) {
-		OT_LOG_WAS("Entity already exists in model state while adding new entity { \"EntityID\": " + std::to_string(entityID) + " }");
+		OT_LOG_W("Entity already exists in model state while adding new entity { \"EntityID\": " + std::to_string(entityID) + " }");
 	}
 	m_entities[entityID] = newEntity;
 	m_addedOrModifiedEntities[entityID] = newEntity;
@@ -215,7 +215,7 @@ void ModelState::modifyEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID 
 	}
 	else
 	{
-		OT_LOG_WAS("Entity not found in model state while modifying entity { \"EntityID\": " + std::to_string(entityID) + " }");
+		OT_LOG_W("Entity not found in model state while modifying entity { \"EntityID\": " + std::to_string(entityID) + " }");
 	}
 }
 
@@ -237,7 +237,7 @@ void ModelState::modifyEntityVersion(ot::UID entityID, ot::UID entityVersion)
 	}
 	else
 	{
-		OT_LOG_WAS("Entity not found in model state while modifying entity version { \"EntityID\": " + std::to_string(entityID) + " }");
+		OT_LOG_W("Entity not found in model state while modifying entity version { \"EntityID\": " + std::to_string(entityID) + " }");
 	}
 }
 
@@ -526,7 +526,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 
 			auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
 			if (!result) {
-				OT_LOG_EAS("Model state not found { \"Version\": \"" + incrementalStateVersion.getName() + "\" }");
+				OT_LOG_E("Model state not found { \"Version\": \"" + incrementalStateVersion.getName() + "\" }");
 				return false; // Model state not found
 			}
 
@@ -538,7 +538,7 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 	}
 	else
 	{
-		OT_LOG_EA("Unknown storage type");
+		OT_LOG_E("Unknown storage type");
 		return false;
 	}
 }
@@ -572,13 +572,13 @@ bool ModelState::loadIncrementalState(bsoncxx::document::view docView)
 bool ModelState::loadState(bsoncxx::document::view docView, const std::string &expectedType)
 {
 	if (docView["SchemaType"].get_utf8().value.data() != std::string("ModelState")) {
-		OT_LOG_EAS("ShemaType \"ModelState\" not found");
+		OT_LOG_E("ShemaType \"ModelState\" not found");
 	}
 	if (docView["SchemaVersion_ModelState"].get_int32() != 1) {
-		OT_LOG_EAS("Invalid \"SchemaVersion_ModelState\": (" + std::to_string(docView["SchemaVersion_ModelState"].get_int32()) + ")");
+		OT_LOG_E("Invalid \"SchemaVersion_ModelState\": (" + std::to_string(docView["SchemaVersion_ModelState"].get_int32()) + ")");
 	}
 	if (docView["Type"].get_utf8().value.data() != expectedType) {
-		OT_LOG_EAS("Invalid type { \"ExpectedType\": \"" + expectedType + "\", \"ActualType\": \"" + docView["Type"].get_utf8().value.data() + "\" }");
+		OT_LOG_E("Invalid type { \"ExpectedType\": \"" + expectedType + "\", \"ActualType\": \"" + docView["Type"].get_utf8().value.data() + "\" }");
 	}
 
 	m_graphCfg.setActiveVersionName(docView["Version"].get_utf8().value.data());
@@ -774,7 +774,7 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 				hasDataEntities = true;
 				break;
 			default:
-				OT_LOG_EAS("Unknown entity type (" + std::to_string(entity.second.getEntityType()) + ")");
+				OT_LOG_E("Unknown entity type (" + std::to_string(entity.second.getEntityType()) + ")");
 			}
 		}		
 		
@@ -1684,7 +1684,7 @@ std::list<std::string> ModelState::removeRedoModelStates()
 void ModelState::updateVersionEntity(const std::string& _version) {
 	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
 	if (!version) {
-		OT_LOG_EAS("Version not found \"" + _version + "\"");
+		OT_LOG_E("Version not found \"" + _version + "\"");
 		return;
 	}
 
@@ -2291,7 +2291,7 @@ std::string ModelState::getVersionDescription(const std::string& _version)
 		return version->getDescription();
 	}
 	else {
-		OT_LOG_EAS("Version \"" + _version + "\" does not exist");
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
 		return std::string();
 	}
 }

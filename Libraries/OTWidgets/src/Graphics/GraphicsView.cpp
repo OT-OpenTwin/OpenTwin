@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/EntityName.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTWidgets/QtFactory.h"
@@ -152,7 +152,7 @@ ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID&  _itemUid) {
 ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _connectionUid) {
 	auto it = m_connections.find(_connectionUid);
 	if (it == m_connections.end()) {
-		OT_LOG_WAS("Connection with the UID \"" + std::to_string(_connectionUid)+ "\" does not exist");
+		OT_LOG_W("Connection with the UID \"" + std::to_string(_connectionUid)+ "\" does not exist");
 		return nullptr;
 	}
 	else {

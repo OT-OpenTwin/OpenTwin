@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 namespace intern {
 	static const std::string c_viewConfigVersion{ "1" };

@@ -21,7 +21,7 @@
 #include "DebugServiceConfig.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 std::string DebugServiceConfig::toString(FeatureFlag _flag) {
 	switch (_flag) {
@@ -31,7 +31,7 @@ std::string DebugServiceConfig::toString(FeatureFlag _flag) {
 	case FeatureFlag::ExitOnPing: return "ExitOnPing";
 	case FeatureFlag::ExitOnPreShutdown: return "ExitOnPreShutdown";
 	default:
-		OT_LOG_EAS("Unknown ConfigFlag (" + std::to_string(_flag) + ")");
+		OT_LOG_E("Unknown ConfigFlag (" + std::to_string(_flag) + ")");
 		return "FeaturesDisabled";
 	}
 }
@@ -43,7 +43,7 @@ DebugServiceConfig::FeatureFlag DebugServiceConfig::stringToFeatureFlag(const st
 	else if (_flag == toString(FeatureFlag::ExitOnPing)) { return FeatureFlag::ExitOnPing; }
 	else if (_flag == toString(FeatureFlag::ExitOnPreShutdown)) { return FeatureFlag::ExitOnPreShutdown; }
 	else {
-		OT_LOG_EAS("Unknown ConfigFlag \"" + _flag + "\"");
+		OT_LOG_E("Unknown ConfigFlag \"" + _flag + "\"");
 		return FeatureFlag::FeaturesDisabled;
 	}
 }

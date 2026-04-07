@@ -24,7 +24,7 @@
 #include "ServiceManager.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTSystem/SystemProcess.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -53,7 +53,7 @@ Service::~Service() {
 #if defined(OT_OS_WINDOWS)
 		CloseHandle(m_processHandle);
 #else
-		OT_LOG_EA("Not implemented");
+		OT_LOG_E("Not implemented");
 #endif
 	}
 	m_processHandle = OT_INVALID_PROCESS_HANDLE;
@@ -139,7 +139,7 @@ ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t
 	
 	return ot::SystemProcess::runApplication(launcherName, commandLine, m_processHandle);
 #else
-	OT_LOG_EA("Not implemented");
+	OT_LOG_E("Not implemented");
 	return ot::SystemProcess::GeneralError;
 #endif
 }
@@ -181,7 +181,7 @@ ot::RunResult Service::checkAlive() {
 	}
 
 #else
-	OT_LOG_EA("Function is implemented only for Windows OS");
+	OT_LOG_E("Function is implemented only for Windows OS");
 #endif // OT_OS_WINDOWS
 
 	return result;

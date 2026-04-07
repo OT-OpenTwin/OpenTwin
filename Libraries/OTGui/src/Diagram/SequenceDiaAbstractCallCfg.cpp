@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Diagram/SequenceDiaAbstractCallCfg.h"
 
 void ot::SequenceDiaAbstractCallCfg::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const {

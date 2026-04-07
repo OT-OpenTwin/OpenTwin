@@ -24,7 +24,7 @@
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Properties/Property.h"
@@ -1313,7 +1313,7 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 	}
 	else
 	{
-		//OT_LOG_EA("Container not found"); For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+		//OT_LOG_E("Container not found"); For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
 		//							        No error message should be shown in this case.
 	}
 
@@ -1332,7 +1332,7 @@ void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std:
 		}
 		else
 		{
-			//OT_LOG_EA("Value not found");  For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+			//OT_LOG_E("Value not found");  For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
 			//							     No error message should be shown in this case.
 		}
 	}

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "SelectEntitiesDialog.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Widgets/TreeWidget.h"
 #include "OTWidgets/Widgets/TreeWidgetItem.h"
@@ -138,7 +138,7 @@ ot::TreeWidgetItem* SelectEntitiesDialog::addItem(ot::TreeWidget* _tree, QTreeWi
 void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 	ot::TreeWidgetItem* itm = dynamic_cast<ot::TreeWidgetItem*>(_item);
 	if (!itm) {
-		OT_LOG_EA("Item cast failed");
+		OT_LOG_E("Item cast failed");
 		return;
 	}
 
@@ -156,7 +156,7 @@ void SelectEntitiesDialog::slotAdd(QTreeWidgetItem* _item, int _col) {
 		}
 	}
 	else {
-		OT_LOG_EA("Item cast failed");
+		OT_LOG_E("Item cast failed");
 	}
 }
 

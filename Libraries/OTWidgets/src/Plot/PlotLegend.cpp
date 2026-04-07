@@ -58,7 +58,7 @@ void ot::PlotLegend::addItem(PlotLegendItem* _item)
 	auto it = std::find(m_items.begin(), m_items.end(), _item);
 	if (it != m_items.end())
 	{
-		OT_LOG_EAS("Item already exists in legend");
+		OT_LOG_E("Item already exists in legend");
 		return;
 	}
 
@@ -68,7 +68,7 @@ void ot::PlotLegend::addItem(PlotLegendItem* _item)
 	PlotDataset* dataset = _item->getDataset();
 	if (!dataset)
 	{
-		OT_LOG_EAS("Legend item has no dataset");
+		OT_LOG_E("Legend item has no dataset");
 		return;
 	}
 

@@ -36,7 +36,7 @@ QString ConnectionManager::toString(RequestType _type) {
     case ConnectionManager::Error: return "Error";
 
     default:
-        OT_LOG_EAS("Unknown request type (" + std::to_string((int)_type) + ")");
+        OT_LOG_E("Unknown request type (" + std::to_string((int)_type) + ")");
         return "";
     }
 }

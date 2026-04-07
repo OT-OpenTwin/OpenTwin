@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyBase.h"
 
 std::string ot::PropertyBase::toString(PropertyFlag _flag) {
@@ -36,7 +36,7 @@ std::string ot::PropertyBase::toString(PropertyFlag _flag) {
 	case ot::PropertyBase::GroupChanges: return "GroupChanges";
 	case ot::PropertyBase::NoSerialize: return "NoSerialize";
 	default:
-		OT_LOG_EA("Unknown PropertyBase Flag");
+		OT_LOG_E("Unknown PropertyBase Flag");
 		return "<null>";
 	}
 }
@@ -54,7 +54,7 @@ ot::PropertyBase::PropertyFlag ot::PropertyBase::stringToFlag(const std::string&
 	else if (_flag == PropertyBase::toString(PropertyBase::GroupChanges)) { return PropertyBase::GroupChanges; }
 	else if (_flag == PropertyBase::toString(PropertyBase::NoSerialize)) { return PropertyBase::NoSerialize; }
 	else {
-		OT_LOG_EAS("Unknown PropertyBase Flag \"" + _flag + "\"");
+		OT_LOG_E("Unknown PropertyBase Flag \"" + _flag + "\"");
 		return PropertyBase::NoFlags;
 	}
 }
@@ -135,7 +135,7 @@ ot::PropertyBase::PropertyBase(const std::string& _name, PropertyFlags _flags)
 std::string ot::PropertyBase::getAdditionalPropertyData(const std::string& _key) const {
 	const auto& it = m_data.find(_key);
 	if (it == m_data.end()) {
-		OT_LOG_EA("Data not found");
+		OT_LOG_E("Data not found");
 		return std::string();
 	}
 	else {

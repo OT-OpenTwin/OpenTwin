@@ -23,7 +23,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/DebugHelper.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
@@ -120,7 +120,7 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 
 	}
 	catch (std::exception& e) {
-		OT_LOG_EAS(std::string{"Uncaught exception: "}.append(e.what()));
+		OT_LOG_E(std::string{"Uncaught exception: "}.append(e.what()));
 		exit(ot::AppExitCode::GeneralError);
 	}
 	catch (...) {

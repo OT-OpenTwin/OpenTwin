@@ -164,7 +164,7 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	}
 	else
 	{
-		OT_LOG_WAS("Unknown visualization request: \"" + _visualisationCfg.getVisualisationType() + "\"");
+		OT_LOG_W("Unknown visualization request: \"" + _visualisationCfg.getVisualisationType() + "\"");
 	}
 }
 

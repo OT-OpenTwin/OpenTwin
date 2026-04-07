@@ -58,7 +58,7 @@ void ot::Menu::setFromConfiguration(const MenuCfg& _config) {
             // Add action
             const MenuButtonCfg* itemCfg = dynamic_cast<const MenuButtonCfg*>(entry);
             if (!itemCfg) {
-                OT_LOG_EAS("Item configuration cast failed");
+                OT_LOG_E("Item configuration cast failed");
                 continue;
             }
             MenuAction* newAction = new MenuAction(*itemCfg, this);
@@ -70,7 +70,7 @@ void ot::Menu::setFromConfiguration(const MenuCfg& _config) {
 			// Add submenu
             const MenuCfg* menuCfg = dynamic_cast<const MenuCfg*>(entry);
             if (!menuCfg) {
-                OT_LOG_EAS("Menu configuration cast failed");
+                OT_LOG_E("Menu configuration cast failed");
                 continue;
             }
             Menu* newMenu = new Menu(*menuCfg, this);
@@ -83,7 +83,7 @@ void ot::Menu::setFromConfiguration(const MenuCfg& _config) {
         }
         else
         {
-			OT_LOG_EAS("Unknown menu entry type \"" + entry->getClassName() + "\"");
+			OT_LOG_E("Unknown menu entry type \"" + entry->getClassName() + "\"");
         }
     }
 }
@@ -94,7 +94,7 @@ void ot::Menu::slotActionTriggered() {
         this->slotActionTriggered(actualAction->getMenuActionName());
     }
     else {
-        OT_LOG_EA("ContextMenuAction cast failed");
+        OT_LOG_E("ContextMenuAction cast failed");
     }
 }
 

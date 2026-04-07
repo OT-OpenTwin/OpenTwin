@@ -20,7 +20,7 @@
 // OpenTwin
 #include "CSXMeshGrid.h"
 #include "OTCore/CoreTypes.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityMeshCartesianData.h"
@@ -42,7 +42,7 @@ CSXMeshGrid::~CSXMeshGrid() {
 void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	EntityPropertiesEntityList* mesh = dynamic_cast<EntityPropertiesEntityList*>(_solverEntity->getProperties().getProperty("Mesh"));
 	if (!mesh) {
-		OT_LOG_EA("CSXMeshGrid::loadMeshGridDataFromEntity: Unable to get the mesh property from the solver entity.");
+		OT_LOG_E("CSXMeshGrid::loadMeshGridDataFromEntity: Unable to get the mesh property from the solver entity.");
 		return;
 	}
 
@@ -53,7 +53,7 @@ void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	std::list<ot::EntityInformation> entityInfo;
 	ot::ModelServiceAPI::getEntityInformation(entityList, entityInfo);
 	if (entityInfo.empty()) {
-		OT_LOG_EA("CSXMeshGrid::loadMeshGridDataFromEntity: No entity information found.");
+		OT_LOG_E("CSXMeshGrid::loadMeshGridDataFromEntity: No entity information found.");
 		return;
 	}
 
@@ -66,7 +66,7 @@ void CSXMeshGrid::loadMeshGridDataFromEntity(EntityBase* _solverEntity) {
 	// unique ptr
 	EntityMeshCartesianData* meshDataEntity = dynamic_cast<EntityMeshCartesianData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataID, version));
 	if (!meshDataEntity) {
-		OT_LOG_EA("CSXMeshGrid::loadMeshGridDataFromEntity: Unable to read the mesh data entity.");
+		OT_LOG_E("CSXMeshGrid::loadMeshGridDataFromEntity: Unable to read the mesh data entity.");
 		return;
 	}
 

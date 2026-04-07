@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "DownloadFile.h"			// Corresponding header
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"

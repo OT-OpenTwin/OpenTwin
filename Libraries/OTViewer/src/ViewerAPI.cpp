@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityBase.h"

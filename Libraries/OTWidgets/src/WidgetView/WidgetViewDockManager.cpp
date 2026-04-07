@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 #include "OTWidgets/WidgetView/WidgetViewDockManager.h"
 #include "OTWidgets/WidgetView/WidgetViewDockComponentsFactory.h"
@@ -62,7 +62,7 @@ ads::DockWidgetArea ot::WidgetViewDockManager::getDockWidgetArea(const WidgetVie
 	case ot::WidgetViewBase::Right: return ads::RightDockWidgetArea;
 	case ot::WidgetViewBase::Bottom: return ads::BottomDockWidgetArea;
 	default:
-		OT_LOG_EAS("Unknown dock location (" + std::to_string((int)_view->getViewData().getDockLocation()) + ")");
+		OT_LOG_E("Unknown dock location (" + std::to_string((int)_view->getViewData().getDockLocation()) + ")");
 		return ads::CenterDockWidgetArea;
 	}
 }

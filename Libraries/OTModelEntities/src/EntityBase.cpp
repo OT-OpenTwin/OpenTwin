@@ -23,7 +23,7 @@
 #include "OTCore/String.h"
 #include "OTGui/Menu/MenuCfg.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // Activate the following flag to display the (approximate) memory consumption of the entity while restoring it from the database.
 //#define DISPLAY_MEMORY_CONSUMPTION
@@ -272,7 +272,7 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 		resetModified();
 	}
 	catch (std::exception _e) {
-		OT_LOG_EAS(_e.what()); // Read failed
+		OT_LOG_E(_e.what()); // Read failed
 	}
 }
 

@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTGui/GuiTypes.h"
 
@@ -38,7 +38,7 @@ std::string ot::toString(ot::Alignment _alignment) {
 	case Alignment::Left: return "AlignLeft";
 	case Alignment::TopLeft: return "AlignTopLeft";
 	default:
-		OT_LOG_EAS("Unknown Alignment provided: \"" + std::to_string((int)_alignment) + "\"");
+		OT_LOG_E("Unknown Alignment provided: \"" + std::to_string((int)_alignment) + "\"");
 		throw std::exception("Unknown Alignment provided");
 	}
 }
@@ -54,7 +54,7 @@ ot::Alignment ot::stringToAlignment(const std::string& _string) {
 	else if (_string == toString(Alignment::Left)) return Alignment::Left;
 	else if (_string == toString(Alignment::TopLeft)) return Alignment::TopLeft;
 	else {
-		OT_LOG_EAS("Unknown Alignment provided: \"" + _string + "\"");
+		OT_LOG_E("Unknown Alignment provided: \"" + _string + "\"");
 		throw std::exception("Unknown Alignment provided");
 	}
 }
@@ -69,7 +69,7 @@ std::string ot::toString(Orientation _orientation) {
 	case Orientation::Horizontal: return "Horizontal";
 	case Orientation::Vertical: return "Vertical";
 	default:
-		OT_LOG_EAS("Unknown Orientation provided: \"" + std::to_string((int)_orientation) + "\"");
+		OT_LOG_E("Unknown Orientation provided: \"" + std::to_string((int)_orientation) + "\"");
 		throw std::exception("Unknown Orientation provided");
 	}
 }
@@ -78,7 +78,7 @@ ot::Orientation ot::stringToOrientation(const std::string& _string) {
 	if (_string == toString(Orientation::Horizontal)) return Orientation::Horizontal;
 	else if (_string == toString(Orientation::Vertical)) return Orientation::Vertical;
 	else {
-		OT_LOG_EAS("Unknown Orientation provided: \"" + _string + "\"");
+		OT_LOG_E("Unknown Orientation provided: \"" + _string + "\"");
 		throw std::exception("Unknown Orientation provided");
 	}
 }
@@ -102,7 +102,7 @@ std::string ot::toString(FontFamily _fontFamily) {
 	case FontFamily::TrebuchetMS: return "TrebuchetMS";
 	case FontFamily::Verdana: return "Verdana";
 	default:
-		OT_LOG_EA("Unknown font family provided");
+		OT_LOG_E("Unknown font family provided");
 		throw std::exception("Unknown font family provided");
 	}
 }
@@ -120,7 +120,7 @@ ot::FontFamily ot::stringToFontFamily(const std::string& _string) {
 	else if (_string == toString(FontFamily::TrebuchetMS)) { return FontFamily::TrebuchetMS; }
 	else if (_string == toString(FontFamily::Verdana)) { return FontFamily::Verdana; }
 	else {
-		OT_LOG_EAS("Unknown font family provided: \"" + _string + "\"");
+		OT_LOG_E("Unknown font family provided: \"" + _string + "\"");
 		throw std::exception("Unknown font family provided");
 	}
 }
@@ -151,7 +151,7 @@ std::string ot::toString(SizePolicy _policy) {
 	case SizePolicy::Preferred: return "Preferred";
 	case SizePolicy::Dynamic: return "Dynamic";
 	default:
-		OT_LOG_EA("Unknown size policy");
+		OT_LOG_E("Unknown size policy");
 		throw std::exception("Unknown size policy");
 	}
 }
@@ -160,7 +160,7 @@ ot::SizePolicy ot::stringToSizePolicy(const std::string& _string) {
 	if (_string == toString(SizePolicy::Preferred)) { return SizePolicy::Preferred; }
 	else if (_string == toString(SizePolicy::Dynamic)) { return SizePolicy::Dynamic; }
 	else {
-		OT_LOG_EAS("Unknown size policy \"" + _string + "\"");
+		OT_LOG_E("Unknown size policy \"" + _string + "\"");
 		throw std::exception("Unknown size policy");
 	}
 }
@@ -180,7 +180,7 @@ std::string ot::toString(ConnectionDirection _direction) {
 	case ConnectionDirection::Out: return "Out";
 	case ConnectionDirection::In: return "In";
 	default:
-		OT_LOG_EA("Unknown connection direction");
+		OT_LOG_E("Unknown connection direction");
 		throw std::exception("Unknown connection direction");
 	}
 }
@@ -194,7 +194,7 @@ ot::ConnectionDirection ot::stringToConnectionDirection(const std::string& _dire
 	else if (_direction == toString(ConnectionDirection::Out)) return ConnectionDirection::Out;
 	else if (_direction == toString(ConnectionDirection::In)) return ConnectionDirection::In;
 	else {
-		OT_LOG_EAS("Unknown connection direction \"" + _direction + "\"");
+		OT_LOG_E("Unknown connection direction \"" + _direction + "\"");
 		throw std::exception("Unknown connection direction");
 	}
 }
@@ -210,7 +210,7 @@ ot::ConnectionDirection ot::inversedConnectionDirection(ConnectionDirection _dir
 	case ConnectionDirection::Out: return ConnectionDirection::In;
 	case ConnectionDirection::In: return ConnectionDirection::Out;
 	default:
-		OT_LOG_EA("Unknown connection direction");
+		OT_LOG_E("Unknown connection direction");
 		return ConnectionDirection::Any;
 	}
 }
@@ -239,7 +239,7 @@ std::string ot::toString(GradientSpread _spread) {
 	case GradientSpread::Repeat: return "Repeat";
 	case GradientSpread::Reflect: return "Reflect";
 	default:
-		OT_LOG_EA("Unknown gradient spread");
+		OT_LOG_E("Unknown gradient spread");
 		throw std::exception("Unknown gradient spread");
 	}
 }
@@ -249,7 +249,7 @@ ot::GradientSpread ot::stringToGradientSpread(const std::string& _spread) {
 	else if (_spread == toString(GradientSpread::Repeat)) return GradientSpread::Repeat;
 	else if (_spread == toString(GradientSpread::Reflect)) return GradientSpread::Reflect;
 	else {
-		OT_LOG_EAS("Unknown gradient spread \"" + _spread + "\"");
+		OT_LOG_E("Unknown gradient spread \"" + _spread + "\"");
 		throw std::exception("Unknown gradient spread");
 	}
 }
@@ -406,7 +406,7 @@ std::string ot::toString(DocumentSyntax _syntax) {
 	case DocumentSyntax::Markdown: return "Markdown";
 	case DocumentSyntax::HTML: return "HTML";
 	default:
-		OT_LOG_EAS("Unknown document syntax (" + std::to_string((int)_syntax) + ")");
+		OT_LOG_E("Unknown document syntax (" + std::to_string((int)_syntax) + ")");
 		return "Plain";
 	}
 }
@@ -417,7 +417,7 @@ ot::DocumentSyntax ot::stringToDocumentSyntax(const std::string& _syntax) {
 	else if (_syntax == toString(DocumentSyntax::Markdown)) return DocumentSyntax::Markdown;
 	else if (_syntax == toString(DocumentSyntax::HTML)) return DocumentSyntax::HTML;
 	else {
-		OT_LOG_EAS("Unknown document syntax \"" + _syntax + "\"");
+		OT_LOG_E("Unknown document syntax \"" + _syntax + "\"");
 		return DocumentSyntax::PlainText;
 	}
 }
@@ -670,7 +670,7 @@ std::string ot::toString(PathBrowseMode _mode) {
 	case PathBrowseMode::WriteFile: return "Write File";
 	case PathBrowseMode::Directory: return "Directory";
 	default:
-		OT_LOG_EA("Unknown browse mode");
+		OT_LOG_E("Unknown browse mode");
 		return "Read File";
 	}
 }
@@ -680,7 +680,7 @@ ot::PathBrowseMode ot::stringToPathBrowseMode(const std::string& _mode) {
 	else if (_mode == toString(PathBrowseMode::WriteFile)) return PathBrowseMode::WriteFile;
 	else if (_mode == toString(PathBrowseMode::Directory)) return PathBrowseMode::Directory;
 	else {
-		OT_LOG_EA("Unknown browse mode");
+		OT_LOG_E("Unknown browse mode");
 		return PathBrowseMode::ReadFile;
 	}
 }

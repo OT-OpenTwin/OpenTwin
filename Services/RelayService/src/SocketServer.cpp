@@ -23,7 +23,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/JSON/JSON.h"						// rapidjson wrapper
-#include "OTCore/Logging/LogDispatcher.h"						// Logger
+#include "OTCore/Logging/Logger.h"						// Logger
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"				// message sending
 #include "OTCommunication/ActionTypes.h"		// action member and types definition
@@ -230,7 +230,7 @@ void SocketServer::queueAction(const std::string& _json, const std::string& _sen
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 	}
 }
 
@@ -341,7 +341,7 @@ void SocketServer::slotProcessMessage(const QString& _message) {
 		OT_LOG_E(std::string(e.what()));
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 	}
 }
 
@@ -505,7 +505,7 @@ bool SocketServer::relayToHttp(const ot::RelayedMessageHandler::Request& _reques
 			success = ot::msg::send(m_relayUrl, _request.receiverUrl, ot::QUEUE, _request.message, _response);
 		}
 		else {
-			OT_LOG_EAS("Unknown message type (" + std::to_string(static_cast<int>(_request.messageType)) + ")");
+			OT_LOG_E("Unknown message type (" + std::to_string(static_cast<int>(_request.messageType)) + ")");
 			success = false;
 		}
 
@@ -516,7 +516,7 @@ bool SocketServer::relayToHttp(const ot::RelayedMessageHandler::Request& _reques
 		return false;
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error");
+		OT_LOG_E("[FATAL] Unknown error");
 		return false;
 	}
 

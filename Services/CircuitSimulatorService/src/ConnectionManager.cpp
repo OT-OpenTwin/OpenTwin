@@ -24,7 +24,7 @@
 // OpenTwin Header
 #include "Application.h"
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/StyledTextBuilder.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -45,7 +45,7 @@ QString ConnectionManager::toString(RequestType _type) {
     case ConnectionManager::Error: return "Error";
     case ConnectionManager::Disconnect: return "Disconnect";
     default:
-        OT_LOG_EAS("Unknown request type (" + std::to_string((int)_type) + ")");
+        OT_LOG_E("Unknown request type (" + std::to_string((int)_type) + ")");
         return "";
     }
 }

@@ -21,7 +21,7 @@
 #include "Session.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 
 Session::Session() : m_state(NoStateFlags) {}
@@ -80,7 +80,7 @@ void Session::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	for (const std::string& state : ot::json::getStringList(_object, OT_ACTION_PARAM_State)) {
 		if (state == "LssConfirmed") { m_state.set(SessionStateFlag::LssConfirmed); }
 		else {
-			OT_LOG_EAS("Unknown state flag \"" + state + "\"");
+			OT_LOG_E("Unknown state flag \"" + state + "\"");
 		}
 	}
 }

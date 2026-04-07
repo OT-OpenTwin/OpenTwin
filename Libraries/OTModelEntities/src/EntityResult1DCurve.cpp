@@ -65,7 +65,7 @@ ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
+		OT_LOG_E("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
 		break;
 	}
 
@@ -169,7 +169,7 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
+		OT_LOG_E("Unknown default curve style (" + std::to_string(static_cast<int>(_style)) + ")");
 		defaultLineStyle = ot::toString(ot::LineStyle::SolidLine);
 		defaultSymbol = ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::NoSymbol);
 		defaultSymbolSize = 5;

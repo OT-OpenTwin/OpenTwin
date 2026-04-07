@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcherBase.h"
 #include "OTCommunication/Handler/ActionHandleConnector.h"
@@ -37,7 +37,7 @@ ot::ActionDispatcherBase::~ActionDispatcherBase() {
 
 void ot::ActionDispatcherBase::setDefaultMessageTypes(const MessageTypeFlags& _type) {
 	if (_type == ot::DEFAULT_MESSAGE_TYPE) {
-		OT_LOG_EA("Invalid message type provided as default message type");
+		OT_LOG_E("Invalid message type provided as default message type");
 	}
 	else {
 		std::lock_guard<std::mutex> mtxLock(m_mutex);
@@ -53,7 +53,7 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 	OTAssertNullptr(_item);
 
 	if (_item->actionNames().empty()) {
-		OT_LOG_EA("No action names provided. Cancelling add...");
+		OT_LOG_E("No action names provided. Cancelling add...");
 		return false;
 	}
 
@@ -69,11 +69,11 @@ bool ot::ActionDispatcherBase::add(ActionHandleConnector* _item, const InsertFla
 		auto it = m_data.find(action);
 		if (it != m_data.end()) {
 			if (!it->second.second) {
-				OT_LOG_EAS("Handler for \"" + action + "\" already exist, multiple handlers are not expected. Cancelling add...");
+				OT_LOG_E("Handler for \"" + action + "\" already exist, multiple handlers are not expected. Cancelling add...");
 				return false;
 			}
 			else if (!(_insertFlags & InsertFlag::ExpectMultiple)) {
-				OT_LOG_EAS("Handler for \"" + action + "\" already exist, multiple handlers are expected but not allowed by insert flags. Cancelling add...");
+				OT_LOG_E("Handler for \"" + action + "\" already exist, multiple handlers are expected but not allowed by insert flags. Cancelling add...");
 				return false;
 			}
 		}
@@ -156,7 +156,7 @@ std::string ot::ActionDispatcherBase::dispatch(JsonDocument& _document, MessageT
 	std::string action = json::getString(_document, OT_ACTION_MEMBER);
 
 	if (action.empty()) {
-		OT_LOG_EA("Action member not found");
+		OT_LOG_E("Action member not found");
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Provided action is empty");
 	}
 
@@ -165,7 +165,7 @@ std::string ot::ActionDispatcherBase::dispatch(JsonDocument& _document, MessageT
 
 	// Check if a handler was found or an error occured (non empty result);
 	if (!handlerFound && result.empty()) {
-		OT_LOG_WAS("Unknown action received: " + action);
+		OT_LOG_W("Unknown action received: " + action);
 		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Unknown action received: \"" + action + "\"");
 	}
 
@@ -219,11 +219,11 @@ std::string ot::ActionDispatcherBase::dispatchImpl(const std::string& _action, J
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, _e.what());
 	}
 	catch (...) {
-		OT_LOG_EA("[FATAL] Unknown error occured");
+		OT_LOG_E("[FATAL] Unknown error occured");
 		result = ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Unknown error occured");
 	}
 

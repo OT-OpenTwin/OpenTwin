@@ -33,7 +33,7 @@
 #include "OTModelEntities/DataBase.h"
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
@@ -1263,7 +1263,7 @@ void Application::asyncActionWorker() {
 
 void Application::handleAsyncSelectionChanged(const ot::JsonDocument& _document) {
 	if (!m_model) {
-		OT_LOG_EA("No model created yet");
+		OT_LOG_E("No model created yet");
 	}
 
 	std::list<ot::UID> selectedEntityIDs = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_SelectedEntityIDs);

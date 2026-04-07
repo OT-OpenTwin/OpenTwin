@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/StyledTextBuilder.h"
 
 ot::StyledTextBuilder::StyledTextBuilder(const BuilderFlags& _flags) :
@@ -87,7 +87,7 @@ void ot::StyledTextBuilder::setFromJsonObject(const ot::ConstJsonObject& _object
 			m_flags.set(StyledTextBuilder::EvaluateSubstitutionTokens, true);
 		}
 		else {
-			OT_LOG_EAS("Unknown StyledTextBuilder flag \"" + flag + "\"");
+			OT_LOG_E("Unknown StyledTextBuilder flag \"" + flag + "\"");
 		}
 	}
 }
@@ -153,7 +153,7 @@ ot::StyledTextBuilder& ot::StyledTextBuilder::operator<<(StyledText::TextControl
 	case ot::StyledText::Header2: newStyle.setTextSize(StyledTextStyle::TextSize::Header2); break;
 	case ot::StyledText::Header3: newStyle.setTextSize(StyledTextStyle::TextSize::Header3); break;
 	default:
-		OT_LOG_EAS("Unknown TextControl (" + std::to_string((int)_control) + ")");
+		OT_LOG_E("Unknown TextControl (" + std::to_string((int)_control) + ")");
 		break;
 	}
 

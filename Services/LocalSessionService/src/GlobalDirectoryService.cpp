@@ -22,7 +22,7 @@
 #include "GlobalDirectoryService.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -255,7 +255,7 @@ void GlobalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::Jso
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
+		OT_LOG_E("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
 		break;
 	}
 }
@@ -270,7 +270,7 @@ void GlobalDirectoryService::startHealthCheck(void)
 
 	if (m_healthCheckRunning)
 	{
-		OT_LOG_EA("Health check already running");
+		OT_LOG_E("Health check already running");
 		return;
 	}
 

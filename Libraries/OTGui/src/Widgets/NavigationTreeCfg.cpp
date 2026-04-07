@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Widgets/NavigationTreeCfg.h"
 
 std::string ot::NavigationTreeCfg::toString(TreeFlag _flag) {
@@ -28,7 +28,7 @@ std::string ot::NavigationTreeCfg::toString(TreeFlag _flag) {
 	case NoFlags: return "None";
 	case ItemsDefaultExpanded: return "ItemsDefaultExpanded";
 	default:
-		OT_LOG_WAS("Unknown flag: " + std::to_string((int)_flag));
+		OT_LOG_W("Unknown flag: " + std::to_string((int)_flag));
 		return "None";
 	}
 }
@@ -37,7 +37,7 @@ ot::NavigationTreeCfg::TreeFlag ot::NavigationTreeCfg::stringToFlag(const std::s
 	if (_flag == toString(NoFlags)) return NoFlags;
 	else if (_flag == toString(ItemsDefaultExpanded)) return ItemsDefaultExpanded;
 	else {
-		OT_LOG_WAS("Unknown flag: \"" + _flag + "\"");
+		OT_LOG_W("Unknown flag: \"" + _flag + "\"");
 		return NoFlags;
 	}
 }

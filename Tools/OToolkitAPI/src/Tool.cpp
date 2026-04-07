@@ -21,7 +21,7 @@
 #include "OToolkitAPI/Tool.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 #include "OTWidgets/WidgetView/BasicWidgetView.h"
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"

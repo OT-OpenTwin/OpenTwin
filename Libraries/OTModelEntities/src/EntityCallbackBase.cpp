@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTModelEntities/EntityCallbackBase.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 void ot::EntityCallbackBase::clearCallbacks(bool _supressChangedNotification) {
 	m_callbackServices.clear();

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/Exception.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 
 // Public API
@@ -68,7 +68,7 @@ void ot::WindowAPI::appendOutputMessage(const StyledTextBuilder& _message) {
 
 ot::WindowAPI::WindowAPI() {
 	if (getInstanceReference()) {
-		OT_LOG_EA("WindowAPI instance already exists");
+		OT_LOG_E("WindowAPI instance already exists");
 		throw Exception::ObjectAlreadyExists("WindowAPI instance already exists");
 	}
 	getInstanceReference() = this;
@@ -86,7 +86,7 @@ ot::WindowAPI::~WindowAPI() {
 ot::WindowAPI* ot::WindowAPI::instance() {
 	ot::WindowAPI* instance = getInstanceReference();
 	if (!instance) {
-		OT_LOG_EA("WindowAPI instance not available");
+		OT_LOG_E("WindowAPI instance not available");
 		throw Exception::ObjectNotFound("WindowAPI instance not available");
 	}
 	return instance;

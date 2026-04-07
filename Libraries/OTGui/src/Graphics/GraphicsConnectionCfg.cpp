@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 
 #define OT_JSON_Member_Uid "UID"
@@ -41,7 +41,7 @@ std::string ot::GraphicsConnectionCfg::shapeToString(ConnectionShape _shape) {
 	case ot::GraphicsConnectionCfg::ConnectionShape::YXLine: return "YXLine";
 	case ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine: return "AutoXYLine";
 	default:
-		OT_LOG_EA("Unknown connection style");
+		OT_LOG_E("Unknown connection style");
 		return "DirectLine";
 	}
 }
@@ -53,7 +53,7 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToSh
 	else if (_shape == shapeToString(ConnectionShape::YXLine)) return ConnectionShape::YXLine;
 	else if (_shape == shapeToString(ConnectionShape::AutoXYLine)) return ConnectionShape::AutoXYLine;
 	else {
-		OT_LOG_EAS("Unknown connection style \"" + _shape + "\"");
+		OT_LOG_E("Unknown connection style \"" + _shape + "\"");
 		return ConnectionShape::DirectLine;
 	}
 }

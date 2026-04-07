@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTWidgets/Private/WidgetDebug.h"
 #include "OTWidgets/WidgetView/WidgetView.h"

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Menu/MenuEntryCfg.h"
 
 const std::string& ot::MenuEntryCfg::classNameJsonKey() {

@@ -840,7 +840,7 @@ void Application::sendTableWorker(int _rows, int _columns) {
 bool Application::actionAboutToBePerformed(const char* _json) {
 	ot::JsonDocument doc;
 	if (!doc.fromJson(_json)) {
-		OT_LOG_EAS("Failed to deserialize request: \"" + std::string(_json) + "\"");
+		OT_LOG_E("Failed to deserialize request: \"" + std::string(_json) + "\"");
 		return true;
 	}
 

@@ -178,7 +178,7 @@ void ot::VersionGraphItem::forgetChildVersion(VersionGraphItem* _version) {
 
 void ot::VersionGraphItem::connectToParent(void) {
 	if (m_parentConnection) {
-		OT_LOG_WA("Connection already set");
+		OT_LOG_W("Connection already set");
 		delete m_parentConnection;
 		m_parentConnection = nullptr;
 	}

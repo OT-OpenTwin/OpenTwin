@@ -21,7 +21,7 @@
 
 #include "OTModelEntities/CSVToTableTransformer.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/CSVProperties.h"

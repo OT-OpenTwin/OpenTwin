@@ -20,8 +20,8 @@
 //#define _CRT_SECURE_NO_WARNINGS
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"

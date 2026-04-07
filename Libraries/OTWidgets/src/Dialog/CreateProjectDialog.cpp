@@ -195,7 +195,7 @@ std::string ot::CreateProjectDialog::getProjectType(void) const {
 	if (items.count() == 1) {
 		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
 		if (!actualItem) {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 			return std::string();
 		}
 		return actualItem->getInfo().getProjectType();
@@ -211,7 +211,7 @@ std::string ot::CreateProjectDialog::getTemplateName(bool _emptyIfDefault) const
 	if (items.count() == 1) {
 		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
 		if (!actualItem) {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 			return std::string();
 		}
 		if (_emptyIfDefault && actualItem->getInfo().getIsDefault()) {
@@ -249,7 +249,7 @@ void ot::CreateProjectDialog::slotShowInfo(void) {
 	else if (items.count() == 1) {
 		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
 		if (!actualItem) {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 			return;
 		}
 		
@@ -314,7 +314,7 @@ void ot::CreateProjectDialog::slotCreate(void) {
 	else {
 		CreateProjectDialogEntry* actualItem = dynamic_cast<CreateProjectDialogEntry*>(items.front());
 		if (!actualItem) {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 			return;
 		}
 		Q_EMIT createProject(newName, actualItem->getInfo().getProjectType(), actualItem->getInfo().getName());

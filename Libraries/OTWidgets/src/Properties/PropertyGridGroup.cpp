@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/QtFactory.h"
@@ -126,7 +126,7 @@ void ot::PropertyGridGroup::finishSetup() {
 
 	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
 	if (!tree) {
-		OT_LOG_EA("Tree cast failed");
+		OT_LOG_E("Tree cast failed");
 		return;
 	}
 	tree->setItemWidget(this, 0, m_titleLayoutW);
@@ -142,7 +142,7 @@ void ot::PropertyGridGroup::finishSetup() {
 				g->finishSetup();
 			}
 			else {
-				OT_LOG_EA("Unknown tree item");
+				OT_LOG_E("Unknown tree item");
 			}
 		}
 	}

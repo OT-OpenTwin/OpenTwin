@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
@@ -89,7 +89,7 @@ bool ot::PropertyGridItem::setupFromConfig(const Property * _config) {
 void ot::PropertyGridItem::finishSetup() {
 	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
 	if (!tree) {
-		OT_LOG_EA("Tree cast failed");
+		OT_LOG_E("Tree cast failed");
 		return;
 	}
 	tree->setItemWidget(this, 0, m_titleLayoutW);
@@ -101,7 +101,7 @@ void ot::PropertyGridItem::finishSetup() {
 std::string ot::PropertyGridItem::getGroupName() const {
 	if (m_parentGroup) return m_parentGroup->getName();
 	else {
-		OT_LOG_EA("No parent group set");
+		OT_LOG_E("No parent group set");
 		return std::string();
 	}
 }
@@ -117,7 +117,7 @@ QString ot::PropertyGridItem::getTitle() const {
 void ot::PropertyGridItem::setInput(PropertyInput* _input) {
 	TreeWidget* tree = dynamic_cast<TreeWidget*>(this->treeWidget());
 	if (!tree) {
-		OT_LOG_EA("Tree cast failed");
+		OT_LOG_E("Tree cast failed");
 		return;
 	}
 

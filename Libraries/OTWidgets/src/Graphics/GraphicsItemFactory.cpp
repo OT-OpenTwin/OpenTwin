@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsItemFileCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
@@ -69,7 +69,7 @@ ot::GraphicsItem* ot::GraphicsItemFactory::itemFromConfig(const ot::GraphicsItem
 	GraphicsItem* itm = GraphicsItemFactory::instance().createFromKey(_configuration->getFactoryKey());
 	if (!itm) return nullptr;
 	if (!itm->setupFromConfig(_configuration)) {
-		OT_LOG_EA("Setup from configuration failed");
+		OT_LOG_E("Setup from configuration failed");
 		delete itm;
 		return nullptr;
 	}

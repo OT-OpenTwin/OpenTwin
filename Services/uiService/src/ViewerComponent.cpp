@@ -455,11 +455,11 @@ void ViewerComponent::closeView(const std::string& _entityName, ot::WidgetViewBa
 	case ot::WidgetViewBase::ViewNavigation:
 	case ot::WidgetViewBase::View3D:
 	case ot::WidgetViewBase::CustomView:
-		OT_LOG_EAS("The view type (" + std::to_string((int)_viewType) + ") is not supported for internal close request");
+		OT_LOG_E("The view type (" + std::to_string((int)_viewType) + ") is not supported for internal close request");
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown view type (" + std::to_string((int)_viewType) + ")");
+		OT_LOG_E("Unknown view type (" + std::to_string((int)_viewType) + ")");
 		break;
 	}
 }

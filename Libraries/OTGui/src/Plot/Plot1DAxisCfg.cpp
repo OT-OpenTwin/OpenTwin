@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Symbol.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DAxisCfg.h"
 
@@ -34,7 +34,7 @@ std::string ot::Plot1DAxisCfg::toString(AxisQuantity _quantity)
 	case AxisQuantity::Real: return "Real";
 	case AxisQuantity::Imaginary: return "Imaginary";
 	default:
-		OT_LOG_EAS("Unknown axis quantity (" + std::to_string((int)_quantity) + ")");
+		OT_LOG_E("Unknown axis quantity (" + std::to_string((int)_quantity) + ")");
 		return "Undefined";
 	}
 }
@@ -48,7 +48,7 @@ ot::Plot1DAxisCfg::AxisQuantity ot::Plot1DAxisCfg::stringToAxisQuantity(const st
 	else if (_quantity == toString(AxisQuantity::Real)) return AxisQuantity::Real;
 	else if (_quantity == toString(AxisQuantity::Imaginary)) return AxisQuantity::Imaginary;
 	else {
-		OT_LOG_EAS("Unknown axis quantity \"" + _quantity + "\"");
+		OT_LOG_E("Unknown axis quantity \"" + _quantity + "\"");
 		return AxisQuantity::Undefined;
 	}
 }
@@ -61,7 +61,7 @@ std::string ot::Plot1DAxisCfg::toString(QuantityScalingFlag _scaling)
 	case QuantityScalingFlag::DB10: return "dB 10";
 	case QuantityScalingFlag::DB20: return "dB 20";
 	default:
-		OT_LOG_EAS("Unknown quantity scaling (" + std::to_string((int)_scaling) + ")");
+		OT_LOG_E("Unknown quantity scaling (" + std::to_string((int)_scaling) + ")");
 		return "No Scaling";
 	};
 }
@@ -72,7 +72,7 @@ ot::Plot1DAxisCfg::QuantityScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalin
 	else if (_scaling == toString(QuantityScalingFlag::DB10)) return QuantityScalingFlag::DB10;
 	else if (_scaling == toString(QuantityScalingFlag::DB20)) return QuantityScalingFlag::DB20;
 	else {
-		OT_LOG_EAS("Unknown quantity scaling \"" + _scaling + "\"");
+		OT_LOG_E("Unknown quantity scaling \"" + _scaling + "\"");
 		return QuantityScalingFlag::NoQuantityScaling;
 	}
 }

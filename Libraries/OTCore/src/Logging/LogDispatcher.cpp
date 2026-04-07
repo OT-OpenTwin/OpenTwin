@@ -21,7 +21,7 @@
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/String.h"
 #include "OTCore/ServiceBase.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/Logging/LogNotifierStdCout.h"
 #include "OTCore/Logging/LogNotifierFileWriter.h"
 
@@ -118,6 +118,12 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 			std::cout << "Dispatch error: " << _e.what() << std::endl;
 		}
 	}
+}
+
+void ot::LogDispatcher::dispatch(const LogMessageStream& _messageStream)
+{
+	LogMessage msg(m_serviceName, _messageStream.getFunctionName(), _messageStream.getText(), _messageStream.getFlags());
+	this->dispatch(msg);
 }
 
 void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {

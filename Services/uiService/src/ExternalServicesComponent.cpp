@@ -51,7 +51,7 @@
 #include "OTCore/OwnerServiceGlobal.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
@@ -445,7 +445,7 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 		if (manager) {
 			KeyboardCommandHandler* oldHandler = manager->handlerFromKeySequence(_keySequence.c_str());
 			if (oldHandler) {
-				OT_LOG_WAS("Shortcut for key sequence \"" + _keySequence + "\" already occupied by service \"" + oldHandler->creator()->getServiceName() +
+				OT_LOG_W("Shortcut for key sequence \"" + _keySequence + "\" already occupied by service \"" + oldHandler->creator()->getServiceName() +
 					" (ID: " + std::to_string(oldHandler->creator()->getServiceID()) + ")\"\n");
 				return nullptr;
 			}
@@ -459,7 +459,7 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 		}
 	}
 	else {
-		OT_LOG_EA("No key sequence provided for shortcut");
+		OT_LOG_E("No key sequence provided for shortcut");
 		return nullptr;
 	}
 }
@@ -522,10 +522,10 @@ ModelUIDtype ExternalServicesComponent::getVisualizationModel(ModelUIDtype model
 			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_EAS("Error response: " + response);
+				OT_LOG_E("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
+				OT_LOG_E("Warning response: " + response);
 			}
 		}
 		//NOTE, WARNING, at this point only the last response will be taken into accout..
@@ -551,10 +551,10 @@ bool ExternalServicesComponent::isModelModified(ModelUIDtype modelID) {
 		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
+				OT_LOG_E("Warning response: " + response);
 			}
 	}
 	//NOTE, WARNING, at this point only the last response will be taken into accout..
@@ -585,7 +585,7 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 		if (_event & (ak::etClicked | ak::etEditingFinished)) {
 			auto receiver = this->getServiceFromNameType(m_controlsManager->objectCreator(_senderId));
 			if (!receiver) {
-				OT_LOG_EAS("Could not find service for object (" + std::to_string(_senderId) + ")");
+				OT_LOG_E("Could not find service for object (" + std::to_string(_senderId) + ")");
 				return;
 			}
 
@@ -619,7 +619,7 @@ void ExternalServicesComponent::notify(ot::UID _senderId, ak::eventType _event, 
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -639,10 +639,10 @@ void ExternalServicesComponent::modelSelectionChangedNotification(ModelUIDtype m
 		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc.toJson(), response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_EAS("Warning response: " + response);
+			OT_LOG_E("Warning response: " + response);
 		}
 	}
 }
@@ -658,10 +658,10 @@ void ExternalServicesComponent::itemRenamed(ModelUIDtype modelID, const std::str
 		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), inDoc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_EAS("Warning response: " + response);
+			OT_LOG_E("Warning response: " + response);
 		}
 	}
 }
@@ -728,7 +728,7 @@ void ExternalServicesComponent::propertyGridValuesChanged(const std::list<const 
 		for (const Property* prop : _properties) {
 			Property* cleanedProperty = this->createCleanedProperty(prop);
 			if (!cleanedProperty) {
-				OT_LOG_EA("Failed to create cleaned property");
+				OT_LOG_E("Failed to create cleaned property");
 				return;
 			}
 
@@ -795,7 +795,7 @@ void ExternalServicesComponent::propertyGridValueChangedTemporarly(const ot::Pro
 
 		Property* cleanedProperty = this->createCleanedProperty(_property);
 		if (!cleanedProperty) {
-			OT_LOG_EA("Failed to create cleaned property");
+			OT_LOG_E("Failed to create cleaned property");
 			return;
 		}
 
@@ -939,15 +939,15 @@ void ExternalServicesComponent::entitiesSelected(ModelUIDtype modelID, ot::servi
 			sendRelayedRequest(EXECUTE, receiver->getServiceURL(), inDoc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_EAS("Error response: " + response);
+				OT_LOG_E("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
+				OT_LOG_E("Warning response: " + response);
 			}
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -964,10 +964,10 @@ void ExternalServicesComponent::notifyButtonPressed(ModelUIDtype buttonID)
 			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_EAS("Error response: " + response);
+				OT_LOG_E("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
+				OT_LOG_E("Warning response: " + response);
 			}
 		}
 	}
@@ -1120,15 +1120,15 @@ void ExternalServicesComponent::sendRubberbandResultsToService(ot::serviceID_t _
 		sendRelayedRequest(EXECUTE, receiver->second->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_EAS("Warning response: " + response);
+			OT_LOG_E("Warning response: " + response);
 		}
 
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -1146,15 +1146,15 @@ void ExternalServicesComponent::requestUpdateVTKEntity(unsigned long long modelE
 			sendRelayedRequest(EXECUTE, reciever->getServiceURL(), doc, response);
 			// Check if response is an error or warning
 			OT_ACTION_IF_RESPONSE_ERROR(response) {
-				OT_LOG_EAS("Error response: " + response);
+				OT_LOG_E("Error response: " + response);
 			}
 			else OT_ACTION_IF_RESPONSE_WARNING(response) {
-				OT_LOG_EAS("Warning response: " + response);
+				OT_LOG_E("Warning response: " + response);
 			}
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -1162,7 +1162,7 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 	try {
 		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 		if (!model) {
-			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			OT_LOG_E(OT_INFO_SERVICE_TYPE_MODEL " service not found");
 			return;
 		}
 		OT_LOG_D("Version selected { \"Version\": \"" + _version + "\" }");
@@ -1175,14 +1175,14 @@ void ExternalServicesComponent::versionSelected(const std::string& _version) {
 		this->sendRelayedRequest(EXECUTE, model->getServiceURL(), doc, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_EAS("Warning response: " + response);
+			OT_LOG_E("Warning response: " + response);
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -1190,7 +1190,7 @@ void ExternalServicesComponent::versionDeselected() {
 	try {
 		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 		if (!model) {
-			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			OT_LOG_E(OT_INFO_SERVICE_TYPE_MODEL " service not found");
 			return;
 		}
 		
@@ -1208,7 +1208,7 @@ void ExternalServicesComponent::versionDeselected() {
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -1217,7 +1217,7 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 	try {
 		ServiceDataUi* model = this->getServiceFromNameType(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL);
 		if (!model) {
-			OT_LOG_EA(OT_INFO_SERVICE_TYPE_MODEL " service not found");
+			OT_LOG_E(OT_INFO_SERVICE_TYPE_MODEL " service not found");
 			return;
 		}
 		OT_LOG_D("Version requested { \"Version\": \"" + _version + "\" }");
@@ -1237,7 +1237,7 @@ void ExternalServicesComponent::activateVersion(const std::string& _version)
 		}
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -1248,10 +1248,10 @@ void ExternalServicesComponent::broadcastToViewNotifiers(const std::string& _mes
 		sendRelayedRequest(EXECUTE, reciever->getServiceURL(), _message, response);
 		// Check if response is an error or warning
 		OT_ACTION_IF_RESPONSE_ERROR(response) {
-			OT_LOG_EAS("Error response: " + response);
+			OT_LOG_E("Error response: " + response);
 		}
 		else OT_ACTION_IF_RESPONSE_WARNING(response) {
-			OT_LOG_EAS("Warning response: " + response);
+			OT_LOG_E("Warning response: " + response);
 		}
 		else {
 			_responses.push_back(std::move(response));
@@ -1341,7 +1341,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		std::string gssResponse;
 		if (!ot::msg::send("", app->getCurrentLoginData().getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, gssDoc.toJson(), gssResponse)) {
-			OT_LOG_EA("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
+			OT_LOG_E("Failed to send \"" OT_ACTION_CMD_CreateNewSession "\" request to the global session service");
 			app->slotShowErrorPrompt("Error", "Failed to send create new session request to the global session service", "");
 			clearSessionInformation();
 			return false;
@@ -1394,7 +1394,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 
 		std::string lssResponse;
 		if (!ot::msg::send("", m_sessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, sessionDoc.toJson(), lssResponse)) {
-			OT_LOG_EAS("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
+			OT_LOG_E("Failed to send http request to Local Session Service at \"" + m_sessionServiceURL + "\"");
 			app->slotShowErrorPrompt("Connection Error", "Failed to send http request to Local Session Service", "");
 			clearSessionInformation();
 			return false;
@@ -1403,7 +1403,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		ot::ReturnMessage lssResult = ot::ReturnMessage::fromJson(lssResponse);
 
 		if (lssResult != ot::ReturnMessage::Ok) {
-			OT_LOG_EAS("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
+			OT_LOG_E("Failed to create new session at Local Session Service at \"" + m_sessionServiceURL + "\": " + lssResult.getWhat());
 			app->slotShowErrorPrompt("Error", "Failed to create session. ", lssResult.getWhat());
 			clearSessionInformation();
 			return false;
@@ -1548,7 +1548,7 @@ bool ExternalServicesComponent::openProject(const std::string & _projectName, co
 		return true;
 	}
 	catch (const std::exception & e) {
-		OT_LOG_EAS(e.what());
+		OT_LOG_E(e.what());
 		app->slotShowErrorPrompt("Error", "Open project failed due to exception.", e.what());
 		clearSessionInformation();
 		return false;
@@ -1732,7 +1732,7 @@ void ExternalServicesComponent::saveProject() {
 		AppBase::instance()->setCurrentProjectIsModified(false);
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 	}
 }
 
@@ -2073,7 +2073,7 @@ ServiceDataUi * ExternalServicesComponent::getService(const ot::BasicServiceInfo
 			return s.second;
 		}
 	}
-	OT_LOG_WAS("Failed to find service { \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
+	OT_LOG_W("Failed to find service { \"Service.Name\": \"" + _serviceInfo.serviceName() + "\"; \"Service.Type\": \"" + _serviceInfo.serviceType() + "\" }");
 	return nullptr;
 }
 
@@ -2086,7 +2086,7 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromName(const std::string& 
 		}
 	}
 
-	OT_LOG_WAS("Failed to find service { \"Service.Name\": \"" + _serviceName + "\" }");
+	OT_LOG_W("Failed to find service { \"Service.Name\": \"" + _serviceName + "\" }");
 	return nullptr;
 }
 
@@ -2103,7 +2103,7 @@ ServiceDataUi* ExternalServicesComponent::getServiceFromNameType(const std::stri
 		}
 	}
 
-	OT_LOG_WAS("Failed to find service { \"Service.Name\": \"" + _serviceName + "\"; \"Service.Type\": \"" + _serviceType + "\" }");
+	OT_LOG_W("Failed to find service { \"Service.Name\": \"" + _serviceName + "\"; \"Service.Type\": \"" + _serviceType + "\" }");
 	return nullptr;
 }
 
@@ -2478,7 +2478,7 @@ void ExternalServicesComponent::handleOpenRawFile(ot::JsonDocument& _document) {
 
 	// Launch the file with the associated application
 	if (!QDesktopServices::openUrl(QUrl::fromLocalFile(info.fullPath))) {
-		OT_LOG_EAS("Failed to open temporary file \"" + info.fullPath.toStdString() + "\" with associated application");
+		OT_LOG_E("Failed to open temporary file \"" + info.fullPath.toStdString() + "\" with associated application");
 
 		m_tempFolder->removeFile(entityName);
 	}
@@ -2508,7 +2508,7 @@ void ExternalServicesComponent::handleSetCheckboxValue(ot::JsonDocument& _docume
 	ot::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 
 	if (objectID == ak::invalidUID) {
-		OT_LOG_EAS("Failed to find checkbox with name \"" + controlName + "\"");
+		OT_LOG_E("Failed to find checkbox with name \"" + controlName + "\"");
 		return;
 	}
 
@@ -2524,7 +2524,7 @@ void ExternalServicesComponent::handleSetLineEditValue(ot::JsonDocument& _docume
 	ot::UID objectID = ak::uiAPI::object::getUidFromObjectUniqueName(controlName.c_str());
 
 	if (objectID == ak::invalidUID) {
-		OT_LOG_EAS("Failed to find line edit with name \"" + controlName + "\"");
+		OT_LOG_E("Failed to find line edit with name \"" + controlName + "\"");
 		return;
 	}
 
@@ -2537,7 +2537,7 @@ void ExternalServicesComponent::handleSetLineEditValue(ot::JsonDocument& _docume
 		ak::uiAPI::niceLineEdit::setErrorState(objectID, error);
 	}
 	else {
-		OT_LOG_EAS("Invalid object type of object \"" + controlName + "\"");
+		OT_LOG_E("Invalid object type of object \"" + controlName + "\"");
 	}
 }
 
@@ -2693,7 +2693,7 @@ void ExternalServicesComponent::handleAddSettingsData(ot::JsonDocument& _documen
 		UserSettings::instance().addSettings(service->getBasicServiceInformation().serviceName(), config);
 	}
 	else {
-		OT_LOG_EAS("Service with the ID (" + std::to_string(serviceId) + ") is not registered");
+		OT_LOG_E("Service with the ID (" + std::to_string(serviceId) + ") is not registered");
 		AppBase::instance()->appendInfoMessage("[ERROR] Dispatch: " OT_ACTION_CMD_UI_AddSettingsData ": Service not registered");
 	}
 }
@@ -2706,7 +2706,7 @@ void ExternalServicesComponent::handleAddIconSearchPath(ot::JsonDocument& _docum
 		OT_LOG_D("Icon search path added: \"" + iconPath + "\"");
 	}
 	catch (const std::exception& _e) {
-		OT_LOG_EAS("[ERROR] Failed to add icon search path: " + std::string(_e.what()));
+		OT_LOG_E("[ERROR] Failed to add icon search path: " + std::string(_e.what()));
 	}
 #endif // _DEBUG
 }
@@ -3430,7 +3430,7 @@ void ExternalServicesComponent::handleAddMenuCheckbox(ot::JsonDocument& _documen
 
 	//NOTE, add error handling
 	if (parentID == ak::invalidUID) {
-		OT_LOG_EAS("Failed to find parent group \"" + pageName + ":" + groupName + (subgroupName.length() > 0 ? (":" + subgroupName) : "") + "\"");
+		OT_LOG_E("Failed to find parent group \"" + pageName + ":" + groupName + (subgroupName.length() > 0 ? (":" + subgroupName) : "") + "\"");
 		return;
 	}
 
@@ -3965,7 +3965,7 @@ void ExternalServicesComponent::handleSetTableSaved(ot::JsonDocument& _document)
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -3977,7 +3977,7 @@ void ExternalServicesComponent::handleSetTableModified(ot::JsonDocument& _docume
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -3989,7 +3989,7 @@ void ExternalServicesComponent::handleInsertTableRowAfter(ot::JsonDocument& _doc
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4005,7 +4005,7 @@ void ExternalServicesComponent::handleInsertTableRowBefore(ot::JsonDocument& _do
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4021,7 +4021,7 @@ void ExternalServicesComponent::handleRemoveTableRow(ot::JsonDocument& _document
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4037,7 +4037,7 @@ void ExternalServicesComponent::handleInsertTableColumnAfter(ot::JsonDocument& _
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4053,7 +4053,7 @@ void ExternalServicesComponent::handleInsertTableColumnBefore(ot::JsonDocument& 
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4069,7 +4069,7 @@ void ExternalServicesComponent::handleRemoveTableColumn(ot::JsonDocument& _docum
 
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 	if (table == nullptr) {
-		OT_LOG_EAS("Table \"" + tableName + "\" not found");
+		OT_LOG_E("Table \"" + tableName + "\" not found");
 		return;
 	}
 
@@ -4111,7 +4111,7 @@ void ExternalServicesComponent::handleSetTableSelection(ot::JsonDocument& _docum
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
-		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		OT_LOG_E("Table \"" + tableName + "\" does not exist");
 		return;
 	}
 
@@ -4136,7 +4136,7 @@ void ExternalServicesComponent::handleGetTableSelection(ot::JsonDocument& _docum
 	ot::TableView* table = AppBase::instance()->findTable(tableName, {});
 
 	if (!table) {
-		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		OT_LOG_E("Table \"" + tableName + "\" does not exist");
 		return;
 	}
 
@@ -4199,7 +4199,7 @@ void ExternalServicesComponent::handleSetCurrentTableSelectionBackground(ot::Jso
 	}
 
 	if (!table) {
-		OT_LOG_EAS("Table \"" + tableName + "\" does not exist");
+		OT_LOG_E("Table \"" + tableName + "\" does not exist");
 		return;
 	}
 
@@ -4514,10 +4514,10 @@ void ExternalServicesComponent::sendTableSelectionInformation(const std::string&
 	std::string response;
 	sendRelayedRequest(EXECUTE, _serviceUrl, doc, response);
 	OT_ACTION_IF_RESPONSE_ERROR(response) {
-		OT_LOG_EAS(response);
+		OT_LOG_E(response);
 	}
 	else OT_ACTION_IF_RESPONSE_WARNING(response) {
-		OT_LOG_WAS(response);
+		OT_LOG_W(response);
 	}
 }
 
@@ -4602,11 +4602,11 @@ void ExternalServicesComponent::workerImportSingleFile(QString _fileToImport, Im
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, _info.receiverUrl, std::move(json));
 	}
 	catch (const std::exception& e) {
-		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
+		OT_LOG_E("Exception during file import: " + std::string(e.what()));
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 	catch (...) {
-		OT_LOG_EAS("Unknown exception during file import.");
+		OT_LOG_E("Unknown exception during file import.");
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 }
@@ -4684,11 +4684,11 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, _info.receiverUrl, std::move(json));
 	}
 	catch (const std::exception& e) {
-		OT_LOG_EAS("Exception during file import: " + std::string(e.what()));
+		OT_LOG_E("Exception during file import: " + std::string(e.what()));
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 	catch (...) {
-		OT_LOG_EAS("Unknown exception during file import.");
+		OT_LOG_E("Unknown exception during file import.");
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotImportFileWorkerCompleted, Qt::QueuedConnection, std::string(), std::string());
 	}
 }
@@ -4852,7 +4852,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 
 void ExternalServicesComponent::slotPlotDataLoadingFailed(const std::string& _errorMessage) {
 	if (ot::LogDispatcher::mayLog(ot::ERROR_LOG)) {
-		OT_LOG_EAS(_errorMessage);
+		OT_LOG_E(_errorMessage);
 	}
 	else {
 		ot::LogMessage logMessage;

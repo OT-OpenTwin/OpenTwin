@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ThisService.h"
 
 #include "OTGui/Event/MenuRequestEvent.h"
@@ -107,7 +107,7 @@ void ot::ApplicationBase::setSessionServiceURL(const std::string & _url)
 
 void ot::ApplicationBase::initiallySelectEntity(const std::string& _entityName) {
 	if (m_initialSelectionHelper) {
-		OT_LOG_WA("Initial selection helper is already initialized...");
+		OT_LOG_W("Initial selection helper is already initialized...");
 		return;
 	}
 
@@ -127,7 +127,7 @@ void ot::ApplicationBase::initiallySelectEntity(const std::string& _entityName) 
 
 void ot::ApplicationBase::initiallySelectFirstChildEntityOf(const std::string& _parentEntityName) {
 	if (m_initialSelectionHelper != nullptr) {
-		OT_LOG_WA("Initial selection helper is already initialized...");
+		OT_LOG_W("Initial selection helper is already initialized...");
 		return;
 	}
 
@@ -293,13 +293,13 @@ bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceN
 bool ot::ApplicationBase::sendMessage(bool _queue, const std::string & _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>> & _prefetchIds, std::string& _response, const ot::msg::RequestFlags& _requestFlags)
 {
 	if (_serviceName == this->getServiceName()) {
-		OT_LOG_EA("Attempt to send message to self detected. Aborting message send.");
+		OT_LOG_E("Attempt to send message to self detected. Aborting message send.");
 		return false;
 	}
 
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
-		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
+		OT_LOG_E("Could not find service by name: \"" + _serviceName + "\"");
 		return false;
 	}
 	ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
@@ -327,7 +327,7 @@ void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::list<std::str
 		if (serviceName != this->getServiceName()) {
 			auto serviceInfoByServiceName = m_serviceNameMap.find(serviceName);
 			if (serviceInfoByServiceName == m_serviceNameMap.end()) {
-				OT_LOG_EAS("Could not find service by name: \"" + serviceName + "\"");
+				OT_LOG_E("Could not find service by name: \"" + serviceName + "\"");
 				continue;
 			}
 			ServiceBase* destinationServiceInfo = serviceInfoByServiceName->second;
@@ -342,13 +342,13 @@ void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::list<std::str
 
 void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serviceName, const JsonDocument& _doc, std::list<std::pair<UID, UID>>& _prefetchIds, const ot::msg::RequestFlags& _requestFlags) {
 	if (_serviceName == this->getServiceName()) {
-		OT_LOG_EA("Attempt to send message to self detected. Aborting async message send.");
+		OT_LOG_E("Attempt to send message to self detected. Aborting async message send.");
 		return;
 	}
 
 	auto serviceInfoByServiceName = m_serviceNameMap.find(_serviceName);
 	if (serviceInfoByServiceName == m_serviceNameMap.end()) {
-		OT_LOG_EAS("Could not find service by name: \"" + _serviceName + "\"");
+		OT_LOG_E("Could not find service by name: \"" + _serviceName + "\"");
 		return;
 	}
 
@@ -461,19 +461,19 @@ void ot::ApplicationBase::initializeDefaultTemplate() {
 
 bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config, const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
 	if (_databaseURL.empty()) {
-		OT_LOG_EA("DataBase URL not set");
+		OT_LOG_E("DataBase URL not set");
 		return false;
 	}
 	if (_userName.empty()) {
-		OT_LOG_EA("User name not set");
+		OT_LOG_E("User name not set");
 		return false;
 	}
 	if (_userPassword.empty()) {
-		OT_LOG_EA("User password not set");
+		OT_LOG_E("User password not set");
 		return false;
 	}
 	if (_userCollection.empty()) {
-		OT_LOG_EA("User collection not set");
+		OT_LOG_E("User collection not set");
 		return false;
 	}
 
@@ -526,14 +526,14 @@ bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config,
 			}
 			catch (std::exception _e)
 			{
-				OT_LOG_EAS(_e.what());
+				OT_LOG_E(_e.what());
 				return false;
 			}
 		}
 	}
 	catch (std::exception _e)
 	{
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		return false;
 	}
 
@@ -542,19 +542,19 @@ bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config,
 
 ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::string& _databaseURL, const std::string& _siteID, const std::string& _userName, const std::string& _userPassword, const std::string& _userCollection) {
 	if (_databaseURL.empty()) {
-		OT_LOG_EA("DataBase URL not set");
+		OT_LOG_E("DataBase URL not set");
 		return PropertyGridCfg();
 	}
 	if (_userName.empty()) {
-		OT_LOG_EA("User name not set");
+		OT_LOG_E("User name not set");
 		return PropertyGridCfg();
 	}
 	if (_userPassword.empty()) {
-		OT_LOG_EA("User password not set");
+		OT_LOG_E("User password not set");
 		return PropertyGridCfg();
 	}
 	if (_userCollection.empty()) {
-		OT_LOG_EA("User collection not set");
+		OT_LOG_E("User collection not set");
 		return PropertyGridCfg();
 	}
 
@@ -595,7 +595,7 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 		catch (std::exception _e)
 		{
 			// Something went wrong with accessing the settings data
-			OT_LOG_EAS(_e.what());
+			OT_LOG_E(_e.what());
 			return PropertyGridCfg();
 		}
 
@@ -610,7 +610,7 @@ ot::PropertyGridCfg ot::ApplicationBase::getSettingsFromDataBase(const std::stri
 	}
 	catch (std::exception _e)
 	{
-		OT_LOG_EAS(_e.what());
+		OT_LOG_E(_e.what());
 		return PropertyGridCfg();
 	}
 }
@@ -811,7 +811,7 @@ void ot::ApplicationBase::setSessionIDPrivate(const std::string& _id) {
 	m_sessionID = _id;
 	size_t index = m_sessionID.find(':');
 	if (index == std::string::npos) {
-		OT_LOG_EAS("Invalid session id format: \"" + _id + "\"");
+		OT_LOG_E("Invalid session id format: \"" + _id + "\"");
 	}
 	else {
 		m_projectName = m_sessionID.substr(0, index);
@@ -830,12 +830,12 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 
 	// Check for duplicate
 	if (m_serviceIdMap.find(_service.getServiceID()) != m_serviceIdMap.end()) {
-		OT_LOG_EAS("Service already registered { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
+		OT_LOG_E("Service already registered { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
 		return;
 	}
 	if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
 		if (m_uiComponent) {
-			OT_LOG_EA("UI component already registered. Multiple UIs not supported");
+			OT_LOG_E("UI component already registered. Multiple UIs not supported");
 			return;
 		}
 		// Store information

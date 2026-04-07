@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/Handler/ActionHandleConnector.h"
@@ -27,7 +27,7 @@
 
 ot::LineEditHandler::LineEditHandler() {
 	if (!m_actionHandler.connectAction(OT_ACTION_CMD_LineEditChanged, this, &LineEditHandler::handleToolBarLineEditChanged, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
-		OT_LOG_EA("Failed to register line edit changed handler");
+		OT_LOG_E("Failed to register line edit changed handler");
 	}
 }
 

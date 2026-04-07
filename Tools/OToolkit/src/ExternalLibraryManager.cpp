@@ -27,7 +27,7 @@
 #include "ExternalLibraryManager.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // Qt header
 #include <QtCore/qdir.h>

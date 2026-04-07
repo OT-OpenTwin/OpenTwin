@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Properties/PropertyGrid.h"
 #include "OTWidgets/Properties/PropertyInput.h"
 #include "OTWidgets/Properties/PropertyGridItem.h"
@@ -155,7 +155,7 @@ void ot::PropertyGrid::focusProperty(const std::list<std::string>& _groupPath, c
 			}
 			fullPath.append(gr);
 		}
-		OT_LOG_EAS("Property not found { \"Group\": \"" + fullPath + "\", \"Property\": \"" + _itemName + "\" }");
+		OT_LOG_E("Property not found { \"Group\": \"" + fullPath + "\", \"Property\": \"" + _itemName + "\" }");
 		return;
 	}
 	

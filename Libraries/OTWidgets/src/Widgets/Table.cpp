@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Delegate/TableItemDelegate.h"
@@ -295,9 +295,9 @@ void ot::Table::showEvent(QShowEvent* _event) {
 
 	if (!m_columnWidthBuffer.empty() || !m_rowHeightBuffer.empty()) {
 		if (this->columnCount() != m_columnWidthBuffer.size()) {
-			OT_LOG_EA("Column width buffer is invalid");
+			OT_LOG_E("Column width buffer is invalid");
 		} else if (this->rowCount() != m_rowHeightBuffer.size()) {
-			OT_LOG_EA("Row height buffer is invalid");
+			OT_LOG_E("Row height buffer is invalid");
 		}
 		else if (!m_columnWidthBuffer.empty()) {
 			m_stopResizing = false;

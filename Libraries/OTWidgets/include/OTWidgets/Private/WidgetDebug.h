@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 #define OT_WIDGETS_VIEW_DBG_ENABLED false
 #if OT_WIDGETS_VIEW_DBG_ENABLED==true

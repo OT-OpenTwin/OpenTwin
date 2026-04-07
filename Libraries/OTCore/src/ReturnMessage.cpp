@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageStatus _status) {
 	switch (_status)
@@ -31,7 +31,7 @@ std::string ot::ReturnMessage::statusToString(ot::ReturnMessage::ReturnMessageSt
 	case ot::ReturnMessage::Retry: return "Retry";
 	case ot::ReturnMessage::Cancel: return "Cancel";
 	default:
-		OT_LOG_EA("Unknown Return Message Status");
+		OT_LOG_E("Unknown Return Message Status");
 		return "Failed";
 	}
 }
@@ -44,7 +44,7 @@ ot::ReturnMessage::ReturnMessageStatus ot::ReturnMessage::stringToStatus(const s
 	else if (_status == statusToString(ReturnMessage::Retry)) return ReturnMessage::Retry;
 	else if (_status == statusToString(ReturnMessage::Cancel)) return ReturnMessage::Cancel;
 	else {
-		OT_LOG_EAS("Unknown Return Message Status \"" + _status + "\"");
+		OT_LOG_E("Unknown Return Message Status \"" + _status + "\"");
 		return ReturnMessage::Failed;
 	}
 }

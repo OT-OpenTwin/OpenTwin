@@ -130,7 +130,7 @@ std::string DataBase::storeDataItem(bsoncxx::builder::basic::document& _storage)
 	DataStorageAPI::DataStorageResponse res = docManager.InsertDocumentToDatabaseOrFileStorage(entityID, (int)storageVersion, m_collectionName, _storage, false, m_queueWritingFlag);
 
 	if (!res.getSuccess()) {
-		OT_LOG_EA("Failed to insert document");
+		OT_LOG_E("Failed to insert document");
 		return "";
 	}
 
@@ -145,7 +145,7 @@ std::string DataBase::storePlainDataItem(bsoncxx::builder::basic::document& _sto
 	DataStorageAPI::DataStorageResponse res = docAccess.InsertDocumentToDatabase(_storage.extract(), m_queueWritingFlag);
 
 	if (!res.getSuccess()) {
-		OT_LOG_EA("Failed to insert plain document");
+		OT_LOG_E("Failed to insert plain document");
 		return "";
 	}
 
@@ -355,7 +355,7 @@ int64_t DataBase::getIntFromView(const bsoncxx::document::view& _doc_view, const
 			return it->get_int64();
 		}
 		else {
-			OT_LOG_EA("Invalid value type");
+			OT_LOG_E("Invalid value type");
 		}
 	}
 	return _defaultValue;
@@ -368,7 +368,7 @@ int64_t DataBase::getIntFromArrayViewIterator(bsoncxx::array::view::const_iterat
 	if (_it->type() == bsoncxx::type::k_int64) {
 		return _it->get_int64();
 	}
-	OT_LOG_EA("Invalid value type");
+	OT_LOG_E("Invalid value type");
 	return 0;
 }
 

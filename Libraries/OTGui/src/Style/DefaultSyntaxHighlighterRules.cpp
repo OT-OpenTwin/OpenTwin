@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Style/DefaultSyntaxHighlighterRules.h"
 
@@ -27,7 +27,7 @@ std::list<ot::SyntaxHighlighterRule> ot::DefaultSyntaxHighlighterRules::create(D
 	case ot::DocumentSyntax::PlainText: return std::list<ot::SyntaxHighlighterRule>();
 	case ot::DocumentSyntax::PythonScript: return DefaultSyntaxHighlighterRules::createPython();
 	default:
-		OT_LOG_EAS("Unknown syntax (" + std::to_string((int)_syntax) + ")");
+		OT_LOG_E("Unknown syntax (" + std::to_string((int)_syntax) + ")");
 		return std::list<ot::SyntaxHighlighterRule>();
 	}
 }

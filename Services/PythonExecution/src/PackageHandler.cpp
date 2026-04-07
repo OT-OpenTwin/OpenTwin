@@ -22,7 +22,7 @@
 #include "OTCore/String.h"
 #include <Python.h>
 #include "CPythonObjectNew.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "PythonException.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Positioning.h"
 #include "OTWidgets/Dialog/Dialog.h"
 #include "OTWidgets/Style/IconManager.h"
@@ -97,7 +97,7 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::list<st
 		case ot::Dialog::Retry: this->connect(btn, &PushButton::clicked, this, &Dialog::closeRetry); break;
 		case ot::Dialog::Cancel: this->connect(btn, &PushButton::clicked, this, &Dialog::closeCancel); break;
 		default:
-			OT_LOG_EAS("Unknown dialog result (" + std::to_string((int)info.second) + ")");
+			OT_LOG_E("Unknown dialog result (" + std::to_string((int)info.second) + ")");
 			break;
 		}
 	}
@@ -143,7 +143,7 @@ std::list<ot::PushButton*> ot::Dialog::generateDefaultButtons(const std::initial
 			break;
 
 		default:
-			OT_LOG_EAS("Unknown dialog result (" + std::to_string((int)result) + ")");
+			OT_LOG_E("Unknown dialog result (" + std::to_string((int)result) + ")");
 			break;
 		}
 

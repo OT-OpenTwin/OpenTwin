@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Painter/Painter2DFactory.h"
@@ -39,7 +39,7 @@ std::string ot::Grid::toString(GridFlag _flag) {
 	case Grid::ShowCenterCross: return "ShowCenterCross";
 	case Grid::AutoScaleGrid: return "AutoScaleGrid";
 	default:
-		OT_LOG_EAS("Invalid grid flag (" + std::to_string((int)_flag) + ")");
+		OT_LOG_E("Invalid grid flag (" + std::to_string((int)_flag) + ")");
 		return "null";
 	}
 }
@@ -84,7 +84,7 @@ std::string ot::Grid::toString(GridSnapMode _snapMode) {
 	case Grid::SnapTopLeft: return "SnapTopLeft";
 	case Grid::SnapCenter: return "SnapCenter";
 	default: 
-		OT_LOG_EAS("Invalid GridSnapMode (" + std::to_string((int)_snapMode) + ")");
+		OT_LOG_E("Invalid GridSnapMode (" + std::to_string((int)_snapMode) + ")");
 		return "NoGridSnap";
 	}
 }
@@ -94,7 +94,7 @@ ot::Grid::GridSnapMode ot::Grid::stringToGridSnapMode(const std::string& _snapMo
 	else if (_snapMode == Grid::toString(Grid::SnapTopLeft)) return Grid::SnapTopLeft;
 	else if (_snapMode == Grid::toString(Grid::SnapCenter)) return Grid::SnapCenter;
 	else {
-		OT_LOG_EAS("Invalid GridSnapMode \"" + _snapMode + "\"");
+		OT_LOG_E("Invalid GridSnapMode \"" + _snapMode + "\"");
 		return Grid::NoGridSnap;
 	}
 }

@@ -947,7 +947,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 	}
 	else
 	{
-		OT_LOG_EA("UI needs to be available before the visualization model is set");
+		OT_LOG_E("UI needs to be available before the visualization model is set");
 	}
 }
 
@@ -1922,7 +1922,7 @@ void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configurati
 
 	ot::VersionGraphVersionCfg* version = getStateManager()->getVersionGraph().findVersion(m_selectedVersion);
 	if (!version) {
-		OT_LOG_EAS("Selected version not found \"" + m_selectedVersion + "\"");
+		OT_LOG_E("Selected version not found \"" + m_selectedVersion + "\"");
 		return;
 	}
 
@@ -1932,13 +1932,13 @@ void Model::setVersionPropertiesFromJson(const ot::PropertyGridCfg& _configurati
 		if (path == "Version/Label") {
 			ot::PropertyString* actualProperty = dynamic_cast<ot::PropertyString*>(prop);
 			if (!actualProperty) {
-				OT_LOG_EAS("Property cast failed \"" + path + "\"");
+				OT_LOG_E("Property cast failed \"" + path + "\"");
 				continue;
 			}
 			version->setLabel(actualProperty->getValue());
 		}
 		else {
-			OT_LOG_EAS("Unknown version property \"" + path + "\"");
+			OT_LOG_E("Unknown version property \"" + path + "\"");
 		}
 	}
 
@@ -1953,7 +1953,7 @@ void Model::setVersionLabel(const std::string& version, const std::string& label
 	ot::VersionGraphVersionCfg* versionObject = getStateManager()->getVersionGraph().findVersion(version);
 
 	if (!versionObject) {
-		OT_LOG_EAS("Selected version not found \"" + version + "\"");
+		OT_LOG_E("Selected version not found \"" + version + "\"");
 		return;
 	}
 
@@ -3909,7 +3909,7 @@ void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::Basic
 		projectSave(_parameter1, true);
 	}
 	else {
-		OT_LOG_EAS("Unknown promt type \"" + _type + "\"");
+		OT_LOG_E("Unknown promt type \"" + _type + "\"");
 	}
 }
 
@@ -4263,7 +4263,7 @@ void Model::versionSelected(const std::string& _version) {
 
 	const ot::VersionGraphVersionCfg* version = getStateManager()->getVersionGraph().findVersion(_version);
 	if (!version) {
-		OT_LOG_EAS("Version not found \"" + _version + "\"");
+		OT_LOG_E("Version not found \"" + _version + "\"");
 		return;
 	}
 
@@ -5238,7 +5238,7 @@ void Model::updateModelStateForUndoRedo()
 		prefetchDocumentsFromStorage(prefetchIds);
 
 		if (m_entityMap.empty()) {
-			OT_LOG_EA("Entity map is empty after initialization");
+			OT_LOG_E("Entity map is empty after initialization");
 		}
 
 		do
@@ -5265,7 +5265,7 @@ void Model::updateModelStateForUndoRedo()
 							EntityBase *parentEntity = getEntityByID(parentID);
 
 							if (m_entityMap.empty()) {
-								OT_LOG_EA("Entity map is empty before reading entity");
+								OT_LOG_E("Entity map is empty before reading entity");
 							}
 
 							EntityBase *newEntity = readEntityFromEntityID(parentEntity, entity, m_entityMap);
@@ -5286,7 +5286,7 @@ void Model::updateModelStateForUndoRedo()
 								}
 
 								if (m_entityMap.empty()) {
-									OT_LOG_EA("Entity map is empty after reading entity");
+									OT_LOG_E("Entity map is empty after reading entity");
 								}
 							}
 							else
@@ -5299,7 +5299,7 @@ void Model::updateModelStateForUndoRedo()
 					{
 						if (parentID == 0) {
 							// This should not happen
-							OT_LOG_EA("The top level ID affected by an undo operation");
+							OT_LOG_E("The top level ID affected by an undo operation");
 						}
 					}
 				}

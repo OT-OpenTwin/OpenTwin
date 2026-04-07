@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTWidgets/Properties/PropertyDialog.h"
@@ -124,7 +124,7 @@ ot::Property* ot::ApplicationPropertiesManager::createCleanedSlotProperty(const 
 
 	PropertyGroup* rootGroup = newProperty->getRootGroup();
 	if (rootGroup->getChildGroups().empty()) {
-		OT_LOG_EA("Data mismatch");
+		OT_LOG_E("Data mismatch");
 		return newProperty;
 	}
 

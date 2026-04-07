@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/GradientPainter2D.h"
 #include "OTWidgets/Dialog/Painter2DEditDialogGradientBase.h"
 #include "OTWidgets/Widgets/Label.h"
@@ -107,7 +107,7 @@ ot::GradientSpread ot::Painter2DEditDialogGradientBase::gradientSpread() {
 	else if (m_spreadBox->currentText().toStdString() == ot::toString(GradientSpread::Repeat)) return GradientSpread::Repeat;
 	else if (m_spreadBox->currentText().toStdString() == ot::toString(GradientSpread::Reflect)) return GradientSpread::Reflect;
 	else {
-		OT_LOG_EA("Unknown pad spread");
+		OT_LOG_E("Unknown pad spread");
 		return GradientSpread::Pad;
 	}
 }

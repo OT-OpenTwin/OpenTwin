@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/SceneNodeBase.h"
 #include "OTViewer/TextVisualiser.h"

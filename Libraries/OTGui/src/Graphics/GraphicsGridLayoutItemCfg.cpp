@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTGui/Graphics/GraphicsGridLayoutItemCfg.h"
 
@@ -112,7 +112,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _ob
 
 	// Ensure correct array sizes
 	if (itemsArr.Size() != m_rows) {
-		OT_LOG_EA("Item array size mismatch");
+		OT_LOG_E("Item array size mismatch");
 		return;
 	}
 
@@ -120,7 +120,7 @@ void ot::GraphicsGridLayoutItemCfg::setFromJsonObject(const ConstJsonObject& _ob
 	for (rapidjson::SizeType r = 0; r < itemsArr.Size(); r++) {
 		ConstJsonArray columnArr = json::getArray(itemsArr, r);
 		if (columnArr.Size() != m_columns) {
-			OT_LOG_EA("Item column array size mismatch");
+			OT_LOG_E("Item column array size mismatch");
 			return;
 		}
 		for (rapidjson::SizeType c = 0; c < columnArr.Size(); c++) {
@@ -159,21 +159,21 @@ void ot::GraphicsGridLayoutItemCfg::addChildItem(ot::GraphicsItemCfg* _item) {
 			}
 		}
 	}
-	OT_LOG_EA("No more free space to add the item");
+	OT_LOG_E("No more free space to add the item");
 }
 
 void ot::GraphicsGridLayoutItemCfg::addChildItem(int _row, int _column, ot::GraphicsItemCfg* _item) {
 	if (_row < 0 || _row >= m_rows) {
-		OT_LOG_EA("Row index out of range");
+		OT_LOG_E("Row index out of range");
 		return;
 	}
 	if (_column < 0 || _column >= m_columns) {
-		OT_LOG_EA("Column index out of range");
+		OT_LOG_E("Column index out of range");
 		return;
 	}
 
 	if (m_items[_row][_column]) {
-		OT_LOG_EA("At the given index another item was placed before. Deleting old item");
+		OT_LOG_E("At the given index another item was placed before. Deleting old item");
 		delete m_items[_row][_column];
 	}
 

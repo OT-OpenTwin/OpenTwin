@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/SceneNodeBase.h"

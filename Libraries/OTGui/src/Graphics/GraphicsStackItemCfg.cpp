@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsStackItemCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 
@@ -100,7 +100,7 @@ void ot::GraphicsStackItemCfg::setFromJsonObject(const ConstJsonObject& _object)
 			}
 		}
 		catch (const std::exception& _e) {
-			OT_LOG_EAS("Failed to create child item from factory: " + std::string(_e.what()));
+			OT_LOG_E("Failed to create child item from factory: " + std::string(_e.what()));
 			if (itm) {
 				delete itm;
 			}

@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ThisComputerInfo.h"
 #include "OTCore/Logging/LogNotifierFileWriter.h"
 

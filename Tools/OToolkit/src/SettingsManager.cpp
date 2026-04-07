@@ -22,7 +22,7 @@
 #include "SettingsManager.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTGui/Properties/Property.h"
 #include "OTGui/Properties/PropertyPath.h"

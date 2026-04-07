@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTCommunication/Handler/ActionHandleConnector.h"
@@ -29,7 +29,7 @@ ot::ButtonHandler::ButtonHandler(ActionDispatcherBase* _dispatcher)
 	: m_actionHandler(_dispatcher)
 {
 	if (!m_actionHandler.connectAction(OT_ACTION_CMD_ButtonPressed, this, &ButtonHandler::handleToolBarButtonClicked, ot::SECURE_MESSAGE_TYPES, ActionDispatcher::ExpectMultiple)) {
-		OT_LOG_EA("Failed to register button click handler");
+		OT_LOG_E("Failed to register button click handler");
 	}
 }
 

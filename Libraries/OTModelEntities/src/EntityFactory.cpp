@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/EntityFactory.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 EntityFactory& EntityFactory::instance() {
 	static EntityFactory g_instance;

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsGroupItemCfg.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Graphics/GraphicsGroupItem.h"
@@ -49,7 +49,7 @@ bool ot::GraphicsGroupItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
 	const GraphicsGroupItemCfg* cfg = dynamic_cast<const GraphicsGroupItemCfg*>(_cfg);
 	if (cfg == nullptr) {
-		OT_LOG_EA("Invalid configuration provided: Cast failed");
+		OT_LOG_E("Invalid configuration provided: Cast failed");
 		return false;
 	}
 
@@ -97,7 +97,7 @@ ot::GraphicsItem* ot::GraphicsGroupItem::findItem(const std::string& _itemName) 
 			if (r) return r;
 		}
 		else {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 		}
 	}
 	return nullptr;
@@ -110,7 +110,7 @@ void ot::GraphicsGroupItem::finalizeGraphicsItem(void) {
 			itm->finalizeGraphicsItem();
 		}
 		else {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 		}
 	}
 }
@@ -136,7 +136,7 @@ std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllGraphicsElements(vo
 			result.splice(result.end(), actualItem->getAllGraphicsElements());
 		}
 		else {
-			OT_LOG_EA("Unknown item");
+			OT_LOG_E("Unknown item");
 		}
 	}
 	return result;
@@ -150,7 +150,7 @@ std::list<ot::GraphicsElement*> ot::GraphicsGroupItem::getAllDirectChildElements
 			result.push_back(actualItem);
 		}
 		else {
-			OT_LOG_EA("Unknown item");
+			OT_LOG_E("Unknown item");
 		}
 	}
 	return result;
@@ -261,7 +261,7 @@ void ot::GraphicsGroupItem::graphicsElementStateChanged(const GraphicsElementSta
 				itm->setGraphicsElementStateFlags(_state);
 			}
 			else {
-				OT_LOG_EA("Item cast failed");
+				OT_LOG_E("Item cast failed");
 			}
 		}
 	}
@@ -276,7 +276,7 @@ void ot::GraphicsGroupItem::notifyChildsAboutTransformChange(const QTransform& _
 			itm->parentItemTransformChanged(_newTransform);
 		}
 		else {
-			OT_LOG_EA("Item cast failed");
+			OT_LOG_E("Item cast failed");
 		}
 	}
 }

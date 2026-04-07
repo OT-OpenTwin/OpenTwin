@@ -24,7 +24,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCore/ThisService.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
 
@@ -145,13 +145,13 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	OT_LOG_D("Foundation startup...");
 
 	if (m_componentState != WaitForStartup) {
-		OT_LOG_EA("Component startup already performed");
+		OT_LOG_E("Component startup already performed");
 		return -30;
 	}
 
 	m_application = _application;
 	if (m_application == nullptr) {
-		OT_LOG_EA("nullptr as application instance provided");
+		OT_LOG_E("nullptr as application instance provided");
 		return -1;
 	}
 
@@ -176,7 +176,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	OTAssertNullptr(m_application);
 
 	if (m_componentState != WaitForInit) {
-		OT_LOG_EA("Component already initialized");
+		OT_LOG_E("Component already initialized");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Component already initialized");
 	}
 
@@ -224,7 +224,7 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 
 	unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
 	if (handleID == 0) {
-		OT_LOG_EA("Failed to get current process id");
+		OT_LOG_E("Failed to get current process id");
 	}
 	else {
 		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
@@ -301,7 +301,7 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	ot::MessageType						_messageType
 ) {
 	if (m_application == nullptr) {
-		OT_LOG_EA("Not initialized yet");
+		OT_LOG_E("Not initialized yet");
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Not initialized yet");
 	}
 	try {

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGuiAPI/GraphicsFlowItem.h"
 
 ot::GraphicsFlowItem::GraphicsFlowItem() {

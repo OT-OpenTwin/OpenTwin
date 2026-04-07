@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTGui/Painter/Painter2DFactory.h"
@@ -44,7 +44,7 @@ std::string ot::Plot1DCurveCfg::toString(Symbol _symbol)
 	case ot::Plot1DCurveCfg::Star8: return "Star 8";
 	case ot::Plot1DCurveCfg::Hexagon: return "Hexagon";
 	default:
-		OT_LOG_EAS("Unknown plot curve symbol (" + std::to_string(static_cast<int>(_symbol)) + ")");
+		OT_LOG_E("Unknown plot curve symbol (" + std::to_string(static_cast<int>(_symbol)) + ")");
 		return "None";
 	}
 }
@@ -68,7 +68,7 @@ ot::Plot1DCurveCfg::Symbol ot::Plot1DCurveCfg::stringToSymbol(const std::string&
 	else if (_symbol == toString(Hexagon)) return Hexagon;
 	else
 	{
-		OT_LOG_EAS("Unknown plot curve symbol \"" + _symbol + "\"");
+		OT_LOG_E("Unknown plot curve symbol \"" + _symbol + "\"");
 		return NoSymbol;
 	}
 }

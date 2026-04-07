@@ -32,7 +32,7 @@
 
 #include "CartesianMeshToSTL.h"
 
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTModelEntities/EntityAPI.h"

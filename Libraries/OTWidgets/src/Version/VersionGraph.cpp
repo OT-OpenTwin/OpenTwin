@@ -152,7 +152,7 @@ void ot::VersionGraph::slotSelectionChanged(void) {
 
 	std::list<ot::GraphicsItem*> selection = this->getSelectedGraphicsItems();
 	if (selection.size() > 1) {
-		OT_LOG_EA("Invalid selection");
+		OT_LOG_E("Invalid selection");
 		return;
 	}
 	if (selection.empty()) {
@@ -274,7 +274,7 @@ QRectF ot::VersionGraph::calculateFittedViewportRect(void) const {
 		return sceneRect;
 	}
 	else {
-		OT_LOG_EAS("Version not found \"" + m_activeVersion + "\"");
+		OT_LOG_E("Version not found \"" + m_activeVersion + "\"");
 		return QRectF();
 	}
 }

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Painter/LinearGradientPainter2D.h"
@@ -190,6 +190,6 @@ void ot::Painter2DEditButton::updateText() {
 		m_btn->setToolTip(m_btnTip);
 	}
 	else {
-		OT_LOG_EAS("Unknown painter type \"" + m_painter->getFactoryKey() + "\"");
+		OT_LOG_E("Unknown painter type \"" + m_painter->getFactoryKey() + "\"");
 	}
 }

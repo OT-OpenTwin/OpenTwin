@@ -24,7 +24,7 @@
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/DebugHelper.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/DebugInfo/GDSDebugInfo.h"
@@ -360,7 +360,7 @@ void Application::handleSetGlobalLogFlags(ot::JsonDocument& _doc) {
 	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
 		std::string response;
 		if (!ot::msg::send("", lds.getServiceURL(), ot::EXECUTE, json, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_EAS("Failed to send message to LSS at \"" + lds.getServiceURL() + "\"");
+			OT_LOG_E("Failed to send message to LSS at \"" + lds.getServiceURL() + "\"");
 		}
 	}
 }

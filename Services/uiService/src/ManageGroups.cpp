@@ -636,7 +636,7 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
 	}
 
 	if (!hasSuccessful(response)) {
-		OT_LOG_EA("Request returned error");
+		OT_LOG_E("Request returned error");
 	}
 }
 

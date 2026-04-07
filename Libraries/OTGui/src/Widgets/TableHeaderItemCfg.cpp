@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Widgets/TableHeaderItemCfg.h"
 
 std::string ot::TableHeaderItemCfg::toString(FilterBehavior _behavior)
@@ -29,7 +29,7 @@ std::string ot::TableHeaderItemCfg::toString(FilterBehavior _behavior)
 	case ot::TableHeaderItemCfg::UseText: return "Text";
 	case ot::TableHeaderItemCfg::RequestData: return "Request";
 	default:
-		OT_LOG_EAS("Unknown filter behavior (" + std::to_string((int)_behavior) + ")");
+		OT_LOG_E("Unknown filter behavior (" + std::to_string((int)_behavior) + ")");
 		return "None";
 	}
 }
@@ -40,7 +40,7 @@ ot::TableHeaderItemCfg::FilterBehavior ot::TableHeaderItemCfg::stringToFilterBeh
 	else if (_behavior == toString(FilterBehavior::UseText)) return FilterBehavior::UseText;
 	else if (_behavior == toString(FilterBehavior::RequestData)) return FilterBehavior::RequestData;
 	else {
-		OT_LOG_EAS("Unknown filter behavior \"" + _behavior + "\"");
+		OT_LOG_E("Unknown filter behavior \"" + _behavior + "\"");
 		return FilterBehavior::NoFilter;
 	}
 }

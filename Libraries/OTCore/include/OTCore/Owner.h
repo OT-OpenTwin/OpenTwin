@@ -19,9 +19,6 @@
 
 #pragma once
 
-// OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
-
 // std header
 #include <string>
 #include <list>

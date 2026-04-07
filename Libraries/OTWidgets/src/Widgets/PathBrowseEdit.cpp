@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/PushButton.h"
 #include "OTWidgets/Widgets/PathBrowseEdit.h"
@@ -75,7 +75,7 @@ void ot::PathBrowseEdit::setBrowseMode(PathBrowseMode _mode) {
 		m_browseTitle = "Open Directory";
 		break;
 	default:
-		OT_LOG_EA("Unknown browse mode");
+		OT_LOG_E("Unknown browse mode");
 		break;
 	}
 }
@@ -94,7 +94,7 @@ void ot::PathBrowseEdit::slotBrowse(void) {
 		pth = QFileDialog::getExistingDirectory(m_edit, m_browseTitle, m_edit->text(), QFileDialog::ShowDirsOnly);
 		break;
 	default:
-		OT_LOG_EA("Unknown browse mode");
+		OT_LOG_E("Unknown browse mode");
 		break;
 	}
 

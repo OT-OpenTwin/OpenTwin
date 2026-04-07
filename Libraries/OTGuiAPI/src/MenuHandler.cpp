@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTGui/Event/MenuRequestData.h"
 #include "OTGui/Event/MenuRequestEvent.h"
@@ -33,7 +33,7 @@ ot::MenuHandler::MenuHandler(ActionDispatcherBase* _dispatcher)
 {
 	if (!m_actionHandler.connectAction(OT_ACTION_CMD_UI_CreateContextMenu, this, &MenuHandler::handleMenuRequested, ot::SECURE_MESSAGE_TYPES))
 	{
-		OT_LOG_EA("Failed to register context menu request handler");
+		OT_LOG_E("Failed to register context menu request handler");
 	}
 }
 

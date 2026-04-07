@@ -21,7 +21,7 @@
 #include "FDTDConfig.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityProperties.h"
 
@@ -168,7 +168,7 @@ void FDTDConfig::FDTDpropertyChecking() {
 	}
 
 	if (m_timeSteps == 0) {
-		OT_LOG_WA("[FDTDConfig] [Timesteps] Number of timesteps is set to zero. Adjusting to default value of 1000.");
+		OT_LOG_W("[FDTDConfig] [Timesteps] Number of timesteps is set to zero. Adjusting to default value of 1000.");
 		m_timeSteps = 1000;
 	}
 
@@ -179,7 +179,7 @@ void FDTDConfig::FDTDpropertyChecking() {
 		m_excitationType = ExcitationTypes::SINUSOIDAL;
 	}
 	else {
-		OT_LOG_WA("[Excitation Type] Invalid excitation type string. Defaulting to Gaussian.");
+		OT_LOG_W("[Excitation Type] Invalid excitation type string. Defaulting to Gaussian.");
 		m_excitationType = ExcitationTypes::GAUSSIAN;
 	}
 }

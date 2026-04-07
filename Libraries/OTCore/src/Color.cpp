@@ -19,7 +19,7 @@
 
 // Project header
 #include "OTCore/Color.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 ot::Color::Color() : m_r(0), m_g(0), m_b(0), m_a(255) {}
 
@@ -355,7 +355,8 @@ void ot::Color::set(ot::DefaultColor _color)
         m_a = 255;
         break;
     default:
-        OT_LOG_EA("Unknown color provided");
+		OTAssert(0, "Unknown color provided");
+        OT_LOG_E("Unknown color provided");
         break;
     }
 }
@@ -708,7 +709,7 @@ void ot::ColorF::set(ot::DefaultColor _color)
         m_a = 1.0f;
         break;
     default:
-        OT_LOG_EA("Unknown color provided");
+        OT_LOG_E("Unknown color provided");
         break;
     }
 }

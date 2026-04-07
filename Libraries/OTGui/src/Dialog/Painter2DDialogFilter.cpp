@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Dialog/Painter2DDialogFilter.h"
 
 ot::Painter2DDialogFilter::Painter2DDialogFilter() :
@@ -53,7 +53,7 @@ void ot::Painter2DDialogFilter::setFromJsonObject(const ot::ConstJsonObject& _ob
 		else if (painterType == "LinearGradient") { m_allowedPainters |= Painter2DDialogFilter::LinearGradient; }
 		else if (painterType == "RadialGradient") { m_allowedPainters |= Painter2DDialogFilter::RadialGradient; }
 		else {
-			OT_LOG_EAS("Unknown painter type \"" + painterType + "\"");
+			OT_LOG_E("Unknown painter type \"" + painterType + "\"");
 		}
 	}
 

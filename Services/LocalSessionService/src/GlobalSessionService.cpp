@@ -23,7 +23,7 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -186,7 +186,7 @@ void GlobalSessionService::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonA
 		break;
 
 	default:
-		OT_LOG_EAS("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
+		OT_LOG_E("Unknown connection status (" + std::to_string(static_cast<int>(m_connectionStatus)) + ")");
 		break;
 	}
 
@@ -238,7 +238,7 @@ void GlobalSessionService::startHealthCheck() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	if (m_healthCheckRunning) {
-		OT_LOG_EA("Health check already running");
+		OT_LOG_E("Health check already running");
 		return;
 	}
 

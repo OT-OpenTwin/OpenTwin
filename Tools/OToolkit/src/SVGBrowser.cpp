@@ -21,7 +21,7 @@
 #include "SVGBrowser.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Widgets/SVGWidgetGrid.h"
 #include "OTWidgets/Widgets/DirectoryBrowser.h"
 

@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTCore/String.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/EntityName.h"
 
 std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEntityName, int32_t _topologyLevel) {
@@ -76,7 +76,8 @@ std::string ot::EntityName::changeParentPath(const std::string& _currentEntityPa
 	size_t parentTopo = EntityName::getTopologyLevel(_newParentPath);
 
 	if (parentTopo >= (currentTopo)) {
-		OT_LOG_EAS("Invalid topology level { \"CurrentTopo\": " + std::to_string(currentTopo) +
+		OTAssert(0, "Invalid topology level");
+		OT_LOG_E("Invalid topology level { \"CurrentTopo\": " + std::to_string(currentTopo) +
 			", \"NewParentTopo\": " + std::to_string(parentTopo) + 
 			", \"CurrentEntity\": \"" + _currentEntityPath + "\", \"NewParent\": \"" + _newParentPath + "\" }"
 		);

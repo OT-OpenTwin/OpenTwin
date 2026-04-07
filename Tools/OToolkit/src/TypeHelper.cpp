@@ -26,7 +26,7 @@
 #include "OTWidgets/Widgets/LineEdit.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>

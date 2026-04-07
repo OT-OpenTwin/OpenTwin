@@ -22,7 +22,7 @@
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTFrontendConnectorAPI/WindowAPI.h"
 

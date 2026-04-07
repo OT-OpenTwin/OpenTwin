@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyBool.h"
 #include "OTGui/Properties/PropertyFactoryRegistrar.h"
 

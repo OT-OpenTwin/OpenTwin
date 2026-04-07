@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
 
 std::string ot::WidgetViewBase::toString(ViewFlag _flag) {
@@ -35,7 +35,7 @@ std::string ot::WidgetViewBase::toString(ViewFlag _flag) {
 	case WidgetViewBase::ViewNameAsTitle: return "NameAsTitle";
 	case WidgetViewBase::ViewCloseOnEmptySelection: return "ViewCloseOnEmptySelection";
 	default:
-		OT_LOG_EAS("Unknown view flag (" + std::to_string((int)_flag) + ")");
+		OT_LOG_E("Unknown view flag (" + std::to_string((int)_flag) + ")");
 		return "<null>";
 	}
 }
@@ -50,7 +50,7 @@ ot::WidgetViewBase::ViewFlag ot::WidgetViewBase::stringToViewFlag(const std::str
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewNameAsTitle)) return WidgetViewBase::ViewNameAsTitle;
 	else if (_flag == WidgetViewBase::toString(WidgetViewBase::ViewCloseOnEmptySelection)) return WidgetViewBase::ViewCloseOnEmptySelection;
 	else {
-		OT_LOG_EAS("Unknown view flag \"" + _flag + "\"");
+		OT_LOG_E("Unknown view flag \"" + _flag + "\"");
 		return NoViewFlags;
 	}
 }
@@ -87,7 +87,7 @@ std::string ot::WidgetViewBase::toString(ViewDockLocation _dockLocation) {
 	case ot::WidgetViewBase::Right: return "Right";
 	case ot::WidgetViewBase::Bottom: return "Bottom";
 	default:
-		OT_LOG_EAS("Unknown view dock location (" + std::to_string((int)_dockLocation) + ")");
+		OT_LOG_E("Unknown view dock location (" + std::to_string((int)_dockLocation) + ")");
 		return "Default";
 	}
 }
@@ -99,7 +99,7 @@ ot::WidgetViewBase::ViewDockLocation ot::WidgetViewBase::stringToDockLocation(co
 	else if (_dockLocation == WidgetViewBase::toString(WidgetViewBase::Right)) return WidgetViewBase::Right;
 	else if (_dockLocation == WidgetViewBase::toString(WidgetViewBase::Bottom)) return WidgetViewBase::Bottom;
 	else {
-		OT_LOG_EAS("Unknown view dock location \"" + _dockLocation + "\"");
+		OT_LOG_E("Unknown view dock location \"" + _dockLocation + "\"");
 		return WidgetViewBase::Default;
 	}
 }
@@ -123,7 +123,7 @@ std::string ot::WidgetViewBase::toString(ViewType _type) {
 		}
 		else
 		{
-			OT_LOG_EAS("Unknown view type (" + std::to_string(static_cast<int32_t>(_type)) + ")");
+			OT_LOG_E("Unknown view type (" + std::to_string(static_cast<int32_t>(_type)) + ")");
 			return "Custom";
 		}
 	}
@@ -142,7 +142,7 @@ ot::WidgetViewBase::ViewType ot::WidgetViewBase::stringToViewType(const std::str
 	else if (_type == WidgetViewBase::toString(ViewType::ViewPDF)) return ViewType::ViewPDF;
 	else if (_type == WidgetViewBase::toString(ViewType::CustomView)) return ViewType::CustomView;
 	else {
-		OT_LOG_EAS("Unknown view type \"" + _type + "\"");
+		OT_LOG_E("Unknown view type \"" + _type + "\"");
 		return WidgetViewBase::CustomView;
 	}
 }

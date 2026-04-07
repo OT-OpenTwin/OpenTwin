@@ -25,7 +25,7 @@
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTModelEntities/EntityMetadataSeries.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/CurveFactory.h"

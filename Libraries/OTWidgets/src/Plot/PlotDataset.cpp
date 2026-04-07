@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Painter/Painter2D.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -59,7 +59,7 @@ QwtSymbol::Style ot::PlotDataset::toQwtSymbolStyle(Plot1DCurveCfg::Symbol _symbo
 	case ot::Plot1DCurveCfg::Star8: return QwtSymbol::Style::Star1;
 	case ot::Plot1DCurveCfg::Hexagon: return QwtSymbol::Style::Hexagon;
 	default:
-		OT_LOG_EAS("Unknown symbol (" + std::to_string((int)_symbol) + ")");
+		OT_LOG_E("Unknown symbol (" + std::to_string((int)_symbol) + ")");
 		return QwtSymbol::Style::NoSymbol;
 	}
 }
@@ -84,7 +84,7 @@ ot::Plot1DCurveCfg::Symbol ot::PlotDataset::toPlot1DCurveSymbol(QwtSymbol::Style
 	case QwtSymbol::Star2: return Plot1DCurveCfg::Star6;
 	case QwtSymbol::Hexagon: return Plot1DCurveCfg::Hexagon;
 	default:
-		OT_LOG_EAS("Unknown symbol (" + std::to_string((int)_symbol) + ")");
+		OT_LOG_E("Unknown symbol (" + std::to_string((int)_symbol) + ")");
 		return Plot1DCurveCfg::NoSymbol;
 	}
 }

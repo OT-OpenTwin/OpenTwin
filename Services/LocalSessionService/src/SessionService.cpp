@@ -24,7 +24,7 @@
 #include "OTSystem/Exception.h"
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCore/ReturnMessage.h"
@@ -45,7 +45,7 @@ SessionService& SessionService::instance(void) {
 
 int SessionService::initialize(const std::string& _ownUrl, const std::string& _gssUrl) {
 	if (_ownUrl.empty()) {
-		OT_LOG_EA("Uwn url may not be empty");
+		OT_LOG_E("Uwn url may not be empty");
 		return ot::AppExitCode::ServiceUrlInvalid;
 	}
 
@@ -55,14 +55,14 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	// Determine debug port ranges
 	size_t colonIndex = _ownUrl.rfind(':');
 	if (colonIndex == std::string::npos) {
-		OT_LOG_EA("Unable to determine own port");
+		OT_LOG_E("Unable to determine own port");
 		return ot::AppExitCode::FailedToConvertPort;
 	}
 
 	bool failed = false;
 	ot::port_t portFrom = ot::String::toNumber<ot::port_t>(_ownUrl.substr(colonIndex + 1), failed);
 	if (failed || portFrom == 0) {
-		OT_LOG_EA("Invalid port number format");
+		OT_LOG_E("Invalid port number format");
 		return ot::AppExitCode::FailedToConvertPort;
 	}
 	lss.m_debugPortManager.addPortRange(portFrom + 1, portFrom + 79);
@@ -396,7 +396,7 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	size_t colonIndex = m_url.rfind(':');
 	if (colonIndex == std::string::npos) {
 		std::string msg = "Unable to determine own port { \"Url\": \"" + m_url + "\" }";
-		OT_LOG_EAS(msg);
+		OT_LOG_E(msg);
 		throw ot::Exception::InvalidArgument(msg);
 	}
 	std::string serviceURL = m_url.substr(0, colonIndex);

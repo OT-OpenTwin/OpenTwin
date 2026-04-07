@@ -24,7 +24,7 @@
 #include "SubprocessManager.h"
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -89,7 +89,7 @@ void CommunicationHandler::cleanupAfterCrash(void) {
 
 void CommunicationHandler::slotMessageReceived(void) {
 	if (!m_client) {
-		OT_LOG_EA("Client not set");
+		OT_LOG_E("Client not set");
 		return;
 	}
 
@@ -306,13 +306,13 @@ void CommunicationHandler::slotProcessMessage(std::string _message) {
 bool CommunicationHandler::sendToClient(const QByteArray& _data, bool _expectResponse, std::string& _response) {
 	// Ensure client is in ready state
 	if (m_clientState != ClientState::Ready) {
-		OT_LOG_EA("No client connected");
+		OT_LOG_E("No client connected");
 		return false;
 	}
 
 	// Ensure client exists
 	if (!m_client) {
-		OT_LOG_EA("Fatal Error: Client ready but no socket...");
+		OT_LOG_E("Fatal Error: Client ready but no socket...");
 		return false;
 	}
 
@@ -355,7 +355,7 @@ void CommunicationHandler::slotNewConnection(void) {
 
 	// Ensure we don't have a client connected.
 	if (m_client) {
-		OT_LOG_EAS("Client already connected");
+		OT_LOG_E("Client already connected");
 
 		newSocket->disconnect();
 		delete newSocket;

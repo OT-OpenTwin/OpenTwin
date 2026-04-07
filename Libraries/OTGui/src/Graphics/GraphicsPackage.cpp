@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
@@ -33,7 +33,7 @@ void ot::GraphicsPickerCollectionPackage::addToJsonObject(JsonValue& _object, Js
 	_object.AddMember("PickerKey", JsonString(m_pickerKey, _allocator), _allocator);
 
 	if (m_pickerKey.empty()) {
-		OT_LOG_WA("Picker key is empty");
+		OT_LOG_W("Picker key is empty");
 	}
 }
 

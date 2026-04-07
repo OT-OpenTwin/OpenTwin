@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
 #include "OTGui/Painter/Painter2D.h"
@@ -152,7 +152,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		else if (f == OT_JSON_VALUE_ForwardState) m_flags |= ItemForwardsState;
 		else if (f == OT_JSON_VALUE_SilencesNotifications) m_flags |= ItemSilencesNotifcations;
 		else {
-			OT_LOG_EAS("Unknown GraphicsItemFlag \"" + f + "\"");
+			OT_LOG_E("Unknown GraphicsItemFlag \"" + f + "\"");
 		}
 	}
 

@@ -18,7 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTCore/Logging/LogDispatcher.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 
 #include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
@@ -146,7 +146,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemConnector::createConnectorItem() const 
 	case ot::GraphicsFlowItemConnector::IceConeUp: return this->createTriangleItem(GraphicsTriangleItemCfg::Up, GraphicsTriangleItemCfg::IceCone);
 	case ot::GraphicsFlowItemConnector::IceConeDown: return this->createTriangleItem(GraphicsTriangleItemCfg::Down, GraphicsTriangleItemCfg::IceCone);
 	default:
-		OT_LOG_EA("Unknown connector type");
+		OT_LOG_E("Unknown connector type");
 		throw std::exception("Unknown connector type");
 	}
 }
