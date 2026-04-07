@@ -114,16 +114,8 @@ bool EntityBlockPython::updateFromProperties()
 		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
 		config.setPropertyName(m_propertyNameScripts);
 
-		// Build the document
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
-		// Add the config information to the document
-		ot::JsonObject configObj;
-		config.addToJsonObject(configObj, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestLibraryElement(doc);
+		getObserver()->requestConfigForModelDialog(config);
 	}
 
 	auto scriptSelectionProperty =	getProperties().getProperty(m_propertyNameScripts);
@@ -174,16 +166,8 @@ std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::
 		request.setCallBackService(_libraryElement.getCallBackService());
 		request.setValue(environmentInfo);  // Now passing string directly
 
-		// Build the document
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_LibraryElementRequest, doc.GetAllocator()), doc.GetAllocator());
-		// Add the config information to the document
-		ot::JsonObject configObj;
-		request.addToJsonObject(configObj, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
 		// Send the document to the observer (Model Service)
-		std::string answer = getObserver()->requestLibraryElement(doc);
+		std::string answer = getObserver()->requestLibraryElement(request);
 
 		// Process the answer
 		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(answer);

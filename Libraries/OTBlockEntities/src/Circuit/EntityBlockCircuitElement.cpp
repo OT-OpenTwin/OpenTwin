@@ -66,16 +66,8 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
 		config.setPropertyName("ModelSelection");
 
-		// Build the document
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_CreateConfig, doc.GetAllocator()), doc.GetAllocator());
-		// Add the config information to the document
-		ot::JsonObject configObj;
-		config.addToJsonObject(configObj, doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
 		// if it was selected use observer to send message to LMS
-		getObserver()->requestLibraryElement(doc);
+		getObserver()->requestConfigForModelDialog(config);
 	}
 
 	return true;

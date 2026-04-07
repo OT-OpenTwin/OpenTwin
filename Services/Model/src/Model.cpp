@@ -4177,21 +4177,30 @@ void Model::requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config)
 	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
-	
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
-std::string Model::requestLibraryElement(ot::JsonDocument& _doc) {
+std::string Model::requestLibraryElement(ot::LibraryElementRequest& _config) {
+
+	// Build the document
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_LibraryElementRequest, doc.GetAllocator()), doc.GetAllocator());
+	// Add the config information to the document
+	ot::JsonObject configObj;
+	_config.addToJsonObject(configObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
 
 	// Add the database information to the document
-	_doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), _doc.GetAllocator()), _doc.GetAllocator());
-	_doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
-	_doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), _doc.GetAllocator()), _doc.GetAllocator());
-	_doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), _doc.GetAllocator()), _doc.GetAllocator());
-	_doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), _doc.GetAllocator()), _doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(DataBase::instance().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(DataBase::instance().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(DataBase::instance().getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	return Application::instance()->getLibraryManagementWrapper().requestCreateConfig(_doc);
+	return Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
