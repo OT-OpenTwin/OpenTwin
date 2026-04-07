@@ -454,6 +454,18 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "QtNetwork")
+        ot_define_qt6_targets("Core;Network")
+        target_link_libraries("${CORE_TARGET}" PRIVATE Qt6::Network)
+        return()
+    endif()
+
+    if(DEP STREQUAL "QtGui")
+        ot_define_qt6_targets("Core;Gui")
+        target_link_libraries("${CORE_TARGET}" PRIVATE Qt6::Gui)
+        return()
+    endif()
+
     # RapidJSON headers
     if(DEP STREQUAL "RJSON")
         if(R_JSON_INCD_PATH)
@@ -581,6 +593,18 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     if(DEP STREQUAL "QtWidgets")
         ot_define_qt6_targets("Core;Gui;Widgets")
         target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::Widgets)
+        return()
+    endif()
+
+    if(DEP STREQUAL "QtNetwork")
+        ot_define_qt6_targets("Core;Network")
+        target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::Network)
+        return()
+    endif()
+
+    if(DEP STREQUAL "QtGui")
+        ot_define_qt6_targets("Core;Gui")
+        target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::Gui)
         return()
     endif()
 
