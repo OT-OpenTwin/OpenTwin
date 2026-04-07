@@ -4201,6 +4201,7 @@ std::string Model::requestLibraryElement(ot::LibraryElementRequest& _config) {
 	//doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
 	//return Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
+	return "";
 }
 
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
