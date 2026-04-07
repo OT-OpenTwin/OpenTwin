@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotBase.cpp
 // 
 // License:
@@ -363,7 +363,7 @@ void ot::PlotBase::setInfoText(const QString& _text)
 
 void ot::PlotBase::clearPositionInfoText()
 {
-	m_infoLabel->setText(m_infoText);
+	//m_infoLabel->setText(m_infoText);
 }
 
 void ot::PlotBase::setInfoTextFromPosition(const QPoint& _pos)
