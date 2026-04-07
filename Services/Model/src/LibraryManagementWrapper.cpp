@@ -197,9 +197,6 @@ void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _im
 	// Create and initialize entity
 	ot::NewModelStateInfo newStateInfo;
 	createLibraryEntity(_importCfg, modelPtr, newStateInfo);
-
-	// Add entity to model
-	addEntityToModel(newStateInfo, modelPtr);
 	return;
 }
 
@@ -207,14 +204,19 @@ void LibraryManagementWrapper::createLibraryEntity(const ot::LibraryElement& _im
 	EntityBase* entity = createAndInitializeEntity(_importCfg, _newStateInfo, _model);
 	if (!entity) return;
 
-	
+
+	// Add entity to model
+	addEntityToModel(_newStateInfo, _model);
 	updatePropertyOfEntity(_importCfg,entity ,true);
+
+	// We reset here the new state info to ensure not to add the created entity twice in case of multiple additional entities being created from the additional interface
+	// We need to do it this way because we can not updatePropertyOfEntity which is not currently added to the model
+	_newStateInfo = ot::NewModelStateInfo();
 
 	// Here get the requesting block
 	// This triggers with an additional interface if needed a second request to LMS
 	// Instantly return of the requested information 
 	// Then with requested information the entity can be created 
-	// updatePropertyOfEntity is being triggered in function of the additional interface after receiving the requested information
 	ot::UID requestingEntityID = _importCfg.getRequestingEntityID();
 	EntityBase* requestingEntity = _model->getEntityByID(requestingEntityID);
 	if (!requestingEntity) {
@@ -256,8 +258,10 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 		return;
 	}
 
-	if(!_entity) {
-		OT_LOG_E("Circuit model entity not found: " + _entity->getName());
+
+	EntityBase* libraryModelEntity = model->findEntityFromName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
+	if (!libraryModelEntity) {
+		OT_LOG_E("Circuit model entity not found: " + _importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
 	}
 
 	EntityBase* ModelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
