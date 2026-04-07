@@ -67,8 +67,9 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	}
 	
 	auto allCurvesByDependencies = createCurves(_plotCfg, _config, allMongoDocuments);
-	auto datasetsByCurveTitle = createNamedCurveFamilies(allCurvesByDependencies, _config);
-	auto dataSets =	createPlotDatasets(datasetsByCurveTitle,_config, _plotCfg);
+	auto matchingDependenciesInfo = findMatchingDependencies(allCurvesByDependencies, _config);
+	auto datasetsByCurveTitle = createNamedCurves(std::move(allCurvesByDependencies), _config, std::move(matchingDependenciesInfo));
+	auto dataSets =	createPlotDatasets(std::move(datasetsByCurveTitle), _config);
 	return dataSets;
 }
 
@@ -82,11 +83,10 @@ std::string CurveDatasetFactory::createUnitLabel(const std::string& _unit) {
 	return result;
 }
 
-std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+CurveDatasetFactory::DependencyDataMap CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const int numberOfQuantities = 1;
-
 
 	std::unordered_map<DependencyList, std::list<Datapoints>> familyOfCurves;
 	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
@@ -134,8 +134,8 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 				assert(false);
 			}
 
-			//Get series label and use it to form a unique curve name depending on the values of the document
-			//Get all other dependencies and build a unique curve name depending on their values.
+			// Get series label and use it to form a unique curve name depending on the values of the document
+			// Get all other dependencies and build a unique curve name depending on their values.
 			
 			const auto& allSeriesDecoder = dataLakeAccessCfg.getAllFieldDecoderSeriesByLabel();
 			auto series = singleMongoDocument.FindMember(MetadataSeries::getFieldName().c_str());
@@ -145,7 +145,7 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 			additionalParameterInfo.m_value = seriesDecoder->second->getLabel();
 			//unit should already be normalised during the data point extraction
 
-			//additionalParameterInfo.m_unit = "";
+			// additionalParameterInfo.m_unit = "";
 			dependencies.push_back(additionalParameterInfo);
 			
 
@@ -168,7 +168,7 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 				}				
 			}
 
-			//With a unique name, depending on the values of the additional parameter we now look if there is already data stored for this curve
+			// With a unique name, depending on the values of the additional parameter we now look if there is already data stored for this curve
 
 			auto key = makeSortedKey(dependencies);
 			auto curve = familyOfCurves.find(key);
@@ -186,7 +186,7 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 				dataPoints.push_back(Datapoints());
 			}
 
-			//Get quantity value
+			// Get quantity value
 			const ot::JsonValue& entryQuantityValue =	singleMongoDocument["Values"];
 			ot::Variable quantityValue =	jsonToVariableConverter(entryQuantityValue);
 			
@@ -201,7 +201,6 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 
 	for (auto& curve : familyOfCurves)
 	{
-
 		std::list<Datapoints>& dataPointLists = curve.second;
 		for (Datapoints& dataPoints : dataPointLists)
 		{
@@ -212,71 +211,100 @@ std::unordered_map<DependencyList, std::list<Datapoints>> CurveDatasetFactory::c
 	return familyOfCurves;
 }
 
-std::map<std::string, std::list<Datapoints>>  CurveDatasetFactory::createNamedCurveFamilies(std::unordered_map<DependencyList, std::list<Datapoints>>& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg)
+CurveDatasetFactory::CurveByTitleMap CurveDatasetFactory::createNamedCurves(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg, MatchingDependencies&& _matchingDependenciesInfo)
 {
-	// Always size > 1 since at least the series is there
-	// Cases for additional dependencies (parameter except of x-axis param and series):
-	// 1) Only 1 additional Parameter -> Family of Curves (FoC): name of each curve shows the value of the additional parameter 
-	//  1b) The additional parameter is constant -> Single curve: name of curve shows the value of the additional parameter
-	// 2) More then 2 parameter -> FoC: name of each curve is abstracted to make it easier to read. The parameter values of each curve are communicated
-	//  2b) All parameter are constant -> Single curve: name of curve is abstracted to make it easier to read. The parameter values of each curve are communicated
-	//  2c) All but one parameter are constant -> FoC: name of each curve shows the value of the not-constant parameter. The other parameter values of each curve are communicated
-	
+	if (_datasetsByDependencies.empty())
+	{
+		return CurveByTitleMap();
+	}
+
 	size_t numberOfDependencies = _datasetsByDependencies.size();
-	const std::string simpleNameBase = _curveCfg.getTitle();
-	std::map<std::string, std::list<Datapoints>> namedCurveFamilies;
-	std::list<Datapoints>& dataPoints = _datasetsByDependencies.begin()->second;
-	std::map< std::string, DependencyList> dependencyListByCurveName;
+
 	if (numberOfDependencies == 1)
 	{
-		// Here all dependencies are the same for all datapoints. 
-		const DependencyList& dependencies = _datasetsByDependencies.begin()->first;
-		if (dependencies.size() == 2)
-		{
-			// Here we have the series and the quantity as dependencies. No other additional dependencies.
-			//If there is only one dependency, we create the curve name such that it includes the value of the dependency.
-			for(auto dependency : dependencies)
-			{
-				if(dependency.m_label == MetadataQuantity::getFieldName())
-				{
-					_curveCfg.setTitle(dependency.m_value);
-				}
-			}
-		}
-		else if (numberOfDependencies == 3)
-		{
+		// Only one curve -> simple naming
+		return createNamedCurvesSimpleNames(std::move(_datasetsByDependencies), _curveCfg);
+	}
 
+	MatchingDependencies matchingDependencies;
+	MatchingDependencies nonMatchingDependencies;
+	for (MatchingDependency& dep : _matchingDependenciesInfo)
+	{
+		if (dep.isMatching)
+		{
+			matchingDependencies.push_back(std::move(dep));
 		}
 		else
 		{
-			_curveCfg.setTitle(simpleNameBase);
+			nonMatchingDependencies.push_back(std::move(dep));
 		}
-		namedCurveFamilies.insert({ _curveCfg.getTitle(), std::move(dataPoints)});
-		dependencyListByCurveName.insert({ _curveCfg.getTitle(),dependencies });
+	}
+
+	if (nonMatchingDependencies.empty())
+	{
+		// All dependencies are matching -> simple naming
+		return createNamedCurvesSimpleNames(std::move(_datasetsByDependencies), _curveCfg);
+	}
+	else if (nonMatchingDependencies.size() == 1)
+	{
+		// Only one dependency is not matching -> use it for naming
+
+		return createNamedCurvesByDependency(std::move(_datasetsByDependencies), _curveCfg, nonMatchingDependencies.front().dependency.m_label);
 	}
 	else
 	{
-		int counter(1);
-		double temp = std::log10(numberOfDependencies);
-		uint32_t numberOfDigits = static_cast<uint32_t>(std::ceil(temp));
-		for (auto entry : _datasetsByDependencies)
-		{
-			std::list<Datapoints>& dataPoints = entry.second;
-			std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
-			const std::string simpleName = simpleNameBase + " (curve " + curveNumber + ")";
-			counter++;
+		MatchingDependencies nonMatchingParameterDependencies;
+		bool hasSeriesDiff = false;
+		bool hasQuantityDiff = false;
 
-			namedCurveFamilies.insert({ simpleName,std::move(dataPoints)});
-			dependencyListByCurveName.insert({ simpleName,entry.first });
+		for (const auto& dep : nonMatchingDependencies)
+		{
+			if (dep.type == DependencyType::Parameter)
+			{
+				nonMatchingParameterDependencies.push_back(dep);
+			}
+			else if (dep.type == DependencyType::Quantity)
+			{
+				hasQuantityDiff = true;
+			}
+			else if (dep.type == DependencyType::Series)
+			{
+				hasSeriesDiff = true;
+			}
+		}
+
+		std::string paramKey;
+		if (hasSeriesDiff) {
+			paramKey = MetadataSeries::getFieldName();
+		}
+		else if (hasQuantityDiff)
+		{
+			paramKey = MetadataQuantity::getFieldName();
+		}
+
+		if (nonMatchingParameterDependencies.size() == 1)
+		{
+			paramKey = nonMatchingParameterDependencies.front().dependency.m_label;
+		}
+
+		if (paramKey.empty())
+		{
+			return createNamedCurvesSimpleNames(std::move(_datasetsByDependencies), _curveCfg);
+		}
+		else
+		{
+			return createNamedCurvesByDependency(std::move(_datasetsByDependencies), _curveCfg, paramKey);
 		}
 	}
 
-	//Potentially for the additional info label
-	std::string message =
-		_curveCfg.getTitle() + ":\n";
-	for (auto entry : dependencyListByCurveName)
+	/*
+
+	// Potentially for the additional info label
+	std::string message = _curveCfg.getTitle() + ":\n";
+
+	for (const auto& entry : dependencyListByCurveName)
 	{
-		const std::string curveName = entry.first;	
+		const std::string& curveName = entry.first;	
 		const DependencyList& dependencies = entry.second;
 		message += "Curve: " + curveName + "\n";
 		for (const auto& dependency : dependencies)
@@ -284,11 +312,129 @@ std::map<std::string, std::list<Datapoints>>  CurveDatasetFactory::createNamedCu
 			message += "	" + dependency.m_label + " = " + dependency.m_value + " " + dependency.m_unit + "\n";
 		}
 	}
+
 	m_curveIDDescriptions.push_back(message);
-	return namedCurveFamilies;
+
+	*/
 }
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg, ot::Plot1DCfg& _plotCfg)
+CurveDatasetFactory::CurveByTitleMap CurveDatasetFactory::createNamedCurvesSimpleNames(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg)
+{
+	CurveByTitleMap result;
+
+	if (!_datasetsByDependencies.empty())
+	{
+		size_t numberOfCurves = 0;
+		for (const auto& entry : _datasetsByDependencies)
+		{
+			numberOfCurves += entry.second.size();
+		}
+
+		if (numberOfCurves == 1)
+		{
+			// Only one curve -> use the title as curve name
+
+			for (auto& entry : _datasetsByDependencies)
+			{
+				std::list<Datapoints>& dataPointsList = entry.second;
+				for (Datapoints& dataPoints : dataPointsList)
+				{
+					std::string title = _curveCfg.getTitle();
+					result.insert({ std::move(title), std::move(dataPoints)});
+					break;
+				}
+			}
+		}
+		else
+		{
+			int counter = 1;
+			const double temp = std::log10(numberOfCurves);
+			const uint32_t numberOfDigits = static_cast<uint32_t>(std::ceil(temp));
+
+			for (auto& entry : _datasetsByDependencies)
+			{
+				std::list<Datapoints>& dataPointsList = entry.second;
+				for (Datapoints& dataPoints : dataPointsList)
+				{
+					std::string curveNumber = ot::String::fillPrefix(std::to_string(counter), numberOfDigits, '0');
+					const std::string title = _curveCfg.getTitle() + " (curve " + curveNumber + ")";
+					counter++;
+
+					result.insert({ title, std::move(dataPoints) });
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+CurveDatasetFactory::CurveByTitleMap CurveDatasetFactory::createNamedCurvesByDependency(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg, const std::string& _dependencyLabel)
+{
+	std::map<std::string, std::list<Datapoints>> tmpResult;
+	
+	for (auto& entry : _datasetsByDependencies)
+	{
+		AdditionalDependency dependency = findDependency(entry.first, _dependencyLabel);
+
+		std::string title = _curveCfg.getTitle();
+
+		if (dependency.m_label == MetadataQuantity::getFieldName() || dependency.m_label == MetadataSeries::getFieldName())
+		{
+			title = _curveCfg.getTitle() + " (" + dependency.m_value + (dependency.m_unit.empty() ? "" : " (" + dependency.m_unit + ")") + ")";
+		}
+		else
+		{
+			title = _curveCfg.getTitle() + " (" + dependency.m_label + " = " + dependency.m_value + (dependency.m_unit.empty() ? "" : " (" + dependency.m_unit + ")") + ")";
+		}
+
+		std::list<Datapoints>& dataPoints = entry.second;
+
+		auto it = tmpResult.find(title);
+		if (it != tmpResult.end())
+		{
+			it->second.splice(it->second.end(), std::move(dataPoints));
+		}
+		else
+		{
+			tmpResult.insert({ title, std::move(dataPoints) });
+		}
+	}
+
+	CurveByTitleMap result;
+
+	// Make names unique
+	for (auto& entry : tmpResult)
+	{
+		std::list<Datapoints>& dataPointsList = entry.second;
+
+		int counter = 0;
+
+		const std::string& titleBase = entry.first;
+
+		bool isSingleCurve = dataPointsList.size() == 1;
+
+		for (Datapoints& dataPoints : dataPointsList)
+		{
+			std::string curveTitle = titleBase;
+
+			bool isNameUnique = (isSingleCurve || (result.find(curveTitle) == result.end()));
+			while (!isNameUnique)
+			{
+				counter++;
+				curveTitle = titleBase + " (curve " + std::to_string(counter) + ")";
+				isNameUnique = (result.find(curveTitle) == result.end());
+			}
+
+			result.insert({ std::move(curveTitle), std::move(dataPoints) });
+		}
+	}
+
+	return result;
+}
+
+std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(CurveByTitleMap&& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg)
 {
 	std::list<ot::PlotDataset*> dataSets;
 
@@ -299,18 +445,18 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std
 		const std::string curveTitle = singleCurve.first;
 		ot::Plot1DCurveCfg newCurveCfg = _curveCfg;
 		newCurveCfg.setTitle(curveTitle);
-		auto curveData = singleCurve.second.begin();
+		Datapoints& curveData = singleCurve.second;
 				
 		ot::PlotDatasetData datasetData;
-		if (curveData->m_yData.front().isComplex())
+		if (curveData.m_yData.front().isComplex())
 		{
 			std::vector<std::complex<double>> complexData = toComplexVector(curveData->m_yData);
 			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(complexData), _plotCfg.getXAxisQuantity(), _plotCfg.getYAxisQuantity());
 		}
 		else
 		{
-			std::vector<double> doubleData = toDoubleVector(curveData->m_yData);
-			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(doubleData));
+			std::vector<double> doubleData = toDoubleVector(curveData.m_yData);
+			datasetData = ot::PlotDatasetData(std::move(curveData.m_xData), std::move(doubleData));
 		}
 		
 		auto dataset = new ot::PlotDataset(nullptr, newCurveCfg, std::move(datasetData));
@@ -320,6 +466,106 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std
 
 	}
 	return dataSets;
+}
+
+AdditionalDependency CurveDatasetFactory::findDependency(const DependencyList& _dependencies, const std::string& _label)
+{
+	for (const AdditionalDependency& dependency : _dependencies)
+	{
+		if (dependency.m_label == _label)
+		{
+			return dependency;
+		}
+	}
+
+	throw ot::Exception::ObjectNotFound("Dependency with label " + _label + " not found");
+}
+
+CurveDatasetFactory::MatchingDependencies CurveDatasetFactory::findMatchingDependencies(const DependencyDataMap& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg)
+{
+	std::vector<MatchingDependency> result;
+
+	if (!_datasetsByDependencies.empty())
+	{
+		// Create a vector that holds all dependencies and whether they are the same for all curves.
+		const DependencyList& firstDependencyList = _datasetsByDependencies.begin()->first;
+
+		result.reserve(firstDependencyList.size());
+
+		size_t numberOfCurves = 0;
+		for (const auto& entry : _datasetsByDependencies)
+		{
+			numberOfCurves += entry.second.size();
+		}
+
+		for (const AdditionalDependency& dependency : firstDependencyList)
+		{
+			MatchingDependency newMatchInfo(dependency);
+			newMatchInfo.isMatching = (numberOfCurves > 1);
+			result.push_back(std::move(newMatchInfo));
+		}
+
+		// Check for matching dependencies for all curves
+		for (const auto& entry : _datasetsByDependencies)
+		{
+			auto resultIt = result.begin();
+			while (resultIt != result.end())
+			{
+				bool found = false;
+				for (const auto& dependency : entry.first)
+				{
+					// Dependency is the same
+					if (resultIt->dependency.m_label == dependency.m_label)
+					{
+						found = true;
+
+						// Chekc equal value
+						if (resultIt->dependency.m_value != dependency.m_value)
+						{
+							resultIt->isMatching = false;
+						}
+					}
+
+					// Dependency not found
+					if (found)
+					{
+						++resultIt;
+					}
+					else
+					{
+						resultIt = result.erase(resultIt);
+						if (resultIt == result.end())
+						{
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+}
+
+CurveDatasetFactory::DependencyType CurveDatasetFactory::getDependencyType(const AdditionalDependency& _dependency)
+{
+	return getDependencyType(_dependency.m_label, _dependency.m_unit);
+}
+
+CurveDatasetFactory::DependencyType CurveDatasetFactory::getDependencyType(const std::string& _label, const std::string& _unit)
+{
+	if (_label == MetadataSeries::getFieldName())
+	{
+		return DependencyType::Series;
+	}
+	else if (_label == MetadataQuantity::getFieldName())
+	{
+		return DependencyType::Quantity;
+	}
+	else
+	{
+		return DependencyType::Parameter;
+	}
 }
 
 double CurveDatasetFactory::jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jsonEntry, const std::string& _dataType)
