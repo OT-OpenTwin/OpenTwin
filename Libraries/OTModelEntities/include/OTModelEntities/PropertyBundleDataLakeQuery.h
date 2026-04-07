@@ -18,6 +18,10 @@ public:
 	
 	std::list<std::string> getParameterOptions(const EntityBase* _thisObject) const;
 	std::list<std::string> getQuantityOptions(const EntityBase* _thisObject) const;
+	std::list<std::string> getTupleOptions(const EntityBase* _thisObject) const;
+	std::string getTupleType(const EntityBase* _thisObject) const;
+
+	bool tuplePropertiesAreVisible(const EntityBase* _thisObject) const;
 
 private:
 	const uint32_t m_maxNbOfQueries = 40;

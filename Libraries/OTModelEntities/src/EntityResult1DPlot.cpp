@@ -27,7 +27,7 @@
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-
+#include "OTCore/Tuple/TupleFactory.h"
 // std header
 #include <set>
 #include <algorithm>
@@ -182,12 +182,14 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 
 	std::list<EntityBase*> children = getChildrenList();
 	
+	std::set<std::string> tupleTypes;
 	for (EntityBase* child : children)
 	{
 		EntityResult1DCurve* curve = dynamic_cast<EntityResult1DCurve*>(child);
 		if (curve)
 		{
-			// @jan: options are empty
+			tupleTypes.insert(curve->getTupleType());
+
 			for (const std::string& param : curve->getParameterOptions())
 			{
 				queryParameters.insert(param);
@@ -209,6 +211,47 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 	{
 		parameterSelection->resetOptions(queryParameterList);
 	}	
+	
+	EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
+	EntityPropertiesSelection* quCompRadiusAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName()));
+	EntityPropertiesSelection* quCompPhaseAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName()));
+
+	tupleTypes.erase("");
+	if (tupleTypes.size() == 1)
+	{
+		ot::Plot1DCfg::PlotType plotType = getPlotType();
+		bool showCartesian = (plotType == ot::Plot1DCfg::Cartesian);
+
+		ot::TupleDescription* description =	TupleFactory::create(*tupleTypes.begin());
+		if (description != nullptr)
+		{
+			std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
+
+			quCompYAxis->resetOptions(tupleOptionsVec);
+			//For the other two axis settings it is also possible to select the parameter
+			tupleOptionsVec.insert(tupleOptionsVec.end(), ++queryParameterList.begin(), queryParameterList.end());
+			quCompRadiusAxis->resetOptions(tupleOptionsVec);
+			quCompPhaseAxis->resetOptions(tupleOptionsVec);
+
+			quCompYAxis->setVisible(showCartesian);
+			quCompRadiusAxis->setVisible(!showCartesian);
+			quCompPhaseAxis->setVisible(!showCartesian);
+		}
+		else
+		{
+			assert(false);
+		}
+	}
+	else if(tupleTypes.size() >1)
+	{
+		//This is not valid. The plot cannot be shown.
+	}
+	else
+	{
+		quCompYAxis->setVisible(false);
+		quCompRadiusAxis->setVisible(false);
+		quCompPhaseAxis->setVisible(false);
+	}
 }
 
 void EntityResult1DPlot::createProperties()
@@ -231,8 +274,13 @@ void EntityResult1DPlot::createProperties()
 
 	// Axis settings
 	EntityPropertiesSelection::createProperty(getXAxisPropertyGroupName(), "Parameter", {}, "", "default", getProperties());
-		
-	// ToDo: "Quantity component" for the tuple elements.
+	EntityPropertiesSelection* quYAxis =	EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	quYAxis->setVisible(false);
+	EntityPropertiesSelection* quRadiusAxis =EntityPropertiesSelection::createProperty(getRadiusAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	quRadiusAxis->setVisible(false);
+	EntityPropertiesSelection* quAngleAxis =EntityPropertiesSelection::createProperty(getAzimuthAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	quAngleAxis->setVisible(false);
+			
 	createAxisProperties(getXAxisPropertyGroupName());
 	createAxisProperties(getYAxisPropertyGroupName());
 	createAxisProperties(getAzimuthAxisPropertyGroupName());
@@ -302,21 +350,27 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	ot::Plot1DAxisCfg xAxisCfg = config.getXAxis();
 	ot::Plot1DAxisCfg yAxisCfg = config.getYAxis();
 
-	switch (config.getPlotType())
+	if (config.getPlotType() == ot::Plot1DCfg::Cartesian)
 	{
-	case ot::Plot1DCfg::Cartesian:
 		setAxisFromProperties(getXAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getYAxisPropertyGroupName(), yAxisCfg);
-		break;
-
-	case ot::Plot1DCfg::Polar:
+		const std::string yAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getYAxisPropertyGroupName());
+		config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
+		config.setXAxisQuantity(ot::Plot1DAxisCfg::AxisQuantity::XData);
+	}
+	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
+	{
 		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
-		break;
+		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
+		config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(phaseAxisComponent));
+		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
+		config.setXAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(radiusAxisComponent));
 
-	default:
+	}
+	else
+	{
 		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(config.getPlotType())) + ")");
-		break;
 	}
 
 	config.setXAxis(std::move(xAxisCfg));
@@ -412,6 +466,11 @@ bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisNam
 
 	getProperties().getProperty("Display number format", _axisName)->setVisible(_visible);
 	getProperties().getProperty("Display number precision", _axisName)->setVisible(_visible);
+
+	if (_axisName == getXAxisPropertyGroupName())
+	{
+		getProperties().getProperty("Parameter", _axisName)->setVisible(_visible);
+	}
 
 	return true;
 }

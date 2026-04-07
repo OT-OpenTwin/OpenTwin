@@ -889,14 +889,17 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		}
 
 
+		bool isTuple = !queryTupleDescription.isSingle();
 		// If the query has no comparator set, we simply target all documents with the named quantity. 
 		if (!comparisonDescription.getComparator().empty())
 		{
 			auto valueQueryDescription = createQuantityValueQueryDescription(queryDescription);
-			
-			if(targetTransformedCollection)
+			if (isTuple)
 			{
-				std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription, false, siBuilderWrapper);
+				// Tuples shall always be normalised to an internal standard format. This conversion is possible if we always provide a to si base transformer.
+				// Plots are handling switches between the formats. 
+				// ToDo: Other endpoints need to get the proper inverse transformer.
+				std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription, true, siBuilderWrapper);
 				if (valueQuery.has_value())
 				{
 					// Value comparison was viable for creating a query.
@@ -928,7 +931,7 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 			ValueProcessingChainBuilder builder;
 			for (size_t i = 0; i < units.size(); i++)
 			{
-				if (targetTransformedCollection)
+				if (isTuple)
 				{
 					ot::ValueProcessing transformer = builder.buildToSIChain(units[i]);
 					m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(transformer);

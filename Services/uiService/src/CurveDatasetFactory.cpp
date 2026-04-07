@@ -68,7 +68,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	
 	auto allCurvesByDependencies = createCurves(_plotCfg, _config, allMongoDocuments);
 	auto datasetsByCurveTitle = createNamedCurveFamilies(allCurvesByDependencies, _config);
-	auto dataSets =	createPlotDatasets(datasetsByCurveTitle,_config);
+	auto dataSets =	createPlotDatasets(datasetsByCurveTitle,_config, _plotCfg);
 	return dataSets;
 }
 
@@ -288,7 +288,7 @@ std::map<std::string, std::list<Datapoints>>  CurveDatasetFactory::createNamedCu
 	return namedCurveFamilies;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg, ot::Plot1DCfg& _plotCfg)
 {
 	std::list<ot::PlotDataset*> dataSets;
 
@@ -305,7 +305,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(std::map<std
 		if (curveData->m_yData.front().isComplex())
 		{
 			std::vector<std::complex<double>> complexData = toComplexVector(curveData->m_yData);
-			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(complexData));
+			datasetData = ot::PlotDatasetData(std::move(curveData->m_xData), std::move(complexData), _plotCfg.getXAxisQuantity(), _plotCfg.getYAxisQuantity());
 		}
 		else
 		{

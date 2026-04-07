@@ -191,8 +191,7 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 				assert(temp.isComplex());
 				std::complex<double> complexValue = temp.getComplex();
 				double firstValue = complexValue.real();
-				double secondValue = complexValue.imag();
-
+				double secondValue = complexValue.imag();				
 				auto& firstProcessing =	valueProcessing.front();
 				if (!firstProcessing.isEmpty())
 				{
@@ -206,6 +205,15 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 					secondValue = var.getDouble();
 				}
 				std::complex<double> transformedComplex(firstValue, secondValue);
+
+				// Tuples shall only be kept in the standardized internal format. In this case Re/Im
+				const std::string tupleFormat = quantityTupleInstance.getTupleFormatName();
+				ot::ComplexNumberFormat complexNumberFormat = ot::ComplexNumbers::getFormatFromString(tupleFormat);
+				if (complexNumberFormat == ot::ComplexNumberFormat::Polar)
+				{
+					transformedComplex = ot::ComplexNumberConversion::polarToCartesian(firstValue, secondValue);
+				}
+				
 				ot::JsonValue transformedEntry = variableToJSONConverter(ot::Variable(transformedComplex), clearTextDoc.GetAllocator());
 				clearTextEntry.AddMember(ot::JsonString("Values", clearTextDoc.GetAllocator()), transformedEntry, clearTextDoc.GetAllocator());
 			}

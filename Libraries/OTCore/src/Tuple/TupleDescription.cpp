@@ -7,6 +7,16 @@ std::vector<std::string> ot::TupleDescription::getTupleElementNames(const std::s
 	return m_tupleElementNamesByFormatName.find(_formatName) != m_tupleElementNamesByFormatName.end() ? m_tupleElementNamesByFormatName.at(_formatName) : std::vector<std::string>();
 }
 
+std::vector<std::string> ot::TupleDescription::getAllTupleElementNames() const
+{
+	std::list<std::string> allNames;
+	for (const auto& elementNamesByFromatName : m_tupleElementNamesByFormatName)
+	{
+		allNames.insert(allNames.begin(), elementNamesByFromatName.second.begin(), elementNamesByFromatName.second.end());
+	}
+	return {allNames.begin(),allNames.end()};
+}
+
 std::vector<std::string> ot::TupleDescription::getUnitCombinations(const std::string& _formatName) const
 {
 	return m_unitCombinationsByFormatName.find(_formatName) != m_unitCombinationsByFormatName.end() ? m_unitCombinationsByFormatName.at(_formatName) : std::vector<std::string>();

@@ -100,6 +100,12 @@ void EntityResult1DCurve::addVisualizationNodes()
 	getObserver()->sendMessageToViewer(doc);
 }
 
+
+bool EntityResult1DCurve::tuplePropertiesAreVisible()
+{
+	return m_queryProperties.tuplePropertiesAreVisible(this);
+}
+
 bool EntityResult1DCurve::updateFromProperties()
 {
 	bool refresh = this->updatePropertyVisibilities();
@@ -401,6 +407,16 @@ std::list<std::string> EntityResult1DCurve::getParameterOptions() const
 std::list<std::string> EntityResult1DCurve::getQuantityOptions() const
 {
 	return m_queryProperties.getQuantityOptions(this);
+}
+
+std::list<std::string> EntityResult1DCurve::getTupleOptions() const
+{
+	return m_queryProperties.getTupleOptions(this);
+}
+
+std::string EntityResult1DCurve::getTupleType() const
+{
+	return m_queryProperties.getTupleType(this);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

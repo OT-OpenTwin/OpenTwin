@@ -57,7 +57,7 @@ private:
 	
 	std::unordered_map<DependencyList, std::list<Datapoints>>  createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
 	std::map<std::string, std::list<Datapoints>>  createNamedCurveFamilies(std::unordered_map<DependencyList, std::list<Datapoints>>& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg);
-	std::list<ot::PlotDataset*> createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg);
+	std::list<ot::PlotDataset*> createPlotDatasets(std::map<std::string, std::list<Datapoints>>& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg, ot::Plot1DCfg& _plotCfg);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);

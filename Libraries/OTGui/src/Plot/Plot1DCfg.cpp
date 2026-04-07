@@ -24,21 +24,33 @@
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
-
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 std::string ot::Plot1DCfg::toString(PlotType _type) {
-	switch (_type) {
-	case ot::Plot1DCfg::Cartesian: return "Cartesian";
-	case ot::Plot1DCfg::Polar: return "Polar";
+	switch (_type) 
+	{
+	case ot::Plot1DCfg::Cartesian: 
+		return ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian);
+	case ot::Plot1DCfg::Polar: 
+		return ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar);
 	default:
 		OT_LOG_EAS("Unknown plot type (" + std::to_string((int)_type) + ")");
 		return "Cartesian";
 	}
+	
 }
 
-ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type) {
-	if (_type == Plot1DCfg::toString(Plot1DCfg::Cartesian)) return Plot1DCfg::Cartesian;
-	else if (_type == Plot1DCfg::toString(Plot1DCfg::Polar)) return Plot1DCfg::Polar;
-	else {
+ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type) 
+{
+	if (ot::ComplexNumbers::getFormatFromString(_type) == ot::ComplexNumberFormat::Cartesian)
+	{
+		return Plot1DCfg::Cartesian;
+	}
+	else if (ot::ComplexNumbers::getFormatFromString(_type) == ot::ComplexNumberFormat::Polar)
+	{
+		return Plot1DCfg::Polar;
+	}
+	else 
+	{
 		OT_LOG_EAS("Unknown plot type \"" + _type + "\"");
 		return Plot1DCfg::Cartesian;
 	}

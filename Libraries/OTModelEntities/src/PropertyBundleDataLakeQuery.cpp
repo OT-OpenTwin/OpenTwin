@@ -152,6 +152,28 @@ std::list<std::string> PropertyBundleDataLakeQuery::getQuantityOptions(const Ent
 	return { options.begin(), options.end() };
 }
 
+std::list<std::string> PropertyBundleDataLakeQuery::getTupleOptions(const EntityBase* _thisObject) const
+{
+	const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
+	const auto&	options = selection->getOptions();
+	if (options.size() > 0)
+	{
+		std::list<std::string> optionsWithoutTupleType = { std::next(options.begin()), options.end()};
+		return optionsWithoutTupleType;
+	}
+	return {};
+}
+
+std::string PropertyBundleDataLakeQuery::getTupleType(const EntityBase* _thisObject) const
+{
+	const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
+	const auto& options = selection->getOptions();
+	if (options.size() > 0)
+	{
+		return options.front();
+	}
+	return {};
+}
 
 std::string PropertyBundleDataLakeQuery::getSelectedProject(EntityBase* _thisObject)
 {
@@ -453,6 +475,11 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 
 
 	return refreshNecessary;
+}
+
+bool PropertyBundleDataLakeQuery::tuplePropertiesAreVisible(const EntityBase* _thisObject) const
+{
+	return PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->getVisible();
 }
 
 

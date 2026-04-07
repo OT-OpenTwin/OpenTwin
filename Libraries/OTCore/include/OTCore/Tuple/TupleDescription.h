@@ -28,6 +28,7 @@ namespace ot {
 		virtual std::string getName() const { return ""; };
 
 		std::vector<std::string> getTupleElementNames(const std::string& _formatName) const;
+		std::vector<std::string> getAllTupleElementNames() const;
 		std::vector<std::string> getUnitCombinations(const std::string& _formatName) const;
 		const std::vector<std::string>& getAllTupleFormatNames() const { return m_tupleFormatNames; }
 

@@ -91,10 +91,11 @@ public:
 
 	std::list<std::string> getParameterOptions() const;
 	std::list<std::string> getQuantityOptions() const;
-
+	std::list<std::string> getTupleOptions() const;
+	std::string getTupleType() const;
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Protected: Virtual methods
+	bool tuplePropertiesAreVisible();
 
 protected:
 	//! @brief Updates the property visibilities of the curve properties.
