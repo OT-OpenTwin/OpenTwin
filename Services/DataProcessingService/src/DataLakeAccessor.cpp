@@ -875,21 +875,27 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		
 		auto queryTupleDescription = comparisonDescription.getTupleInstance();
 		bool targetTransformedCollection = transformationNecessary(queryTupleDescription, storedTupleDescription);
+
+		// If transform necessary :
+		// 1) Storage tuple format to SIBase -> Store all data points as SIBase in new format in transformed db
+		// 2) target tuple format to SIBase -> Adjust query value accordingly
+		// 3) Determine unit transformation from target tuple format to SIBase -> Take inverse and use it for the resulting data 
+		if (targetTransformedCollection)
+		{
+			if (!alreadyStoredTransformation(queryDescription))
+			{
+				storeTransformation(queryDescription);
+			}
+		}
+
+
 		// If the query has no comparator set, we simply target all documents with the named quantity. 
 		if (!comparisonDescription.getComparator().empty())
 		{
 			auto valueQueryDescription = createQuantityValueQueryDescription(queryDescription);
-			if (targetTransformedCollection)
+			
+			if(targetTransformedCollection)
 			{
-				// If transform necessary :
-				// 1) Storage tuple format to SIBase -> Store all data points as SIBase in new format in transformed db
-				// 2) target tuple format to SIBase -> Adjust query value accordingly
-				// 3) Determine unit transformation from target tuple format to SIBase -> Take inverse and use it for the resulting data 
-				if (!alreadyStoredTransformation(queryDescription))
-				{
-					storeTransformation(queryDescription);
-				}
-
 				std::optional<BsonViewOrValue> valueQuery = generateComparisonConsideringUnits(valueQueryDescription, false, siBuilderWrapper);
 				if (valueQuery.has_value())
 				{
@@ -915,7 +921,6 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 					assert(false);
 				}
 			}
-
 		}
 		else
 		{
