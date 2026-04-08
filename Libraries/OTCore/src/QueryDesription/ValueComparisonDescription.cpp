@@ -38,6 +38,7 @@ void ot::ValueComparisonDescription::addToJsonObject(ot::JsonValue& _object, ot:
 	_object.AddMember("Comparator", ot::JsonString(m_comparator, _allocator), _allocator);
 	_object.AddMember("Name", ot::JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
+	_object.AddMember("TupleTarget", ot::JsonString(m_tupleTarget, _allocator), _allocator);
 	ot::JsonObject tupleDescription;
 	m_tupleDescription.addToJsonObject(tupleDescription, _allocator);
 	_object.AddMember("Tuple", tupleDescription, _allocator);
@@ -48,6 +49,7 @@ void ot::ValueComparisonDescription::setFromJsonObject(const ot::ConstJsonObject
 	m_comparator = ot::json::getString(_object, "Comparator");
 	m_name = ot::json::getString(_object, "Name");
 	m_value = ot::json::getString(_object, "Value");
+	m_tupleTarget = ot::json::getString(_object, "TupleTarget");
 	ot::ConstJsonObject tupleObject = ot::json::getObject(_object, "Tuple");
 	m_tupleDescription.setFromJsonObject(tupleObject);
 }
