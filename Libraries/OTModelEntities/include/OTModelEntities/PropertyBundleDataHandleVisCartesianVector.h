@@ -27,7 +27,8 @@ public:
 	PropertyBundleDataHandleVisCartesianVector(EntityBase * thisObject);
 
 	const PropertiesVisCartesianVector::VisualizationType GetSelectedVisType(void) const { return selectedVisType; }
-	const PropertiesVisCartesianVector::VisualizationComponent GetSelectedVisComp(void) const {return selectedVisComp; }
+	const PropertiesVisCartesianVector::VisualizationComponent GetSelectedVisComp(void) const { return selectedVisComp; }
+	const PropertiesVisCartesianVector::VisualizationQuantity GetSelectedVisQuantity(void) const { return selectedVisQuantity; }
 	const int getMaxArrows(void) const { return maxArrows; }
 	const PropertiesVisCartesianVector::VisualizationArrowType GetSelectedArrowType(void) { return selectedArrowType; }
 	const double GetArrowScale(void) { return arrowScale; }
@@ -39,11 +40,13 @@ public:
 	const double GetColor2dIsolinesR(void) { return color2dIsolines[0]; }
 	const double GetColor2dIsolinesG(void) { return color2dIsolines[1]; }
 	const double GetColor2dIsolinesB(void) { return color2dIsolines[2]; }
+	const double GetPhase(void) { return phase; }
 
 private:
 	PropertiesVisCartesianVector properties;
 	PropertiesVisCartesianVector::VisualizationType selectedVisType;
 	PropertiesVisCartesianVector::VisualizationComponent selectedVisComp;
+	PropertiesVisCartesianVector::VisualizationQuantity selectedVisQuantity;
 	int maxArrows;
 	PropertiesVisCartesianVector::VisualizationArrowType selectedArrowType;
 	double arrowScale;
@@ -51,6 +54,7 @@ private:
 	bool show2dIsolines;
 	double color2dMesh[3];
 	double color2dIsolines[3];
+	double phase;
 
 	virtual void LoadCurrentData(EntityBase * thisObject) override;
 };

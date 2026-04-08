@@ -78,6 +78,8 @@
 #include <vtkHedgeHog.h>
 #include <vtkTransform.h>
 #include <vtkTransformFilter.h>
+#include <vtkMergeArrays.h>
+#include <vtkArrayCalculator.h>
 
 VtkDriverCartesianVectorVolume::VtkDriverCartesianVectorVolume() : dataSource(nullptr), dataConnection(nullptr) {}
 
@@ -88,6 +90,8 @@ VtkDriverCartesianVectorVolume::~VtkDriverCartesianVectorVolume()
 
 void VtkDriverCartesianVectorVolume::CheckForModelUpdates()
 {
+	if (scalarRange == nullptr) return;
+
 	bool requiresModelUpdate = scalingData->UpdateMinMaxProperties(scalarRange[0], scalarRange[1]);
 
 	if (requiresModelUpdate)
@@ -134,19 +138,18 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 	if (dataSource != nullptr)
 	{
 		vtkNew<vtkCellDataToPointData> cellToPoint;
-
 		dataConnection = nullptr;
+
+		prepareComplexData();
 
 		if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
 		{
-			cellToPoint->SetInputData(dataSource->GetVtkGridAbs());
+			cellToPoint->SetInputConnection(dataConnection);
 			cellToPoint->ProcessAllArraysOn();
 			cellToPoint->Update();
 
 			dataConnection = cellToPoint->GetOutputPort();
 		}
-
-		prepareComplexData();
 
 		if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Arrows3D)
 		{
@@ -185,7 +188,37 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 
 void VtkDriverCartesianVectorVolume::prepareComplexData()
 {
-	// Here we combine the magnitude / phase data according to the current complex settings. In addition, we scale it according to the geometry scale
+	// First, set correct names for the input data arrays (magnitude and phase)
+	auto magGrid = dataSource->GetVtkGridAbs();
+	auto phaseGrid = dataSource->GetVtkGridArg();
+
+	vtkDataSetAttributes* magAttrs = dataSource->GetHasCellVector()
+		? static_cast<vtkDataSetAttributes*>(magGrid->GetCellData())
+		: static_cast<vtkDataSetAttributes*>(magGrid->GetPointData());
+
+	vtkDataSetAttributes* phaseAttrs = dataSource->GetHasCellVector()
+		? static_cast<vtkDataSetAttributes*>(phaseGrid->GetCellData())
+		: static_cast<vtkDataSetAttributes*>(phaseGrid->GetPointData());
+
+	auto magArr = magAttrs->GetVectors();
+	auto phaArr = phaseAttrs->GetVectors();
+
+	if (!magArr || !phaArr)
+	{
+		assert(0);
+		return;
+	}
+
+	magArr->SetName("Magnitude");
+	phaArr->SetName("Phase");
+
+	// Merge the input data arrays into one
+	auto mergeFilter = vtkMergeArrays::New();
+	objectsToDelete.push_back(mergeFilter);
+	mergeFilter->AddInputData(magGrid);
+	mergeFilter->AddInputData(phaseGrid);
+
+	// Scale the data according to the geometry scale. Attention: This will also scale the values, so we need to divide later
 	auto transform = vtkTransform::New();
 	objectsToDelete.push_back(transform);
 	transform->Scale(dataSource->getScaleFactor(), dataSource->getScaleFactor(), dataSource->getScaleFactor());
@@ -193,13 +226,80 @@ void VtkDriverCartesianVectorVolume::prepareComplexData()
 	// TransformFilter
 	auto transformFilter = vtkTransformFilter::New();
 	objectsToDelete.push_back(transformFilter);
+	transformFilter->TransformAllInputVectorsOn();
 	transformFilter->SetTransform(transform);
-	if (dataConnection != nullptr) transformFilter->SetInputConnection(dataConnection);
-	else transformFilter->SetInputData(dataSource->GetVtkGridAbs());
+	transformFilter->SetInputConnection(mergeFilter->GetOutputPort());
 
 	transformFilter->Update();
 
-	dataConnection = transformFilter->GetOutputPort();
+	// And calculate the combination
+	auto calcFilter = vtkArrayCalculator::New();
+	objectsToDelete.push_back(calcFilter);
+	calcFilter->SetInputConnection(transformFilter->GetOutputPort());
+
+	if (dataSource->GetHasCellVector())
+	{
+		calcFilter->SetAttributeTypeToCellData();
+	}
+	else
+	{
+		calcFilter->SetAttributeTypeToPointData();
+	}
+
+	calcFilter->AddVectorVariable("M", "Magnitude");
+	calcFilter->AddVectorVariable("P", "Phase");
+
+	calcFilter->SetResultArrayName("DisplayField");
+
+	calcFilter->AddScalarVariable("Mx", "Magnitude", 0);
+	calcFilter->AddScalarVariable("My", "Magnitude", 1);
+	calcFilter->AddScalarVariable("Mz", "Magnitude", 2);
+
+	calcFilter->AddScalarVariable("Px", "Phase", 0);
+	calcFilter->AddScalarVariable("Py", "Phase", 1);
+	calcFilter->AddScalarVariable("Pz", "Phase", 2);
+
+	calcFilter->SetResultArrayName("DisplayField");
+
+	std::string sScale = std::to_string(1.0 / dataSource->getScaleFactor());
+
+	switch (visData->GetSelectedVisQuantity())
+	{
+	case PropertiesVisCartesianVector::VisualizationQuantity::REAL:
+		calcFilter->SetFunction((  "Mx * cos(Px * " + sScale + ") * iHat * " + sScale +
+								 "+ My * cos(Py * " + sScale + ") * jHat * " + sScale +
+								 "+ Mz * cos(Pz * " + sScale + ") * kHat * " + sScale).c_str());
+		break;
+	case PropertiesVisCartesianVector::VisualizationQuantity::IMAG:
+		calcFilter->SetFunction((  "Mx * sin(Px * " + sScale + ") * iHat * " + sScale +
+								 "+ My * sin(Py * " + sScale + ") * jHat * " + sScale +
+								 "+ Mz * sin(Pz * " + sScale + ") * kHat * " + sScale).c_str());
+		break;
+	case PropertiesVisCartesianVector::VisualizationQuantity::MAG:
+		calcFilter->SetFunction(("(Mx * iHat + My * jHat + Mz * kHat) * " + sScale).c_str());
+		break;
+	case PropertiesVisCartesianVector::VisualizationQuantity::PHASE:
+		calcFilter->SetFunction(
+			("(Px*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Px*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*iHat + "
+			 "(Py*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Py*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*jHat + "
+			 "(Pz*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Pz*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*kHat").c_str());
+		break;
+	case PropertiesVisCartesianVector::VisualizationQuantity::PHASE_PROJECTION:
+		{
+			// here we assume a positive phase definition exp(+i omega t)
+			std::string sPhase = std::to_string(visData->GetPhase() * 3.14159265359 / 180.0);
+			calcFilter->SetFunction((  "Mx*cos(Px*" + sScale + "+" + sPhase + ")*iHat * " + sScale +
+									 "+ My*cos(Py*" + sScale + "+" + sPhase + ")*jHat * " + sScale +
+									 "+ Mz*cos(Pz*" + sScale + "+" + sPhase + ")*kHat * " + sScale).c_str());
+		}
+		break;
+	default:
+		assert(0);
+	}
+
+	calcFilter->Update();
+
+	dataConnection = calcFilter->GetOutputPort();
 }
 
 vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::ApplyCutplane(osg::Node * parent)
@@ -344,6 +444,29 @@ void VtkDriverCartesianVectorVolume::Assemble2DNode(osg::Node *parent)
 {
 	dataConnection = ApplyCutplane(parent);
 
+	// Check whether we have valid output from the cutplane
+	vtkAlgorithm* producer = dataConnection->GetProducer();
+	int outPort = dataConnection->GetIndex();
+
+	producer->Update();
+
+	vtkDataObject* obj = producer->GetOutputDataObject(outPort);
+	vtkDataSet* ds = vtkDataSet::SafeDownCast(obj);
+
+	if (ds == nullptr)
+	{
+		// We have no data set (maybe cutplane is outside valid region)
+		return;
+	}
+
+	if (ds->GetNumberOfPoints() == 0 || ds->GetNumberOfCells() == 0)
+	{
+		// We have no data set (maybe cutplane is outside valid region)
+		return;
+	}
+
+
+	// Now we are sure to have data, process it according to the visualization settings
 	if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Arrows2D)
 	{
 		vtkAlgorithmOutput* data = SetScalarValues();
@@ -425,8 +548,9 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::SetScalarValues()
 		if (dataConnection != nullptr) vectorComponent->SetInputConnection(dataConnection);
 		else vectorComponent->SetInputData(dataSource->GetVtkGridAbs());
 
-		vectorComponent->Update();
 		vectorComponent->SetExtractToFieldData(false);
+		vectorComponent->Update();
+
 		if (visData->GetSelectedVisComp() == PropertiesVisCartesianVector::VisualizationComponent::X)
 		{
 			scalarRange = vectorComponent->GetOutput(0)->GetScalarRange();

@@ -119,7 +119,7 @@ std::string FDTDSolver::generateRunCommand()
 		"\n"
 		"### Define dump box...\n"
 		"#Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop], sub_sampling=[2,2,2])\n"
-		"Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop],opt_resolution=[0,90,2])\n"
+		"Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
 		"start = [0, 0, 0];\n"
 		"stop  = [a, b, length];\n"
 		"Et.AddBox(start, stop);\n"

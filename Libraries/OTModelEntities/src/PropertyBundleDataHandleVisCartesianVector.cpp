@@ -35,6 +35,10 @@ void PropertyBundleDataHandleVisCartesianVector::LoadCurrentData(EntityBase * th
 	assert(visComp != nullptr);
 	selectedVisComp = properties.GetVisualizationComponent(visComp->getValue());
 
+	auto visQuantity = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisQuantity()));
+	assert(visQuantity != nullptr);
+	selectedVisQuantity = properties.GetVisualizationQuantity(visQuantity->getValue());
+
 	auto maxArrowsEnt = dynamic_cast<EntityPropertiesInteger*>(thisObject->getProperties().getProperty(properties.GetNameMaxArrows()));
 	assert(maxArrowsEnt != nullptr);
 	maxArrows = maxArrowsEnt->getValue();
@@ -66,4 +70,8 @@ void PropertyBundleDataHandleVisCartesianVector::LoadCurrentData(EntityBase * th
 	color2dIsolines[0] = color2dIsolinesEnt->getColorR();
 	color2dIsolines[1] = color2dIsolinesEnt->getColorG();
 	color2dIsolines[2] = color2dIsolinesEnt->getColorB();
+
+	auto phaseEnt = dynamic_cast<EntityPropertiesDouble*>(thisObject->getProperties().getProperty(properties.GetNamePhase()));
+	assert(phaseEnt != nullptr);
+	phase = phaseEnt->getValue();
 }
