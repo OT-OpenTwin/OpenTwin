@@ -36,4 +36,5 @@ private:
 	const std::string m_groupNameGeneral = "General";
 	const std::string m_groupNameArrows = "Arrows";
 	const std::string m_groupNameContour = "Contour";
+	const std::string m_groupNameComplex = "Complex";
 };

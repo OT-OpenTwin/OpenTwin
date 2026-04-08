@@ -52,12 +52,26 @@ void PropertyBundleVisCartesianVectorVolume:: setProperties(EntityBase * _thisOb
 	EntityPropertiesColor::createProperty(m_groupNameContour, m_properties.GetName2DIsolineColor(), { 0, 0, 0 }, m_defaultCategory, _thisObject->getProperties());
 
 	EntityPropertiesInteger::createProperty(m_groupNameArrows, m_properties.GetNameMaxArrows(), 1000, m_defaultCategory, _thisObject->getProperties());
+
+	EntityPropertiesSelection::createProperty(m_groupNameComplex, m_properties.GetNameVisQuantity(),
+		{
+			m_properties.GetValueQuantityReal(),
+			m_properties.GetValueQuantityImag(),
+			m_properties.GetValueQuantityMag(),
+			m_properties.GetValueQuantityPhase(),
+			m_properties.GetValueQuantityPhaseProjected()
+		}, m_properties.GetValueQuantityPhaseProjected(), m_defaultCategory, _thisObject->getProperties());
+
+	EntityPropertiesDouble::createProperty(m_groupNameComplex, m_properties.GetNamePhase(), 0.0, m_defaultCategory, _thisObject->getProperties());
 }
 
 bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase * _thisObject)
 {
+	bool changes = false;
+
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	EntityPropertiesSelection* visComp = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisComponent()));
+	EntityPropertiesSelection* visQuantity = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisQuantity()));
 	EntityPropertiesSelection* arrowType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameArrowType()));
 	EntityPropertiesDouble* arrowScale = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetNameArrowScale()));
 	EntityPropertiesBoolean* show2dMesh = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DMesh()));
@@ -65,6 +79,7 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 	EntityPropertiesBoolean* show2dIsolines = dynamic_cast<EntityPropertiesBoolean*>(_thisObject->getProperties().getProperty(m_properties.GetNameShow2DIsolines()));
 	EntityPropertiesColor* color2dIsolines = dynamic_cast<EntityPropertiesColor*>(_thisObject->getProperties().getProperty(m_properties.GetName2DIsolineColor()));
 	EntityPropertiesInteger* maxArrows = dynamic_cast<EntityPropertiesInteger*>(_thisObject->getProperties().getProperty(m_properties.GetNameMaxArrows()));
+	EntityPropertiesDouble* phase = dynamic_cast<EntityPropertiesDouble*>(_thisObject->getProperties().getProperty(m_properties.GetNamePhase()));
 
 	assert(visType != nullptr);
 	assert(visComp != nullptr);
@@ -75,7 +90,6 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 
 	if (type == PropertiesVisCartesianVector::VisualizationType::Arrows3D)
 	{
-		bool changes = false;
 		if (visComp->getVisible())
 		{
 			visComp->setVisible(false);
@@ -116,11 +130,9 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 			color2dIsolines->setVisible(false);
 			changes |= true;
 		}
-		return changes;
 	}
 	else if (type == PropertiesVisCartesianVector::VisualizationType::Arrows2D)
 	{
-		bool changes = false;
 		if (visComp->getVisible())
 		{
 			visComp->setVisible(false);
@@ -161,11 +173,9 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 			color2dIsolines->setVisible(false);
 			changes |= true;
 		}
-		return changes;
 	}
 	else if(type == PropertiesVisCartesianVector::VisualizationType::Contour2D)
 	{
-		bool changes = false;
 		if (!visComp->getVisible())
 		{
 			visComp->setVisible(true);
@@ -206,14 +216,36 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 			color2dIsolines->setVisible(true);
 			changes |= true;
 		}
-		return changes;
 	}
 	else
 	{
 		assert(0); // Unknown type
 	}
 
-	return false;
+	assert(visQuantity != nullptr);
+	assert(phase != nullptr);
+
+	PropertiesVisCartesianVector::VisualizationQuantity quantity = m_properties.GetVisualizationQuantity(visQuantity->getValue());
+	assert(quantity != PropertiesVisCartesianVector::VisualizationQuantity::UNKNOWN);
+
+	if (quantity == PropertiesVisCartesianVector::VisualizationQuantity::PHASE_PROJECTION)
+	{
+		if (!phase->getVisible())
+		{
+			phase->setVisible(true);
+			changes |= true;
+		}
+	}
+	else
+	{
+		if (phase->getVisible())
+		{
+			phase->setVisible(false);
+			changes |= true;
+		}
+	}
+
+	return changes;
 }
 
 bool PropertyBundleVisCartesianVectorVolume::is2dType(EntityBase* _thisObject)

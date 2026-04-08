@@ -36,9 +36,14 @@ public:
 	{
 		ARROW_FLAT, ARROW_SHADED, HEDGHEHOG, UNKNOWN
 	};
+	enum class VisualizationQuantity
+	{
+		REAL, IMAG, MAG, PHASE, PHASE_PROJECTION, UNKNOWN
+	};
 
 	const std::string GetNameVisType(void) { return nameVisType; }
 	const std::string GetNameVisComponent(void) { return nameVisComponent; }
+	const std::string GetNameVisQuantity(void) { return nameVisQuantity; }
 	const std::string GetNamePhase(void) { return namePhase; }
 	const std::string GetNameTime(void) { return nameTime; }
 	const std::string GetNameMaxArrows(void) { return nameMaxArrows; }
@@ -59,6 +64,12 @@ public:
 	const std::string GetValueArrowTypeFlat(void) { return arrowTypeFlat; }
 	const std::string GetValueArrowTypeShaded(void) { return arrowTypeShaded; }
 	const std::string GetValueArrowTypeHedgehog(void) { return arrowTypeHedgehog; }
+
+	const std::string GetValueQuantityReal(void) { return quantityComponentRe; }
+	const std::string GetValueQuantityImag(void) { return quantityComponentImag; }
+	const std::string GetValueQuantityMag(void) { return quantityComponentMag; }
+	const std::string GetValueQuantityPhase(void) { return quantityComponentPhase; }
+	const std::string GetValueQuantityPhaseProjected(void) { return quantityComponentPhaseProjected; }
 
 	const VisualizationType GetVisualizationType(const std::string type) const
 	{
@@ -81,9 +92,17 @@ public:
 		return returnVal;
 	}
 
+	const VisualizationQuantity GetVisualizationQuantity(const std::string quantity)
+	{
+		VisualizationQuantity returnVal;
+		visualizationQuantityMapping.find(quantity) == visualizationQuantityMapping.end() ? returnVal = VisualizationQuantity::UNKNOWN : returnVal = visualizationQuantityMapping.at(quantity);
+		return returnVal;
+	}
+
 private:
 	const std::string nameVisType = "Type";
 	const std::string nameVisComponent = "Component";
+	const std::string nameVisQuantity = "Quantity";
 	const std::string namePhase = "Phase";
 	const std::string nameTime = "Time";
 	const std::string nameMaxArrows = "Max. Arrows";
@@ -108,11 +127,18 @@ private:
 	const std::string nameShow2dIsolines = "Show Isolines";
 	const std::string name2dIsolineColor = "Isoline Color";
 
+	const std::string quantityComponentRe = "Real";
+	const std::string quantityComponentImag = "Imag";
+	const std::string quantityComponentMag = "Magnitude";
+	const std::string quantityComponentPhase = "Phase";
+	const std::string quantityComponentPhaseProjected = "Phase Projected";
+
 	//Not supported yet
 	const std::string valueCarpet = "Carpet";
 	const std::string valueIsolines = "Isolines";
 
 	std::map<std::string, VisualizationType> visualizationTypeMapping { {valueArrows3D,VisualizationType::Arrows3D},{valueArrows2D,VisualizationType::Arrows2D},{valueContour2D,VisualizationType::Contour2D} };
 	std::map < std::string, VisualizationComponent> visualizationComponentMapping{ {valueComponentX,VisualizationComponent::X},{valueComponentY,VisualizationComponent::Y}, {valueComponentZ,VisualizationComponent::Z},{valueAbsolute,VisualizationComponent::Abs} };
+	std::map < std::string, VisualizationQuantity> visualizationQuantityMapping{ {quantityComponentRe,VisualizationQuantity::REAL},{quantityComponentImag,VisualizationQuantity::IMAG}, {quantityComponentMag,VisualizationQuantity::MAG},{quantityComponentPhase,VisualizationQuantity::PHASE}, { quantityComponentPhaseProjected,VisualizationQuantity::PHASE_PROJECTION } };
 	std::map < std::string, VisualizationArrowType> arrowTypeMapping{ {arrowTypeFlat,VisualizationArrowType::ARROW_FLAT},{arrowTypeShaded,VisualizationArrowType::ARROW_SHADED}, {arrowTypeHedgehog,VisualizationArrowType::HEDGHEHOG} };
 };
