@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/DatasetDependencyInfos.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DCurveCfg.h"
 #include "OTWidgets/Plot/PlotDatasetData.h"
@@ -165,19 +166,21 @@ namespace ot {
 		void setPlotData(PlotDatasetData&& _dataset) { m_data = std::move(_dataset); }
 		PlotDatasetData& getPlotData() { return m_data; }
 
-		void setCurveNameBase(const std::string& _curveNameBase) { m_curveNameBase = _curveNameBase; }
-		const std::string& getCurveNameBase() { return m_curveNameBase; }
-
 		//! @brief Returns true if the dataset contains complex data only, false if real only.
 		inline bool dataIsComplex() const { return m_data.dataIsComplex(); };
 
-	private:
-		std::string m_curveNameBase = "";
+		void setDependencyInfos(const DatasetDependencyInfos& _infos) { m_dependencyInfos = _infos; };
+		void setDependencyInfos(DatasetDependencyInfos&& _infos) { m_dependencyInfos = std::move(_infos); };
+		const DatasetDependencyInfos& getDependencyInfos() const { return m_dependencyInfos; };
 
+		void setDisplayTitle(const QString& _title);
+
+	private:
 		void buildCartesianCurve();
 		void buildPolarCurve();
 		void createLegendItem();
 		void updateLegendVisualization();
+		void updateToolTip();
 
 		PlotBase* m_ownerPlot = nullptr;
 
@@ -198,6 +201,10 @@ namespace ot {
 		BasicEntityInformation m_storageEntityInfo;
 
 		PlotLegendItem* m_legendItem;
+
+		DatasetDependencyInfos m_dependencyInfos;
+
+		QString m_displayTitle;
 	};
 
 }

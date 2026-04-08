@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Symbol.h"
+#include "OTCore/EntityName.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/PlotBase.h"
@@ -213,6 +214,8 @@ void ot::PlotBase::setIncompatibleData()
 
 void ot::PlotBase::applyConfig()
 {
+	updateDatasetTitles();
+
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setAzimuthOrigin(Math::degToRad(m_config.getPolarDegreeOrigin()));
@@ -225,6 +228,7 @@ void ot::PlotBase::applyConfig()
 	const Plot1DAxisCfg::QuantityScaling xQuantityScaling = m_config.getXAxis().getQuantityScaling();
 	const Plot1DAxisCfg::QuantityScaling yQuantityScaling = m_config.getYAxis().getQuantityScaling();
 
+	// Apply changes (triggers calculation if needed)
 	for (PlotDataset* data : getAllDatasets())
 	{
 		data->setAxisQuantitiesAndScaling(xAxisQuantity, xQuantityScaling, yAxisQuantity, yQuantityScaling);
@@ -403,6 +407,179 @@ QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multil
 	return QString::fromStdString(txt);
 }
 
+void ot::PlotBase::updateDatasetTitles()
+{
+	auto datasets = this->getAllDatasets();
+	
+	if (datasets.empty())
+	{
+		return;
+	}
+
+	// Find non matching dependencies for all datasets
+	auto it = datasets.begin();
+	DatasetDependencyInfos nonMatchingDependencies = (*it)->getDependencyInfos();
+	it++;
+
+	while (it != datasets.end())
+	{
+		nonMatchingDependencies = nonMatchingDependencies.findNonMatchingDependencies((*it)->getDependencyInfos(), true);
+		it++;
+	}
+
+	// If all dependencies are equal we create simple names for the datasets
+	if (!nonMatchingDependencies.hasDependencies())
+	{
+		updateDatasetTitleSimple(datasets);
+		return;
+	}
+
+	// If there is only one non-matching dependency, we can use this for the dataset titles
+	if (nonMatchingDependencies.getDependencyCount() == 1)
+	{
+		const auto& dependency = nonMatchingDependencies.getFirstDependency();
+
+		Plot1DCfg::DependencyLabelBehavior labelBehavior = Plot1DCfg::DependencyLabelBehavior::ShowInBrackets;
+
+		for (const auto& fixedDep : m_config.getFixedDatasetLabelInfos())
+		{
+			if (dependency.getLabel() == fixedDep.label)
+			{
+				labelBehavior = fixedDep.behavior;
+				break;
+			}
+		}
+
+		updateDatasetTitleFromDependency(datasets, nonMatchingDependencies.getFirstDependency(), labelBehavior);
+		return;
+	}
+	
+	std::list<std::pair<ot::DatasetDependencyInfo, ot::Plot1DCfg::DependencyLabelInfo>> nonMatchingFixedDependencies;
+	std::list<ot::DatasetDependencyInfo> nonMatchingParameterDependencies;
+
+	for (const auto& dep : nonMatchingDependencies.getDependencies())
+	{
+		bool found = false;
+		for (const auto& fixedDep : m_config.getFixedDatasetLabelInfos())
+		{
+			if (dep.getLabel() == fixedDep.label)
+			{
+				nonMatchingFixedDependencies.push_back({ dep, fixedDep });
+				found = true;
+				break;
+			}
+		}
+		
+		if (!found)
+		{
+			nonMatchingParameterDependencies.push_back(dep);
+		}
+	}
+
+	if (!nonMatchingFixedDependencies.empty())
+	{
+		updateDatasetTitleFromDependency(datasets, nonMatchingFixedDependencies.front().first, nonMatchingFixedDependencies.front().second.behavior);
+	}
+	else if (!nonMatchingParameterDependencies.empty())
+	{
+		updateDatasetTitleFromDependency(datasets, nonMatchingParameterDependencies.front(), Plot1DCfg::DependencyLabelBehavior::ShowInBrackets);
+	}
+	else
+	{
+		OT_LOG_W("Unexpeced naming case, fallback to simple");
+		updateDatasetTitleSimple(datasets);
+	}
+
+	// Here we know: Dependency count > 1
+	/*
+	MatchingDependencies nonMatchingParameterDependencies;
+	bool hasSeriesDiff = false;
+	bool hasQuantityDiff = false;
+
+	for (const auto& dep : nonMatchingDependencies)
+	{
+		if (dep.type == DependencyType::Parameter)
+		{
+			nonMatchingParameterDependencies.push_back(dep);
+		}
+		else if (dep.type == DependencyType::Quantity)
+		{
+			hasQuantityDiff = true;
+		}
+		else if (dep.type == DependencyType::Series)
+		{
+			hasSeriesDiff = true;
+		}
+	}
+
+	
+
+
+	std::vector<MatchingDependency> result;
+
+	if (!_datasetsByDependencies.empty())
+	{
+		// Create a vector that holds all dependencies and whether they are the same for all curves.
+		const DependencyList& firstDependencyList = _datasetsByDependencies.begin()->first;
+
+		result.reserve(firstDependencyList.size());
+
+		size_t numberOfCurves = 0;
+		for (const auto& entry : _datasetsByDependencies)
+		{
+			numberOfCurves += entry.second.size();
+		}
+
+		for (const AdditionalDependency& dependency : firstDependencyList)
+		{
+			MatchingDependency newMatchInfo(dependency);
+			newMatchInfo.isMatching = (numberOfCurves > 1);
+			result.push_back(std::move(newMatchInfo));
+		}
+
+		// Check for matching dependencies for all curves
+		for (const auto& entry : _datasetsByDependencies)
+		{
+			auto resultIt = result.begin();
+			while (resultIt != result.end())
+			{
+				bool found = false;
+				for (const auto& dependency : entry.first)
+				{
+					// Dependency is the same
+					if (resultIt->dependency.m_label == dependency.m_label)
+					{
+						found = true;
+
+						// Chekc equal value
+						if (resultIt->dependency.m_value != dependency.m_value)
+						{
+							resultIt->isMatching = false;
+						}
+					}
+
+					// Dependency not found
+					if (found)
+					{
+						++resultIt;
+					}
+					else
+					{
+						resultIt = result.erase(resultIt);
+						if (resultIt == result.end())
+						{
+							break;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return result;
+	*/
+}
+
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
 	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel());
@@ -421,5 +598,123 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 
 		m_polarPlot->updateWholePlot();
 		m_polarPlot->update();
+	}
+}
+
+void ot::PlotBase::updateDatasetTitleSimple(const std::list<PlotDataset*>& _datasets)
+{
+	PreferredDatasetNameInfoList list;
+
+	for (PlotDataset* dataset : _datasets)
+	{
+		const Plot1DCurveCfg& config = dataset->getConfig();
+
+		PreferredDatasetNameInfo nameInfo;
+		nameInfo.dataset = dataset;
+
+		if (config.getTitle().empty())
+		{
+			nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
+		}
+		else
+		{
+			nameInfo.title = config.getTitle();
+		}
+
+		list.push_back(nameInfo);
+	}
+
+	updateDatasetTitles(list);
+}
+
+void ot::PlotBase::updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo, Plot1DCfg::DependencyLabelBehavior _labelBehavior)
+{
+	PreferredDatasetNameInfoList list;
+	
+	for (PlotDataset* dataset : _datasets)
+	{
+		const Plot1DCurveCfg& config = dataset->getConfig();
+
+		PreferredDatasetNameInfo nameInfo;
+		nameInfo.dataset = dataset;
+
+		auto dependency = dataset->getDependencyInfos().getDependency(_dependencyInfo.getLabel());
+		
+		switch (_labelBehavior)
+		{
+		case Plot1DCfg::DependencyLabelBehavior::ShowInBrackets:
+			if (config.getTitle().empty())
+			{
+				nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
+			}
+			else
+			{
+				nameInfo.title = config.getTitle();
+			}
+
+			if (dependency.has_value())
+			{
+				nameInfo.title.append(" (" + _dependencyInfo.getLabel() + " = " + dependency->getValue() + ")");
+			}
+			else
+			{
+				nameInfo.title.append(" (" + _dependencyInfo.getLabel() + " = NaN)");
+			}
+			break;
+
+		case Plot1DCfg::DependencyLabelBehavior::ReplaceTitle:
+			nameInfo.title = dependency->getValue();
+			break;
+
+		default:
+			break;
+		}
+
+		list.push_back(nameInfo);
+	}
+
+	updateDatasetTitles(list);
+}
+
+void ot::PlotBase::updateDatasetTitles(const PreferredDatasetNameInfoList& _preferredTitlesList)
+{
+	std::map<std::string, std::list<PlotDataset*>> titleToDatasetsMap;
+
+	for (const auto& nameInfo : _preferredTitlesList)
+	{
+		auto it = titleToDatasetsMap.find(nameInfo.title);
+		if (it == titleToDatasetsMap.end())
+		{
+			titleToDatasetsMap.insert_or_assign(nameInfo.title, std::list<PlotDataset*>({ nameInfo.dataset }));
+		}
+		else
+		{
+			it->second.push_back(nameInfo.dataset);
+		}
+	}
+
+	for (const auto& entry : titleToDatasetsMap)
+	{
+		const std::string& title = entry.first;
+		const std::list<PlotDataset*>& datasets = entry.second;
+
+		if (datasets.empty())
+		{
+			continue;
+		}
+
+		if (datasets.size() > 1)
+		{
+			int counter = 1;
+			for (PlotDataset* dataset : datasets)
+			{
+				dataset->setDisplayTitle(QString::fromStdString(title + " (curve " + std::to_string(counter) + ")"));
+				counter++;
+			}
+		}
+		else
+		{
+			datasets.front()->setDisplayTitle(QString::fromStdString(title));
+		}
 	}
 }

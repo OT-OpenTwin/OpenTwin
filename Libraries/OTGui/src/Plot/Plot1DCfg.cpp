@@ -25,27 +25,27 @@
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+
 std::string ot::Plot1DCfg::toString(PlotType _type) {
 	switch (_type) 
 	{
-	case ot::Plot1DCfg::Cartesian: 
-		return ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian);
-	case ot::Plot1DCfg::Polar: 
-		return ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar);
+	case Plot1DCfg::Cartesian: 
+		return ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian);
+	case Plot1DCfg::Polar: 
+		return ComplexNumbers::getFormatString(ComplexNumberFormat::Polar);
 	default:
 		OT_LOG_E("Unknown plot type (" + std::to_string((int)_type) + ")");
 		return "Cartesian";
 	}
-	
 }
 
 ot::Plot1DCfg::PlotType ot::Plot1DCfg::stringToPlotType(const std::string& _type) 
 {
-	if (ot::ComplexNumbers::getFormatFromString(_type) == ot::ComplexNumberFormat::Cartesian)
+	if (ComplexNumbers::getFormatFromString(_type) == ComplexNumberFormat::Cartesian)
 	{
 		return Plot1DCfg::Cartesian;
 	}
-	else if (ot::ComplexNumbers::getFormatFromString(_type) == ot::ComplexNumberFormat::Polar)
+	else if (ComplexNumbers::getFormatFromString(_type) == ComplexNumberFormat::Polar)
 	{
 		return Plot1DCfg::Polar;
 	}
@@ -76,7 +76,7 @@ ot::Plot1DCfg::Plot1DCfg() :
 
 ot::Plot1DCfg::~Plot1DCfg() {}
 
-void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+void ot::Plot1DCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	OTAssert(invariant(), "Plot1DCfg object is in an invalid state before serialization.");
 
 	WidgetViewBase::addToJsonObject(_object, _allocator);
@@ -103,14 +103,14 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	m_yAxis.addToJsonObject(yAxisObject, _allocator);
 	_object.AddMember("YAxis", yAxisObject, _allocator);
 
-	_object.AddMember("DataLabelX", ot::JsonString(m_dataLabelX, _allocator), _allocator);
-	_object.AddMember("DataLabelY", ot::JsonString(m_dataLabelY, _allocator), _allocator);
+	_object.AddMember("DataLabelX", JsonString(m_dataLabelX, _allocator), _allocator);
+	_object.AddMember("DataLabelY", JsonString(m_dataLabelY, _allocator), _allocator);
 
-	_object.AddMember("UnitLabelX", ot::JsonString(m_unitLabelX, _allocator), _allocator);
-	_object.AddMember("UnitLabelY", ot::JsonString(m_unitLabelY, _allocator), _allocator);
+	_object.AddMember("UnitLabelX", JsonString(m_unitLabelX, _allocator), _allocator);
+	_object.AddMember("UnitLabelY", JsonString(m_unitLabelY, _allocator), _allocator);
 
-	_object.AddMember("xAxisParameter", ot::JsonString(m_xAxisParameter, _allocator), _allocator);
-	_object.AddMember("QueryQuantity", ot::JsonString(m_queryQuantity, _allocator), _allocator);
+	_object.AddMember("xAxisParameter", JsonString(m_xAxisParameter, _allocator), _allocator);
+	_object.AddMember("QueryQuantity", JsonString(m_queryQuantity, _allocator), _allocator);
 
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
 	_object.AddMember("NbCurveLimit", m_curveLimit, _allocator);
@@ -129,9 +129,19 @@ void ot::Plot1DCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _
 	_object.AddMember("Queries", allQueries, _allocator);
 
 	_object.AddMember("PolarDegreeOrigin", m_polarDegreeOrigin, _allocator);
+
+	JsonArray fixedDatasetLabelInfosArr;
+	for (const auto& labelInfo : m_fixedDatasetLabelInfos)
+	{
+		JsonObject labelInfoObj;
+		labelInfoObj.AddMember("Label", JsonString(labelInfo.label, _allocator), _allocator);
+		labelInfoObj.AddMember("Behavior", static_cast<uint32_t>(labelInfo.behavior), _allocator);
+		fixedDatasetLabelInfosArr.PushBack(labelInfoObj, _allocator);
+	}
+	_object.AddMember("FixedDatasetLabelInfos", fixedDatasetLabelInfosArr, _allocator);
 }
 
-void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
+void ot::Plot1DCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	WidgetViewBase::setFromJsonObject(_object);
 
 	m_collectionName = json::getString(_object, "CollectionName");
@@ -149,32 +159,41 @@ void ot::Plot1DCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_xAxis.setFromJsonObject(json::getObject(_object, "XAxis"));
 	m_yAxis.setFromJsonObject(json::getObject(_object, "YAxis"));
 
-	m_dataLabelX = ot::json::getString(_object, "DataLabelX");
-	m_dataLabelY = ot::json::getString(_object, "DataLabelY");
+	m_dataLabelX = json::getString(_object, "DataLabelX");
+	m_dataLabelY = json::getString(_object, "DataLabelY");
 
-	m_unitLabelX = ot::json::getString(_object, "UnitLabelX");
-	m_unitLabelY = ot::json::getString(_object, "UnitLabelY");
+	m_unitLabelX = json::getString(_object, "UnitLabelX");
+	m_unitLabelY = json::getString(_object, "UnitLabelY");
 
-	m_xAxisParameter = ot::json::getString(_object, "xAxisParameter");
-	m_queryQuantity = ot::json::getString(_object, "QueryQuantity");
+	m_xAxisParameter = json::getString(_object, "xAxisParameter");
+	m_queryQuantity = json::getString(_object, "QueryQuantity");
 
-	m_showEntireMatrix = ot::json::getBool(_object, "ShowEntireMatrix");
-	m_showMatrixRowEntry = ot::json::getInt(_object, "ShowMatrixRow");
-	m_showMatrixColumnEntry = ot::json::getInt(_object, "ShowMatrixColumn");
+	m_showEntireMatrix = json::getBool(_object, "ShowEntireMatrix");
+	m_showMatrixRowEntry = json::getInt(_object, "ShowMatrixRow");
+	m_showMatrixColumnEntry = json::getInt(_object, "ShowMatrixColumn");
 
-	const auto& allQueries = ot::json::getArray(_object, "Queries");
+	const auto& allQueries = json::getArray(_object, "Queries");
 	for (uint32_t i = 0; i < allQueries.Size(); i++)
 	{
-		const auto& query = ot::json::getObject(allQueries, i);
+		const auto& query = json::getObject(allQueries, i);
 		ValueComparisonDescription valueDescription;
 		valueDescription.setFromJsonObject(query);
 		m_queries.push_back(valueDescription);
 	}
 
-	m_useLimit = ot::json::getBool(_object,"UseLimitOfCurves");
-	m_curveLimit = ot::json::getInt(_object, "NbCurveLimit");
+	m_useLimit = json::getBool(_object,"UseLimitOfCurves");
+	m_curveLimit = json::getInt(_object, "NbCurveLimit");
 
-	m_polarDegreeOrigin = ot::json::getDouble(_object, "PolarDegreeOrigin");
+	m_polarDegreeOrigin = json::getDouble(_object, "PolarDegreeOrigin");
+
+	m_fixedDatasetLabelInfos.clear();
+	for (const ConstJsonObject& labelInfoObj : json::getObjectList(_object, "FixedDatasetLabelInfos"))
+	{
+		DependencyLabelInfo labelInfo;
+		labelInfo.label = json::getString(labelInfoObj, "Label");
+		labelInfo.behavior = static_cast<Plot1DCfg::DependencyLabelBehavior>(json::getUInt(labelInfoObj, "Behavior"));
+		m_fixedDatasetLabelInfos.push_back(labelInfo);
+	}
 
 	OTAssert(invariant(), "Plot1DCfg object is in an invalid state after deserialization.");
 }

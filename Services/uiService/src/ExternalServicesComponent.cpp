@@ -3781,6 +3781,8 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 }
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document) {
+	return;
+	/*
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	ot::VisualisationCfg visualisationCfg;
@@ -3827,6 +3829,7 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 	{
 		OT_LOG_E("Requested curve update could not identify the corresponding plot. { \"Plot\": \"" + plotName + "\" }");
 	}
+	*/
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -4701,7 +4704,6 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 
 		ot::ConstJsonArray curveCfgs = ot::json::getArray(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs);
 		std::list<ot::PlotDataset*> dataSets;
-		std::list<std::string> curveIDDescriptions;
 
 		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
 		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
@@ -4717,17 +4719,14 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			dataSets.splice(dataSets.begin(), newCurveDatasets);
 
 			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-			curveIDDescriptions.splice(curveIDDescriptions.begin(), newCurveIDDescriptions);
-
 			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) 
 			{
 				break;
 			}
-
 		}
 
 		auto endTime = ot::DateTime::msSinceEpoch();
-		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), _visualizationCfg, dataSets, curveIDDescriptions, (endTime - startTime));
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), _visualizationCfg, dataSets, (endTime - startTime));
 	}
 	catch (const std::exception& e) {
 		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingFailed, Qt::QueuedConnection, std::string("Exception during plot data loading: " + std::string(e.what())));
@@ -4785,7 +4784,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
-void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, const std::list<std::string>& _curveIDDescriptions, unsigned long long _loadTimeMs)
+void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs)
 {
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!_visualizationCfg.getSetAsActiveView()) {
@@ -4805,21 +4804,14 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 
 	// Now we add the data sets to the plot and visualise them
 	int32_t curveCounter = 0;
-	std::string displayMessage("");
-	auto curveIDDescription = _curveIDDescriptions.begin();
-
+	
 	for (ot::PlotDataset* dataSet : _dataSets) {
-		if (!_plotConfig.getUseLimitNbOfCurves() || curveCounter < _plotConfig.getLimitOfCurves())
+		if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
 		{
 			dataSet->setOwnerPlot(plot);
 			dataSet->updateCurveVisualization();
 			plot->addDatasetToCache(dataSet);
 			dataSet->attach();
-			if (curveIDDescription != _curveIDDescriptions.end() && !curveIDDescription->empty())
-			{
-				displayMessage += *curveIDDescription;
-				curveIDDescription++;
-			}
 		}
 		else
 		{
@@ -4828,11 +4820,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 		}
 		curveCounter++;
 	}
-	if (!displayMessage.empty())
-	{
-		ot::WindowAPI::appendOutputMessage(displayMessage);
-	}
-
+	
 	// Now we refresh the plot visualisation.
 	plot->applyConfig();
 	plot->resetView();

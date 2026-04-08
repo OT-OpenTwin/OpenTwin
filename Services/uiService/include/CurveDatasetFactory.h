@@ -25,7 +25,6 @@
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTDataStorage/DataLakeAPI.h"
 #include "Datapoints.h"
-#include "AdditionalDependencies.h"
 
 // std header
 #include <vector>
@@ -54,45 +53,18 @@ private:
 		Quantity,
 		Series
 	};
+
+	using DependencyInfoEntry = std::pair<ot::DatasetDependencyInfos, Datapoints>;
+	using DependencyInfoList = std::list<DependencyInfoEntry>;
 	
-	struct MatchingDependency
-	{
-		OT_DECL_NODEFAULT(MatchingDependency)
-		OT_DECL_DEFCOPY(MatchingDependency)
-		OT_DECL_DEFMOVE(MatchingDependency)
-
-		MatchingDependency(const AdditionalDependency& _dependency)
-			: dependency(_dependency), isMatching(false), type(getDependencyType(_dependency))
-		{};
-
-		AdditionalDependency dependency;
-		bool isMatching = false;
-		DependencyType type = DependencyType::Parameter;
-	};
-	using MatchingDependencies = std::vector<MatchingDependency>;
-
-	using DependencyDataMap = std::unordered_map<DependencyList, std::list<Datapoints>>;
-	using CurveByTitleMap = std::map<std::string, std::pair<Datapoints, DependencyList>>;
-
 	std::list<std::string> m_curveIDDescriptions;
 	std::list<std::string> m_skippedValueComparisons;
 	DataStorageAPI::DataLakeAPI m_dataAccess;
 
 	std::string createUnitLabel(const std::string& _unit);
 
-	DependencyDataMap createCurves(const ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
-	CurveByTitleMap createNamedCurves(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg, MatchingDependencies&& _matchingDependenciesInfo);
-	CurveByTitleMap createNamedCurvesSimpleNames(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg);
-	CurveByTitleMap createNamedCurvesByDependency(DependencyDataMap&& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg, const std::string& _dependencyLabel);
-	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, CurveByTitleMap&& _curvesByCurveTitle, ot::Plot1DCurveCfg& _curveCfg);
-
-	AdditionalDependency findDependency(const DependencyList& _dependencies, const std::string& _label);
-	MatchingDependencies findMatchingDependencies(const DependencyDataMap& _datasetsByDependencies, ot::Plot1DCurveCfg& _curveCfg);
-
-	static DependencyType getDependencyType(const AdditionalDependency& _dependency);
-	static DependencyType getDependencyType(const std::string& _label, const std::string& _unit);
-
-	static std::string getCurveToolTip(const std::string& _entityName, const DependencyList& _dependencies);
+	DependencyInfoList createCurves(const ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
+	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, ot::Plot1DCurveCfg& _curveCfg);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);

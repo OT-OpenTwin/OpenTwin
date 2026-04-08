@@ -45,6 +45,30 @@ namespace ot {
 			Polar
 		};
 
+		enum class DependencyLabelBehavior : uint32_t
+		{
+			ShowInBrackets,
+			ReplaceTitle
+		};
+
+		struct DependencyLabelInfo
+		{
+			DependencyLabelInfo() = default;
+			DependencyLabelInfo(const DependencyLabelInfo&) = default;
+			DependencyLabelInfo(DependencyLabelInfo&&) = default;
+			DependencyLabelInfo& operator=(const DependencyLabelInfo&) = default;
+			DependencyLabelInfo& operator=(DependencyLabelInfo&&) = default;
+			~DependencyLabelInfo() = default;
+
+			DependencyLabelInfo(const std::string& _label, DependencyLabelBehavior _behavior)
+				: label(_label), behavior(_behavior)
+			{}
+
+			std::string label;
+			DependencyLabelBehavior behavior = DependencyLabelBehavior::ShowInBrackets;
+		};
+		typedef std::list<DependencyLabelInfo> DependencyLabelInfoList;
+
 		static std::string toString(PlotType _type);
 		static PlotType stringToPlotType(const std::string& _type);
 
@@ -209,6 +233,17 @@ namespace ot {
 		void setPolarDegreeOrigin(double _origin) { m_polarDegreeOrigin = _origin; };
 		double getPolarDegreeOrigin() const { return m_polarDegreeOrigin; };
 
+		//! @ref Plot1DCfg::setFixedDatasetLabelInfos
+		void setFixedDatasetLabelInfos(const DependencyLabelInfoList& _labelInfos) { m_fixedDatasetLabelInfos = _labelInfos; };
+
+		//! @brief Set the fixed dataset label infos.
+		//! @param _labelInfos List of label infos in decreasing priority order (first entry has the highest priority).
+		void setFixedDatasetLabelInfos(DependencyLabelInfoList&& _labelInfos) { m_fixedDatasetLabelInfos = std::move(_labelInfos); };
+
+		//! @brief Get the fixed dataset label infos.
+		//! @return List of label infos in decreasing priority order (first entry has the highest priority).
+		const DependencyLabelInfoList& getFixedDatasetLabelInfos() const { return m_fixedDatasetLabelInfos; };
+
 	private:
 		bool invariant() const;
 
@@ -244,5 +279,7 @@ namespace ot {
 		Plot1DAxisCfg m_yAxis;
 
 		double m_polarDegreeOrigin = 0.0;
+
+		DependencyLabelInfoList m_fixedDatasetLabelInfos;
 	};
 }

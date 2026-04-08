@@ -37,7 +37,7 @@ public:
 	ParameterDescription(ParameterDescription&& _other) noexcept = default;
 	ParameterDescription& operator=(ParameterDescription&& _other) = default;
 
-	ParameterDescription(const ParameterDescription& _other) =delete;
+	ParameterDescription(const ParameterDescription& _other) = delete;
 	ParameterDescription& operator=(const ParameterDescription& _other) = delete;
 
 	MetadataParameter& getMetadataParameter() 

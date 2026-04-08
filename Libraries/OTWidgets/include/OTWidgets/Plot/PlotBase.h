@@ -20,6 +20,7 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/DatasetDependencyInfo.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DDataBaseCfg.h"
 #include "OTWidgets/Plot/AbstractPlot.h"
@@ -60,7 +61,6 @@ namespace ot {
 		OT_DECL_NOMOVE(PlotBase)
 		OT_DECL_NODEFAULT(PlotBase)
 	public:
-
 		//! @brief Defines the Z-order for plot items.
 		struct ItemZOrder
 		{
@@ -168,6 +168,10 @@ namespace ot {
 		QString toPositionInfoText(const QPointF& _pos, bool _multiline) const;
 		QString toPositionInfoText(const QwtPointPolar& _pos, bool _multiline) const;
 
+		//! @brief Update the dataset titles based on the provided dependency label information list.
+		//! @param _dependencyLabelInfoList 
+		void updateDatasetTitles();
+
 	Q_SIGNALS:
 		void resetItemSelectionRequest();
 		void curveDoubleClicked(PlotDataset* _dataset, bool _hasControlModifier);
@@ -184,6 +188,18 @@ namespace ot {
 		void updateAxisTitles(bool _replot = false);
 		
 	private:
+		struct PreferredDatasetNameInfo
+		{
+			std::string title;
+			PlotDataset* dataset;
+		};
+		using PreferredDatasetNameInfoList = std::list<PreferredDatasetNameInfo>;
+
+		void updateDatasetTitleSimple(const std::list<PlotDataset*>& _datasets);
+		void updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo, Plot1DCfg::DependencyLabelBehavior _labelBehavior);
+
+		void updateDatasetTitles(const PreferredDatasetNameInfoList& _preferredTitlesList);
+
 		Plot1DCfg m_config;
 
 		QWidget* m_centralWidget;

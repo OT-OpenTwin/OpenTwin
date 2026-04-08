@@ -20,6 +20,9 @@
 // OpenTwin header
 #include "OTCore/Symbol.h"
 #include "OTCore/EntityName.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/Tuple/TupleFactory.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
@@ -27,7 +30,7 @@
 #include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTCore/Tuple/TupleFactory.h"
+
 // std header
 #include <set>
 #include <algorithm>
@@ -301,7 +304,6 @@ void EntityResult1DPlot::createProperties()
 
 const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
-
 	const ot::Painter2D* gridColour = PropertyHelper::getPainterPropertyValue(this, "Grid color");
 
 	const std::string entityName = getName();
@@ -326,7 +328,6 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Parameter", getXAxisPropertyGroupName());
 	
-
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
@@ -339,7 +340,6 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setOldTreeIcons(ot::NavigationTreeItemIcon("Plot1DVisible", "Plot1DHidden"));
 
 	config.setPlotType(ot::Plot1DCfg::stringToPlotType(plotType));
-
 
 	config.setGridColor(gridColour->createCopy());
 	config.setGridVisible(gridVisible);
@@ -380,6 +380,12 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	config.setXAxis(std::move(xAxisCfg));
 	config.setYAxis(std::move(yAxisCfg));
+
+	ot::Plot1DCfg::DependencyLabelInfoList fixedDatasetLabelInfos = {
+		{ MetadataSeries::getFieldName(), ot::Plot1DCfg::DependencyLabelBehavior::ReplaceTitle },
+		{ MetadataQuantity::getFieldName(), ot::Plot1DCfg::DependencyLabelBehavior::ReplaceTitle }
+	};
+	config.setFixedDatasetLabelInfos(std::move(fixedDatasetLabelInfos));
 
 	return config;
 }

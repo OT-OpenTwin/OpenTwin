@@ -589,6 +589,17 @@ void ot::PlotDataset::updateCurveVisualization()
 	updateLegendVisualization();
 }
 
+void ot::PlotDataset::setDisplayTitle(const QString& _title)
+{
+	m_displayTitle = _title;
+	if (m_legendItem)
+	{
+		m_legendItem->setLabel(m_displayTitle);
+	}
+
+	updateToolTip();
+}
+
 void ot::PlotDataset::buildCartesianCurve()
 {
 	if (m_cartesianCurve == nullptr)
@@ -632,7 +643,8 @@ void ot::PlotDataset::createLegendItem()
 
 		m_legendItem = new PlotLegendItem(this);
 		m_legendItem->setLegend(m_ownerPlot->getLegend());
-		m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
+		m_legendItem->setLabel(m_displayTitle);
+		updateToolTip();
 	}
 }
 
@@ -645,17 +657,29 @@ void ot::PlotDataset::updateLegendVisualization()
 
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
 	const ColorStyleValue& dimmedColorValue = cs.getValue(ColorStyleValueEntry::PlotCurveDimmed);
-
-	m_legendItem->setLabel(QString::fromStdString(m_config.getTitle()));
-	if (m_config.getToolTip().empty())
-	{
-		m_legendItem->setToolTip(QString::fromStdString(m_config.getTitle()));
-	}
-	else
-	{
-		m_legendItem->setToolTip(QString::fromStdString(m_config.getToolTip()));
-	}
 	m_legendItem->setSelectedPainter(m_config.getLinePen().getPainter());
 	m_legendItem->setDimmedPainter(dimmedColorValue.painter());
 	m_legendItem->updateVisibility();
+}
+
+void ot::PlotDataset::updateToolTip()
+{
+	if (!m_legendItem)
+	{
+		return;
+	}
+
+	if (m_dependencyInfos.hasDependencies())
+	{
+		std::string tip = m_config.getEntityName();
+		for (const auto& dep : m_dependencyInfos.getDependencies())
+		{
+			tip.append("\n        - " + dep.getLabel() + " (" + dep.getValue() + (dep.getUnit().empty() ? "" : " " + dep.getUnit()) + ")");
+		}
+		m_legendItem->setToolTip(QString::fromStdString(tip));
+	}
+	else
+	{
+		m_legendItem->setToolTip(m_displayTitle);
+	}
 }
