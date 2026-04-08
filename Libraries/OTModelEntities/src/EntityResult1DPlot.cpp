@@ -226,12 +226,17 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 		if (description != nullptr)
 		{
 			std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
-
-			quCompYAxis->resetOptions(tupleOptionsVec);
+			if (quCompYAxis->getOptions() != tupleOptionsVec)
+			{
+				quCompYAxis->resetOptions(tupleOptionsVec);
+			}
 			//For the other two axis settings it is also possible to select the parameter
 			tupleOptionsVec.insert(tupleOptionsVec.end(), ++queryParameterList.begin(), queryParameterList.end());
-			quCompRadiusAxis->resetOptions(tupleOptionsVec);
-			quCompPhaseAxis->resetOptions(tupleOptionsVec);
+			if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
+			{
+				quCompRadiusAxis->resetOptions(tupleOptionsVec);
+				quCompPhaseAxis->resetOptions(tupleOptionsVec);
+			}
 
 			quCompYAxis->setVisible(showCartesian);
 			quCompRadiusAxis->setVisible(!showCartesian);
@@ -355,17 +360,17 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 		setAxisFromProperties(getXAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getYAxisPropertyGroupName(), yAxisCfg);
 		const std::string yAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getYAxisPropertyGroupName());
-		config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
-		config.setXAxisQuantity(ot::Plot1DAxisCfg::AxisQuantity::XData);
+		yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
+		xAxisCfg.setQuantity(ot::Plot1DAxisCfg::AxisQuantity::XData);
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
 	{
 		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
-		config.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(phaseAxisComponent));
+		yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(phaseAxisComponent));
 		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
-		config.setXAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(radiusAxisComponent));
+		xAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(radiusAxisComponent));
 
 	}
 	else
