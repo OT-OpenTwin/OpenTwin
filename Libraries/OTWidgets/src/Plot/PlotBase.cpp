@@ -214,7 +214,7 @@ void ot::PlotBase::setIncompatibleData()
 
 void ot::PlotBase::applyConfig()
 {
-	updateDatasetTitles();
+	updateDatasetAndAxesTitles();
 
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
@@ -407,7 +407,7 @@ QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multil
 	return QString::fromStdString(txt);
 }
 
-void ot::PlotBase::updateDatasetTitles()
+void ot::PlotBase::updateDatasetAndAxesTitles()
 {
 	auto datasets = this->getAllDatasets();
 	
@@ -415,6 +415,10 @@ void ot::PlotBase::updateDatasetTitles()
 	{
 		return;
 	}
+
+	// Axis titles
+	std::string xAxisData;
+	std::string yAxisData;
 
 	// Find non matching dependencies for all datasets
 	auto it = datasets.begin();

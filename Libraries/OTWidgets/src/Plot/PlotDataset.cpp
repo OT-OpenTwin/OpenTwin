@@ -554,7 +554,7 @@ void ot::PlotDataset::updateCurveVisualization()
 		}
 	}
 	else
-	{ 
+	{
 		// No symbol
 		if (m_cartesianCurvePointSymbol)
 		{
@@ -674,7 +674,11 @@ void ot::PlotDataset::updateToolTip()
 		std::string tip = m_config.getEntityName();
 		for (const auto& dep : m_dependencyInfos.getDependencies())
 		{
-			tip.append("\n        - " + dep.getLabel() + " (" + dep.getValue() + (dep.getUnit().empty() ? "" : " " + dep.getUnit()) + ")");
+			tip.append(
+				"\n        " +
+				dep.getLabel() + " = " + dep.getValue() +
+				(dep.getUnit().empty() ? "" : " " + dep.getUnit())
+			);
 		}
 		m_legendItem->setToolTip(QString::fromStdString(tip));
 	}
