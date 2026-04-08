@@ -444,7 +444,7 @@ void Application::createPlotTwoCurves() {
 	parameter2.typeName = ot::TypeNames::getFloatTypeName();
 	parameter2.unit = "kHz";
 	std::unique_ptr<QuantityDescriptionCurve> quantDesc2(new QuantityDescriptionCurve());
-	quantDesc2->setName("Magnitude");
+	quantDesc2->setName("Magnitude 2");
 
 	quantDesc2->defineQuantityAsSingle(ot::TypeNames::getInt32TypeName(), "dB");
 	
