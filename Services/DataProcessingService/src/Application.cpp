@@ -39,8 +39,6 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTBlockEntities/BlockHelper.h"
-#include "DataLakeAccessor.h"
-
 #include "OTModelEntities/EntitySolverDataProcessing.h"
 
 Application * g_instance{ nullptr };
@@ -124,14 +122,14 @@ void Application::runPipeline()
 	}
 }
 #include "OTModelEntities/EntityResult1DCurve.h"
-
+#include "OTResultDataAccess/DataLakeAccessor.h"
 std::string Application::updateDataLakeAccessCfg(ot::JsonDocument& _document)
 {
 	try
 	{
 		DataLakeQueryCfg queryCfg;
 		queryCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-		DataLakeAccessor dataLakeAccessor;
+		DataLakeAccessor dataLakeAccessor(this);
 		dataLakeAccessor.accessPartition(queryCfg.getCollectionName());
 		dataLakeAccessor.createQueryDescriptionQuantity(queryCfg.getValueDescriptionQuantities());
 		dataLakeAccessor.createQueryDescriptionsParameter(queryCfg.getValueDescriptionParameters());

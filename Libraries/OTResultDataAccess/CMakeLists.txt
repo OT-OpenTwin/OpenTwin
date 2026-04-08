@@ -100,7 +100,8 @@ set(OTResultDataAccess_HEADERS
     include/OTResultDataAccess/QuantityContainer.h
     include/OTResultDataAccess/QuantityContainerSerialiser.h
     include/OTResultDataAccess/ResultDataAccessAPIExport.h
-    
+    include/OTResultDataAccess/DataLakeAccessor.h
+    include/OTResultDataAccess/QueryDescriptionBuilder.h
 
 )
 
@@ -117,6 +118,8 @@ set(OTResultDataAccess_SOURCES
     src/ResultCollectionExtender.cpp
     src/ResultCollectionMetadataAccess.cpp
     src/ResultImportLogger.cpp
+    src/DataLakeAccessor.cpp
+    src/QueryDescriptionBuilder.cpp
 )
 
 # Core object library (for reuse in tests)

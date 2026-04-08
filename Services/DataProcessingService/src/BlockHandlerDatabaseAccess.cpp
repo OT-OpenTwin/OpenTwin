@@ -21,10 +21,9 @@
 #include "Application.h"
 #include "SolverReport.h"
 #include "MetadataVectorizer.h"
-#include "QueryDescriptionBuilder.h"
 #include "BlockHandlerDatabaseAccess.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
-
+#include <mongocxx/options/find.hpp>
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/TimeFormatter.h"
@@ -44,7 +43,7 @@
 #include <algorithm>
 
 BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap)
-	: BlockHandler(blockEntity, handlerMap)
+	: BlockHandler(blockEntity, handlerMap), m_dataLakeAccessor(Application::instance())
 {
 	//First get handler of the selected project result data.
 	std::string collectionName;

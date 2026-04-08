@@ -1,6 +1,6 @@
-﻿#include "DataLakeAccessor.h"
-#include "Application.h"
-#include "QueryDescriptionBuilder.h"
+﻿#include "OTResultDataAccess/DataLakeAccessor.h"
+
+#include "OTResultDataAccess/QueryDescriptionBuilder.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTDataStorage/DataLakeAPI.h"
@@ -8,12 +8,16 @@
 #include "OTResultDataAccess/QuantityContainer.h"
 #include "OTCore/Tuple/TupleFactory.h"
 #include <tuple>
-#include "ValueProcessingChainBuilder.h"
+#include "OTCore/ValueProcessing/ValueProcessingChainBuilder.h"
 #include "OTCore/DataFilter/RegexHelper.h"
 #include "OTCore/JSON/JSONVectoriser.h"
 #include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTDataStorage/DataLakeHelper.h"
 #include "OTCore/EntityName.h"
+
+DataLakeAccessor::DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase)
+ : m_applicationBase(_thisApplicationBase)
+{}
 
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
@@ -27,8 +31,8 @@ void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 		m_resultCollectionMetadataAccess = nullptr;
 	}
 	
-	bool isCrossCollection = Application::instance()->getCollectionName() != _collectionName;
-	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_collectionName, Application::instance()->getModelComponent(), isCrossCollection);
+	bool isCrossCollection = m_applicationBase->getCollectionName() != _collectionName;
+	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_collectionName, m_applicationBase->getModelComponent(), isCrossCollection);
 }
 
 void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel)

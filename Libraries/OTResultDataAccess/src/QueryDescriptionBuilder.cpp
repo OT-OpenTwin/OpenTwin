@@ -1,4 +1,4 @@
-﻿#include "QueryDescriptionBuilder.h"
+﻿#include "OTResultDataAccess/QueryDescriptionBuilder.h"
 
 ot::QueryDescription QueryDescriptionBuilder::create(const ot::ValueComparisonDescription& _valueDescription, const MetadataParameter* _parameter)
 {	

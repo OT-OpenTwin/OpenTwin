@@ -1,9 +1,9 @@
 ﻿#pragma once
 #include "OTCore/ValueProcessing/ValueProcessing.h"
-#include "ResolvedToken.h"
-#include "UnitToken.h"
-
-class ValueProcessingChainBuilder
+#include "OTCore/ValueProcessing/ResolvedToken.h"
+#include "OTCore/ValueProcessing/UnitToken.h"
+#include "OTCore/CoreAPIExport.h"
+class OT_CORE_API_EXPORT ValueProcessingChainBuilder
 {
 public:
 	ot::ValueProcessing build(const std::string& _unitStringCurrent , const std::string& _unitStringTarget);

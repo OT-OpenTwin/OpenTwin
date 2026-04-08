@@ -4214,6 +4214,7 @@ std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _p
 	return m_metadataHandler.getMetadataCampaign(_projectName,_collectionName);
 }
 
+
 void Model::requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot::UID _entityID, ot::UID _entityVersion)
 {
 	ot::JsonDocument doc;
@@ -4221,7 +4222,6 @@ void Model::requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot:
 	_queryCfg.addToJsonObject(queryCfg, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, queryCfg, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _entityID,doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion, _entityVersion,doc.GetAllocator());
 
 	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, doc.GetAllocator());
 	

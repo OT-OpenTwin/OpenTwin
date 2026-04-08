@@ -3,17 +3,20 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTCore/QueryDescription/QueryDescription.h"
 #include "mongocxx/options/find.hpp"
-#include <map>
 #include "OTCore/ValueProcessing/ValueProcessing.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
+#include "OTServiceFoundation/ApplicationBase.h"
+#include "OTResultDataAccess/ResultDataAccessAPIExport.h"
 
+#include <map>
 #include <functional>
 #include <string>
 
-class DataLakeAccessor
+class OT_RESULTDATAACCESS_API_EXPORT DataLakeAccessor
 {
 public:
+	DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase);
 	void accessPartition(const std::string& _collectionName);
 	void createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel);
 	void createQueryDescriptionsParameter(const std::list<ot::ValueComparisonDescription>& _valueComparisons);
@@ -29,6 +32,8 @@ private:
 	std::list<ot::QueryDescription> m_queryDescriptionsParameters;
 	std::map<std::string, ot::ValueProcessing> m_inverseParameterTransformationsByFieldKey;
 	std::map<std::string, std::list<ot::ValueProcessing>> m_inverseQuantityTransformationsByFieldKey;
+
+	ot::ApplicationBase* m_applicationBase = nullptr;
 
 	std::string m_collectionName;
 	const std::string m_transformedCollectionEnding = ".transformed";

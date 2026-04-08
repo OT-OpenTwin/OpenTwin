@@ -26,7 +26,7 @@
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 #include "OTCore/QueryDescription/QueryDescription.h"
-#include "DataLakeAccessor.h"
+#include "OTResultDataAccess/DataLakeAccessor.h"
 
 class BlockHandlerDatabaseAccess : public BlockHandler
 {
