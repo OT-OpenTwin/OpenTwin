@@ -137,7 +137,6 @@ void EntityVis2D3D::addVisualizationNodes(void)
 		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceID, sourceID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_SourceVersion, sourceVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ColorRamp, ot::JsonString(colorRampData, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_MODEL_Unit, ot::JsonString(unit, doc.GetAllocator()), doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshID, meshID, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_MeshVersion, meshVersion, doc.GetAllocator());
 		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());

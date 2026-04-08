@@ -151,6 +151,11 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 			dataConnection = cellToPoint->GetOutputPort();
 		}
 
+		if (visData->GetSelectedVisQuantity() == PropertiesVisCartesianVector::VisualizationQuantity::PHASE)
+		{
+			unit = "Degrees";  // Here we overwrite the unit from the data entity, since we have degrees here.
+		}
+
 		if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Arrows3D)
 		{
 			Assemble3DNode(node);

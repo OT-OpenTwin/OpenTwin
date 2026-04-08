@@ -2985,9 +2985,8 @@ void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document
 	ot::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
 
 	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
-	std::string unit = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Unit);
 
-	ViewerAPI::addVTKNode(visModelID, item, isHidden, collectionName, visualizationDataID, visualizationDataVersion, colorRampData, unit);
+	ViewerAPI::addVTKNode(visModelID, item, isHidden, collectionName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 void ExternalServicesComponent::handleAddAnnotationNode(ot::JsonDocument& _document) {
@@ -3106,9 +3105,8 @@ void ExternalServicesComponent::handleUpdateVis2D3DNode(ot::JsonDocument& _docum
 	ot::UID visualizationDataID = _document[OT_ACTION_PARAM_MODEL_DataID].GetUint64();
 	ot::UID visualizationDataVersion = _document[OT_ACTION_PARAM_MODEL_DataVersion].GetUint64();
 	std::string colorRampData = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ColorRamp);
-	std::string unit = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_Unit);
 
-	ViewerAPI::updateVTKNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion, colorRampData, unit);
+	ViewerAPI::updateVTKNode(visModelID, modelEntityID, projectName, visualizationDataID, visualizationDataVersion, colorRampData);
 }
 
 void ExternalServicesComponent::handleUpdateObjectColor(ot::JsonDocument& _document) {
