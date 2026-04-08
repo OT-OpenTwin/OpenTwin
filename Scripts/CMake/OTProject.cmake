@@ -58,7 +58,7 @@ set(_OT_CFG_DEBUG   "$<CONFIG:Debug>")
 set(_OT_CFG_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
 
 if(MSVC)
-    add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP /external:anglebrackets)
+    add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP /external:anglebrackets /external:W0 /external:templates-)
 endif()
 
 # ------------------------------------------------------------
