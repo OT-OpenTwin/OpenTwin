@@ -19,6 +19,10 @@ namespace ot
 			return "Complex";
 		}	
 
+		static std::string getComponentReal() { return "Real"; }
+		static std::string getComponentImaginary() { return "Imaginary"; }
+		static std::string getComponentMagnitude() { return "Magnitude"; }
+		static std::string getComponentPhase() { return "Phase"; }
 
 		static std::string getFormatString(const ComplexNumberFormat& _format)
 		{

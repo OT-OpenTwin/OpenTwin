@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DAxisCfg.cpp
 // 
 // License:
@@ -22,17 +22,24 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DAxisCfg.h"
+#include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
 std::string ot::Plot1DAxisCfg::toString(AxisQuantity _quantity) 
 {
 	switch (_quantity) 
 	{
-	case AxisQuantity::Undefined: return "Undefined";
-	case AxisQuantity::XData: return "X Data";
-	case AxisQuantity::Magnitude: return "Magnitude";
-	case AxisQuantity::Phase: return "Phase";
-	case AxisQuantity::Real: return "Real";
-	case AxisQuantity::Imaginary: return "Imaginary";
+	case AxisQuantity::Undefined: 
+		return "Undefined";
+	case AxisQuantity::XData: 
+		return "X Data";
+	case AxisQuantity::Magnitude: 
+		return ot::ComplexNumbers::getComponentMagnitude();
+	case AxisQuantity::Phase: 
+		return ot::ComplexNumbers::getComponentPhase();
+	case AxisQuantity::Real: 
+		return ot::ComplexNumbers::getComponentReal();
+	case AxisQuantity::Imaginary: 
+		return ot::ComplexNumbers::getComponentImaginary();
 	default:
 		OT_LOG_E("Unknown axis quantity (" + std::to_string((int)_quantity) + ")");
 		return "Undefined";
@@ -41,12 +48,30 @@ std::string ot::Plot1DAxisCfg::toString(AxisQuantity _quantity)
 
 ot::Plot1DAxisCfg::AxisQuantity ot::Plot1DAxisCfg::stringToAxisQuantity(const std::string& _quantity) 
 {
-	if (_quantity == toString(AxisQuantity::Undefined)) return AxisQuantity::Undefined;
-	else if (_quantity == toString(AxisQuantity::XData)) return AxisQuantity::XData;
-	else if (_quantity == toString(AxisQuantity::Magnitude)) return AxisQuantity::Magnitude;
-	else if (_quantity == toString(AxisQuantity::Phase)) return AxisQuantity::Phase;
-	else if (_quantity == toString(AxisQuantity::Real)) return AxisQuantity::Real;
-	else if (_quantity == toString(AxisQuantity::Imaginary)) return AxisQuantity::Imaginary;
+	if (_quantity == toString(AxisQuantity::Undefined)) 
+	{
+		return AxisQuantity::Undefined;
+	}
+	else if (_quantity == toString(AxisQuantity::XData)) 
+	{
+		return AxisQuantity::XData;
+	}
+	else if (_quantity == toString(AxisQuantity::Magnitude)) 
+	{
+		return AxisQuantity::Magnitude;
+	}
+	else if (_quantity == toString(AxisQuantity::Phase)) 
+	{
+		return AxisQuantity::Phase;
+	}
+	else if (_quantity == toString(AxisQuantity::Real))
+	{
+		return AxisQuantity::Real;
+	}
+	else if (_quantity == toString(AxisQuantity::Imaginary)) 
+	{
+		return AxisQuantity::Imaginary;
+	}
 	else {
 		OT_LOG_E("Unknown axis quantity \"" + _quantity + "\"");
 		return AxisQuantity::Undefined;

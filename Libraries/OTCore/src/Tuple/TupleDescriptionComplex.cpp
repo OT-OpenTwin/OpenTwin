@@ -10,8 +10,8 @@ ot::TupleDescriptionComplex::TupleDescriptionComplex()
 	m_tupleFormatNames = { ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian), ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar) };
 
 	// Define element names for each format
-	m_tupleElementNamesByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian)] = { "Real", "Imaginary" };
-	m_tupleElementNamesByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Polar)] = { "Magnitude", "Phase" };
+	m_tupleElementNamesByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian)] = { ot::ComplexNumbers::getComponentReal(), ot::ComplexNumbers::getComponentImaginary() };
+	m_tupleElementNamesByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Polar)] = { ot::ComplexNumbers::getComponentMagnitude(), ot::ComplexNumbers::getComponentPhase()};
 
 	// Define possible unit combinations for each format.
 	m_unitCombinationsByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian)] = { createCombinedUnitsString({"",""}) };
