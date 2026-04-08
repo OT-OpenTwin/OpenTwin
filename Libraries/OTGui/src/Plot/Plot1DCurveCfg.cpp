@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DCurveCfg.cpp
 // 
 // License:
@@ -148,8 +148,6 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexc
 		m_pointFillPainter = _other.m_pointFillPainter;
 		_other.m_pointFillPainter = nullptr;
 
-		m_queryInformation = std::move(_other.m_queryInformation);
-
 		m_toolTip = std::move(_other.m_toolTip);
 	}
 
@@ -176,8 +174,6 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other)
 		m_pointSymbol = _other.m_pointSymbol;
 		m_pointColorFromCurve = _other.m_pointColorFromCurve;
 		m_pointOulinePen = _other.m_pointOulinePen;
-
-		m_queryInformation = _other.m_queryInformation;
 
 		m_toolTip = _other.m_toolTip;
 
@@ -218,7 +214,6 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("PointOutlinePen", JsonObject(m_pointOulinePen, _allocator), _allocator);
 	_object.AddMember("PointFillPainter", JsonObject(m_pointFillPainter, _allocator), _allocator);
 
-	_object.AddMember("QueryInformation", JsonObject(m_queryInformation, _allocator), _allocator);
 	_object.AddMember("DataAccess", JsonObject(m_dataAccessConfig, _allocator), _allocator);
 
 	_object.AddMember("ToolTip", JsonString(m_toolTip, _allocator), _allocator);
@@ -242,7 +237,6 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_pointColorFromCurve = json::getBool(_object, "PointColorFromCurve");
 	m_pointOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
 
-	m_queryInformation.setFromJsonObject(json::getObject(_object, "QueryInformation"));
 	m_dataAccessConfig.setFromJsonObject(json::getObject(_object, "DataAccess"));
 
 	m_toolTip = json::getString(_object, "ToolTip");

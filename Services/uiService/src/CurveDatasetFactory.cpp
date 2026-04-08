@@ -46,8 +46,7 @@
 std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config)
 {
 	m_curveIDDescriptions.clear();
-	const auto& queryInformation = _config.getQueryInformation();
-
+	
 	mongocxx::options::find options;
 	std::string log;
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options, log);

@@ -19,7 +19,6 @@
 
 // OpenTwin header
 #include "OTCore/FolderNames.h"
-#include "OTGui/QueryInformation.h"
 #include "OTDataStorage/AdvancedQueryBuilder.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
@@ -62,12 +61,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
-	m_quantityLabel.push_back(_config.getQueryInformation().getQuantityDescription().getLabel());
-
-	for (auto& parameterDescription : _config.getQueryInformation().getParameterDescriptions())
-	{
-		m_parameterLabels.push_back(parameterDescription.getLabel());
-	}
+	
 	curveEntity.setCurve(_config);
 	curveEntity.setTreeItemEditable(true);
 	m_curves.push_back(std::move(curveEntity));

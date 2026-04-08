@@ -20,7 +20,6 @@
 #pragma once
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Visualization/IVisualisationCurve.h"
-#include "OTGui/QueryInformation.h"
 #include "OTModelEntities/PropertyBundleDataLakeQuery.h"
 
 class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve
@@ -85,8 +84,6 @@ public:
 	ot::Plot1DCurveCfg getCurve() override;
 	void setCurve(const ot::Plot1DCurveCfg& _curve) override;
 
-	const ot::QueryInformation& getQueryInformation() const { return m_queryInformation; }
-
 	void setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _dataLakeAccessCfg);
 
 	std::list<std::string> getParameterOptions() const;
@@ -111,7 +108,6 @@ protected:
 	
 
 private:
-	ot::QueryInformation m_queryInformation;
 	PropertyBundleDataLakeQuery m_queryProperties;
 	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
 

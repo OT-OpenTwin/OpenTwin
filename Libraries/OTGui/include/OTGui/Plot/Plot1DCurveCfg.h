@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DCurveCfg.h
 // 
 // License:
@@ -24,7 +24,6 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/BasicEntityInformation.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
-#include "OTGui/QueryInformation.h"
 #include "OTGui/Style/PenCfg.h"
 
 // std header
@@ -164,12 +163,6 @@ namespace ot {
 		//! The curve keeps ownership of the painter.
 		const Painter2D* getPointFillPainter() const { return m_pointFillPainter; };
 
-		//! @brief Set the query information for the curve.
-		//! @param _queryInformation 
-		void setQueryInformation(const QueryInformation& _queryInformation) { m_queryInformation = _queryInformation; };
-		void setQueryInformation(QueryInformation&& _queryInformation) { m_queryInformation = std::move(_queryInformation); };
-		const QueryInformation& getQueryInformation() const { return m_queryInformation; };
-
 		void setDataAccessConfig(DataLakeAccessCfg&& _dataAccessConfig) { m_dataAccessConfig = std::move(_dataAccessConfig); };
 		const DataLakeAccessCfg& getDataAccessConfig() const { return m_dataAccessConfig; };
 
@@ -194,7 +187,6 @@ namespace ot {
 		PenFCfg m_pointOulinePen;
 		Painter2D* m_pointFillPainter;
 
-		QueryInformation m_queryInformation;
 		DataLakeAccessCfg m_dataAccessConfig;
 
 		std::string m_toolTip;

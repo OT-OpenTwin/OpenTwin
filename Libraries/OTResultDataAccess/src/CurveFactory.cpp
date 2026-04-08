@@ -33,76 +33,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg
 
 void CurveFactory::addToConfig(const MetadataSeries& _series, ot::Plot1DCurveCfg& _config, const std::string& _quantityNameOnYAxis, const std::string& _quantityValueDescriptionNameOnYAxis, const std::string& _defaultParameterForXAxis)
 {
-	ot::QueryInformation queryInformation;
-	queryInformation.setProjection(createProjection());
-
-	const std::list<MetadataQuantity>& quantities = _series.getQuantities();
-
-	//assert(quantities.size() == 1);
 	
-	const MetadataQuantity* selectedQuantity = nullptr;
-	if (!_quantityNameOnYAxis.empty())
-	{
-		for (const MetadataQuantity& quantity : quantities)
-		{
-			if (quantity.quantityName == _quantityNameOnYAxis)
-			{
-				selectedQuantity = &quantity;
-				break;
-			}
-		}
-	}
-	else
-	{
-		if (quantities.size() > 1)
-		{
-			throw std::invalid_argument("Creating a curve is only possible with a single quantity");
-		}
-		selectedQuantity = &(*quantities.begin());
-	}
-
-	if (selectedQuantity == nullptr)
-	{
-		throw std::exception("Curve creation failed to extract the y-axis information");
-	}
-	
-	ot::TupleInstance tupleDescription = selectedQuantity->m_tupleDescription;
-	int tupleIndex = 0;
-			
-	queryInformation.setQuery(createQuery(_series.getSeriesIndex(), selectedQuantity->quantityIndex));
-	
-	ot::DataPointDecoder quantityInformation;
-	quantityInformation.setFieldName(QuantityContainer::getFieldName());
-	quantityInformation.setLabel(selectedQuantity->quantityName);
-	quantityInformation.setDimension(selectedQuantity->dataDimensions);
-	quantityInformation.setTupleInstance(std::move(tupleDescription));
-
-	queryInformation.setQuantityDescription(std::move(quantityInformation));
-
-	const std::list<MetadataParameter>& parameters = _series.getParameter();
-	auto& dependingParameter = selectedQuantity->dependingParameterIds;
-	for (const auto& parameter : parameters)
-	{
-		if (std::find(dependingParameter.begin(), dependingParameter.end(), parameter.parameterUID) != dependingParameter.end())
-		{
-			ot::DataPointDecoder qcDescription;
-			qcDescription.setLabel(parameter.parameterLabel);
-			qcDescription.setFieldName(std::to_string(parameter.parameterUID));
-			ot::TupleInstance tupleInstance = ot::TupleDescriptionSingle::createInstance(parameter.unit, parameter.typeName);
-			qcDescription.setTupleInstance(std::move(tupleInstance));
-			
-			if (!_defaultParameterForXAxis.empty() && _defaultParameterForXAxis == parameter.parameterName)
-			{
-				queryInformation.addParameterDescriptionFront(qcDescription);
-			}
-			else
-			{
-				queryInformation.addParameterDescription(qcDescription);
-			}
-		}
-	}
-
-	_config.setQueryInformation(queryInformation);
 
 }
 

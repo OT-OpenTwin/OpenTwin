@@ -317,7 +317,6 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	auto dlAccessCfg = m_dataLakeAccessCfg;
 	curveCfg.setDataAccessConfig(std::move(dlAccessCfg));
 	curveCfg.setTitle(curveLabel);
-	curveCfg.setQueryInformation(m_queryInformation);
 
 	return curveCfg;
 }
@@ -390,7 +389,6 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 	this->updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 
-	m_queryInformation = _curve.getQueryInformation();
 }
 
 void EntityResult1DCurve::setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _cfg)
@@ -475,47 +473,16 @@ void EntityResult1DCurve::addStorageData(bsoncxx::builder::basic::document& stor
 {
 	EntityBase::addStorageData(storage);
 
-	const ot::DataPointDecoder& quantityDescription = m_queryInformation.getQuantityDescription();
-	bsoncxx::builder::basic::document quantityDescriptionSerialised = serialise(quantityDescription);
-
-	bsoncxx::builder::basic::array arrayOfSubDocs;
-	for (const ot::DataPointDecoder& parameterDescr : m_queryInformation.getParameterDescriptions())
-	{
-		bsoncxx::builder::basic::document parameterDescrDoc = serialise(parameterDescr);
-		arrayOfSubDocs.append(parameterDescrDoc.extract());
-	}
-
 	const std::string serialisedDLA = m_dataLakeAccessCfg.toJson();
-	storage.append(
-		bsoncxx::builder::basic::kvp("Query", m_queryInformation.getQuery()),
-		bsoncxx::builder::basic::kvp("Projection", m_queryInformation.getProjection()),
-		bsoncxx::builder::basic::kvp("QuantityDescription", quantityDescriptionSerialised.extract()),
-		bsoncxx::builder::basic::kvp("ParameterDescription", arrayOfSubDocs.extract()),
+	storage.append
+	(
 		bsoncxx::builder::basic::kvp("DataLakeAccessCfg", serialisedDLA)
 	);
-
-
 }
 
 void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
-
-	m_queryInformation.setQuery(std::string(doc_view["Query"].get_string()));
-	m_queryInformation.setProjection(std::string(doc_view["Projection"].get_string()));
-
-	const auto& quantityDescriptionDoc = doc_view["QuantityDescription"].get_document();
-
-	m_queryInformation.setQuantityDescription(deserialise(quantityDescriptionDoc));
-
-	bsoncxx::array::view parameterDescriptions = doc_view["ParameterDescription"].get_array().value;
-
-	for (auto parameterDescription = parameterDescriptions.begin(); parameterDescription != parameterDescriptions.end(); parameterDescription++)
-	{
-		const auto& parameterDoc = parameterDescription->get_document();
-		ot::DataPointDecoder parameterDesc = deserialise(parameterDoc);
-		m_queryInformation.addParameterDescription(std::move(parameterDesc));
-	}
 
 	const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
 	if (!serialisedDLA.empty())
