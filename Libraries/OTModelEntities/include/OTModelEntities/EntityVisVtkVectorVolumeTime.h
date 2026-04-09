@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityVisVtkVectorVolumeComplex.h
+// File: EntityVisVtkVectorVolumeTime.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -24,24 +24,25 @@
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundlePlane.h"
 #include "OTModelEntities/PropertyBundleScaling.h"
-#include "OTModelEntities/PropertyBundleVisVtkVectorVolumeComplex.h"
+#include "OTModelEntities/PropertyBundleVisVtkVectorVolumeTime.h"
 
 #include <list>
 
-class __declspec(dllexport) EntityVisVtkVectorVolumeComplex : public EntityVis2D3D
+class __declspec(dllexport) EntityVisVtkVectorVolumeTime : public EntityVis2D3D
 {
 public:
-	EntityVisVtkVectorVolumeComplex() : EntityVisVtkVectorVolumeComplex(0, nullptr, nullptr, nullptr) {};
-	EntityVisVtkVectorVolumeComplex(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
-	virtual ~EntityVisVtkVectorVolumeComplex();
+	EntityVisVtkVectorVolumeTime() : EntityVisVtkVectorVolumeTime(0, nullptr, nullptr, nullptr) {};
+	EntityVisVtkVectorVolumeTime(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+	virtual ~EntityVisVtkVectorVolumeTime();
 
-	virtual std::string getClassName(void) const override { return "EntityVisVtkVectorVolumeComplex"; };
+	virtual std::string getClassName(void) const override { return "EntityVisVtkVectorVolumeTime"; };
 
 	virtual bool updateFromProperties(void) override;
 
 	virtual void createProperties(void) override;
 	virtual bool updatePropertyVisibilities(void) override;
 
+	void setTimeList(const std::list<double>& timeList);
 	virtual void setGlobalRange(double minValue, double maxValue) override { propertyBundleScaling.setGlobalRange(this, minValue, maxValue); }
 
 protected:
@@ -52,7 +53,7 @@ protected:
 private:
 	PropertyBundlePlane propertyBundlePlane;
 	PropertyBundleScaling propertyBundleScaling;
-	PropertyBundleVisVtkVectorVolumeComplex propertyBundleVisComplex;
+	PropertyBundleVisVtkVectorVolumeTime propertyBundleVisTime;
 	// Temporary
 	//EntityResultBase *source;
 };

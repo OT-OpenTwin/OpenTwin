@@ -21,6 +21,7 @@
 
 #include <string>
 #include <vector>
+#include <list>
 
 class Application;
 
@@ -42,19 +43,23 @@ private:
 	void addSolverRun(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
-	void convertAndStoreFrequencyDomainDumps();
-	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName);
+	void convertAndStoreFrequencyDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit);
+	void convertAndStoreTimeDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit);
+	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& unit);
+	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& unit);
 	std::string toLower(std::string s);
 	std::vector<char> readFile(const std::string& filename);
-	std::string parseComplexResultFileName(const std::string& input, std::string &quantityName);
+	std::string parseComplexResultFileName(const std::string& input);
 	bool toDouble(const std::string& s, double& value);
 	std::string doubleToString(double value);
+	double extractRangeMax(const std::vector<char>& data);
 
 	Application* application;
 	EntityBase *solverEntity;
 	EntityMeshCartesian *meshEntity;
 	std::string openEMSPath;
 	std::string tempDirPath;
+	double timeStepWidth;
 
 	EntityUnits* entityUnits;
 };

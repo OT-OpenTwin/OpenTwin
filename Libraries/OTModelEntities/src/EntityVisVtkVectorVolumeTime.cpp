@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityVisVtkVectorVolumeComplex.cpp
+// File: EntityVisVtkVectorVolumeTime.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,32 +18,32 @@
 // @otlicense-end
 
 #include "OTModelEntities/Database.h"
-#include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
+#include "OTModelEntities/EntityVisVtkVectorVolumeTime.h"
 
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityVisVtkVectorVolumeComplex> registrar("EntityVisVtkVectorVolumeComplex");
+static EntityFactoryRegistrar<EntityVisVtkVectorVolumeTime> registrar("EntityVisVtkVectorVolumeTime");
 
-EntityVisVtkVectorVolumeComplex::EntityVisVtkVectorVolumeComplex(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
+EntityVisVtkVectorVolumeTime::EntityVisVtkVectorVolumeTime(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
 	EntityVis2D3D(ID, parent, obs, ms)
 {
 }
 
-EntityVisVtkVectorVolumeComplex::~EntityVisVtkVectorVolumeComplex()
+EntityVisVtkVectorVolumeTime::~EntityVisVtkVectorVolumeTime()
 {
 
 }
 
-void EntityVisVtkVectorVolumeComplex::addStorageData(bsoncxx::builder::basic::document& storage)
+void EntityVisVtkVectorVolumeTime::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	// We store the parent class information first 
 	EntityVis2D3D::addStorageData(storage);
 
 }
 
-void EntityVisVtkVectorVolumeComplex::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityVisVtkVectorVolumeTime::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	// We read the parent class information first 
 	EntityVis2D3D::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -53,11 +53,11 @@ void EntityVisVtkVectorVolumeComplex::readSpecificDataFromDataBase(const bsoncxx
 	resetModified();
 }
 
-void EntityVisVtkVectorVolumeComplex::createProperties(void)
+void EntityVisVtkVectorVolumeTime::createProperties(void)
 {
 	assert(resultType != EntityResultBase::UNKNOWN);
 
-	propertyBundleVisComplex.setProperties(this);
+	propertyBundleVisTime.setProperties(this);
 	propertyBundlePlane.setProperties(this);
 	propertyBundleScaling.setProperties(this);
 
@@ -66,14 +66,14 @@ void EntityVisVtkVectorVolumeComplex::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-bool EntityVisVtkVectorVolumeComplex::updatePropertyVisibilities(void)
+bool EntityVisVtkVectorVolumeTime::updatePropertyVisibilities(void)
 {
 	bool updatePropertiesGrid = false;
 	bool is2dType = false;
 
-	updatePropertiesGrid |= propertyBundleVisComplex.updatePropertyVisibility(this);
+	updatePropertiesGrid |= propertyBundleVisTime.updatePropertyVisibility(this);
 
-	if (propertyBundleVisComplex.is2dType(this))
+	if (propertyBundleVisTime.is2dType(this))
 	{
 		updatePropertiesGrid |= propertyBundlePlane.updatePropertyVisibility(this);
 	}
@@ -88,7 +88,7 @@ bool EntityVisVtkVectorVolumeComplex::updatePropertyVisibilities(void)
 }
 
 
-bool EntityVisVtkVectorVolumeComplex::updateFromProperties(void)
+bool EntityVisVtkVectorVolumeTime::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());
@@ -101,3 +101,10 @@ bool EntityVisVtkVectorVolumeComplex::updateFromProperties(void)
 
 	return updatePropertyVisibilities(); // No property grid update necessary
 }
+
+void EntityVisVtkVectorVolumeTime::setTimeList(const std::list<double>& timeList)
+{
+	propertyBundleVisTime.setTimeList(this, timeList);
+	setModified();
+}
+

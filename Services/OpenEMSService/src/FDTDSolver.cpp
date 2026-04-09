@@ -29,7 +29,9 @@
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityResultVtkComplex.h"
+#include "OTModelEntities/EntityResultVtkTime.h"
 #include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
+#include "OTModelEntities/EntityVisVtkVectorVolumeTime.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -40,6 +42,7 @@
 #include <list>
 #include <vector>
 #include <charconv>
+#include <regex>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr)
@@ -119,9 +122,11 @@ std::string FDTDSolver::generateRunCommand()
 		"\n"
 		"### Define dump box...\n"
 		"#Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop], sub_sampling=[2,2,2])\n"
-		"Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
+		"Ef = CSX.AddDump('E-Field Complex', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
+		"Et = CSX.AddDump('E-Field Time', dump_type=0, dump_mode=3, file_type=0, sub_sampling=[2,2,2])\n"
 		"start = [0, 0, 0];\n"
 		"stop  = [a, b, length];\n"
+		"Ef.AddBox(start, stop);\n"
 		"Et.AddBox(start, stop);\n"
 		"\n";
 		//"### Postprocessing & plotting\n"
@@ -188,48 +193,82 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 
 void FDTDSolver::convertAndStoreResults()
 {
-	convertAndStoreFrequencyDomainDumps();
+	timeStepWidth = 5.18459e-13;
+
+	convertAndStoreFrequencyDomainDump("E-Field Complex", "E-Field", "V/m");
+	convertAndStoreTimeDomainDump("E-Field Time", "E-Field", "V/m");
 }
 
-void FDTDSolver::convertAndStoreFrequencyDomainDumps()
+void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit)
 {
-	// First, we search for all complex dump results
-	std::list<std::string> results;
+	// Search for files of the form resultName_00010.vtr
+
+	auto escape_regex = [](const std::string& s) {
+		return std::regex_replace(s, std::regex(R"([.^$|()\\[*+?{\]])"), R"(\$&)");
+	};
+
+	std::list<std::string> resultFileList;
 
 	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath)) {
 		if (entry.is_regular_file()) {
 			std::string name = toLower(entry.path().filename().string());
 
-			if (name.size() >= 8 && name.substr(name.size() - 8) == "_abs.vtr") 
+			std::string pattern_str = "^" + escape_regex(toLower(resultName)) + R"(_\d+\.vtr$)";
+			std::regex pattern(pattern_str);
+
+			if (std::regex_match(name, pattern))
+			{
+				std::string fullPath = entry.path().string();
+
+				resultFileList.push_back(fullPath);
+			}
+		}
+	}
+
+	if (!resultFileList.empty())
+	{
+		convertAndStoreSingleTimeDomainDump(resultFileList, resultName, fieldType, unit);
+	}
+}
+
+void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string &resultName, const std::string& fieldType, const std::string& unit)
+{
+	// Search for files of the form resultName_f=20000.000_abs.vtr
+
+	auto escape_regex = [](const std::string& s) {
+		return std::regex_replace(s, std::regex(R"([.^$|()\\[*+?{\]])"), R"(\$&)");
+	};
+
+	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath)) {
+		if (entry.is_regular_file()) {
+			std::string name = toLower(entry.path().filename().string());
+
+			std::string pattern_str = "^" + escape_regex(toLower(resultName)) + R"(_[^_]+_abs\.vtr$)";
+			std::regex pattern(pattern_str);
+
+			if (std::regex_match(name, pattern))
 			{
 				std::string fullPath = entry.path().string();
 
 				// remove "_abs.vtr" (8 characters)
 				std::string base = fullPath.substr(0, fullPath.size() - 8);
 
-				results.push_back(base);
+				std::string absFile = base + "_abs.vtr";
+				std::string argFile = base + "_arg.vtr";
+
+				if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
+				{
+					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, unit);
+				}
 			}
-		}
-	}
-
-	// Now we process each result one by one (make sure that both _abs and _arg exist
-	for (auto& result : results)
-	{
-		std::string absFile = result + "_abs.vtr";
-		std::string argFile = result + "_arg.vtr";
-
-		if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
-		{
-			convertAndStoreSingleFrequencyDomainDump(absFile, argFile);
 		}
 	}
 }
 
-void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName)
+void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string &unit)
 {
 	// Extract result folder name from result file name
-	std::string quantityName;
-	std::string resultName = parseComplexResultFileName(absFileName, quantityName);
+	std::string resultName = parseComplexResultFileName(absFileName);
 	if (resultName.empty())
 	{
 		assert(0);
@@ -260,7 +299,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	argFileData.clear();
 
 	EntityResultVtkComplex* vtkResult = new EntityResultVtkComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkResult->setComplexData(quantityName, EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
+	vtkResult->setComplexData(fieldType, EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
 	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
 	vtkResult->storeToDataBase();
 
@@ -279,7 +318,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	visualizationEntity->createProperties();
 
 	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
-	visualizationEntity->setUnit("V/m");
+	visualizationEntity->setUnit(unit);
 
 	visualizationEntity->storeToDataBase();
 
@@ -293,6 +332,147 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 
 	delete vtkResult;
 	vtkResult = nullptr;
+}
+
+void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& unit)
+{
+	// First, write binary data items for all result data files
+	std::list<std::pair<ot::UID, ot::UID>> dataEntityList;
+	std::list<double>  dataEntityTimeList;
+
+	double rangeMax = 0.0;
+
+	for (auto resultFile : resultFileList)
+	{
+		// Determine the time for this result
+		double time = 0.0;
+
+		size_t underscore_pos = resultFile.rfind('_');
+		if (underscore_pos != std::string::npos)
+		{
+			size_t dot_pos = resultFile.rfind(".vtr");
+
+			if (dot_pos != std::string::npos && dot_pos > underscore_pos)
+			{
+				std::string number_str = resultFile.substr(underscore_pos + 1, dot_pos - underscore_pos - 1);
+				time = timeStepWidth * std::stoi(number_str) / entityUnits->getScaleToSITime();
+			}
+		}
+
+		// Read the data
+		std::vector<char> resultFileData = readFile(resultFile);
+
+		// Determine the max value
+		double dataRangeMax = fabs(extractRangeMax(resultFileData));
+		rangeMax = std::max(rangeMax, dataRangeMax);
+
+		EntityBinaryData* vtkData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+		vtkData->setData(resultFileData.data(), resultFileData.size());
+		vtkData->storeToDataBase();
+
+		dataEntityList.push_back(std::pair<ot::UID, ot::UID>(vtkData->getEntityID(), vtkData->getEntityStorageVersion()));
+		dataEntityTimeList.push_back(time);
+
+		// Clear the storage (we need to load file by file, since the storage may be too large otherwise
+		delete vtkData;
+		vtkData = nullptr;
+	}
+
+	// Now we create a vtk result entity as a container for the binary data and the topology entity
+	EntityResultVtkTime* vtkResult = new EntityResultVtkTime(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	vtkResult->setTimeData(fieldType, dataEntityList, dataEntityTimeList);
+	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
+	vtkResult->storeToDataBase();
+
+	EntityVisVtkVectorVolumeTime* visualizationEntity = new EntityVisVtkVectorVolumeTime(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
+	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
+	visualizationEntity->setTreeItemEditable(true);
+	visualizationEntity->setInitiallyHidden(true);
+	visualizationEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		OT_INFO_SERVICE_TYPE_VisualizationService
+	);
+
+	visualizationEntity->createProperties();
+
+	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
+	visualizationEntity->setUnit(unit);
+	visualizationEntity->setTimeList(dataEntityTimeList);
+	visualizationEntity->setGlobalRange(-rangeMax, rangeMax);
+
+	visualizationEntity->storeToDataBase();
+
+	application->getModelComponent()->addNewTopologyEntity(visualizationEntity->getEntityID(), visualizationEntity->getEntityStorageVersion(), false);
+
+	for (auto dataEntity : dataEntityList)
+	{
+		application->getModelComponent()->addNewDataEntity(dataEntity.first, dataEntity.second, vtkResult->getEntityID());
+	}
+
+	application->getModelComponent()->addNewDataEntity(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion(), visualizationEntity->getEntityID());
+
+	delete visualizationEntity;
+	visualizationEntity = nullptr;
+
+	delete vtkResult;
+	vtkResult = nullptr;
+}
+
+double FDTDSolver::extractRangeMax(const std::vector<char>& data) 
+{
+	if (data.empty()) {
+		return 0.0;
+	}
+
+	const char* begin = data.data();
+	const char* end = begin + data.size();
+
+	const char key[] = "RangeMax=\"";
+	const std::size_t keyLen = sizeof(key) - 1;
+
+	const char* pos = begin;
+
+	while (pos + keyLen < end) {
+		const void* found = std::memchr(pos, 'R', static_cast<std::size_t>(end - pos));
+		if (!found) {
+			return 0.0;
+		}
+
+		pos = static_cast<const char*>(found);
+
+		if (pos + keyLen >= end) {
+			return 0.0;
+		}
+
+		if (std::memcmp(pos, key, keyLen) == 0) {
+			const char* valueBegin = pos + keyLen;
+			const char* valueEnd = valueBegin;
+
+			while (valueEnd < end && *valueEnd != '"') {
+				++valueEnd;
+			}
+
+			if (valueEnd == end) {
+				return 0.0;
+			}
+
+			double value = 0.0;
+			auto result = std::from_chars(valueBegin, valueEnd, value);
+
+			if (result.ec != std::errc() || result.ptr != valueEnd) {
+				return 0.0;
+			}
+
+			return value;
+		}
+
+		++pos;
+	}
+
+	return 0.0;
 }
 
 std::string FDTDSolver::escapeBackslashes(const std::string& input) 
@@ -337,7 +517,7 @@ std::vector<char> FDTDSolver::readFile(const std::string& filename)
 	return buffer;
 }
 
-std::string FDTDSolver::parseComplexResultFileName(const std::string& input, std::string& quantityName)
+std::string FDTDSolver::parseComplexResultFileName(const std::string& input)
 {
 	// The input name has the format: <name>_f=<frequency>_abs.vtr
 
@@ -380,8 +560,6 @@ std::string FDTDSolver::parseComplexResultFileName(const std::string& input, std
 	{
 		name = name.substr(pos + 1);
 	}
-
-	quantityName = name;
 
 	// Build new name with scaled frequency
 	name = name + "(f=" + doubleToString(frequency / entityUnits->getScaleToSIFrequency()) + ")";
