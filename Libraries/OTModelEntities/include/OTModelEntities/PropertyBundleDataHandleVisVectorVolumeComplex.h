@@ -1,5 +1,5 @@
 // @otlicense
-// File: PropertyBundleDataHandleVisCartesianVector.h
+// File: PropertyBundleDataHandleVisVectorVolumeComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -21,10 +21,10 @@
 #include "OTModelEntities/PropertyBundleDataHandle.h"
 #include "OTModelEntities/PropertiesVisCartesianVector.h"
 
-class _declspec(dllexport) PropertyBundleDataHandleVisCartesianVector : public PropertyBundleDataHandle
+class _declspec(dllexport) PropertyBundleDataHandleVisVectorVolumeComplex : public PropertyBundleDataHandle
 {
 public:
-	PropertyBundleDataHandleVisCartesianVector(EntityBase * thisObject);
+	PropertyBundleDataHandleVisVectorVolumeComplex(EntityBase * thisObject);
 
 	const PropertiesVisCartesianVector::VisualizationType GetSelectedVisType(void) const { return selectedVisType; }
 	const PropertiesVisCartesianVector::VisualizationComponent GetSelectedVisComp(void) const { return selectedVisComp; }

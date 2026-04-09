@@ -1,5 +1,5 @@
 // @otlicense
-// File: PropertyBundleDataHandleVisCartesianVector.cpp
+// File: PropertyBundleDataHandleVisVectorVolumeComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,14 +18,14 @@
 // @otlicense-end
 
 #include "OTModelEntities/PropertyBundleDataHandle.h"
-#include "OTModelEntities/PropertyBundleDataHandleVisCartesianVector.h"
+#include "OTModelEntities/PropertyBundleDataHandleVisVectorVolumeComplex.h"
 
-PropertyBundleDataHandleVisCartesianVector::PropertyBundleDataHandleVisCartesianVector(EntityBase * thisObject)
+PropertyBundleDataHandleVisVectorVolumeComplex::PropertyBundleDataHandleVisVectorVolumeComplex(EntityBase * thisObject)
 {
 	LoadCurrentData(thisObject);
 }
 
-void PropertyBundleDataHandleVisCartesianVector::LoadCurrentData(EntityBase * thisObject)
+void PropertyBundleDataHandleVisVectorVolumeComplex::LoadCurrentData(EntityBase * thisObject)
 {
 	auto visType = dynamic_cast<EntityPropertiesSelection*>(thisObject->getProperties().getProperty(properties.GetNameVisType()));
 	assert(visType != nullptr);

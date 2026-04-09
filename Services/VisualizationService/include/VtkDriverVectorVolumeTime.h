@@ -1,5 +1,5 @@
 // @otlicense
-// File: VtkDriverVectorVolumeComplex.h
+// File: VtkDriverVectorVolumeTime.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -25,8 +25,8 @@
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
 #include "OTModelEntities/PropertyBundleDataHandleScaling.h"
-#include "OTModelEntities/PropertyBundleDataHandleVisVectorVolumeComplex.h"
-#include "DataSourceVtkComplex.h"
+#include "OTModelEntities/PropertyBundleDataHandleVisVectorVolumeTime.h"
+#include "DataSourceVtkTime.h"
 
 #include <string>
 #include <ctime>
@@ -39,19 +39,19 @@ namespace osg {
 	class Node;
 }
 
-class VtkDriverVectorVolumeComplex : public VtkDriverWithScaling {
+class VtkDriverVectorVolumeTime : public VtkDriverWithScaling {
 public:
-	VtkDriverVectorVolumeComplex();
-	virtual ~VtkDriverVectorVolumeComplex();
+	VtkDriverVectorVolumeTime();
+	virtual ~VtkDriverVectorVolumeTime();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) override;
 	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
 	
 private:
 	PropertyBundleDataHandlePlane * planeData = nullptr;
-	PropertyBundleDataHandleVisVectorVolumeComplex* visData = nullptr;
+	PropertyBundleDataHandleVisVectorVolumeTime* visData = nullptr;
 
-	void prepareComplexData();
+	void prepareTimeData();
 	vtkAlgorithmOutput* ApplyCutplane(osg::Node *parent);
 	void Assemble2DNode(osg::Node *parent);
 	void Assemble3DNode(osg::Node* parent);
@@ -63,7 +63,7 @@ private:
 	void CheckForModelUpdates();
 	virtual void DeletePropertyData(void) override;
 
-	DataSourceVtkComplex* dataSource;
+	DataSourceVtkTime* dataSource;
 	vtkAlgorithmOutput* dataConnection;
 
 	std::list<vtkObject*> objectsToDelete;

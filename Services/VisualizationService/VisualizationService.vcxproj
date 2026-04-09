@@ -193,6 +193,7 @@
     <ClCompile Include="src\DataSourceManagerItem.cpp" />
     <ClCompile Include="src\DataSourceResult3D.cpp" />
     <ClCompile Include="src\DataSourceUnstructuredMesh.cpp" />
+    <ClCompile Include="src\DataSourceVtkTime.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -207,6 +208,7 @@
     <ClCompile Include="src\VtkDriverUnstructuredScalarVolume.cpp" />
     <ClCompile Include="src\VtkDriverUnstructuredVectorSurface.cpp" />
     <ClCompile Include="src\VtkDriverUnstructuredVectorVolume.cpp" />
+    <ClCompile Include="src\VtkDriverVectorVolumeTime.cpp" />
     <ClCompile Include="src\VtkDriverWithScaling.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -218,6 +220,7 @@
     <ClInclude Include="include\DataSourceManagerItem.h" />
     <ClInclude Include="include\DataSourceResult3D.h" />
     <ClInclude Include="include\DataSourceUnstructuredMesh.h" />
+    <ClInclude Include="include\DataSourceVtkTime.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\UiNotifier.h" />
     <ClInclude Include="include\VisualizationServiceTypes.h" />
@@ -232,6 +235,7 @@
     <ClInclude Include="include\VtkDriverUnstructuredScalarVolume.h" />
     <ClInclude Include="include\VtkDriverUnstructuredVectorSurface.h" />
     <ClInclude Include="include\VtkDriverUnstructuredVectorVolume.h" />
+    <ClInclude Include="include\VtkDriverVectorVolumeTime.h" />
     <ClInclude Include="include\VtkDriverWithScaling.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

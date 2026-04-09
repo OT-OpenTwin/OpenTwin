@@ -26,6 +26,7 @@
 #include "DataSourceResult3D.h"
 #include "DataSourceUnstructuredMesh.h"
 #include "DataSourceVtkComplex.h"
+#include "DataSourceVtkTime.h"
 #include "OTCore/Logging/Logger.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
@@ -49,6 +50,10 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	else if (resultEntity->getClassName() == "EntityResultVtkComplex")
 	{
 		return new DataSourceVtkComplex;
+	}	
+	else if (resultEntity->getClassName() == "EntityResultVtkTime")
+	{
+		return new DataSourceVtkTime;
 	}
 	else
 	{

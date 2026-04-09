@@ -1,5 +1,5 @@
 // @otlicense
-// File: VtkDriverVectorVolumeComplex.cpp
+// File: VtkDriverVectorVolumeTime.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "VtkDriverVectorVolumeComplex.h"
+#include "VtkDriverVectorVolumeTime.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
 #include "DataSourceUnstructuredMesh.h"
@@ -81,14 +81,14 @@
 #include <vtkMergeArrays.h>
 #include <vtkArrayCalculator.h>
 
-VtkDriverVectorVolumeComplex::VtkDriverVectorVolumeComplex() : dataSource(nullptr), dataConnection(nullptr) {}
+VtkDriverVectorVolumeTime::VtkDriverVectorVolumeTime() : dataSource(nullptr), dataConnection(nullptr) {}
 
-VtkDriverVectorVolumeComplex::~VtkDriverVectorVolumeComplex() 
+VtkDriverVectorVolumeTime::~VtkDriverVectorVolumeTime() 
 {
 	DeletePropertyData();
 }
 
-void VtkDriverVectorVolumeComplex::CheckForModelUpdates()
+void VtkDriverVectorVolumeTime::CheckForModelUpdates()
 {
 	if (scalarRange == nullptr) return;
 
@@ -104,7 +104,7 @@ void VtkDriverVectorVolumeComplex::CheckForModelUpdates()
 	}
 }
 
-void VtkDriverVectorVolumeComplex::DeletePropertyData(void)
+void VtkDriverVectorVolumeTime::DeletePropertyData(void)
 {
 	VtkDriverWithScaling::DeletePropertyData();
 
@@ -121,7 +121,7 @@ void VtkDriverVectorVolumeComplex::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverVectorVolumeComplex::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
+std::string VtkDriverVectorVolumeTime::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
 {
 	objectsToDelete.clear();
 
@@ -133,14 +133,14 @@ std::string VtkDriverVectorVolumeComplex::buildSceneNode(DataSourceManagerItem *
 
 	osg::Node *node = new osg::Switch;
 	
-	dataSource = dynamic_cast<DataSourceVtkComplex*>(dataItem);
+	dataSource = dynamic_cast<DataSourceVtkTime*>(dataItem);
 
 	if (dataSource != nullptr)
 	{
 		vtkNew<vtkCellDataToPointData> cellToPoint;
 		dataConnection = nullptr;
 
-		prepareComplexData();
+		prepareTimeData();
 
 		if (dataSource->GetHasCellScalar() || dataSource->GetHasCellVector())
 		{
@@ -149,11 +149,6 @@ std::string VtkDriverVectorVolumeComplex::buildSceneNode(DataSourceManagerItem *
 			cellToPoint->Update();
 
 			dataConnection = cellToPoint->GetOutputPort();
-		}
-
-		if (visData->GetSelectedVisQuantity() == PropertiesVisCartesianVector::VisualizationQuantity::PHASE)
-		{
-			unit = "Degrees";  // Here we overwrite the unit from the data entity, since we have degrees here.
 		}
 
 		if (visData->GetSelectedVisType() == PropertiesVisCartesianVector::VisualizationType::Arrows3D)
@@ -191,37 +186,24 @@ std::string VtkDriverVectorVolumeComplex::buildSceneNode(DataSourceManagerItem *
 	return dataOut.str();
 }
 
-void VtkDriverVectorVolumeComplex::prepareComplexData()
+void VtkDriverVectorVolumeTime::prepareTimeData()
 {
 	// First, set correct names for the input data arrays (magnitude and phase)
-	auto magGrid = dataSource->GetVtkGridAbs();
-	auto phaseGrid = dataSource->GetVtkGridArg();
+	auto grid = dataSource->GetVtkGrid();
 
-	vtkDataSetAttributes* magAttrs = dataSource->GetHasCellVector()
-		? static_cast<vtkDataSetAttributes*>(magGrid->GetCellData())
-		: static_cast<vtkDataSetAttributes*>(magGrid->GetPointData());
+	vtkDataSetAttributes* attrs = dataSource->GetHasCellVector()
+		? static_cast<vtkDataSetAttributes*>(grid->GetCellData())
+		: static_cast<vtkDataSetAttributes*>(grid->GetPointData());
 
-	vtkDataSetAttributes* phaseAttrs = dataSource->GetHasCellVector()
-		? static_cast<vtkDataSetAttributes*>(phaseGrid->GetCellData())
-		: static_cast<vtkDataSetAttributes*>(phaseGrid->GetPointData());
+	auto arr = attrs->GetVectors();
 
-	auto magArr = magAttrs->GetVectors();
-	auto phaArr = phaseAttrs->GetVectors();
-
-	if (!magArr || !phaArr)
+	if (!arr)
 	{
 		assert(0);
 		return;
 	}
 
-	magArr->SetName("Magnitude");
-	phaArr->SetName("Phase");
-
-	// Merge the input data arrays into one
-	auto mergeFilter = vtkMergeArrays::New();
-	objectsToDelete.push_back(mergeFilter);
-	mergeFilter->AddInputData(magGrid);
-	mergeFilter->AddInputData(phaseGrid);
+	arr->SetName("Values");
 
 	// Scale the data according to the geometry scale. Attention: This will also scale the values, so we need to divide later
 	auto transform = vtkTransform::New();
@@ -233,7 +215,7 @@ void VtkDriverVectorVolumeComplex::prepareComplexData()
 	objectsToDelete.push_back(transformFilter);
 	transformFilter->TransformAllInputVectorsOn();
 	transformFilter->SetTransform(transform);
-	transformFilter->SetInputConnection(mergeFilter->GetOutputPort());
+	transformFilter->SetInputData(grid);
 
 	transformFilter->Update();
 
@@ -251,63 +233,23 @@ void VtkDriverVectorVolumeComplex::prepareComplexData()
 		calcFilter->SetAttributeTypeToPointData();
 	}
 
-	calcFilter->AddVectorVariable("M", "Magnitude");
-	calcFilter->AddVectorVariable("P", "Phase");
+	calcFilter->AddVectorVariable("V", "Values");
 
 	calcFilter->SetResultArrayName("DisplayField");
 
-	calcFilter->AddScalarVariable("Mx", "Magnitude", 0);
-	calcFilter->AddScalarVariable("My", "Magnitude", 1);
-	calcFilter->AddScalarVariable("Mz", "Magnitude", 2);
-
-	calcFilter->AddScalarVariable("Px", "Phase", 0);
-	calcFilter->AddScalarVariable("Py", "Phase", 1);
-	calcFilter->AddScalarVariable("Pz", "Phase", 2);
-
-	calcFilter->SetResultArrayName("DisplayField");
+	calcFilter->AddScalarVariable("Vx", "Values", 0);
+	calcFilter->AddScalarVariable("Vy", "Values", 1);
+	calcFilter->AddScalarVariable("Vz", "Values", 2);
 
 	std::string sScale = std::to_string(1.0 / dataSource->getScaleFactor());
 
-	switch (visData->GetSelectedVisQuantity())
-	{
-	case PropertiesVisCartesianVector::VisualizationQuantity::REAL:
-		calcFilter->SetFunction((  "Mx * cos(Px * " + sScale + ") * iHat * " + sScale +
-								 "+ My * cos(Py * " + sScale + ") * jHat * " + sScale +
-								 "+ Mz * cos(Pz * " + sScale + ") * kHat * " + sScale).c_str());
-		break;
-	case PropertiesVisCartesianVector::VisualizationQuantity::IMAG:
-		calcFilter->SetFunction((  "Mx * sin(Px * " + sScale + ") * iHat * " + sScale +
-								 "+ My * sin(Py * " + sScale + ") * jHat * " + sScale +
-								 "+ Mz * sin(Pz * " + sScale + ") * kHat * " + sScale).c_str());
-		break;
-	case PropertiesVisCartesianVector::VisualizationQuantity::MAG:
-		calcFilter->SetFunction(("(Mx * iHat + My * jHat + Mz * kHat) * " + sScale).c_str());
-		break;
-	case PropertiesVisCartesianVector::VisualizationQuantity::PHASE:
-		calcFilter->SetFunction(
-			("(Px*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Px*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*iHat + "
-			 "(Py*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Py*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*jHat + "
-			 "(Pz*" + sScale + "*180.0/3.141592653589793 - 360.0*floor((Pz*" + sScale + "*180.0/3.141592653589793 + 180.0)/360.0))*kHat").c_str());
-		break;
-	case PropertiesVisCartesianVector::VisualizationQuantity::PHASE_PROJECTION:
-		{
-			// here we assume a positive phase definition exp(+i omega t)
-			std::string sPhase = std::to_string(visData->GetPhase() * 3.14159265359 / 180.0);
-			calcFilter->SetFunction((  "Mx*cos(Px*" + sScale + "+" + sPhase + ")*iHat * " + sScale +
-									 "+ My*cos(Py*" + sScale + "+" + sPhase + ")*jHat * " + sScale +
-									 "+ Mz*cos(Pz*" + sScale + "+" + sPhase + ")*kHat * " + sScale).c_str());
-		}
-		break;
-	default:
-		assert(0);
-	}
-
+	calcFilter->SetFunction(("(Vx * iHat + Vy * jHat + Vz * kHat) * " + sScale).c_str());
 	calcFilter->Update();
 
 	dataConnection = calcFilter->GetOutputPort();
 }
 
-vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::ApplyCutplane(osg::Node * parent)
+vtkAlgorithmOutput * VtkDriverVectorVolumeTime::ApplyCutplane(osg::Node * parent)
 {	
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
@@ -365,7 +307,7 @@ vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::ApplyCutplane(osg::Node * par
 	objectsToDelete.push_back(planeCut);
 
 	if (dataConnection != nullptr) planeCut->SetInputConnection(dataConnection);
-	else planeCut->SetInputData(dataSource->GetVtkGridAbs());
+	else planeCut->SetInputData(dataSource->GetVtkGrid());
 
 	planeCut->SetCutFunction(plane);
 	planeCut->Update();
@@ -393,7 +335,7 @@ vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::ApplyCutplane(osg::Node * par
 	return planeCut->GetOutputPort();
 }
 
-vtkAlgorithmOutput* VtkDriverVectorVolumeComplex::GetArrowSource(void)
+vtkAlgorithmOutput* VtkDriverVectorVolumeTime::GetArrowSource(void)
 {
 	if (visData->GetSelectedArrowType() == PropertiesVisCartesianVector::VisualizationArrowType::ARROW_FLAT)
 	{
@@ -436,7 +378,7 @@ vtkAlgorithmOutput* VtkDriverVectorVolumeComplex::GetArrowSource(void)
 	return nullptr;
 }
 
-void VtkDriverVectorVolumeComplex::Assemble3DNode(osg::Node* parent)
+void VtkDriverVectorVolumeTime::Assemble3DNode(osg::Node* parent)
 {
 	vtkAlgorithmOutput* data = SetScalarValues();
 
@@ -445,7 +387,7 @@ void VtkDriverVectorVolumeComplex::Assemble3DNode(osg::Node* parent)
 	AddNodeVectors(data, parent);
 }
 
-void VtkDriverVectorVolumeComplex::Assemble2DNode(osg::Node *parent)
+void VtkDriverVectorVolumeTime::Assemble2DNode(osg::Node *parent)
 {
 	dataConnection = ApplyCutplane(parent);
 
@@ -525,7 +467,7 @@ void VtkDriverVectorVolumeComplex::Assemble2DNode(osg::Node *parent)
 	}
 }
 
-vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::SetScalarValues()
+vtkAlgorithmOutput * VtkDriverVectorVolumeTime::SetScalarValues()
 {
 	if (   visData->GetSelectedVisType() != PropertiesVisCartesianVector::VisualizationType::Contour2D
 		|| visData->GetSelectedVisComp() == PropertiesVisCartesianVector::VisualizationComponent::Abs)
@@ -534,7 +476,7 @@ vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::SetScalarValues()
 		objectsToDelete.push_back(vectorNorm);
 		
 		if (dataConnection != nullptr) vectorNorm->SetInputConnection(dataConnection);
-		else vectorNorm->SetInputData(dataSource->GetVtkGridAbs());
+		else vectorNorm->SetInputData(dataSource->GetVtkGrid());
 
 		vectorNorm->SetNormalize(false);
 		vectorNorm->Update();
@@ -551,7 +493,7 @@ vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::SetScalarValues()
 		objectsToDelete.push_back(vectorComponent);
 
 		if (dataConnection != nullptr) vectorComponent->SetInputConnection(dataConnection);
-		else vectorComponent->SetInputData(dataSource->GetVtkGridAbs());
+		else vectorComponent->SetInputData(dataSource->GetVtkGrid());
 
 		vectorComponent->SetExtractToFieldData(false);
 		vectorComponent->Update();
@@ -575,7 +517,7 @@ vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::SetScalarValues()
 	return nullptr;
 }
 
-void VtkDriverVectorVolumeComplex::AddNodeVectors(vtkAlgorithmOutput *input, osg::Node* parent)
+void VtkDriverVectorVolumeTime::AddNodeVectors(vtkAlgorithmOutput *input, osg::Node* parent)
 {
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
@@ -599,9 +541,9 @@ void VtkDriverVectorVolumeComplex::AddNodeVectors(vtkAlgorithmOutput *input, osg
 		glyph->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
 
-		double dx = dataSource->GetVtkGridAbs()->GetBounds()[1] - dataSource->GetVtkGridAbs()->GetBounds()[0];
-		double dy = dataSource->GetVtkGridAbs()->GetBounds()[3] - dataSource->GetVtkGridAbs()->GetBounds()[2];
-		double dz = dataSource->GetVtkGridAbs()->GetBounds()[5] - dataSource->GetVtkGridAbs()->GetBounds()[4];
+		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
+		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 
@@ -624,9 +566,9 @@ void VtkDriverVectorVolumeComplex::AddNodeVectors(vtkAlgorithmOutput *input, osg
 		hedgehog->SetVectorModeToUseVector();
 		double normalization = std::abs(scalarRange[1]);
 
-		double dx = dataSource->GetVtkGridAbs()->GetBounds()[1] - dataSource->GetVtkGridAbs()->GetBounds()[0];
-		double dy = dataSource->GetVtkGridAbs()->GetBounds()[3] - dataSource->GetVtkGridAbs()->GetBounds()[2];
-		double dz = dataSource->GetVtkGridAbs()->GetBounds()[5] - dataSource->GetVtkGridAbs()->GetBounds()[4];
+		double dx = dataSource->GetVtkGrid()->GetBounds()[1] - dataSource->GetVtkGrid()->GetBounds()[0];
+		double dy = dataSource->GetVtkGrid()->GetBounds()[3] - dataSource->GetVtkGrid()->GetBounds()[2];
+		double dz = dataSource->GetVtkGrid()->GetBounds()[5] - dataSource->GetVtkGrid()->GetBounds()[4];
 
 		double pointRadius = 0.1 * sqrt(dx * dx + dy * dy + dz * dz);
 
@@ -659,10 +601,10 @@ void VtkDriverVectorVolumeComplex::AddNodeVectors(vtkAlgorithmOutput *input, osg
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-void VtkDriverVectorVolumeComplex::setProperties(EntityVis2D3D *visEntity) 
+void VtkDriverVectorVolumeTime::setProperties(EntityVis2D3D *visEntity) 
 {
 	DeletePropertyData();
 	VtkDriverWithScaling::setProperties(visEntity);
 	planeData = new PropertyBundleDataHandlePlane(visEntity);
-	visData = new PropertyBundleDataHandleVisVectorVolumeComplex(visEntity);
+	visData = new PropertyBundleDataHandleVisVectorVolumeTime(visEntity);
 }

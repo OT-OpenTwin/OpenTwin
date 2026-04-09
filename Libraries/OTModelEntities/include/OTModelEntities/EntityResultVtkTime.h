@@ -39,7 +39,7 @@ public:
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 
-	//void getComplexData(std::string& quantityName, eQuantityType& quantityType, std::vector<char>& dataAbs, std::vector<char>& dataArg);
+	void getTimeData(double time, std::string& quantityName, std::vector<char>& data);
 
 	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setTimeData(const std::string &quantityName, const std::list<std::pair<ot::UID, ot::UID>> &dataEntityList, const std::list<double> &dataEntityTimeList);
@@ -48,6 +48,7 @@ public:
 	double getScaleFactor(void) { return _scaleFactor; }
 
 private:
+	std::pair<ot::UID, ot::UID> findClosestDataItem(double time);
 	
 	std::string _quantityName;
 
@@ -55,6 +56,9 @@ private:
 	std::list<double>  _dataEntityTimeList;
 
 	double _scaleFactor = 1.0;
+
+	EntityBinaryData* _vtkData = nullptr;
+	double _currentTime = 0.0;
 
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;

@@ -29,6 +29,7 @@
 #include "VtkDriverUnstructuredVectorVolume.h"
 #include "VtkDriverUnstructuredVectorSurface.h"
 #include "VtkDriverVectorVolumeComplex.h"
+#include "VtkDriverVectorVolumeTime.h"
 
 VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 {
@@ -59,6 +60,10 @@ VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 	else if (visEntity->getClassName() == "EntityVisVtkVectorVolumeComplex")
 	{
 		return new VtkDriverVectorVolumeComplex;
+	}
+	else if (visEntity->getClassName() == "EntityVisVtkVectorVolumeTime")
+	{
+		return new VtkDriverVectorVolumeTime;
 	}
 	else
 	{
