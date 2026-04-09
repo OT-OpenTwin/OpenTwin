@@ -380,6 +380,8 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 		{
 			symbolFillColorProp->setValue(_curve.getPointFillPainter());
 		}
+		
+		m_dataLakeAccessCfg = _curve.getDataAccessConfig();
 	}
 	catch (...)
 	{
@@ -415,6 +417,14 @@ std::list<std::string> EntityResult1DCurve::getTupleOptions() const
 std::string EntityResult1DCurve::getTupleType() const
 {
 	return m_queryProperties.getTupleType(this);
+}
+
+void EntityResult1DCurve::setStaticCurveQueryOptions(const ot::Plot1DCurveCfg& _curve)
+{
+	setCurve(_curve);
+	DataLakeQueryCfg queryCfg = _curve.getQueryCfg();
+	m_queryProperties.reset(this, queryCfg);
+	m_queryProperties.lockAllProperties(this);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

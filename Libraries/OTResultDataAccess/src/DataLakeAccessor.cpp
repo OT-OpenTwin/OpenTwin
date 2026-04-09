@@ -19,6 +19,15 @@ DataLakeAccessor::DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase)
  : m_applicationBase(_thisApplicationBase)
 {}
 
+DataLakeAccessor::~DataLakeAccessor()
+{
+	if (m_resultCollectionMetadataAccess != nullptr && owning)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
+	}
+}
+
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
 	m_collectionName = _collectionName;
@@ -33,6 +42,21 @@ void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 	
 	bool isCrossCollection = m_applicationBase->getCollectionName() != _collectionName;
 	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_collectionName, m_applicationBase->getModelComponent(), isCrossCollection);
+	owning = true;
+}
+
+void DataLakeAccessor::accessPartition(ResultCollectionMetadataAccess* _resultCollectionMetadataAccess)
+{
+	if (m_resultCollectionMetadataAccess != nullptr)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
+	}
+	m_resultCollectionMetadataAccess = _resultCollectionMetadataAccess;
+	m_collectionName = m_resultCollectionMetadataAccess->getCollectionName();
+	m_queryDescriptionsParameters.clear();
+	m_queryDescriptionsQuantities.clear();
+	m_queryDescriptionsSeries.clear();
 }
 
 void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel)

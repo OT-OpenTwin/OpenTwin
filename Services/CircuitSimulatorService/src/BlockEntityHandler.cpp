@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockEntityHandler.cpp
 // 
 // License:
@@ -167,8 +167,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 	std::map<std::string, std::vector<double>> resultVectors = SimulationResults::getInstance()->getResultMap();
 	ResultCollectionExtender extender(Application::instance());
 
-	PlotBuilder plotBuilderCurrent(extender);
-	PlotBuilder plotBuilderVoltage(extender);
+	PlotBuilder plotBuilderCurrent(extender, Application::instance());
+	PlotBuilder plotBuilderVoltage(extender, Application::instance());
 
 	//First we parse the result values, depending on the simulation type 
 	std::vector<double> xValues;	
@@ -336,9 +336,10 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			yLabel = "Voltage";
 			quantity->setName(yLabel);
 			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), yUnit);
-						
-			dataset.setQuantityDescription(quantity.release());
-			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, curveName);				
+			
+			auto temp = quantity.release();
+			dataset.setQuantityDescription(temp);
+			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, curveName, temp->getMetadataQuantity());
 		}
 		else
 		{
@@ -348,9 +349,9 @@ void BlockEntityHandler::createResultCurves(std::string solverName,std::string s
 			quantity->setName(yLabel);
 			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), yUnit);
 			
-			dataset.setQuantityDescription(quantity.release());
-
-			plotBuilderCurrent.addCurve(std::move(dataset), curveCfg, curveName);
+			auto temp = quantity.release();
+			dataset.setQuantityDescription(temp);
+			plotBuilderCurrent.addCurve(std::move(dataset), curveCfg, curveName, temp->getMetadataQuantity());
 		}
 	}
 	

@@ -236,7 +236,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 	
 
 	const std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
@@ -288,16 +288,18 @@ void Application::createPlotOneComplexCurveMagPhase()
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
 	DatasetDescription description;
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_Complex_Plot_MagPhase";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
-	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Polar");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Polar", temp->getMetadataQuantity());
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
@@ -305,7 +307,7 @@ void Application::createPlotOneComplexCurveRealImag()
 {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	const std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 	if (devPath.empty())
@@ -356,16 +358,18 @@ void Application::createPlotOneComplexCurveRealImag()
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
 	DatasetDescription description;
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_Complex_Plot_RIm";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "CMC_Stysch");
-	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Cartesian");
+	builder.addCurve(std::move(description), curveCfg, "CMC_Stysch_S11_Cartesian", temp->getMetadataQuantity());
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
@@ -373,7 +377,7 @@ void Application::createPlotOneCurve()
 {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	//Single curve
 	DatasetDescription description;
@@ -393,23 +397,25 @@ void Application::createPlotOneCurve()
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_plot_Single";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve");
-	builder.addCurve(std::move(description), curveCfg, "SingleCurve");
+	builder.addCurve(std::move(description), curveCfg, "SingleCurve", temp->getMetadataQuantity());
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
 void Application::createPlotTwoCurves() {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	// First curve
 	DatasetDescription description;
@@ -428,14 +434,15 @@ void Application::createPlotTwoCurves() {
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_plot_Double";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve1");
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 
-	builder.addCurve(std::move(description), curveCfg, "TwoCurves1");
+	builder.addCurve(std::move(description), curveCfg, "TwoCurves1", temp->getMetadataQuantity());
 
 	// Second curve
 	DatasetDescription description2;
@@ -454,15 +461,17 @@ void Application::createPlotTwoCurves() {
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
 
-	description2.setQuantityDescription(quantDesc2.release());
+	auto temp2 = quantDesc2.release();
+	description2.setQuantityDescription(temp2);
 	description2.addParameterDescription(parameterDesc2);
 
 	ot::Plot1DCurveCfg curveCfg2 = EntityResult1DCurve::createDefaultConfig(plotName, "A_Curve2");
 	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
-	builder.addCurve(std::move(description2), curveCfg2, "TwoCurves2");
+	builder.addCurve(std::move(description2), curveCfg2, "TwoCurves2", temp2->getMetadataQuantity());
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -491,7 +500,7 @@ void Application::createFamilyOfCurves()
 {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
@@ -542,10 +551,12 @@ void Application::createFamilyOfCurves()
 	auto stylePainter = rainbowPainterIt.getNextPainter();
 
 	curveCfg.setLinePenPainter(stylePainter.release());
-	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve");
+	
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve", descriptions.front().getQuantityDescription()->getMetadataQuantity());
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -555,7 +566,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 	const std::string collName = getCollectionName();
 
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
@@ -613,11 +624,12 @@ void Application::createFamilyOfCurves3ParameterConst()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3PConst");
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3PConst", descriptions.front().getQuantityDescription()->getMetadataQuantity());
 
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -627,7 +639,7 @@ void Application::createFamilyOfCurves3Parameter()
 	const std::string collName = getCollectionName();
 
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	MetadataParameter parameter;
 	parameter.parameterName = "Frequency";
@@ -683,19 +695,20 @@ void Application::createFamilyOfCurves3Parameter()
 			descriptions.push_back(std::move(description));
 		}
 	}
-	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3P");
+	builder.addCurve(std::move(descriptions), curveCfg, "FamilyOfCurve_3P", descriptions.front().getQuantityDescription()->getMetadataQuantity());
 
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
 void Application::createPlotScatter() {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	//Single curve
 	DatasetDescription description;
@@ -713,23 +726,25 @@ void Application::createPlotScatter() {
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_plot_Scatter";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "ScatterCurve", EntityResult1DCurve::ScatterPlot);
-	builder.addCurve(std::move(description), curveCfg, "Scatter");
+	builder.addCurve(std::move(description), curveCfg, "Scatter", temp->getMetadataQuantity());
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
 void Application::createPlotSinglePoint() {
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	// First curve
 	DatasetDescription description;
@@ -747,14 +762,15 @@ void Application::createPlotSinglePoint() {
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
-	description.setQuantityDescription(quantDesc.release());
+	auto temp = quantDesc.release();
+	description.setQuantityDescription(temp);
 	description.addParameterDescription(parameterDesc);
 
 	const std::string plotName = "Test/A_plot_SingleValue";
 	ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(plotName, "SingleValueCurve1");
 	curveCfg.setLinePenColor(ot::Color(ot::DefaultColor::Blue));
 	
-	builder.addCurve(std::move(description), curveCfg, "SingleValueCurve1");
+	builder.addCurve(std::move(description), curveCfg, "SingleValueCurve1", temp->getMetadataQuantity());
 
 	// Second curve
 	DatasetDescription description2;
@@ -773,17 +789,19 @@ void Application::createPlotSinglePoint() {
 	}
 	std::shared_ptr<ParameterDescription> parameterDesc2(new ParameterDescription(parameter2, false));
 
-	description2.setQuantityDescription(quantDesc2.release());
+	auto temp2 = quantDesc2.release();
+	description2.setQuantityDescription(temp2);
 	description2.addParameterDescription(parameterDesc2);
 
 	ot::Plot1DCurveCfg curveCfg2 = EntityResult1DCurve::createDefaultConfig(plotName, "SingleValueCurve2");
 	curveCfg2.setLinePenColor(ot::Color(ot::DefaultColor::Red));
 
-	builder.addCurve(std::move(description2), curveCfg2, "SingleValueCurve2");
+	builder.addCurve(std::move(description2), curveCfg2, "SingleValueCurve2", temp2->getMetadataQuantity());
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
+	plotCfg.setXAxisParameter(parameter.parameterName);
 	builder.buildPlot(plotCfg);
 }
 
@@ -911,7 +929,7 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 
 	const std::string collName = getCollectionName();
 	ResultCollectionExtender extender(collName, *getModelComponent());
-	PlotBuilder builder(extender);
+	PlotBuilder builder(extender, &Application::instance());
 
 	for (int curveId = 0; curveId < _numberOfCurves; curveId++) {
 		progress.triggerUpdate(static_cast<uint64_t>(curveId));
@@ -933,13 +951,14 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 
 		std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
-		description.setQuantityDescription(quantDesc.release());
+		auto temp = quantDesc.release();
+		description.setQuantityDescription(temp);
 		description.addParameterDescription(parameterDesc);
 
 		ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(_plotName, "/A_Curve" + std::to_string(curveId));
 		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
 
-		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId));
+		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId), temp->getMetadataQuantity());
 	}
 
 	// Here the shared part
@@ -947,6 +966,7 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 	plotCfg.setEntityName(_plotName);
 
 	ot::RuntimeIntervalTest testBuild;
+	plotCfg.setXAxisParameter("Frequency");
 	builder.buildPlot(plotCfg);
 	testBuild.logCurrentInterval("Application::createManyCurvesPlot - Build plot");
 

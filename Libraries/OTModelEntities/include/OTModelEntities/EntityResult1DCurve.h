@@ -93,6 +93,7 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	bool tuplePropertiesAreVisible();
+	void setStaticCurveQueryOptions(const ot::Plot1DCurveCfg& _curve);
 
 protected:
 	//! @brief Updates the property visibilities of the curve properties.

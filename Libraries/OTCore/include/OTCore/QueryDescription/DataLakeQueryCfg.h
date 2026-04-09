@@ -20,6 +20,9 @@ public:
 	const std::string& getSeriesLabel() const { return m_seriesLabel; }
 	const std::string& getCollectionName() const { return m_collectionName; }
 
+	void setParameterOptions(const std::vector<std::string>& _options) { m_parameterOptions = _options; }
+	const std::vector<std::string>& getParameterOptions() const { return m_parameterOptions; }
+
 	// Inherited via Serializable
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const override;
 	void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) override;
@@ -30,4 +33,5 @@ private:
 	ot::ValueComparisonDescription m_valueDescriptionsQuantities;
 	std::list<ot::ValueComparisonDescription> m_valueDescriptionsSeriesMD;
 
+	std::vector <std::string> m_parameterOptions;
 };

@@ -25,7 +25,7 @@
 #include "OTCore/BasicEntityInformation.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 #include "OTGui/Style/PenCfg.h"
-
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 // std header
 #include <string>
 
@@ -170,6 +170,9 @@ namespace ot {
 		void setToolTip(std::string&& _toolTip) { m_toolTip = std::move(_toolTip); };
 		const std::string& getToolTip() const { return m_toolTip; };
 
+		// Set by the curve builder to define which properties need to be set ín the curve entity.
+		void setQueryCfg(DataLakeQueryCfg _queryCfg) { m_queryCfg = _queryCfg; }
+		const DataLakeQueryCfg& getQueryCfg() const { return m_queryCfg; }
 	private:
 		UID m_navigationId;
 
@@ -188,6 +191,7 @@ namespace ot {
 		Painter2D* m_pointFillPainter;
 
 		DataLakeAccessCfg m_dataAccessConfig;
+		DataLakeQueryCfg m_queryCfg;
 
 		std::string m_toolTip;
 	};

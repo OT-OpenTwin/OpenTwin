@@ -22,7 +22,7 @@ std::vector<std::string> ot::TupleDescription::getUnitCombinations(const std::st
 	return m_unitCombinationsByFormatName.find(_formatName) != m_unitCombinationsByFormatName.end() ? m_unitCombinationsByFormatName.at(_formatName) : std::vector<std::string>();
 }
 
-std::string ot::TupleDescription::createCombinedUnitsString(const std::vector<std::string>& _units) const
+std::string ot::TupleDescription::createCombinedUnitsString(const std::vector<std::string>& _units)
 {
 	std::string combinedUnitsString;
 	for(const std::string& unit : _units)

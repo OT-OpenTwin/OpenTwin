@@ -356,12 +356,22 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	bool hasVoltages = false;
 	bool hasCurrents = false;
 
+	std::string voltQuantityName, currentQuantityName;
+
 	for (DatasetDescription& dataDescription : allCurveDescriptions)
 	{
 		std::string fullName = dataDescription.getQuantityDescription()->getName();
 
-		if (fullName[0] == 'V' || fullName[0] == 'v') hasVoltages = true;
-		if (fullName[0] == 'I' || fullName[0] == 'i') hasCurrents = true;
+		if (fullName[0] == 'V' || fullName[0] == 'v')
+		{
+			hasVoltages = true;
+			voltQuantityName = fullName;
+		}
+		if (fullName[0] == 'I' || fullName[0] == 'i') 
+		{
+			hasCurrents = true;
+			currentQuantityName = fullName;
+		}
 
 		if (hasVoltages && hasCurrents) break;
 	}
@@ -372,24 +382,29 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	{
 		EntityResult1DPlot newPlotVoltages(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		newPlotVoltages.setName(plotNameVoltages);
+		newPlotVoltages.createProperties();
 
+		std::string defaultAxis = getDefaultAxisFromData(series, voltQuantityName);
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Voltages");
-		newPlotVoltages.createProperties();
+		plotCfg.setXAxisParameter(defaultAxis);
 		newPlotVoltages.setPlot(plotCfg);
 		newPlotVoltages.storeToDataBase();
-
 		_modelComponent->addNewTopologyEntity(newPlotVoltages.getEntityID(), newPlotVoltages.getEntityStorageVersion(), false);
 	}
 
 	if (hasCurrents)
 	{
+
 		EntityResult1DPlot newPlotCurrents(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		newPlotCurrents.setName(plotNameCurrents);
-
+		newPlotCurrents.createProperties();
+		
+		std::string defaultAxis = getDefaultAxisFromData(series, currentQuantityName);
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Currents");
-		newPlotCurrents.createProperties();
+		plotCfg.setXAxisParameter(defaultAxis);
+
 		newPlotCurrents.setPlot(plotCfg);
 		newPlotCurrents.storeToDataBase();
 
@@ -428,19 +443,18 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 
 				if (createdCurves.count(curveName) == 0)
 				{
-					std::string defaultAxis = getDefaultAxisFromData(series, fullName);
 
 					ot::Plot1DCurveCfg curveConfig;
 
 					auto painter = plotPainter->getNextPainter();
 					curveConfig.setLinePenPainter(painter.release());
 
-					CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
+					CurveFactory::addToConfig(*series, dataDescription.getQuantityDescription()->getMetadataQuantity(),curveConfig, &Application::instance(), &resultCollectionExtender);
 
 					EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 					newCurve.setName(curveName);
 					newCurve.createProperties();
-					newCurve.setCurve(curveConfig);
+					newCurve.setStaticCurveQueryOptions(curveConfig);
 					newCurve.storeToDataBase();
 
 					_modelComponent->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);

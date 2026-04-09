@@ -624,3 +624,161 @@ bool PropertyBundleDataLakeQuery::setTupleSelectionOptions(EntityBase* _thisObje
 	selectionUnits->setNeedsUpdate();
 	return refresh;
 }
+
+
+void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQueryCfg& _config)
+{
+	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+	{
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+		PropertyHelper::setStringPropertyValue("", _thisObject, m_propertyDataType, groupName);
+		PropertyHelper::setStringPropertyValue("", _thisObject, m_propertyUnit, groupName);
+		PropertyHelper::setStringPropertyValue("", _thisObject, m_propertyValue, groupName);
+
+		std::list<std::string> parameterOptions = { _config.getParameterOptions().begin(), _config.getParameterOptions().end() };
+		parameterOptions.push_front("");
+		PropertyHelper::setSelectionPropertyValue(parameterOptions, _thisObject, m_propertyName, groupName);
+		PropertyHelper::setSelectionPropertyValue({ _config.getParameterOptions().begin(), _config.getParameterOptions().end() }, _thisObject, m_propertyName, groupName);
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ "" }, _thisObject, m_propertyComparator, groupName);
+
+		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setVisible(false);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setVisible(false);
+		PropertyHelper::getStringProperty( _thisObject, m_propertyValue, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty( _thisObject, m_propertyComparator, groupName)->setVisible(false);
+	}
+	const std::list<ot::ValueComparisonDescription>& paramComp = _config.getValueDescriptionParameters();
+	assert(static_cast<uint32_t>(paramComp.size()) <= m_maxNbOfQueries);
+	
+	PropertyHelper::setIntegerPropertyValue(static_cast<int32_t>(paramComp.size()), _thisObject, m_propertyNumberOfQueries, m_groupMetadataFilter);
+	auto currentParamComp = paramComp.begin();
+	for (size_t i = 1; i <= paramComp.size(); i++)
+	{
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+		
+		const ot::TupleInstance& tuple = currentParamComp->getTupleInstance();
+		assert(tuple.isSingle()); // parameter are not allowed to be tuple.
+		
+		PropertyHelper::setStringPropertyValue(tuple.getTupleElementDataTypes().front(), _thisObject, m_propertyDataType, groupName);
+		PropertyHelper::setStringPropertyValue(tuple.getTupleUnits().front(), _thisObject, m_propertyUnit, groupName);
+		PropertyHelper::setStringPropertyValue(currentParamComp->getValue(), _thisObject, m_propertyValue, groupName);
+		PropertyHelper::setSelectionPropertyValue(currentParamComp->getName(), _thisObject, m_propertyName, groupName);
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ currentParamComp->getComparator() }, _thisObject, m_propertyComparator, groupName);
+
+		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setVisible(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setVisible(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(true);
+
+		if (currentParamComp != paramComp.end())
+		{
+			currentParamComp++;
+		}
+	}
+
+	ot::ValueComparisonDescription quantityComparison = _config.getValueDescriptionQuantities();
+	const ot::TupleInstance& quantityTuple = 	quantityComparison.getTupleInstance();
+	if (!quantityTuple.isSingle())
+	{
+		// Component, format, units, data type, value, comp, name
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ quantityComparison.getTupleTarget() }, _thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+		const std::string combinedUnit = ot::TupleDescription::createCombinedUnitsString(quantityTuple.getTupleUnits());
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ combinedUnit }, _thisObject, m_propertyTupleUnit, m_groupQuantitySettings);
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ quantityTuple.getTupleFormatName() }, _thisObject, m_propertyTupleFormat, m_groupQuantitySettings);
+
+
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings)->setVisible(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings)->setVisible(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->setVisible(true);
+		PropertyHelper::getStringProperty( _thisObject, m_propertyUnit, m_groupQuantitySettings)->setVisible(false);
+	}
+	else
+	{
+		PropertyHelper::setStringPropertyValue(quantityTuple.getTupleUnits().front(), _thisObject, m_propertyUnit, m_groupQuantitySettings);
+		
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->setVisible(false);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, m_groupQuantitySettings)->setVisible(true);
+	}
+	PropertyHelper::setStringPropertyValue(quantityTuple.getTupleTypeName(), _thisObject, m_propertyDataType, m_groupQuantitySettings);
+	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ quantityComparison.getName() }, _thisObject, m_propertyName, m_groupQuantitySettings);
+	PropertyHelper::setStringPropertyValue(quantityComparison.getValue(), _thisObject, m_propertyValue, m_groupQuantitySettings);
+	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{quantityComparison.getComparator()}, _thisObject, m_propertyComparator, m_groupQuantitySettings);
+	
+	PropertyHelper::setProjectPropertyValue(_config.getCollectionName(), _thisObject, m_propertyNameProjectName, m_groupMetadataFilter);
+	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ _config.getSeriesLabel() }, _thisObject, m_propertyNameSeriesMetadata, m_groupMetadataFilter);
+
+	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+		
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ "" }, _thisObject, m_propertyName, groupName);
+		PropertyHelper::setStringPropertyValue("",_thisObject, m_propertyValue, groupName);
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ "" }, _thisObject, m_propertyComparator, groupName);
+
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(false);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(false);
+	}
+
+	std::list<ot::ValueComparisonDescription> metadataComp = _config.getValueDescriptionSeriesMD();
+	PropertyHelper::setIntegerPropertyValue(static_cast<int32_t>(metadataComp.size()), _thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter);
+	auto currentMetadataComp = metadataComp.begin();
+	for (size_t i = 1; i <= metadataComp.size(); i++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ currentMetadataComp->getName() }, _thisObject, m_propertyName, groupName);
+		PropertyHelper::setStringPropertyValue(currentMetadataComp->getValue(), _thisObject, m_propertyValue, groupName);
+		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ currentMetadataComp->getComparator() }, _thisObject, m_propertyComparator, groupName);
+
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(true);
+
+		if (currentMetadataComp != metadataComp.end())
+		{
+			currentMetadataComp++;
+		}
+	}
+
+}
+
+
+void PropertyBundleDataLakeQuery::lockAllProperties(EntityBase* _thisObject)
+{
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getStringProperty(_thisObject, m_propertyValue, m_groupQuantitySettings)->setReadOnly(true);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, m_groupQuantitySettings)->setReadOnly(true);
+
+	PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName, m_groupMetadataFilter)->setReadOnly(true);
+	PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameSeriesMetadata, m_groupMetadataFilter)->setReadOnly(true);
+	PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter)->setReadOnly(true);
+	PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueries, m_groupMetadataFilter)->setReadOnly(true);
+
+	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setReadOnly(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setReadOnly(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
+	}
+
+	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+	{
+		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+		
+		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setReadOnly(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setReadOnly(true);
+		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setReadOnly(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setReadOnly(true);
+		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
+	}
+}

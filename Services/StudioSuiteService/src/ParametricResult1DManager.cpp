@@ -175,9 +175,11 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			const std::string shortName = plotName.substr(plotName.find_last_of("/") + 1);
 			plotCfg.setTitle(shortName);
 			newPlot.createProperties();
-			newPlot.setPlot(plotCfg);
-			newPlot.storeToDataBase();
 
+			std::string defaultAxis = getDefaultAxisFromData(series, fullName);
+			plotCfg.setXAxisParameter(defaultAxis);
+			newPlot.setStaticCurveQueryOptions(plotCfg);
+			newPlot.storeToDataBase(); // Check ob das schon so war
 			m_application->getModelComponent()->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
 
 			createdPlots.emplace(plotName);
@@ -216,18 +218,17 @@ void ParametricResult1DManager::storeDataInResultCollection()
 			if (createdCurves.count(curveName) == 0)
 			{
 				std::string defaultAxis = getDefaultAxisFromData(series, fullName);
-
+				
 				ot::Plot1DCurveCfg curveConfig;
 
 				auto painter = plotPainters[plotName].getNextPainter();
 				curveConfig.setLinePenPainter(painter.release());
 
-				CurveFactory::addToConfig(*series, curveConfig, fullName, "", defaultAxis);
-
+				CurveFactory::addToConfig(*series, dataDescription.getQuantityDescription()->getMetadataQuantity(),curveConfig, &Application::instance(), &resultCollectionExtender);
 				EntityResult1DCurve newCurve(m_application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 				newCurve.setName(curveName);
 				newCurve.createProperties();
-				newCurve.setCurve(curveConfig);
+				newCurve.setStaticCurveQueryOptions(curveConfig);
 				newCurve.storeToDataBase();
 
 				m_application->getModelComponent()->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);

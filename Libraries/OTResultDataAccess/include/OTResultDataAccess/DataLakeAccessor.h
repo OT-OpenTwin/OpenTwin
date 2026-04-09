@@ -17,7 +17,10 @@ class OT_RESULTDATAACCESS_API_EXPORT DataLakeAccessor
 {
 public:
 	DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase);
+	~DataLakeAccessor();
 	void accessPartition(const std::string& _collectionName);
+	
+	void accessPartition(ResultCollectionMetadataAccess* _resultCollectionMetadataAccess);
 	void createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel);
 	void createQueryDescriptionsParameter(const std::list<ot::ValueComparisonDescription>& _valueComparisons);
 	void createQueryDescriptionQuantity(const ot::ValueComparisonDescription& _valueComparisons);
@@ -34,13 +37,14 @@ private:
 	std::map<std::string, std::list<ot::ValueProcessing>> m_inverseQuantityTransformationsByFieldKey;
 
 	ot::ApplicationBase* m_applicationBase = nullptr;
+	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
+	bool owning = false;
 
 	std::string m_collectionName;
 	const std::string m_transformedCollectionEnding = ".transformed";
 	const std::string m_resultCollectionEnding = ".results";
 	const std::string m_resultDataField = "Data";
 	
-	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
 
 	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
 

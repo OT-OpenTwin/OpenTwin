@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyHelper.h
 // 
 // License:
@@ -89,6 +89,7 @@ public:
 	OT_DECL_NODISCARD static void setStringPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setSelectionPropertyValue(const std::string& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setSelectionPropertyValue(const std::list<std::string>& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
+	OT_DECL_NODISCARD static void setSelectionPropertyValue(std::list<std::string>&& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setColourPropertyValue(const ot::Color& _value, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");
 	OT_DECL_NODISCARD static void setPainterPropertyValue(const ot::Painter2D* _painter, EntityBase* _base, const std::string& _name, const std::string& _groupName = "");

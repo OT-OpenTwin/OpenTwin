@@ -297,8 +297,8 @@ bool BlockHandlerStorage::executeSpecialized()
 				ot::Plot1DCurveCfg curveConfig;
 				auto painter = colourIt.getNextPainter();
 				curveConfig.setLinePenPainter(painter.release());
-				CurveFactory::addToConfig(*series, curveConfig);
-
+				//CurveFactory::addToConfig(*series, curveConfig,&Application::instance(), );
+				assert(false); // ToDo
 				EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 				newCurve.registerCallbacks(
 					ot::EntityCallbackBase::Callback::Properties |

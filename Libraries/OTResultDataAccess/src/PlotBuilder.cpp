@@ -30,19 +30,19 @@
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
-PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender)
-	:m_extender(_extender)
+PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, ot::ApplicationBase* _appBase)
+	:m_extender(_extender) , m_appBase(_appBase)
 {}
 
-void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+void PlotBuilder::addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity)
 {
 	std::list<DatasetDescription> datasets;
 	datasets.push_back(std::move(_dataSetDescription));
-	addCurve(std::move(datasets), _config, _seriesName);
+	addCurve(std::move(datasets), _config, _seriesName, _yAxisQuantity);
 }
 
 
-void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity)
 {
 	const bool valid = validityCheck(_dataSetDescriptions, _config);
 	assert(valid);
@@ -52,7 +52,7 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	}
 
 
-	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName);
+	storeCurve(std::move(_dataSetDescriptions), _config, ot::FolderNames::DatasetFolder + "/" + _seriesName, _yAxisQuantity);
 
 	ot::UID uid = EntityBase::getUidGenerator()->getUID();
 	EntityResult1DCurve curveEntity(uid, nullptr, nullptr, nullptr);
@@ -61,8 +61,8 @@ void PlotBuilder::addCurve(std::list<DatasetDescription>&& _dataSetDescriptions,
 	curveEntity.setName(_config.getEntityName());
 	curveEntity.createProperties();
 
-	
-	curveEntity.setCurve(_config);
+	curveEntity.setStaticCurveQueryOptions(_config);
+
 	curveEntity.setTreeItemEditable(true);
 	m_curves.push_back(std::move(curveEntity));
 }
@@ -116,7 +116,7 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 }
 
 
-void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName)
+void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity)
 { 
 	ot::UID seriesID = m_extender.buildSeriesMetadata(_dataSetDescriptions, _seriesName);
 	for (auto& dataset : _dataSetDescriptions)
@@ -125,7 +125,7 @@ void PlotBuilder::storeCurve(std::list<DatasetDescription>&& _dataSetDescription
 	}
 	
 	const MetadataSeries* series =	m_extender.findMetadataSeries(seriesID);
-	CurveFactory::addToConfig(*series, _config);
+	CurveFactory::addToConfig(*series, _yAxisQuantity, _config, m_appBase, &m_extender);
 }
 
 void PlotBuilder::clearBuffer()
@@ -155,7 +155,7 @@ void PlotBuilder::createPlot(ot::Plot1DCfg& _plotCfg)
 	m_quantityLabel.sort();
 	m_quantityLabel.unique();
 	plotEntity.createProperties();
-	plotEntity.setPlot(_plotCfg);
+	plotEntity.setStaticCurveQueryOptions(_plotCfg);
 	plotEntity.setTreeItemEditable(true);
 	plotEntity.storeToDataBase();
 	m_newModelStateInformation.addTopologyEntity(plotEntity);

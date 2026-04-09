@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyHelper.cpp
 // 
 // License:
@@ -185,6 +185,11 @@ void PropertyHelper::setSelectionPropertyValue(const std::string& _value, Entity
 void PropertyHelper::setSelectionPropertyValue(const std::list<std::string>& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
 	EntityPropertiesSelection* selectionProperty = getSelectionProperty(_base, _name, _groupName);
 	selectionProperty->resetOptions(_values);
+}
+
+void PropertyHelper::setSelectionPropertyValue(std::list<std::string>&& _values, EntityBase* _base, const std::string& _name, const std::string& _groupName) {
+	EntityPropertiesSelection* selectionProperty = getSelectionProperty(_base, _name, _groupName);
+	selectionProperty->resetOptions(std::move(_values));
 }
 
 void PropertyHelper::setBoolPropertyValue(bool _value, EntityBase* _base, const std::string& _name, const std::string& _groupName) {

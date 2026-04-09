@@ -210,9 +210,15 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 	std::vector<std::string> queryQuantityList(queryQuantities.begin(), queryQuantities.end());
 
 	auto parameterSelection = PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName());
+	const std::string currentSelection = parameterSelection->getValue();
 	if (parameterSelection  != nullptr && parameterSelection->getOptions() != queryParameterList)
 	{
 		parameterSelection->resetOptions(queryParameterList);
+		const auto& temp = parameterSelection->getOptions();
+		if (std::find(temp.begin(), temp.end(), currentSelection) != temp.end())
+		{
+			parameterSelection->setValue(currentSelection);
+		}
 	}	
 	
 	EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
@@ -360,7 +366,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 		setAxisFromProperties(getXAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getYAxisPropertyGroupName(), yAxisCfg);
 		const std::string yAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getYAxisPropertyGroupName());
-		yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
+		if (!yAxisComponent.empty())
+		{
+			yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
+		}
 		xAxisCfg.setQuantity(ot::Plot1DAxisCfg::AxisQuantity::XData);
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
@@ -582,9 +591,58 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
+	PropertyHelper::setSelectionPropertyValue(_config.getXAxisParameter(), this, "Parameter", getXAxisPropertyGroupName());
+
 	updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 }
 
+void EntityResult1DPlot::setStaticCurveQueryOptions(const ot::Plot1DCfg& _config)
+{
+	std::string xAxisPropGroup;
+	std::string yAxisPropGroup;
 
+	switch (getPlotType())
+	{
+	case ot::Plot1DCfg::Cartesian:
+		xAxisPropGroup = getXAxisPropertyGroupName();
+		yAxisPropGroup = getYAxisPropertyGroupName();
+		break;
+
+	case ot::Plot1DCfg::Polar:
+		xAxisPropGroup = getRadiusAxisPropertyGroupName();
+		yAxisPropGroup = getAzimuthAxisPropertyGroupName();
+		break;
+
+	default:
+		OT_LOG_E("Unknown plot type (" + std::to_string(static_cast<int>(getPlotType())) + ")");
+		break;
+	}
+
+	PropertyHelper::setPainterPropertyValue(_config.getGridColor(), this, "Grid color");
+	PropertyHelper::setSelectionPropertyValue(ot::Plot1DCfg::toString(_config.getPlotType()), this, "Plot type");
+
+	PropertyHelper::setBoolPropertyValue(_config.getGridVisible(), this, "Grid");
+	PropertyHelper::setBoolPropertyValue(_config.getLegendVisible(), this, "Legend");
+	PropertyHelper::setDoublePropertyValue(_config.getPolarDegreeOrigin(), this, "Origin", "General");
+
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsLogScale(), this, "Logscale", xAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", xAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", xAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", xAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", xAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getXAxisLabelAutoDetermine(), this, "Automatic label", xAxisPropGroup);
+
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", yAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", yAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", yAxisPropGroup);
+	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", yAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
+	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
+
+	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{_config.getXAxisParameter()}, this, "Parameter", getXAxisPropertyGroupName());
+	
+	updatePropertyVisibilities();
+	getProperties().forceResetUpdateForAllProperties();
+}
 

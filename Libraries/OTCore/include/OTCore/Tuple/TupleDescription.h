@@ -32,7 +32,7 @@ namespace ot {
 		std::vector<std::string> getUnitCombinations(const std::string& _formatName) const;
 		const std::vector<std::string>& getAllTupleFormatNames() const { return m_tupleFormatNames; }
 
-		std::string createCombinedUnitsString(const std::vector<std::string>& _units) const;
+		static std::string createCombinedUnitsString(const std::vector<std::string>& _units) ;
 		static std::vector<std::string> separateCombinedUnitString(const std::string& _combinedUnitString);
 	private:
 

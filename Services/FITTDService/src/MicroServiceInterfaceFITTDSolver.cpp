@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MicroServiceInterfaceFITTDSolver.cpp
 // 
 // License:
@@ -569,7 +569,7 @@ void MicroServiceInterfaceFITTDSolver::HandleResultPipelines()
 		ot::EntityCallbackBase::Callback::DataNotify,
 		Application::instance().getServiceName()
 	);
-	PlotBuilder plotBuilder(resultCollectionExtender);
+	PlotBuilder plotBuilder(resultCollectionExtender, &Application::instance());
 
 	for (auto pipeLine : pipelines)
 	{
@@ -628,11 +628,12 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkScala
 		quantDesc->addDatapoint(ot::Variable(resultVector[i]));
 	}
 
-	dataset.setQuantityDescription(quantDesc.release());
 
 	ot::Plot1DCurveCfg curveConfig;
-	_plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel());
+	auto temp = quantDesc.release();
+	dataset.setQuantityDescription(temp);
 
+	_plotBuilder.addCurve(std::move(dataset), curveConfig, pipeline->GetResultLegendLabel(),temp->getMetadataQuantity());
 	ot::Plot1DCfg plotCfg;
 	std::string plotName = pipeline->GetResultName() + "/Plot";
 	if (!pipeline->GetResultTitle().empty())
@@ -701,10 +702,11 @@ void MicroServiceInterfaceFITTDSolver::HandleTimelinePlots(const ResultSinkVecto
 			quantDesc->addDatapoint(ot::Variable(resultVector[i]));
 		}
 
-		dataset.setQuantityDescription(quantDesc.release());
+		auto temp =	quantDesc.release();
+		dataset.setQuantityDescription(temp);
 		ot::Plot1DCurveCfg curveConfig;
 		curveConfig.setLinePenPainter(painter.release());
-		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName);
+		_plotBuilder.addCurve(std::move(dataset), curveConfig, curveName,temp->getMetadataQuantity());
 	}
 	
 	ot::Plot1DCfg plotCfg;

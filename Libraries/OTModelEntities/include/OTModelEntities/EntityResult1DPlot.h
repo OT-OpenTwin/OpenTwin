@@ -31,6 +31,10 @@ class __declspec(dllexport) EntityResult1DPlot: public EntityContainer, public o
 public:
 	EntityResult1DPlot() : EntityResult1DPlot(0, nullptr, nullptr, nullptr) {};
 	EntityResult1DPlot(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
+	EntityResult1DPlot(const EntityResult1DPlot& _other) = default;
+	EntityResult1DPlot(EntityResult1DPlot&& _other) = default;
+	EntityResult1DPlot& operator=(const EntityResult1DPlot& _other) = default;
+	EntityResult1DPlot& operator=(EntityResult1DPlot&& _other) = default;
 
 	bool getEntityBox(double& _xmin, double& _xmax, double& _ymin, double& _ymax, double& _zmin, double& _zmax) override { return false; };
 	entityType getEntityType() const override { return entityType::TOPOLOGY; };
@@ -55,6 +59,7 @@ public:
 	// Inherited via IVisualisationPlot1D
 	const ot::Plot1DCfg getPlot() override;
 	void setPlot(const ot::Plot1DCfg& _config) override;
+	void setStaticCurveQueryOptions(const ot::Plot1DCfg& _config);
 
 	bool visualisePlot() override;
 

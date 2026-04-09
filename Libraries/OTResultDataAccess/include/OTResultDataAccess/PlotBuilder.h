@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotBuilder.h
 // 
 // License:
@@ -26,21 +26,21 @@
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-
+#include "OTServiceFoundation/ApplicationBase.h"
 // std header
 #include <string>
 
 class OT_RESULTDATAACCESS_API_EXPORT PlotBuilder
 {
 public:
-	PlotBuilder(ResultCollectionExtender& _extender);
+	PlotBuilder(ResultCollectionExtender& _extender, ot::ApplicationBase* _appBase);
 	//! @brief Creating a series metadata entity.
 	//! The datapoints are directly stored in the result database. 
 	//! Modelstate is created when the final plot is build
 	//! @param _dataSetDescription 
 	//! @param _config Curve title is used for entity name and added at the back of the plot entity name
 	//! @param _seriesName Name of the created series metadata entity. The the dataset folder name is automatically added in front of the series name.
-	void addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	void addCurve(DatasetDescription&& _dataSetDescription, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity);
 	
 	//! @brief Creating one series metadata entity for all dataset descriptions. 
 	//! The datapoints are directly stored in the result database, curve entity is directly stored as well. 
@@ -48,7 +48,7 @@ public:
 	//! @param _dataSetDescriptions 
 	//! @param _config Curve title is used for entity name and added at the back of the plot entity name
 	//! @param _seriesName Name of the created series metadata entity. The the dataset folder name is automatically added in front of the series name.
-	void addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	void addCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity);
 	
 	//! @brief Final method. All added curves and the plot are stored and added to the model state.
 	//! @param _plotCfg Needs entity name to be set.
@@ -60,13 +60,14 @@ public:
 private:
 	ot::NewModelStateInfo m_newModelStateInformation;
 	ResultCollectionExtender& m_extender;
+	ot::ApplicationBase* m_appBase = nullptr;
 	std::list<std::string> m_parameterLabels;
 	std::list<std::string> m_quantityLabel;
 	std::list<EntityResult1DCurve> m_curves;
 
 	bool validityCheck(std::list<DatasetDescription>& _dataSetDescriptions, ot::Plot1DCurveCfg& _config);
 
-	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName);
+	void storeCurve(std::list<DatasetDescription>&& _dataSetDescriptions, ot::Plot1DCurveCfg& _config, const std::string& _seriesName, MetadataQuantity& _yAxisQuantity);
 	
 	void clearBuffer();
 
