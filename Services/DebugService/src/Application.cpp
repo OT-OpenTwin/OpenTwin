@@ -299,7 +299,8 @@ void Application::createPlotOneComplexCurveMagPhase()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(ot::ComplexNumbers::getComponentMagnitude()));
 	builder.buildPlot(plotCfg);
 }
 
@@ -369,7 +370,8 @@ void Application::createPlotOneComplexCurveRealImag()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(ot::ComplexNumbers::getComponentMagnitude()));
 	builder.buildPlot(plotCfg);
 }
 
