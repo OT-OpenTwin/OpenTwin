@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityResultCartesianMeshVtk.cpp
+// File: EntityResultVtkComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,21 +18,21 @@
 // @otlicense-end
 
 #pragma once
-#include "OTModelEntities/EntityResultCartesianMeshVtk.h"
+#include "OTModelEntities/EntityResultVtkComplex.h"
 #include "OTModelEntities/DataBase.h"
 
-static EntityFactoryRegistrar<EntityResultCartesianMeshVtk> registrar("EntityResultCartesianMeshVtk");
+static EntityFactoryRegistrar<EntityResultVtkComplex> registrar("EntityResultVtkComplex");
 
-EntityResultCartesianMeshVtk::EntityResultCartesianMeshVtk(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+EntityResultVtkComplex::EntityResultVtkComplex(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBase(ID, parent, obs, ms)
 {}
 
-EntityResultCartesianMeshVtk::~EntityResultCartesianMeshVtk()
+EntityResultVtkComplex::~EntityResultVtkComplex()
 {
 	clearAllBinaryData();
 }
 
-void EntityResultCartesianMeshVtk::clearAllBinaryData()
+void EntityResultVtkComplex::clearAllBinaryData()
 {
 	if (_vtkDataAbs != nullptr)
 	{
@@ -47,12 +47,12 @@ void EntityResultCartesianMeshVtk::clearAllBinaryData()
 	}
 }
 
-bool EntityResultCartesianMeshVtk::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
+bool EntityResultVtkComplex::getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax)
 {
 	return false;
 }
 
-void EntityResultCartesianMeshVtk::setComplexData(const std::string& quantityName, eQuantityType quantityType, EntityBinaryData*& dataAbs, EntityBinaryData*& dataArg)
+void EntityResultVtkComplex::setComplexData(const std::string& quantityName, eQuantityType quantityType, EntityBinaryData*& dataAbs, EntityBinaryData*& dataArg)
 {
 	clearAllBinaryData();
 
@@ -72,7 +72,7 @@ void EntityResultCartesianMeshVtk::setComplexData(const std::string& quantityNam
 	dataArg = nullptr;
 }
 
-void EntityResultCartesianMeshVtk::getComplexData(std::string &quantityName, eQuantityType& quantityType, std::vector<char> &dataAbs, std::vector<char>& dataArg)
+void EntityResultVtkComplex::getComplexData(std::string &quantityName, eQuantityType& quantityType, std::vector<char> &dataAbs, std::vector<char>& dataArg)
 {
 	quantityName.clear();
 
@@ -101,7 +101,7 @@ void EntityResultCartesianMeshVtk::getComplexData(std::string &quantityName, eQu
 	dataArg      = _vtkDataArg->getData();
 }
 
-void EntityResultCartesianMeshVtk::addStorageData(bsoncxx::builder::basic::document & storage)
+void EntityResultVtkComplex::addStorageData(bsoncxx::builder::basic::document & storage)
 {
 	EntityBase::addStorageData(storage);
 
@@ -129,7 +129,7 @@ void EntityResultCartesianMeshVtk::addStorageData(bsoncxx::builder::basic::docum
 	);
 }
 
-void EntityResultCartesianMeshVtk::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityResultVtkComplex::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 

@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityResultCartesianMeshVtk.h
+// File: EntityResultVtkComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -26,18 +26,18 @@
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/EntityBinaryData.h"
 
-class __declspec(dllexport) EntityResultCartesianMeshVtk : public EntityBase, public EntityResultBase
+class __declspec(dllexport) EntityResultVtkComplex : public EntityBase, public EntityResultBase
 {
 public:
 	enum eQuantityType {VECTOR_COMPLEX_MAG_PHASE};
 
-	EntityResultCartesianMeshVtk() : EntityResultCartesianMeshVtk(0, nullptr, nullptr, nullptr) {};
-	EntityResultCartesianMeshVtk(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
-	virtual ~EntityResultCartesianMeshVtk();
+	EntityResultVtkComplex() : EntityResultVtkComplex(0, nullptr, nullptr, nullptr) {};
+	EntityResultVtkComplex(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
+	virtual ~EntityResultVtkComplex();
 	
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
 	
-	virtual std::string getClassName(void) const override { return "EntityResultCartesianMeshVtk"; };
+	virtual std::string getClassName(void) const override { return "EntityResultVtkComplex"; };
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 

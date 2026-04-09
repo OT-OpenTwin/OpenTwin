@@ -1,5 +1,5 @@
 // @otlicense
-// File: PropertyBundleVisCartesianVectorVolume.h
+// File: PropertyBundleVisVtkVectorVolumeComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -22,7 +22,7 @@
 
 #include "OTModelEntities/PropertiesVisCartesianVector.h"
 
-class __declspec(dllexport) PropertyBundleVisCartesianVectorVolume : public PropertyBundle
+class __declspec(dllexport) PropertyBundleVisVtkVectorVolumeComplex : public PropertyBundle
 {
 public:
 	virtual void setProperties(EntityBase * _thisObject) override;

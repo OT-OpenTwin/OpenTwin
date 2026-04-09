@@ -1,5 +1,5 @@
 // @otlicense
-// File: VtkDriverCartesianVectorVolume.h
+// File: VtkDriverVectorVolumeComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -26,7 +26,7 @@
 #include "OTModelEntities/PropertyBundleDataHandlePlane.h"
 #include "OTModelEntities/PropertyBundleDataHandleScaling.h"
 #include "OTModelEntities/PropertyBundleDataHandleVisCartesianVector.h"
-#include "DataSourceCartesianMesh.h"
+#include "DataSourceVtkComplex.h"
 
 #include <string>
 #include <ctime>
@@ -39,10 +39,10 @@ namespace osg {
 	class Node;
 }
 
-class VtkDriverCartesianVectorVolume : public VtkDriverWithScaling {
+class VtkDriverVectorVolumeComplex : public VtkDriverWithScaling {
 public:
-	VtkDriverCartesianVectorVolume();
-	virtual ~VtkDriverCartesianVectorVolume();
+	VtkDriverVectorVolumeComplex();
+	virtual ~VtkDriverVectorVolumeComplex();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) override;
 	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
@@ -63,7 +63,7 @@ private:
 	void CheckForModelUpdates();
 	virtual void DeletePropertyData(void) override;
 
-	DataSourceCartesianMesh* dataSource;
+	DataSourceVtkComplex* dataSource;
 	vtkAlgorithmOutput* dataConnection;
 
 	std::list<vtkObject*> objectsToDelete;

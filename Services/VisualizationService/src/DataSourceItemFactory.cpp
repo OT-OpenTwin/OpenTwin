@@ -25,7 +25,7 @@
 #include "DataSourceCartesianVector.h"
 #include "DataSourceResult3D.h"
 #include "DataSourceUnstructuredMesh.h"
-#include "DataSourceCartesianMesh.h"
+#include "DataSourceVtkComplex.h"
 #include "OTCore/Logging/Logger.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
@@ -46,9 +46,9 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	{
 		return new DataSourceUnstructuredMesh;
 	}
-	else if (resultEntity->getClassName() == "EntityResultCartesianMeshVtk")
+	else if (resultEntity->getClassName() == "EntityResultVtkComplex")
 	{
-		return new DataSourceCartesianMesh;
+		return new DataSourceVtkComplex;
 	}
 	else
 	{

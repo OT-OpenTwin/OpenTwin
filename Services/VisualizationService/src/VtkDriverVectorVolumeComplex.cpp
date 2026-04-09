@@ -1,5 +1,5 @@
 // @otlicense
-// File: VtkDriverCartesianVectorVolume.cpp
+// File: VtkDriverVectorVolumeComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "VtkDriverCartesianVectorVolume.h"
+#include "VtkDriverVectorVolumeComplex.h"
 #include "DataSourceManager.h"
 #include "DataSourceManagerItem.h"
 #include "DataSourceUnstructuredMesh.h"
@@ -81,14 +81,14 @@
 #include <vtkMergeArrays.h>
 #include <vtkArrayCalculator.h>
 
-VtkDriverCartesianVectorVolume::VtkDriverCartesianVectorVolume() : dataSource(nullptr), dataConnection(nullptr) {}
+VtkDriverVectorVolumeComplex::VtkDriverVectorVolumeComplex() : dataSource(nullptr), dataConnection(nullptr) {}
 
-VtkDriverCartesianVectorVolume::~VtkDriverCartesianVectorVolume() 
+VtkDriverVectorVolumeComplex::~VtkDriverVectorVolumeComplex() 
 {
 	DeletePropertyData();
 }
 
-void VtkDriverCartesianVectorVolume::CheckForModelUpdates()
+void VtkDriverVectorVolumeComplex::CheckForModelUpdates()
 {
 	if (scalarRange == nullptr) return;
 
@@ -104,7 +104,7 @@ void VtkDriverCartesianVectorVolume::CheckForModelUpdates()
 	}
 }
 
-void VtkDriverCartesianVectorVolume::DeletePropertyData(void)
+void VtkDriverVectorVolumeComplex::DeletePropertyData(void)
 {
 	VtkDriverWithScaling::DeletePropertyData();
 
@@ -121,7 +121,7 @@ void VtkDriverCartesianVectorVolume::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
+std::string VtkDriverVectorVolumeComplex::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
 {
 	objectsToDelete.clear();
 
@@ -133,7 +133,7 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 
 	osg::Node *node = new osg::Switch;
 	
-	dataSource = dynamic_cast<DataSourceCartesianMesh*>(dataItem);
+	dataSource = dynamic_cast<DataSourceVtkComplex*>(dataItem);
 
 	if (dataSource != nullptr)
 	{
@@ -191,7 +191,7 @@ std::string VtkDriverCartesianVectorVolume::buildSceneNode(DataSourceManagerItem
 	return dataOut.str();
 }
 
-void VtkDriverCartesianVectorVolume::prepareComplexData()
+void VtkDriverVectorVolumeComplex::prepareComplexData()
 {
 	// First, set correct names for the input data arrays (magnitude and phase)
 	auto magGrid = dataSource->GetVtkGridAbs();
@@ -307,7 +307,7 @@ void VtkDriverCartesianVectorVolume::prepareComplexData()
 	dataConnection = calcFilter->GetOutputPort();
 }
 
-vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::ApplyCutplane(osg::Node * parent)
+vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::ApplyCutplane(osg::Node * parent)
 {	
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
@@ -393,7 +393,7 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::ApplyCutplane(osg::Node * p
 	return planeCut->GetOutputPort();
 }
 
-vtkAlgorithmOutput* VtkDriverCartesianVectorVolume::GetArrowSource(void)
+vtkAlgorithmOutput* VtkDriverVectorVolumeComplex::GetArrowSource(void)
 {
 	if (visData->GetSelectedArrowType() == PropertiesVisCartesianVector::VisualizationArrowType::ARROW_FLAT)
 	{
@@ -436,7 +436,7 @@ vtkAlgorithmOutput* VtkDriverCartesianVectorVolume::GetArrowSource(void)
 	return nullptr;
 }
 
-void VtkDriverCartesianVectorVolume::Assemble3DNode(osg::Node* parent)
+void VtkDriverVectorVolumeComplex::Assemble3DNode(osg::Node* parent)
 {
 	vtkAlgorithmOutput* data = SetScalarValues();
 
@@ -445,7 +445,7 @@ void VtkDriverCartesianVectorVolume::Assemble3DNode(osg::Node* parent)
 	AddNodeVectors(data, parent);
 }
 
-void VtkDriverCartesianVectorVolume::Assemble2DNode(osg::Node *parent)
+void VtkDriverVectorVolumeComplex::Assemble2DNode(osg::Node *parent)
 {
 	dataConnection = ApplyCutplane(parent);
 
@@ -525,7 +525,7 @@ void VtkDriverCartesianVectorVolume::Assemble2DNode(osg::Node *parent)
 	}
 }
 
-vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::SetScalarValues()
+vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::SetScalarValues()
 {
 	if (   visData->GetSelectedVisType() != PropertiesVisCartesianVector::VisualizationType::Contour2D
 		|| visData->GetSelectedVisComp() == PropertiesVisCartesianVector::VisualizationComponent::Abs)
@@ -575,7 +575,7 @@ vtkAlgorithmOutput * VtkDriverCartesianVectorVolume::SetScalarValues()
 	return nullptr;
 }
 
-void VtkDriverCartesianVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, osg::Node* parent)
+void VtkDriverVectorVolumeComplex::AddNodeVectors(vtkAlgorithmOutput *input, osg::Node* parent)
 {
 	vtkNew<vtkMaskPoints> downSampling;
 	downSampling->SetInputConnection(input);
@@ -659,7 +659,7 @@ void VtkDriverCartesianVectorVolume::AddNodeVectors(vtkAlgorithmOutput *input, o
 	dynamic_cast<osg::Switch*>(parent)->addChild(cutNode);
 }
 
-void VtkDriverCartesianVectorVolume::setProperties(EntityVis2D3D *visEntity) 
+void VtkDriverVectorVolumeComplex::setProperties(EntityVis2D3D *visEntity) 
 {
 	DeletePropertyData();
 	VtkDriverWithScaling::setProperties(visEntity);

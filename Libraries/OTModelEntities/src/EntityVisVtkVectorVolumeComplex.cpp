@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityVisCartesianVectorVolume.cpp
+// File: EntityVisVtkVectorVolumeComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,32 +18,32 @@
 // @otlicense-end
 
 #include "OTModelEntities/Database.h"
-#include "OTModelEntities/EntityVisCartesianVectorVolume.h"
+#include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
 
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
-static EntityFactoryRegistrar<EntityVisCartesianVectorVolume> registrar("EntityVisCartesianVectorVolume");
+static EntityFactoryRegistrar<EntityVisVtkVectorVolumeComplex> registrar("EntityVisVtkVectorVolumeComplex");
 
-EntityVisCartesianVectorVolume::EntityVisCartesianVectorVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
+EntityVisVtkVectorVolumeComplex::EntityVisVtkVectorVolumeComplex(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
 	EntityVis2D3D(ID, parent, obs, ms)
 {
 }
 
-EntityVisCartesianVectorVolume::~EntityVisCartesianVectorVolume()
+EntityVisVtkVectorVolumeComplex::~EntityVisVtkVectorVolumeComplex()
 {
 
 }
 
-void EntityVisCartesianVectorVolume::addStorageData(bsoncxx::builder::basic::document& storage)
+void EntityVisVtkVectorVolumeComplex::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	// We store the parent class information first 
 	EntityVis2D3D::addStorageData(storage);
 
 }
 
-void EntityVisCartesianVectorVolume::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityVisVtkVectorVolumeComplex::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	// We read the parent class information first 
 	EntityVis2D3D::readSpecificDataFromDataBase(doc_view, entityMap);
@@ -53,7 +53,7 @@ void EntityVisCartesianVectorVolume::readSpecificDataFromDataBase(const bsoncxx:
 	resetModified();
 }
 
-void EntityVisCartesianVectorVolume::createProperties(void)
+void EntityVisVtkVectorVolumeComplex::createProperties(void)
 {
 	assert(resultType != EntityResultBase::UNKNOWN);
 
@@ -66,7 +66,7 @@ void EntityVisCartesianVectorVolume::createProperties(void)
 	getProperties().forceResetUpdateForAllProperties();
 }
 
-bool EntityVisCartesianVectorVolume::updatePropertyVisibilities(void)
+bool EntityVisVtkVectorVolumeComplex::updatePropertyVisibilities(void)
 {
 	bool updatePropertiesGrid = false;
 	bool is2dType = false;
@@ -88,7 +88,7 @@ bool EntityVisCartesianVectorVolume::updatePropertyVisibilities(void)
 }
 
 
-bool EntityVisCartesianVectorVolume::updateFromProperties(void)
+bool EntityVisVtkVectorVolumeComplex::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());

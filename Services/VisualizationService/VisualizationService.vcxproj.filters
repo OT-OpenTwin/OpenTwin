@@ -78,10 +78,10 @@
     <ClCompile Include="src\VtkDriverWithScaling.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\VtkDriverCartesianVectorVolume.cpp">
+    <ClCompile Include="src\VtkDriverVectorVolumeComplex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\DataSourceCartesianMesh.cpp">
+    <ClCompile Include="src\DataSourceVtkComplex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -149,10 +149,10 @@
     <ClInclude Include="include\VtkDriverWithScaling.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\VtkDriverCartesianVectorVolume.h">
+    <ClInclude Include="include\VtkDriverVectorVolumeComplex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="include\DataSourceCartesianMesh.h">
+    <ClInclude Include="include\DataSourceVtkComplex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

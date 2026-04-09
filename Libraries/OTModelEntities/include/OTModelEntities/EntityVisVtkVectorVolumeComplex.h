@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityVisCartesianVectorVolume.h
+// File: EntityVisVtkVectorVolumeComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -24,18 +24,18 @@
 #include "OTModelEntities/EntityResultBase.h"
 #include "OTModelEntities/PropertyBundlePlane.h"
 #include "OTModelEntities/PropertyBundleScaling.h"
-#include "OTModelEntities/PropertyBundleVisCartesianVectorVolume.h"
+#include "OTModelEntities/PropertyBundleVisVtkVectorVolumeComplex.h"
 
 #include <list>
 
-class __declspec(dllexport) EntityVisCartesianVectorVolume : public EntityVis2D3D
+class __declspec(dllexport) EntityVisVtkVectorVolumeComplex : public EntityVis2D3D
 {
 public:
-	EntityVisCartesianVectorVolume() : EntityVisCartesianVectorVolume(0, nullptr, nullptr, nullptr) {};
-	EntityVisCartesianVectorVolume(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
-	virtual ~EntityVisCartesianVectorVolume();
+	EntityVisVtkVectorVolumeComplex() : EntityVisVtkVectorVolumeComplex(0, nullptr, nullptr, nullptr) {};
+	EntityVisVtkVectorVolumeComplex(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+	virtual ~EntityVisVtkVectorVolumeComplex();
 
-	virtual std::string getClassName(void) const override { return "EntityVisCartesianVectorVolume"; };
+	virtual std::string getClassName(void) const override { return "EntityVisVtkVectorVolumeComplex"; };
 
 	virtual bool updateFromProperties(void) override;
 
@@ -52,7 +52,7 @@ protected:
 private:
 	PropertyBundlePlane propertyBundlePlane;
 	PropertyBundleScaling propertyBundleScaling;
-	PropertyBundleVisCartesianVectorVolume propertyBundleVisCartesianVector;
+	PropertyBundleVisVtkVectorVolumeComplex propertyBundleVisCartesianVector;
 	// Temporary
 	//EntityResultBase *source;
 };

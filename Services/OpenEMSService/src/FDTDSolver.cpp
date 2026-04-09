@@ -28,8 +28,8 @@
 #include "OTModelEntities/EntityUnits.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityInformation.h"
-#include "OTModelEntities/EntityResultCartesianMeshVtk.h"
-#include "OTModelEntities/EntityVisCartesianVectorVolume.h"
+#include "OTModelEntities/EntityResultVtkComplex.h"
+#include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -259,12 +259,12 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 
 	argFileData.clear();
 
-	EntityResultCartesianMeshVtk* vtkResult = new EntityResultCartesianMeshVtk(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	vtkResult->setComplexData(quantityName, EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
+	EntityResultVtkComplex* vtkResult = new EntityResultVtkComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	vtkResult->setComplexData(quantityName, EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
 	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
 	vtkResult->storeToDataBase();
 
-	EntityVisCartesianVectorVolume* visualizationEntity = new EntityVisCartesianVectorVolume(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	EntityVisVtkVectorVolumeComplex* visualizationEntity = new EntityVisVtkVectorVolumeComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);

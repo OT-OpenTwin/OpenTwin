@@ -1,5 +1,5 @@
 // @otlicense
-// File: DataSourceCartesianMesh.cpp
+// File: DataSourceVtkComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,9 +17,9 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "DataSourceCartesianMesh.h"
+#include "DataSourceVtkComplex.h"
 #include "OTModelEntities/EntityBase.h"
-#include "OTModelEntities/EntityResultCartesianMeshVtk.h"
+#include "OTModelEntities/EntityResultVtkComplex.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>
@@ -35,13 +35,13 @@
 #include <vtkTriangle.h>
 #include <vtkTetra.h>
 
-DataSourceCartesianMesh::DataSourceCartesianMesh()
+DataSourceVtkComplex::DataSourceVtkComplex()
 {
 	vtkGridAbs = vtkRectilinearGrid::New();
 	vtkGridArg = vtkRectilinearGrid::New();
 }
 
-DataSourceCartesianMesh::~DataSourceCartesianMesh()
+DataSourceVtkComplex::~DataSourceVtkComplex()
 {
 	FreeMemory();
 
@@ -52,9 +52,9 @@ DataSourceCartesianMesh::~DataSourceCartesianMesh()
 	vtkGridArg = nullptr;
 }
 
-bool DataSourceCartesianMesh::loadData(EntityBase* resultEntity, EntityBase* meshEntity)
+bool DataSourceVtkComplex::loadData(EntityBase* resultEntity, EntityBase* meshEntity)
 {
-	EntityResultCartesianMeshVtk* cartesianMesh = dynamic_cast<EntityResultCartesianMeshVtk *>(resultEntity);
+	EntityResultVtkComplex* cartesianMesh = dynamic_cast<EntityResultVtkComplex *>(resultEntity);
 
 	if (cartesianMesh != nullptr)
 	{
@@ -65,14 +65,14 @@ bool DataSourceCartesianMesh::loadData(EntityBase* resultEntity, EntityBase* mes
 	return false;
 }
 
-bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
+bool DataSourceVtkComplex::loadData(EntityResultVtkComplex* resultData)
 {
 	FreeMemory();
 
 	assert(resultData != nullptr);
 
 	std::string quantityName;
-	EntityResultCartesianMeshVtk::eQuantityType quantityType = EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE;
+	EntityResultVtkComplex::eQuantityType quantityType = EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE;
 	std::vector<char> dataAbs;
 	std::vector<char> dataArg;
 
@@ -108,7 +108,7 @@ bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
 
 		if (name == quantityName)
 		{
-			if (quantityType == EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE)
+			if (quantityType == EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE)
 			{
 				vtkGridAbs->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
 				vtkGridArg->GetCellData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
@@ -127,7 +127,7 @@ bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
 
 		if (name == quantityName)
 		{
-			if (quantityType == EntityResultCartesianMeshVtk::VECTOR_COMPLEX_MAG_PHASE)
+			if (quantityType == EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE)
 			{
 				vtkGridAbs->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
 				vtkGridArg->GetPointData()->SetActiveAttribute(index, vtkDataSetAttributes::VECTORS);
@@ -143,7 +143,7 @@ bool DataSourceCartesianMesh::loadData(EntityResultCartesianMeshVtk* resultData)
 	return true;
 }
 
-void DataSourceCartesianMesh::FreeMemory(void)
+void DataSourceVtkComplex::FreeMemory(void)
 {
 	vtkGridAbs->SetDimensions(0, 0, 0);
 
@@ -169,32 +169,32 @@ void DataSourceCartesianMesh::FreeMemory(void)
 	hasCellVector  = false;
 }
 
-double DataSourceCartesianMesh::GetXMinCoordinate()
+double DataSourceVtkComplex::GetXMinCoordinate()
 {
 	return vtkGridAbs->GetBounds()[0] * scaleFactor;
 }
 
-double DataSourceCartesianMesh::GetYMinCoordinate()
+double DataSourceVtkComplex::GetYMinCoordinate()
 {
 	return vtkGridAbs->GetBounds()[2] * scaleFactor;
 }
 
-double DataSourceCartesianMesh::GetZMinCoordinate()
+double DataSourceVtkComplex::GetZMinCoordinate()
 {
 	return vtkGridAbs->GetBounds()[4] * scaleFactor;
 }
 
-double DataSourceCartesianMesh::GetXMaxCoordinate()
+double DataSourceVtkComplex::GetXMaxCoordinate()
 {
 	return vtkGridAbs->GetBounds()[1] * scaleFactor;
 }
 
-double DataSourceCartesianMesh::GetYMaxCoordinate()
+double DataSourceVtkComplex::GetYMaxCoordinate()
 {
 	return vtkGridAbs->GetBounds()[3] * scaleFactor;
 }
 
-double DataSourceCartesianMesh::GetZMaxCoordinate()
+double DataSourceVtkComplex::GetZMaxCoordinate()
 {
 	return vtkGridAbs->GetBounds()[5] * scaleFactor;
 }

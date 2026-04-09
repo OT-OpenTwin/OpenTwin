@@ -1,5 +1,5 @@
 // @otlicense
-// File: DataSourceUnstructuredMesh.h
+// File: DataSourceVtkComplex.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -27,13 +27,13 @@
 
 #include <string>
 
-class EntityResultCartesianMeshVtk;
+class EntityResultVtkComplex;
 
-class DataSourceCartesianMesh : public DataSourceManagerItem
+class DataSourceVtkComplex : public DataSourceManagerItem
 {
 public:
-	DataSourceCartesianMesh();
-	virtual ~DataSourceCartesianMesh();
+	DataSourceVtkComplex();
+	virtual ~DataSourceVtkComplex();
 
 	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) override;
 
@@ -55,7 +55,7 @@ public:
 	double getScaleFactor() { return scaleFactor; }
 
 private:
-	bool loadData(EntityResultCartesianMeshVtk* resultData);
+	bool loadData(EntityResultVtkComplex* resultData);
 
 	void FreeMemory();
 

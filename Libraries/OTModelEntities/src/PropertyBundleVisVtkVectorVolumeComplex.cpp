@@ -1,5 +1,5 @@
 // @otlicense
-// File: PropertyBundleVisCartesianVectorVolume.cpp
+// File: PropertyBundleVisVtkVectorVolumeComplex.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,9 +17,9 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/PropertyBundleVisCartesianVectorVolume.h"
+#include "OTModelEntities/PropertyBundleVisVtkVectorVolumeComplex.h"
 
-void PropertyBundleVisCartesianVectorVolume:: setProperties(EntityBase * _thisObject)
+void PropertyBundleVisVtkVectorVolumeComplex:: setProperties(EntityBase * _thisObject)
 {
 	EntityPropertiesSelection::createProperty(m_groupNameGeneral, m_properties.GetNameVisType(),
 		{
@@ -65,7 +65,7 @@ void PropertyBundleVisCartesianVectorVolume:: setProperties(EntityBase * _thisOb
 	EntityPropertiesDouble::createProperty(m_groupNameComplex, m_properties.GetNamePhase(), 0.0, m_defaultCategory, _thisObject->getProperties());
 }
 
-bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase * _thisObject)
+bool PropertyBundleVisVtkVectorVolumeComplex::updatePropertyVisibility(EntityBase * _thisObject)
 {
 	bool changes = false;
 
@@ -248,7 +248,7 @@ bool PropertyBundleVisCartesianVectorVolume::updatePropertyVisibility(EntityBase
 	return changes;
 }
 
-bool PropertyBundleVisCartesianVectorVolume::is2dType(EntityBase* _thisObject)
+bool PropertyBundleVisVtkVectorVolumeComplex::is2dType(EntityBase* _thisObject)
 {
 	EntityPropertiesSelection* visType = dynamic_cast<EntityPropertiesSelection*>(_thisObject->getProperties().getProperty(m_properties.GetNameVisType()));
 	assert(visType != nullptr);
