@@ -20,6 +20,7 @@
 #include "DataSourceVtkTime.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityResultVtkTime.h"
+#include "OTModelEntities/EntityAPI.h"
 
 #include <vtkNew.h>
 #include <vtkStructuredGrid.h>
@@ -67,16 +68,34 @@ bool DataSourceVtkTime::loadData(EntityResultVtkTime* resultData)
 
 	assert(resultData != nullptr);
 
-	double time = 0.0;
+	quantityName = resultData->getQuantityName();
 
-	std::string quantityName;
+	dataEntityTimeList = resultData->getTimeList();
+	dataEntityList     = resultData->getDataList();
+	scaleFactor        = resultData->getScaleFactor();
+
+	return true;
+}
+
+void DataSourceVtkTime::ensureDataLoaded(double time)
+{
+	if (dataEntityTimeList.empty()) return;
+
+	double maxTime = dataEntityTimeList.back();
+
+	if (fabs(time - currentTime) < 1e-10 * maxTime)
+	{
+		// We have already loaded the correct data
+		return;
+	}
+	
+	// Get the data for the given time
 	std::vector<char> data;
+	getTimeData(time, data);
 
-	resultData->getTimeData(time, quantityName, data);
-	scaleFactor = resultData->getScaleFactor();
+	if (data.empty()) return;
 
-	if (data.empty()) return false;
-
+	// Set up the vtk grid
 	vtkXMLRectilinearGridReader* gridReader = vtkXMLRectilinearGridReader::New();
 
 	std::string inputAbs(data.data());
@@ -108,8 +127,66 @@ bool DataSourceVtkTime::loadData(EntityResultVtkTime* resultData)
 			hasPointVector = true;
 		}
 	}
+}
 
-	return true;
+void DataSourceVtkTime::getTimeData(double time, std::vector<char>& data)
+{
+	if (dataEntityTimeList.empty()) return;
+
+	std::pair<ot::UID, ot::UID> dataItem = findClosestDataItem(time);
+
+	// Load the corresponding data item
+	EntityBinaryData *vtkData = dynamic_cast<EntityBinaryData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(dataItem.first, dataItem.second));
+	assert(vtkData != nullptr);
+
+	currentTime = time;
+
+	if (vtkData == nullptr)
+	{
+		return; // The data is missing for this entity.
+	}
+
+	data = vtkData->getData();
+
+	delete vtkData;
+	vtkData = nullptr;
+}
+
+std::pair<ot::UID, ot::UID> DataSourceVtkTime::findClosestDataItem(double time)
+{
+	assert(!dataEntityTimeList.empty());
+
+	// Find the index if the closest item
+	int closestIndex = 0;
+	double closestDistance = fabs(time - dataEntityTimeList.front());
+
+	int index = 0;
+	for (auto item : dataEntityTimeList)
+	{
+		double currentDistance = fabs(time - item);
+
+		if (currentDistance < closestDistance)
+		{
+			closestDistance = currentDistance;
+			closestIndex = index;
+		}
+
+		index++;
+	}
+
+	// Now return the best closest date item
+	index = 0;
+	for (auto item : dataEntityList)
+	{
+		if (index == closestIndex)
+		{
+			return item;
+		}
+
+		index++;
+	}
+
+	return std::pair<ot::UID, ot::UID>(-1, -1);
 }
 
 void DataSourceVtkTime::FreeMemory(void)

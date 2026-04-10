@@ -135,6 +135,9 @@ std::string VtkDriverVectorVolumeTime::buildSceneNode(DataSourceManagerItem *dat
 	
 	dataSource = dynamic_cast<DataSourceVtkTime*>(dataItem);
 
+	// Ensure that the grid is available
+	dataSource->ensureDataLoaded(visData->GetTime());
+
 	if (dataSource != nullptr)
 	{
 		vtkNew<vtkCellDataToPointData> cellToPoint;

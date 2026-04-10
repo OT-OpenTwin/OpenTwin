@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "OTCore/CoreTypes.h"
+
 #include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
 
@@ -26,6 +28,7 @@
 #include <vtkNew.h>
 
 #include <string>
+#include <vector>
 
 class EntityResultVtkTime;
 
@@ -53,14 +56,25 @@ public:
 
 	double getScaleFactor() { return scaleFactor; }
 
+	void ensureDataLoaded(double time);
+
 private:
 	bool loadData(EntityResultVtkTime* resultData);
+	void getTimeData(double time, std::vector<char>& data);
+	std::pair<ot::UID, ot::UID> findClosestDataItem(double time);
 
 	void FreeMemory();
 
 	vtkRectilinearGrid* vtkGrid;
 
 	double scaleFactor = 1.0;
+
+	std::string quantityName;
+
+	std::list<std::pair<ot::UID, ot::UID>> dataEntityList;
+	std::list<double>  dataEntityTimeList;
+
+	double currentTime = -1.0;
 
 	bool hasPointScalar = false;
 	bool hasCellScalar = false;

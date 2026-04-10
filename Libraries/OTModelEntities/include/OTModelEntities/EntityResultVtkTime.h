@@ -39,17 +39,16 @@ public:
 	
 	virtual entityType getEntityType(void) const override { return DATA;};
 
-	void getTimeData(double time, std::string& quantityName, std::vector<char>& data);
-
-	// Please note that setting the data also transfers the ownership of the EntityBinaryData objects. The objects must not be deleted outside the EntityResultUnstructuredMesh.
 	void setTimeData(const std::string &quantityName, const std::list<std::pair<ot::UID, ot::UID>> &dataEntityList, const std::list<double> &dataEntityTimeList);
 
 	void setScaleFactor(double value) { _scaleFactor = value; }
 	double getScaleFactor(void) { return _scaleFactor; }
 
+	std::string getQuantityName(void) { return _quantityName; }
+	std::list<std::pair<ot::UID, ot::UID>> getDataList(void) { return _dataEntityList; }
+	std::list<double> getTimeList(void) { return _dataEntityTimeList; }
+
 private:
-	std::pair<ot::UID, ot::UID> findClosestDataItem(double time);
-	
 	std::string _quantityName;
 
 	std::list<std::pair<ot::UID, ot::UID>> _dataEntityList;
