@@ -146,24 +146,24 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 			dependencies.addDependency(additionalParameterInfo);
 			
-			for (const auto& additionalParameter : additionalParameterDecoders)
-			{
-				if (ot::json::exists(singleMongoDocument, additionalParameter.first))
-				{
-					auto& additionalParameterEntry = singleMongoDocument[additionalParameter.first.c_str()];
-					const ot::TupleInstance& parameterTuple = additionalParameter.second->getTupleInstance();
+			//for (const auto& additionalParameter : additionalParameterDecoders)
+			//{
+			//	if (ot::json::exists(singleMongoDocument, additionalParameter.first))
+			//	{
+			//		auto& additionalParameterEntry = singleMongoDocument[additionalParameter.first.c_str()];
+			//		const ot::TupleInstance& parameterTuple = additionalParameter.second->getTupleInstance();
 
-					const std::string value = ot::json::toJson(additionalParameterEntry);
-					parameterValuesByParameterName[additionalParameter.first].push_back(value);
+			//		const std::string value = ot::json::toJson(additionalParameterEntry);
+			//		parameterValuesByParameterName[additionalParameter.first].push_back(value);
 
-					ot::DatasetDependencyInfo additionalParameterInfo;
-					additionalParameterInfo.setLabel(additionalParameter.first);
-					additionalParameterInfo.setValue(value);
-					//unit should already be normalised during the data point extraction
-					//additionalParameterInfo.m_unit = parameterTuple.getTupleUnits().front(); 
-					dependencies.addDependency(additionalParameterInfo);
-				}				
-			}
+			//		ot::DatasetDependencyInfo additionalParameterInfo;
+			//		additionalParameterInfo.setLabel(additionalParameter.first);
+			//		additionalParameterInfo.setValue(value);
+			//		//unit should already be normalised during the data point extraction
+			//		//additionalParameterInfo.m_unit = parameterTuple.getTupleUnits().front(); 
+			//		dependencies.addDependency(additionalParameterInfo);
+			//	}				
+			//}
 
 
 
