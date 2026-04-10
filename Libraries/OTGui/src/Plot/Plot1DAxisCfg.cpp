@@ -24,21 +24,21 @@
 #include "OTGui/Plot/Plot1DAxisCfg.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 
-std::string ot::Plot1DAxisCfg::toString(AxisQuantity _quantity) 
+std::string ot::Plot1DAxisCfg::toString(AxisQuantityComponent _quantity) 
 {
 	switch (_quantity) 
 	{
-	case AxisQuantity::Undefined: 
+	case AxisQuantityComponent::Undefined: 
 		return "Undefined";
-	case AxisQuantity::XData: 
+	case AxisQuantityComponent::XData: 
 		return "X Data";
-	case AxisQuantity::Magnitude: 
+	case AxisQuantityComponent::Magnitude: 
 		return ot::ComplexNumbers::getComponentMagnitude();
-	case AxisQuantity::Phase: 
+	case AxisQuantityComponent::Phase: 
 		return ot::ComplexNumbers::getComponentPhase();
-	case AxisQuantity::Real: 
+	case AxisQuantityComponent::Real: 
 		return ot::ComplexNumbers::getComponentReal();
-	case AxisQuantity::Imaginary: 
+	case AxisQuantityComponent::Imaginary: 
 		return ot::ComplexNumbers::getComponentImaginary();
 	default:
 		OT_LOG_E("Unknown axis quantity (" + std::to_string((int)_quantity) + ")");
@@ -46,35 +46,35 @@ std::string ot::Plot1DAxisCfg::toString(AxisQuantity _quantity)
 	}
 }
 
-ot::Plot1DAxisCfg::AxisQuantity ot::Plot1DAxisCfg::stringToAxisQuantity(const std::string& _quantity) 
+ot::Plot1DAxisCfg::AxisQuantityComponent ot::Plot1DAxisCfg::stringToAxisQuantity(const std::string& _quantity) 
 {
-	if (_quantity == toString(AxisQuantity::Undefined)) 
+	if (_quantity == toString(AxisQuantityComponent::Undefined)) 
 	{
-		return AxisQuantity::Undefined;
+		return AxisQuantityComponent::Undefined;
 	}
-	else if (_quantity == toString(AxisQuantity::XData)) 
+	else if (_quantity == toString(AxisQuantityComponent::XData)) 
 	{
-		return AxisQuantity::XData;
+		return AxisQuantityComponent::XData;
 	}
-	else if (_quantity == toString(AxisQuantity::Magnitude)) 
+	else if (_quantity == toString(AxisQuantityComponent::Magnitude)) 
 	{
-		return AxisQuantity::Magnitude;
+		return AxisQuantityComponent::Magnitude;
 	}
-	else if (_quantity == toString(AxisQuantity::Phase)) 
+	else if (_quantity == toString(AxisQuantityComponent::Phase)) 
 	{
-		return AxisQuantity::Phase;
+		return AxisQuantityComponent::Phase;
 	}
-	else if (_quantity == toString(AxisQuantity::Real))
+	else if (_quantity == toString(AxisQuantityComponent::Real))
 	{
-		return AxisQuantity::Real;
+		return AxisQuantityComponent::Real;
 	}
-	else if (_quantity == toString(AxisQuantity::Imaginary)) 
+	else if (_quantity == toString(AxisQuantityComponent::Imaginary)) 
 	{
-		return AxisQuantity::Imaginary;
+		return AxisQuantityComponent::Imaginary;
 	}
 	else {
 		OT_LOG_E("Unknown axis quantity \"" + _quantity + "\"");
-		return AxisQuantity::Undefined;
+		return AxisQuantityComponent::Undefined;
 	}
 }
 
@@ -105,11 +105,11 @@ ot::Plot1DAxisCfg::ValueScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalingFl
 std::list<std::string> ot::Plot1DAxisCfg::getAxisQuantityStringList() 
 {
 	return std::list<std::string>({
-		toString(AxisQuantity::XData),
-		toString(AxisQuantity::Real),
-		toString(AxisQuantity::Imaginary),
-		toString(AxisQuantity::Magnitude),
-		toString(AxisQuantity::Phase),
+		toString(AxisQuantityComponent::XData),
+		toString(AxisQuantityComponent::Real),
+		toString(AxisQuantityComponent::Imaginary),
+		toString(AxisQuantityComponent::Magnitude),
+		toString(AxisQuantityComponent::Phase),
 	});
 }
 
@@ -138,7 +138,7 @@ bool ot::Plot1DAxisCfg::operator==(const Plot1DAxisCfg& _other) const
 		m_axisLabel == _other.m_axisLabel &&
 		
 		m_axisScaling == _other.m_axisScaling &&
-		m_axisQuantity == _other.m_axisQuantity &&
+		m_axisQuantityComponent == _other.m_axisQuantityComponent &&
 		m_valueScaling == _other.m_valueScaling &&
 
 		m_displayNumberFormat == _other.m_displayNumberFormat &&
@@ -165,7 +165,7 @@ void ot::Plot1DAxisCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	_object.AddMember("AutoDetermineAxisLabel", m_autoDetermineAxisLabel, _allocator);
 	_object.AddMember("AxisLabel", ot::JsonString(m_axisLabel, _allocator), _allocator);
 	
-	_object.AddMember("AxisQuantity", JsonString(toString(m_axisQuantity), _allocator), _allocator);
+	_object.AddMember("AxisQuantityComponent", JsonString(toString(m_axisQuantityComponent), _allocator), _allocator);
 	_object.AddMember("AxisScale", static_cast<uint32_t>(m_axisScaling), _allocator);
 	_object.AddMember("QuantityScale", static_cast<uint32_t>(m_valueScaling), _allocator);
 
@@ -181,7 +181,7 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_autoDetermineAxisLabel = json::getBool(_object, "AutoDetermineAxisLabel");
 	m_axisLabel = json::getString(_object, "AxisLabel");
 	
-	m_axisQuantity = stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
+	m_axisQuantityComponent = stringToAxisQuantity(json::getString(_object, "AxisQuantityComponent"));
 	m_axisScaling = static_cast<AxisScaling>(json::getUInt(_object, "AxisScale"));
 	m_valueScaling = static_cast<ValueScaling>(json::getUInt(_object, "QuantityScale"));
 
@@ -232,7 +232,7 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 	else
 	{
 		// Determine axis type label based on plot type and axis quantity
-		result = String::trim((m_axisQuantity == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY()));
+		result = String::trim((m_axisQuantityComponent == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY()));
 
 		if (!result.empty())
 		{
@@ -240,7 +240,7 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 		}
 
 		// Append the quantity name based on the axis quantity.
-		switch (m_axisQuantity)
+		switch (m_axisQuantityComponent)
 		{
 		case ot::Plot1DAxisCfg::Undefined: break;
 		case ot::Plot1DAxisCfg::XData: break;
@@ -249,7 +249,7 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 		case ot::Plot1DAxisCfg::Real: result.append("Real"); break;
 		case ot::Plot1DAxisCfg::Imaginary: result.append("Imaginary"); break;
 		default:
-			OT_LOG_E("Unknown axis quantity (" + std::to_string((int)m_axisQuantity) + ")");
+			OT_LOG_E("Unknown axis quantity (" + std::to_string((int)m_axisQuantityComponent) + ")");
 			break;
 		}
 	}
@@ -258,7 +258,7 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 
 std::string ot::Plot1DAxisCfg::getUnitLabel(const Plot1DCfg& _plotCfg) const
 {
-	return (m_axisQuantity == Plot1DAxisCfg::XData ? _plotCfg.getUnitLabelX() : _plotCfg.getUnitLabelY());
+	return (m_axisQuantityComponent == Plot1DAxisCfg::XData ? _plotCfg.getUnitLabelX() : _plotCfg.getUnitLabelY());
 }
 
 std::string ot::Plot1DAxisCfg::getUnitWithScalingLabel(const Plot1DCfg& _plotCfg) const

@@ -70,8 +70,8 @@ std::list<std::string> ot::Plot1DCfg::getPlotTypeStringList() {
 ot::Plot1DCfg::Plot1DCfg() : 
 	WidgetViewBase(WidgetViewBase::View1D, WidgetViewBase::ViewIsCentral | WidgetViewBase::ViewIsCloseable | WidgetViewBase::ViewIsPinnable | WidgetViewBase::ViewNameAsTitle | WidgetViewBase::ViewCloseOnEmptySelection)
 {
-	m_xAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::XData);
-	m_yAxis.setQuantity(Plot1DAxisCfg::AxisQuantity::Real);
+	m_xAxis.setQuantity(Plot1DAxisCfg::AxisQuantityComponent::XData);
+	m_yAxis.setQuantity(Plot1DAxisCfg::AxisQuantityComponent::Real);
 }
 
 ot::Plot1DCfg::~Plot1DCfg() {}

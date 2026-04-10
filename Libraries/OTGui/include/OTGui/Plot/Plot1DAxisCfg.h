@@ -39,7 +39,7 @@ namespace ot {
 		OT_DECL_DEFCOPY(Plot1DAxisCfg)
 		OT_DECL_DEFMOVE(Plot1DAxisCfg)
 	public:
-		enum AxisQuantity : uint8_t
+		enum AxisQuantityComponent : uint8_t
 		{
 			Undefined,
 			XData,
@@ -65,8 +65,8 @@ namespace ot {
 		};
 		typedef Flags<ValueScalingFlag, uint32_t> ValueScaling;
 
-		static std::string toString(AxisQuantity _quantity);
-		static AxisQuantity stringToAxisQuantity(const std::string& _quantity);
+		static std::string toString(AxisQuantityComponent _quantity);
+		static AxisQuantityComponent stringToAxisQuantity(const std::string& _quantity);
 
 		static std::string toString(ValueScalingFlag _scaling);
 		static ValueScalingFlag stringToQuantityScalingFlag(const std::string& _scaling);
@@ -101,8 +101,8 @@ namespace ot {
 		void setMax(double _max) { m_max = _max; };
 		double getMax() const { return m_max; };
 
-		void setQuantity(AxisQuantity _quantity) { m_axisQuantity = _quantity; };
-		AxisQuantity getQuantity() const { return m_axisQuantity; };
+		void setQuantity(AxisQuantityComponent _quantity) { m_axisQuantityComponent = _quantity; };
+		AxisQuantityComponent getQuantity() const { return m_axisQuantityComponent; };
 
 		inline void setScaling(const AxisScaling& _scaling) { m_axisScaling = _scaling; };
 		constexpr const AxisScaling& getScaling() const { return m_axisScaling; };
@@ -188,10 +188,9 @@ namespace ot {
 		String::DisplayNumberFormat m_displayNumberFormat = String::DisplayNumberFormat::Auto;
 		int32_t m_displayNumberPrecision = 3;
 
-		AxisQuantity m_axisQuantity = AxisQuantity::Undefined;
+		AxisQuantityComponent m_axisQuantityComponent = AxisQuantityComponent::Undefined;
 		AxisScaling m_axisScaling = AxisScalingFlag::Autoscale;
 		ValueScaling m_valueScaling = ValueScalingFlag::NoQuantityScaling;
-
 	};
 
 }
