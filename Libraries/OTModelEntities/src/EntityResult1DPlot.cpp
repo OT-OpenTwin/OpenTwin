@@ -591,7 +591,11 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
-	PropertyHelper::setSelectionPropertyValue(_config.getXAxisParameter(), this, "Parameter", getXAxisPropertyGroupName());
+	// If there are no options, the plot parameter list is uninitialised. That happens in the propertiesAboutToBeShown method and depends on the curves within the plot
+	if (PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName())->getOptions().size() != 0)
+	{
+		PropertyHelper::setSelectionPropertyValue(_config.getXAxisParameter(), this, "Parameter", getXAxisPropertyGroupName());
+	}
 
 	updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
