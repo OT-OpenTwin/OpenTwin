@@ -355,6 +355,12 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
         resultDoc.AddMember(versionKey, _documentView["Version"].get_int64().value, allocator);
     }
 
+    // Extract LibraryElementID
+    if (_documentView["LibraryElementID"]) {
+        rapidjson::Value idKey("LibraryElementID", allocator);
+        resultDoc.AddMember(idKey, _documentView["LibraryElementID"].get_int64().value, allocator);
+	}
+
     // Extract additionalInfos as complete object
     if (_documentView["additionalInfos"]) {
         bsoncxx::document::view additionalInfosView = _documentView["additionalInfos"].get_document().value;

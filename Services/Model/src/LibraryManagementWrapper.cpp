@@ -259,22 +259,20 @@ void LibraryManagementWrapper::updatePropertyOfEntity(const ot::LibraryElement& 
 	}
 
 
-	EntityBase* libraryModelEntity = model->findEntityFromName(_importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
-	if (!libraryModelEntity) {
-		OT_LOG_E("Circuit model entity not found: " + _importCfg.getNewEntityFolder() + "/" + _importCfg.getName());
-	}
 
-	EntityBase* ModelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
-	if(!ModelFolderEntity) {
-		OT_LOG_E("Circuit model folder entity not found: " + _importCfg.getNewEntityFolder());
-	}
+	if (_dialogConfirmed && _entity) {
+		EntityBase* modelFolderEntity = model->findEntityFromName(_importCfg.getNewEntityFolder());
+		if (!modelFolderEntity) {
+			OT_LOG_E("Circuit model folder entity not found: " + _importCfg.getNewEntityFolder());
+		}
 
-	if (_dialogConfirmed && _entity && ModelFolderEntity) {
-		modelProperty->setValueName(_entity->getName());
-		modelProperty->setValueID(_entity->getEntityID());
-		modelProperty->setEntityContainerID(ModelFolderEntity->getEntityID());
-		entBase->updateFromProperties();
-		entBase->setModified();
+		if (modelFolderEntity) {
+			modelProperty->setValueName(_entity->getName());
+			modelProperty->setValueID(_entity->getEntityID());
+			modelProperty->setEntityContainerID(modelFolderEntity->getEntityID());
+			entBase->updateFromProperties();
+			entBase->setModified();
+		}
 	}
 	else {
 		modelProperty->setValueName("");
@@ -320,12 +318,13 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 
 	// First setLibraryElement to ensure that in case of python script the environment requested in this function is being handled too
 	libInterface->setLibraryElement(_importCfg, _createdEntities);
+	entity->setLibraryElementID(_importCfg.getLibraryElementID());
 
 	// Check if entity with the same name already exists and if the content of the entities matches
 	EntityBase* existingEntity = checkAndHandleIfEntityExists(fullPath, _importCfg, _model);
 
 	if (existingEntity != nullptr) {
-		_model->displayMessage("The to be imported library element already exists: " + fullPath);
+		_model->displayMessage("The to be imported library element already exists: " + existingEntity->getName() + "\n");
 		return existingEntity; // Entity already exists with matching content, no need to create a new one
 	}
 
@@ -339,20 +338,25 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 
 EntityBase* LibraryManagementWrapper::checkAndHandleIfEntityExists(const std::string& _fullPath, const ot::LibraryElement& _importCfg, Model* _model) {
 
-	EntityBase* currentEntity = _model->findEntityFromName(_fullPath);
-	if (!currentEntity) return nullptr;
-		
-	auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(currentEntity);
-	if (!libInterface) {
-		OT_LOG_E("Entity does not implement LibraryEntityInterface: " + _importCfg.getEntityType());
-		return nullptr;
-	}
+	auto libraryElements = _model->getListOfFolderItems(_importCfg.getNewEntityFolder(), true);
+	for(auto& element : libraryElements) {
+		EntityBase* currentEntity = _model->findEntityFromName(element);
+		if (!currentEntity) continue;
 
-	if (libInterface->checkIfLibraryElementContentMatches(_importCfg)) {
-		OT_LOG_I("Entity with matching content already exists: " + _fullPath);
-		return currentEntity;
+		std::string libraryElementID = currentEntity->getLibraryElementID();
+		if (libraryElementID != std::to_string(_importCfg.getLibraryElementID())) continue;
+
+		auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(currentEntity);
+		if (!libInterface) {
+			OT_LOG_E("Entity does not implement LibraryEntityInterface: " + _importCfg.getEntityType());
+			continue;
+		}
+
+		if (libInterface->checkIfLibraryElementContentMatches(_importCfg)) {
+			OT_LOG_I("Entity with matching content already exists: " + element);
+			return currentEntity;
+		}
 	}
-	
 
 	return nullptr;
 }

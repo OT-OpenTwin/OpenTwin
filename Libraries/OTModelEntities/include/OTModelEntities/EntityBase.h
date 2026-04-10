@@ -252,6 +252,10 @@ public:
 	//!@brief Set whether the entity should update its own version in the dependency lists during the next save operation
 	void setUpdateSelfDependency(bool _updateSelfDepedency) { m_updateSelfDepedency = _updateSelfDepedency; }
 
+	//! @brief Set the library element ID
+	virtual void setLibraryElementID(ot::UID _libraryElementID);
+	//! @brief Get the library element ID
+	virtual std::string getLibraryElementID();
 protected:
 	//! @brief Will set the default tree item.
 	//! Will reset the modified flags for all entries of the tree item.

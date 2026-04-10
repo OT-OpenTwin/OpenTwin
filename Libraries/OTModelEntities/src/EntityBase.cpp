@@ -577,6 +577,39 @@ void EntityBase::fillContextMenu(const ot::MenuRequestData* _requestData, ot::Me
 	}
 }
 
+
+void EntityBase::setLibraryElementID(ot::UID _libraryElementID) {
+	EntityPropertiesBase* property = getProperties().getProperty("LibraryElementID");
+	if (property) {
+		EntityPropertiesString* libraryElementIDProperty = dynamic_cast<EntityPropertiesString*>(property);
+		if(!libraryElementIDProperty) {
+			OT_LOG_E("LibraryElementID property is not of type string");
+			return;
+		}
+		libraryElementIDProperty->setValue(std::to_string(_libraryElementID));
+	}
+	else {
+		EntityPropertiesString* prop = EntityPropertiesString::createProperty("LibraryElement", "LibraryElementID", std::to_string(_libraryElementID), "", getProperties());
+		prop->setVisible(false);
+		this->setModified();
+	}
+}
+
+std::string EntityBase::getLibraryElementID() {
+	EntityPropertiesBase* property = getProperties().getProperty("LibraryElementID");
+	if (property) {
+		EntityPropertiesString* libraryElementIDProperty = dynamic_cast<EntityPropertiesString*>(property);
+		if (!libraryElementIDProperty) {
+			OT_LOG_E("LibraryElementID property is not of type string");
+			return "";
+		}
+		return libraryElementIDProperty->getValue();
+	}
+	else {
+		return std::to_string(ot::invalidUID);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected methods

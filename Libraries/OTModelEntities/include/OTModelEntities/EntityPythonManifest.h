@@ -63,7 +63,10 @@ public:
 	void setLibraryElement(const ot::LibraryElement& _libraryElement, ot::NewModelStateInfo& _modelState) override;
 	//! @brief Check if the content of the library element already imported in the project
 	bool checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) override;
-
+	//! @brief setLibraryElementID as manifest ID
+	void setLibraryElementID(ot::UID _id) override { setManifestID(_id); }
+	//! @brief getLibraryElementID as manifest ID
+	std::string getLibraryElementID() override { return std::to_string(getManifestID()); }
 private:
 	ot::UID m_manifestID = ot::invalidUID;
 	std::string m_manifestText;

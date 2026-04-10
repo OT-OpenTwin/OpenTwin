@@ -84,6 +84,11 @@ namespace ot{
 		void setPropertyName(std::string _propertyName) { m_propertyName = _propertyName; };
 		std::string getPropertyName() const { return m_propertyName; };
 
+		//! @brief Set the library element ID
+		void setLibraryElementID(ot::UID _id) { m_libraryElementID = _id; }
+		ot::UID getLibraryElementID() const { return m_libraryElementID; }
+
+
         // Metadata management
 
         //! @brief Add a metadata key-value pair (e.g., "IS": "27.5")
@@ -131,7 +136,7 @@ namespace ot{
         std::string m_data;
 
         // Import context
-        ot::UID m_requestingEntityID = 0;
+        ot::UID m_requestingEntityID;
         std::string m_collectionName;
 
         // Additional data
@@ -143,5 +148,7 @@ namespace ot{
         std::string m_newEntityFolder;
         std::string m_className;
         std::string m_propertyName;
+
+		ot::UID m_libraryElementID; // ID of the library element
     };
 }

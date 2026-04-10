@@ -46,10 +46,10 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 
 void EntityBlockPython::createProperties()
 {
-	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());
+	/*EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());*/
 	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1, "default", getProperties());
-	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());
+	/*EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());*/
 }
 
 std::string EntityBlockPython::getSelectedScript()
@@ -130,9 +130,9 @@ bool EntityBlockPython::updateFromProperties()
 
 void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID) {
 	
-	//auto propBase = getProperties().getProperty(m_propertyNameScripts);
-	//auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
-	//scriptSelection->setEntityContainerID(_scriptFolderID);
+	/*auto propBase = getProperties().getProperty(m_propertyNameScripts);
+	auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
+	scriptSelection->setEntityContainerID(_scriptFolderID);*/
 
 	auto scriptProperty = PropertyHelper::getEntityListProperty(this, m_propertyNameScripts);
 	scriptProperty->setEntityContainerID(_scriptFolderID);
@@ -176,6 +176,7 @@ std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::
 		
 		ot::LibraryElement returnedElement;
 		returnedElement.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_Config));
+		
 		resultList.push_back(returnedElement);
 
 

@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTCore/Logging/Logger.h"
 
 std::string ot::LibraryElement::getMetaDataValue(const std::string& _key) const {
     auto it = m_metaData.find(_key);
@@ -55,6 +56,8 @@ void ot::LibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
     _object.AddMember("CallbackService", ot::JsonString(m_callBackService, _allocator), _allocator);
     _object.AddMember("PropertyName", ot::JsonString(m_propertyName, _allocator), _allocator);
 
+	_object.AddMember("LibraryElementID", m_libraryElementID, _allocator);
+
     // Serialize metadata
     ot::JsonObject metaDataObj;
     for (const auto& pair : m_metaData) {
@@ -88,6 +91,13 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
     if (_object.HasMember("Version")) {
         m_version = ot::json::getInt64(_object, "Version");
+    }
+
+    if(_object.HasMember("LibraryElementID")) {
+        m_libraryElementID = ot::json::getUInt64(_object, "LibraryElementID");
+    }
+    else {
+		m_libraryElementID = ot::invalidUID;
     }
 
     // Origin information
@@ -145,25 +155,29 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
         m_propertyName = "";
     }
 
-    // Deserialize metadata
+
     m_metaData.clear();
-    if (_object.HasMember("MetaData")) {
+    if (_object.HasMember("MetaData")) {    
         ot::ConstJsonObject metaDataObj = ot::json::getObject(_object, "MetaData");
         for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
-            std::string key = it->name.GetString();
-            std::string value = it->value.IsString() ? it->value.GetString() : "";
-            m_metaData[key] = value;
+            if (it->name.IsString() && it->value.IsString()) {
+                std::string key = it->name.GetString();
+                std::string value = it->value.GetString();
+                m_metaData[key] = value;
+            }
         }
     }
 
-    // Deserialize additional infos
+    // Deserialize additional infos - mit Schutz vor ungültigen Objekten
     m_additionalInfos.clear();
     if (_object.HasMember("AdditionalInfos")) {
         ot::ConstJsonObject additionalInfosObj = ot::json::getObject(_object, "AdditionalInfos");
         for (auto it = additionalInfosObj.MemberBegin(); it != additionalInfosObj.MemberEnd(); ++it) {
-            std::string key = it->name.GetString();
-            std::string value = it->value.IsString() ? it->value.GetString() : "";
-            m_additionalInfos[key] = value;
+            if (it->name.IsString() && it->value.IsString()) {
+                std::string key = it->name.GetString();
+                std::string value = it->value.GetString();
+                m_additionalInfos[key] = value;
+            }
         }
     }
 }

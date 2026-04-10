@@ -366,6 +366,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	ot::LibraryElement importCfg;
 	importCfg.setFromJsonObject(modelInfoDoc.getConstObject());
 
+
 	// Creating dialog confirmed doc with the import config
 	ot::JsonDocument dialogConfirmed;
 	dialogConfirmed.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, dialogConfirmed.GetAllocator()), dialogConfirmed.GetAllocator());
