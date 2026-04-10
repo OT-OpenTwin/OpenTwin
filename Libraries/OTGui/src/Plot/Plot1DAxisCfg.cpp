@@ -78,27 +78,27 @@ ot::Plot1DAxisCfg::AxisQuantity ot::Plot1DAxisCfg::stringToAxisQuantity(const st
 	}
 }
 
-std::string ot::Plot1DAxisCfg::toString(QuantityScalingFlag _scaling)
+std::string ot::Plot1DAxisCfg::toString(ValueScalingFlag _scaling)
 {
 	switch (_scaling)
 	{
-	case QuantityScalingFlag::NoQuantityScaling: return "No Scaling";
-	case QuantityScalingFlag::DB10: return "dB 10";
-	case QuantityScalingFlag::DB20: return "dB 20";
+	case ValueScalingFlag::NoQuantityScaling: return "No Scaling";
+	case ValueScalingFlag::DB10: return "dB 10";
+	case ValueScalingFlag::DB20: return "dB 20";
 	default:
 		OT_LOG_E("Unknown quantity scaling (" + std::to_string((int)_scaling) + ")");
 		return "No Scaling";
 	};
 }
 
-ot::Plot1DAxisCfg::QuantityScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalingFlag(const std::string& _scaling)
+ot::Plot1DAxisCfg::ValueScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalingFlag(const std::string& _scaling)
 {
-	if (_scaling == toString(QuantityScalingFlag::NoQuantityScaling)) return QuantityScalingFlag::NoQuantityScaling;
-	else if (_scaling == toString(QuantityScalingFlag::DB10)) return QuantityScalingFlag::DB10;
-	else if (_scaling == toString(QuantityScalingFlag::DB20)) return QuantityScalingFlag::DB20;
+	if (_scaling == toString(ValueScalingFlag::NoQuantityScaling)) return ValueScalingFlag::NoQuantityScaling;
+	else if (_scaling == toString(ValueScalingFlag::DB10)) return ValueScalingFlag::DB10;
+	else if (_scaling == toString(ValueScalingFlag::DB20)) return ValueScalingFlag::DB20;
 	else {
 		OT_LOG_E("Unknown quantity scaling \"" + _scaling + "\"");
-		return QuantityScalingFlag::NoQuantityScaling;
+		return ValueScalingFlag::NoQuantityScaling;
 	}
 }
 
@@ -116,9 +116,9 @@ std::list<std::string> ot::Plot1DAxisCfg::getAxisQuantityStringList()
 std::list<std::string> ot::Plot1DAxisCfg::getQuantityScalingStringList()
 {
 	return std::list<std::string>({
-		toString(QuantityScalingFlag::NoQuantityScaling),
-		toString(QuantityScalingFlag::DB10),
-		toString(QuantityScalingFlag::DB20)
+		toString(ValueScalingFlag::NoQuantityScaling),
+		toString(ValueScalingFlag::DB10),
+		toString(ValueScalingFlag::DB20)
 		});
 }
 
@@ -139,7 +139,7 @@ bool ot::Plot1DAxisCfg::operator==(const Plot1DAxisCfg& _other) const
 		
 		m_axisScaling == _other.m_axisScaling &&
 		m_axisQuantity == _other.m_axisQuantity &&
-		m_quantityScaling == _other.m_quantityScaling &&
+		m_valueScaling == _other.m_valueScaling &&
 
 		m_displayNumberFormat == _other.m_displayNumberFormat &&
 		m_displayNumberPrecision == _other.m_displayNumberPrecision &&
@@ -167,7 +167,7 @@ void ot::Plot1DAxisCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocato
 	
 	_object.AddMember("AxisQuantity", JsonString(toString(m_axisQuantity), _allocator), _allocator);
 	_object.AddMember("AxisScale", static_cast<uint32_t>(m_axisScaling), _allocator);
-	_object.AddMember("QuantityScale", static_cast<uint32_t>(m_quantityScaling), _allocator);
+	_object.AddMember("QuantityScale", static_cast<uint32_t>(m_valueScaling), _allocator);
 
 	_object.AddMember("DisplayNumberFormat", static_cast<uint32_t>(m_displayNumberFormat), _allocator);
 	_object.AddMember("DisplayNumberPrecision", m_displayNumberPrecision, _allocator);
@@ -183,7 +183,7 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	
 	m_axisQuantity = stringToAxisQuantity(json::getString(_object, "AxisQuantity"));
 	m_axisScaling = static_cast<AxisScaling>(json::getUInt(_object, "AxisScale"));
-	m_quantityScaling = static_cast<QuantityScaling>(json::getUInt(_object, "QuantityScale"));
+	m_valueScaling = static_cast<ValueScaling>(json::getUInt(_object, "QuantityScale"));
 
 	m_displayNumberPrecision = json::getInt(_object, "DisplayNumberPrecision");
 	m_displayNumberFormat = static_cast<String::DisplayNumberFormat>(json::getUInt(_object, "DisplayNumberFormat"));
@@ -264,8 +264,8 @@ std::string ot::Plot1DAxisCfg::getUnitLabel(const Plot1DCfg& _plotCfg) const
 std::string ot::Plot1DAxisCfg::getUnitWithScalingLabel(const Plot1DCfg& _plotCfg) const
 {
 	std::string result = getUnitLabel(_plotCfg);
-	if (m_quantityScaling.has(QuantityScalingFlag::DB10)) result.append((result.empty() ? "" : " ") + std::string("(dB 10)"));
-	if (m_quantityScaling.has(QuantityScalingFlag::DB20)) result.append((result.empty() ? "" : " ") + std::string("(dB 20)"));
+	if (m_valueScaling.has(ValueScalingFlag::DB10)) result.append((result.empty() ? "" : " ") + std::string("(dB 10)"));
+	if (m_valueScaling.has(ValueScalingFlag::DB20)) result.append((result.empty() ? "" : " ") + std::string("(dB 20)"));
 	return result;
 }
 

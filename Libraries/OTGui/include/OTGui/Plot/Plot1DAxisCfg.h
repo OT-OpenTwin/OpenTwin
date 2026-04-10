@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Plot1DAxisCfg.h
 // 
 // License:
@@ -57,19 +57,19 @@ namespace ot {
 		};
 		typedef Flags<AxisScalingFlag, uint32_t> AxisScaling;
 
-		enum QuantityScalingFlag : uint32_t
+		enum ValueScalingFlag : uint32_t
 		{
 			NoQuantityScaling = 0 << 0, //! @brief No scaling applied to the quantities. f(x)=x.
 			DB10 = 1 << 1, //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(10 * log10(x)).
 			DB20 = 1 << 2  //! @brief Decibel (dB) scaling applied to the quantities. f(x)=(20 * log10(x)).
 		};
-		typedef Flags<QuantityScalingFlag, uint32_t> QuantityScaling;
+		typedef Flags<ValueScalingFlag, uint32_t> ValueScaling;
 
 		static std::string toString(AxisQuantity _quantity);
 		static AxisQuantity stringToAxisQuantity(const std::string& _quantity);
 
-		static std::string toString(QuantityScalingFlag _scaling);
-		static QuantityScalingFlag stringToQuantityScalingFlag(const std::string& _scaling);
+		static std::string toString(ValueScalingFlag _scaling);
+		static ValueScalingFlag stringToQuantityScalingFlag(const std::string& _scaling);
 
 		static std::list<std::string> getAxisQuantityStringList();
 
@@ -135,28 +135,28 @@ namespace ot {
 
 		//! @brief Set the quantity scaling flags for the axis.
 		//! @param _scaling The quantity scaling flags to set for the axis.
-		inline void setQuantityScaling(const QuantityScaling& _scaling) { m_quantityScaling = _scaling; };
+		inline void setQuantityScaling(const ValueScalingFlag& _scaling) { m_valueScaling = _scaling; };
 
 		//! @brief Get the quantity scaling flags for the axis.
-		constexpr const QuantityScaling& getQuantityScaling() const { return m_quantityScaling; };
+		constexpr const ValueScaling& getQuantityScaling() const { return m_valueScaling; };
 
 		//! @brief Set whether decibel (dB) scaling is enabled for the axis using 10 * log_10.
 		//! @note The plot allows for both dB10 and dB20 scaling to be enabled at the same time.
 		//! If this behavior is not desired if must be controlled externally (e.g. property not allowing both to be enabled at the same time).
 		//! @param _db10ScaleEnabled True to enable dB10 scaling, false to disable it.
-		inline void setIsQuantityDB10Scale(bool _db10ScaleEnabled) noexcept { m_quantityScaling.set(QuantityScalingFlag::DB10, _db10ScaleEnabled); };
+		inline void setIsQuantityDB10Scale(bool _db10ScaleEnabled) noexcept { m_valueScaling.set(ValueScalingFlag::DB10, _db10ScaleEnabled); };
 
 		//! @brief Get whether decibel (dB) scaling is enabled for the axis using 10 * log_10.
-		constexpr bool getIsQuantityDB10Scale() const noexcept { return m_quantityScaling.has(QuantityScalingFlag::DB10); };
+		constexpr bool getIsQuantityDB10Scale() const noexcept { return m_valueScaling.has(ValueScalingFlag::DB10); };
 
 		//! @brief Set whether decibel (dB) scaling is enabled for the axis using 20 * log_10.
 		//! @note The plot allows for both dB10 and dB20 scaling to be enabled at the same time.
 		//! If this behavior is not desired if must be controlled externally (e.g. property not allowing both to be enabled at the same time).
 		//! @param _db20ScaleEnabled True to enable dB20 scaling, false to disable it.
-		inline void setIsQuantityDB20Scale(bool _db20ScaleEnabled) noexcept { m_quantityScaling.set(QuantityScalingFlag::DB20, _db20ScaleEnabled); };
+		inline void setIsQuantityDB20Scale(bool _db20ScaleEnabled) noexcept { m_valueScaling.set(ValueScalingFlag::DB20, _db20ScaleEnabled); };
 
 		//! @brief Get whether decibel (dB) scaling is enabled for the axis using 20 * log_10.
-		constexpr bool getIsQuantityDB20Scale() const noexcept { return m_quantityScaling.has(QuantityScalingFlag::DB20); };
+		constexpr bool getIsQuantityDB20Scale() const noexcept { return m_valueScaling.has(ValueScalingFlag::DB20); };
 
 		inline void setAutoDetermineAxisLabel(bool _autoDetermineAxisLabel) { m_autoDetermineAxisLabel = _autoDetermineAxisLabel; };
 		constexpr bool getAutoDetermineAxisLabel() const { return m_autoDetermineAxisLabel; };
@@ -190,7 +190,7 @@ namespace ot {
 
 		AxisQuantity m_axisQuantity = AxisQuantity::Undefined;
 		AxisScaling m_axisScaling = AxisScalingFlag::Autoscale;
-		QuantityScaling m_quantityScaling = QuantityScalingFlag::NoQuantityScaling;
+		ValueScaling m_valueScaling = ValueScalingFlag::NoQuantityScaling;
 
 	};
 
