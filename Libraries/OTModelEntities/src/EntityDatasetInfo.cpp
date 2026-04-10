@@ -113,7 +113,10 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 	cfg.setTitle(getBasicEntityInformation().getEntityName());
 	cfg.setReadOnly(true);
 	cfg.setColumnSortingEnabled(true);
-
+	for (uint32_t i = 0; i < matrix.getNumberOfColumns(); i++)
+	{
+		cfg.setColumnHeaderFilterBehavior(i, ot::TableHeaderItemCfg::FilterBehavior::UseText);
+	}
 	return cfg;
 }
 
