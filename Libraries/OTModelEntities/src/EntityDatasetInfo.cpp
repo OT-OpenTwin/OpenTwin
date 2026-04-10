@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 
 // OpenTwin header
 #include "OTCore/JSON/JSONVectoriser.h"
@@ -112,6 +112,7 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 	cfg.setEntityInformation(getBasicEntityInformation());
 	cfg.setTitle(getBasicEntityInformation().getEntityName());
 	cfg.setReadOnly(true);
+	cfg.setColumnSortingEnabled(true);
 
 	return cfg;
 }
