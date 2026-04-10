@@ -249,7 +249,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 		if (dataPoints.m_yData.front().isComplex())
 		{
 			std::vector<std::complex<double>> complexData = toComplexVector(dataPoints.m_yData);
-			datasetData = ot::PlotDatasetData(std::move(dataPoints.m_xData), std::move(complexData), _plotCfg.getXAxisQuantity(), _plotCfg.getYAxisQuantity());
+			datasetData = ot::PlotDatasetData(std::move(dataPoints.m_xData), std::move(complexData), _plotCfg.getXAxisQuantityComponent(), _plotCfg.getYAxisQuantityComponent());
 		}
 		else
 		{
@@ -345,7 +345,7 @@ ot::PlotDatasetData CurveDatasetFactory::createCurveData(const std::vector<doubl
 	ot::PlotDatasetData result;
 
 	if (_yDataIsComplex) {
-		result = ot::PlotDatasetData(_xData, toComplexVector(_yData), _plotCfg.getXAxisQuantity(), _plotCfg.getYAxisQuantity());
+		result = ot::PlotDatasetData(_xData, toComplexVector(_yData), _plotCfg.getXAxisQuantityComponent(), _plotCfg.getYAxisQuantityComponent());
 	}
 	else {
 		result = ot::PlotDatasetData(_xData, toDoubleVector(_yData));

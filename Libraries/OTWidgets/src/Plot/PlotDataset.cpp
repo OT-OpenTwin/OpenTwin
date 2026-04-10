@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotDataset.cpp
 // 
 // License:
@@ -347,12 +347,12 @@ void ot::PlotDataset::setPointInterval(int _interval, bool _repaint)
 	}
 }
 
-void ot::PlotDataset::setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantity _xQuantity, const Plot1DAxisCfg::QuantityScaling& _xQuantityScaling, Plot1DAxisCfg::AxisQuantity _yQuantity, const Plot1DAxisCfg::QuantityScaling& _yQuantityScaling)
+void ot::PlotDataset::setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantityComponent _xQuantity, const Plot1DAxisCfg::ValueScaling& _xValueScaling, Plot1DAxisCfg::AxisQuantityComponent _yQuantity, const Plot1DAxisCfg::ValueScaling& _yValueScaling)
 {
 	m_data.setXQuantity(_xQuantity);
-	m_data.setXQuantityScaling(_xQuantityScaling);
+	m_data.setXValueScaling(_xValueScaling);
 	m_data.setYQuantity(_yQuantity);
-	m_data.setYQuantityScaling(_yQuantityScaling);
+	m_data.setYValueScaling(_yValueScaling);
 	m_data.updateData();
 }
 

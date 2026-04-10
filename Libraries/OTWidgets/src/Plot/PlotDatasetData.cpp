@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotDatasetData.cpp
 // 
 // License:
@@ -48,11 +48,11 @@ ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<d
 	updateData();
 }
 
-ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
+ot::PlotDatasetData::PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantityComponent _initialXQuantity, Plot1DAxisCfg::AxisQuantityComponent _initialYQuantity)
 	: PlotDatasetData(std::move(std::vector<double>(_dataX)), std::move(_dataY), _initialXQuantity, _initialYQuantity)
 {}
 
-ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity, Plot1DAxisCfg::AxisQuantity _initialYQuantity)
+ot::PlotDatasetData::PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantityComponent _initialXQuantity, Plot1DAxisCfg::AxisQuantityComponent _initialYQuantity)
 	: m_xQuantity(Plot1DAxisCfg::Undefined), m_yQuantity(Plot1DAxisCfg::Undefined),
 	m_dataX(std::move(_dataX)), m_dataY(std::move(_dataY)), m_dataIsComplex(true),
 	m_cartesianAccessor(nullptr), m_polarAccessor(nullptr)
@@ -88,9 +88,9 @@ ot::PlotDatasetData& ot::PlotDatasetData::operator=(PlotDatasetData&& _other) no
 		m_polarAccessor = _other.m_polarAccessor;
 
 		m_xQuantity = _other.m_xQuantity;
-		m_xQuantityScaling = _other.m_xQuantityScaling;
+		m_xValueScaling = _other.m_xValueScaling;
 		m_yQuantity = _other.m_yQuantity;
-		m_yQuantityScaling = _other.m_yQuantityScaling;
+		m_yValueScaling = _other.m_yValueScaling;
 
 		m_dataX = std::move(_other.m_dataX);
 		m_dataY = std::move(_other.m_dataY);
@@ -122,11 +122,11 @@ ot::PlotDatasetData::~PlotDatasetData()
 
 void ot::PlotDatasetData::updateData()
 {
-	applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
-	applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
+	applyQuantityWithScaling(m_xQuantity, m_xValueScaling, m_calcX);
+	applyQuantityWithScaling(m_yQuantity, m_yValueScaling, m_calcY);
 }
 
-void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
+void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity, bool _updateData) {
 	if (m_xQuantity == _quantity || !m_dataIsComplex) {
 		return;
 	}
@@ -134,42 +134,42 @@ void ot::PlotDatasetData::setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bo
 	
 	if (_updateData)
 	{
-		applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
+		applyQuantityWithScaling(m_xQuantity, m_xValueScaling, m_calcX);
 	}
 }
 
-void ot::PlotDatasetData::setXQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
+void ot::PlotDatasetData::setXValueScaling(const Plot1DAxisCfg::ValueScaling& _scaling, bool _updateData)
 {
-	if (m_xQuantityScaling == _scaling) {
+	if (m_xValueScaling == _scaling) {
 		return;
 	}
-	m_xQuantityScaling = _scaling;
+	m_xValueScaling = _scaling;
 	if (_updateData)
 	{
-		applyQuantityWithScaling(m_xQuantity, m_xQuantityScaling, m_calcX);
+		applyQuantityWithScaling(m_xQuantity, m_xValueScaling, m_calcX);
 	}
 }
 
-void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData) {
+void ot::PlotDatasetData::setYQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity, bool _updateData) {
 	if (m_yQuantity == _quantity || !m_dataIsComplex) {
 		return;
 	}
 	m_yQuantity = _quantity;
 	if (_updateData)
 	{
-		applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
+		applyQuantityWithScaling(m_yQuantity, m_yValueScaling, m_calcY);
 	}
 }
 
-void ot::PlotDatasetData::setYQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData)
+void ot::PlotDatasetData::setYValueScaling(const Plot1DAxisCfg::ValueScaling& _scaling, bool _updateData)
 {
-	if (m_yQuantityScaling == _scaling) {
+	if (m_yValueScaling == _scaling) {
 		return;
 	}
-	m_yQuantityScaling = _scaling;
+	m_yValueScaling = _scaling;
 	if (_updateData)
 	{
-		applyQuantityWithScaling(m_yQuantity, m_yQuantityScaling, m_calcY);
+		applyQuantityWithScaling(m_yQuantity, m_yValueScaling, m_calcY);
 	}
 }
 
@@ -196,7 +196,7 @@ void ot::PlotDatasetData::resetCachedRect() {
 	}
 }
 
-double ot::PlotDatasetData::scaledValue(double _value, const Plot1DAxisCfg::QuantityScaling& _scaling) const
+double ot::PlotDatasetData::scaledValue(double _value, const Plot1DAxisCfg::ValueScaling& _scaling) const
 {
 	double result = _value;
 	if (_scaling.has(Plot1DAxisCfg::DB10)) {
@@ -221,7 +221,7 @@ double ot::PlotDatasetData::scaledValue(double _value, const Plot1DAxisCfg::Quan
 	return result;
 }
 
-bool ot::PlotDatasetData::applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantity _quantity, const Plot1DAxisCfg::QuantityScaling& _scaling, std::vector<double>& _dataTarget) {
+bool ot::PlotDatasetData::applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantityComponent _quantity, const Plot1DAxisCfg::ValueScaling& _scaling, std::vector<double>& _dataTarget) {
 	_dataTarget.clear();
 	
 	if (m_polarAccessor) {

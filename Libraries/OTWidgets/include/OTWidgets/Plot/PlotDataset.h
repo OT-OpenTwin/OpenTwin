@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotDataset.h
 // 
 // License:
@@ -142,7 +142,7 @@ namespace ot {
 		void setConfig(const Plot1DCurveCfg& _config) { m_config = _config; };
 		void setConfig(Plot1DCurveCfg&& _config) { m_config = std::move(_config); };
 
-		void setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantity _xQuantity, const Plot1DAxisCfg::QuantityScaling& _xQuantityScaling, Plot1DAxisCfg::AxisQuantity _yQuantity, const Plot1DAxisCfg::QuantityScaling& _yQuantityScaling);
+		void setAxisQuantitiesAndScaling(Plot1DAxisCfg::AxisQuantityComponent _xQuantity, const Plot1DAxisCfg::ValueScaling& _xValueScaling, Plot1DAxisCfg::AxisQuantityComponent _yQuantity, const Plot1DAxisCfg::ValueScaling& _yValueScaling);
 
 		void setSelected(bool _isSelected);
 		bool isSelected() const { return m_isSelected; };

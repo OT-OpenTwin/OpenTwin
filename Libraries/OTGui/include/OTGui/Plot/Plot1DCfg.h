@@ -133,8 +133,8 @@ namespace ot {
 		void setXAxisMax(double _max) { m_xAxis.setMax(_max); };
 		double getXAxisMax() const { return m_xAxis.getMax(); };
 
-		void setXAxisQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity) { m_xAxis.setQuantity(_quantity); };
-		Plot1DAxisCfg::AxisQuantityComponent getXAxisQuantity() const { return m_xAxis.getQuantity(); };
+		void setXAxisQuantityComponent(Plot1DAxisCfg::AxisQuantityComponent _quantity) { m_xAxis.setQuantityComponent(_quantity); };
+		Plot1DAxisCfg::AxisQuantityComponent getXAxisQuantityComponent() const { return m_xAxis.getQuantityComponent(); };
 
 		void setXAxisIsLogScale(bool _logScaleEnabled) { m_xAxis.setIsLogScale(_logScaleEnabled); };
 		bool getXAxisIsLogScale() const { return m_xAxis.getIsLogScale(); };
@@ -168,8 +168,8 @@ namespace ot {
 		void setYAxisMax(double _max) { m_yAxis.setMax(_max); };
 		double getYAxisMax() const { return m_yAxis.getMax(); };
 
-		void setYAxisQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity) { m_yAxis.setQuantity(_quantity); };
-		Plot1DAxisCfg::AxisQuantityComponent getYAxisQuantity() const { return m_yAxis.getQuantity(); };
+		void setYAxisQuantityComponent(Plot1DAxisCfg::AxisQuantityComponent _quantity) { m_yAxis.setQuantityComponent(_quantity); };
+		Plot1DAxisCfg::AxisQuantityComponent getYAxisQuantityComponent() const { return m_yAxis.getQuantityComponent(); };
 
 		void setYAxisIsLogScale(bool _logScaleEnabled) { m_yAxis.setIsLogScale(_logScaleEnabled); };
 		bool getYAxisIsLogScale() const { return m_yAxis.getIsLogScale(); };

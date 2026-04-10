@@ -46,7 +46,7 @@ std::string ot::Plot1DAxisCfg::toString(AxisQuantityComponent _quantity)
 	}
 }
 
-ot::Plot1DAxisCfg::AxisQuantityComponent ot::Plot1DAxisCfg::stringToAxisQuantity(const std::string& _quantity) 
+ot::Plot1DAxisCfg::AxisQuantityComponent ot::Plot1DAxisCfg::stringToAxisQuantityComponent(const std::string& _quantity)
 {
 	if (_quantity == toString(AxisQuantityComponent::Undefined)) 
 	{
@@ -91,7 +91,7 @@ std::string ot::Plot1DAxisCfg::toString(ValueScalingFlag _scaling)
 	};
 }
 
-ot::Plot1DAxisCfg::ValueScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalingFlag(const std::string& _scaling)
+ot::Plot1DAxisCfg::ValueScalingFlag ot::Plot1DAxisCfg::stringToValueScalingFlag(const std::string& _scaling)
 {
 	if (_scaling == toString(ValueScalingFlag::NoQuantityScaling)) return ValueScalingFlag::NoQuantityScaling;
 	else if (_scaling == toString(ValueScalingFlag::DB10)) return ValueScalingFlag::DB10;
@@ -102,7 +102,7 @@ ot::Plot1DAxisCfg::ValueScalingFlag ot::Plot1DAxisCfg::stringToQuantityScalingFl
 	}
 }
 
-std::list<std::string> ot::Plot1DAxisCfg::getAxisQuantityStringList() 
+std::list<std::string> ot::Plot1DAxisCfg::getAxisQuantityComponentStringList()
 {
 	return std::list<std::string>({
 		toString(AxisQuantityComponent::XData),
@@ -113,7 +113,7 @@ std::list<std::string> ot::Plot1DAxisCfg::getAxisQuantityStringList()
 	});
 }
 
-std::list<std::string> ot::Plot1DAxisCfg::getQuantityScalingStringList()
+std::list<std::string> ot::Plot1DAxisCfg::getValueScalingStringList()
 {
 	return std::list<std::string>({
 		toString(ValueScalingFlag::NoQuantityScaling),
@@ -181,7 +181,7 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_autoDetermineAxisLabel = json::getBool(_object, "AutoDetermineAxisLabel");
 	m_axisLabel = json::getString(_object, "AxisLabel");
 	
-	m_axisQuantityComponent = stringToAxisQuantity(json::getString(_object, "AxisQuantityComponent"));
+	m_axisQuantityComponent = stringToAxisQuantityComponent(json::getString(_object, "AxisQuantityComponent"));
 	m_axisScaling = static_cast<AxisScaling>(json::getUInt(_object, "AxisScale"));
 	m_valueScaling = static_cast<ValueScaling>(json::getUInt(_object, "QuantityScale"));
 

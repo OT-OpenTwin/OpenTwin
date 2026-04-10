@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PlotDatasetData.h
 // 
 // License:
@@ -65,7 +65,7 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		explicit PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
+		explicit PlotDatasetData(const std::vector<double>& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantityComponent _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantityComponent _initialYQuantity = Plot1DAxisCfg::Real);
 
 		//! @brief Constructor for complex data.
 		//! @param _dataX X values of the dataset.
@@ -73,7 +73,7 @@ namespace ot {
 		//! @param _complexRepresentation Representation of the provided complex data. This is required to correctly convert the data to the real/imaginary representation.
 		//! @param _initialXQuantity Initial quantity for the X axis.
 		//! @param _initialYQuantity Initial quantity for the Y axis.
-		explicit PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantity _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantity _initialYQuantity = Plot1DAxisCfg::Real);
+		explicit PlotDatasetData(std::vector<double>&& _dataX, std::vector<std::complex<double>>&& _dataY, Plot1DAxisCfg::AxisQuantityComponent _initialXQuantity = Plot1DAxisCfg::XData, Plot1DAxisCfg::AxisQuantityComponent _initialYQuantity = Plot1DAxisCfg::Real);
 
 		PlotDatasetData(PlotDatasetData&& _other) noexcept;
 		PlotDatasetData& operator=(PlotDatasetData&& _other) noexcept;
@@ -82,17 +82,17 @@ namespace ot {
 
 		void updateData();
 
-		void setXQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData = false);
-		Plot1DAxisCfg::AxisQuantity getXQuantity() const { return m_xQuantity; };
+		void setXQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity, bool _updateData = false);
+		Plot1DAxisCfg::AxisQuantityComponent getXQuantity() const { return m_xQuantity; };
 
-		void setXQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData = false);
-		const Plot1DAxisCfg::QuantityScaling& getXQuantityScaling() const { return m_xQuantityScaling; };
+		void setXValueScaling(const Plot1DAxisCfg::ValueScaling& _scaling, bool _updateData = false);
+		const Plot1DAxisCfg::ValueScaling& getXValueScaling() const { return m_xValueScaling; };
 
-		void setYQuantity(Plot1DAxisCfg::AxisQuantity _quantity, bool _updateData = false);
-		Plot1DAxisCfg::AxisQuantity getYQuantity() const { return m_yQuantity; };
+		void setYQuantity(Plot1DAxisCfg::AxisQuantityComponent _quantity, bool _updateData = false);
+		Plot1DAxisCfg::AxisQuantityComponent getYQuantity() const { return m_yQuantity; };
 
-		void setYQuantityScaling(const Plot1DAxisCfg::QuantityScaling& _scaling, bool _updateData = false);
-		const Plot1DAxisCfg::QuantityScaling& getYQuantityScaling() const { return m_yQuantityScaling; };
+		void setYValueScaling(const Plot1DAxisCfg::ValueScaling& _scaling, bool _updateData = false);
+		const Plot1DAxisCfg::ValueScaling& getYValueScaling() const { return m_yValueScaling; };
 
 		CartesianPlotDatasetData* getCartesianAccessor();
 		PolarPlotDatasetData* getPolarAccessor();
@@ -108,8 +108,8 @@ namespace ot {
 		friend class PlotSeriesData<QPointF>;
 		friend class PlotSeriesData<QwtPointPolar>;
 
-		double scaledValue(double _value, const Plot1DAxisCfg::QuantityScaling& _scaling) const;
-		bool applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantity _quantity, const Plot1DAxisCfg::QuantityScaling& _scaling, std::vector<double>& _dataTarget);
+		double scaledValue(double _value, const Plot1DAxisCfg::ValueScaling& _scaling) const;
+		bool applyQuantityWithScaling(Plot1DAxisCfg::AxisQuantityComponent _quantity, const Plot1DAxisCfg::ValueScaling& _scaling, std::vector<double>& _dataTarget);
 
 		void forgetCartesianAccessor() { m_cartesianAccessor = nullptr; };
 		void forgetPolarAccessor() { m_polarAccessor = nullptr; };
@@ -117,10 +117,10 @@ namespace ot {
 		CartesianPlotDatasetData* m_cartesianAccessor;
 		PolarPlotDatasetData* m_polarAccessor;
 
-		Plot1DAxisCfg::AxisQuantity m_xQuantity;
-		Plot1DAxisCfg::QuantityScaling m_xQuantityScaling;
-		Plot1DAxisCfg::AxisQuantity m_yQuantity;
-		Plot1DAxisCfg::QuantityScaling m_yQuantityScaling;
+		Plot1DAxisCfg::AxisQuantityComponent m_xQuantity;
+		Plot1DAxisCfg::ValueScaling m_xValueScaling;
+		Plot1DAxisCfg::AxisQuantityComponent m_yQuantity;
+		Plot1DAxisCfg::ValueScaling m_yValueScaling;
 
 		std::vector<double> m_dataX;
 		std::vector<std::complex<double>> m_dataY;

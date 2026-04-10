@@ -368,18 +368,18 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 		const std::string yAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getYAxisPropertyGroupName());
 		if (!yAxisComponent.empty())
 		{
-			yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(yAxisComponent));
+			yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(yAxisComponent));
 		}
-		xAxisCfg.setQuantity(ot::Plot1DAxisCfg::AxisQuantity::XData);
+		xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::AxisQuantityComponent::XData);
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
 	{
 		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
-		yAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(phaseAxisComponent));
+		yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
 		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
-		xAxisCfg.setQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(radiusAxisComponent));
+		xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
 
 	}
 	else
@@ -420,8 +420,8 @@ ot::Plot1DCfg::PlotType EntityResult1DPlot::getPlotType() const
 
 void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 {
-	const std::list<std::string> quantityScalingOptions = ot::Plot1DAxisCfg::getQuantityScalingStringList();
-	EntityPropertiesSelection::createProperty(_axisName, "Value scaling", quantityScalingOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::NoQuantityScaling), "", getProperties());
+	const std::list<std::string> valueScalingOptions = ot::Plot1DAxisCfg::getValueScalingStringList();
+	EntityPropertiesSelection::createProperty(_axisName, "Value scaling", valueScalingOptions, ot::Plot1DAxisCfg::toString(ot::Plot1DAxisCfg::NoQuantityScaling), "", getProperties());
 
 	EntityPropertiesBoolean::createProperty(_axisName, "Logscale", false, "", getProperties());
 	EntityPropertiesBoolean::createProperty(_axisName, "Autoscale", true, "", getProperties());

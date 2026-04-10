@@ -223,15 +223,15 @@ void ot::PlotBase::applyConfig()
 	this->setPlotType(m_config.getPlotType());
 
 	// Update quantities and scaling for all datasets
-	const Plot1DAxisCfg::AxisQuantity xAxisQuantity = m_config.getXAxisQuantity();
-	const Plot1DAxisCfg::AxisQuantity yAxisQuantity = m_config.getYAxisQuantity();
-	const Plot1DAxisCfg::QuantityScaling xQuantityScaling = m_config.getXAxis().getQuantityScaling();
-	const Plot1DAxisCfg::QuantityScaling yQuantityScaling = m_config.getYAxis().getQuantityScaling();
+	const Plot1DAxisCfg::AxisQuantityComponent xAxisQuantityComponent = m_config.getXAxisQuantityComponent();
+	const Plot1DAxisCfg::AxisQuantityComponent yAxisQuantityComponent = m_config.getYAxisQuantityComponent();
+	const Plot1DAxisCfg::ValueScaling xValueScaling = m_config.getXAxis().getValueScaling();
+	const Plot1DAxisCfg::ValueScaling yValueScaling = m_config.getYAxis().getValueScaling();
 
 	// Apply changes (triggers calculation if needed)
 	for (PlotDataset* data : getAllDatasets())
 	{
-		data->setAxisQuantitiesAndScaling(xAxisQuantity, xQuantityScaling, yAxisQuantity, yQuantityScaling);
+		data->setAxisQuantitiesAndScaling(xAxisQuantityComponent, xValueScaling, yAxisQuantityComponent, yValueScaling);
 	}
 
 	// Legend

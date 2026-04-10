@@ -66,14 +66,14 @@ namespace ot {
 		typedef Flags<ValueScalingFlag, uint32_t> ValueScaling;
 
 		static std::string toString(AxisQuantityComponent _quantity);
-		static AxisQuantityComponent stringToAxisQuantity(const std::string& _quantity);
+		static AxisQuantityComponent stringToAxisQuantityComponent(const std::string& _quantity);
 
 		static std::string toString(ValueScalingFlag _scaling);
-		static ValueScalingFlag stringToQuantityScalingFlag(const std::string& _scaling);
+		static ValueScalingFlag stringToValueScalingFlag(const std::string& _scaling);
 
-		static std::list<std::string> getAxisQuantityStringList();
+		static std::list<std::string> getAxisQuantityComponentStringList();
 
-		static std::list<std::string> getQuantityScalingStringList();
+		static std::list<std::string> getValueScalingStringList();
 
 		Plot1DAxisCfg();
 		virtual ~Plot1DAxisCfg();
@@ -101,8 +101,8 @@ namespace ot {
 		void setMax(double _max) { m_max = _max; };
 		double getMax() const { return m_max; };
 
-		void setQuantity(AxisQuantityComponent _quantity) { m_axisQuantityComponent = _quantity; };
-		AxisQuantityComponent getQuantity() const { return m_axisQuantityComponent; };
+		void setQuantityComponent(AxisQuantityComponent _quantity) { m_axisQuantityComponent = _quantity; };
+		AxisQuantityComponent getQuantityComponent() const { return m_axisQuantityComponent; };
 
 		inline void setScaling(const AxisScaling& _scaling) { m_axisScaling = _scaling; };
 		constexpr const AxisScaling& getScaling() const { return m_axisScaling; };
@@ -138,7 +138,7 @@ namespace ot {
 		inline void setQuantityScaling(const ValueScalingFlag& _scaling) { m_valueScaling = _scaling; };
 
 		//! @brief Get the quantity scaling flags for the axis.
-		constexpr const ValueScaling& getQuantityScaling() const { return m_valueScaling; };
+		constexpr const ValueScaling& getValueScaling() const { return m_valueScaling; };
 
 		//! @brief Set whether decibel (dB) scaling is enabled for the axis using 10 * log_10.
 		//! @note The plot allows for both dB10 and dB20 scaling to be enabled at the same time.
