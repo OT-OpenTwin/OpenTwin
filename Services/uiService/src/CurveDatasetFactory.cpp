@@ -55,6 +55,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 		return {};
 	}
 
+	//@Alex here you can get the selected parameter and its units. Parameter never have more then 1 units. If available, it is the first one.
+	/*const std::string xAxisParameter;
+	accessCfg.getAllFieldDecoderParameter().find(xAxisParameter)->second.getTupleInstance().getTupleUnits().front();*/
+
 	mongocxx::options::find options;
 	std::string log;
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options, log);
@@ -228,6 +232,18 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 	{
 		const ot::DatasetDependencyInfos& dependencies = curve.first;
 		auto& dataPoints = curve.second;
+
+		// @Alex Here you can get metadata per series. You can turn these metadata as json document into instances of additional dependencies for the naming. 
+		/*auto accessCfg = _curveCfg.getDataAccessConfig();
+		for (auto dep : dependencies.getDependencies())
+		{
+			bool isSeries;
+			if (isSeries)
+			{
+				auto seriesName = dep.getLabel();
+				const ot::JsonDocument& doc = accessCfg.getSeriesMetadata(seriesName);
+			}
+		}*/
 
 		ot::PlotDatasetData datasetData;
 		if (dataPoints.m_yData.front().isComplex())
