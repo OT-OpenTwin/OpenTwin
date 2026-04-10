@@ -47,6 +47,14 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 {
 	m_curveIDDescriptions.clear();
 	
+	// We check the validity of the access cfg first
+	const ot::DataLakeAccessCfg& accessCfg = _config.getDataAccessConfig();
+	if (accessCfg.getAllFieldDecoderSeriesByLabel().size() == 0)
+	{
+		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since no series matches the criteria.\n");
+		return {};
+	}
+
 	mongocxx::options::find options;
 	std::string log;
 	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options, log);
@@ -211,6 +219,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, ot::Plot1DCurveCfg& _curveCfg)
 {
+
 	std::list<ot::PlotDataset*> dataSets;
 
 	CurveColourSetter curveColourSetter(_curveCfg);
