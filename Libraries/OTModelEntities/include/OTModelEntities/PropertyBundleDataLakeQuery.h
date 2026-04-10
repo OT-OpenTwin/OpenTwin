@@ -27,7 +27,7 @@ public:
 	void lockAllProperties(EntityBase* _thisObject);
 private:
 	const uint32_t m_maxNbOfQueries = 40;
-	const uint32_t m_maxNbOfQueriesMetadata = 4;
+	const uint32_t m_maxNbOfQueriesMetadata = 10;
 
 	const std::string m_propertyNameProjectName = "Project name";
 	const std::string m_propertyNameSeriesMetadata = "Measurement series";
