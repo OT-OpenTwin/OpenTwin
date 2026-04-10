@@ -687,7 +687,16 @@ void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQ
 	if (!quantityTuple.isSingle())
 	{
 		// Component, format, units, data type, value, comp, name
-		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ quantityComparison.getTupleTarget() }, _thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+		std::list<std::string>quantityComponents = { quantityTuple.getTupleTypeName() };
+		if (quantityComparison.getTupleTarget() != "")
+		{
+			quantityComponents.push_back(quantityComparison.getTupleTarget());
+		}
+		PropertyHelper::setSelectionPropertyValue(quantityComponents, _thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+		if (quantityComparison.getTupleTarget() != "")
+		{
+			PropertyHelper::setSelectionPropertyValue(quantityComparison.getTupleTarget(), _thisObject, m_propertyQuantityComponent, m_groupQuantitySettings);
+		}
 		const std::string combinedUnit = ot::TupleDescription::createCombinedUnitsString(quantityTuple.getTupleUnits());
 		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ combinedUnit }, _thisObject, m_propertyTupleUnit, m_groupQuantitySettings);
 		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ quantityTuple.getTupleFormatName() }, _thisObject, m_propertyTupleFormat, m_groupQuantitySettings);

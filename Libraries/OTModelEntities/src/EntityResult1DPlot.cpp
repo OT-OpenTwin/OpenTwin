@@ -221,40 +221,11 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 		}
 	}	
 	
-	EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
-	EntityPropertiesSelection* quCompRadiusAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName()));
-	EntityPropertiesSelection* quCompPhaseAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName()));
-
 	tupleTypes.erase("");
 	if (tupleTypes.size() == 1)
 	{
-		ot::Plot1DCfg::PlotType plotType = getPlotType();
-		bool showCartesian = (plotType == ot::Plot1DCfg::Cartesian);
-
-		ot::TupleDescription* description =	TupleFactory::create(*tupleTypes.begin());
-		if (description != nullptr)
-		{
-			std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
-			if (quCompYAxis->getOptions() != tupleOptionsVec)
-			{
-				quCompYAxis->resetOptions(tupleOptionsVec);
-			}
-			//For the other two axis settings it is also possible to select the parameter
-			tupleOptionsVec.insert(tupleOptionsVec.end(), ++queryParameterList.begin(), queryParameterList.end());
-			if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
-			{
-				quCompRadiusAxis->resetOptions(tupleOptionsVec);
-				quCompPhaseAxis->resetOptions(tupleOptionsVec);
-			}
-
-			quCompYAxis->setVisible(showCartesian);
-			quCompRadiusAxis->setVisible(!showCartesian);
-			quCompPhaseAxis->setVisible(!showCartesian);
-		}
-		else
-		{
-			assert(false);
-		}
+		const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type", "General");
+		setTupleSettings(*tupleTypes.begin(), plotType, queryParameterList);
 	}
 	else if(tupleTypes.size() >1)
 	{
@@ -262,11 +233,46 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 	}
 	else
 	{
-		quCompYAxis->setVisible(false);
-		quCompRadiusAxis->setVisible(false);
-		quCompPhaseAxis->setVisible(false);
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName())->setVisible(false);
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName())->setVisible(false);
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName())->setVisible(false);
 	}
 }
+
+void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions)
+{
+	EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
+	EntityPropertiesSelection* quCompRadiusAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName()));
+	EntityPropertiesSelection* quCompPhaseAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName()));
+
+	bool showCartesian = (_tupleFormat == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
+
+	ot::TupleDescription* description = TupleFactory::create(_tupleType);
+	if (description != nullptr)
+	{
+		std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
+		if (quCompYAxis->getOptions() != tupleOptionsVec)
+		{
+			quCompYAxis->resetOptions(tupleOptionsVec);
+		}
+		//For the other two axis settings it is also possible to select the parameter, but we skip the empty entry at the beginning of the list.
+		tupleOptionsVec.insert(tupleOptionsVec.end(), ++_parameterOptions.begin(), _parameterOptions.end());
+		if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
+		{
+			quCompRadiusAxis->resetOptions(tupleOptionsVec);
+			quCompPhaseAxis->resetOptions(tupleOptionsVec);
+		}
+
+		quCompYAxis->setVisible(showCartesian);
+		quCompRadiusAxis->setVisible(!showCartesian);
+		quCompPhaseAxis->setVisible(!showCartesian);
+	}
+	else
+	{
+		assert(false);
+	}
+}
+
 
 void EntityResult1DPlot::createProperties()
 {
@@ -646,6 +652,10 @@ void EntityResult1DPlot::setStaticCurveQueryOptions(const ot::Plot1DCfg& _config
 
 	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{_config.getXAxisParameter()}, this, "Parameter", getXAxisPropertyGroupName());
 	
+	const std::string tupleType = _config.getTupleType();
+	const std::string tupleFormat = _config.getTupleFormat();
+	setTupleSettings(tupleType, tupleFormat, { _config.getXAxisParameter() });
+
 	updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 }

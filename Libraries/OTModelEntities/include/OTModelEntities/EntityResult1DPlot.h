@@ -71,7 +71,7 @@ public:
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	// Private helper
+	void setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions);
 
 private:
 	static std::string getXAxisPropertyGroupName() { return "X axis"; };

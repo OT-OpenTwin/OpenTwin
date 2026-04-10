@@ -178,6 +178,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 
 			std::string defaultAxis = getDefaultAxisFromData(series, fullName);
 			plotCfg.setXAxisParameter(defaultAxis);
+			plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(),ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 			newPlot.setStaticCurveQueryOptions(plotCfg);
 			newPlot.storeToDataBase(); // Check ob das schon so war
 			m_application->getModelComponent()->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);

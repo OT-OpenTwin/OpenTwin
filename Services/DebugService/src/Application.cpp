@@ -300,7 +300,8 @@ void Application::createPlotOneComplexCurveMagPhase()
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
 	plotCfg.setXAxisParameter(parameter.parameterLabel);
-	plotCfg.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(ot::ComplexNumbers::getComponentMagnitude()));
+	plotCfg.setYAxisQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(ot::ComplexNumbers::getComponentMagnitude()));
+	plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 	builder.buildPlot(plotCfg);
 }
 
@@ -371,7 +372,8 @@ void Application::createPlotOneComplexCurveRealImag()
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
 	plotCfg.setXAxisParameter(parameter.parameterLabel);
-	plotCfg.setYAxisQuantity(ot::Plot1DAxisCfg::stringToAxisQuantity(ot::ComplexNumbers::getComponentMagnitude()));
+	plotCfg.setYAxisQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(ot::ComplexNumbers::getComponentMagnitude()));
+	plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 	builder.buildPlot(plotCfg);
 }
 

@@ -229,6 +229,13 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 		;
 }
 
+void ot::Plot1DCfg::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat)
+{
+	m_tupleType = _tupleType;
+	m_tupleFormat = _tupleFormat;
+}
+
+
 bool ot::Plot1DCfg::operator!=(const Plot1DCfg& _other) const {
 	return !Plot1DCfg::operator==(_other);
 }

@@ -244,6 +244,11 @@ namespace ot {
 		//! @return List of label infos in decreasing priority order (first entry has the highest priority).
 		const DependencyLabelInfoList& getFixedDatasetLabelInfos() const { return m_fixedDatasetLabelInfos; };
 
+		// For defining the entity properties through the plot builder.
+		void setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat);
+		const std::string& getTupleType() const { return m_tupleType; }
+		const std::string& getTupleFormat() const { return m_tupleFormat; }
+
 	private:
 		bool invariant() const;
 
@@ -281,5 +286,8 @@ namespace ot {
 		double m_polarDegreeOrigin = 0.0;
 
 		DependencyLabelInfoList m_fixedDatasetLabelInfos;
+		std::string m_tupleType;
+		std::string m_tupleFormat;
+
 	};
 }
