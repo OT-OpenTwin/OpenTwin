@@ -216,6 +216,7 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 			const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
 			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->resetOptions(allOptions);
 		}
+		allOptions.push_front("");
 		setNameOptions(_thisObject, seriesNames, m_groupMetadataFilter, m_propertyNameSeriesMetadata);
 	}
 
