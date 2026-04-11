@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Symbol.h"
+#include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTWidgets/QtFactory.h"
@@ -214,7 +215,7 @@ void ot::PlotBase::setIncompatibleData()
 
 void ot::PlotBase::applyConfig()
 {
-	updateDatasetAndAxesTitles();
+	updateDatasetTitles();
 
 	m_cartesianPlot->setTitle(m_config.getTitle().c_str());
 	m_polarPlot->setTitle(m_config.getTitle().c_str());
@@ -407,7 +408,7 @@ QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multil
 	return QString::fromStdString(txt);
 }
 
-void ot::PlotBase::updateDatasetAndAxesTitles()
+void ot::PlotBase::updateDatasetTitles()
 {
 	auto datasets = this->getAllDatasets();
 	
@@ -586,6 +587,32 @@ void ot::PlotBase::updateDatasetAndAxesTitles()
 
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
+	// Updata data info
+	m_config.setDataLabelX(m_config.getXAxisParameter());
+	std::string dataY;
+
+	for (const PlotDataset* dataset : getAllDatasets())
+	{
+		auto quantity = dataset->getDependencyInfos().getDependency(MetadataQuantity::getFieldName());
+		if (quantity.has_value())
+		{
+			if (dataY.empty())
+			{
+				dataY = quantity->getValue();
+			}
+			else if (dataY != quantity->getValue())
+			{
+				dataY = "";
+				break;
+			}
+		}
+	}
+	if (!dataY.empty())
+	{
+		m_config.setDataLabelY(dataY);
+	}
+
+	// Create title based on axis config and data info
 	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel());
 	const QString axisTitleY = QString::fromStdString(m_config.getYAxisDisplayLabel());
 

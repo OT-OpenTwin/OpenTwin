@@ -170,7 +170,7 @@ namespace ot {
 
 		//! @brief Update the dataset titles based on the provided dependency label information list.
 		//! @param _dependencyLabelInfoList 
-		void updateDatasetAndAxesTitles();
+		void updateDatasetTitles();
 
 	Q_SIGNALS:
 		void resetItemSelectionRequest();
