@@ -586,7 +586,6 @@ std::string ot::toString(SelectionHandlingEvent _flag) {
 	case SelectionHandlingEvent::NewViewRequested: return "NewViewRequested";
 	case SelectionHandlingEvent::ActiveViewChanged: return "ActiveViewChanged";
 	case SelectionHandlingEvent::ActiveViewChangeRequested: return "ActiveViewChangeRequested";
-	case SelectionHandlingEvent::ModelWasNotified: return "ModelWasNotified";
 	default:
 		OT_LOG_E("Unknown selection result (" + std::to_string((int)_flag) + ")");
 		return "Default";
@@ -597,7 +596,6 @@ ot::SelectionHandlingEvent ot::stringToSelectionHandlingEvent(const std::string&
 	if (_flag == toString(SelectionHandlingEvent::NewViewRequested)) return SelectionHandlingEvent::NewViewRequested;
 	if (_flag == toString(SelectionHandlingEvent::ActiveViewChanged)) return SelectionHandlingEvent::ActiveViewChanged;
 	if (_flag == toString(SelectionHandlingEvent::ActiveViewChangeRequested)) return SelectionHandlingEvent::ActiveViewChangeRequested;
-	if (_flag == toString(SelectionHandlingEvent::ModelWasNotified)) return SelectionHandlingEvent::ModelWasNotified;
 	else if (_flag != toString(SelectionHandlingEvent::Default)) {
 		OT_LOG_E("Unknown selection result \"" + _flag + "\"");
 	}
@@ -633,7 +631,6 @@ std::list<ot::SelectionHandlingEvent> ot::getAllSetEvents(const SelectionHandlin
 	if (_flags & SelectionHandlingEvent::NewViewRequested) result.push_back(SelectionHandlingEvent::NewViewRequested);
 	if (_flags & SelectionHandlingEvent::ActiveViewChanged) result.push_back(SelectionHandlingEvent::ActiveViewChanged);
 	if (_flags & SelectionHandlingEvent::ActiveViewChangeRequested) result.push_back(SelectionHandlingEvent::ActiveViewChangeRequested);
-	if (_flags & SelectionHandlingEvent::ModelWasNotified) result.push_back(SelectionHandlingEvent::ModelWasNotified);
 	return result;
 }
 

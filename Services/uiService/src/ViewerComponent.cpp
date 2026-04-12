@@ -753,13 +753,10 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::Se
 	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;
 	result = ViewerAPI::setSelectedTreeItems(_selectionData, selectedModelItems, selectedVisibleModelItems);
 
-	// If the model was already notified it means that the selection handling already triggered a notification.
-	if (true || !(result & ot::SelectionHandlingEvent::ModelWasNotified)) {
-		ot::UID activeModel = ViewerAPI::getActiveDataModel();
-		if (activeModel > 0) {
-			result |= ot::SelectionHandlingEvent::ModelWasNotified;
-			AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
-		}
+	// Send the selection changed notification to the model service
+	ot::UID activeModel = ViewerAPI::getActiveDataModel();
+	if (activeModel > 0) {
+		AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
 	}
 
 	OT_SLECTION_TEST_LOG(">> Handle selection change completed");
