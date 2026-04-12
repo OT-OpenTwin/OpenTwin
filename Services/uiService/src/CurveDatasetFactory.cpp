@@ -106,8 +106,8 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	const std::string displayParameterLabel = _plotCfg.getXAxisParameter();
 
 	const ot::DataLakeAccessCfg& dataLakeAccessCfg = _curveCfg.getDataAccessConfig();
-	ot::JSONToVariableConverter converter;
-
+	
+	/*
 	std::optional<ot::DataPointDecoder> decoderParameter = dataLakeAccessCfg.getFieldDecoderParameterByLabel(displayParameterLabel);
 	
 	std::map<std::string, ot::DataPointDecoder*> additionalParameterDecoders = dataLakeAccessCfg.getAllFieldDecoderParameterByLabel();
@@ -115,8 +115,8 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 	if (!decoderParameter.has_value())
 	{
-		throw std::exception("Plot axis selection did not work.");
-	}
+		//throw std::exception("Plot axis selection did not work.");
+	}*/
 
 	ot::JSONToVariableConverter jsonToVariableConverter;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
