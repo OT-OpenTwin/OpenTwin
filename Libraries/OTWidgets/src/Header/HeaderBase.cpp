@@ -18,8 +18,7 @@ ot::HeaderBase::HeaderBase(Qt::Orientation _orientation, QWidget* _parent)
 	m_buttonSize(14, 14), m_buttonPadding(4, 4)
 {
 	setDefaultAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-	setMouseTracking(true);
-	setSectionsClickable(true);
+	setDefaultHeaderFlags();
 	connect(this, &QHeaderView::sectionClicked, this, &HeaderBase::slotSectionClicked);
 }
 
@@ -45,6 +44,12 @@ int ot::HeaderBase::sizeHintForRow(int _row) const
 	}
 
 	return hint;
+}
+
+void ot::HeaderBase::setDefaultHeaderFlags()
+{
+	setMouseTracking(true);
+	setSectionsClickable(true);
 }
 
 void ot::HeaderBase::paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const

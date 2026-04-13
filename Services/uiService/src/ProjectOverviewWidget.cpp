@@ -79,6 +79,7 @@ ot::ProjectOverviewWidget::ProjectOverviewWidget(QWidget* _parent)
 	m_tree = new ot::ProjectOverviewTree(_parent);
 	m_header = new ProjectOverviewHeader(this, m_tree);
 	m_tree->setHeader(m_header);
+	m_header->setDefaultHeaderFlags();
 
 	m_tree->setObjectName("ProjectOverviewWidgetTree");
 	m_tree->setIconSize(QSize(28, 28));

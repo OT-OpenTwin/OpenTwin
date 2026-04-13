@@ -34,6 +34,8 @@ namespace ot {
 		void setFilterButtonPadding(const QSize& _padding) { m_buttonPadding = _padding; };
 		const QSize& getFilterButtonPadding() const { return m_buttonPadding; };
 
+		void setDefaultHeaderFlags();
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected: Events

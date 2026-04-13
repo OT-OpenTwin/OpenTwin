@@ -52,11 +52,11 @@ namespace ot {
 		explicit ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
 		virtual ~ProjectOverviewHeader();
 
+		void setFilterData(const ProjectFilterData& _filterData);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Overrides
-
-		void setFilterData(const ProjectFilterData& _filterData);
 
 	protected:
 		virtual ot::HeaderFilter::Features getFilterFeatures(int _logicalIndex) const override;
