@@ -63,7 +63,12 @@ ot::CartesianPlot::CartesianPlot(PlotBase* _owner, QWidget* _parent)
 }
 
 ot::CartesianPlot::~CartesianPlot() {
-
+	delete m_picker;
+	delete m_grid;
+	delete m_plotMagnifier;
+	delete m_plotZoomer;
+	delete m_plotPanner;
+	delete m_canvas;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

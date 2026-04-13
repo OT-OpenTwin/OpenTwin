@@ -4839,7 +4839,6 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 		if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
 		{
 			dataSet->setOwnerPlot(plot);
-			dataSet->updateCurveVisualization();
 			plot->addDatasetToCache(dataSet);
 			dataSet->attach();
 		}
@@ -4855,8 +4854,7 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 
 	
 	// Now we refresh the plot visualisation.
-	plot->applyConfig();
-	plot->resetView();
+	QMetaObject::invokeMethod(plot, &ot::PlotBase::applyConfig, Qt::QueuedConnection);
 	
 	if (_visualizationCfg.getSupressViewHandling()) {
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);

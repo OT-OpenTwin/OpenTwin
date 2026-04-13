@@ -48,8 +48,7 @@
 ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_isError(false), m_currentPlotType(Plot1DCfg::Cartesian)
 {
-	m_centralWidget = new QWidget(_parent);
-	QHBoxLayout* centralLayout = new QHBoxLayout(m_centralWidget);
+	QHBoxLayout* centralLayout = new QHBoxLayout(this);
 
 	QVBoxLayout* plotContainerLayout = new QVBoxLayout;
 	centralLayout->addLayout(plotContainerLayout, 1);
@@ -62,11 +61,11 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	infoLayout->setContentsMargins(2, 2, 2, 2);
 	plotContainerLayout->addLayout(infoLayout, 0);
 
-	m_infoLabel = new Label(m_centralWidget);
+	m_infoLabel = new Label(this);
 	infoLayout->addWidget(m_infoLabel);
 	infoLayout->addStretch(1);
 
-	m_errorLabel = new Label("Error", m_centralWidget);
+	m_errorLabel = new Label("Error", this);
 	m_errorLabel->setVisible(false);
 
 	// Create plots
@@ -76,7 +75,7 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	m_plotLayout->addWidget(m_cartesianPlot->getQWidget());
 
 	// Layout
-	m_legendContainer = new QWidget(m_centralWidget);
+	m_legendContainer = new QWidget(this);
 	centralLayout->addWidget(m_legendContainer, 0);
 
 	QVBoxLayout* legendContainerLayout = new QVBoxLayout(m_legendContainer);
@@ -113,7 +112,7 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 			m_polarPlot->hide();
 
 			m_plotLayout->addWidget(m_cartesianPlot->getQWidget());
-			m_cartesianPlot->setParent(m_centralWidget);
+			m_cartesianPlot->setParent(this);
 			m_cartesianPlot->show();
 			break;
 
@@ -123,7 +122,7 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 			m_cartesianPlot->hide();
 
 			m_plotLayout->addWidget(m_polarPlot->getQWidget());
-			m_polarPlot->setParent(m_centralWidget);
+			m_polarPlot->setParent(this);
 			m_polarPlot->show();
 			break;
 
@@ -233,6 +232,7 @@ void ot::PlotBase::applyConfig()
 	for (PlotDataset* data : getAllDatasets())
 	{
 		data->setAxisQuantitiesAndScaling(xAxisQuantityComponent, xValueScaling, yAxisQuantityComponent, yValueScaling);
+		data->updateCurveVisualization();
 	}
 
 	// Legend
@@ -276,6 +276,8 @@ void ot::PlotBase::applyConfig()
 	m_polarPlot->updateLegend();
 	m_polarPlot->updateWholePlot();
 	m_polarPlot->update();
+
+	resetView();
 }
 
 void ot::PlotBase::replot()
@@ -650,6 +652,11 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 		m_polarPlot->updateWholePlot();
 		m_polarPlot->update();
 	}
+}
+
+void ot::PlotBase::showEvent(QShowEvent* _event)
+{
+	QWidget::showEvent(_event);
 }
 
 void ot::PlotBase::updateDatasetTitleSimple(const std::list<PlotDataset*>& _datasets)

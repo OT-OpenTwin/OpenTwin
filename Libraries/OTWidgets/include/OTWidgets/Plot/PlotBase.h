@@ -32,6 +32,7 @@
 #include <QtCore/qstring.h>
 #include <QtCore/qobject.h>
 #include <QtGui/qpen.h>
+#include <QtWidgets/qwidget.h>
 
 // std header
 #include <map>
@@ -55,7 +56,7 @@ namespace ot {
 	//! @brief The PlotBase class is the base class for all plot widgets.
 	//! It provides common functionality for handling plot configuration, data management, and user interactions.
 	//! It also defines the interface for finding datasets associated with plot curves and managing the plot legend.
-	class OT_WIDGETS_API_EXPORT PlotBase : public QObject, public WidgetBase {
+	class OT_WIDGETS_API_EXPORT PlotBase : public QWidget, public WidgetBase {
 		Q_OBJECT
 		OT_DECL_NOCOPY(PlotBase)
 		OT_DECL_NOMOVE(PlotBase)
@@ -81,10 +82,10 @@ namespace ot {
 		// Setter / Getter
 
 		//! @brief Returns the central widget of the plot, which contains the plot area and the legend.
-		virtual QWidget* getQWidget() override { return m_centralWidget; };
+		virtual QWidget* getQWidget() override { return this; };
 
 		//! @brief Returns the central widget of the plot, which contains the plot area and the legend.
-		virtual const QWidget* getQWidget() const override { return m_centralWidget; };
+		virtual const QWidget* getQWidget() const override { return this; };
 
 		PlotLegend* getLegend() const { return m_legend; };
 
@@ -115,9 +116,6 @@ namespace ot {
 		void setErrorState(bool _isError, const QString& _message = QString());
 
 		void setIncompatibleData();
-
-		//! @brief Applies the current configuration to the plot, updating its appearance and behavior accordingly.
-		void applyConfig();
 
 		//! @brief Replots the plot, refreshing its display to reflect any changes in the data or state.
 		void replot();
@@ -176,6 +174,10 @@ namespace ot {
 		void resetItemSelectionRequest();
 		void curveDoubleClicked(PlotDataset* _dataset, bool _hasControlModifier);
 
+	public Q_SLOTS:
+		//! @brief Applies the current configuration to the plot, updating its appearance and behavior accordingly.
+		void applyConfig();
+
 	protected:
 		//! @brief Clears the dataset cache, removing all cached datasets and their associations.
 		virtual void clearCache() = 0;
@@ -187,6 +189,8 @@ namespace ot {
 		//! @param _replot If true, the plot will be replotted after updating the axis titles.
 		void updateAxisTitles(bool _replot = false);
 		
+		virtual void showEvent(QShowEvent* _event) override;
+
 	private:
 		struct PreferredDatasetNameInfo
 		{
@@ -202,7 +206,6 @@ namespace ot {
 
 		Plot1DCfg m_config;
 
-		QWidget* m_centralWidget;
 		Label* m_errorLabel;
 		QVBoxLayout* m_plotLayout;
 

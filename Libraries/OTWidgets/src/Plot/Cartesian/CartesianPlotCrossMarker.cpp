@@ -28,11 +28,11 @@ ot::CartesianPlotCrossMarker::CartesianPlotCrossMarker() : m_symbol(nullptr) {
 	this->setLabelAlignment(Qt::AlignRight | Qt::AlignBottom);
 	this->setLinePen(QPen(QColor(200, 150, 0), 0, Qt::DashDotLine));
 	m_symbol = new QwtSymbol(QwtSymbol::Diamond, QColor(Qt::yellow), QColor(Qt::green), QSize(7, 7));
-	this->setSymbol(m_symbol);
+	this->setSymbol(m_symbol); // The marker takes ownership of the symbol, so we don't have to care about it anymore
 }
 
 ot::CartesianPlotCrossMarker::~CartesianPlotCrossMarker() {
-	delete m_symbol;
+
 }
 
 void ot::CartesianPlotCrossMarker::setStyle(const QColor& _innerColor, const QColor& _outerColor, int _size, double _outerColorSize) {
