@@ -34,7 +34,9 @@ namespace ot {
     namespace intern {
 
         static inline const std::regex getDurationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
-        static inline const std::regex getDurationCaptureRegex() { return std::regex(R"(^(?:(?:(\d+):)?(\d+):)?(\d+):(\d+)(?:\.(\d+))?$)"); };
+        static inline const std::regex getDurationDayRegex() { return std::regex(R"(^(?:(\d+):)?(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+		static inline const std::regex getDurationHourRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+        static inline const std::regex getDurationMinuteRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$)"); };
 
         std::string toTimeStamp(std::chrono::system_clock::time_point _timePoint, ot::DateTime::DateFormat _format) {
             auto timeT = std::chrono::system_clock::to_time_t(_timePoint);
@@ -223,39 +225,77 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
 {
     std::smatch match;
 
-    if (!std::regex_match(_duration, match, intern::getDurationCaptureRegex())) {
-        throw std::runtime_error("Invalid duration format: " + _duration);
-    }
-
     int64_t days = 0;
     int64_t hours = 0;
     int64_t minutes = 0;
     int64_t seconds = 0;
     int64_t msec = 0;
 
-    seconds = std::stoll(match[4].str());
+    auto normalizeFraction = [](const std::string& fraction) -> int64_t
+        {
+            std::string value = fraction;
 
-    if (match[3].matched) {
-        minutes = std::stoll(match[3].str());
-    }
+            if (value.size() > 3)
+            {
+                value = value.substr(0, 3);
+            }
 
-    if (match[2].matched) {
+            while (value.size() < 3)
+            {
+                value.push_back('0');
+            }
+
+            return std::stoll(value);
+        };
+
+    if (std::regex_match(_duration, match, intern::getDurationDayRegex()))
+    {
+        if (match[1].matched)
+        {
+            days = std::stoll(match[1].str());
+        }
+
         hours = std::stoll(match[2].str());
-    }
+        minutes = std::stoll(match[3].str());
+        seconds = std::stoll(match[4].str());
 
-    if (match[1].matched) {
-        days = std::stoll(match[1].str());
+        if (match[5].matched)
+        {
+            msec = normalizeFraction(match[5].str());
+        }
     }
+    else if (std::regex_match(_duration, match, intern::getDurationHourRegex()))
+    {
+        if (match[1].matched)
+        {
+            hours = std::stoll(match[1].str());
+        }
 
-    if (match[5].matched) {
-        std::string fraction = match[5].str();
-        if (fraction.length() > 3) {
-            fraction = fraction.substr(0, 3);
+        minutes = std::stoll(match[2].str());
+        seconds = std::stoll(match[3].str());
+
+        if (match[4].matched)
+        {
+            msec = normalizeFraction(match[4].str());
         }
-        else {
-            fraction.append(3 - fraction.length(), '0');
+    }
+    else if (std::regex_match(_duration, match, intern::getDurationMinuteRegex()))
+    {
+        if (match[1].matched)
+        {
+            minutes = std::stoll(match[1].str());
         }
-        msec = std::stoll(fraction);
+
+        seconds = std::stoll(match[2].str());
+
+        if (match[3].matched)
+        {
+            msec = normalizeFraction(match[3].str());
+        }
+    }
+    else
+    {
+        throw std::runtime_error("Invalid duration format: " + _duration);
     }
 
     return (((days * 24LL + hours) * 60LL + minutes) * 60LL + seconds) * 1000LL + msec;
