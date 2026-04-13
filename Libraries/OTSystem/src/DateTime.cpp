@@ -22,6 +22,7 @@
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
+#include <string>
 #include <regex>
 #include <chrono>
 #include <charconv>
@@ -33,6 +34,7 @@ namespace ot {
     namespace intern {
 
         static inline const std::regex getDurationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
+        static inline const std::regex getDurationCaptureRegex() { return std::regex(R"(^(?:(?:(\d+):)?(\d+):)?(\d+):(\d+)(?:\.(\d+))?$)"); };
 
         std::string toTimeStamp(std::chrono::system_clock::time_point _timePoint, ot::DateTime::DateFormat _format) {
             auto timeT = std::chrono::system_clock::to_time_t(_timePoint);
@@ -221,7 +223,7 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
 {
     std::smatch match;
 
-    if (!std::regex_match(_duration, match, intern::getDurationRegex())) {
+    if (!std::regex_match(_duration, match, intern::getDurationCaptureRegex())) {
         throw std::runtime_error("Invalid duration format: " + _duration);
     }
 
