@@ -4749,6 +4749,10 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 					_plotConfig.setUnitLabelX(unitsX.front());
 				}
 			}
+			else
+			{
+				_plotConfig.setDataLabelX(paramNameX);
+			}
 		}
 
 		auto endTime = ot::DateTime::msSinceEpoch();
