@@ -412,7 +412,7 @@ void Application::createPlotOneCurve()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -475,7 +475,7 @@ void Application::createPlotTwoCurves() {
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -560,7 +560,7 @@ void Application::createFamilyOfCurves()
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -633,7 +633,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -705,7 +705,7 @@ void Application::createFamilyOfCurves3Parameter()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -741,7 +741,7 @@ void Application::createPlotScatter() {
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -805,7 +805,7 @@ void Application::createPlotSinglePoint() {
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterName);
+	plotCfg.setXAxisParameter(parameter.parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
