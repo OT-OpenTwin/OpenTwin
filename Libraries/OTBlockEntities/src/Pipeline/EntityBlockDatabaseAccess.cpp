@@ -46,128 +46,12 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 
 void EntityBlockDatabaseAccess::createProperties()
 {
-	std::list<std::string> comparators = ot::ComparisonSymbols::g_comparators;
-	comparators.push_front("");
-
-	EntityPropertiesProjectList* projectList = new EntityPropertiesProjectList(m_propertyNameProjectName);
-	getProperties().createProperty(projectList, m_groupMetadataFilter);
-	
-	// Basic properties
-	EntityPropertiesSelection* metadataProp = EntityPropertiesSelection::createProperty(m_groupMetadataFilter, m_propertyNameSeriesMetadata, { ""}, "", "default", getProperties());
-	metadataProp->setAllowCustomValues(true);
-	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueries, 0,0, m_maxNbOfQueries, "default", getProperties());
-	EntityPropertiesInteger::createProperty(m_groupMetadataFilter, m_propertyNumberOfQueriesMetadataSeries, 0,0, m_maxNbOfQueriesMetadata, "default", getProperties());
-	
-	// Quantity Settings
-	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyName, {""}, "", "default", getProperties());
-	groupQuantityProp->setAllowCustomValues(true);
-	
-	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
-	typeLabelProperty->setReadOnly(true);
-	typeLabelProperty->setName(m_propertyDataType);
-	typeLabelProperty->setGroup(m_groupQuantitySetttings);
-	typeLabelProperty->setValue("");
-	getProperties().createProperty(typeLabelProperty, m_groupQuantitySetttings);
-
-	EntityPropertiesString* unitLabelProperty = new EntityPropertiesString();
-	unitLabelProperty->setReadOnly(true);
-	unitLabelProperty->setName(m_propertyUnit);
-	unitLabelProperty->setGroup(m_groupQuantitySetttings);
-	unitLabelProperty->setValue("");
-	getProperties().createProperty(unitLabelProperty, m_groupQuantitySetttings);
-
-	EntityPropertiesString::createProperty(m_groupQuantitySetttings, m_propertyValue, "", "default", getProperties());
-	EntityPropertiesSelection::createProperty(m_groupQuantitySetttings, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
-
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleFormat, { }, "", "default", getProperties());
-	PropertyHelper::getSelectionProperty(this, m_propertyTupleFormat, m_groupTupleSettings)->setVisible(false);
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleTarget, { }, "", "default", getProperties());
-	PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings)->setVisible(false);
-	EntityPropertiesSelection::createProperty(m_groupTupleSettings, m_propertyTupleUnit, {}, "", "default", getProperties());
-	PropertyHelper::getSelectionProperty(this, m_propertyTupleUnit, m_groupTupleSettings)->setVisible(false);
-
-	EntityPropertiesBoolean::createProperty(m_groupQuerySetttings, m_propertyOrder, true,"default", getProperties());
-
-	
-	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
-	{
-		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
-		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", getProperties());
-		PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(false);
-
-		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", getProperties());
-		PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(false);
-
-		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
-		PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(false);
-	}
-	//Add all query fields
-	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
-	{
-		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);
-
-		EntityPropertiesSelection::createProperty(groupName, m_propertyName, { "" }, "", "default", getProperties());
-		PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(false);
-
-		EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
-		typeLabelProperty->setReadOnly(true);
-		typeLabelProperty->setName(m_propertyDataType);
-		typeLabelProperty->setGroup(groupName);
-		typeLabelProperty->setValue("");
-		getProperties().createProperty(typeLabelProperty, groupName);
-		PropertyHelper::getStringProperty(this, m_propertyDataType, groupName)->setVisible(false);
-
-		EntityPropertiesString* unitLabelProperty = new EntityPropertiesString();
-		unitLabelProperty->setReadOnly(true);
-		unitLabelProperty->setName(m_propertyUnit);
-		unitLabelProperty->setGroup(groupName);
-		unitLabelProperty->setValue("");
-		getProperties().createProperty(unitLabelProperty, groupName);
-		PropertyHelper::getStringProperty(this, m_propertyUnit, groupName)->setVisible(false);
-
-		EntityPropertiesString::createProperty(groupName, m_propertyValue, "", "default", getProperties());
-		PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(false);
-
-		EntityPropertiesSelection::createProperty(groupName, m_propertyComparator, comparators, comparators.front(), "default", getProperties());
-		PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(false);
-
-	}	
-}
-
-void EntityBlockDatabaseAccess::setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue)
-{
-	EntityPropertiesBase* baseEntity =	getProperties().getProperty(m_propertyNameSeriesMetadata, m_groupMetadataFilter);
-	assert(baseEntity != nullptr);
-	EntityPropertiesSelection* selectionEntity = dynamic_cast<EntityPropertiesSelection*>(baseEntity);
-	assert(selectionEntity != nullptr);
-
-	selectionEntity->resetOptions(_options);
-	selectionEntity->setValue(_selectedValue);
+	m_propertyBundleDataLakeQuery.setProperties(this);
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 {
-	auto propertyBase = getProperties().getProperty(m_propertyNameProjectName);
-	auto selectedProjectName = dynamic_cast<EntityPropertiesProjectList*>(propertyBase);
-	assert(selectedProjectName != nullptr);
-
-	return  selectedProjectName->getValue();
-}
-
-bool EntityBlockDatabaseAccess::setVisibleParameter(const std::string& _groupName, bool _visible)
-{
-	bool isVisible = getProperties().getProperty(m_propertyName, _groupName)->getVisible();
-	const bool refresh = isVisible != _visible;
-	if (refresh)
-	{
-		getProperties().getProperty(m_propertyName, _groupName)->setVisible(_visible);
-		getProperties().getProperty(m_propertyDataType, _groupName)->setVisible(_visible);
-		getProperties().getProperty(m_propertyComparator, _groupName)->setVisible(_visible);
-		getProperties().getProperty(m_propertyValue, _groupName)->setVisible(_visible);
-		getProperties().getProperty(m_propertyUnit, _groupName)->setVisible(_visible);
-		this->setModified();
-	}
-	return refresh;
+	return  m_propertyBundleDataLakeQuery.getSelectedProject(this);
 }
 
 void EntityBlockDatabaseAccess::updateBlockConfig()
@@ -195,43 +79,33 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::createBlockCfg()
 
 bool EntityBlockDatabaseAccess::getReproducibleOrder()
 {
-	const bool orderReproducible = PropertyHelper::getBoolPropertyValue(this, m_propertyOrder, m_groupQuerySetttings);
-	return orderReproducible;
+	//const bool orderReproducible = PropertyHelper::getBoolPropertyValue(this, m_propertyOrder, m_groupQuerySetttings);
+	//return orderReproducible;
+	return true;
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
 {
-
-	EntityPropertiesInteger* numberOfQueriesProp =PropertyHelper::getIntegerProperty(this, m_propertyNumberOfQueries);
-	bool requiresUpdate = numberOfQueriesProp->needsUpdate();
-	if (requiresUpdate)
+	bool requiresUpdate = m_propertyBundleDataLakeQuery.updatePropertyVisibility(this);
+	if (getObserver() != nullptr)
 	{
-		uint32_t numberVisible = static_cast<uint32_t>(numberOfQueriesProp->getValue());
-		for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
-		{
-			const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);
-			PropertyHelper::getStringProperty(this, m_propertyDataType, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getStringProperty(this, m_propertyUnit, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(i <= numberVisible);
-		}
-	}
 
-	auto numberOfMetadataQueries = PropertyHelper::getIntegerProperty(this, m_propertyNumberOfQueriesMetadataSeries);
-	bool metadataQueryRequiresUpdate = numberOfMetadataQueries->needsUpdate();
-	if (metadataQueryRequiresUpdate)
-	{
-		uint32_t numberVisible = static_cast<uint32_t>(numberOfMetadataQueries->getValue());
-		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
-		{
-			const std::string groupName = m_groupSeriesMetadata+ "_" + std::to_string(i);
-			PropertyHelper::getStringProperty(this, m_propertyValue, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(this, m_propertyComparator, groupName)->setVisible(i <= numberVisible);
-		}
-	}
+		const std::string projectName = m_propertyBundleDataLakeQuery.getSelectedProject(this);
+		std::string collectionName;
+		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
+		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
+		requiresUpdate |= m_propertyBundleDataLakeQuery.updateOptions(this, associatedCampaign.value());
 
+		DataLakeQueryCfg cfg;
+		cfg.setCollectionName(collectionName);
+		cfg.setSeriesLabel(m_propertyBundleDataLakeQuery.getSelectedSeries(this));
+		cfg.setValueDescriptionParameters(m_propertyBundleDataLakeQuery.getParameterQueries(this));
+		cfg.setValueDescriptionSeriesMD(m_propertyBundleDataLakeQuery.getMetadataQueries(this));
+		cfg.setValueDescriptionQuantities(m_propertyBundleDataLakeQuery.getQuantityQuery(this));
+
+		getObserver()->requestDatapointVisualisation(cfg, getEntityID(), getEntityStorageVersion());
+	}
+		
 	getProperties().forceResetUpdateForAllProperties();
 	//updateBlockConfig();
 
@@ -246,181 +120,4 @@ void EntityBlockDatabaseAccess::addStorageData(bsoncxx::builder::basic::document
 void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
-}
-
-EntityPropertiesSelection* EntityBlockDatabaseAccess::getSeriesSelection()
-{
-	EntityPropertiesBase* base = getProperties().getProperty(m_propertyNameSeriesMetadata, m_groupMetadataFilter);
-	assert(base != nullptr);
-	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(base);
-	assert(selection != nullptr);
-	return selection;
-}
-
-EntityProperties EntityBlockDatabaseAccess::setMetadataQueryOptions(const std::list<std::string>& _options)
-{
-	std::vector<std::string> newOptions = { _options.begin(), _options.end() };
-	std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(1);
-	const auto& currentOptions = PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->getOptions();
-	EntityProperties newProperties;
-	if (currentOptions != newOptions)
-	{
-		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
-		{
-			groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
-			EntityPropertiesBase* newProperty = PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->createCopy();
-			auto newSelectionProperty=	dynamic_cast<EntityPropertiesSelection*>(newProperty);
-			newSelectionProperty->resetOptions(_options);
-			newProperties.createProperty(newSelectionProperty, newSelectionProperty->getGroup());
-		}
-	}
-	return newProperties;
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getQuantityValueCharacteristic()
-{
-	return getValueCharacteristics(m_groupQuantitySetttings);
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getValueCharacteristics(const std::string& _groupName)
-{
-	ValueCharacteristicProperties valueCharacteristicProperties;
-	EntityPropertiesBase* base = getProperties().getProperty(m_propertyName, _groupName);
-	assert(base != nullptr);
-	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(base);
-	assert(selection != nullptr);
-	valueCharacteristicProperties.m_label = selection;
-
-	base = getProperties().getProperty(m_propertyUnit, _groupName);
-	assert(base != nullptr);
-	EntityPropertiesString* unitProperty = dynamic_cast<EntityPropertiesString*>(base);
-	valueCharacteristicProperties.m_unit = unitProperty;
-
-	base = getProperties().getProperty(m_propertyDataType, _groupName);
-	assert(base != nullptr);
-	EntityPropertiesString* dataTypeProperty = dynamic_cast<EntityPropertiesString*>(base);
-	valueCharacteristicProperties.m_dataType = dataTypeProperty;
-
-	return valueCharacteristicProperties;
-}
-
-ValueCharacteristicProperties EntityBlockDatabaseAccess::getQueryValueCharacteristics(int32_t _queryIndex)
-{
-	const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(_queryIndex);
-	return getValueCharacteristics(groupName);
-}
-
-EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleFormatSelection()
-{
-	return PropertyHelper::getSelectionProperty(this, m_propertyTupleFormat, m_groupTupleSettings);
-}
-
-EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleTargetSelection()
-{
-	return PropertyHelper::getSelectionProperty(this, m_propertyTupleTarget, m_groupTupleSettings);
-}
-
-EntityPropertiesSelection* EntityBlockDatabaseAccess::getTupleUnitSelection()
-{
-	return PropertyHelper::getSelectionProperty(this, m_propertyTupleUnit, m_groupTupleSettings);
-}
-
-
-int32_t EntityBlockDatabaseAccess::getSelectedNumberOfQueries()
-{
-	int32_t numberOfQueries = PropertyHelper::getIntegerPropertyValue(this, m_propertyNumberOfQueries);
-	return numberOfQueries;
-}
-
-void EntityBlockDatabaseAccess::createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& _properties)
-{
-	EntityPropertiesBase* base = getProperties().getProperty(_propName, _propGroup);
-	EntityPropertiesString* label = dynamic_cast<EntityPropertiesString*>(base);
-	EntityPropertiesString* newLabel = new EntityPropertiesString();
-	*newLabel = *label;
-	newLabel->setValue(_labelValue);
-	_properties.createProperty(newLabel, newLabel->getGroup());
-}
-
-ot::ValueComparisonDescription EntityBlockDatabaseAccess::getSelectedQuantityDefinition()
-{
-
-	ot::ValueComparisonDescription valueDefinition = getSelectedValueComparisonDefinition(m_groupQuantitySetttings);
-	ot::TupleInstance tupleInstance = valueDefinition.getTupleInstance();
-
-	const std::string formatName = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleFormat, m_groupTupleSettings);
-	tupleInstance.setTupleFormatName(formatName);
-	const std::string combinedUnitString = 	PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleUnit, m_groupTupleSettings);
-	auto separatedUnits = ot::TupleDescription::separateCombinedUnitString(combinedUnitString);
-	tupleInstance.setTupleUnits(separatedUnits);
-	valueDefinition.setTupleInstance(tupleInstance);
-
-	const std::string tupleElementTarget = PropertyHelper::getSelectionPropertyValue(this, m_propertyTupleTarget, m_groupTupleSettings);
-	valueDefinition.setTupleTarget(tupleElementTarget);
-	
-	return valueDefinition;
-}
-
-std::list<ot::ValueComparisonDescription> EntityBlockDatabaseAccess::getAdditionalQueries()
-{
-	
-	std::list<ot::ValueComparisonDescription> valueComparisonDefinitions;
-	const int32_t numberOfQueries = getSelectedNumberOfQueries();
-	for (int i = 1; i <= numberOfQueries; i++)
-	{
-		const std::string groupName = m_groupQuerySetttings + "_" + std::to_string(i);
-		const std::string dataType = PropertyHelper::getStringPropertyValue(this, m_propertyDataType, groupName);
-		const std::string unit = PropertyHelper::getStringPropertyValue(this, m_propertyUnit, groupName);
-		const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
-		const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
-		const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
-		const ot::ValueComparisonDescription valueComparisonDefinition(name, comparator, value, dataType, unit);
-		valueComparisonDefinitions.push_back(valueComparisonDefinition);
-	}
-	return valueComparisonDefinitions;
-}
-
-std::list<ot::ValueComparisonDescription> EntityBlockDatabaseAccess::getMetadataQueries()
-{
-	std::list<ot::ValueComparisonDescription> definitions;
-	for (uint32_t index = 1; index < m_maxNbOfQueriesMetadata; index++)
-	{
-		const std::string groupName = m_groupSeriesMetadata+ "_" + std::to_string(index);
-		if (PropertyHelper::getSelectionProperty(this, m_propertyName, groupName)->getVisible())
-		{
-			const std::string name = PropertyHelper::getSelectionPropertyValue(this, m_propertyName, groupName);
-			const std::string comparator = PropertyHelper::getSelectionPropertyValue(this, m_propertyComparator, groupName);
-			const std::string value = PropertyHelper::getStringPropertyValue(this, m_propertyValue, groupName);
-			ot::ValueComparisonDescription definition(name, comparator, value, "", "");
-			definitions.push_back(definition);
-
-		}
-	}
-	
-	return definitions;
-}
-
-const ot::ValueComparisonDescription EntityBlockDatabaseAccess::getSelectedValueComparisonDefinition(const std::string& _groupName)
-{
-	auto baseProp = getProperties().getProperty(m_propertyName,_groupName);
-	auto nameProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	const std::string name = nameProp->getValue();
-
-	baseProp = getProperties().getProperty(m_propertyValue,_groupName);
-	auto valueProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	const std::string value = valueProp->getValue();
-
-	baseProp = getProperties().getProperty(m_propertyComparator, _groupName);
-	auto comparatorProp = dynamic_cast<EntityPropertiesSelection*>(baseProp);
-	const std::string comparator = comparatorProp->getValue();
-
-	baseProp = getProperties().getProperty(m_propertyDataType,_groupName);
-	auto typeProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	const std::string type = typeProp->getValue();
-
-	baseProp = getProperties().getProperty(m_propertyUnit, _groupName);
-	auto unitProp = dynamic_cast<EntityPropertiesString*>(baseProp);
-	const std::string unit = typeProp->getValue();
-
-	return ot::ValueComparisonDescription(name, comparator, value, type,unit);
 }

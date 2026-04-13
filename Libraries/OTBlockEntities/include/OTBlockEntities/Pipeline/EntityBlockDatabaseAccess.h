@@ -22,13 +22,7 @@
 // OpenTwin header
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTBlockEntities/EntityBlock.h"
-
-struct __declspec(dllexport) ValueCharacteristicProperties
-{
-	EntityPropertiesString* m_unit;
-	EntityPropertiesString* m_dataType;
-	EntityPropertiesSelection* m_label;
-};
+#include "OTModelEntities/PropertyBundleDataLakeQuery.h"
 
 class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public EntityBlock
 {
@@ -41,29 +35,9 @@ public:
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 	virtual void createProperties() override;
-	void setSelectionSeries(std::list<std::string>& _options, const std::string& _selectedValue);
-
+	
 	std::string getSelectedProjectName();
-
-	EntityPropertiesSelection* getSeriesSelection();
 	
-	EntityProperties setMetadataQueryOptions(const std::list<std::string>& _options);
-
-	ValueCharacteristicProperties getQuantityValueCharacteristic();
-	ValueCharacteristicProperties getValueCharacteristics(const std::string& _groupName);
-	ValueCharacteristicProperties getQueryValueCharacteristics(int32_t _queryIndex);
-
-	EntityPropertiesSelection* getTupleFormatSelection();
-	EntityPropertiesSelection* getTupleTargetSelection();
-	EntityPropertiesSelection* getTupleUnitSelection();
-
-	int32_t getSelectedNumberOfQueries();
-	
-	ot::ValueComparisonDescription getSelectedQuantityDefinition();
-
-	std::list<ot::ValueComparisonDescription> getAdditionalQueries();
-	std::list<ot::ValueComparisonDescription> getMetadataQueries();
-
 	ot::Connector getConnectorOutput() const { return m_connectorOutput; }	
 
 	virtual bool updateFromProperties() override;
@@ -81,41 +55,8 @@ protected:
 	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 private:
-	const uint32_t m_maxNbOfQueries = 40;
-	const uint32_t m_maxNbOfQueriesMetadata = 4;
-
-	const std::string m_propertyNameProjectName = "Project name";
-	const std::string m_propertyNameSeriesMetadata = "Measurement series";
-
-	const std::string m_groupMetadataFilter = "Dataset";
-	const std::string m_groupQuantitySetttings = "Quantity settings";
-	const std::string m_groupQuerySetttings = "Query settings";
-	const std::string m_groupTupleSettings = "Tuple settings";
-
-	const std::string m_groupSeriesMetadata = "Series metadata";
-
-	const std::string m_propertyNumberOfQueries = "Number of parameter queries";
-	const std::string m_propertyNumberOfQueriesMetadataSeries = "Number of metadata queries";
-
-	const std::string m_propertyName = "Name";
-	const std::string m_propertyTupleFormat = "Format";
-	const std::string m_propertyTupleTarget = "Target";
-	const std::string m_propertyTupleUnit = "Units";
-	const std::string m_propertyOrder = "Order reproducible";
-	
-
-
-	const std::string m_propertyDataType = "Data type";
-	const std::string m_propertyComparator = "Comparator";
-	const std::string m_propertyValue = "Value";
-	const std::string m_propertyUnit = "Unit";
-
 	ot::Connector m_connectorOutput;
-
-	void createUpdatedProperty(const std::string& _propName, const std::string& _propGroup, const std::string& _labelValue, EntityProperties& properties);
-
-	const ot::ValueComparisonDescription getSelectedValueComparisonDefinition(const std::string& _groupName);
-
-	bool setVisibleParameter(const std::string& _groupName,bool _visible);
+	PropertyBundleDataLakeQuery m_propertyBundleDataLakeQuery;
+	
 	void updateBlockConfig();
 };
