@@ -166,16 +166,16 @@ namespace ot {
 
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getDisplayLabel(const Plot1DCfg& _plotCfg) const;
+		std::string getDisplayLabel(const Plot1DCfg& _plotCfg, bool _isComplexData) const;
 
-		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg) const;
-		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix) const;
+		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, bool _isComplexData) const;
+		std::string getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix, bool _isComplexData) const;
 
 	private:
 		std::string getXDataLabelWithUnit(const Plot1DCfg& _plotCfg) const;
 		std::string getYDataLabelWithUnit(const Plot1DCfg& _plotCfg) const;
 
-		std::string getQuantityLabel(const Plot1DCfg& _plotCfg) const;
+		std::string getQuantityLabel(const Plot1DCfg& _plotCfg, bool _isComplexData) const;
 		std::string getUnitLabel(const Plot1DCfg& _plotCfg) const;
 		std::string getUnitWithScalingLabel(const Plot1DCfg& _plotCfg) const;
 

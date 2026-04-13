@@ -394,17 +394,17 @@ QString ot::PlotBase::toPositionInfoText(const QPoint& _pos, bool _multiline) co
 QString ot::PlotBase::toPositionInfoText(const QPointF& _pos, bool _multiline) const
 {
 	const std::string sep = _multiline ? "\n" : "     ";
-	std::string txt = "X = " + m_config.getXAxis().getValueDisplayString(_pos.x(), m_config);
-	txt.append(sep + "Y = " + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config));
+	std::string txt = "X = " + m_config.getXAxis().getValueDisplayString(_pos.x(), m_config, false);
+	txt.append(sep + "Y = " + m_config.getYAxis().getValueDisplayString(_pos.y(), m_config, false));
 	return QString::fromStdString(txt);
 }
 
 QString ot::PlotBase::toPositionInfoText(const QwtPointPolar& _pos, bool _multiline) const
 {
 	const std::string sep = _multiline ? "\n" : "     ";
-	std::string txt = "r = " + m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config);
-	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg "));
-	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad "));
+	std::string txt = "r = " + m_config.getXAxis().getValueDisplayString(_pos.radius(), m_config, false);
+	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(_pos.azimuth(), m_config, "deg ", false));
+	txt.append(sep + std::string(Symbol::phi()) + " = " + m_config.getYAxis().getValueDisplayString(Math::degToRad(_pos.azimuth()), m_config, "rad ", false));
 	return QString::fromStdString(txt);
 }
 
@@ -587,13 +587,17 @@ void ot::PlotBase::updateDatasetTitles()
 
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
-	// Updata data info
-	m_config.setDataLabelX(m_config.getXAxisParameter());
+	// Update data info
 	std::string dataY;
 	std::string unitY;
+	bool isComplexData = false;
 	
 	for (const PlotDataset* dataset : getAllDatasets())
 	{
+		if (dataset->dataIsComplex()) {
+			isComplexData = true;
+		}
+
 		auto quantity = dataset->getDependencyInfos().getDependency(MetadataQuantity::getFieldName());
 		if (quantity.has_value())
 		{
@@ -616,8 +620,8 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	}
 
 	// Create title based on axis config and data info
-	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel());
-	const QString axisTitleY = QString::fromStdString(m_config.getYAxisDisplayLabel());
+	const QString axisTitleX = QString::fromStdString(m_config.getXAxisDisplayLabel(isComplexData));
+	const QString axisTitleY = QString::fromStdString(m_config.getYAxisDisplayLabel(isComplexData));
 
 	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::xBottom, axisTitleX);
 	m_cartesianPlot->setPlotAxisTitle(AbstractPlotAxis::yLeft, axisTitleY);

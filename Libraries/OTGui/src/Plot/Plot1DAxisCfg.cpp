@@ -189,13 +189,13 @@ void ot::Plot1DAxisCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_displayNumberFormat = static_cast<String::DisplayNumberFormat>(json::getUInt(_object, "DisplayNumberFormat"));
 }
 
-std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg) const
+std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg, bool _isComplexData) const
 {
 	std::string result;
 
 	if (m_autoDetermineAxisLabel)
 	{
-		result = getQuantityLabel(_plotCfg) + " " + getUnitWithScalingLabel(_plotCfg);
+		result = getQuantityLabel(_plotCfg, _isComplexData) + " " + getUnitWithScalingLabel(_plotCfg);
 	}
 	else
 	{
@@ -204,24 +204,24 @@ std::string ot::Plot1DAxisCfg::getDisplayLabel(const Plot1DCfg& _plotCfg) const
 	return result;
 }
 
-std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg) const
+std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, bool _isComplexData) const
 {
 	return
-		getQuantityLabel(_plotCfg) + 
+		getQuantityLabel(_plotCfg, _isComplexData) + 
 		" = " +  String::numberToString(_value, m_displayNumberFormat, m_displayNumberPrecision) +
 		" " + getUnitWithScalingLabel(_plotCfg);
 }
 
-std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix) const
+std::string ot::Plot1DAxisCfg::getValueDisplayString(double _value, const Plot1DCfg& _plotCfg, const std::string& _unitPrefix, bool _isComplexData) const
 {
 	return 
-		getQuantityLabel(_plotCfg) + 
+		getQuantityLabel(_plotCfg, _isComplexData) + 
 		" = " + String::numberToString(_value, m_displayNumberFormat, m_displayNumberPrecision) +
 		" " + _unitPrefix + getUnitWithScalingLabel(_plotCfg);
 }
 
 
-std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
+std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg, bool _isComplexData) const
 {
 	std::string result;
 
@@ -234,23 +234,22 @@ std::string ot::Plot1DAxisCfg::getQuantityLabel(const Plot1DCfg& _plotCfg) const
 		// Determine axis type label based on plot type and axis quantity
 		result = String::trim((m_axisQuantityComponent == Plot1DAxisCfg::XData ? _plotCfg.getDataLabelX() : _plotCfg.getDataLabelY()));
 
-		if (!result.empty())
+		if (_isComplexData)
 		{
-			result.append(" ");
-		}
 
-		// Append the quantity name based on the axis quantity.
-		switch (m_axisQuantityComponent)
-		{
-		case ot::Plot1DAxisCfg::Undefined: break;
-		case ot::Plot1DAxisCfg::XData: break;
-		case ot::Plot1DAxisCfg::Magnitude: result.append("Magnitude"); break;
-		case ot::Plot1DAxisCfg::Phase: result.append("Phase"); break;
-		case ot::Plot1DAxisCfg::Real: result.append("Real"); break;
-		case ot::Plot1DAxisCfg::Imaginary: result.append("Imaginary"); break;
-		default:
-			OT_LOG_E("Unknown axis quantity (" + std::to_string((int)m_axisQuantityComponent) + ")");
-			break;
+			// Append the quantity name based on the axis quantity.
+			switch (m_axisQuantityComponent)
+			{
+			case ot::Plot1DAxisCfg::Undefined: break;
+			case ot::Plot1DAxisCfg::XData: break;
+			case ot::Plot1DAxisCfg::Magnitude: result.append(" Magnitude"); break;
+			case ot::Plot1DAxisCfg::Phase: result.append(" Phase"); break;
+			case ot::Plot1DAxisCfg::Real: result.append(" Real"); break;
+			case ot::Plot1DAxisCfg::Imaginary: result.append(" Imaginary"); break;
+			default:
+				OT_LOG_E("Unknown axis quantity (" + std::to_string((int)m_axisQuantityComponent) + ")");
+				break;
+			}
 		}
 	}
 	return result;

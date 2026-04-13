@@ -154,7 +154,7 @@ namespace ot {
 
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getXAxisDisplayLabel() const { return m_xAxis.getDisplayLabel(*this); };
+		std::string getXAxisDisplayLabel(bool _isComplexData) const { return m_xAxis.getDisplayLabel(*this, _isComplexData); };
 
 		void setXAxisDisplayNumberFormat(String::DisplayNumberFormat _format) { m_xAxis.setDisplayNumberFormat(_format); };
 		String::DisplayNumberFormat getXAxisDisplayNumberFormat() const { return m_xAxis.getDisplayNumberFormat(); };
@@ -185,7 +185,7 @@ namespace ot {
 
 		//! @brief Returns the axis label to be displayed.
 		//! Will include the axis label, quantity name and quantity scaling information.
-		std::string getYAxisDisplayLabel() const { return m_yAxis.getDisplayLabel(*this); };
+		std::string getYAxisDisplayLabel(bool _isComplexData) const { return m_yAxis.getDisplayLabel(*this, _isComplexData); };
 
 		void setYAxisDisplayNumberFormat(String::DisplayNumberFormat _format) { m_yAxis.setDisplayNumberFormat(_format); };
 		String::DisplayNumberFormat getYAxisDisplayNumberFormat() const { return m_yAxis.getDisplayNumberFormat(); };

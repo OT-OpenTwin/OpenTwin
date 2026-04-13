@@ -4718,11 +4718,12 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			curveCfg.setFromJsonObject(curveCfgSerialised);
 			
 			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
-			dataSets.splice(dataSets.begin(), newCurveDatasets);
 
 			if (!firstCurveCfg.has_value() && !newCurveDatasets.empty()) {
 				firstCurveCfg = curveCfg;
 			}
+
+			dataSets.splice(dataSets.begin(), newCurveDatasets);
 
 			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
 			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) 
@@ -4733,15 +4734,20 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 
 		if (firstCurveCfg.has_value()) {
 			const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
-			std::optional<ot::DataPointDecoder> decoderParameter = dataLakeAccessCfg.getFieldDecoderParameterByLabel(_plotConfig.getXAxisParameter());
 
-			if (!decoderParameter->getLabel().empty()) {
-				_plotConfig.setDataLabelX(decoderParameter->getLabel());
-			}
+			const auto& decoders = dataLakeAccessCfg.getAllFieldDecoderParameter();
 
-			const auto& unitsX = decoderParameter->getTupleInstance().getTupleUnits();
-			if (unitsX.size() == 1) {
-				_plotConfig.setUnitLabelX(unitsX.front());
+			std::string paramNameX = _plotConfig.getXAxisParameter();
+			auto it = decoders.find(paramNameX);
+
+			if (it != decoders.end()) {
+				if (!it->second.getLabel().empty()) {
+					_plotConfig.setDataLabelX(it->second.getLabel());
+				}
+				const auto& unitsX = it->second.getTupleInstance().getTupleUnits();
+				if (unitsX.size() == 1) {
+					_plotConfig.setUnitLabelX(unitsX.front());
+				}
 			}
 		}
 
