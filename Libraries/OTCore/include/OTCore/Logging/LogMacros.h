@@ -25,7 +25,7 @@
 //! @param ___flags LogFlags describing the type of the created log message
 #define OT_LOG(___text, ___flags) ot::LogDispatcher::instance().dispatch(___text, __FUNCTION__, ___flags)
 
-#define OT_LOG_STREAM(___streamData, ___flags) { ot::LogMessageStream ot_intern_LogMessageStream; ot_intern_LogMessageStream << _streamData; ot::LogDispatcher::instance().dispatch(ot_intern_LogMessageStream); }
+#define OT_LOG_STREAM(___streamData, ___flags) { ot::LogMessageStream ot_intern_LogMessageStream(__FUNCTION__, ___flags); ot_intern_LogMessageStream << ___streamData; ot::LogDispatcher::instance().dispatch(ot_intern_LogMessageStream); }
 
 #else
 
@@ -36,7 +36,7 @@
 //! @param ___flags LogFlags describing the type of the created log message
 #define OT_LOG(___text, ___flags) if (ot::LogDispatcher::mayLog(___flags)) { ot::LogDispatcher::instance().dispatch(___text, __FUNCTION__, ___flags); }
 
-#define OT_LOG_STREAM(___streamPipeline, ___flags) if (ot::LogDispatcher::mayLog(___flags)) { ot::LogMessageStream ot_intern_LogMessageStream; ot_intern_LogMessageStream << ___streamPipeline; ot::LogDispatcher::instance().dispatch(ot_intern_LogMessageStream); }
+#define OT_LOG_STREAM(___streamPipeline, ___flags) if (ot::LogDispatcher::mayLog(___flags)) { ot::LogMessageStream ot_intern_LogMessageStream(__FUNCTION__, ___flags); ot_intern_LogMessageStream << ___streamPipeline; ot::LogDispatcher::instance().dispatch(ot_intern_LogMessageStream); }
 
 #endif
 
