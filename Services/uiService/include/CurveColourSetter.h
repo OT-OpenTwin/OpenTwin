@@ -26,8 +26,8 @@
 class CurveColourSetter
 {
 public:
-	CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg);
-	CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize);
+	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg);
+	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize);
 	
 	void setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint);
 	void setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _bufferIndex ,bool _hasSingleDatapoint);

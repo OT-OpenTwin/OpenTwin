@@ -37,7 +37,7 @@ public:
 	CurveDatasetFactory(const std::string& _collectionName)
 		: m_dataAccess(_collectionName){ }
 	
-	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg);
+	std::list<ot::PlotDataset*> createCurves(ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg);
 
 	const std::list<std::string>& getCurveIDDescriptions() { return m_curveIDDescriptions; }
 private:
@@ -63,8 +63,8 @@ private:
 
 	std::string createUnitLabel(const std::string& _unit);
 
-	DependencyInfoList createCurves(const ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
-	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, ot::Plot1DCurveCfg& _curveCfg);
+	DependencyInfoList createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
+	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);

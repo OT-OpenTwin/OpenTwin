@@ -264,6 +264,9 @@ std::string ot::Plot1DAxisCfg::getUnitLabel(const Plot1DCfg& _plotCfg) const
 std::string ot::Plot1DAxisCfg::getUnitWithScalingLabel(const Plot1DCfg& _plotCfg) const
 {
 	std::string result = getUnitLabel(_plotCfg);
+	if (!result.empty()) {
+		result = "(" + result + ")";
+	}
 	if (m_valueScaling.has(ValueScalingFlag::DB10)) result.append((result.empty() ? "" : " ") + std::string("(dB 10)"));
 	if (m_valueScaling.has(ValueScalingFlag::DB20)) result.append((result.empty() ? "" : " ") + std::string("(dB 20)"));
 	return result;

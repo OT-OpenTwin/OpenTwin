@@ -4708,6 +4708,8 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
 		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 
+		std::optional<ot::Plot1DCurveCfg> firstCurveCfg;
+
 		for (uint32_t i = 0; i < curveCfgs.Size(); i++) {
 			ot::ConstJsonObject curveCfgSerialised = ot::json::getObject(curveCfgs, i);
 			const std::string t = ot::json::toJson(curveCfgs);
@@ -4718,10 +4720,28 @@ void ExternalServicesComponent::workerLoadPlotData(ot::JsonDocument&& _document,
 			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
 			dataSets.splice(dataSets.begin(), newCurveDatasets);
 
+			if (!firstCurveCfg.has_value() && !newCurveDatasets.empty()) {
+				firstCurveCfg = curveCfg;
+			}
+
 			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
 			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves) 
 			{
 				break;
+			}
+		}
+
+		if (firstCurveCfg.has_value()) {
+			const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
+			std::optional<ot::DataPointDecoder> decoderParameter = dataLakeAccessCfg.getFieldDecoderParameterByLabel(_plotConfig.getXAxisParameter());
+
+			if (!decoderParameter->getLabel().empty()) {
+				_plotConfig.setDataLabelX(decoderParameter->getLabel());
+			}
+
+			const auto& unitsX = decoderParameter->getTupleInstance().getTupleUnits();
+			if (unitsX.size() == 1) {
+				_plotConfig.setUnitLabelX(unitsX.front());
 			}
 		}
 
@@ -4820,6 +4840,9 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 		}
 		curveCounter++;
 	}
+
+	// Refresh the X data label + unit
+
 	
 	// Now we refresh the plot visualisation.
 	plot->applyConfig();

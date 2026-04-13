@@ -19,13 +19,13 @@
 
 #include "CurveColourSetter.h"
 
-CurveColourSetter::CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg)
+CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg)
 {
 	m_useRainBowItterator = m_painterRainbowIterator.initiateWithOtherPainter(_curveCfg.getLinePen().getPainter());
 	m_painterRainbowIterator.initiateWithOtherPainter(_curveCfg.getLinePen().getPainter());
 }
 
-CurveColourSetter::CurveColourSetter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize)
+CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize)
 	:CurveColourSetter(_curveCfg)
 {
 	m_rainbowPainterBuffer.reserve(_rainbowBufferSize);

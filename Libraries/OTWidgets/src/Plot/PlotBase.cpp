@@ -590,7 +590,8 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	// Updata data info
 	m_config.setDataLabelX(m_config.getXAxisParameter());
 	std::string dataY;
-
+	std::string unitY;
+	
 	for (const PlotDataset* dataset : getAllDatasets())
 	{
 		auto quantity = dataset->getDependencyInfos().getDependency(MetadataQuantity::getFieldName());
@@ -599,6 +600,7 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 			if (dataY.empty())
 			{
 				dataY = quantity->getValue();
+				unitY = quantity->getUnit();
 			}
 			else if (dataY != quantity->getValue())
 			{
@@ -610,6 +612,7 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	if (!dataY.empty())
 	{
 		m_config.setDataLabelY(dataY);
+		m_config.setUnitLabelY(unitY);
 	}
 
 	// Create title based on axis config and data info

@@ -43,15 +43,15 @@
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _config)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg)
 {
 	m_curveIDDescriptions.clear();
 	
 	// We check the validity of the access cfg first
-	const ot::DataLakeAccessCfg& accessCfg = _config.getDataAccessConfig();
+	const ot::DataLakeAccessCfg& accessCfg = _curveCfg.getDataAccessConfig();
 	if (accessCfg.getAllFieldDecoderSeriesByLabel().size() == 0)
 	{
-		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since no series matches the criteria.\n");
+		ot::WindowAPI::appendOutputMessage("Curve " + _curveCfg.getTitle() + " cannot be visualised since no series matches the criteria.\n");
 		return {};
 	}
 
@@ -61,12 +61,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 
 	mongocxx::options::find options;
 	std::string log;
-	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_config.getDataAccessConfig(), options, log);
+	ot::JsonDocument entireResult = DataLakeHelper::executeQuery(_curveCfg.getDataAccessConfig(), options, log);
 	std::string temp = ot::json::toJson(entireResult);
 
 	if (!ot::json::exists(entireResult, DataLakeHelper::getDataFieldName()))
 	{
-		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
+		ot::WindowAPI::appendOutputMessage("Curve " + _curveCfg.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
 
@@ -74,12 +74,12 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 	uint32_t numberOfDocuments = allMongoDocuments.Size();
 	if (numberOfDocuments == 0)
 	{
-		ot::WindowAPI::appendOutputMessage("Curve " + _config.getTitle() + " cannot be visualised since the query returned no data.\n");
+		ot::WindowAPI::appendOutputMessage("Curve " + _curveCfg.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
 	
-	auto allCurvesByDependencies = createCurves(_plotCfg, _config, allMongoDocuments);
-	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _config);
+	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments);
+	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _curveCfg);
 	return dataSets;
 }
 
@@ -93,7 +93,7 @@ std::string CurveDatasetFactory::createUnitLabel(const std::string& _unit) {
 	return result;
 }
 
-CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const ot::Plot1DCfg& _plotCfg, ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const int numberOfQuantities = 1;
@@ -221,7 +221,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	return familyOfCurves;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, ot::Plot1DCurveCfg& _curveCfg)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg)
 {
 
 	std::list<ot::PlotDataset*> dataSets;
