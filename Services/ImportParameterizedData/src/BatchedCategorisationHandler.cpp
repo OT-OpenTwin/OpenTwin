@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BatchedCategorisationHandler.cpp
 // 
 // License:
@@ -299,6 +299,7 @@ std::map<uint32_t, std::list<BatchUpdateInformation>> BatchedCategorisationHandl
 		);
 		allMSMDNames += newMSMD->getName() + ", ";
 		newMSMD->CreateProperties(EntityParameterizedDataCategorization::measurementSeriesMetadata);
+		newMSMD->setTreeItemEditable(true);
 		newMSMD->storeToDataBase();
 		topoVers.push_back(newMSMD->getEntityStorageVersion());
 		topoIDs.push_back(newMSMD->getEntityID());
