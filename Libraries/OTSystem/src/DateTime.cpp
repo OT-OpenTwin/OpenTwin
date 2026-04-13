@@ -33,10 +33,25 @@
 namespace ot {
     namespace intern {
 
-        static inline const std::regex getDurationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
-        static inline const std::regex getDurationDayRegex() { return std::regex(R"(^(?:(\d+):)?(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
-		static inline const std::regex getDurationHourRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
-        static inline const std::regex getDurationMinuteRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+		//! @brief Regular expression for validating duration strings.
+		//! 
+        //! Used by isValidTimestamp() for duration format detection.
+        static inline const std::regex getDurationValidationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
+
+		//! @brief Regular expression for parsing duration strings with day component.
+		//! 
+        //! (e.g. "01:12:30:45.500" for 1 day, 12 hours, 30 minutes, 45 seconds and 500 milliseconds).
+        static inline const std::regex getDurationDayParserRegex() { return std::regex(R"(^(?:(\d+):)?(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+
+		//! @brief Regular expression for parsing duration strings with hour component.
+		//! 
+        //! (e.g. "12:30:45.500" for 12 hours, 30 minutes, 45 seconds and 500 milliseconds).
+		static inline const std::regex getDurationHourParserRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+
+		//! @brief Regular expression for parsing duration strings with minute component.
+        //! 
+        //! (e.g. "30:45.500" for 30 minutes, 45 seconds and 500 milliseconds).
+        static inline const std::regex getDurationMinuteParserRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$)"); };
 
         std::string toTimeStamp(std::chrono::system_clock::time_point _timePoint, ot::DateTime::DateFormat _format) {
             auto timeT = std::chrono::system_clock::to_time_t(_timePoint);
@@ -231,9 +246,9 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
     int64_t seconds = 0;
     int64_t msec = 0;
 
-    auto normalizeFraction = [](const std::string& fraction) -> int64_t
+    auto normalizeFraction = [](const std::string& _fraction) -> int64_t
         {
-            std::string value = fraction;
+            std::string value = _fraction;
 
             if (value.size() > 3)
             {
@@ -248,7 +263,7 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
             return std::stoll(value);
         };
 
-    if (std::regex_match(_duration, match, intern::getDurationDayRegex()))
+    if (std::regex_match(_duration, match, intern::getDurationDayParserRegex()))
     {
         if (match[1].matched)
         {
@@ -264,7 +279,7 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
             msec = normalizeFraction(match[5].str());
         }
     }
-    else if (std::regex_match(_duration, match, intern::getDurationHourRegex()))
+    else if (std::regex_match(_duration, match, intern::getDurationHourParserRegex()))
     {
         if (match[1].matched)
         {
@@ -279,7 +294,7 @@ int64_t ot::DateTime::durationToMsec(const std::string& _duration)
             msec = normalizeFraction(match[4].str());
         }
     }
-    else if (std::regex_match(_duration, match, intern::getDurationMinuteRegex()))
+    else if (std::regex_match(_duration, match, intern::getDurationMinuteParserRegex()))
     {
         if (match[1].matched)
         {
@@ -480,7 +495,7 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
     case Msec:
         return true;
     case Duration:
-        return std::regex_match(_timestamp, intern::getDurationRegex());
+        return std::regex_match(_timestamp, intern::getDurationValidationRegex());
     default:
         return false;
     }
