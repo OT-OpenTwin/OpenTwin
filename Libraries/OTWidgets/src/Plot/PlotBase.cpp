@@ -604,11 +604,20 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 			if (dataY.empty())
 			{
 				dataY = quantity->getValue();
-				unitY = quantity->getUnit();
 			}
 			else if (dataY != quantity->getValue())
 			{
 				dataY = "";
+				break;
+			}
+
+			if (unitY.empty())
+			{
+				unitY = quantity->getUnit();
+			}
+			else if (unitY != quantity->getUnit())
+			{
+				unitY = "";
 				break;
 			}
 		}
@@ -616,6 +625,10 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	if (!dataY.empty())
 	{
 		m_config.setDataLabelY(dataY);
+	}
+
+	if (!unitY.empty())
+	{
 		m_config.setUnitLabelY(unitY);
 	}
 
