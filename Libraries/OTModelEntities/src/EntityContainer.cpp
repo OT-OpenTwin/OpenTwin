@@ -135,6 +135,7 @@ void EntityContainer::takeOverChildren(EntityContainer* _other)
 {
 	m_children = _other->m_children;
 	_other->m_children.clear();
+	setModified();
 }
 
 const std::list<EntityBase *> &EntityContainer::getChildrenList()
