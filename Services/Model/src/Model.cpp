@@ -4215,17 +4215,10 @@ std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _p
 }
 
 
-void Model::requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot::UID _entityID, ot::UID _entityVersion)
+ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg)
 {
-	ot::JsonDocument doc;
-	ot::JsonObject queryCfg;
-	_queryCfg.addToJsonObject(queryCfg, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, queryCfg, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _entityID,doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_DataProcessing_CreateAccessConfig, doc.GetAllocator());
-	
-	Application::instance()->sendMessageAsync(true, OT_INFO_SERVICE_TYPE_DataProcessingService, doc);
+	MetadataHandler metadataHandler;
+	return metadataHandler.createConfig(_campaign, _collectionName, _queryCfg);
 }
 
 

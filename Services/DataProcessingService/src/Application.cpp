@@ -121,65 +121,6 @@ void Application::runPipeline()
 		}
 	}
 }
-#include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTResultDataAccess/DataLakeAccessor.h"
-std::string Application::updateDataLakeAccessCfg(ot::JsonDocument& _document)
-{
-	try
-	{
-		DataLakeQueryCfg queryCfg;
-		queryCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
-		DataLakeAccessor dataLakeAccessor(this);
-		dataLakeAccessor.accessPartition(queryCfg.getCollectionName());
-		dataLakeAccessor.createQueryDescriptionQuantity(queryCfg.getValueDescriptionQuantities());
-		dataLakeAccessor.createQueryDescriptionsParameter(queryCfg.getValueDescriptionParameters());
-		dataLakeAccessor.createQueryDescriptionsSeries(queryCfg.getValueDescriptionSeriesMD(),queryCfg.getSeriesLabel());
-		ot::DataLakeAccessCfg accessConfig = dataLakeAccessor.createConfig();
-	
-		if (!accessConfig.getQueriesByCollection().empty())
-		{
-			ot::UID curveEntityID =	ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
-			std::list<ot::EntityInformation> entityInfos;
-			ot::ModelServiceAPI::getEntityInformation({ curveEntityID }, entityInfos);
-			
-			assert(entityInfos.size() == 1);
-			ot::UID curveEntityVersion = entityInfos.front().getEntityVersion();
-			EntityBase* base = ot::EntityAPI::readEntityFromEntityIDandVersion(curveEntityID, curveEntityVersion);
-			std::unique_ptr< EntityResult1DCurve> curve(dynamic_cast<EntityResult1DCurve*>(base));
-			curve->setDataLakeAccessCfg(std::move(accessConfig));
-			curve->storeToDataBase();
-			ot::NewModelStateInfo updatedCurve;
-			updatedCurve.addTopologyEntity(*curve.get());
-			ot::ModelServiceAPI::updateTopologyEntities(updatedCurve, "Performed update on the data lake access cfg.");
-
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
-
-			const std::string plotName = ot::EntityName::getParentPath(curve->getName());
-			doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(plotName, doc.GetAllocator()), doc.GetAllocator());
-
-			ot::VisualisationCfg visualisationCfg;
-			visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
-			visualisationCfg.setOverrideViewerContent(false);
-			visualisationCfg.setAsActiveView(true);
-
-			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
-			
-			bool success = sendMessage(true, OT_INFO_SERVICE_TYPE_UI, doc);
-			if (!success)
-			{
-				return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create data lake access config").toJson();
-			}
-		}
-		return ot::ReturnMessage().toJson();	
-
-	}
-	catch (std::exception& _e)
-	{
-		return ot::ReturnMessage(ot::ReturnMessage::Failed,_e.what()).toJson();
-	}
-	
-}
 
 // ##################################################################################################################################################################################################################
 

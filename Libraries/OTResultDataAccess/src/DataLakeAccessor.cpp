@@ -21,28 +21,24 @@ DataLakeAccessor::DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase)
 
 DataLakeAccessor::~DataLakeAccessor()
 {
-	if (m_resultCollectionMetadataAccess != nullptr && owning)
-	{
-		delete m_resultCollectionMetadataAccess;
-		m_resultCollectionMetadataAccess = nullptr;
-	}
+	clear();
 }
 
 void DataLakeAccessor::accessPartition(const std::string& _collectionName)
 {
+	clear();
 	m_collectionName = _collectionName;
-	m_queryDescriptionsParameters.clear();
-	m_queryDescriptionsQuantities.clear();
-	m_queryDescriptionsSeries.clear();
-	if (m_resultCollectionMetadataAccess != nullptr)
-	{
-		delete m_resultCollectionMetadataAccess;
-		m_resultCollectionMetadataAccess = nullptr;
-	}
 	
 	bool isCrossCollection = m_applicationBase->getCollectionName() != _collectionName;
 	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_collectionName, m_applicationBase->getModelComponent(), isCrossCollection);
 	owning = true;
+}
+
+void DataLakeAccessor::accessPartition(const MetadataCampaign& _campaign, const std::string& _collectionName)
+{
+	clear();
+	m_collectionName = _collectionName;
+	m_resultCollectionMetadataAccess = new ResultCollectionMetadataAccess(_campaign, _collectionName);
 }
 
 void DataLakeAccessor::accessPartition(ResultCollectionMetadataAccess* _resultCollectionMetadataAccess)
@@ -1221,3 +1217,16 @@ bool DataLakeAccessor::compare(const ot::ValueComparisonDescription& _comparison
 	}
 	return false;
 }
+
+void DataLakeAccessor::clear()
+{
+	if (m_resultCollectionMetadataAccess != nullptr && owning)
+	{
+		delete m_resultCollectionMetadataAccess;
+		m_resultCollectionMetadataAccess = nullptr;
+	}
+	m_queryDescriptionsParameters.clear();
+	m_queryDescriptionsQuantities.clear();
+	m_queryDescriptionsSeries.clear();
+}
+

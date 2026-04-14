@@ -357,8 +357,6 @@
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 
-#define OT_ACTION_CMD_DataProcessing_CreateAccessConfig "DataProcessing.Create.AccessConfig"
-
 #define OT_ACTION_PARAM_BASETYPE_UID "BaseTypes.UID"
 #define OT_ACTION_PARAM_BASETYPE_Bool "BaseTypes.Boolean"
 #define OT_ACTION_PARAM_BASETYPE_List "BaseTypes.List"

@@ -5,6 +5,7 @@
 #include "CrossCollectionDatabaseWrapper.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
+#include "OTResultDataAccess/DataLakeAccessor.h"
 
 MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
@@ -112,4 +113,15 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 	{
 		return MetadataCampaign();
 	}
+}
+
+ot::DataLakeAccessCfg MetadataHandler::createConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg)
+{
+	DataLakeAccessor dataLakeAccessor(Application::instance());
+	dataLakeAccessor.accessPartition(_campaign,_collectionName);
+	dataLakeAccessor.createQueryDescriptionQuantity(_queryCfg.getValueDescriptionQuantities());
+	dataLakeAccessor.createQueryDescriptionsParameter(_queryCfg.getValueDescriptionParameters());
+	dataLakeAccessor.createQueryDescriptionsSeries(_queryCfg.getValueDescriptionSeriesMD(), _queryCfg.getSeriesLabel());
+	ot::DataLakeAccessCfg accessConfig = dataLakeAccessor.createConfig();
+	return accessConfig;
 }

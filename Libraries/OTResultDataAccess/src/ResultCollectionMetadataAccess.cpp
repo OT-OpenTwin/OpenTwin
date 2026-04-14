@@ -57,6 +57,13 @@ ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const std::string
 	}
 }
 
+ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(const MetadataCampaign& _loadedCampaign, const std::string& _collectionName)
+{
+	m_metadataCampaign = _loadedCampaign;
+	m_modelComponent = nullptr;
+	m_collectionName = _collectionName;
+}
+
 ResultCollectionMetadataAccess::ResultCollectionMetadataAccess(ResultCollectionMetadataAccess&& other) noexcept
 	:m_modelComponent(other.m_modelComponent), m_metadataCampaign(std::move(other.m_metadataCampaign)), m_collectionName(other.m_collectionName)
 {}

@@ -34,6 +34,7 @@ class OT_RESULTDATAACCESS_API_EXPORT ResultCollectionMetadataAccess
 {
 public:
 	ResultCollectionMetadataAccess(const std::string& crossCollectionName, ot::components::ModelComponent* modelComponent, bool crossCollection = false);
+	ResultCollectionMetadataAccess(const MetadataCampaign& _loadedCampaign, const std::string& _collectionName);
 	ResultCollectionMetadataAccess(ResultCollectionMetadataAccess&& other) noexcept;
 	ResultCollectionMetadataAccess& operator=(ResultCollectionMetadataAccess&& other) noexcept;
 
@@ -68,8 +69,6 @@ public:
 	const std::string& getCollectionName() const { return m_collectionName; }
 
 	bool collectionHasMetadata() const { return m_metadataExistInProject; }
-
-
 
 protected:
 	ResultCollectionMetadataAccess() {};

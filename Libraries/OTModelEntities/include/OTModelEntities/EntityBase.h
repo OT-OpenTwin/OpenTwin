@@ -66,9 +66,10 @@ public:
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) { return ""; };
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
-
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
-	virtual void requestDatapointVisualisation(const DataLakeQueryCfg& _queryCfg, ot::UID _entityID, ot::UID _entityVersion) {};
+	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); }
+
+
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

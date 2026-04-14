@@ -564,7 +564,7 @@ std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getParame
 	
 	int32_t considerableQueries = PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyNumberOfQueries, m_groupMetadataFilter);
 		
-	for (uint32_t i = 1; i <= considerableQueries; i++)
+	for (int32_t i = 1; i <= considerableQueries; i++)
 	{
 		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
 		const std::string dataType = PropertyHelper::getStringPropertyValue(_thisObject, m_propertyDataType, groupName);
@@ -582,7 +582,7 @@ std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getMetada
 {
 	int32_t considerableQueries = PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter);
 	std::list<ot::ValueComparisonDescription> definitions;
-	for (uint32_t index = 1; index < considerableQueries; index++)
+	for (int32_t index = 1; index < considerableQueries; index++)
 	{
 		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(index);
 		

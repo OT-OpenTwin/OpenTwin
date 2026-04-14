@@ -38,7 +38,7 @@ class OT_CORE_API_EXPORT MetadataCampaign : public ot::Serializable
 public:
 	MetadataCampaign() = default;
 	MetadataCampaign(const MetadataCampaign& _other) = default;
-	MetadataCampaign& operator=(const MetadataCampaign& _other) = delete;
+	MetadataCampaign& operator=(const MetadataCampaign& _other) = default;
 	MetadataCampaign(MetadataCampaign&& other) noexcept =default;
 	MetadataCampaign& operator=(MetadataCampaign&& other) noexcept = default;
 	~MetadataCampaign() {};

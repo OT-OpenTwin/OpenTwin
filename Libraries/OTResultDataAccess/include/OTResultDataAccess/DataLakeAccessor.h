@@ -18,7 +18,10 @@ class OT_RESULTDATAACCESS_API_EXPORT DataLakeAccessor
 public:
 	DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase);
 	~DataLakeAccessor();
+	//! @brief Will pull all metadata about the given collection
 	void accessPartition(const std::string& _collectionName);
+	//! @brief Uses the given metadata campaign for accessing metadata. Nothing else is being loaded.
+	void accessPartition(const MetadataCampaign& _campaign, const std::string& _collectionName);
 	
 	void accessPartition(ResultCollectionMetadataAccess* _resultCollectionMetadataAccess);
 	void createQueryDescriptionsSeries(const std::list<ot::ValueComparisonDescription>& _valueComparisons, const std::string& _seriesLabel);
@@ -45,6 +48,7 @@ private:
 	const std::string m_resultCollectionEnding = ".results";
 	const std::string m_resultDataField = "Data";
 	
+	void clear();
 
 	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
 

@@ -109,24 +109,31 @@ bool EntityResult1DCurve::tuplePropertiesAreVisible()
 bool EntityResult1DCurve::updateFromProperties()
 {
 	bool refresh = this->updatePropertyVisibilities();
-
 	if (getObserver() != nullptr)
 	{
-		
-		const std::string projectName = m_queryProperties.getSelectedProject(this);
-		std::string collectionName;
-		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
-		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-		refresh |= m_queryProperties.updateOptions(this,associatedCampaign.value());
-		
-		DataLakeQueryCfg cfg;
-		cfg.setCollectionName(collectionName);
-		cfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
-		cfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
-		cfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
-		cfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+		try
+		{
+			const std::string projectName = m_queryProperties.getSelectedProject(this);
+			std::string collectionName;
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
-		getObserver()->requestDatapointVisualisation(cfg, getEntityID(),getEntityStorageVersion());
+			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
+			refresh |= m_queryProperties.updateOptions(this, associatedCampaign.value());
+
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+			m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+		}
+		catch (std::exception& _e)
+		{
+			std::string message = "Failed to use user given comparisons for data lake access: " + std::string(_e.what());
+			OT_LOG_E(message);
+		}
 	}
 
 
