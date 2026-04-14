@@ -4408,8 +4408,20 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 
 	for (ot::UID entityID : _dataEntityIDList)
 	{
-		getStateManager()->storeEntity(entityID, *parentID, *entityVersion, ModelStateEntity::tEntityType::DATA);
-		setModified();
+		if (entityID == 0)
+		{
+			OTAssert(0, "Attempting to add a data entity with ID 0");
+			OT_LOG_E("[FATAL] Attempting to add a data entity with ID 0");
+		}
+		else if (entityID == ot::invalidUID) {
+			OTAssert(0, "Attempting to add a data entity with invalid ID");
+			OT_LOG_E("[FATAL] Attempting to add a data entity with invalid ID");
+		}
+		else
+		{
+			getStateManager()->storeEntity(entityID, *parentID, *entityVersion, ModelStateEntity::tEntityType::DATA);
+			setModified();
+		}
 		entityVersion++;
 		parentID++;
 	}
@@ -4435,21 +4447,33 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 
 	for (ot::UID id : _topologyEntityIDList)
 	{
-		EntityBase *entity = readEntityFromEntityIDandVersion(nullptr, id, *version, m_entityMap);
-		assert(entity != nullptr);
-		assert(entity->getEntityType() == EntityBase::TOPOLOGY);
-
-		entityList.push_back(entity);
-
-		// Now check whether the entity already exists and if so, delete it and mark if for removal from the display
-		EntityBase *oldEntity = findEntityFromName(entity->getName());
-		if (oldEntity != nullptr)
+		if (id == 0)
 		{
-			removeFromDisplay.push_back(oldEntity->getEntityID());
+			OTAssert(0, "Attempting to add a topology entity with ID 0");
+			OT_LOG_E("[FATAL] Attempting to add a topology entity with ID 0");
+		}
+		else if (id == ot::invalidUID) {
+			OTAssert(0, "Attempting to add a topology entity with invalid ID");
+			OT_LOG_E("[FATAL] Attempting to add a topology entity with invalid ID");
+		}
+		else
+		{
+			EntityBase* entity = readEntityFromEntityIDandVersion(nullptr, id, *version, m_entityMap);
+			assert(entity != nullptr);
+			assert(entity->getEntityType() == EntityBase::TOPOLOGY);
 
-			// Remove the entity from the entity map and also from the model state
-			removeEntityFromMap(oldEntity, false, false);
-			delete oldEntity;
+			entityList.push_back(entity);
+
+			// Now check whether the entity already exists and if so, delete it and mark if for removal from the display
+			EntityBase* oldEntity = findEntityFromName(entity->getName());
+			if (oldEntity != nullptr)
+			{
+				removeFromDisplay.push_back(oldEntity->getEntityID());
+
+				// Remove the entity from the entity map and also from the model state
+				removeEntityFromMap(oldEntity, false, false);
+				delete oldEntity;
+			}
 		}
 
 		version++;
