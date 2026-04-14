@@ -113,3 +113,40 @@ std::string ot::EntityName::createUniqueEntityName(const std::string& _nameRoot,
 	}
 	return fullEntityName;
 }
+
+std::list<std::string> ot::EntityName::removeMatchingParentPaths(const std::list<std::string>& _entityNames)
+{
+	if (_entityNames.empty()) {
+		return _entityNames;
+	}
+
+	bool reduced = true;
+	std::string commonPrefix = EntityName::getParentPath(_entityNames.front());
+	while (reduced && !commonPrefix.empty())
+	{
+		reduced = false;
+
+		if (!commonPrefix.empty())
+		{
+			commonPrefix.append("/");
+		}
+
+		for (const auto& entityName : _entityNames)
+		{
+			if (!String::startsWith(entityName, commonPrefix))
+			{
+				reduced = true;
+				commonPrefix.pop_back();
+				commonPrefix = EntityName::getParentPath(commonPrefix);
+				break;
+			}
+		}
+	}
+
+	std::list<std::string> result;
+	for (const auto& entityName : _entityNames)
+	{
+		result.push_back(entityName.substr(commonPrefix.size()));
+	}
+	return result;
+}

@@ -1,6 +1,7 @@
 ﻿// @otlicense
 
 // OpenTwin header
+#include "OTCore/EntityName.h"
 #include "OTCore/JSON/JSONVectoriser.h"
 #include "OTCore/DataStruct/GenericDataStructMatrixMerger.h"
 #include "OTCommunication/ActionTypes.h"
@@ -124,12 +125,14 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 		cfg.setColumnHeaderFilterBehavior(i, ot::TableHeaderItemCfg::FilterBehavior::UseText);
 	}
 
+	rowHeaders = ot::EntityName::removeMatchingParentPaths(rowHeaders);
+
 	auto rowHeaderIt = rowHeaders.begin();
 	if (rowHeaders.size() == cfg.getRowCount())
 	{
 		OTAssert(rowHeaderIt != rowHeaders.end(), "Iterator out of range");
 
-		for (uint32_t i = 0; i < cfg.getRowCount(); i++)
+		for (int i = 0; i < cfg.getRowCount(); i++)
 		{
 			cfg.setRowHeader(i, *rowHeaderIt);
 			++rowHeaderIt;

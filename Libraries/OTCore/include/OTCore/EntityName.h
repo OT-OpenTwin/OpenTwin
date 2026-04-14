@@ -72,5 +72,9 @@ namespace ot {
 		static std::string getParentPath(const std::string& _entityName);
 
 		static std::string createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames);
+
+		//! @brief Removes the maximum parent path from the provided entity names.
+		//! @param _entityNames List of entity names to remove the parent paths from.
+		static std::list<std::string> removeMatchingParentPaths(const std::list<std::string>& _entityNames);
 	};
 }

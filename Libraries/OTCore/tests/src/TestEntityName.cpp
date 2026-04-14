@@ -131,3 +131,26 @@ TEST(EntityNameTest, EntityReparentName_SmallerTopo) {
 	const std::string parentPath = "Root/NewParent/OtherParent";
 	EXPECT_THROW(ot::EntityName::changeParentPath(entityPath, parentPath), ot::OutOfBoundsException);
 }*/
+
+TEST(EntityNameTest, RemoveMatchingParentsTest)
+{
+	std::list<std::string> names1 = { "Root/Parent/Entity1", "Root/Parent/Entity2", "Root/Parent/Entity3" };
+	std::list<std::string> result1 = ot::EntityName::removeMatchingParentPaths(names1);
+	EXPECT_EQ(result1.size(), 3);
+	auto resultIt1 = result1.begin();
+	EXPECT_EQ(*resultIt1, "Entity1");
+	++resultIt1;
+	EXPECT_EQ(*resultIt1, "Entity2");
+	++resultIt1;
+	EXPECT_EQ(*resultIt1, "Entity3");
+
+	std::list<std::string> names2 = { "Root/Parent/Entity1", "Root/OtherParent/Entity2", "Root/Parent/Entity3" };
+	std::list<std::string> result2 = ot::EntityName::removeMatchingParentPaths(names2);
+	EXPECT_EQ(result2.size(), 3);
+	auto resultIt2 = result2.begin();
+	EXPECT_EQ(*resultIt2, "Entity1");
+	++resultIt2;
+	EXPECT_EQ(*resultIt2, "Entity2");
+	++resultIt2;
+	EXPECT_EQ(*resultIt2, "Entity3");
+}
