@@ -23,3 +23,35 @@
 ot::LibraryEntityInterface::LibraryEntityInterface() {
 	
 }
+
+void ot::LibraryEntityInterface::setLibraryElementID(ot::UID _libraryElementID, EntityBase* _entity) {
+	EntityPropertiesBase* property = _entity->getProperties().getProperty("LibraryElementID");
+	if (property) {
+		EntityPropertiesString* libraryElementIDProperty = dynamic_cast<EntityPropertiesString*>(property);
+		if (!libraryElementIDProperty) {
+			OT_LOG_E("LibraryElementID property is not of type string");
+			return;
+		}
+		libraryElementIDProperty->setValue(std::to_string(_libraryElementID));
+	}
+	else {
+		EntityPropertiesString* prop = EntityPropertiesString::createProperty("LibraryElement", "LibraryElementID", std::to_string(_libraryElementID), "", _entity->getProperties());
+		prop->setVisible(false);
+		_entity->setModified();
+	}
+}
+
+std::string ot::LibraryEntityInterface::getLibraryElementID(EntityBase* _entity) {
+	EntityPropertiesBase* property = _entity->getProperties().getProperty("LibraryElementID");
+	if (property) {
+		EntityPropertiesString* libraryElementIDProperty = dynamic_cast<EntityPropertiesString*>(property);
+		if (!libraryElementIDProperty) {
+			OT_LOG_E("LibraryElementID property is not of type string");
+			return "";
+		}
+		return libraryElementIDProperty->getValue();
+	}
+	else {
+		return std::to_string(ot::invalidUID);
+	}
+}

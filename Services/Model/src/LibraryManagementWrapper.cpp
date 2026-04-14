@@ -292,7 +292,7 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 
 	// Create entity from factory
 	EntityFactory& factory = EntityFactory::instance();
-	EntityBase* entity = factory.create(_importCfg.getEntityType());
+	std::unique_ptr<EntityBase> entity (factory.create(_importCfg.getEntityType()));
 	if (!entity) {
 		OT_LOG_E("Failed to create entity of type: " + _importCfg.getEntityType());
 		return nullptr;
@@ -309,16 +309,15 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 	entity->setObserver(_model);
 
 	// Populate entity with library data
-	auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(entity);
+	auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(entity.get());
 	if (!libInterface) {
 		OT_LOG_E("Entity does not implement LibraryEntityInterface: " + _importCfg.getEntityType());
-		delete entity;
 		return nullptr;
 	}
 
 	// First setLibraryElement to ensure that in case of python script the environment requested in this function is being handled too
 	libInterface->setLibraryElement(_importCfg, _createdEntities);
-	entity->setLibraryElementID(_importCfg.getLibraryElementID());
+	libInterface->setLibraryElementID(_importCfg.getLibraryElementID(),entity.get());
 
 	// Check if entity with the same name already exists and if the content of the entities matches
 	EntityBase* existingEntity = checkAndHandleIfEntityExists(fullPath, _importCfg, _model);
@@ -333,7 +332,8 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 	//_importCfg.setName(entName);
 	entity->storeToDataBase();
 	_createdEntities.addTopologyEntity(*entity, false);
-	return entity;
+
+	return entity.release();
 }
 
 EntityBase* LibraryManagementWrapper::checkAndHandleIfEntityExists(const std::string& _fullPath, const ot::LibraryElement& _importCfg, Model* _model) {
@@ -343,14 +343,14 @@ EntityBase* LibraryManagementWrapper::checkAndHandleIfEntityExists(const std::st
 		EntityBase* currentEntity = _model->findEntityFromName(element);
 		if (!currentEntity) continue;
 
-		std::string libraryElementID = currentEntity->getLibraryElementID();
-		if (libraryElementID != std::to_string(_importCfg.getLibraryElementID())) continue;
-
 		auto* libInterface = dynamic_cast<ot::LibraryEntityInterface*>(currentEntity);
 		if (!libInterface) {
 			OT_LOG_E("Entity does not implement LibraryEntityInterface: " + _importCfg.getEntityType());
-			continue;
+			return nullptr;
 		}
+
+		std::string libraryElementID = libInterface->getLibraryElementID(currentEntity);
+		if (libraryElementID != std::to_string(_importCfg.getLibraryElementID())) continue;
 
 		if (libInterface->checkIfLibraryElementContentMatches(_importCfg)) {
 			OT_LOG_I("Entity with matching content already exists: " + element);

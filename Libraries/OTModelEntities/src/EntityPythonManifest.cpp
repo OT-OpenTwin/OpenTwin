@@ -134,6 +134,14 @@ bool EntityPythonManifest::checkIfLibraryElementContentMatches(const ot::Library
 	return currentContent == newContent;
 }
 
+void EntityPythonManifest::setLibraryElementID(ot::UID _id, EntityBase* _entity) {
+	this->setManifestID(_id);
+}
+
+std::string EntityPythonManifest::getLibraryElementID(EntityBase* _entity) {
+	return std::to_string(this->getManifestID());
+}
+
 bool EntityPythonManifest::environmentHasChanged(const std::string& _newContent)
 {
 	auto currentPackageList = getPackageList(m_manifestText);

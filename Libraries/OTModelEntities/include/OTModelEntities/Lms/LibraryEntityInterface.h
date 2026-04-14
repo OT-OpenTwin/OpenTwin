@@ -38,6 +38,11 @@ namespace ot {
 
 		//! @brief Check if the library element already imported in the project 
 		virtual bool checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) = 0;
+
+		//! @brief Set the library element ID
+		virtual void setLibraryElementID(ot::UID _libraryElementID, EntityBase* _entity);
+		//! @brief Get the library element ID
+		virtual std::string getLibraryElementID(EntityBase* _entity);
 	};
 }
 ;
