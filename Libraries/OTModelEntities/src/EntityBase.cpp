@@ -126,6 +126,11 @@ void EntityBase::storeToDataBase(void) {
 
 void EntityBase::storeToDataBase(ot::UID _givenEntityVersion) {
 	if (!getModified()) return;
+	
+	if (getEntityID() == ot::invalidUID) {
+		OT_LOG_E("Storing entity with invalid ID to database. { \"Entity\": \"" + getName() + "\" }");
+		OTAssert(0, "Invalid entity ID when storing to data base");
+	}
 
 	m_treeItem.setEntityVersion(_givenEntityVersion);
 	entityIsStored();
@@ -329,9 +334,11 @@ void EntityBase::entityIsStored(void) {
 	if (getParent() != nullptr) {
 		parentID = getParent()->getEntityID();
 		assert(parentID != 0);
+		assert(parentID != ot::invalidUID);
 	}
 
 	assert(getEntityID() != 0);
+	assert(getEntityID() != ot::invalidUID);
 	assert(getEntityStorageVersion() > 0);
 
 	ModelStateEntity::tEntityType entityType = ModelStateEntity::tEntityType::DATA;
