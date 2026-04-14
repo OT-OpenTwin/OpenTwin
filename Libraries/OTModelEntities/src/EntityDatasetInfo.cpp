@@ -55,11 +55,22 @@ void ot::EntityDatasetInfo::createProperties(const std::string& _initialProjectN
 
 ot::GenericDataStructMatrix ot::EntityDatasetInfo::getTable()
 {
+	OT_LOG_E("getTable is not supported for EntityDatasetInfo");
+	return GenericDataStructMatrix();
+}
+
+void ot::EntityDatasetInfo::setTable(const ot::GenericDataStructMatrix& _table)
+{
+	OT_LOG_E("EntityDatasetInfo can not be set from config");
+}
+
+ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
+{
 	auto obs = getObserver();
 	if (!obs)
 	{
 		OT_LOG_W("Can not get metadata campaign. No observer for EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
-		return GenericDataStructMatrix();
+		return TableCfg();
 	}
 
 	std::string collectionName;
@@ -67,20 +78,24 @@ ot::GenericDataStructMatrix ot::EntityDatasetInfo::getTable()
 	if (!campaign)
 	{
 		OT_LOG_W("No metadata campaign for project \"" + getProjectName() + "\"");
-		return GenericDataStructMatrix();
+		return TableCfg();
 	}
 
 	JSONToVariableConverter jsonVar;
 
 	std::list<GenericDataStructMatrix> matrices;
 
+	std::list<std::string> rowHeaders;
+
 	for (const auto& seriesMetadata : campaign->getSeriesMetadata())
 	{
+		rowHeaders.push_back(seriesMetadata.getName());
+
 		const JsonDocument& metadata = seriesMetadata.getMetadata();
 		std::string dooc = json::toJson(metadata);
 		std::list<std::string> columnHeader;
 		JSONVectoriser::vectorise(metadata, columnHeader, "", JSONVectoriser::AddLeavesOnly);
-		
+
 		GenericDataStructMatrix matrix(2, static_cast<uint32_t>(columnHeader.size()));
 		uint32_t columnIndex = 0;
 		for (const std::string& col : columnHeader)
@@ -96,17 +111,8 @@ ot::GenericDataStructMatrix ot::EntityDatasetInfo::getTable()
 		matrices.push_back(std::move(matrix));
 	}
 
-	return GenericDataStructMatrixMerger::tableMerge(matrices, getHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal);
-}
+	const GenericDataStructMatrix matrix = GenericDataStructMatrixMerger::tableMerge(matrices, getHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal);
 
-void ot::EntityDatasetInfo::setTable(const ot::GenericDataStructMatrix& _table)
-{
-	OT_LOG_E("EntityDatasetInfo can not be set from config");
-}
-
-ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
-{
-	const GenericDataStructMatrix matrix = getTable();
 	ot::TableCfg cfg(matrix, getHeaderMode());
 
 	cfg.setEntityInformation(getBasicEntityInformation());
@@ -117,6 +123,23 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 	{
 		cfg.setColumnHeaderFilterBehavior(i, ot::TableHeaderItemCfg::FilterBehavior::UseText);
 	}
+
+	auto rowHeaderIt = rowHeaders.begin();
+	if (rowHeaders.size() == cfg.getRowCount())
+	{
+		OTAssert(rowHeaderIt != rowHeaders.end(), "Iterator out of range");
+
+		for (uint32_t i = 0; i < cfg.getRowCount(); i++)
+		{
+			cfg.setRowHeader(i, *rowHeaderIt);
+			++rowHeaderIt;
+		}
+	}
+	else
+	{
+		OT_LOG_E("Row header size mismatch for { \"Entity\": \"" + getName() + "\", \"ExpectedRowHeaderSize\": " + std::to_string(cfg.getRowCount()) + ", \"ActualRowHeaderSize\": " + std::to_string(rowHeaders.size()) + " }");
+	}
+
 	return cfg;
 }
 
