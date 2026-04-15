@@ -327,7 +327,7 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 		return existingEntity; // Entity already exists with matching content, no need to create a new one
 	}
 
-	std::string entName = CreateNewUniqueTopologyName(libraryElements, libraryElementFolderName, _importCfg.getName());
+	std::string entName = ot::EntityName::createUniqueEntityName(libraryElementFolderName, libraryElements, _importCfg.getName());
 	entity->setName(entName);
 	//_importCfg.setName(entName);
 	entity->storeToDataBase();

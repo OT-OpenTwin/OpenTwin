@@ -33,7 +33,7 @@ void EntityCreator::createManifests()
 	EntityPythonManifest newManifest;
 	auto modelComponent = Application::instance()->getModelComponent();
 	newManifest.setEntityID(modelComponent->createEntityUID());
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::PythonManifestFolder, "Environment", ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonManifestFolder));
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::PythonManifestFolder, ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonManifestFolder), "Environment");
 	newManifest.setName(entityName);
 	newManifest.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -62,7 +62,7 @@ void EntityCreator::createPipeline()
 	);
 
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataProcessingFolder);
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, "Pipeline", allPipelines);
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::DataProcessingFolder, allPipelines, "Pipeline");
 	newDataprocessing.setName(entityName);
 	newDataprocessing.setTreeItemEditable(true);
 
@@ -99,7 +99,7 @@ void EntityCreator::createSolver()
 	newSolver.createProperties(ot::FolderNames::DataProcessingFolder, m_dataProcessingFolderID);
 
 	auto allPipelines = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::SolverFolder);
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, "Pipeline Solver", allPipelines);
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::SolverFolder, allPipelines, "Pipeline Solver");
 	newSolver.setName(entityName);
 
 	newSolver.storeToDataBase();

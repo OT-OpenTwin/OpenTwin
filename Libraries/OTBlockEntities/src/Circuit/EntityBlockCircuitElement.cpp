@@ -73,8 +73,8 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	return true;
 }
 
-EntityNamingBehavior EntityBlockCircuitElement::getNamingBehavior() const {
-	EntityNamingBehavior namingBehavior;
+ot::EntityName::NamingBehavior EntityBlockCircuitElement::getNamingBehavior() const {
+	ot::EntityName::NamingBehavior namingBehavior;
 	namingBehavior.alwaysNumbered = true;
 	namingBehavior.delimiter = "";
 	return namingBehavior;

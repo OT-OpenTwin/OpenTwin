@@ -622,9 +622,9 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 		}
 	}
 	
-	EntityNamingBehavior connectionNaming;
+	ot::EntityName::NamingBehavior connectionNaming;
 	connection.setUid(model->createEntityUID());
-	std::unique_ptr<EntityBlockConnection> createdConnection = createConnection(_scene, _originBlock, connection, connectionNaming, modelStateInfo);
+	std::unique_ptr<EntityBlockConnection> createdConnection = createConnection(_scene, _originBlock, connection, connectionNaming, false, modelStateInfo);
 	
 	if (createdConnection) {
 		// Add the created connection to the model
@@ -739,12 +739,10 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 		connectedElements.pop();
 	}
 
-	EntityNamingBehavior connectionNaming;
-	connectionNaming.explicitNaming = true;
-
+	ot::EntityName::NamingBehavior connectionNaming;
 	for (auto& connectionCfg : newConnections) {
 		connectionCfg.setUid(model->createEntityUID());
-		createConnection(_scene, _originBlock, connectionCfg, connectionNaming, _modelStateInfo);
+		createConnection(_scene, _originBlock, connectionCfg, connectionNaming, true, _modelStateInfo);
 	}
 
 	model->addEntitiesToModel(_modelStateInfo, "Added Connection to Connection", true, true, true);
@@ -908,7 +906,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	std::string folderName = _editor->getName() + blockFolderName;
 
 	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
-	std::string entName = CreateNewUniqueTopologyName(blockEnt->getNamingBehavior(), blocks, folderName, blockEnt->getBlockTitle());
+	std::string entName = ot::EntityName::createUniqueEntityName(folderName, blocks, blockEnt->getBlockTitle(), blockEnt->getNamingBehavior());
 
 	// Setup block entity
 	blockEnt->setName(entName);
@@ -958,7 +956,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	return blockEnt;
 }
 
-std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo) {
+std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, const ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
@@ -971,24 +969,26 @@ std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGra
 	connectionEntity->setConnectionCfg(_connectionCfg);
 	connectionEntity->setLineShape(_originBlock->getDefaultConnectionShape());
 
-	if (_connectionNaming.explicitNaming) {
+	if (_explicitNaming) {
 		std::list<std::string> connectionItems = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
 
 		// Use a manual counter because all connections are added to the model at the end.
 		// CreateNewUniqueEntityName only considers connections already in the model,
 		// which could otherwise result in duplicate names.
 		std::string connectionName;
+		int counter = _namingBehavior.startNumber;
 		do {
-			connectionName = _scene->getName() + "/" + m_connectionsFolder + "/Connection" + std::to_string(_connectionNaming.namingCounter);
-			_connectionNaming.namingCounter++;
+			connectionName = _scene->getName() + "/" + m_connectionsFolder + "/Connection" + std::to_string(counter);
+			counter++;
 		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
 
 		connectionEntity->setName(connectionName);
 	}
 	else {
 		// Determine unique name
-		auto connectionsFolder = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
-		const std::string connectionName = CreateNewUniqueTopologyName(connectionsFolder, _scene->getName() + "/" + m_connectionsFolder, "Connection");
+		auto connectionsFolder = _scene->getName() + "/" + m_connectionsFolder;
+		auto folderContent = model->getListOfFolderItems(connectionsFolder, true);
+		const std::string connectionName = ot::EntityName::createUniqueEntityName(connectionsFolder, folderContent, "Connection");
 		connectionEntity->setName(connectionName);
 	}
 

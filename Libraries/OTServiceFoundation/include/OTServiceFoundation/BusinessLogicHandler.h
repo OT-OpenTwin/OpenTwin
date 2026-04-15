@@ -18,16 +18,16 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
+// std header
+#include <list>
 #include <string>
 #include <vector>
-#include <list>
-
-// OpenTwin header
-#include "OTModelEntities/EntityNamingBehavior.h"
 
 //! @brief Common methods for all central service handler classes.
 class OT_SERVICEFOUNDATION_API_EXPORT BusinessLogicHandler
@@ -50,13 +50,11 @@ protected:
 	ot::components::UiComponent * _uiComponent = nullptr;
 	ot::components::ModelComponent * _modelComponent = nullptr;
 
-	inline void CheckEssentials();
+	inline void checkEssentials();
 
-	std::string CreateNewUniqueTopologyName(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber = 1, bool alwaysNumbered = false);
-	std::string CreateNewUniqueTopologyName(const EntityNamingBehavior& _entityNamingBehavior, std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber = 1);
-	std::string CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber = 1, bool alwaysNumbered = false);
-	std::vector<std::string> CreateNewUniqueTopologyNames(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);
-	std::vector<std::string> CreateNewUniqueTopologyNames(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);
+	std::string createNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber = 1, bool alwaysNumbered = false);
+	std::vector<std::string> createNewUniqueTopologyNames(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);
+	std::vector<std::string> createNewUniqueTopologyNames(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber = 1, bool alwaysNumbered = false);
 		
 	virtual void UIComponentWasSet() {};
 	virtual void ModelComponentWasSet() {};

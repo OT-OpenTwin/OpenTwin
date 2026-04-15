@@ -1134,58 +1134,42 @@ void Model::handleCreateNewGroup()
 void Model::handleShowDatasetInformation()
 {
 	const std::string datasetInfoRootName = ot::FolderNames::DatasetFolder + "/Views";
-	const std::string datasetInfoEntityName = datasetInfoRootName + "/Dataset Info";
+	
+	ot::NewModelStateInfo newStateInfo;
 
-	EntityBase* ent = findEntityFromName(datasetInfoEntityName);
-	if (ent)
+	std::unique_ptr<EntityBase> cont;
+	EntityBase* containerBase = findEntityFromName(datasetInfoRootName);
+	if (containerBase == nullptr)
 	{
-		// Entity exists, switch to current project and show it
-
-		ot::EntityDatasetInfo* infoEntity = dynamic_cast<ot::EntityDatasetInfo*>(ent);
-		if (infoEntity)
-		{
-			infoEntity->setProjectName(Application::instance()->getProjectName());
-		}
-		else
-		{
-			OT_LOG_E("Unable to show dataset information. Dataset info entity is not of the expected type.");
-		}
-		updateEntity(infoEntity);
+		containerBase = new EntityContainer(createEntityUID(), nullptr, nullptr, nullptr);
+		containerBase->setName(datasetInfoRootName);
+		containerBase->storeToDataBase();
+		cont.reset(containerBase);
+		newStateInfo.addTopologyEntity(*containerBase);
 	}
-	else
+
+	EntityContainer* container = dynamic_cast<EntityContainer*>(containerBase);
+	if (!container)
 	{
-		// Entity does not exist, create it and show it
-
-		ot::NewModelStateInfo newStateInfo;
-
-		std::unique_ptr<EntityBase> cont;
-		EntityBase* containerBase = findEntityFromName(datasetInfoRootName);
-		if (containerBase == nullptr)
-		{
-			containerBase = new EntityContainer(createEntityUID(), nullptr, nullptr, nullptr);
-			containerBase->setName(datasetInfoRootName);
-			containerBase->storeToDataBase();
-			cont.reset(containerBase);
-			newStateInfo.addTopologyEntity(*containerBase);
-		}
-
-		EntityContainer* container = dynamic_cast<EntityContainer*>(containerBase);
-		if (!container)
-		{
-			OT_LOG_E("Unable to show dataset information. Dataset info root entity is not of the expected type.");
-			return;
-		}
-
-		ot::EntityDatasetInfo infoEntity(createEntityUID(), nullptr, nullptr, nullptr);
-		infoEntity.setName(datasetInfoEntityName);
-		infoEntity.createProperties(Application::instance()->getProjectName());
-		infoEntity.storeToDataBase();
-
-		newStateInfo.addTopologyEntity(infoEntity);
-
-		addEntitiesToModel(newStateInfo, "Add dataset info view", true, true, true);
-		Application::instance()->handleProjectSave();
+		OT_LOG_E("Unable to show dataset information. Dataset info root entity is not of the expected type.");
+		return;
 	}
+
+	std::list<std::string> existingNames = getListOfFolderItems(container->getName(), false);
+
+	const std::string datasetInfoEntityName = ot::EntityName::createUniqueEntityName(container->getName(), existingNames, "Dataset Info");
+
+	ot::EntityDatasetInfo infoEntity(createEntityUID(), nullptr, nullptr, nullptr);
+	infoEntity.setName(datasetInfoEntityName);
+	infoEntity.createProperties(Application::instance()->getProjectName());
+	infoEntity.storeToDataBase();
+
+	newStateInfo.addTopologyEntity(infoEntity);
+
+	addEntitiesToModel(newStateInfo, "Add dataset info view", true, true, true);
+	Application::instance()->handleProjectSave();
+
+	ot::Frontend::setEntitySelected(datasetInfoEntityName, true, true, true);
 }
 
 EntityParameter* Model::createNewParameterItem(const std::string &parameterName)

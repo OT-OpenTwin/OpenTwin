@@ -92,7 +92,7 @@ Application::~Application() {
 void Application::createNewCircuit() {
 	
 	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
-	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, "Circuit", existingCircuits);
+	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, existingCircuits, "Circuit");
 
 	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr));
 	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);

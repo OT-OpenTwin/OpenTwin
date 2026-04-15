@@ -82,7 +82,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		newEntities.addTopologyEntity(container);
 	}
 
-	const std::string newEntityName = CreateNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName());
+	const std::string newEntityName = createNewUniqueTopologyName(c_projectsFolder, _projectInfo.getProjectName());
 	const std::string serviceName = Application::instance().getServiceName();
 
 	// Create coordinates
@@ -169,7 +169,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 		newEntities.addTopologyEntity(container);
 	}
 
-	std::string newConnectionName = CreateNewUniqueTopologyName(c_connectionsFolder, connectionFromName + " >> " + connectionToName);
+	std::string newConnectionName = createNewUniqueTopologyName(c_connectionsFolder, connectionFromName + " >> " + connectionToName);
 
 	// Create connection entity
 	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
@@ -232,7 +232,7 @@ void EntityHandler::addDocument(const std::string& _fileName, const std::string&
 	ot::UID documentEntityID = ot::invalidUID;
 	ot::UID documentEntityVersion = ot::invalidUID;
 
-	const std::string newDocumentName = CreateNewUniqueTopologyName(c_documentsFolder, fileNameOnly + "." + extensionString);
+	const std::string newDocumentName = createNewUniqueTopologyName(c_documentsFolder, fileNameOnly + "." + extensionString);
 
 	std::string dataTypeString;
 	std::unique_ptr<EntityBase> dataTypeEntity(EntityFactory::instance().create(extension));
@@ -349,7 +349,7 @@ void EntityHandler::addImage(const std::string& _fileName, const std::string& _f
 		serviceName
 	);
 	backgroundImageEntity.setEntityID(_modelComponent->createEntityUID());
-	backgroundImageEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, newName));
+	backgroundImageEntity.setName(createNewUniqueTopologyName(c_decorationFolder, newName));
 	backgroundImageEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	backgroundImageEntity.createProperties();
 	backgroundImageEntity.setTreeItemEditable(true);
@@ -420,7 +420,7 @@ void EntityHandler::addLabel() {
 		serviceName
 	);
 	labelEntity.setEntityID(_modelComponent->createEntityUID());
-	labelEntity.setName(CreateNewUniqueTopologyName(c_decorationFolder, "Label"));
+	labelEntity.setName(createNewUniqueTopologyName(c_decorationFolder, "Label"));
 	labelEntity.setGraphicsScenePackageChildName(c_decorationFolderName);
 	labelEntity.createProperties();
 	labelEntity.setTreeItemEditable(true);
@@ -638,7 +638,7 @@ void EntityHandler::addContainer() {
 
 	newContainer.setTreeItemEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
-	newContainer.setName(CreateNewUniqueTopologyName(c_containerFolder, "Container"));
+	newContainer.setName(createNewUniqueTopologyName(c_containerFolder, "Container"));
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
 	newContainer.setTreeItemSelectChildren(false);

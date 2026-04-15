@@ -374,7 +374,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 
 	textFile->setFileFilter(_fileFilter);
 
-	const std::string entityName = CreateNewUniqueTopologyName(_folderContent, _folderName, name);;
+	const std::string entityName = ot::EntityName::createUniqueEntityName(_folderName, _folderContent, name);
 	textFile->setName(entityName);
 	_folderContent.push_back(entityName);
 

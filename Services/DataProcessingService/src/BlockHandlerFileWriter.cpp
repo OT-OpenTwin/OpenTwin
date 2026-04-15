@@ -89,7 +89,7 @@ void BlockHandlerFileWriter::createFile()
 
 	const std::string solverName =	SolverReport::instance().getSolverName();
 	const std::string resultFolder = solverName + "/" + ot::FolderNames::FilesFolder;
-	const std::string fileName = CreateNewUniqueTopologyName(resultFolder, m_fileName);
+	const std::string fileName = createNewUniqueTopologyName(resultFolder, m_fileName);
 
 	EntityFileText textFile(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	textFile.setName(fileName);

@@ -31,7 +31,7 @@ public:
 	virtual std::string getFolderName() = 0;
 	virtual bool updateFromProperties(void) override;
 
-	virtual EntityNamingBehavior getNamingBehavior() const override;
+	virtual ot::EntityName::NamingBehavior getNamingBehavior() const override;
 	virtual std::string getCircuitModel();
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
 	virtual std::string getBlockFolderName() const override { return ""; };

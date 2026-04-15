@@ -101,14 +101,19 @@ std::string ot::EntityName::getParentPath(const std::string& _entityName)
 	return parentPath;
 }
 
-std::string ot::EntityName::createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames)
+std::string ot::EntityName::createUniqueEntityName(const std::string& _parentContainer, const std::list<std::string>& _containerContent, const std::string& _nameBase, const NamingBehavior& _namingBehavior)
 {
-	std::string fullEntityName = _nameRoot + "/" + _nameBase;
-	int count = 1;
-	
-	while (std::find(_takenEntityNames.begin(), _takenEntityNames.end(), fullEntityName) != _takenEntityNames.end())
+	std::string fullEntityName = _parentContainer + "/" + _nameBase;
+	int count = _namingBehavior.startNumber;
+
+	if (_namingBehavior.alwaysNumbered)
 	{
-		fullEntityName = _nameRoot + "/" + _nameBase + "_" + std::to_string(count);
+		fullEntityName.append(_namingBehavior.delimiter + std::to_string(count));
+		count++;
+	}
+	while (std::find(_containerContent.begin(), _containerContent.end(), fullEntityName) != _containerContent.end())
+	{
+		fullEntityName = _parentContainer + "/" + _nameBase + _namingBehavior.delimiter + std::to_string(count);
 		count++;
 	}
 	return fullEntityName;

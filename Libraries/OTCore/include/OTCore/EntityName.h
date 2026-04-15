@@ -31,6 +31,13 @@ namespace ot {
 	class OT_CORE_API_EXPORT EntityName {
 		OT_DECL_STATICONLY(EntityName)
 	public:
+		struct NamingBehavior
+		{
+			std::string delimiter = "_";
+			bool alwaysNumbered = false;
+			int startNumber = 1;
+		};
+
 		//! @brief Extract a name from the full topology entity name.
 		//! @param _topologyLevel -1 = Entity name, 0 = root folder, 1 = next level container .... n = short name of entity (default).
 		//! @return Empty optional if the topology is out of range.
@@ -71,7 +78,7 @@ namespace ot {
 
 		static std::string getParentPath(const std::string& _entityName);
 
-		static std::string createUniqueEntityName(const std::string& _nameRoot, const std::string& _nameBase, const std::list<std::string>& _takenEntityNames);
+		static std::string createUniqueEntityName(const std::string& _parentContainer, const std::list<std::string>& _containerContent, const std::string& _nameBase, const NamingBehavior& _namingBehavior = NamingBehavior());
 
 		//! @brief Removes the maximum parent path from the provided entity names.
 		//! @param _entityNames List of entity names to remove the parent paths from.

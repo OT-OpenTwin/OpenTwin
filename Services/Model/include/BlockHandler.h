@@ -19,13 +19,14 @@
 
 #pragma once
 
-//std header
-#include <set>
-
 // OpenTwin header
+#include "OTCore/EntityName.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
+
+//std header
+#include <set>
 
 class EntityBlock;
 class EntityGraphicsScene;
@@ -115,7 +116,7 @@ private:
 	//! @param _originBlock The block from which the connection originates.
 	//! @param _connectionNaming The naming convention for the requested connection.
 	//! @return void 
-	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection,  EntityNamingBehavior& _connectionNaming, ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection, const ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Modifies the connection information for a given entity.
 	//! @param _connectionID Connection ID of the connection to be modified.

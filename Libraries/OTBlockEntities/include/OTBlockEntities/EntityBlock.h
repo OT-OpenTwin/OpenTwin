@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTCore/EntityName.h"
 #include "OTCore/Geometry/Point2D.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
@@ -29,7 +30,6 @@
 #include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityCoordinates2D.h"
-#include "OTModelEntities/EntityNamingBehavior.h"
 #include "OTBlockEntities/Connector.h"
 #include "OTBlockEntities/BlockEntitiesAPIExport.h"
 
@@ -68,7 +68,7 @@ public:
 	virtual void createProperties();
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const;
 
-	virtual EntityNamingBehavior getNamingBehavior() const { return EntityNamingBehavior(); } ;
+	virtual ot::EntityName::NamingBehavior getNamingBehavior() const { return ot::EntityName::NamingBehavior(); } ;
 	virtual std::string getBlockFolderName() const { return "Blocks"; };
 
 	std::string createBlockHeadline() const;

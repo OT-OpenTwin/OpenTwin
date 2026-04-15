@@ -121,7 +121,7 @@ void ParametricResult1DManager::storeDataInResultCollection()
 		Application::instance().getServiceName()
 	);
 
-	std::string seriesName = CreateNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
+	std::string seriesName = createNewUniqueTopologyName(m_resultFolderName, m_seriesNameBase);
 	
 	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(m_allDataDescriptions, seriesName);
 	resultCollectionExtender.storeCampaignChanges();

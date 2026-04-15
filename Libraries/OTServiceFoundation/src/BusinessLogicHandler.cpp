@@ -18,67 +18,45 @@
 // @otlicense-end
 
 #include "OTSystem/OTAssert.h"
+#include "OTCore/EntityName.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 
-std::string BusinessLogicHandler::CreateNewUniqueTopologyName(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber, bool alwaysNumbered)
-{
-	std::string fullFileName = folderName + "/" + fileName;
-	int count = startNumber;
-	if (alwaysNumbered)
-	{
-		fullFileName += "_" + std::to_string(count);
-	}
-	while (std::find(folderContent.begin(), folderContent.end(), fullFileName) != folderContent.end())
-	{
-		fullFileName = folderName + "/" + fileName + "_" + std::to_string(count);
-		count++;
-	}
-	return fullFileName;
-}
-
-std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const EntityNamingBehavior& _entityNamingBehavior, std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, int startNumber) {
-	std::string fullFileName = folderName + "/" + fileName;
-	int count = startNumber;
-	if (_entityNamingBehavior.alwaysNumbered) {
-		fullFileName += _entityNamingBehavior.delimiter + std::to_string(count);
-	}
-	while (std::find(folderContent.begin(), folderContent.end(), fullFileName) != folderContent.end()) {
-		fullFileName = folderName + "/" + fileName + _entityNamingBehavior.delimiter + std::to_string(count);
-		count++;
-	}
-	return fullFileName;
-}
-
-std::string BusinessLogicHandler::CreateNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber, bool alwaysNumbered)
+std::string BusinessLogicHandler::createNewUniqueTopologyName(const std::string& folderName, const std::string& fileName, int startNumber, bool alwaysNumbered)
 {
 	assert(_modelComponent != nullptr);
 	std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(folderName);
-	return CreateNewUniqueTopologyName(folderItems, folderName, fileName, startNumber, alwaysNumbered);
+	ot::EntityName::NamingBehavior namingBehavior;
+	namingBehavior.startNumber = startNumber;
+	namingBehavior.alwaysNumbered = alwaysNumbered;
+	return ot::EntityName::createUniqueEntityName(folderName, folderItems, fileName, namingBehavior);
 }
 
-
-std::vector<std::string> BusinessLogicHandler::CreateNewUniqueTopologyNames(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber, bool alwaysNumbered)
+std::vector<std::string> BusinessLogicHandler::createNewUniqueTopologyNames(std::list<std::string>& folderContent, const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber, bool alwaysNumbered)
 {
 	std::vector<std::string> newNames;
 	newNames.reserve(numberOfFiles);
+
+	ot::EntityName::NamingBehavior namingBehavior;
+	namingBehavior.startNumber = startNumber;
+	namingBehavior.alwaysNumbered = alwaysNumbered;
+
 	for (uint64_t i = 0; i < numberOfFiles; i++)
 	{
-		newNames.push_back(CreateNewUniqueTopologyName(folderContent, folderName, fileName, startNumber, alwaysNumbered));
+		newNames.push_back(ot::EntityName::createUniqueEntityName(folderName, folderContent, fileName, namingBehavior));
 		folderContent.push_back(newNames.back());
 	}
 	return newNames;
 }
 
-std::vector<std::string> BusinessLogicHandler::CreateNewUniqueTopologyNames(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber, bool alwaysNumbered)
+std::vector<std::string> BusinessLogicHandler::createNewUniqueTopologyNames(const std::string& folderName, const std::string& fileName, uint64_t numberOfFiles, int startNumber, bool alwaysNumbered)
 {
 	assert(_modelComponent != nullptr);
 	std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(folderName);
-	return CreateNewUniqueTopologyNames(folderItems, folderName, fileName, numberOfFiles, startNumber, alwaysNumbered);
+	return createNewUniqueTopologyNames(folderItems, folderName, fileName, numberOfFiles, startNumber, alwaysNumbered);
 }
 
-
-inline void BusinessLogicHandler::CheckEssentials()
+inline void BusinessLogicHandler::checkEssentials()
 {
 	OTAssert(_modelComponent != nullptr, "No model component set");
 	OTAssert(_uiComponent != nullptr, "No UI component set");

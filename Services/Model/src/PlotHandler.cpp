@@ -209,14 +209,14 @@ void PlotHandler::createCurves(ot::NewModelStateInfo& _modelStateInformation, co
 	
 	ot::Plot1DCurveCfg curveConfig;
 	
-	const std::string shortName = "curve";
+	const std::string shortName = "Curve";
 	
 	auto painter = colourIt.getNextPainter();
 	curveConfig.setLinePenPainter(painter.release());
 
 	EntityResult1DCurve newCurve(model->createEntityUID(), nullptr, nullptr, nullptr);
 	std::list<std::string> takenNames = model->getListOfFolderItems(_nameBase,false);
-	const std::string fullName = ot::EntityName::createUniqueEntityName(_nameBase, shortName, takenNames);
+	const std::string fullName = ot::EntityName::createUniqueEntityName(_nameBase, takenNames, shortName);
 	newCurve.setName(fullName);
 	newCurve.setTreeItemEditable(true);
 	newCurve.createProperties();
