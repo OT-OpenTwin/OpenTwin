@@ -16,7 +16,7 @@
         "BUILD_TESTING": "ON"
       },
       "environment": {
-        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{QT_ADS_LIBPATH};$penv{PATH}"
       }
     },
     {
