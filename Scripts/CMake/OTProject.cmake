@@ -125,7 +125,6 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
         return()
     endif()
 
-    # no extra underscore in env var names
     if(DEP_TOKEN STREQUAL "OTDataStorage")
         set(${OUT_VAR} "OT_DATASTORAGE_ROOT" PARENT_SCOPE)
         return()
@@ -136,7 +135,48 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
         return()
     endif()
 
+    if(DEP_TOKEN STREQUAL "UICore")
+        set(${OUT_VAR} "OT_UICORE_ROOT" PARENT_SCOPE)
+        return()
+    endif()
+
+    if(DEP_TOKEN STREQUAL "OTFMC")
+        if(DEFINED ENV{OT_FILE_MANAGER_CONNECTOR_ROOT} AND NOT "$ENV{OT_FILE_MANAGER_CONNECTOR_ROOT}" STREQUAL "")
+            set(${OUT_VAR} "OT_FILE_MANAGER_CONNECTOR_ROOT" PARENT_SCOPE)
+            return()
+        endif()
+        if(DEFINED ENV{OT_FMC_ROOT} AND NOT "$ENV{OT_FMC_ROOT}" STREQUAL "")
+            set(${OUT_VAR} "OT_FMC_ROOT" PARENT_SCOPE)
+            return()
+        endif()
+        if(DEFINED ENV{OTFMC_ROOT} AND NOT "$ENV{OTFMC_ROOT}" STREQUAL "")
+            set(${OUT_VAR} "OTFMC_ROOT" PARENT_SCOPE)
+            return()
+        endif()
+    endif()
+
     _ot_guess_ot_root_envvar(_guess "${DEP_TOKEN}")
+
+    string(REPLACE "_" "" _guess_no_underscores "${_guess}")
+
+    string(REGEX REPLACE "^OT" "" _name "${DEP_TOKEN}")
+    string(TOUPPER "${_name}" _name_u)
+    set(_candidate_compact "OT${_name_u}_ROOT")
+    set(_candidate_split "OT_${_name_u}_ROOT")
+
+    set(_candidates "")
+    list(APPEND _candidates "${_guess}")
+    list(APPEND _candidates "${_guess_no_underscores}")
+    list(APPEND _candidates "${_candidate_split}")
+    list(APPEND _candidates "${_candidate_compact}")
+
+    foreach(_envName IN LISTS _candidates)
+        if(DEFINED ENV{${_envName}} AND NOT "$ENV{${_envName}}" STREQUAL "")
+            set(${OUT_VAR} "${_envName}" PARENT_SCOPE)
+            return()
+        endif()
+    endforeach()
+
     set(${OUT_VAR} "${_guess}" PARENT_SCOPE)
 endfunction()
 
@@ -334,6 +374,41 @@ function(ot_add_export TARGET_NAME)
     message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
 endfunction()
 
+function(ot_add_resources TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_add_resources: core target '${_core}' not found.")
+    endif()
+
+    file(GLOB_RECURSE _rc CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.rc"
+    )
+
+    file(GLOB_RECURSE _ico CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.ico"
+    )
+
+    set(_all_res "")
+    list(APPEND _all_res ${_rc} ${_ico})
+
+    if(_all_res)
+        target_sources(${_core} PRIVATE ${_all_res})
+    endif()
+endfunction()
+
+function(ot_deploy_app_configuration TARGET_NAME)
+    set(_qtconf "${CMAKE_CURRENT_SOURCE_DIR}/qt.conf")
+    if(EXISTS "${_qtconf}")
+        add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${_qtconf}"
+                "$<TARGET_FILE_DIR:${TARGET_NAME}>/qt.conf"
+            COMMENT "[${TARGET_NAME}] Deploying qt.conf to binary directory"
+        )
+    endif()
+endfunction()
+
 # ------------------------------------------------------------
 # Compiler definitons and options wrappers
 # ------------------------------------------------------------
@@ -402,29 +477,15 @@ endfunction()
 # dependency resolution helpers
 # ------------------------------------------------------------
 function(_ot_apply_dep_to_core CORE_TARGET DEP)
-    # OT* deps: add include dirs to compile *_core
-    if(DEP MATCHES "^OT")
-        _ot_get_ot_root_envvar(_rootVar "${DEP}")
-        if("${_rootVar}" STREQUAL "")
-            return()
-        endif()
-
+    _ot_get_ot_root_envvar(_rootVar "${DEP}")
+    if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
         _ot_get_ot_inc_suffix(_incSuffix)
-
-        if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
-            file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${_root}/${_incSuffix}")
-        else()
-            message(FATAL_ERROR
-                "Could not add OT include directory for token '${DEP}'. "
-                "Expected env var '${_rootVar}' to be set."
-            )
-        endif()
+        file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
+        target_include_directories("${CORE_TARGET}" PRIVATE "${_root}/${_incSuffix}")
 
         if(DEP STREQUAL "OTRubberbandOSG")
             _ot_apply_dep_to_core("${CORE_TARGET}" "OSG")
         endif()
-
         return()
     endif()
 
@@ -442,7 +503,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     endif()
 
     if(DEP STREQUAL "QtFull")
-        ot_define_qt6_targets("Core;Gui;Widgets;Network;Svg;Xml;OpenGLWidgets;SvgWidgets")
+        ot_define_qt6_targets("Core;Gui;Widgets;Network;Svg;Xml;OpenGLWidgets;SvgWidgets;Qml;WebSockets")
         target_link_libraries("${CORE_TARGET}" PRIVATE
             Qt6::Widgets
             Qt6::Network
@@ -450,6 +511,8 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
             Qt6::Xml
             Qt6::OpenGLWidgets
             Qt6::SvgWidgets
+            Qt6::Qml
+            Qt6::WebSockets
         )
         return()
     endif()
@@ -562,24 +625,13 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
 endfunction()
 
 function(_ot_apply_dep_to_final FINAL_TARGET DEP)
-    # OT libs: link + compatibility link dirs
-    if(DEP MATCHES "^OT")
+    _ot_get_ot_root_envvar(_rootVar "${DEP}")
+
+    if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
         target_link_libraries("${FINAL_TARGET}" PRIVATE ${DEP})
-
-        _ot_get_ot_root_envvar(_rootVar "${DEP}")
-        if("${_rootVar}" STREQUAL "")
-            message(FATAL_ERROR "OT dependency '${DEP}' requested but no root env var mapping was found.")
-        endif()
-
-        if(NOT DEFINED ENV{${_rootVar}} OR "$ENV{${_rootVar}}" STREQUAL "")
-            message(FATAL_ERROR
-                "OT dependency '${DEP}' requested but its root env var '${_rootVar}' is not set."
-            )
-        endif()
 
         file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
         _ot_add_ot_dep_link_dirs("${FINAL_TARGET}" "${_root}")
-
         return()
     endif()
 
@@ -615,7 +667,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     endif()
 
     if(DEP STREQUAL "QtFull")
-        ot_define_qt6_targets("Core;Gui;Widgets;Network;Svg;Xml;OpenGLWidgets;SvgWidgets")
+        ot_define_qt6_targets("Core;Gui;Widgets;Network;Svg;Xml;OpenGLWidgets;SvgWidgets;Qml;WebSockets")
         target_link_libraries("${FINAL_TARGET}" PRIVATE
             Qt6::Widgets
             Qt6::Network
@@ -623,6 +675,8 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
             Qt6::Xml
             Qt6::OpenGLWidgets
             Qt6::SvgWidgets
+            Qt6::Qml
+            Qt6::WebSockets
         )
         return()
     endif()
@@ -682,6 +736,26 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
             target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${OSG_LIBR_NAME}>)
         endif()
 
+        return()
+    endif()
+
+    if(DEP STREQUAL "OsLibs")
+        if(WIN32)
+            set(_system_libs
+                "userenv"
+                "ws2_32"
+                "advapi32"
+                "shell32"
+                "bcrypt"
+                "secur32"
+                "pdh"
+                "odbc32"
+            )
+            target_link_libraries("${FINAL_TARGET}" PRIVATE ${_system_libs})
+        elseif(UNIX AND NOT APPLE)
+            # UNIX/LINUX libs ...
+            target_link_libraries("${FINAL_TARGET}" PRIVATE ${_system_libs})
+        endif()
         return()
     endif()
 
@@ -774,12 +848,29 @@ function(ot_finalize_bin TARGET_NAME)
         message(FATAL_ERROR "ot_finalize_bin: core target '${_core}' does not exist. Call ot_initialize_app first.")
     endif()
 
+    set(_output_name "${ARGV1}")
+
     get_property(_deps TARGET ${_core} PROPERTY OT_DEPS)
     if(NOT _deps)
         set(_deps "")
     endif()
 
-    add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
+    if(WIN32)
+        add_executable(${TARGET_NAME} WIN32 $<TARGET_OBJECTS:${_core}>)
+
+        if(MSVC)
+            target_link_options(${TARGET_NAME} PRIVATE "/ENTRY:mainCRTStartup")
+        endif()
+
+    else()
+        add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
+    endif()
+
+    if(NOT "${_output_name}" STREQUAL "")
+        set_target_properties(${TARGET_NAME} PROPERTIES
+            OUTPUT_NAME "${_output_name}"
+        )
+    endif()
 
     _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
 
