@@ -6,7 +6,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 ot_initialize_lib(UICore OT_UICORE_ROOT_PATH)
 ot_add_export(UICore UICORE_EXPORT)
 
-ot_add_dependency(UICore
+ot_add_dependancy(UICore
     OTSystem
     OTCore
     OTGui

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 project(OTCore LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
@@ -6,7 +6,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 ot_initialize_lib(OTCore OT_CORE_ROOT_PATH)
 ot_add_export(OTCore)
 
-ot_add_dependency(OTCore
+ot_add_dependancy(OTCore
     OTSystem
     ZLIB
     RJSON

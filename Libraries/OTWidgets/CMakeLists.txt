@@ -7,7 +7,7 @@ ot_initialize_lib(OTWidgets OT_WIDGETS_ROOT_PATH)
 ot_add_export(OTWidgets OT_WIDGETS_EXPORTS)
 ot_add_compile_definitions(OTWidgets QWT_DLL)
 
-ot_add_dependency(OTWidgets
+ot_add_dependancy(OTWidgets
     OTSystem
     OTCore
     OTGui

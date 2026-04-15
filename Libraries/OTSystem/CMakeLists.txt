@@ -7,7 +7,7 @@ ot_initialize_lib(OTSystem OT_SYSTEM_ROOT_PATH)
 ot_add_export(OTSystem)
 ot_add_compile_options(OTSystem /W3 /sdl 4996)
 
-ot_add_dependency(OTSystem
+ot_add_dependancy(OTSystem
     WINLIB:secur32
     WINLIB:advapi32
     WINLIB:userenv

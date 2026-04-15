@@ -6,7 +6,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 ot_initialize_lib(OTCommunication OT_COMMUNICATION_ROOT_PATH)
 ot_add_export(OTCommunication)
 
-ot_add_dependency(OTCommunication
+ot_add_dependancy(OTCommunication
     OTSystem
     OTCore
     RJSON
