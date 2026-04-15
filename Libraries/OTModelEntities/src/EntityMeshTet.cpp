@@ -256,6 +256,14 @@ void EntityMeshTet::setNumberOfNodes(size_t n)
 	meshData->setNumberOfNodes(n);
 }
 
+bool EntityMeshTet::hasMeshData(void)
+{
+	if (meshData != nullptr) return true;
+	if (meshDataStorageId != -1) return true;
+
+	return false;
+}
+
 void EntityMeshTet::EnsureMeshDataLoaded(void)
 {
 	if (meshData == nullptr)

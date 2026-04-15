@@ -441,30 +441,33 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	// Terminate the gmsh component
 	gmsh::finalize();
 
-	// Write the properties of the mesh data entity
-	EntityPropertiesBoolean::createProperty("Mesh Visualization", "Show volume mesh", false, "", getEntityMesh()->getMeshData()->getProperties());
+	if (getEntityMesh()->hasMeshData())
+	{
+		// Write the properties of the mesh data entity
+		EntityPropertiesBoolean::createProperty("Mesh Visualization", "Show volume mesh", false, "", getEntityMesh()->getMeshData()->getProperties());
 
-	EntityPropertiesString::createProperty("Mesh Dimensions", "Number of nodes", std::to_string(meshWriter.getNumberOfNodes()), "", getEntityMesh()->getMeshData()->getProperties());
-	EntityPropertiesString::createProperty("Mesh Dimensions", "Number of triangles", std::to_string(meshWriter.getNumberOfTriangles()), "", getEntityMesh()->getMeshData()->getProperties());
-	EntityPropertiesString::createProperty("Mesh Dimensions", "Number of tetrahedrons", std::to_string(meshWriter.getNumberOfTets()), "", getEntityMesh()->getMeshData()->getProperties());
+		EntityPropertiesString::createProperty("Mesh Dimensions", "Number of nodes", std::to_string(meshWriter.getNumberOfNodes()), "", getEntityMesh()->getMeshData()->getProperties());
+		EntityPropertiesString::createProperty("Mesh Dimensions", "Number of triangles", std::to_string(meshWriter.getNumberOfTriangles()), "", getEntityMesh()->getMeshData()->getProperties());
+		EntityPropertiesString::createProperty("Mesh Dimensions", "Number of tetrahedrons", std::to_string(meshWriter.getNumberOfTets()), "", getEntityMesh()->getMeshData()->getProperties());
 
-	getEntityMesh()->getMeshData()->getProperties().getProperty("Number of nodes")->setReadOnly(true);
-	getEntityMesh()->getMeshData()->getProperties().getProperty("Number of triangles")->setReadOnly(true);
-	getEntityMesh()->getMeshData()->getProperties().getProperty("Number of tetrahedrons")->setReadOnly(true);
+		getEntityMesh()->getMeshData()->getProperties().getProperty("Number of nodes")->setReadOnly(true);
+		getEntityMesh()->getMeshData()->getProperties().getProperty("Number of triangles")->setReadOnly(true);
+		getEntityMesh()->getMeshData()->getProperties().getProperty("Number of tetrahedrons")->setReadOnly(true);
 
-	// Store the mesh data entity
-	getEntityMesh()->storeMeshData();
-	application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getMeshData()->getEntityID(), 
-														getEntityMesh()->getMeshData()->getEntityStorageVersion(), 
-														false);
+		// Store the mesh data entity
+		getEntityMesh()->storeMeshData();
+		application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getMeshData()->getEntityID(),
+															   getEntityMesh()->getMeshData()->getEntityStorageVersion(),
+															   false);
+	}
 
 	// Get the information of all newly created entities as output dependency
 	application->getModelComponent()->getListOfNewEntities(outputDependencyList);
 
 	getEntityMesh()->storeToDataBase();
 	application->getModelComponent()->addNewTopologyEntity(getEntityMesh()->getEntityID(), 
-														getEntityMesh()->getEntityStorageVersion(), 
-														false);
+														   getEntityMesh()->getEntityStorageVersion(), 
+														   false);
 
 	// We release the mesh data from memory (since it is already stored in the data base)
 	getEntityMesh()->releaseMeshData(); 

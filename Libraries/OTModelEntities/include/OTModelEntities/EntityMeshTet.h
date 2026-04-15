@@ -56,6 +56,7 @@ public:
 	void setFace(int faceId, EntityMeshTetFace *face);
 
 	EntityMeshTetData *getMeshData(void);
+	bool hasMeshData(void);
 
 	virtual void storeToDataBase(void) override;
 
