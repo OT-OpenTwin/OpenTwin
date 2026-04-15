@@ -739,7 +739,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
-    if(DEP STREQUAL "OsLibs")
+    if(DEP STREQUAL "OSLibs")
         if(WIN32)
             set(_system_libs
                 "userenv"

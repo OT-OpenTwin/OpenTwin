@@ -32,6 +32,7 @@ ECHO Building Project
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\uiService\.vs"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\uiService\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\uiService\packages"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\uiService\build"
 
 GOTO END
 
