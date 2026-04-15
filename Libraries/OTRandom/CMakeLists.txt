@@ -6,7 +6,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 ot_initialize_lib(OTRandom OT_RANDOM_ROOT_PATH)
 ot_add_export(OTRandom)
 
-ot_add_dependancy(OTRandom
+ot_add_dependency(OTRandom
     OTSystem
     OTCore
     RJSON

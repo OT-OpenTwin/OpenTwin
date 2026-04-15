@@ -30,7 +30,7 @@ include_guard(GLOBAL)
 #   ot_initialize_lib(<LIB_NAME> <LIB>_ROOT_PATH)
 #   ot_add_export(<LIB_NAME>)
 #
-#   ot_add_dependancy(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
+#   ot_add_dependency(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
 #
 #   ot_finalize_lib(<LIB_NAME>)
 #   ot_add_test(<LIB_NAME>)
@@ -45,7 +45,7 @@ include_guard(GLOBAL)
 #
 #   ot_initialize_bin(<APP_NAME> <APP>_ROOT_PATH)
 #
-#   ot_add_dependancy(<APP_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
+#   ot_add_dependency(<APP_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
 #
 #   ot_finalize_bin(<APP_NAME>)
 #   ot_add_test(<APP_NAME>)
@@ -380,10 +380,10 @@ endfunction()
 # ------------------------------------------------------------
 # add_dependency (collect tokens)
 # ------------------------------------------------------------
-function(ot_add_dependancy TARGET_NAME)
+function(ot_add_dependency TARGET_NAME)
     _ot_target_core_name(_core ${TARGET_NAME})
     if(NOT TARGET ${_core})
-        message(FATAL_ERROR "ot_add_dependancy: core target '${_core}' does not exist. Call ot_initialize_lib/app first.")
+        message(FATAL_ERROR "ot_add_dependency: core target '${_core}' does not exist. Call ot_initialize_lib/app first.")
     endif()
 
     get_property(_deps TARGET ${_core} PROPERTY OT_DEPS)

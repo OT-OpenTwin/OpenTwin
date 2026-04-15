@@ -6,7 +6,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 ot_initialize_lib(OTGuiAPI OT_GUIAPI_ROOT_PATH)
 ot_add_export(OTGuiAPI OTGUIAPI_EXPORTS)
 
-ot_add_dependancy(OTGuiAPI
+ot_add_dependency(OTGuiAPI
     OTSystem
     OTCore
     OTGui
