@@ -20,8 +20,8 @@
 // Project header
 #include "ShortcutManager.h"
 #include "AppBase.h"
-#include "ExternalServicesComponent.h"
-#include "ViewerComponent.h"
+#include "Component/ViewerComponent.h"
+#include "Component/ExternalServicesComponent.h"
 
 // uiCore header
 #include <akAPI/uiAPI.h>

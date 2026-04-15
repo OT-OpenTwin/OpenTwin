@@ -1,0 +1,157 @@
+// @otlicense
+// File: ProjectOverviewPreviewBox.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "ProjectOverview/ProjectOverviewPreviewBox.h"
+#include "OTCore/Logging/Logger.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/TextEdit.h"
+#include "OTWidgets/Widgets/ImagePainterWidget.h"
+#include "OTWidgets/ImagePainter/PixmapImagePainter.h"
+#include "OTWidgets/ImagePainter/ImagePainterManager.h"
+
+// Qt header
+#include <QtCore/qpropertyanimation.h>
+#include <QtWidgets/qlayout.h>
+
+ot::ProjectOverviewPreviewBox::ProjectOverviewPreviewBox(QWidget* _parent)
+	: QWidget(_parent)
+{
+	// Create widgets
+	QVBoxLayout* mainLayout = new QVBoxLayout(this);
+
+	m_imageWidget = new ot::ImagePainterWidget(this);
+	m_imageWidget->setFixedSize(previewImageSize());
+	m_imageWidget->setInteractive(false);
+	m_imageWidget->setHidden(true);
+	mainLayout->addWidget(m_imageWidget, 0, Qt::AlignCenter);
+
+	QGridLayout* infoLayout = new QGridLayout;
+	infoLayout->setContentsMargins(0, 0, 0, 0);
+	infoLayout->setColumnStretch(1, 1);
+	mainLayout->addLayout(infoLayout);
+
+	int r = 0;
+	infoLayout->addWidget(new ot::Label("Name:", this), r, 0);
+	m_name = new ot::Label(this);
+	infoLayout->addWidget(m_name, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Type:", this), r, 0);
+	m_type = new ot::Label(this);
+	infoLayout->addWidget(m_type, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Group:", this), r, 0);
+	m_projectGroup = new ot::Label(this);
+	infoLayout->addWidget(m_projectGroup, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Tags:", this), r, 0);
+	m_tags = new ot::Label(this);
+	m_tags->setWordWrap(true);
+	infoLayout->addWidget(m_tags, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Owner:", this), r, 0);
+	m_owner = new ot::Label(this);
+	infoLayout->addWidget(m_owner, r++, 1);
+
+	infoLayout->addWidget(new ot::Label("Access:", this), r, 0);
+	m_userGroups = new ot::Label(this);
+	m_userGroups->setWordWrap(true);
+	infoLayout->addWidget(m_userGroups, r++, 1);
+
+	mainLayout->addWidget(new ot::Label("Description:", this));
+	m_description = new ot::TextEdit(this);
+	m_description->setObjectName("OT_ProjectOverviewDescriptionEdit");
+	m_description->setReadOnly(true);
+	mainLayout->addWidget(m_description, 1);
+
+	// Start collapsed
+	setMinimumWidth(300);
+}
+
+ot::ProjectOverviewPreviewBox::~ProjectOverviewPreviewBox() {
+
+}
+
+void ot::ProjectOverviewPreviewBox::unsetProject() {
+	ExtendedProjectInformation emptyInfo;
+	setProject(emptyInfo);
+}
+
+void ot::ProjectOverviewPreviewBox::setProject(const ExtendedProjectInformation& _projectInfo) {
+	// Set image if available
+	if (!_projectInfo.getImageData().empty()) {
+		ImagePainter* painter = ImagePainterManager::createFromRawData(_projectInfo.getImageData(), _projectInfo.getImageFormat());
+		if (painter) {
+			m_imageWidget->setPainter(painter);
+			m_imageWidget->setHidden(false);
+		}
+		else {
+			m_imageWidget->setPainter(new PixmapImagePainter(QPixmap()));
+			m_imageWidget->setHidden(true);
+		}
+	}
+	else {
+		m_imageWidget->setHidden(true);
+	}
+
+	// Set description if available
+	if (!_projectInfo.getDescription().empty()) {
+		switch (_projectInfo.getDescriptionSyntax()) {
+		case DocumentSyntax::PlainText:
+			m_description->setPlainText(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		case DocumentSyntax::Markdown:
+			m_description->setMarkdown(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		case DocumentSyntax::HTML:
+			m_description->setHtml(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+
+		default:
+			OT_LOG_W("Unsupported document syntax (" + std::to_string(static_cast<int>(_projectInfo.getDescriptionSyntax())) + "). Defaulting to plain text...");
+			m_description->setPlainText(QString::fromStdString(_projectInfo.getDescription()));
+			break;
+		}
+	}
+	else {
+		m_description->setPlainText("");
+	}
+
+	// Set general info
+	m_name->setText(QString::fromStdString(_projectInfo.getProjectName()));
+	m_type->setText(QString::fromStdString(_projectInfo.getProjectType()));
+	m_projectGroup->setText(QString::fromStdString(_projectInfo.getProjectGroup()));
+	m_owner->setText(QString::fromStdString(_projectInfo.getUserName()));
+
+	std::string tagsString;
+	for (const std::string& tag : _projectInfo.getTags()) {
+		if (!tagsString.empty()) tagsString += " ";
+		tagsString += tag;
+	}
+	m_tags->setText(QString::fromStdString(tagsString));
+
+	std::string userGroupsString;
+	for (const std::string& group : _projectInfo.getUserGroups()) {
+		if (!userGroupsString.empty()) userGroupsString += " ";
+		userGroupsString += group;
+	}
+	m_userGroups->setText(QString::fromStdString(userGroupsString));
+}

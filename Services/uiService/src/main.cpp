@@ -19,8 +19,8 @@
 
 // App header
 #include "AppBase.h"
-#include "StartArgumentParser.h"
-#include "ExternalServicesComponent.h"
+#include "Component/ExternalServicesComponent.h"
+#include "Helper/StartArgumentParser.h"
 
 // OT header
 #include "OTSystem/AppExitCodes.h"

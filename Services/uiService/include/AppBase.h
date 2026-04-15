@@ -23,11 +23,11 @@
 #include "QtMetaTypes.h"
 
 // Frontend header
-#include "uiServiceTypes.h"				// Model and View types
-#include "LoginData.h"
-#include "UIContextMenuManager.h"
-#include "ProjectOverviewWidget.h"
+#include "uiServiceTypes.h"
 #include "NavigationSelectionManager.h"
+#include "Component/UIContextMenuManager.h"
+#include "Login/LoginData.h"
+#include "ProjectOverview/ProjectOverviewWidget.h"
 
 // OpenTwin Core header
 #include "OTCore/Geometry/Point2D.h"
