@@ -3713,13 +3713,19 @@ void AppBase::setNavigationTreeItemText(ot::UID _itemID, const QString& _itemNam
 	m_projectNavigation->getTree()->setItemText(_itemID, _itemName);
 }
 
-void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection) {
+void AppBase::setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection, bool _expandParents) {
 	{
 		QSignalBlocker sigBlock(m_projectNavigation->getTree());
 		if (_clearOtherSelection) {
 			m_projectNavigation->getTree()->deselectAllItems(false);
 		}
 		m_projectNavigation->getTree()->setItemsSelected(_itemIDs, _selected);
+
+		if (_expandParents) {
+			for (ot::UID itemID : _itemIDs) {
+				m_projectNavigation->getTree()->expandAllParents(itemID);
+			}
+		}
 	}
 
 	slotTreeItemSelectionChanged();

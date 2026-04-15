@@ -249,6 +249,8 @@ namespace ak {
 			bool		_expanded
 		);
 
+		void expandAllParents(ak::UID _itemUID);
+
 		bool isItemExpanded(
 			ak::UID			_itemUID
 		);

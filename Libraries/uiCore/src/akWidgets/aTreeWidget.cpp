@@ -463,6 +463,12 @@ void ak::aTreeWidget::expandItem(
 	itm->second->setExpanded(_expanded);
 }
 
+void ak::aTreeWidget::expandAllParents(ak::UID _itemUID) {
+	auto itm = m_items.find(_itemUID);
+	if (itm == m_items.end()) return;
+	itm->second->expandAllParents(false);
+}
+
 bool ak::aTreeWidget::isItemExpanded(
 	ak::UID			_itemUID
 ) 

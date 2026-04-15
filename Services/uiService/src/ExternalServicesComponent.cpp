@@ -3239,6 +3239,11 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 		clearSelection = ot::json::getBool(_document, OT_ACTION_PARAM_ClearSelection);
 	}
 
+	bool expandParents = false;
+	if (_document.HasMember(OT_ACTION_PARAM_ExpandParents)) {
+		expandParents = ot::json::getBool(_document, OT_ACTION_PARAM_ExpandParents);
+	}
+
 	ot::UIDList selectedEntities;
 	if (_document.HasMember(OT_ACTION_PARAM_MODEL_ITM_ID)) {
 		if (ot::json::isArray(_document, OT_ACTION_PARAM_MODEL_ITM_ID)) {
@@ -3277,6 +3282,7 @@ void ExternalServicesComponent::handleSetEntitySelected(ot::JsonDocument& _docum
 	if (!treeIDs.empty()) {
 		InitialSelectionInfo info;
 		info.clearSelection = clearSelection;
+		info.expandParents = expandParents;
 		info.treeIDs = std::move(treeIDs);
 		m_initialSelection.push_back(std::move(info));
 

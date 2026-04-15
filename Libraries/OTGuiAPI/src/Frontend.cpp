@@ -65,3 +65,37 @@ bool ot::Frontend::writeDataToFile(const std::string& _dialogTitle, const std::s
 
 	return GuiAPIManager::instance().sendQueuedRequestToFrontend(request.toJson());
 }
+
+bool ot::Frontend::setEntitySelected(const std::string& _entityName, bool _selected, bool _clearSelection, bool _expandAllParents)
+{
+	return setEntitiesSelected(std::list<std::string>{ _entityName }, _selected, _clearSelection, _expandAllParents);
+}
+
+bool ot::Frontend::setEntitiesSelected(const std::list<std::string>& _entityNames, bool _selected, bool _clearSelection, bool _expandAllParents)
+{
+	ot::JsonDocument uiDoc;
+	uiDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, uiDoc.GetAllocator()), uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_IsSelected, _selected, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_ExpandParents, _expandAllParents, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_ClearSelection, _clearSelection, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_NAME, JsonArray(_entityNames, uiDoc.GetAllocator()), uiDoc.GetAllocator());
+
+	return GuiAPIManager::instance().sendQueuedRequestToFrontend(uiDoc.toJson());
+}
+
+bool ot::Frontend::setEntitySelected(UID _entityID, bool _selected, bool _clearSelection, bool _expandAllParents)
+{
+	return setEntitiesSelected(UIDList{ _entityID }, _selected, _clearSelection, _expandAllParents);
+}
+
+bool ot::Frontend::setEntitiesSelected(const UIDList& _entityIDs, bool _selected, bool _clearSelection, bool _expandAllParents)
+{
+	ot::JsonDocument uiDoc;
+	uiDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, uiDoc.GetAllocator()), uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_IsSelected, _selected, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_ExpandParents, _expandAllParents, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_ClearSelection, _clearSelection, uiDoc.GetAllocator());
+	uiDoc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ID, JsonArray(_entityIDs, uiDoc.GetAllocator()), uiDoc.GetAllocator());
+
+	return GuiAPIManager::instance().sendQueuedRequestToFrontend(uiDoc.toJson());
+}

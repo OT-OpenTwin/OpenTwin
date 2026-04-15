@@ -640,7 +640,7 @@ public Q_SLOTS:
 
 	void setNavigationTreeItemText(ot::UID _itemID, const QString& _itemName);
 
-	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection);
+	void setNavigationTreeItemsSelected(const ot::UIDList& _itemIDs, bool _selected, bool _clearOtherSelection, bool _expandParents = false);
 
 	void setNavigationTreeItemSelected(ot::UID _itemID, bool _isSelected);
 

@@ -62,6 +62,11 @@ namespace ot {
 
 		static bool writeDataToFile(const std::string& _dialogTitle, const std::string& _filePath, const std::string& _content, unsigned long long _uncompressedContentLength);
 
+		static bool setEntitySelected(const std::string& _entityName, bool _selected, bool _clearSelection, bool _expandAllParents);
+		static bool setEntitiesSelected(const std::list<std::string>& _entityNames, bool _selected, bool _clearSelection, bool _expandAllParents);
+		static bool setEntitySelected(UID _entityID, bool _selected, bool _clearSelection, bool _expandAllParents);
+		static bool setEntitiesSelected(const UIDList& _entityIDs, bool _selected, bool _clearSelection, bool _expandAllParents);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private

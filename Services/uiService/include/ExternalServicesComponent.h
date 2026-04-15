@@ -507,6 +507,7 @@ private:
 	struct InitialSelectionInfo {
 		ot::UIDList		treeIDs;
 		bool			clearSelection;
+		bool            expandParents;
 	};
 	std::list<InitialSelectionInfo>                 m_initialSelection;
 
