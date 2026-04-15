@@ -37,6 +37,8 @@ bool Result1DFileData::readData(const std::string& fileName)
         file.seekg(0, std::ios::beg);
 
         bufferSize = file_size;
+        if (bufferSize == 0) return false;  // The file might be empty and should be ignored in this case.
+
         buffer = new char[(size_t)file_size + 1];
 
         file.read(buffer, file_size);

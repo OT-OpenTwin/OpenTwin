@@ -61,6 +61,8 @@ void ProjectManager::openProject()
 	changeMessage.clear();
 	currentOperation = OPERATION_NONE;
 	localProjectFileName.clear();
+
+	numberOfParameters = 0;
 }
 
 void ProjectManager::setLocalFileName(std::string fileName)
@@ -91,6 +93,7 @@ void ProjectManager::importProject(const std::string& fileName, const std::strin
 		changeMessage = message;
 		includeResults = incResults;
 		includeParametricResults = incParametricResults;
+		numberOfParameters = 0;
 
 		ot::WindowAPI::setProgressBarVisibility("Importing Project", true, false);
 		ot::WindowAPI::setProgressBarValue(0);
@@ -228,6 +231,7 @@ void ProjectManager::getProject(const std::string& fileName, const std::string& 
 		newOrModifiedFiles.clear();
 		dependentDataFiles.clear();
 		deletedFiles.clear();
+		numberOfParameters = 0;
 
 		projectName = prjName;
 
@@ -435,7 +439,7 @@ std::list<int> ProjectManager::getAllRunIds(const std::string & uploadDirectory)
 			{
 				// The directory name consists of digits only -> is an integer number#
 				int runId = atoi(dirname.c_str());
-				if (runId != 0)
+				if (runId != 0 || numberOfParameters == 0)
 				{
 					// We have a parametric result
 					runIds.push_back(runId);
@@ -920,6 +924,13 @@ void ProjectManager::sendParameterInformation(const std::string& projectRoot)
 	// Send the message to the service
 	std::string tmp;
 	ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
+
+	// Read the number of parameters
+	std::stringstream parameterBuffer(fileContent);
+	std::string line;
+	std::getline(parameterBuffer, line);
+
+	numberOfParameters = atoi(line.c_str());
 }
 
 void ProjectManager::sendHistoryInformation(const std::string& projectRoot)

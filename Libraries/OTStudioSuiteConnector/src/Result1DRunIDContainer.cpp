@@ -60,7 +60,6 @@ bool Result1DRunIDContainer::readData(const std::string& dataDir)
 			}
 			else
 			{
-				assert(0);
 				delete data;
 				data = nullptr;
 			}

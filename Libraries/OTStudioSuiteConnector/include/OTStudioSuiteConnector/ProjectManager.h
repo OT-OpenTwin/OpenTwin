@@ -59,7 +59,7 @@ public:
 private:
     enum operationType { OPERATION_NONE, OPERATION_IMPORT, OPERATION_GET, OPERATION_COMMIT};
 
-    ProjectManager() : currentOperation(OPERATION_NONE), includeResults(false), includeParametricResults(false) {};
+    ProjectManager() : currentOperation(OPERATION_NONE), includeResults(false), includeParametricResults(false), numberOfParameters(0) {};
     ~ProjectManager() {};
 
     std::string                getBaseProjectName(const std::string& cstFileName);
@@ -102,4 +102,5 @@ private:
     bool includeParametricResults;
     operationType currentOperation;
     std::string localProjectFileName;
+    int numberOfParameters;
 };
