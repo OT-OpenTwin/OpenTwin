@@ -16,6 +16,7 @@ ot::EntityDatasetInfo::EntityDatasetInfo(ot::UID _ID, EntityBase* _parent, Entit
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("Tree/Hint");
 	treeItem.setHiddenIcon("Tree/Hint");
+	treeItem.setIsEditable(true);
 	this->setDefaultTreeItem(treeItem);
 
 	this->setDeletable(true);
