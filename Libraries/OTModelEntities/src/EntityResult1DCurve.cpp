@@ -118,16 +118,41 @@ bool EntityResult1DCurve::updateFromProperties()
 			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
 			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-			refresh |= m_queryProperties.updateOptions(this, associatedCampaign.value());
+			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
+			refresh |= dataRefreshNeeded;
 
-			DataLakeQueryCfg queryCfg;
-			queryCfg.setCollectionName(collectionName);
-			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
-			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
-			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
-			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+			if(dataRefreshNeeded)
+			{
+				DataLakeQueryCfg queryCfg;
+				queryCfg.setCollectionName(collectionName);
+				queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+				queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+				queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+				queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
 
-			m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			}
+
+			// @Alex: Here the vis update request was send out:
+			/*ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
+
+			const std::string plotName = getParent()->getName();
+			doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(plotName, doc.GetAllocator()), doc.GetAllocator());
+
+			ot::JsonObject curveCfgSerialised;
+			ot::Plot1DCurveCfg curveCfg = getCurve();
+			curveCfg.addToJsonObject(curveCfgSerialised, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_VIEW1D_CurveConfigs, curveCfgSerialised, doc.GetAllocator());
+
+			ot::VisualisationCfg visualisationCfg;
+			visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
+			visualisationCfg.setOverrideViewerContent(false);
+			visualisationCfg.setAsActiveView(true);
+
+			doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
+			getObserver()->sendMessageToViewer(doc);*/
+
 		}
 		catch (std::exception& _e)
 		{
