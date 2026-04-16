@@ -346,47 +346,62 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				const bool hasRealValues = !curveData->getYreValues().empty();
 				const bool hasImValue = !curveData->getYimValues().empty();
 
-				//Values are either complex or real ? Plain imaginary values?
-				auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
-				quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
-				
-				size_t numberOfValues = hasRealValues ? curveData->getYreValues().size() : curveData->getYimValues().size();
-				assert(curveData->getYreValues().size() == curveData->getYimValues().size() || curveData->getYreValues().size() == 0 || curveData->getYimValues().size() == 0);
-				quantityDescriptionComplex->reserveSizeImagValues(numberOfValues);
-				quantityDescriptionComplex->reserveSizeRealValues(numberOfValues);
+				std::unique_ptr<QuantityDescription> quantityDescription(nullptr);
 
 				if (hasImValue)
 				{
+					// If values have an imaginary part, they shall be treated as complex numbers which are internally stored as a tuple
+					auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+				
+					quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+					size_t numberOfValues = hasRealValues ? curveData->getYreValues().size() : curveData->getYimValues().size();
+					assert(curveData->getYreValues().size() == curveData->getYimValues().size() || curveData->getYreValues().size() == 0 || curveData->getYimValues().size() == 0);
+					quantityDescriptionComplex->reserveSizeImagValues(numberOfValues);
+					quantityDescriptionComplex->reserveSizeRealValues(numberOfValues);
+					
+					if (hasRealValues)
+					{
+						for (auto realValue : curveData->getYreValues())
+						{
+							quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
+						}
+					}
+					else
+					{
+						for (size_t i = 0; i < numberOfValues; i++)
+						{
+							quantityDescriptionComplex->addValueReal(ot::Variable(0.0));
+						}
+					}
+
 					for (auto imValue : curveData->getYimValues())
 					{
 						quantityDescriptionComplex->addValueImag(ot::Variable(imValue));
 					}
+					quantityDescription.reset(quantityDescriptionComplex.release());
 				}
 				else
 				{
-					for (size_t i = 0; i  < numberOfValues;i++)
-					{
-						quantityDescriptionComplex->addValueImag(ot::Variable(0.0));
-					}
-				}
-				
-				if (hasRealValues)
-				{
+					auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+					quantityDescriptionCurve->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), quantityUnit);
+					size_t numberOfValues = curveData->getYreValues().size();
+					quantityDescriptionCurve->reserveDatapointSize(numberOfValues);
 					for (auto realValue : curveData->getYreValues())
 					{
-						quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
+						quantityDescriptionCurve->addDatapoint(ot::Variable(realValue));
 					}
+					quantityDescription.reset(quantityDescriptionCurve.release());
 				}
-				else
+				
+				if (quantityName.substr(0, 6) == "Tasks/") 
 				{
-					quantityDescriptionComplex->addValueReal(ot::Variable(0.0));
+					quantityName = "1D Results/" + quantityName;
 				}
+				// If we have results from the circuit simulation, 
+				// we still need to move it under the 1D Results folder
 
-				if (quantityName.substr(0, 6) == "Tasks/") quantityName = "1D Results/" + quantityName;   // If we have results from the circuit simulation, 
-																										  // we still need to move it under the 1D Results folder
-
-				quantityDescriptionComplex->setName(quantityName);
-				newCurveDescription.setQuantityDescription(quantityDescriptionComplex.release());
+				quantityDescription->setName(quantityName);
+				newCurveDescription.setQuantityDescription(quantityDescription.release());
 				allCurveDescriptions.push_back(std::move(newCurveDescription));
 			}
 		}
