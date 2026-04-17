@@ -53,19 +53,5 @@ int main(int _argc, char* _argv[]) {
 
 	Application::getInstance()->start(argumentParser);
 
-
-	//if (_argc == 1) {
-	//	Application::getInstance()->start("","");
-	//}
-	//else if(_argc == 3){
- //		Application::getInstance()->start(_argv[1],_argv[2]);
-	//}
-	//else {
-	//	OT_LOG_E("Error: Only a maximum of one argument is allowed!");
-	//	return 0;
-	//}
-	
-	
-
 	return 0;
 }

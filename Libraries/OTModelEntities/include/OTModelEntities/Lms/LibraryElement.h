@@ -128,7 +128,7 @@ namespace ot{
         //! @param _jsonString JSON string containing an array of LibraryElement objects from the LMS
         //! @return List of deserialized LibraryElement objects
         //! @throw May throw an exception if the JSON string is invalid
-        static std::list<LibraryElement> fromJson(const std::string& _jsonString);
+        static ot::LibraryElement fromJson(const std::string& _jsonString);
     private:
         // Basic information
         std::string m_name;

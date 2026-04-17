@@ -365,7 +365,7 @@ std::string Application::handleModelDialogConfirmed(ot::JsonDocument& _document)
 	// Create LibraryElementImportCfg and populate it with the complete modelInfoDoc
 	ot::LibraryElement importCfg;
 	importCfg.setFromJsonObject(modelInfoDoc.getConstObject());
-
+	importCfg.toJson();
 
 	// Creating dialog confirmed doc with the import config
 	ot::JsonDocument dialogConfirmed;
@@ -465,7 +465,30 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 }
 
 std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
-	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+
+	// Hole das Array der LibraryElements
+	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document,OT_ACTION_PARAM_Config);
+
+	// Deserialisiere jedes Element
+	std::list<ot::LibraryElement> receivedModels;
+	for (const ot::ConstJsonObject& elementObj : elementObjects) {
+		ot::LibraryElement element;
+		element.setFromJsonObject(elementObj);
+		receivedModels.push_back(element);
+	}
+
+	// Create response document with received models
+	ot::JsonDocument responseDoc;
+	// Add the models array to response
+	ot::JsonArray modelsArray;
+	for (const ot::LibraryElement& model : receivedModels) {
+		ot::JsonObject modelObj;
+		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
+		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
+	}
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
 std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {

@@ -124,6 +124,9 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
     if (_object.HasMember("RequestingEntityID")) {
         m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
     }
+    else {
+        m_requestingEntityID = ot::invalidUID;
+    }
 
     if (_object.HasMember("CollectionName")) {
         m_collectionName = ot::json::getString(_object, "CollectionName");
@@ -206,8 +209,8 @@ bool ot::LibraryElement::deserializeCallbackInfoFromAdditionalInfo(const std::st
    
 }
 
-std::list<ot::LibraryElement> ot::LibraryElement::fromJson(const std::string& _jsonString) {
-    std::list<ot::LibraryElement> result;
+ot::LibraryElement ot::LibraryElement::fromJson(const std::string& _jsonString) {
+    ot::LibraryElement result;
 
     try {
         ot::JsonDocument doc;
@@ -215,31 +218,13 @@ std::list<ot::LibraryElement> ot::LibraryElement::fromJson(const std::string& _j
             return result;
         }
 
-        // Check if it's an array
-        if (doc.IsArray()) {
-            // Use auto to deduce the correct type from doc.GetArray()
-            auto jsonArray = doc.GetArray();
-            for (rapidjson::SizeType i = 0; i < jsonArray.Size(); ++i) {
-                if (jsonArray[i].IsObject()) {
-                    ot::LibraryElement element;
-                    element.setFromJsonObject(ot::json::getObject(jsonArray, i));
-                    result.push_back(element);
-                }
-            }
-        }
-        // Also support single object (wrapped in an array with one element)
-        else if (doc.IsObject()) {
-            ot::LibraryElement element;
-            element.setFromJsonObject(doc.getConstObject());
-            result.push_back(element);
+        // Support single object
+        if (doc.IsObject()) {
+            result.setFromJsonObject(doc.getConstObject());
         }
     }
     catch (const std::exception& _e) {
         OT_LOG_E("Failed to deserialize LibraryElement from JSON: " + std::string(_e.what()));
     }
-    catch (...) {
-        OT_LOG_E("Failed to deserialize LibraryElement from JSON: Unknown error");
-    }
-
     return result;
 }
