@@ -25,7 +25,9 @@
 #include "OTCore/BasicEntityInformation.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 #include "OTGui/Style/PenCfg.h"
+#include "OTGui/Painter/Painter2DContainer.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+
 // std header
 #include <string>
 
@@ -36,6 +38,8 @@ namespace ot {
 	//! @brief The Plot1DCurveCfg class represents the configuration for a single curve in a 1D plot.
 	class OT_GUI_API_EXPORT Plot1DCurveCfg : public BasicEntityInformation
 	{
+		OT_DECL_DEFCOPY(Plot1DCurveCfg)
+		OT_DECL_DEFMOVE(Plot1DCurveCfg)
 	public:
 		enum Symbol
 		{
@@ -69,16 +73,12 @@ namespace ot {
 
 		Plot1DCurveCfg();
 		Plot1DCurveCfg(UID _id, UID _version, const std::string& _name);
-		Plot1DCurveCfg(const Plot1DCurveCfg& _other);
-		Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept;
 		virtual ~Plot1DCurveCfg();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Opearator
 
-		Plot1DCurveCfg& operator = (Plot1DCurveCfg&& _other) noexcept;
-		Plot1DCurveCfg& operator = (const Plot1DCurveCfg& _other);
 		Plot1DCurveCfg& operator = (const BasicEntityInformation& _other);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -161,7 +161,7 @@ namespace ot {
 
 		//! @brief Returns the painter for the point fill.
 		//! The curve keeps ownership of the painter.
-		const Painter2D* getPointFillPainter() const { return m_pointFillPainter; };
+		const Painter2D* getPointFillPainter() const { return m_pointFillPainter.getPainter(); };
 
 		void setDataAccessConfig(DataLakeAccessCfg&& _dataAccessConfig) { m_dataAccessConfig = std::move(_dataAccessConfig); };
 		const DataLakeAccessCfg& getDataAccessConfig() const { return m_dataAccessConfig; };
@@ -188,7 +188,7 @@ namespace ot {
 		bool m_pointColorFromCurve;
 		Symbol m_pointSymbol;
 		PenFCfg m_pointOulinePen;
-		Painter2D* m_pointFillPainter;
+		Painter2DContainer m_pointFillPainter;
 
 		DataLakeAccessCfg m_dataAccessConfig;
 		DataLakeQueryCfg m_queryCfg;
