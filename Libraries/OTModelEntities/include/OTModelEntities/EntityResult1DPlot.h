@@ -74,6 +74,11 @@ public:
 	void setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions);
 
 private:
+
+	const std::string m_propertyGroupSecondaryParameter = "Secondary parameter";
+	const std::string m_propertyNameSecondaryParameter = "Name";
+	const std::string m_propertyNbOfSecondaryParameter = "Number of secondary parameter";
+	const uint32_t m_numberOfSecondaryParameterSelections = 5;
 	static std::string getXAxisPropertyGroupName() { return "X axis"; };
 	static std::string getYAxisPropertyGroupName() { return "Y axis"; };
 	static std::string getRadiusAxisPropertyGroupName() { return "r axis"; };

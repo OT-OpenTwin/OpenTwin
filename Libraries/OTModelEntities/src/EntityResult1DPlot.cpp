@@ -140,6 +140,15 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		break;
 	}
 
+	int32_t numberOfSecondaryParameter = 	PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName());
+	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
+	{
+		const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
+		bool currentlyVisible = PropertyHelper::getSelectionProperty(this, m_propertyNameSecondaryParameter, group)->getVisible();
+		bool makeVisible = (i <= numberOfSecondaryParameter);
+		updatePropertiesGrid |= (currentlyVisible != makeVisible);
+		PropertyHelper::getSelectionProperty(this, m_propertyNameSecondaryParameter, group)->setVisible(makeVisible);
+	}
 
 	EntityPropertiesDouble* originProp = PropertyHelper::getDoubleProperty(this, "Origin", "General");
 	OTAssertNullptr(originProp);
@@ -219,6 +228,11 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 		{
 			parameterSelection->setValue(currentSelection);
 		}
+		for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
+		{
+			const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
+			PropertyHelper::setSelectionPropertyValue({ queryParameterList.begin(), queryParameterList.end()}, this, m_propertyNameSecondaryParameter, group);
+		}
 	}	
 	
 	tupleTypes.erase("");
@@ -293,7 +307,12 @@ void EntityResult1DPlot::createProperties()
 	originProp->setDecimalPlaces(3);
 
 	// Axis settings
+	EntityPropertiesInteger::createProperty(getXAxisPropertyGroupName(), m_propertyNbOfSecondaryParameter, 0,0, m_numberOfSecondaryParameterSelections, "default", getProperties());
 	EntityPropertiesSelection::createProperty(getXAxisPropertyGroupName(), "Parameter", {}, "", "default", getProperties());
+	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
+	{
+		EntityPropertiesSelection::createProperty(m_propertyGroupSecondaryParameter + " " + std::to_string(i),m_propertyNameSecondaryParameter, {}, "", "default", getProperties());
+	}
 	EntityPropertiesSelection* quYAxis =	EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
 	quYAxis->setVisible(false);
 	EntityPropertiesSelection* quRadiusAxis =EntityPropertiesSelection::createProperty(getRadiusAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
@@ -401,6 +420,21 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 		{ MetadataQuantity::getFieldName(), ot::Plot1DCfg::DependencyLabelBehavior::ReplaceTitle }
 	};
 	config.setFixedDatasetLabelInfos(std::move(fixedDatasetLabelInfos));
+
+	std::list<std::string> secondaryParameter;
+	int32_t numberOfSecondaryParameter = PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName());
+	for (uint32_t i = 1; i <= numberOfSecondaryParameter; i++)
+	{
+		const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
+		std::string selectedSecParameter = PropertyHelper::getSelectionPropertyValue(this, m_propertyNameSecondaryParameter, group);
+		if (!selectedSecParameter.empty())
+		{
+			secondaryParameter.push_back(selectedSecParameter);
+		}
+	}
+	secondaryParameter.sort();
+	secondaryParameter.unique();
+	config.setSecondaryParameter(secondaryParameter);
 
 	return config;
 }

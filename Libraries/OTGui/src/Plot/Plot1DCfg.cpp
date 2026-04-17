@@ -110,6 +110,10 @@ void ot::Plot1DCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocato
 	_object.AddMember("UnitLabelY", JsonString(m_unitLabelY, _allocator), _allocator);
 
 	_object.AddMember("xAxisParameter", JsonString(m_xAxisParameter, _allocator), _allocator);
+	
+	JsonArray secondParameter(m_secondaryParameter, _allocator);
+	_object.AddMember("SecondaryParameter", secondParameter, _allocator);
+
 	_object.AddMember("QueryQuantity", JsonString(m_queryQuantity, _allocator), _allocator);
 
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
@@ -172,6 +176,8 @@ void ot::Plot1DCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_showMatrixRowEntry = json::getInt(_object, "ShowMatrixRow");
 	m_showMatrixColumnEntry = json::getInt(_object, "ShowMatrixColumn");
 
+	m_secondaryParameter = ot::json::getStringList(_object, "SecondaryParameter");
+
 	const auto& allQueries = json::getArray(_object, "Queries");
 	for (uint32_t i = 0; i < allQueries.Size(); i++)
 	{
@@ -224,9 +230,11 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 		(m_xAxis == _other.m_xAxis) &&
 		(m_yAxis == _other.m_yAxis) &&
 
-		(m_polarDegreeOrigin == _other.m_polarDegreeOrigin)
-		
-		;
+		(m_secondaryParameter == _other.m_secondaryParameter)&&
+
+		(m_polarDegreeOrigin == _other.m_polarDegreeOrigin);
+
+
 }
 
 void ot::Plot1DCfg::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat)

@@ -97,6 +97,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const int numberOfQuantities = 1;
+	std::list<std::string> secondaryParameter = _plotCfg.getSecondaryParameter();
 
 	DependencyInfoList familyOfCurves;
 	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
@@ -107,16 +108,8 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 	const ot::DataLakeAccessCfg& dataLakeAccessCfg = _curveCfg.getDataAccessConfig();
 	
-	/*
-	std::optional<ot::DataPointDecoder> decoderParameter = dataLakeAccessCfg.getFieldDecoderParameterByLabel(displayParameterLabel);
-	
 	std::map<std::string, ot::DataPointDecoder*> additionalParameterDecoders = dataLakeAccessCfg.getAllFieldDecoderParameterByLabel();
 	additionalParameterDecoders.erase(displayParameterLabel);
-
-	if (!decoderParameter.has_value())
-	{
-		//throw std::exception("Plot axis selection did not work.");
-	}*/
 
 	ot::JSONToVariableConverter jsonToVariableConverter;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
@@ -127,7 +120,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 		// Document contains the quantity which the plot shall show
 		if (ot::json::exists(singleMongoDocument, displayParameterLabel))
 		{
-			ot::DatasetDependencyInfos dependencies;
+			ot::DatasetDependencyInfos dependencies, secondaryParameterDependencies;
 			const std::string quantityName = singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetString();
 			std::optional<ot::DataPointDecoder> decoder = dataLakeAccessCfg.getFieldDecoderQuantityByLabel(quantityName);
 			if(decoder.has_value())
@@ -157,11 +150,12 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			// unit should already be normalised during the data point extraction
 
 			dependencies.addDependency(additionalParameterInfo);
-			
+
 			for (const auto& additionalParameter : additionalParameterDecoders)
 			{
 				if (ot::json::exists(singleMongoDocument, additionalParameter.first))
 				{
+
 					auto& additionalParameterEntry = singleMongoDocument[additionalParameter.first.c_str()];
 					const ot::TupleInstance& parameterTuple = additionalParameter.second->getTupleInstance();
 
@@ -173,7 +167,15 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 					additionalParameterInfo.setValue(value);
 					//unit should already be normalised during the data point extraction
 					//additionalParameterInfo.m_unit = parameterTuple.getTupleUnits().front(); 
-					dependencies.addDependency(additionalParameterInfo);
+
+					if (std::find(secondaryParameter.begin(), secondaryParameter.end(), additionalParameterInfo.getLabel()) != secondaryParameter.end())
+					{
+						secondaryParameterDependencies.addDependency(additionalParameterInfo);
+					}
+					else
+					{
+						dependencies.addDependency(additionalParameterInfo);
+					}
 				}				
 			}
 

@@ -249,6 +249,9 @@ namespace ot {
 		const std::string& getTupleType() const { return m_tupleType; }
 		const std::string& getTupleFormat() const { return m_tupleFormat; }
 
+		void setSecondaryParameter(const std::list<std::string>& _secondaryParameter) { m_secondaryParameter = _secondaryParameter; };
+		const std::list<std::string>& getSecondaryParameter() const { return m_secondaryParameter; };
+
 	private:
 		bool invariant() const;
 
@@ -272,6 +275,7 @@ namespace ot {
 		std::list<ValueComparisonDescription> m_queries;
 
 		std::string m_xAxisParameter;
+		std::list<std::string> m_secondaryParameter;
 		std::string m_queryQuantity;
 
 		std::string m_dataLabelX;
