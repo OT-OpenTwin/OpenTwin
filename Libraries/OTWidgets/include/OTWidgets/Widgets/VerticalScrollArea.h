@@ -3,14 +3,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTWidgets/Widgets/WidgetBase.h"
-
-// Qt header
-#include <QtWidgets/qscrollarea.h>
+#include "OTWidgets/Widgets/ScrollArea.h"
 
 namespace ot {
 
-	class OT_WIDGETS_API_EXPORT VerticalScrollArea : public QScrollArea, public WidgetBase
+	class OT_WIDGETS_API_EXPORT VerticalScrollArea : public ScrollArea
 	{
 		Q_OBJECT
 		OT_DECL_NOCOPY(VerticalScrollArea)
@@ -21,9 +18,6 @@ namespace ot {
 		virtual ~VerticalScrollArea() = default;
 
 		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
-
-		virtual QWidget* getQWidget() override { return this; };
-		virtual const QWidget* getQWidget() const override { return this; };
 	};
 
 }

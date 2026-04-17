@@ -8,7 +8,7 @@
 #include <QtGui/qevent.h>
 #include <QtWidgets/qscrollbar.h>
 
-ot::VerticalScrollArea::VerticalScrollArea(QWidget* _parent) : QScrollArea(_parent)
+ot::VerticalScrollArea::VerticalScrollArea(QWidget* _parent) : ScrollArea(_parent)
 {
 	this->setWidgetResizable(true);
 	this->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
@@ -23,5 +23,5 @@ bool ot::VerticalScrollArea::eventFilter(QObject* _watched, QEvent* _event)
 		setMinimumWidth(widget()->minimumSizeHint().width() + verticalScrollBar()->sizeHint().width());
 	}
 
-	return QScrollArea::eventFilter(_watched, _event);
+	return ScrollArea::eventFilter(_watched, _event);
 }
