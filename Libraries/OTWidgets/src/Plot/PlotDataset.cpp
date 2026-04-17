@@ -404,8 +404,7 @@ void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 void ot::PlotDataset::updateCurveVisualization()
 {
 	PenFCfg linePenCfg(m_config.getLinePen());
-	const PenFCfg& pointOutlinePenCfg = m_config.getPointOutlinePen();
-
+	
 	QPen linePen = QtFactory::toQPen(linePenCfg);
 
 	const ColorStyle& cs = GlobalColorStyle::instance().getCurrentStyle();
@@ -422,6 +421,34 @@ void ot::PlotDataset::updateCurveVisualization()
 	QPen highlightPen = linePen;
 	highlightPen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
 	highlightPen.setWidthF(linePen.width() + 2.);
+
+	Plot1DCurveCfg::Symbol pointSymbol = m_config.getPointSymbol();
+	int pointSize = m_config.getPointSize();
+
+	PenFCfg pointOutlinePenCfg = m_config.getPointOutlinePen();
+	const Painter2D* pointFillPainter = m_config.getPointFillPainter();
+	QBrush pointFillBrush = QtFactory::toQBrush(pointFillPainter);
+
+	// Check if curve has only one point
+	if (m_data.getSize() == 1)
+	{
+		if (pointSymbol == Plot1DCurveCfg::NoSymbol)
+		{
+			pointSymbol = Plot1DCurveCfg::Circle;
+		}
+
+		if (pointSize < 8)
+		{
+			pointSize = 8;
+		}
+
+		if (pointOutlinePenCfg.getStyle() == LineStyle::NoLine)
+		{
+			pointOutlinePenCfg.setStyle(LineStyle::SolidLine);
+		}
+
+		pointFillBrush = linePen.brush();
+	}
 
 	double zVal = PlotBase::ItemZOrder::visibleCurves();
 
@@ -483,7 +510,7 @@ void ot::PlotDataset::updateCurveVisualization()
 	}
 
 	// Setup points
-	if (m_config.getPointSymbol() != Plot1DCurveCfg::NoSymbol)
+	if (pointSymbol != Plot1DCurveCfg::NoSymbol)
 	{
 		if (m_config.getDimmed())
 		{
@@ -521,36 +548,35 @@ void ot::PlotDataset::updateCurveVisualization()
 			// Regular Point Pen & Brush
 
 			QPen pointOutlinePen = QtFactory::toQPen(pointOutlinePenCfg);
-			QBrush pointOutlineFillBrush = QtFactory::toQBrush(m_config.getPointFillPainter());
 
 			if (m_config.getPointColorFromCurve())
 			{
-				pointOutlineFillBrush = linePen.brush();
-				pointOutlinePen.setBrush(pointOutlineFillBrush);
+				pointFillBrush = linePen.brush();
+				pointOutlinePen.setBrush(pointFillBrush);
 			}
 
 			if (m_cartesianCurvePointSymbol)
 			{
 				m_cartesianCurvePointSymbol->setPen(pointOutlinePen);
-				m_cartesianCurvePointSymbol->setBrush(pointOutlineFillBrush);
+				m_cartesianCurvePointSymbol->setBrush(pointFillBrush);
 			}
 			if (m_polarCurvePointSymbol)
 			{
 				m_polarCurvePointSymbol->setPen(pointOutlinePen);
-				m_polarCurvePointSymbol->setBrush(pointOutlineFillBrush);
+				m_polarCurvePointSymbol->setBrush(pointFillBrush);
 			}
 		}
 
 		// Symbol and size
 		if (m_cartesianCurvePointSymbol)
 		{
-			m_cartesianCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
-			m_cartesianCurvePointSymbol->setSize(m_config.getPointSize());
+			m_cartesianCurvePointSymbol->setStyle(toQwtSymbolStyle(pointSymbol));
+			m_cartesianCurvePointSymbol->setSize(pointSize);
 		}
 		if (m_polarCurvePointSymbol)
 		{
-			m_polarCurvePointSymbol->setStyle(toQwtSymbolStyle(m_config.getPointSymbol()));
-			m_polarCurvePointSymbol->setSize(m_config.getPointSize());
+			m_polarCurvePointSymbol->setStyle(toQwtSymbolStyle(pointSymbol));
+			m_polarCurvePointSymbol->setSize(pointSize);
 		}
 	}
 	else
