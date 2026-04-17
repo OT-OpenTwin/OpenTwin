@@ -179,45 +179,60 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 				}				
 			}
 
-
-
-			Datapoints* dataPoints = nullptr;
+			CurveDataInfo* curveDataInfo = nullptr;
 
 			for (auto& curve : familyOfCurves)
 			{
 				if (curve.first == dependencies)
 				{
-					dataPoints = &curve.second;
+					curveDataInfo = &curve.second;
 					break;
 				}
 			}
 
-			if (dataPoints == nullptr)
+			if (curveDataInfo == nullptr)
 			{
-				DependencyInfoEntry infoEntry = std::make_pair(dependencies, Datapoints());
+				CurveDataInfo curveInfo;
+				curveInfo.dataPoints = Datapoints();
+				curveInfo.dataPoints.reserve(numberOfDocuments - i);
+				curveInfo.secondaryDependencies.reserve(numberOfDocuments - i);
+
+				DependencyInfoEntry infoEntry = std::make_pair(dependencies, std::move(curveInfo));
 				familyOfCurves.push_back(std::move(infoEntry));
-				dataPoints = &familyOfCurves.back().second;
-				dataPoints->reserve(numberOfDocuments - i);
+				curveDataInfo = &familyOfCurves.back().second;
 			}
 			
-			OTAssertNullptr(dataPoints);
+			OTAssertNullptr(curveDataInfo);
 
 			// Get quantity value
-			const ot::JsonValue& entryQuantityValue =	singleMongoDocument["Values"];
-			ot::Variable quantityValue =	jsonToVariableConverter(entryQuantityValue);
+			const ot::JsonValue& entryQuantityValue = singleMongoDocument["Values"];
+			ot::Variable quantityValue = jsonToVariableConverter(entryQuantityValue);
 			
 			// Get parameter value
 			const ot::JsonValue& entryParameterValue = singleMongoDocument[displayParameterLabel.c_str()];
 			double parameterValue = jsonToDouble(entryParameterValue);
 
-			dataPoints->m_yData.push_back(quantityValue);
-			dataPoints->m_xData.push_back(parameterValue);
+			curveDataInfo->dataPoints.m_yData.push_back(quantityValue);
+			curveDataInfo->dataPoints.m_xData.push_back(parameterValue);
+			curveDataInfo->secondaryDependencies.push_back(secondaryParameterDependencies);
 		}
 	}
 
 	for (auto& curve : familyOfCurves)
 	{
-		curve.second.shrinkToFit();
+		curve.second.dataPoints.shrinkToFit();
+		curve.second.secondaryDependencies.shrink_to_fit();
+
+		if (curve.second.dataPoints.m_xData.size() != curve.second.dataPoints.m_yData.size())
+		{
+			std::string msg = "Number of x and y data points do not match for curve with dependencies: " + curve.first.toJson();
+			throw ot::Exception::OutOfBounds(msg);
+		}
+		if (curve.second.dataPoints.m_xData.size() != curve.second.secondaryDependencies.size())
+		{
+			std::string msg = "Number of secondary dependencies does not match number of data points for curve with dependencies: " + curve.first.toJson();
+			throw ot::Exception::OutOfBounds(msg);
+		}
 	}
 
 	return familyOfCurves;
@@ -225,7 +240,6 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg)
 {
-
 	std::list<ot::PlotDataset*> dataSets;
 
 	CurveColourSetter curveColourSetter(_curveCfg);
@@ -233,7 +247,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 	for (auto& curve : _curveData)
 	{
 		const ot::DatasetDependencyInfos& dependencies = curve.first;
-		auto& dataPoints = curve.second;
+		auto& dataPoints = curve.second.dataPoints;
 
 		// @Alex Here you can get metadata per series. You can turn these metadata as json document into instances of additional dependencies for the naming. 
 		/*auto accessCfg = _curveCfg.getDataAccessConfig();
@@ -261,6 +275,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 
 		ot::PlotDataset* dataset = new ot::PlotDataset(nullptr, _curveCfg, std::move(datasetData));
 		dataset->setDependencyInfos(dependencies);
+		dataset->setSecondaryDependencyInfos(curve.second.secondaryDependencies);
 		//OT_LOG_T("Curve created { \"Title\": \"" + curveTitle + "\", \"EntityName\": \"" + dataset->getEntityName() + "\", \"DatasetTitle\": \"" + dataset->getConfig().getTitle() + "\" }");
 		dataSets.push_back(dataset);
 	}

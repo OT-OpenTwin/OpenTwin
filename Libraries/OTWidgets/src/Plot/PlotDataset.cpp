@@ -626,6 +626,31 @@ void ot::PlotDataset::setDisplayTitle(const QString& _title)
 	updateToolTip();
 }
 
+QString ot::PlotDataset::getSecondaryDependencyInfoString(size_t _index, const QString& _linePrefix) const
+{
+	if (_index >= m_secondaryDependencyInfos.size())
+	{
+		throw Exception::OutOfBounds("Index " + std::to_string(_index) + " is out of bounds for secondary dependency info with size " + std::to_string(m_secondaryDependencyInfos.size()));
+	}
+
+	return getDependencyInfoString(m_secondaryDependencyInfos[_index], _linePrefix);
+}
+
+QString ot::PlotDataset::getDependencyInfoString(const DatasetDependencyInfos& _dependencyInfo, const QString& _linePrefix) const
+{
+	QStringList infoList;
+	for (const auto& dep : _dependencyInfo.getDependencies())
+	{
+		infoList.append(_linePrefix + 
+			QString::fromStdString(dep.getLabel()) +
+			" = " + 
+			QString::fromStdString(dep.getValue()) +
+			(dep.getUnit().empty() ? "" : " " + QString::fromStdString(dep.getUnit()))
+		);
+	}
+	return infoList.join("\n");
+}
+
 void ot::PlotDataset::buildCartesianCurve()
 {
 	if (m_cartesianCurve == nullptr)
@@ -697,16 +722,9 @@ void ot::PlotDataset::updateToolTip()
 
 	if (m_dependencyInfos.hasDependencies())
 	{
-		std::string tip = m_config.getEntityName();
-		for (const auto& dep : m_dependencyInfos.getDependencies())
-		{
-			tip.append(
-				"\n        " +
-				dep.getLabel() + " = " + dep.getValue() +
-				(dep.getUnit().empty() ? "" : " " + dep.getUnit())
-			);
-		}
-		m_legendItem->setToolTip(QString::fromStdString(tip));
+		QString tip = QString::fromStdString(m_config.getEntityName());
+		tip.append("\n" + getDependencyInfoString(m_dependencyInfos));
+		m_legendItem->setToolTip(tip);
 	}
 	else
 	{

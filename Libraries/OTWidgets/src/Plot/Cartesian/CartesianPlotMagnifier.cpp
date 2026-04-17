@@ -199,72 +199,94 @@ void ot::CartesianPlotMagnifier::slotColorStyleChanged() {
 }
 
 void ot::CartesianPlotMagnifier::updateMarkers(const QPoint& _pos) {
-	int itemIx;
-	QwtPlotCurve* curve = m_plot->findNearestCurve(_pos, itemIx);
-	
-	if (curve != nullptr) {
-		// Find dataset
-		OTAssertNullptr(m_plot->getOwner());
+	try
+	{
+		int itemIx;
+		QwtPlotCurve* curve = m_plot->findNearestCurve(_pos, itemIx);
 
-		PlotDataset* dataset = m_plot->getOwner()->findDataset(curve);
-		OTAssertNullptr(dataset);
-		const PlotDatasetData& datasetData = dataset->getPlotData();
-		QPointF pt;
-		if (itemIx < 0 || itemIx >= datasetData.getSize())
+		if (curve != nullptr)
 		{
-			return;
-		}
-		else
-		{
-			pt = datasetData.getSample<QPointF>(itemIx);
-		}
-		
-		// Set new label
-		QwtText newText(m_plot->getOwner()->toPositionInfoText(pt, true), QwtText::PlainText);
-		newText.setColor(QColor(255, 50, 50));
+			// Find dataset
+			OTAssertNullptr(m_plot->getOwner());
 
-		// Get canvas rect and transform maps
-		const QwtScaleMap xMap = m_plot->canvasMap(QwtPlot::xBottom);
-		const QwtScaleMap yMap = m_plot->canvasMap(QwtPlot::yLeft);
-		const QRectF canvasRect(QPointF(xMap.s1(), yMap.s1()), QPointF(xMap.s2(), yMap.s2()));
+			PlotDataset* dataset = m_plot->getOwner()->findDataset(curve);
+			if (!dataset)
+			{
+				OTAssert(0, "Dataset for curve not found.");
+				OT_LOG_E("[FATAL] Dataset for curve not found.");
+				return;
+			}
 
-		// Determine text size in canvas
-		QSizeF textSize = newText.textSize();
-		QPointF textTopLeft(pt);
-		
-		textSize.setWidth((xMap.invTransform(xMap.transform(0) + textSize.width())) - xMap.invTransform(xMap.transform(0)));
-		textSize.setHeight((yMap.invTransform(yMap.transform(0) + textSize.height())) - yMap.invTransform(yMap.transform(0)));
+			const PlotDatasetData& datasetData = dataset->getPlotData();
+			QPointF pt;
+			if (itemIx < 0 || itemIx >= datasetData.getSize())
+			{
+				return;
+			}
+			else
+			{
+				pt = datasetData.getSample<QPointF>(itemIx);
+			}
 
-		if (textSize.width() < 0.) {
-			textSize.setWidth(textSize.width() * (-1.));
-			textTopLeft.setX(textTopLeft.x() - textSize.width());
-		}
-		if (textSize.height() < 0.) {
-			textSize.setHeight(textSize.height() * (-1.));
-			textTopLeft.setY(textTopLeft.y() - textSize.height());
-		}
-		QRectF textBoundingRect(textTopLeft, textSize);
+			// Set new label
+			QString labelText = m_plot->getOwner()->toPositionInfoText(pt, true);
+			labelText.append("\n" + dataset->getSecondaryDependencyInfoString(itemIx));
 
-		// Ensure text rect is in canvas
-		QPointF adjustedPt = pt;
+			QwtText newText(labelText, QwtText::PlainText);
+			newText.setColor(QColor(255, 50, 50));
 
-		if (textBoundingRect.right() > canvasRect.right()) {
-			adjustedPt.setX(adjustedPt.x() - (textBoundingRect.right() - canvasRect.right()));
-		}
-		if (textBoundingRect.left() < canvasRect.left()) {
-			adjustedPt.setX(adjustedPt.x() + (canvasRect.left() - textBoundingRect.left()));
-		}
-		if (textBoundingRect.bottom() > canvasRect.bottom()) {
-			adjustedPt.setY(adjustedPt.y() - (textBoundingRect.bottom() - canvasRect.bottom()));
-		}
-		if (textBoundingRect.top() < canvasRect.top()) {
-			adjustedPt.setY(adjustedPt.y() + (canvasRect.top() - textBoundingRect.top()));
-		}
+			// Get canvas rect and transform maps
+			const QwtScaleMap xMap = m_plot->canvasMap(QwtPlot::xBottom);
+			const QwtScaleMap yMap = m_plot->canvasMap(QwtPlot::yLeft);
+			const QRectF canvasRect(QPointF(xMap.s1(), yMap.s1()), QPointF(xMap.s2(), yMap.s2()));
 
-		// Apply
-		m_crossMarker->setValue(pt);
-		m_textMarker->setValue(adjustedPt);
-		m_textMarker->setLabel(newText);
-		m_plot->replot();
+			// Determine text size in canvas
+			QSizeF textSize = newText.textSize();
+			QPointF textTopLeft(pt);
+
+			textSize.setWidth((xMap.invTransform(xMap.transform(0) + textSize.width())) - xMap.invTransform(xMap.transform(0)));
+			textSize.setHeight((yMap.invTransform(yMap.transform(0) + textSize.height())) - yMap.invTransform(yMap.transform(0)));
+
+			if (textSize.width() < 0.)
+			{
+				textSize.setWidth(textSize.width() * (-1.));
+				textTopLeft.setX(textTopLeft.x() - textSize.width());
+			}
+			if (textSize.height() < 0.)
+			{
+				textSize.setHeight(textSize.height() * (-1.));
+				textTopLeft.setY(textTopLeft.y() - textSize.height());
+			}
+			QRectF textBoundingRect(textTopLeft, textSize);
+
+			// Ensure text rect is in canvas
+			QPointF adjustedPt = pt;
+
+			if (textBoundingRect.right() > canvasRect.right())
+			{
+				adjustedPt.setX(adjustedPt.x() - (textBoundingRect.right() - canvasRect.right()));
+			}
+			if (textBoundingRect.left() < canvasRect.left())
+			{
+				adjustedPt.setX(adjustedPt.x() + (canvasRect.left() - textBoundingRect.left()));
+			}
+			if (textBoundingRect.bottom() > canvasRect.bottom())
+			{
+				adjustedPt.setY(adjustedPt.y() - (textBoundingRect.bottom() - canvasRect.bottom()));
+			}
+			if (textBoundingRect.top() < canvasRect.top())
+			{
+				adjustedPt.setY(adjustedPt.y() + (canvasRect.top() - textBoundingRect.top()));
+			}
+
+			// Apply
+			m_crossMarker->setValue(pt);
+			m_textMarker->setValue(adjustedPt);
+			m_textMarker->setLabel(newText);
+			m_plot->replot();
+		}
+	}
+	catch (const std::exception& ex) {
+		OT_LOG_E(ex.what());
 	}
 }
