@@ -48,7 +48,6 @@
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 
 #include "OTModelEntities/DataBase.h"
-#include "OTModelEntities/InvalidUID.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 
 #include "OTServiceFoundation/ExternalServicesComponent.h"
@@ -197,7 +196,7 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 	std::list<std::pair<UID, UID>> prefetchIdandVersion;
 
 	for (const auto& entity : _entityInfo) {
-		if (entity.getEntityID() != ot::getInvalidUID() && entity.getEntityVersion() != ot::getInvalidUID()) {
+		if (entity.getEntityID() != ot::invalidUID && entity.getEntityVersion() != ot::invalidUID) {
 			m_prefetchedEntityVersions[entity.getEntityID()] = entity.getEntityVersion();
 
 			prefetchIdandVersion.push_back(std::pair<UID, UID>(entity.getEntityID(), entity.getEntityVersion()));
@@ -209,7 +208,7 @@ void ot::ApplicationBase::prefetchDocumentsFromStorage(const std::list<ot::Entit
 
 ot::UID ot::ApplicationBase::getPrefetchedEntityVersion(UID _entityID) {
 	if (m_prefetchedEntityVersions.count(_entityID) == 0) {
-		return ot::getInvalidUID();
+		return ot::invalidUID;
 	}
 	else {
 		return m_prefetchedEntityVersions[_entityID];

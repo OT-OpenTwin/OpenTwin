@@ -29,7 +29,6 @@
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
-#include "OTModelEntities/InvalidUID.h"
 
 #include <fstream>
 
@@ -455,7 +454,7 @@ ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 	// If the entity is not part of the current state, return invalid UID
 	if (m_entities.count(entityID) == 0)
 	{
-		return ot::getInvalidUID();
+		return ot::invalidUID;
 	}
 
 	// Ensure that the entity exists

@@ -66,7 +66,7 @@ void EntityCreator::createPipeline()
 	newDataprocessing.setName(entityName);
 	newDataprocessing.setTreeItemEditable(true);
 
-	if(m_manifestFolderID == ot::getInvalidUID())
+	if(m_manifestFolderID == ot::invalidUID)
 	{
 		ot::EntityInformation entityInfo;
 		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::PythonManifestFolder, entityInfo);
@@ -90,7 +90,7 @@ void EntityCreator::createSolver()
 		Application::instance()->getServiceName()
 	);
 
-	if (m_dataProcessingFolderID == ot::getInvalidUID())
+	if (m_dataProcessingFolderID == ot::invalidUID)
 	{
 		ot::EntityInformation entityInfo;
 		ot::ModelServiceAPI::getEntityInformation(ot::FolderNames::DataProcessingFolder, entityInfo);

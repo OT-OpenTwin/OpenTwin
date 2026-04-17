@@ -45,7 +45,6 @@
 #include "OTModelEntities/EntityMeshTetData.h"
 #include "OTModelEntities/EntityMeshTetFaceData.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
-#include "OTModelEntities/InvalidUID.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
@@ -794,7 +793,7 @@ bool GmshMeshCreation::meshNeedsUpdating(EntityMeshTet* mesh, const std::list<st
 
 	for (auto entity : entityInfo)
 	{
-		if (entity.getEntityID() == ot::getInvalidUID())
+		if (entity.getEntityID() == ot::invalidUID)
 		{
 			// The entity is not longer available
 			return false;

@@ -26,7 +26,6 @@
 #include "PipelineHandler.h"
 #include "PropertyHandlerDatabaseAccessBlock.h"
 #include "GraphHandler.h"
-#include "OTModelEntities/InvalidUID.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "EntityCreator.h"
