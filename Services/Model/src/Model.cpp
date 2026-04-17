@@ -4918,6 +4918,10 @@ void Model::updateTopologyEntities(const ot::UIDList& _topoEntityID, const ot::U
 				EntityContainer* newContainer = dynamic_cast<EntityContainer*>(newEntity);
 				assert(newContainer != nullptr);
 				newContainer->takeOverChildren(oldContainer);
+				for (EntityBase* child : newContainer->getChildrenList())
+				{
+					child->setParent(newContainer);
+				}
 			}
 		}
 
