@@ -40,6 +40,8 @@ namespace ot {
 		//! @brief Called when the a log message was created.
 		virtual void log(const LogMessage& _message) override;
 
+		virtual void userLog(const LogMessage& _message) override;
+
 		void setFlags(ot::LogFlags _flags) { m_flags = _flags; }
 		const ot::LogFlags& getFlags(void) const { return m_flags; }
 

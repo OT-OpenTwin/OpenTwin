@@ -205,6 +205,8 @@ public:
 	//! @brief Called when the a log message was created.
 	virtual void log(const ot::LogMessage& _message) override;
 
+	virtual void userLog(const ot::LogMessage& _message) override;
+
 	//! @brief Will call the callback function with the provided parameters
 	//! @param _senderId The sender ID the message was send from
 	//! @param _message The message

@@ -85,6 +85,12 @@ namespace ot {
 
 		void dispatch(const LogMessageStream& _messageStream);
 
+		void dispatchUserLog(const std::string& _text, const std::string& _functionName = std::string(), const LogFlags& _logFlags = LogFlags(ot::INFORMATION_LOG));
+
+		void dispatchUserLog(const LogMessage& _message);
+
+		void dispatchUserLog(const LogMessageStream& _messageStream);
+
 	private:
 		void applyEnvFlag(const std::string& _str);
 

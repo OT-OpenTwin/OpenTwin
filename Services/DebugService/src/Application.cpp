@@ -195,6 +195,10 @@ void Application::uiDebugInfo() {
 }
 
 void Application::serviceDebugInfo(void) {
+	OT_LOG_T("Test");
+	OT_USER_LOG_T("Test2");
+	OT_USER_LOG_TS("Tester" << "some" << 2);
+
 	getUiComponent()->displayMessage(
 		"Hello :-)\n\nThis Computer Info (Debug Service):\n" 
 		+ ot::ThisComputerInfo::toInfoString(ot::ThisComputerInfo::GatherAllMode) + "\n"

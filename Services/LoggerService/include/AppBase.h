@@ -43,6 +43,8 @@ public:
 	//! @brief Called when the a log message was created.
 	virtual void log(const ot::LogMessage& _message) override;
 
+	virtual void userLog(const ot::LogMessage& _message) override {};
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action handler

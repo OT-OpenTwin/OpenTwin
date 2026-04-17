@@ -65,6 +65,8 @@ public:
 
 	virtual void log(const ot::LogMessage& _message) override;
 
+	virtual void userLog(const ot::LogMessage& _message) override { this->log(_message); };
+
 	virtual void log(const QString& _sender, InterfaceLogType _type, const QString& _message) override;
 
 	virtual bool addTool(otoolkit::Tool* _tool) override;

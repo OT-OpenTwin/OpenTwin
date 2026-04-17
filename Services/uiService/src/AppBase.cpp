@@ -474,6 +474,11 @@ void AppBase::log(const ot::LogMessage& _message) {
 	}
 }
 
+void AppBase::userLog(const ot::LogMessage& _message)
+{
+	this->appendLogMessage(_message);
+}
+
 void AppBase::notify(UID _senderId, eventType _eventType, int _info1, int _info2) {
 	try {
 		// Main window

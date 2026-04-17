@@ -109,13 +109,12 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 	msg.setUserName(m_userName);
 	msg.setProjectName(m_projectName);
 
-	for (auto r : m_messageReceiver) {
+	for (AbstractLogNotifier* r : m_messageReceiver) {
 		try {
 			r->log(msg);
 		}
 		catch (const std::exception& _e) {
 			OTAssert(0, "Error occured while dispatching log message");
-			std::cout << "Dispatch error: " << _e.what() << std::endl;
 		}
 	}
 }
@@ -124,6 +123,47 @@ void ot::LogDispatcher::dispatch(const LogMessageStream& _messageStream)
 {
 	LogMessage msg(m_serviceName, _messageStream.getFunctionName(), _messageStream.getText(), _messageStream.getFlags());
 	this->dispatch(msg);
+}
+
+void ot::LogDispatcher::dispatchUserLog(const std::string& _text, const std::string& _functionName, const LogFlags& _logFlags)
+{
+	this->dispatchUserLog(LogMessage(m_serviceName, _functionName, _text, _logFlags));
+}
+
+void ot::LogDispatcher::dispatchUserLog(const LogMessage& _message)
+{
+#if OT_LOGGER_USE_MUTEX==true
+	if (!intern::g_logInitialized)
+	{
+		intern::g_logInitialized = true;
+		OT_LOG_W("Mutex in use for LogDispatcher!");
+	}
+	std::lock_guard<std::mutex> lock(intern::g_logMutex);
+#endif
+
+	// Create Timestamp
+	LogMessage msg(_message);
+	msg.setCurrentTimeAsLocalSystemTime();
+	msg.setUserName(m_userName);
+	msg.setProjectName(m_projectName);
+
+	for (AbstractLogNotifier* r : m_messageReceiver)
+	{
+		try
+		{
+			r->userLog(msg);
+		}
+		catch (const std::exception& _e)
+		{
+			OTAssert(0, "Error occured while dispatching user log message");
+		}
+	}
+}
+
+void ot::LogDispatcher::dispatchUserLog(const LogMessageStream& _messageStream)
+{
+	LogMessage msg(m_serviceName, _messageStream.getFunctionName(), _messageStream.getText(), _messageStream.getFlags());
+	this->dispatchUserLog(msg);
 }
 
 void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {

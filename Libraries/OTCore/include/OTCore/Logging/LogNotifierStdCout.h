@@ -31,6 +31,8 @@ namespace ot {
 
 		//! @brief Called when the a log message was created.
 		virtual void log(const LogMessage& _message) override;
+
+		virtual void userLog(const LogMessage& _message) override { this->log(_message); };
 	};
 
 }
