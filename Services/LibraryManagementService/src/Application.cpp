@@ -464,6 +464,14 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
+std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+}
+
+std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Constructor/Destructor

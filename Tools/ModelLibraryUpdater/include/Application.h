@@ -34,6 +34,8 @@
 #include <sstream>
 #include <algorithm>
 
+// Service header
+#include "StartArgumentParser.h"
 
 class Application {
 public:
@@ -45,7 +47,7 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	void start(const char * _databasePWD);
+	void start(ot::StartArgumentParser _argumentParser);
 
 
 private:

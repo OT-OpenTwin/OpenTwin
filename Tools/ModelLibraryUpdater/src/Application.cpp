@@ -25,7 +25,11 @@
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"
 #include "OTCore/Logging/Logger.h"
-
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTCore/ReturnMessage.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 // Thirdparty header
 #include <bsoncxx/builder/stream/helpers.hpp>
@@ -166,22 +170,48 @@ std::string Application::getMongoURL(std::string _databaseURL, std::string _dbUs
     return DataStorageAPI::ConnectionAPI::getMongoURL(_databaseURL, _dbUserName, _dbPassword);
 }
 
-void Application::start(const char* _databasePWD) {
+void Application::start(ot::StartArgumentParser _argumentParser) {
 
-    OT_LOG_D("Starting initialization");
-    // Initialisation NEEDED!
-    mongocxx::instance inst{};
 
-    // First connect to database
-    int status = connectToMongoDb(_databasePWD);
-    OT_LOG_D("Status of connection: " + std::to_string(status));
-    
-    // Check if Libraries exist in db
-    try {
-        syncAndUpdateLocalModelsWithDB(m_folderPath);
-    } catch (const mongocxx::exception& e) {
-        OT_LOG_E("MongoDB error: " + std::string(e.what()));
-    } 
+
+    /*std::string lmsResponse;
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER,ot::JsonString(OT_ACTION_CMD_LMS_AddNewLibraryElement, doc.GetAllocator()),doc.GetAllocator());
+
+    const int maxCt = 30;
+    int ct = 1;
+    bool ok = false;
+
+    do {
+        lmsResponse.clear();
+        if (!(ok = ot::msg::send("", _lmsUrl, ot::MessageType::EXECUTE, doc.toJson(), lmsResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+            OT_LOG_E("Request create dialog failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+            using namespace std::chrono_literals;
+            std::this_thread::sleep_for(500ms);
+
+        }
+    } while (!ok && ct++ <= maxCt);
+
+    if (!ok) {
+        OT_LOG_E("Request create dialog failed");
+    }
+
+	OT_LOG_D("Response from LMS: " + lmsResponse);*/
+
+    //OT_LOG_D("Starting initialization");
+    //// Initialisation NEEDED!
+    //mongocxx::instance inst{};
+
+    //// First connect to database
+    //int status = connectToMongoDb(_databasePWD);
+    //OT_LOG_D("Status of connection: " + std::to_string(status));
+    //
+    //// Check if Libraries exist in db
+    //try {
+    //    syncAndUpdateLocalModelsWithDB(m_folderPath);
+    //} catch (const mongocxx::exception& e) {
+    //    OT_LOG_E("MongoDB error: " + std::string(e.what()));
+    //} 
 }
 
 
