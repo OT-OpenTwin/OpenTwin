@@ -56,6 +56,7 @@
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/Logging/Logger.h"
+
 // OpenTwin Gui header
 #include "OTGui/GuiTypes.h"
 #include "OTGui/TableRange.h"
@@ -3784,8 +3785,6 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document) {
 }
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document) {
-	return;
-	/*
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	ot::VisualisationCfg visualisationCfg;
@@ -3796,43 +3795,33 @@ void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _documen
 
 	if (plotView != nullptr)
 	{
-		ot::Plot1DCurveCfg config;
-		config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 		ot::Plot* plot = plotView->getPlot();
-		const std::list<ot::PlotDataset*>& allDatasets = plot->getAllDatasets();
-		CurveColourSetter colourSetter(config);
-		for (ot::PlotDataset* dataSet : allDatasets) {
-			if (dataSet->getEntityName() == config.getEntityName()) {
-				const std::string curveNameBase =  dataSet->getCurveNameBase();
-				
-				const std::string newNameFull = dataSet->getConfig().getEntityName();
-				const std::string newNameShort = ot::EntityName::getSubName(newNameFull).value();
 
-				std::string curveTitle = dataSet->getConfig().getTitle();
-				
-				curveTitle = ot::String::replace(curveTitle, curveNameBase, newNameShort);
-				
-				config.setTitle(curveTitle);
-				
-				//if a rainbow painter is not set yet, it may have been newly set. In that case we need to iterate the colours.
-				bool datasetHasDingleDatapoint = dataSet->getPlotData().getSize() == 1;
-				colourSetter.setPainter(config, datasetHasDingleDatapoint);
-				
+		ot::Plot1DCurveCfg curveCfg;
+		curveCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VIEW1D_CurveConfigs));
 
-				dataSet->setConfig(config);
-				dataSet->setCurveNameBase(newNameShort);
-
-				dataSet->updateCurveVisualization();
+		if (visualisationCfg.getOverrideViewerContent())
+		{
+			// Remove existing curves from plot
+			plot->removeFromCache(curveCfg.getEntityID());
+		}
+		else
+		{
+			// Update config of existing curves and refresh their visualization
+			auto existingDatasets = plot->findDatasets(curveCfg.getEntityID());
+			for (auto dataset : existingDatasets)
+			{
+				dataset->setConfig(curveCfg);
+				dataset->updateCurveVisualization();
 			}
 		}
-		
+
 		plot->replot();
 	}
 	else
 	{
 		OT_LOG_E("Requested curve update could not identify the corresponding plot. { \"Plot\": \"" + plotName + "\" }");
 	}
-	*/
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
