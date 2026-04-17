@@ -21,7 +21,7 @@ ot::PlotLegendItemWidget::PlotLegendItemWidget()
 	layout->addWidget(m_colorPreview, 0);
 
 	m_label = new InteractiveLabel(m_rootWidget);
-	layout->addWidget(m_label, 1);
+	layout->addWidget(m_label);
 
 	connect(m_label, &InteractiveLabel::mouseEntered, this, &PlotLegendItemWidget::slotMouseEntered);
 	connect(m_label, &InteractiveLabel::mouseLeft, this, &PlotLegendItemWidget::slotMouseLeft);
