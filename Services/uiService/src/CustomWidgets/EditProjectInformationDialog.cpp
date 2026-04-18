@@ -416,6 +416,11 @@ void EditProjectInformationDialog::initializeData() {
 			if (!category.empty() && !projectGroups.contains(QString::fromStdString(category))) {
 				projectGroups.append(QString::fromStdString(category));
 			}
+
+			for (const auto& tag : proj.getTags())
+			{
+				m_tags->addOption(QString::fromStdString(tag));
+			}
 		}
 	}
 	m_projectGroup->addItems(projectGroups);
