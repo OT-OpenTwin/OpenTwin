@@ -21,9 +21,8 @@
 #include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityFileImage.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalProjectItem.h"
 
 static EntityFactoryRegistrar<ot::EntityBlockHierarchicalProjectItem> registrar(ot::EntityBlockHierarchicalProjectItem::className());

@@ -30,7 +30,7 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
 
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityFileRawData> registrar(EntityFileRawData::className());
 

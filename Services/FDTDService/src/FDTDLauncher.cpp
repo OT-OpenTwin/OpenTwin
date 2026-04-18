@@ -28,7 +28,6 @@
 #include "OTModelEntities/EntityMeshTet.h"
 #include "OTModelEntities/EntityMeshTetData.h"
 #include "OTModelEntities/EntityBinaryData.h"
-#include "OTModelEntities/EntityProperties.h"
 
 #include "CartesianMeshToSTL.h"
 

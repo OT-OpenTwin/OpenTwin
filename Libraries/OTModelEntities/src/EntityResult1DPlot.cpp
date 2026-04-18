@@ -27,9 +27,9 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/DataBase.h"
-#include "OTModelEntities/PropertyHelper.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 // std header
 #include <set>
@@ -140,7 +140,7 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		break;
 	}
 
-	int32_t numberOfSecondaryParameter = 	PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName());
+	uint32_t numberOfSecondaryParameter = static_cast<uint32_t>(PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName()));
 	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
 	{
 		const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
@@ -422,7 +422,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setFixedDatasetLabelInfos(std::move(fixedDatasetLabelInfos));
 
 	std::list<std::string> secondaryParameter;
-	int32_t numberOfSecondaryParameter = PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName());
+	uint32_t numberOfSecondaryParameter = static_cast<uint32_t>(PropertyHelper::getIntegerPropertyValue(this, m_propertyNbOfSecondaryParameter, getXAxisPropertyGroupName()));
 	for (uint32_t i = 1; i <= numberOfSecondaryParameter; i++)
 	{
 		const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);

@@ -19,10 +19,12 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OTCore/TypeNames.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 #include "OTModelEntities/EntityInformation.h"
 
+// std header
 #include <fstream>
 #include <map>
 #include <list>

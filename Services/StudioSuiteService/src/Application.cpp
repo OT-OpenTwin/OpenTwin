@@ -40,7 +40,6 @@
 #include "OTModelEntities/EntityMaterial.h"
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/EntityParameter.h"
-#include "OTModelEntities/EntityProperties.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityResultText.h"
 #include "OTModelEntities/EntityBinaryData.h"

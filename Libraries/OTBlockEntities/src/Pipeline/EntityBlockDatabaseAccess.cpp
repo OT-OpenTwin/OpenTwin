@@ -20,9 +20,9 @@
 // OpenTwin header
 #include "OTCore/ComparisonSymbols.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTModelEntities/PropertyHelper.h"
 #include "OTBlockEntities/BlockImageNames.h"
 #include "OTBlockEntities/EntityBlockConnection.h"	
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
 
 static EntityFactoryRegistrar<EntityBlockDatabaseAccess> registrar(EntityBlockDatabaseAccess::className());

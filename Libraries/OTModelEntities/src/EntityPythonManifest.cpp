@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTModelEntities/EntityPythonManifest.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTGui/VisualisationTypes.h"
 #include "OTCore/String.h"

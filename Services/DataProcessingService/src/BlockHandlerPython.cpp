@@ -30,7 +30,6 @@
 #include "OTServiceFoundation/PythonServiceInterface.h"
 
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/EntityProperties.h"
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
     : BlockHandler(_blockEntity, _handlerMap)

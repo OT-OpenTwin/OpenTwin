@@ -22,8 +22,8 @@
 #include "DataSourceManagerItem.h"
 
 #include "OTModelEntities/EntityVis2D3D.h"
-#include "OTModelEntities/PlaneProperties.h"
-#include "OTModelEntities/PropertiesVis2D3D.h"
+#include "OTModelEntities/Properties/PlaneProperties.h"
+#include "OTModelEntities/Properties/PropertiesVis2D3D.h"
 #include "OTModelEntities/EntityMeshCartesianData.h"
 
 #include <osg/StateSet>

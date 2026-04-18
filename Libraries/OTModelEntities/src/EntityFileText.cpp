@@ -31,7 +31,7 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
 
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_ENTITYFILETEXT_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled

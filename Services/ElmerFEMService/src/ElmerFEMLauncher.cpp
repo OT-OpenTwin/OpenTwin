@@ -29,7 +29,6 @@
 #include "OTModelEntities/EntityMeshTet.h"
 #include "OTModelEntities/EntityMeshTetData.h"
 #include "OTModelEntities/EntityBinaryData.h"
-#include "OTModelEntities/EntityProperties.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/UiComponent.h"

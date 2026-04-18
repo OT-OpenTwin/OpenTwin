@@ -21,9 +21,8 @@
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsImageItemCfg.h"
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityBinaryData.h"
-#include "OTModelEntities/EntityProperties.h"
 #include "OTBlockEntities/Deco/EntityBlockImage.h"
 
 static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());

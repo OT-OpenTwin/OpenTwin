@@ -19,15 +19,15 @@
 
 // OpenTwin header
 #include "OTCore/FolderNames.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTModelEntities/PropertyHelper.h"
 #include "OTBlockEntities/BlockImageNames.h"
 #include "OTBlockEntities/Pipeline/EntityBlockPython.h"
 #include "OTBlockEntities/Pipeline/PythonHeaderInterpreter.h"
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/Lms/EntityPythonScript.h"
 #include "OTModelEntities/EntityPythonManifest.h"
-#include "OTCore/ReturnMessage.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityBlockPython> registrar(EntityBlockPython::className());
 

@@ -19,14 +19,15 @@
 
 #pragma once
 
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+#include "OTModelEntities/EntityInformation.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
+
+// std header
 #include <string>
 #include <list>
 #include <map>
-
-#include "OTCore/CoreTypes.h"
-#include "OTModelEntities/EntityInformation.h"
-
-#include "OTModelEntities/EntityProperties.h"
 
 namespace ot {
 	namespace components {

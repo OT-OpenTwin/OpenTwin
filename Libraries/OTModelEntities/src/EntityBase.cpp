@@ -17,13 +17,13 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
+#include "OTCore/String.h"
+#include "OTCore/Logging/Logger.h"
+#include "OTGui/Menu/MenuCfg.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityFactory.h"
-#include "OTCore/String.h"
-#include "OTGui/Menu/MenuCfg.h"
-
-#include "OTCore/Logging/Logger.h"
 
 // Activate the following flag to display the (approximate) memory consumption of the entity while restoring it from the database.
 //#define DISPLAY_MEMORY_CONSUMPTION

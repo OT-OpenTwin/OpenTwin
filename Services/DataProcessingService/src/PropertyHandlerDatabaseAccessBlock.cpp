@@ -18,19 +18,20 @@
 // @otlicense-end
 
 #pragma once
-#include "PropertyHandlerDatabaseAccessBlock.h"
-#include "OTModelEntities/EntityPropertiesItems.h"
-#include "OTModelEntities/EntityProperties.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/Msg.h"
+
 #include "OTCore/OwnerServiceGlobal.h"
-#include "Application.h"
-#include "OTModelEntities/DataBase.h"
 #include "OTCore/Tuple/TupleDescriptionComplex.h"
 #include "OTCore/Tuple/TupleFactory.h"
+#include "OTCommunication/Msg.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 #include "OTResultDataAccess/ResultCollection/ProjectToCollectionConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
+
+#include "Application.h"
 #include "MetadataVectorizer.h"
+#include "PropertyHandlerDatabaseAccessBlock.h"
 
 void PropertyHandlerDatabaseAccessBlock::performEntityUpdateIfRequired(std::shared_ptr<EntityBlockDatabaseAccess> _dbAccessEntity)
 {

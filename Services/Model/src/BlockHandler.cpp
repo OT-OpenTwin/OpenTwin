@@ -37,7 +37,7 @@
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTBlockEntities/Pipeline/EntityBlockPython.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitConnector.h"

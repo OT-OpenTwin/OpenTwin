@@ -25,7 +25,7 @@
 #include "OTServiceFoundation/FoundationAPIExport.h"
 
 #include "OTModelEntities/EntityInformation.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 
 #include "OTDataStorage/UniqueUIDGenerator.h"
 

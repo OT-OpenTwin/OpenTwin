@@ -1,0 +1,2011 @@
+﻿// @otlicense
+// File: EntityPropertiesItems.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OpenTwin header
+#include "OTCore/Logging/Logger.h"
+#include "OTGui/Painter/FillPainter2D.h"
+#include "OTGui/Painter/Painter2DFactory.h"
+#include "OTGui/Properties/Property.h"
+#include "OTGui/Properties/PropertyInt.h"
+#include "OTGui/Properties/PropertyBool.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyColor.h"
+#include "OTGui/Properties/PropertyDouble.h"
+#include "OTGui/Properties/PropertyString.h"
+#include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/Properties/PropertyStringList.h"
+#include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/Properties/EntityPropertiesItems.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
+
+EntityPropertiesBase::EntityPropertiesBase()
+	: m_container(nullptr), m_needsUpdateFlag(false), m_multipleValues(false), m_readOnly(false), m_protectedProperty(true),
+	m_visible(true), m_errorState(false), m_groupChanges(false)
+{
+}
+
+EntityPropertiesBase::EntityPropertiesBase(const EntityPropertiesBase& other)
+{
+	m_name = other.m_name;
+	m_group = other.m_group;
+
+	m_multipleValues = other.m_multipleValues;
+	m_container = other.m_container;
+	m_needsUpdateFlag = other.m_needsUpdateFlag;
+	m_readOnly = other.m_readOnly;
+	m_protectedProperty = other.m_protectedProperty;
+	m_visible = other.m_visible;
+	m_errorState = other.m_errorState;
+	m_toolTip = other.m_toolTip;
+	m_groupChanges = other.m_groupChanges;
+}
+
+void EntityPropertiesBase::setNeedsUpdate()
+{
+	if (m_container != nullptr) m_container->setNeedsUpdate();
+
+	m_needsUpdateFlag = true;
+}
+
+void EntityPropertiesBase::setFromConfiguration(const ot::Property* _property, EntityBase* root)
+{
+	this->setName(_property->getPropertyName());
+	this->setHasMultipleValues(_property->getPropertyFlags().has(ot::Property::HasMultipleValues));
+	this->setReadOnly(_property->getPropertyFlags().has(ot::Property::IsReadOnly));
+	this->setProtected(!_property->getPropertyFlags().has(ot::Property::IsDeletable));
+	this->setVisible(!_property->getPropertyFlags().has(ot::Property::IsHidden));
+	this->setErrorState(_property->getPropertyFlags().has(ot::Property::HasInputError));
+	this->setToolTip(_property->getPropertyTip());
+	this->setGroupChanges(_property->getPropertyFlags().has(ot::Property::GroupChanges));
+}
+
+void EntityPropertiesBase::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root)
+{
+	_jsonObject.AddMember("Type", ot::JsonString(this->getTypeString(), _allocator), _allocator);
+	_jsonObject.AddMember("MultipleValues", this->hasMultipleValues(), _allocator);
+	_jsonObject.AddMember("ReadOnly", this->getReadOnly(), _allocator);
+	_jsonObject.AddMember("Protected", this->getProtected(), _allocator);
+	_jsonObject.AddMember("Visible", this->getVisible(), _allocator);
+	_jsonObject.AddMember("ErrorState", this->getErrorState(), _allocator);
+	_jsonObject.AddMember("Group", ot::JsonString(this->getGroup(), _allocator), _allocator);
+	_jsonObject.AddMember("ToolTip", ot::JsonString(this->getToolTip(), _allocator), _allocator);
+	_jsonObject.AddMember("GroupChanges", this->getGroupChanges(), _allocator);
+}
+
+void EntityPropertiesBase::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	if (_object.HasMember("MultipleValues"))
+	{
+		this->setHasMultipleValues(ot::json::getBool(_object, "MultipleValues"));
+	}
+	if (_object.HasMember("ReadOnly"))
+	{
+		this->setReadOnly(ot::json::getBool(_object, "ReadOnly"));
+	}
+	if (_object.HasMember("Protected"))
+	{
+		this->setProtected(ot::json::getBool(_object, "Protected"));
+	}
+	if (_object.HasMember("Visible"))
+	{
+		this->setVisible(ot::json::getBool(_object, "Visible"));
+	}
+	if (_object.HasMember("ErrorState"))
+	{
+		this->setErrorState(ot::json::getBool(_object, "ErrorState"));
+	}
+	if (_object.HasMember("ToolTip"))
+	{
+		this->setToolTip(ot::json::getString(_object, "ToolTip"));
+	}
+	if (_object.HasMember("GroupChanges"))
+	{
+		this->setGroupChanges(ot::json::getBool(_object, "GroupChanges"));
+	}
+}
+
+void EntityPropertiesBase::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	assert(m_name == other->getName());
+
+	// We keep the container unchanged, since we don't want to overwrite the ownership of this item
+	// We also dont assign the group, since the group assignment of a property can not be changed
+	m_multipleValues = other->m_multipleValues;
+	m_needsUpdateFlag = other->m_needsUpdateFlag;
+	m_readOnly = other->m_readOnly;
+	m_protectedProperty = other->m_protectedProperty;
+	m_visible = other->m_visible;
+	m_errorState = other->m_errorState;
+	m_toolTip = other->m_toolTip;
+	m_groupChanges = other->m_groupChanges;
+}
+
+EntityPropertiesBase& EntityPropertiesBase::operator=(const EntityPropertiesBase& other)
+{
+	if (&other != this)
+	{
+		// We keep the container unchanged, since we don't want to overwrite the ownership of this item
+		m_name = other.m_name;
+		m_group = other.m_group;
+		m_multipleValues = other.m_multipleValues;
+		m_needsUpdateFlag = other.m_needsUpdateFlag;
+		m_readOnly = other.m_readOnly;
+		m_protectedProperty = other.m_protectedProperty;
+		m_visible = other.m_visible;
+		m_errorState = other.m_errorState;
+		m_toolTip = other.m_toolTip;
+		m_groupChanges = other.m_groupChanges;
+	}
+
+	return *this;
+}
+
+void EntityPropertiesBase::setupPropertyData(ot::PropertyGridCfg& _configuration, ot::Property* _property) const
+{
+	if (this->hasMultipleValues()) _property->setPropertyFlag(ot::Property::HasMultipleValues);
+	if (this->getReadOnly()) _property->setPropertyFlag(ot::Property::IsReadOnly);
+	if (!this->getProtected()) _property->setPropertyFlag(ot::Property::IsDeletable);
+	if (!this->getVisible()) _property->setPropertyFlag(ot::Property::IsHidden);
+	if (this->getErrorState()) _property->setPropertyFlag(ot::Property::HasInputError);
+	if (this->getGroupChanges()) _property->setPropertyFlag(ot::Property::GroupChanges);
+
+	_property->setPropertyTip(m_toolTip);
+
+	ot::PropertyGroup* group = _configuration.findOrCreateGroup(this->getGroup());
+	OTAssertNullptr(group);
+	group->addProperty(_property);
+}
+
+bool EntityPropertiesBase::needsUpdate() const
+{
+	return m_needsUpdateFlag;
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesDouble::EntityPropertiesDouble()
+	: m_value(0.), m_allowCustomValues(true), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
+{
+
+}
+
+EntityPropertiesDouble::EntityPropertiesDouble(const std::string& _name, double _value)
+	: m_value(_value), m_allowCustomValues(true), m_min(std::numeric_limits<double>::lowest()), m_max(std::numeric_limits<double>::max()), m_precision(2)
+{
+	this->setName(_name);
+}
+
+EntityPropertiesDouble::EntityPropertiesDouble(const EntityPropertiesDouble& _other)
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.m_value;
+	m_allowCustomValues = _other.m_allowCustomValues;
+	m_min = _other.m_min;
+	m_max = _other.m_max;
+	m_suffix = _other.m_suffix;
+	m_precision = _other.m_precision;
+}
+
+EntityPropertiesDouble& EntityPropertiesDouble::operator=(const EntityPropertiesDouble& _other)
+{
+	if (&_other != this)
+	{
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.m_value;
+		m_allowCustomValues = _other.m_allowCustomValues;
+		m_min = _other.m_min;
+		m_max = _other.m_max;
+		m_suffix = _other.m_suffix;
+		m_precision = _other.m_precision;
+	}
+	return *this;
+}
+
+void EntityPropertiesDouble::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyDouble* newProp = new ot::PropertyDouble(this->getName(), m_value);
+	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
+	newProp->setRange(m_min, m_max);
+	newProp->setSuffix(m_suffix);
+	newProp->setPrecision(m_precision);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesDouble::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyDouble* actualProperty = dynamic_cast<const ot::PropertyDouble*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	this->setValue(actualProperty->getValue());
+	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setSuffix(actualProperty->getSuffix());
+	this->setDecimalPlaces(actualProperty->getPrecision());
+	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
+}
+
+void EntityPropertiesDouble::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	_jsonObject.AddMember("Value", m_value, _allocator);
+	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
+	_jsonObject.AddMember("MinValue", m_min, _allocator);
+	_jsonObject.AddMember("MaxValue", m_max, _allocator);
+	_jsonObject.AddMember("Suffix", ot::JsonString(m_suffix, _allocator), _allocator);
+	_jsonObject.AddMember("Decimals", m_precision, _allocator);
+}
+
+void EntityPropertiesDouble::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	this->setValue(ot::json::getDouble(_object, "Value"));
+
+	if (_object.HasMember("MinValue"))
+	{
+		this->setMin(ot::json::getDouble(_object, "MinValue", std::numeric_limits<double>::lowest()));
+	}
+	if (_object.HasMember("MaxValue"))
+	{
+		this->setMax(ot::json::getDouble(_object, "MaxValue", std::numeric_limits<double>::max()));
+	}
+	if (_object.HasMember("AllowCustom"))
+	{
+		this->setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
+	}
+	if (_object.HasMember("Suffix"))
+	{
+		this->setSuffix(ot::json::getString(_object, "Suffix"));
+	}
+	if (_object.HasMember("Decimals"))
+	{
+		this->setDecimalPlaces(ot::json::getInt(_object, "Decimals"));
+	}
+}
+
+void EntityPropertiesDouble::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		this->setValue(entity->getValue());
+		this->setRange(entity->getMin(), entity->getMax());
+		this->setAllowCustomValues(entity->getAllowCustomValues());
+		this->setSuffix(entity->getSuffix());
+		this->setDecimalPlaces(entity->getDecimalPlaces());
+	}
+}
+
+void EntityPropertiesDouble::setValue(double _value)
+{
+	if (m_value != _value)
+	{
+		this->setNeedsUpdate();
+		m_value = _value;
+	}
+}
+
+void EntityPropertiesDouble::setRange(double _min, double _max)
+{
+	if (m_min != _min)
+	{
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+	if (m_max != _max)
+	{
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesDouble::setMin(double _min)
+{
+	if (m_min != _min)
+	{
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+}
+
+void EntityPropertiesDouble::setMax(double _max)
+{
+	if (m_max != _max)
+	{
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesDouble::setAllowCustomValues(bool _allowCustomValues)
+{
+	if (m_allowCustomValues != _allowCustomValues)
+	{
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
+	}
+}
+
+void EntityPropertiesDouble::setDecimalPlaces(int _precision)
+{
+	if (m_precision != _precision)
+	{
+		this->setNeedsUpdate();
+		m_precision = _precision;
+	}
+}
+
+void EntityPropertiesDouble::setSuffix(const std::string& _suffix)
+{
+	if (m_suffix != _suffix)
+	{
+		this->setNeedsUpdate();
+		m_suffix = _suffix;
+	}
+}
+
+bool EntityPropertiesDouble::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesDouble* entity = dynamic_cast<EntityPropertiesDouble*>(other);
+
+	if (entity == nullptr)
+	{
+		return false;
+	}
+
+	return (getValue() == entity->getValue());
+}
+
+EntityPropertiesDouble* EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties)
+{
+	return EntityPropertiesDouble::createProperty(_group, _name, _defaultValue, std::numeric_limits<double>::lowest(), std::numeric_limits<double>::max(), _defaultCategory, _properties);
+}
+
+EntityPropertiesDouble* EntityPropertiesDouble::createProperty(const std::string& _group, const std::string& _name, double _defaultValue, double _minValue, double _maxValue, const std::string& _defaultCategory, EntityProperties& _properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	double value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultDouble(_defaultCategory, _name, _defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesDouble* newProperty = new EntityPropertiesDouble(_name, value);
+	newProperty->setMin(_minValue);
+	newProperty->setMax(_maxValue);
+	_properties.createProperty(newProperty, _group);
+	return newProperty;
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesInteger::EntityPropertiesInteger()
+	: m_value(0), m_allowCustomValues(true), m_min(std::numeric_limits<long>::lowest()), m_max(std::numeric_limits<long>::max())
+{
+}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const std::string& _name, long _value)
+	: m_value(_value), m_allowCustomValues(true), m_min(std::numeric_limits<long>::lowest()), m_max(std::numeric_limits<long>::max())
+{
+	this->setName(_name);
+}
+
+EntityPropertiesInteger::EntityPropertiesInteger(const EntityPropertiesInteger& _other)
+	: EntityPropertiesBase(_other)
+{
+	m_value = _other.getValue();
+	m_allowCustomValues = _other.m_allowCustomValues;
+	m_min = _other.m_min;
+	m_max = _other.m_max;
+	m_suffix = _other.m_suffix;
+}
+
+EntityPropertiesInteger& EntityPropertiesInteger::operator=(const EntityPropertiesInteger& _other)
+{
+	if (&_other != this)
+	{
+		EntityPropertiesBase::operator=(_other);
+		m_value = _other.getValue();
+		m_allowCustomValues = _other.m_allowCustomValues;
+		m_min = _other.m_min;
+		m_max = _other.m_max;
+		m_suffix = _other.m_suffix;
+	}
+	return *this;
+}
+
+void EntityPropertiesInteger::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyInt* newProp = new ot::PropertyInt(this->getName(), m_value);
+	newProp->setPropertyFlag((m_allowCustomValues ? ot::Property::AllowCustomValues : ot::Property::NoFlags));
+	newProp->setRange(m_min, m_max);
+	newProp->setSuffix(m_suffix);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesInteger::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyInt* actualProperty = dynamic_cast<const ot::PropertyInt*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	this->setValue(actualProperty->getValue());
+	this->setRange(actualProperty->getMin(), actualProperty->getMax());
+	this->setSuffix(actualProperty->getSuffix());
+	this->setAllowCustomValues(actualProperty->getPropertyFlags() & ot::PropertyBase::AllowCustomValues);
+}
+
+void EntityPropertiesInteger::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	_jsonObject.AddMember("Value", ot::JsonNumber(m_value), _allocator);
+	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
+	_jsonObject.AddMember("MinValue", ot::JsonNumber(m_min), _allocator);
+	_jsonObject.AddMember("MaxValue", ot::JsonNumber(m_max), _allocator);
+	_jsonObject.AddMember("Suffix", ot::JsonString(m_suffix, _allocator), _allocator);
+}
+
+void EntityPropertiesInteger::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	this->setValue((long)ot::json::getInt64(_object, "Value"));
+	if (_object.HasMember("MinValue"))
+	{
+		this->setMin((long)ot::json::getInt64(_object, "MinValue", std::numeric_limits<long>::lowest()));
+	}
+	if (_object.HasMember("MaxValue"))
+	{
+		this->setMax((long)ot::json::getInt64(_object, "MaxValue", std::numeric_limits<long>::max()));
+	}
+	if (_object.HasMember("AllowCustom"))
+	{
+		this->setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
+	}
+	if (_object.HasMember("Suffix"))
+	{
+		this->setSuffix(ot::json::getString(_object, "Suffix"));
+	}
+}
+
+void EntityPropertiesInteger::setValue(long _value)
+{
+	if (m_value != _value)
+	{
+		this->setNeedsUpdate();
+		m_value = _value;
+	}
+}
+
+void EntityPropertiesInteger::setRange(long _min, long _max)
+{
+	if (m_min != _min)
+	{
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+	if (m_max != _max)
+	{
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesInteger::setMin(long _min)
+{
+	if (m_min != _min)
+	{
+		this->setNeedsUpdate();
+		m_min = _min;
+	}
+}
+
+void EntityPropertiesInteger::setMax(long _max)
+{
+	if (m_max != _max)
+	{
+		this->setNeedsUpdate();
+		m_max = _max;
+	}
+}
+
+void EntityPropertiesInteger::setAllowCustomValues(bool _allowCustomValues)
+{
+	if (m_allowCustomValues != _allowCustomValues)
+	{
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
+	}
+}
+
+void EntityPropertiesInteger::setSuffix(const std::string& _suffix)
+{
+	if (m_suffix != _suffix)
+	{
+		this->setNeedsUpdate();
+		m_suffix = _suffix;
+	}
+}
+
+bool EntityPropertiesInteger::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesInteger* entity = dynamic_cast<EntityPropertiesInteger*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+void EntityPropertiesInteger::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesInteger* entity = dynamic_cast<EntityPropertiesInteger*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		this->setValue(entity->getValue());
+		this->setRange(entity->getMin(), entity->getMax());
+		this->setAllowCustomValues(entity->getAllowCustomValues());
+		this->setSuffix(entity->getSuffix());
+	}
+}
+
+EntityPropertiesInteger* EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, const std::string& _defaultCategory, EntityProperties& _properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(_defaultCategory, _name, _defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesInteger* newProperty = new EntityPropertiesInteger(_name, value);
+	_properties.createProperty(newProperty, _group);
+	return newProperty;
+}
+
+EntityPropertiesInteger* EntityPropertiesInteger::createProperty(const std::string& _group, const std::string& _name, long _defaultValue, long _minValue, long _maxValue, const std::string& _defaultCategory, EntityProperties& _properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(_defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	long value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultLong(_defaultCategory, _name, _defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesInteger* newProperty = new EntityPropertiesInteger(_name, value);
+	newProperty->setMin(_minValue);
+	newProperty->setMax(_maxValue);
+	_properties.createProperty(newProperty, _group);
+	return newProperty;
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesBoolean* EntityPropertiesBoolean::createProperty(const std::string& group, const std::string& name, bool defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	bool value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name, defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesBoolean* newProperty = new EntityPropertiesBoolean(name, value);
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+void EntityPropertiesBoolean::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyBool* newProp = new ot::PropertyBool(this->getName(), m_value);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesBoolean::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyBool* actualProperty = dynamic_cast<const ot::PropertyBool*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	setValue(actualProperty->getValue());
+}
+
+void EntityPropertiesBoolean::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+	_jsonObject.AddMember("Value", m_value, _allocator);
+}
+
+void EntityPropertiesBoolean::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	this->setValue(ot::json::getBool(_object, "Value"));
+}
+
+void EntityPropertiesBoolean::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesBoolean* entity = dynamic_cast<EntityPropertiesBoolean*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		setValue(entity->getValue());
+	}
+}
+
+bool EntityPropertiesBoolean::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesBoolean* entity = dynamic_cast<EntityPropertiesBoolean*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesString* EntityPropertiesString::createProperty(const std::string& group, const std::string& name, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesString* newProperty = new EntityPropertiesString(name, value);
+	newProperty->setIsMultiline(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name + "_Multiline", false));
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+void EntityPropertiesString::setValue(const std::string& _value)
+{
+	if (m_value != _value)
+	{
+		setNeedsUpdate(); 
+		m_value = _value; 
+	} 
+}
+
+EntityPropertiesString::EntityPropertiesString()
+	: m_isMultiline(false)
+{
+}
+
+EntityPropertiesString::EntityPropertiesString(const std::string& n, const std::string& v)
+	: m_value(v), m_isMultiline(false)
+{
+	this->setName(n);
+}
+
+EntityPropertiesString::EntityPropertiesString(const EntityPropertiesString& other)
+	: EntityPropertiesBase(other)
+{
+	m_value = other.m_value;
+	m_isMultiline = other.m_isMultiline;
+}
+
+void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyString* newProp = new ot::PropertyString(this->getName(), m_value);
+	this->setupPropertyData(_configuration, newProp);
+	newProp->setMultiline(m_isMultiline);
+}
+
+void EntityPropertiesString::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyString* actualProperty = dynamic_cast<const ot::PropertyString*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	setValue(actualProperty->getValue());
+	setIsMultiline(actualProperty->isMultiline());
+}
+
+void EntityPropertiesString::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
+	_jsonObject.AddMember("IsMultiline", m_isMultiline, _allocator);
+}
+
+void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	this->setValue(ot::json::getString(_object, "Value"));
+	if (_object.HasMember("IsMultiline"))
+	{
+		this->setIsMultiline(ot::json::getBool(_object, "IsMultiline", false));
+	}
+}
+
+void EntityPropertiesString::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesString* entity = dynamic_cast<EntityPropertiesString*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		setValue(entity->getValue());
+		setIsMultiline(entity->getIsMultiline());
+	}
+}
+
+bool EntityPropertiesString::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesString* entity = dynamic_cast<EntityPropertiesString*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, const std::list<std::string>& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	std::list<std::string> optionsCopy = options;
+	return EntityPropertiesSelection::createProperty(group, name, std::move(optionsCopy), defaultValue, defaultCategory, properties);
+}
+
+EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::string& group, const std::string& name, std::list<std::string>&& options, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue);
+
+	// Finally create the new property
+	EntityPropertiesSelection* prop = new EntityPropertiesSelection;
+	prop->setName(name);
+
+	for (auto& item : options)
+	{
+		prop->addOption(item);
+	}
+
+	prop->setValue(value);
+
+	properties.createProperty(prop, group);
+
+	return prop;
+}
+
+EntityPropertiesSelection::EntityPropertiesSelection() : m_allowCustomValues(false)
+{
+}
+
+EntityPropertiesSelection::EntityPropertiesSelection(const EntityPropertiesSelection& _other)
+	: EntityPropertiesBase(_other), m_value(_other.m_value), m_options(_other.m_options), m_allowCustomValues(_other.m_allowCustomValues)
+{
+}
+
+void EntityPropertiesSelection::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), m_value, m_options);
+	newProp->setPropertyFlag(ot::Property::AllowCustomValues, m_allowCustomValues);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	if (m_value != actualProperty->getCurrent()) setNeedsUpdate();
+	m_value = actualProperty->getCurrent();
+
+	m_options.clear();
+	for (const std::string& s : actualProperty->getList())
+	{
+		m_options.push_back(s);
+	}
+}
+
+void EntityPropertiesSelection::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
+	_jsonObject.AddMember("Options", ot::JsonArray(m_options, _allocator), _allocator);
+	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
+}
+
+void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	resetOptions(ot::json::getStringList(_object, "Options"));
+	if (_object.HasMember("AllowCustom"))
+	{
+		setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
+	}
+	setValue(ot::json::getString(_object, "Value"));
+
+}
+
+void EntityPropertiesSelection::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesSelection* entity = dynamic_cast<EntityPropertiesSelection*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		assert(checkCompatibilityOfSettings(*entity));
+		setValue(entity->getValue());
+	}
+}
+
+void EntityPropertiesSelection::resetOptions(const std::list<std::string>& _options)
+{
+	resetOptionsImpl(_options);
+}
+
+void EntityPropertiesSelection::resetOptions(const std::vector<std::string>& _options)
+{
+	resetOptionsImpl(_options);
+}
+
+bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesSelection* entity = dynamic_cast<EntityPropertiesSelection*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue() == entity->getValue());
+}
+
+bool EntityPropertiesSelection::setValue(const std::string& s)
+{
+	if (!m_allowCustomValues && std::find(m_options.begin(), m_options.end(), s) == m_options.end())
+	{
+		return false; // This value is not a valid option
+	}
+
+	if (m_value != s)
+	{
+		setNeedsUpdate();
+	}
+
+	m_value = s;
+	return true;
+}
+
+void EntityPropertiesSelection::setAllowCustomValues(bool _allowCustomValues)
+{
+	if (m_allowCustomValues != _allowCustomValues)
+	{
+		this->setNeedsUpdate();
+		m_allowCustomValues = _allowCustomValues;
+	}
+}
+
+bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other) const
+{
+	if (m_options.size() != other.m_options.size()) return false;
+
+	for (int i = 0; i < m_options.size(); i++)
+	{
+		if (m_options[i] != other.m_options[i]) return false;
+	}
+
+	return true;
+}
+
+bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other) const
+{
+	EntityPropertiesSelection* otherItem = dynamic_cast<EntityPropertiesSelection*>(other);
+	if (otherItem == nullptr) return false;
+
+	return checkCompatibilityOfSettings(*otherItem);
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesColor* EntityPropertiesColor::createProperty(const std::string& group, const std::string& name, std::vector<int> defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	assert(defaultValue.size() == 3);
+
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	int valueR = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor(defaultCategory, name, 0, defaultValue[0]);
+	int valueG = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor(defaultCategory, name, 1, defaultValue[1]);
+	int valueB = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor(defaultCategory, name, 2, defaultValue[2]);
+
+	// Finally create the new property
+	EntityPropertiesColor* newProperty = new EntityPropertiesColor(name, valueR / 255.0, valueG / 255.0, valueB / 255.0);
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+void EntityPropertiesColor::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::Color col((int)(getColorR() * 255.), (int)(getColorG() * 255.), (int)(getColorB() * 255.));
+	ot::PropertyColor* newProp = new ot::PropertyColor(this->getName(), col);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesColor::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyColor* actualProperty = dynamic_cast<const ot::PropertyColor*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+	ot::ColorF c(actualProperty->getValue().toColorF());
+	setColorR(c.r());
+	setColorG(c.g());
+	setColorB(c.b());
+}
+
+void EntityPropertiesColor::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	_jsonObject.AddMember("ValueR", ot::JsonNumber(getColorR()), _allocator);
+	_jsonObject.AddMember("ValueG", ot::JsonNumber(getColorG()), _allocator);
+	_jsonObject.AddMember("ValueB", ot::JsonNumber(getColorB()), _allocator);
+}
+
+void EntityPropertiesColor::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	const rapidjson::Value& valR = _object["ValueR"];
+	const rapidjson::Value& valG = _object["ValueG"];
+	const rapidjson::Value& valB = _object["ValueB"];
+
+	setColorR(valR.GetDouble());
+	setColorG(valG.GetDouble());
+	setColorB(valB.GetDouble());
+}
+
+EntityPropertiesColor& EntityPropertiesColor::operator=(const EntityPropertiesColor& other)
+{
+	if (&other != this)
+	{
+		EntityPropertiesBase::operator=(other);
+
+		setColorR(other.getColorR());
+		setColorG(other.getColorG());
+		setColorB(other.getColorB());
+	}
+
+	return *this;
+}
+
+void EntityPropertiesColor::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesColor* entity = dynamic_cast<EntityPropertiesColor*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		setColorRGB(entity->getColorR(), entity->getColorG(), entity->getColorB());
+	}
+}
+
+bool EntityPropertiesColor::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesColor* entity = dynamic_cast<EntityPropertiesColor*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getColorR() == entity->getColorR() && getColorG() == entity->getColorG() && getColorB() == entity->getColorB());
+}
+
+// ################################################################################################################################################################
+
+bool EntityPropertiesEntityList::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesEntityList* entity = dynamic_cast<EntityPropertiesEntityList*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getEntityContainerName() == entity->getEntityContainerName()
+		&& getEntityContainerID() == entity->getEntityContainerID()
+		&& getValueName() == entity->getValueName()
+		&& getValueID() == entity->getValueID()
+		&& getFilter() == entity->getFilter()
+		&& getIncludeRoot() == entity->getIncludeRoot()
+		&& getRecursive() == entity->getRecursive());
+}
+
+void EntityPropertiesEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	std::list<std::string> opt;
+
+	if (root != nullptr)
+	{
+		this->updateValueAndContainer(root, opt);
+	}
+
+	if (!root)
+	{
+		opt.clear();
+	}
+
+	ot::JsonDocument dataDoc;
+	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
+	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
+	dataDoc.AddMember("Filter", ot::JsonString(this->getFilter(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("IncludeRoot", this->getIncludeRoot(), dataDoc.GetAllocator());
+	dataDoc.AddMember("Recursive", this->getRecursive(), dataDoc.GetAllocator());
+
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
+	newProp->setSpecialType("EntityList");
+	newProp->addAdditionalPropertyData("EntityData", dataDoc.toJson());
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesEntityList::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	std::string entityData = actualProperty->getAdditionalPropertyData("EntityData");
+	if (entityData.empty())
+	{
+		OT_LOG_E("Data missing");
+		return;
+	}
+
+	ot::JsonDocument dataDoc;
+	dataDoc.fromJson(entityData);
+
+	//this->setValueName(ot::json::getString(dataDoc, "ValueName"));
+	this->setValueName(actualProperty->getCurrent());
+	this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
+	this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
+	this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+
+	if (dataDoc.HasMember("Filter")) this->setFilter(ot::json::getString(dataDoc, "Filter"));
+	if (dataDoc.HasMember("IncludeRoot"))this->setIncludeRoot(ot::json::getBool(dataDoc, "IncludeRoot"));
+	if (dataDoc.HasMember("Recursive")) this->setRecursive(ot::json::getBool(dataDoc, "Recursive"));
+
+	if (_root)
+	{
+		std::list<std::string> opt;
+		this->updateValueAndContainer(_root, opt);
+	}
+
+}
+
+void EntityPropertiesEntityList::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	std::list<std::string> opt;
+
+	if (_root)
+	{
+		this->updateValueAndContainer(_root, opt);
+	}
+
+	_jsonObject.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), _allocator), _allocator);
+	_jsonObject.AddMember("ContainerID", static_cast<int64_t>(this->getEntityContainerID()), _allocator);
+	_jsonObject.AddMember("ValueName", ot::JsonString(this->getValueName(), _allocator), _allocator);
+	_jsonObject.AddMember("ValueID", static_cast<int64_t>(this->getValueID()), _allocator);
+	_jsonObject.AddMember("Filter", ot::JsonString(this->getFilter(), _allocator), _allocator);
+	_jsonObject.AddMember("IncludeRoot", this->getIncludeRoot(), _allocator);
+	_jsonObject.AddMember("Recursive", this->getRecursive(), _allocator);
+
+	if (_root)
+	{
+		_jsonObject.AddMember("Options", ot::JsonArray(opt, _allocator), _allocator);
+	}
+}
+
+void EntityPropertiesEntityList::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+
+	const rapidjson::Value& containerName = _object["ContainerName"];
+	const rapidjson::Value& containerID = _object["ContainerID"];
+	const rapidjson::Value& valName = _object["ValueName"];
+	const rapidjson::Value& valID = _object["ValueID"];
+
+	this->setEntityContainerName(containerName.GetString());
+	this->setEntityContainerID(containerID.GetInt64());
+	this->setValueName(valName.GetString());
+	this->setValueID(valID.GetInt64());
+	this->setFilter("");
+	this->setIncludeRoot(false);
+	this->setRecursive(false);
+
+	if (_object.HasMember("Filter")) this->setFilter(_object["Filter"].GetString());
+	if (_object.HasMember("IncludeRoot")) this->setIncludeRoot(_object["IncludeRoot"].GetBool());
+	if (_object.HasMember("Recursive")) this->setRecursive(_object["Recursive"].GetBool());
+
+	if (_root)
+	{
+		std::list<std::string> opt;
+		this->updateValueAndContainer(_root, opt);
+	}
+}
+
+EntityPropertiesEntityList& EntityPropertiesEntityList::operator=(const EntityPropertiesEntityList& other)
+{
+	if (&other != this)
+	{
+		EntityPropertiesBase::operator=(other);
+
+		setEntityContainerName(other.getEntityContainerName());
+		setEntityContainerID(other.getEntityContainerID());
+		setValueName(other.getValueName());
+		setValueID(other.getValueID());
+		setFilter(other.getFilter());
+		setIncludeRoot(other.getIncludeRoot());
+		setRecursive(other.getRecursive());
+	}
+
+	return *this;
+}
+
+void EntityPropertiesEntityList::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	// Here we can either copy the entire settings from another EntityPropertiesEntityList
+	// or alternatively from a EntityPropertiesSelection. The latter is required when we read
+	// the property change from a UI
+
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesEntityList* entity = dynamic_cast<EntityPropertiesEntityList*>(other);
+	if (entity != nullptr)
+	{
+		setEntityContainerName(entity->getEntityContainerName());
+		setEntityContainerID(entity->getEntityContainerID());
+		setValueName(entity->getValueName());
+		setValueID(entity->getValueID());
+		setFilter(entity->getFilter());
+		setIncludeRoot(entity->getIncludeRoot());
+		setRecursive(entity->getRecursive());
+
+		return;
+	}
+
+	EntityPropertiesSelection* selection = dynamic_cast<EntityPropertiesSelection*>(other);
+	assert(selection != nullptr);
+	assert(root != nullptr);
+
+	if (selection != nullptr)
+	{
+		// We keep our current settings for the entity container
+		m_valueName = selection->getValue();
+
+		// Now we need to search for the entity ID for the selected name
+		EntityBase* entity = findEntityFromName(root, m_valueName);
+		assert(entity != nullptr);
+
+		if (entity != nullptr)
+		{
+			setValueID(entity->getEntityID());
+		}
+
+		// Now we update the container ID
+		EntityContainer* container = findContainerFromID(root, getEntityContainerID());
+		if (container != nullptr)
+		{
+			// The entity id still exists, so update the name if necessary
+			setEntityContainerName(container->getName());
+		}
+		else
+		{
+			// The container id does not exist, try to find the container by its name
+			container = findContainerFromName(root, getEntityContainerName());
+
+			if (container != nullptr)
+			{
+				setEntityContainerID(container->getEntityID());
+			}
+		}
+	}
+}
+
+EntityPropertiesEntityList* EntityPropertiesEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
+
+	// Finally create the new property
+	EntityPropertiesEntityList* newProperty = new EntityPropertiesEntityList(name, contName, contID, value, valID);
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+void EntityPropertiesEntityList::updateValueAndContainer(EntityBase* _root, std::list<std::string>& _containerOptions)
+{
+	OTAssertNullptr(_root);
+
+	EntityContainer* container = this->findContainerFromID(_root, getEntityContainerID());
+	if (container)
+	{
+		this->setEntityContainerName(container->getName());
+	}
+	else
+	{
+		container = this->findContainerFromName(_root, getEntityContainerName());
+		if (container)
+		{
+			this->setEntityContainerID(container->getEntityID());
+		}
+	}
+
+	if (container)
+	{
+		if (getIncludeRoot())
+		{
+			_containerOptions.push_back(container->getName());
+		}
+
+		for (auto child : container->getChildrenList())
+		{
+			appendItemToList(child, getFilter(), getRecursive(), _containerOptions);
+		}
+	}
+	else
+	{
+		//OT_LOG_E("Container not found"); For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+		//							        No error message should be shown in this case.
+	}
+
+	EntityBase* entity = this->findEntityFromID(_root, this->getValueID());
+
+	if (entity != nullptr)
+	{
+		this->setValueName(entity->getName());
+	}
+	else
+	{
+		entity = this->findEntityFromName(_root, this->getValueName());
+		if (entity != nullptr)
+		{
+			this->setValueID(entity->getEntityID());
+		}
+		else
+		{
+			//OT_LOG_E("Value not found");  For copied items, e.g. mesh data items, this information is now available, so the current information in the entity should be used.
+			//							     No error message should be shown in this case.
+		}
+	}
+}
+
+void EntityPropertiesEntityList::appendItemToList(EntityBase* item, const std::string& filter, bool recursive, std::list<std::string>& _containerOptions)
+{
+	if (filter.empty())
+	{
+		_containerOptions.push_back(item->getName());
+	}
+	else
+	{
+		if (item->getClassName() == getFilter())
+		{
+			_containerOptions.push_back(item->getName());
+		}
+	}
+
+	// Process the children, if recursive search
+	if (recursive)
+	{
+		EntityContainer* container = dynamic_cast<EntityContainer*>(item);
+		if (container != nullptr)
+		{
+			for (auto child : container->getChildrenList())
+			{
+				appendItemToList(child, filter, recursive, _containerOptions);
+			}
+		}
+	}
+}
+
+EntityContainer* EntityPropertiesEntityList::findContainerFromID(EntityBase* root, ot::UID entityID)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		if (container->getEntityID() == entityID) return container;
+
+		for (auto child : container->getChildrenList())
+		{
+			EntityContainer* containerChild = findContainerFromID(child, entityID);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
+EntityContainer* EntityPropertiesEntityList::findContainerFromName(EntityBase* root, const std::string& entityName)
+{
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		if (container->getName() == entityName) return container;
+
+		for (auto child : container->getChildrenList())
+		{
+			EntityContainer* containerChild = findContainerFromName(child, entityName);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
+EntityBase* EntityPropertiesEntityList::findEntityFromName(EntityBase* root, const std::string& entityName)
+{
+	if (root->getName() == entityName) return root;
+
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		for (auto child : container->getChildrenList())
+		{
+			EntityBase* containerChild = findEntityFromName(child, entityName);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
+EntityBase* EntityPropertiesEntityList::findEntityFromID(EntityBase* root, ot::UID entityID)
+{
+	if (root->getEntityID() == entityID) return root;
+
+	EntityContainer* container = dynamic_cast<EntityContainer*>(root);
+
+	if (container != nullptr)
+	{
+		for (auto child : container->getChildrenList())
+		{
+			EntityBase* containerChild = findEntityFromID(child, entityID);
+			if (containerChild != nullptr) return containerChild;
+		}
+	}
+
+	return nullptr;
+}
+
+// ################################################################################################################################################################
+
+void EntityPropertiesProjectList::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+	EntityPropertiesProjectList* otherProject = dynamic_cast<EntityPropertiesProjectList*>(other);
+	m_value = otherProject->m_value;
+	setNeedsUpdate();
+}
+
+void EntityPropertiesProjectList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), m_value, std::list<std::string>());
+	newProp->setSpecialType("ProjectList");
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesProjectList::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+	if (m_value != actualProperty->getCurrent())
+	{
+		setNeedsUpdate();
+	}
+	m_value = actualProperty->getCurrent();
+}
+
+void EntityPropertiesProjectList::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
+}
+
+void EntityPropertiesProjectList::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+	m_value = ot::json::getString(_object, "Value");
+}
+
+EntityPropertiesProjectList* EntityPropertiesProjectList::createProperty(const std::string& group, const std::string& name, const std::string& defaultValue, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Finally create the new property
+	EntityPropertiesProjectList* newProperty = new EntityPropertiesProjectList(name);
+	newProperty->setValue(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, defaultValue));
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesGuiPainter::EntityPropertiesGuiPainter()
+{
+	m_painter = new ot::FillPainter2D;
+}
+
+EntityPropertiesGuiPainter::~EntityPropertiesGuiPainter()
+{
+	delete m_painter;
+	m_painter = nullptr;
+}
+
+EntityPropertiesGuiPainter::EntityPropertiesGuiPainter(const EntityPropertiesGuiPainter& other)
+	: EntityPropertiesBase(other), m_painter(nullptr)
+{
+	m_painter = other.getValue()->createCopy();
+	m_filter = other.m_filter;
+}
+
+EntityPropertiesGuiPainter& EntityPropertiesGuiPainter::operator=(const EntityPropertiesGuiPainter& other)
+{
+	if (&other != this)
+	{
+		EntityPropertiesBase::operator=(other);
+		setValue(other.getValue()->createCopy());
+		m_filter = other.m_filter;
+	}
+
+	return *this;
+}
+
+void EntityPropertiesGuiPainter::setValue(const ot::Painter2D* _painter)
+{
+	if (m_painter == _painter)
+	{
+		return;
+	}
+	OTAssertNullptr(_painter);
+	OTAssertNullptr(m_painter);
+	if (m_painter->isEqualTo(_painter))
+	{
+		return;
+	}
+
+	delete m_painter;
+	m_painter = _painter->createCopy();
+	this->setNeedsUpdate();
+}
+
+EntityPropertiesGuiPainter* EntityPropertiesGuiPainter::createProperty(const std::string& group, const std::string& name, ot::Painter2D* _defaultPainter, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	const ot::Painter2D* newPainter = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultGuiPainter(defaultCategory, name);
+
+	if (newPainter)
+	{
+		if (_defaultPainter) delete _defaultPainter;
+		_defaultPainter = newPainter->createCopy();
+	}
+
+	// Finally create the new property
+	EntityPropertiesGuiPainter* newProperty = new EntityPropertiesGuiPainter(name, _defaultPainter);
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}
+
+void EntityPropertiesGuiPainter::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	OTAssertNullptr(m_painter);
+	ot::PropertyPainter2D* newProp = new ot::PropertyPainter2D(this->getName(), m_painter->createCopy());
+	newProp->setFilter(m_filter);
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesGuiPainter::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
+{
+	EntityPropertiesBase::setFromConfiguration(_property, _root);
+	const ot::PropertyPainter2D* actualProperty = dynamic_cast<const ot::PropertyPainter2D*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	m_filter = actualProperty->getFilter();
+	this->setValue(actualProperty->getPainter()->createCopy());
+}
+
+void EntityPropertiesGuiPainter::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
+
+	_jsonObject.AddMember("Value", ot::JsonObject(m_painter, _allocator), _allocator);
+	_jsonObject.AddMember("Filter", ot::JsonObject(m_filter, _allocator), _allocator);
+}
+
+void EntityPropertiesGuiPainter::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
+{
+	EntityPropertiesBase::readFromJsonObject(_object, _root);
+
+	ot::Painter2D* newPainter = ot::Painter2DFactory::create(ot::json::getObject(_object, "Value"));
+	if (!newPainter)
+	{
+		return;
+	}
+
+	if (_object.HasMember("Filter"))
+	{
+		m_filter.setFromJsonObject(ot::json::getObject(_object, "Filter"));
+	}
+
+	setValue(newPainter);
+}
+
+void EntityPropertiesGuiPainter::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesBase::copySettings(other, root);
+
+	EntityPropertiesGuiPainter* entity = dynamic_cast<EntityPropertiesGuiPainter*>(other);
+	assert(entity != nullptr);
+
+	if (entity != nullptr)
+	{
+		setValue(entity->getValue()->createCopy());
+		m_filter = entity->m_filter;
+	}
+}
+
+bool EntityPropertiesGuiPainter::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesGuiPainter* entity = dynamic_cast<EntityPropertiesGuiPainter*>(other);
+
+	if (entity == nullptr) return false;
+
+	return (getValue()->isEqualTo(entity->getValue()));
+}
+
+// ################################################################################################################################################################
+
+EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList() : EntityPropertiesEntityList() {}
+
+EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::vector<std::string>& prefixOptions, const std::vector<std::string>& suffixOptions)
+	: EntityPropertiesEntityList(n, contName, contID, valName, valID), m_prefixOptions(prefixOptions), m_suffixOptions(suffixOptions)
+{
+}
+
+EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList(const EntityPropertiesExtendedEntityList& _other)
+	: EntityPropertiesEntityList(_other)
+{
+	m_prefixOptions = _other.m_prefixOptions;
+	m_suffixOptions = _other.m_suffixOptions;
+}
+
+EntityPropertiesExtendedEntityList& EntityPropertiesExtendedEntityList::operator=(const EntityPropertiesExtendedEntityList& _other)
+{
+	if (&_other != this)
+	{
+		EntityPropertiesEntityList::operator=(_other);
+		m_prefixOptions = _other.m_prefixOptions;
+		m_suffixOptions = _other.m_suffixOptions;
+	}
+	return *this;
+}
+
+void EntityPropertiesExtendedEntityList::clearPrefixOptions()
+{
+	m_prefixOptions.clear();
+}
+
+void EntityPropertiesExtendedEntityList::addPrefixOption(const std::string& option)
+{
+	if (std::find(m_prefixOptions.begin(), m_prefixOptions.end(), option) == m_prefixOptions.end())
+	{
+		m_prefixOptions.push_back(option);
+	}
+}
+
+void EntityPropertiesExtendedEntityList::setPrefixOptions(const std::vector<std::string>& options)
+{
+	m_prefixOptions = options;
+}
+
+const std::vector<std::string>& EntityPropertiesExtendedEntityList::getPrefixOptions() const
+{
+	return m_prefixOptions;
+}
+
+void EntityPropertiesExtendedEntityList::clearSuffixOptions()
+{
+	m_suffixOptions.clear();
+}
+
+void EntityPropertiesExtendedEntityList::addSuffixOption(const std::string& option)
+{
+	if (std::find(m_suffixOptions.begin(), m_suffixOptions.end(), option) == m_suffixOptions.end())
+	{
+		m_suffixOptions.push_back(option);
+	}
+}
+
+void EntityPropertiesExtendedEntityList::setSuffixOptions(const std::vector<std::string>& options)
+{
+	m_suffixOptions = options;
+}
+
+const std::vector<std::string>& EntityPropertiesExtendedEntityList::getSuffixOptions() const
+{
+	return m_suffixOptions;
+}
+
+bool EntityPropertiesExtendedEntityList::isCompatible(EntityPropertiesBase* other) const
+{
+
+	if (!EntityPropertiesEntityList::isCompatible(other)) return false;
+
+	EntityPropertiesExtendedEntityList* otherList = dynamic_cast<EntityPropertiesExtendedEntityList*>(other);
+	if (otherList == nullptr)
+	{
+		return true;
+	}
+
+	if (m_prefixOptions.size() != otherList->m_prefixOptions.size()) return false;
+	for (size_t i = 0; i < m_prefixOptions.size(); i++)
+	{
+		if (m_prefixOptions[i] != otherList->m_prefixOptions[i]) return false;
+	}
+
+	if (m_suffixOptions.size() != otherList->m_suffixOptions.size()) return false;
+	for (size_t i = 0; i < m_suffixOptions.size(); i++)
+	{
+		if (m_suffixOptions[i] != otherList->m_suffixOptions[i]) return false;
+	}
+
+	return true;
+}
+
+void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property* _property, EntityBase* root)
+{
+
+	// 1. Load prefix/suffix options from JSON
+	// 2. Load entity data (Container/Value Name and ID)
+	// 3. Set the new ValueName from UI input
+	// 4. Check if the new value is a prefix/suffix option
+	//    - If YES: Set ValueID to invalidUID (no entity exists)
+	//    - If NO: Call updateValueAndContainer() to sync name/ID
+
+
+	std::string oldValueName = getValueName();
+
+	EntityPropertiesBase::setFromConfiguration(_property, root);
+
+	const ot::PropertyStringList* actualProperty = dynamic_cast<const ot::PropertyStringList*>(_property);
+	if (!actualProperty)
+	{
+		OT_LOG_E("Property cast failed");
+		return;
+	}
+
+	//Prefix options
+	std::string extendedData = actualProperty->getAdditionalPropertyData("ExtendedOptions");
+	if (!extendedData.empty())
+	{
+		ot::JsonDocument dataDoc;
+		dataDoc.fromJson(extendedData);
+		// Read prefix options
+		if (dataDoc.HasMember("PrefixOptions") && dataDoc["PrefixOptions"].IsArray())
+		{
+			m_prefixOptions.clear();
+			const auto& prefixArray = dataDoc["PrefixOptions"].GetArray();
+			for (const auto& opt : prefixArray)
+			{
+				if (opt.IsString())
+				{
+					m_prefixOptions.push_back(opt.GetString());
+				}
+			}
+		}
+		// Read suffix options
+		if (dataDoc.HasMember("SuffixOptions") && dataDoc["SuffixOptions"].IsArray())
+		{
+			m_suffixOptions.clear();
+			const auto& suffixArray = dataDoc["SuffixOptions"].GetArray();
+			for (const auto& opt : suffixArray)
+			{
+				if (opt.IsString())
+				{
+					m_suffixOptions.push_back(opt.GetString());
+				}
+			}
+		}
+	}
+
+	std::string entityData = actualProperty->getAdditionalPropertyData("EntityData");
+	if (!entityData.empty())
+	{
+		ot::JsonDocument dataDoc;
+		dataDoc.fromJson(entityData);
+
+		this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
+		this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
+		this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+	}
+
+
+	this->setValueName(actualProperty->getCurrent());
+
+
+	bool isPrefixOrSuffix = false;
+	for (const auto& prefixOption : m_prefixOptions)
+	{
+		if (getValueName() == prefixOption)
+		{
+			isPrefixOrSuffix = true;
+			break;
+		}
+	}
+
+	for (const auto& suffixOption : m_suffixOptions)
+	{
+		if (getValueName() == suffixOption)
+		{
+			isPrefixOrSuffix = true;
+			break;
+		}
+	}
+
+	if (isPrefixOrSuffix)
+	{
+		this->setValueID(ot::invalidUID);
+	}
+
+	//Update valueID and containerID
+	if (root && !isPrefixOrSuffix)
+	{
+		std::list<std::string> opt;
+		this->updateValueAndContainer(root, opt);
+	}
+
+
+}
+
+void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
+{
+	// Creates a dropdown list with the following structure:
+	// 1. All prefix options
+	// 2. All direct children of the container entity
+	// 3. All suffix options 
+	// Note: Does NOT call updateValueAndContainer() to avoid overwriting the current ValueName if it's a prefix/suffix option.
+
+	std::list<std::string> opt;
+
+	for (const auto& prefixOption : m_prefixOptions)
+	{
+		opt.push_back(prefixOption);
+	}
+
+	if (root != nullptr)
+	{
+		EntityContainer* container = this->findContainerFromID(root, getEntityContainerID());
+		if (!container)
+		{
+			container = this->findContainerFromName(root, getEntityContainerName());
+		}
+
+		if (container)
+		{
+			for (auto child : container->getChildrenList())
+			{
+				opt.push_back(child->getName());
+			}
+		}
+	}
+
+	for (const auto& suffixOption : m_suffixOptions)
+	{
+		opt.push_back(suffixOption);
+	}
+
+	std::string currentValue = this->getValueName();
+
+	if (!root)
+	{
+		opt.clear();
+	}
+
+	ot::JsonDocument dataDoc;
+	dataDoc.AddMember("ContainerName", ot::JsonString(this->getEntityContainerName(), dataDoc.GetAllocator()), dataDoc.GetAllocator());
+	dataDoc.AddMember("ContainerID", this->getEntityContainerID(), dataDoc.GetAllocator());
+	dataDoc.AddMember("ValueID", this->getValueID(), dataDoc.GetAllocator());
+
+	ot::JsonDocument extendedDataDoc;
+	if (!m_prefixOptions.empty())
+	{
+		extendedDataDoc.AddMember("PrefixOptions", ot::JsonArray(m_prefixOptions, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+	}
+	if (!m_suffixOptions.empty())
+	{
+		extendedDataDoc.AddMember("SuffixOptions", ot::JsonArray(m_suffixOptions, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+	}
+
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
+	newProp->setSpecialType("ExtendedEntityList");
+	newProp->addAdditionalPropertyData("EntityData", dataDoc.toJson());
+
+	if (!extendedDataDoc.IsNull())
+	{
+		newProp->addAdditionalPropertyData("ExtendedOptions", extendedDataDoc.toJson());
+	}
+
+	this->setupPropertyData(_configuration, newProp);
+}
+
+void EntityPropertiesExtendedEntityList::readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root)
+{
+
+	EntityPropertiesEntityList::readFromJsonObject(object, root);
+
+	// Read prefix options
+	if (object.HasMember("PrefixOptions") && object["PrefixOptions"].IsArray())
+	{
+		m_prefixOptions.clear();
+		const auto& prefixArray = object["PrefixOptions"].GetArray();
+		for (const auto& opt : prefixArray)
+		{
+			if (opt.IsString())
+			{
+				m_prefixOptions.push_back(opt.GetString());
+			}
+		}
+	}
+
+	// Read suffix options
+	if (object.HasMember("SuffixOptions") && object["SuffixOptions"].IsArray())
+	{
+		m_suffixOptions.clear();
+		const auto& suffixArray = object["SuffixOptions"].GetArray();
+		for (const auto& opt : suffixArray)
+		{
+			if (opt.IsString())
+			{
+				m_suffixOptions.push_back(opt.GetString());
+			}
+		}
+	}
+}
+
+
+void EntityPropertiesExtendedEntityList::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
+{
+	EntityPropertiesEntityList::addToJsonObject(_jsonObject, _allocator, _root);
+	if (!m_prefixOptions.empty())
+	{
+		_jsonObject.AddMember("PrefixOptions", ot::JsonArray(m_prefixOptions, _allocator), _allocator);
+	}
+
+	if (!m_suffixOptions.empty())
+	{
+		_jsonObject.AddMember("SuffixOptions", ot::JsonArray(m_suffixOptions, _allocator), _allocator);
+	}
+}
+
+
+void EntityPropertiesExtendedEntityList::copySettings(EntityPropertiesBase* other, EntityBase* root)
+{
+	EntityPropertiesEntityList::copySettings(other, root);
+
+	EntityPropertiesExtendedEntityList* otherList = dynamic_cast<EntityPropertiesExtendedEntityList*>(other);
+	if (otherList != nullptr)
+	{
+		m_prefixOptions = otherList->m_prefixOptions;
+		m_suffixOptions = otherList->m_suffixOptions;
+	}
+}
+
+bool EntityPropertiesExtendedEntityList::hasSameValue(EntityPropertiesBase* other) const
+{
+	EntityPropertiesExtendedEntityList* entity = dynamic_cast<EntityPropertiesExtendedEntityList*>(other);
+
+	if (entity == nullptr) return false;
+
+	// Compare prefix options
+	if (m_prefixOptions.size() != entity->m_prefixOptions.size()) return false;
+	for (size_t i = 0; i < m_prefixOptions.size(); i++)
+	{
+		if (m_prefixOptions[i] != entity->m_prefixOptions[i]) return false;
+	}
+
+	// Compare suffix options
+	if (m_suffixOptions.size() != entity->m_suffixOptions.size()) return false;
+	for (size_t i = 0; i < m_suffixOptions.size(); i++)
+	{
+		if (m_suffixOptions[i] != entity->m_suffixOptions[i]) return false;
+	}
+	return EntityPropertiesEntityList::hasSameValue(other);
+
+}
+
+EntityPropertiesExtendedEntityList* EntityPropertiesExtendedEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID,
+	const std::string& valName, ot::UID valID, const std::vector<std::string>& prefixOptions,
+	const std::vector<std::string>& suffixOptions, const std::string& defaultCategory, EntityProperties& properties)
+{
+	// Load the template defaults if any
+	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
+
+	// Now load the default value if available. Otherwise take the provided default
+	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
+
+	// Finally create the new property
+	EntityPropertiesExtendedEntityList* newProperty = new EntityPropertiesExtendedEntityList(name, contName, contID, value, valID, prefixOptions, suffixOptions);
+	properties.createProperty(newProperty, group);
+	return newProperty;
+}

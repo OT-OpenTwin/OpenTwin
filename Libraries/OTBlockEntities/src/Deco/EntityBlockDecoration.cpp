@@ -19,8 +19,7 @@
 
 // OpenTwin header
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/PropertyHelper.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Deco/EntityBlockDecoration.h"
 
 EntityBlockDecoration::EntityBlockDecoration(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)

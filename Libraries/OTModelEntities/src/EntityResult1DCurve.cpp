@@ -26,7 +26,7 @@
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");

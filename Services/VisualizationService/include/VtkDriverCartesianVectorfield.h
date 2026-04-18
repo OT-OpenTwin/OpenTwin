@@ -22,9 +22,9 @@
 #include "VtkDriverWithScaling.h"
 #include "vtkRectilinearGrid.h"
 #include "OTModelEntities/EntityResultBase.h"
-#include "OTModelEntities/PropertyBundleDataHandlePlane.h"
-#include "OTModelEntities/PropertyBundleDataHandleScaling.h"
-#include "OTModelEntities/PropertyBundleDataHandleVis2D3D.h"
+#include "OTModelEntities/Properties/PropertyBundleDataHandlePlane.h"
+#include "OTModelEntities/Properties/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/Properties/PropertyBundleDataHandleVis2D3D.h"
 #include "DataSourceResult3D.h"
 
 #include <string>

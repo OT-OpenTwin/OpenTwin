@@ -42,7 +42,7 @@
 #include "OTModelEntities/EntityUnits.h"
 #include "OTModelEntities/EntityMeshTet.h"
 #include "OTModelEntities/EntityVis2D3D.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityMaterial.h"
 #include "OTModelEntities/EntityParameter.h"
 #include "OTModelEntities/EntityAnnotation.h"

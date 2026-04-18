@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/EntityDatabaseIndexManipulator.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityDatabaseIndexManipulator> registrar (EntityDatabaseIndexManipulator::className());
 
