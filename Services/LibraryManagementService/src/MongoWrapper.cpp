@@ -281,6 +281,92 @@ void MongoWrapper::updateGridFSContent(const std::string& _collectionName,
         return;
     }
 }
+void MongoWrapper::addNewDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, ot::LibraryElement& _element) {
+    // Initialization of MongoDB connection
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        OT_LOG_E("Failed to initialize database connection for adding new document");
+        return;
+    }
+
+    // Check if collection exists
+    if (!checkCollectionExists(_collectionName)) {
+        return;
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        // Build the document to insert
+        auto docBuilder = bsoncxx::builder::basic::document{};
+
+        // Add Name
+        docBuilder.append(bsoncxx::builder::basic::kvp("Name", _element.getName()));
+
+        // Add Version
+        docBuilder.append(bsoncxx::builder::basic::kvp("Version", static_cast<int64_t>(_element.getVersion())));
+
+        // Add LibraryElementID (generate if necessary)
+        int64_t elementId = _element.getLibraryElementID();
+        if (elementId == ot::invalidUID) {
+            // Generate unique ID if not set
+            // Find solution for this because that does not work properly
+			DataStorageAPI::UniqueUIDGenerator uidGenerator(0, 0);
+			elementId = uidGenerator.getUID();
+            //elementId = EntityBase::getUidGenerator()->getUID();
+           
+        }
+        docBuilder.append(bsoncxx::builder::basic::kvp("LibraryElementID", elementId));
+
+        // Add additionalInfos
+        auto additionalInfosBuilder = bsoncxx::builder::basic::document{};
+        const auto& additionalInfos = _element.getAdditionalInfos();
+        for (const auto& info : additionalInfos) {
+            additionalInfosBuilder.append(bsoncxx::builder::basic::kvp(info.first, info.second));
+        }
+        docBuilder.append(bsoncxx::builder::basic::kvp("additionalInfos", additionalInfosBuilder));
+
+        // Add metaData
+        auto metaDataBuilder = bsoncxx::builder::basic::document{};
+        const auto& metaData = _element.getMetaData();
+        for (const auto& meta : metaData) {
+            metaDataBuilder.append(bsoncxx::builder::basic::kvp(meta.first, meta.second));
+        }
+        docBuilder.append(bsoncxx::builder::basic::kvp("metaData", metaDataBuilder));
+
+        // Add originInformation
+        auto originInfoBuilder = bsoncxx::builder::basic::document{};
+        originInfoBuilder.append(bsoncxx::builder::basic::kvp("fileName", _element.getFileName()));
+        originInfoBuilder.append(bsoncxx::builder::basic::kvp("hash", _element.getHash()));
+        docBuilder.append(bsoncxx::builder::basic::kvp("originInformation", originInfoBuilder));
+
+        // Upload content to GridFS and get DataID
+        std::string elementContent = _element.getData();
+        if (!elementContent.empty()) {
+            DataStorageAPI::DocumentAPI api;
+            const uint8_t* dataBuffer = reinterpret_cast<const uint8_t*>(elementContent.c_str());
+            size_t dataSize = elementContent.size();
+
+            bsoncxx::types::value gridfsId = api.InsertBinaryDataUsingGridFs(dataBuffer, dataSize, _collectionName, dbName);
+            docBuilder.append(bsoncxx::builder::basic::kvp("DataID", gridfsId.get_oid().value));
+            OT_LOG_I("Uploaded content to GridFS with ID: " + gridfsId.get_oid().value.to_string());
+        }
+
+        // Insert the document into the collection
+        auto result = docBase.InsertDocument(docBuilder.view(), false);
+
+        if (!result.empty()) {
+            OT_LOG_I("Successfully added new document '" + _element.getName() + "' to collection '" + _collectionName + "'");
+        }
+        else {
+            OT_LOG_W("Document insertion returned empty result for '" + _element.getName() + "'");
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error adding new document: " + std::string(e.what()));
+        return;
+    }
+
+}
 // Private helper methods
 
 bool MongoWrapper::initializeConnection(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {

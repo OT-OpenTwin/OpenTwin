@@ -180,21 +180,18 @@ std::list<ot::LibraryElement> Application::addDataToLibraryElements(const std::l
 	return updatedElements;
 }
 
-ot::JsonDocument Application::createJsonDocumentFromLibraryElement(std::list<ot::LibraryElement> _elements) {
-    // Pack the list of LibraryElements into a json document to send it to LMS
-    ot::JsonDocument doc;
-    doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, doc.GetAllocator()), doc.GetAllocator());
+void Application::createJsonDocumentFromLibraryElement(std::list<ot::LibraryElement> _elements, ot::JsonDocument& _doc) {
 
     // Pack the list of LibraryElements
     ot::JsonArray elementsArray;
     for (const auto& element : _elements) {
         ot::JsonObject elementObj;
-        element.addToJsonObject(elementObj, doc.GetAllocator());
-        elementsArray.PushBack(elementObj, doc.GetAllocator());
+        element.addToJsonObject(elementObj, _doc.GetAllocator());
+        elementsArray.PushBack(elementObj, _doc.GetAllocator());
     }
-    doc.AddMember(OT_ACTION_PARAM_Config, elementsArray, doc.GetAllocator());
+    _doc.AddMember(OT_ACTION_PARAM_Config, elementsArray, _doc.GetAllocator());
 
-    return doc;
+    return;
 }
 
 std::list<ot::LibraryElement> Application::createLibraryElementsFromJsonDocument(const std::string& _lmsResponse) {
@@ -258,6 +255,11 @@ std::string Application::sendToLms(const ot::JsonDocument& _doc, std::string _lm
 	return lmsResponse;
 }
 
+std::string Application::sendAsyncToLms(const ot::JsonDocument& _doc, std::string _lmsUrl) {
+    ot::msg::sendAsync("", _lmsUrl, ot::MessageType::EXECUTE, _doc.toJson(), ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+    return"";
+}
+
 
 void Application::start(ot::StartArgumentParser _argumentParser) {
 
@@ -269,17 +271,30 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
     std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath);
     
 	// Pack the list of LibraryElements into a json document to send it to LMS
-	ot::JsonDocument doc = createJsonDocumentFromLibraryElement(localModels);
+	ot::JsonDocument doc;
+    doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, doc.GetAllocator()), doc.GetAllocator());
+	createJsonDocumentFromLibraryElement(localModels, doc);
+    localModels.clear();
 
     // Send to Lms
     std::string lmsResponse;
     lmsResponse = sendToLms(doc, _lmsUrl);
+
+	// Deserialize the LMS response and create a list of LibraryElements which need to be updated or initiall added
 	localModels = createLibraryElementsFromJsonDocument(lmsResponse);
     
+	// Add the content data to the LibraryElements based on the file names and folder path
 	localModels = addDataToLibraryElements(localModels, m_folderPath);
 
+    // Pack the list of LibraryElements into a json document to send it to LMS
+	ot::JsonDocument updateDoc;
+	updateDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_AddNewLibraryElement, updateDoc.GetAllocator()), updateDoc.GetAllocator());
+	createJsonDocumentFromLibraryElement(localModels, updateDoc);
 
-    
+    // Send to Lms
+	lmsResponse = sendToLms(updateDoc, _lmsUrl);
+
+    return;
 }
 
 

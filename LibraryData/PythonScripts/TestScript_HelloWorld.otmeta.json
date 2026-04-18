@@ -7,6 +7,12 @@
 "EntityType":"EntityPythonScript",
 "NewEntityFolder":"Python/Scripts",
 "PropertyName":"Scripts",
-"MetaData":{},
+"metaData": {
+    "Port": {
+      "type": "out",
+      "name": "Dummy",
+      "label": "Dummy"
+    }
+  },
 "AdditionalInfos":{"Environment":"69afd6cb77d8206ac70abda3","Language":"Python","Type":"Script"}
 }

@@ -140,6 +140,74 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	return result;
 }
 
+void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	
+	for(auto it = _elements.begin(); it != _elements.end();) {
+		// Get the collection name from the current element
+		std::string collectionName = it->getCollectionName();
+		std::string elementName = it->getName();
+
+		// Try to fetch the existing document from database
+		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+
+		if (!existingDocJson.empty()) {
+			// Element exists in database - compare hashes
+			ot::JsonDocument existingDoc;
+			existingDoc.fromJson(existingDocJson);
+
+			// Get hash from database document
+			std::string dbHash = ot::json::getString(existingDoc, "Hash");
+
+			// Get hash from current element
+			std::string currentHash = it->getHash();
+
+			// If hashes match, remove element from list (no update needed)
+			if (dbHash == currentHash) {
+				it = _elements.erase(it);
+				continue;
+			}
+		}
+		++it;
+	}
+}
+
+void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	// Process each received model
+	for (auto& model : _elements) {
+		std::string collectionName = model.getCollectionName();
+		std::string elementName = model.getName();
+
+		// Try to fetch existing document from database
+		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+
+		uint32_t newVersion = 1;
+
+		// If document exists, increment version
+		if (!existingDocJson.empty()) {
+			ot::JsonDocument existingDoc;
+			existingDoc.fromJson(existingDocJson);
+
+			// Get current version and increment
+			if (existingDoc.HasMember("Version") && existingDoc["Version"].IsUint()) {
+				newVersion = existingDoc["Version"].GetUint() + 1;
+			}
+		}
+
+		// Set the new version in the model
+		model.setVersion(newVersion);
+
+		// Migrate/update data to GridFS
+		if (!existingDocJson.empty()) {
+			// Update existing GridFS content
+			db->updateGridFSContent(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, model.toJson());
+		}
+		else {
+			// Migrate new entry data to GridFS
+			db->addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, model);
+		}
+	}
+}
+
  std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	
 	// First get model info from database
@@ -477,6 +545,9 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		receivedModels.push_back(element);
 	}
 
+	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
+	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026418-112536-41", "v36OqntCLD9SGAoTb0pjGaqcIcZ2TF", "127.0.0.1:27017");
+
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
 	// Add the models array to response
@@ -492,7 +563,33 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 }
 
 std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
-	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+	// Hole das Array der LibraryElements
+	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
+
+	// Deserialisiere jedes Element
+	std::list<ot::LibraryElement> receivedModels;
+	for (const ot::ConstJsonObject& elementObj : elementObjects) {
+		ot::LibraryElement element;
+		element.setFromJsonObject(elementObj);
+		receivedModels.push_back(element);
+	}
+
+	// Add or update library elements
+	addLibraryElement(receivedModels, "Sebastian-2026418-112536-41", "v36OqntCLD9SGAoTb0pjGaqcIcZ2TF", "127.0.0.1:27017");
+
+	// Create response document with updated models
+	ot::JsonDocument responseDoc;
+	ot::JsonArray modelsArray;
+
+	for (const ot::LibraryElement& model : receivedModels) {
+		ot::JsonObject modelObj;
+		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
+		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
+	}
+
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

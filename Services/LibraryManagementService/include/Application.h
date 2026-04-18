@@ -26,7 +26,7 @@
 #include "OTGui/Dialog/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Handler/ActionHandler.h"
-
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 // std header
 #include <list>
@@ -46,6 +46,9 @@ private:
 
 	std::string getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	void updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	void addLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 

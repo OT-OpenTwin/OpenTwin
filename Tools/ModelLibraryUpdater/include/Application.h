@@ -62,10 +62,11 @@ private:
 	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
 	std::list<ot::LibraryElement> addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath);
 
-	ot::JsonDocument createJsonDocumentFromLibraryElement(std::list<ot::LibraryElement> _element);
+    void createJsonDocumentFromLibraryElement(std::list<ot::LibraryElement> _element, ot::JsonDocument& _doc);
 	std::list<ot::LibraryElement> createLibraryElementsFromJsonDocument(const std::string& _lmsResponse);
 
 	std::string sendToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
+	std::string sendAsyncToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
 
 	const std::string m_collectionName = "";
 	std::string m_databasePWD;

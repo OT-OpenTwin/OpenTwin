@@ -38,19 +38,7 @@ bool ot::StartArgumentParser::parse() {
 
 	QCommandLineOption lmsUrlOption(QStringList() << "l" << "lmsurl", "URL of the LMS to connect to", "lmsurl");
 	parser.addOption(lmsUrlOption);
-
-
-	// Debug: Alle Argumente loggen
 	QStringList arguments = QCoreApplication::arguments();
-	OT_LOG_D("Total arguments: " + std::to_string(arguments.size()));
-	for (int i = 0; i < arguments.size(); ++i) {
-		OT_LOG_D("Arg[" + std::to_string(i) + "]: " + arguments[i].toStdString());
-	}
-
-	// Debug: Nach dem Parsing
-	OT_LOG_D("Collection option set: " + std::to_string(parser.isSet(collectionNameOption)));
-	OT_LOG_D("LMS URL option set: " + std::to_string(parser.isSet(lmsUrlOption)));
-
 	parser.process(QCoreApplication::arguments());
 
 	if (parser.isSet(collectionNameOption)) {
