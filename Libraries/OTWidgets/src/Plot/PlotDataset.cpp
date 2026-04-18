@@ -234,6 +234,12 @@ void ot::PlotDataset::setOwnerPlot(PlotBase* _ownerPlot)
 	rebuildCurve();
 }
 
+void ot::PlotDataset::setEntityName(const std::string& _entityName)
+{
+	m_config.setEntityName(_entityName);
+	updateToolTip();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // General Setter/Getter

@@ -106,7 +106,7 @@ namespace ot {
 		//! @param _ownerPlot 
 		void setOwnerPlot(PlotBase* _ownerPlot);
 
-		void setEntityName(const std::string& _name) { m_config.setEntityName(_name); };
+		void setEntityName(const std::string& _name);
 		const std::string& getEntityName() const { return m_config.getEntityName(); };
 
 		void setEntityID(UID _id) { m_config.setEntityID(_id); };
