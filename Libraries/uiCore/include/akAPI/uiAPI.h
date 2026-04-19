@@ -668,7 +668,7 @@ namespace ak {
 				T * obj = nullptr;
 				obj = dynamic_cast<T *>(getObjectManager()->object(_objectUID));
 				if (obj == nullptr) { 
-					assert(0);
+					//assert(0);
 					throw ak::InvalidObjectTypeException(); 
 				}
 				return obj;

@@ -1966,7 +1966,7 @@ QTreeWidget::item {
     height: 20px;
 }
 
-#OT_TreeItemEdit {
+QTreeView QLineEdit {
     padding: 0px;
     margin: 0px;
     height: 20px;
