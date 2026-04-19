@@ -6,7 +6,7 @@
 "EntityType":"EntityPythonScript",
 "NewEntityFolder":"Python/Scripts",
 "PropertyName":"Scripts",
-"metaData": {
+"MetaData": {
     "Port": {
       "type": "out",
       "name": "Dummy",

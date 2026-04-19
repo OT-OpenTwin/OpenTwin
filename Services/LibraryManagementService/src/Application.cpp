@@ -198,9 +198,16 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
-			// Update existing GridFS content
-			db->updateGridFSContent(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, model.toJson());
-		}
+			// Update existing data to GridFS and update metadata (version, hash)
+			std::string gridfsIdResult = db->updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.toJson());
+
+			if (!gridfsIdResult.empty()) {
+				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
+			}
+			else {
+				OT_LOG_E("Failed to update document '" + elementName + "'");
+			}
+       	}
 		else {
 			// Migrate new entry data to GridFS
 			db->addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, model);
@@ -546,7 +553,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 	}
 
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026418-112536-41", "v36OqntCLD9SGAoTb0pjGaqcIcZ2TF", "127.0.0.1:27017");
+	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026419-122354-41", "sjfHVRjsU1RoWf1q2tfNpSGLbV5Ooe", "127.0.0.1:27017");
 
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
@@ -575,7 +582,7 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 	}
 
 	// Add or update library elements
-	addLibraryElement(receivedModels, "Sebastian-2026418-112536-41", "v36OqntCLD9SGAoTb0pjGaqcIcZ2TF", "127.0.0.1:27017");
+	addLibraryElement(receivedModels, "Sebastian-2026419-122354-41", "sjfHVRjsU1RoWf1q2tfNpSGLbV5Ooe", "127.0.0.1:27017");
 
 	// Create response document with updated models
 	ot::JsonDocument responseDoc;
