@@ -54,8 +54,12 @@ ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2DDialogFilter& _filte
 	: Dialog(_parent), m_currentEntry(nullptr), m_changed(false), m_filter(_filter)
 {
 	// Initialize data
-	if (_painter) m_painter = _painter->createCopy();
-	else m_painter = new FillPainter2D;
+	if (_painter) {
+		m_painter = _painter->createCopy();
+	}
+	else {
+		m_painter = new FillPainter2D;
+	}
 
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
@@ -82,15 +86,12 @@ ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2DDialogFilter& _filte
 	m_typeSelectionBox = new ComboBox(this);
 	m_typeSelectionBox->setEditable(false);
 	comboLay->addWidget(m_typeSelectionBox, 1);
-	this->connect(m_typeSelectionBox, &ComboBox::currentTextChanged, this, &Painter2DEditDialog::slotTypeChanged);
 
 	m_confirm = new PushButton("Confirm", this);
 	cLay->addWidget(m_confirm);
-	this->connect(m_confirm, &PushButton::clicked, this, &Painter2DEditDialog::slotConfirm);
 
 	m_cancel = new PushButton("Cancel", this);
 	cLay->addWidget(m_cancel);
-	this->connect(m_cancel, &PushButton::clicked, this, &Dialog::closeCancel);
 	
 	m_preview = new Painter2DPreview(this);
 	m_preview->setMinimumSize(48, 48);
@@ -139,6 +140,10 @@ ot::Painter2DEditDialog::Painter2DEditDialog(const Painter2DDialogFilter& _filte
 	this->applyPainter(m_painter);
 	this->slotUpdate();
 	m_changed = false;
+
+	this->connect(m_typeSelectionBox, &ComboBox::currentTextChanged, this, &Painter2DEditDialog::slotTypeChanged);
+	this->connect(m_confirm, &PushButton::clicked, this, &Painter2DEditDialog::slotConfirm);
+	this->connect(m_cancel, &PushButton::clicked, this, &Dialog::closeCancel);
 }
 
 ot::Painter2DEditDialog::~Painter2DEditDialog() {
