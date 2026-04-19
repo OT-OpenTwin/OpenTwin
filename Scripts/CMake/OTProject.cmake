@@ -371,6 +371,7 @@ function(ot_add_export TARGET_NAME)
     endif()
 
     target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
+    set_property(TARGET ${_core} PROPERTY OT_EXPORT_MACRO "${_selected_macro}")
     message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
 endfunction()
 
@@ -903,6 +904,26 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
         CXX_EXTENSIONS NO
     )
 
+    _ot_target_core_name(_coreName ${MAIN_TARGET_NAME})
+    if(TARGET ${_coreName})
+        target_sources(${TEST_TARGET_NAME} PRIVATE $<TARGET_OBJECTS:${_coreName}>)
+
+        get_target_property(_export_macro ${_coreName} OT_EXPORT_MACRO)
+        if(_export_macro)
+            target_compile_definitions(${TEST_TARGET_NAME} PRIVATE "${_export_macro}")
+        endif()
+
+        get_target_property(_main_deps ${_coreName} OT_DEPS)
+        if(_main_deps)
+            _ot_apply_all_deps(${TEST_TARGET_NAME} ${_coreName} "${_main_deps}")
+        endif()
+
+    elseif(TARGET ${MAIN_TARGET_NAME})
+        target_link_libraries(${TEST_TARGET_NAME} PRIVATE ${MAIN_TARGET_NAME})
+    else()
+        message(FATAL_ERROR "ot_initialize_test: main target '${MAIN_TARGET_NAME}' not found.")
+    endif()
+
     target_include_directories(${TEST_TARGET_NAME} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/../include"
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -910,35 +931,13 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
         "${CMAKE_CURRENT_SOURCE_DIR}"
     )
 
-    _ot_target_core_name(_coreName ${MAIN_TARGET_NAME})
-    if(TARGET ${_coreName})
-        target_sources(${TEST_TARGET_NAME} PRIVATE $<TARGET_OBJECTS:${_coreName}>)
-    elseif(TARGET ${MAIN_TARGET_NAME})
-        get_target_property(_t_type ${MAIN_TARGET_NAME} TYPE)
-        if(_t_type STREQUAL "EXECUTABLE")
-            message(FATAL_ERROR
-                "ot_initialize_test(${TEST_TARGET_NAME} ${MAIN_TARGET_NAME}): cannot link executable '${MAIN_TARGET_NAME}' into test. "
-                "Link against the core object target '${_coreName}' or a library target instead."
-            )
-        else()
-            target_link_libraries(${TEST_TARGET_NAME} PRIVATE ${MAIN_TARGET_NAME})
-        endif()
-    else()
-        message(FATAL_ERROR
-            "ot_initialize_test(${TEST_TARGET_NAME} ${MAIN_TARGET_NAME}): main target '${MAIN_TARGET_NAME}' not found."
-        )
-    endif()
-
     target_include_directories(${TEST_TARGET_NAME} PRIVATE 
         $<TARGET_PROPERTY:${MAIN_TARGET_NAME},INCLUDE_DIRECTORIES>
         $<TARGET_PROPERTY:${_coreName},INCLUDE_DIRECTORIES>
     )
 
-    if(TARGET ${_coreName})
-        get_target_property(_main_deps ${_coreName} OT_DEPS)
-        if(_main_deps)
-            _ot_apply_all_deps(${TEST_TARGET_NAME} ${_coreName} "${_main_deps}")
-        endif()
+    if(MSVC)
+        target_link_options(${TEST_TARGET_NAME} PRIVATE "/ignore:4099")
     endif()
 
     if(DEFINED ENV{GOOGLE_TEST_INC} AND NOT "$ENV{GOOGLE_TEST_INC}" STREQUAL "")
