@@ -856,15 +856,14 @@ function(ot_finalize_bin TARGET_NAME)
         set(_deps "")
     endif()
 
+    add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
+
     if(WIN32)
-        add_executable(${TARGET_NAME} WIN32 $<TARGET_OBJECTS:${_core}>)
+        set_property(TARGET ${TARGET_NAME} PROPERTY WIN32_EXECUTABLE "${_OT_CFG_RELEASE}")
 
         if(MSVC)
             target_link_options(${TARGET_NAME} PRIVATE "/ENTRY:mainCRTStartup")
         endif()
-
-    else()
-        add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
     endif()
 
     if(NOT "${_output_name}" STREQUAL "")
