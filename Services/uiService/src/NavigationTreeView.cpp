@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "NavigationTreeView.h"
+#include "CustomWidgets/NavigationItemDelegate.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 
 // uiCore header
@@ -31,7 +32,9 @@ ot::NavigationTreeView::NavigationTreeView(QWidget* _parent)
 	: WidgetView(WidgetViewBase::ViewNavigation, _parent)
 {
 	m_tree = new ak::aTreeWidget(getViewDockWidget());
-	m_tree->treeWidget()->setContextMenuPolicy(Qt::CustomContextMenu);
+	ak::aTreeWidgetBase* treeBase = m_tree->treeWidget();
+	treeBase->setContextMenuPolicy(Qt::CustomContextMenu);
+	treeBase->setItemDelegate(new NavigationItemDelegate);
 	this->addWidgetInterfaceToDock(m_tree);
 
 	QShortcut* projectNavCopy = new QShortcut(QKeySequence("Ctrl+C"), m_tree->getQWidget());

@@ -930,6 +930,7 @@ void AppBase::createUi() {
 	// From this point on exceptions can be displayed in a message box since the UI is created
 	try {
 		try {
+			OTAssert(0, "Test");
 			OT_LOG_D("Creating UI");
 			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize Wrapper");
 			uiAPI::window::setStatusProgressValue(m_mainWindow, 1);
