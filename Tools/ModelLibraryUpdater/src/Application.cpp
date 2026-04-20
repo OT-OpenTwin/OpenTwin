@@ -60,7 +60,7 @@ void Application::deleteInstance(void) {
 
 
 
-std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _modelFolderPath) 
+std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName)
 {
 	std::list<ot::LibraryElement> localModels;
     try {
@@ -96,7 +96,7 @@ std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _mo
 
 				// Deserialize the content into a LibraryElement
                 ot::LibraryElement element = ot::LibraryElement::fromJson(content);
-
+				element.setCollectionName(_collectionName);
 				// Fill library element with hash value calculated from content file
 				fillLibraryElementWithHash(element, _modelFolderPath);
 
@@ -268,7 +268,7 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
     m_folderPath += collectionName;
 
     // First iterate through all local models and create a list of LibraryElements
-    std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath);
+    std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath,collectionName);
     
 	// Pack the list of LibraryElements into a json document to send it to LMS
 	ot::JsonDocument doc;

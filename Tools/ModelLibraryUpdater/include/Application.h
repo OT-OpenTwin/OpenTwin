@@ -58,7 +58,7 @@ private:
 	Application();
 	~Application();
 
-	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath);
+	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName);
 	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
 	std::list<ot::LibraryElement> addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath);
 
