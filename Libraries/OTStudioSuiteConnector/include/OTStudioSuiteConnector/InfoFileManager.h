@@ -34,10 +34,12 @@ public:
 	std::string getTriangleHash(const std::string& shapeName);
 	std::string getRunIDMetaHash(int runID);
 	std::string getRunIDFileHash(int runID, const std::string& fileName);
+	std::string getHarnessHash(void);
 	size_t getNumberOfFilesForRunID(int runID);
 
 private:
 	std::map<std::string, std::string> triangleHashMap;
 	std::map<int, std::string> runIdMetaHash;
 	std::map<int, std::map<std::string, std::string>> runIdToFileNameToHash;
+	std::string harnessHash;
 };

@@ -320,6 +320,9 @@ void ProjectManager::uploadFiles(std::list<ot::UID> &entityIDList, std::list<ot:
 		// Send the shapes information and triangulations (progress range 70-80)
 		sendShapeInformationAndTriangulation(baseProjectName, infoFileManager);
 
+		// Send the harness information (in case we have a cable studio project)
+		sendHarnessInformation(baseProjectName, infoFileManager);
+
 		// Send the (parametric) 1D result data (progress range 80-90)
 		send1dResultData(baseProjectName, infoFileManager);
 
@@ -1038,6 +1041,42 @@ void ProjectManager::sendTriangulations(const std::string& projectRoot, std::map
 	}
 
 	ot::WindowAPI::setProgressBarValue(80);
+}
+
+void ProjectManager::sendHarnessInformation(const std::string& projectRoot, InfoFileManager& infoFileManager)
+{
+	std::string harnessData;
+	std::string harnessHash;
+
+	std::string harnessFileName = projectRoot + "/Model/CBLS/Harness/harness.slh";
+
+	bool harnessExists = std::filesystem::is_regular_file(harnessFileName);
+
+	if (harnessExists)
+	{
+		std::string fileContent;
+		readFileContent(harnessFileName, fileContent);
+
+		QCryptographicHash hashCalculator(QCryptographicHash::Md5);
+		hashCalculator.addData(fileContent.c_str(), fileContent.size());
+
+		harnessHash = hashCalculator.result().toHex().toStdString();
+
+		if (infoFileManager.getHarnessHash() != harnessHash)
+		{
+			// The hash value is different -> sending the harness is required
+			harnessData = fileContent;
+		}
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_SS_HARNESS, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Content, ot::JsonString(harnessData, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_FILE_Hash, ot::JsonString(harnessHash, doc.GetAllocator()), doc.GetAllocator());
+
+	// Send the message to the service
+	std::string tmp;
+	ot::CommunicationAPI::sendExecute(doc.toJson(), tmp);
 }
 
 std::string ProjectManager::calculateHash(const std::string& fileContent)
