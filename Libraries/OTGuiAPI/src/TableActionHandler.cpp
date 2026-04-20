@@ -24,6 +24,7 @@ ot::TableActionHandler::TableActionHandler(ActionDispatcherBase* _dispatcher)
 	: m_actionHandler(_dispatcher)
 {
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TABLE_SaveRequest, this, &TableActionHandler::handleTableSaveRequested);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_TABLE_ColumnFilterChanged, this, &TableActionHandler::handleTableColumnFilterChanged);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -39,6 +40,16 @@ ot::JsonDocument ot::TableActionHandler::createTableSaveRequestDocument(const ot
 	return doc;
 }
 
+ot::JsonDocument ot::TableActionHandler::createTableColumnFilterChangeRequestDocument(const TableFilterChangeEvent& _event)
+{
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_TABLE_ColumnFilterChanged, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Event, JsonObject(&_event, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Action handling
@@ -48,4 +59,10 @@ ot::ReturnMessage ot::TableActionHandler::handleTableSaveRequested(JsonDocument&
 	config.setFromJsonObject(json::getObject(_doc, OT_ACTION_PARAM_Config));
 
 	return this->tableSaveRequested(config);
+}
+
+ot::ReturnMessage ot::TableActionHandler::handleTableColumnFilterChanged(JsonDocument& _doc)
+{
+	ot::TableFilterChangeEvent event(json::getObject(_doc, OT_ACTION_PARAM_Event));
+	return this->tableColumnFilterChanged(event);
 }

@@ -78,6 +78,7 @@
 #include "OTWidgets/Dialog/CreateProjectDialog.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
 #include "OTWidgets/Dialog/MessageBoxManager.h"
+#include "OTWidgets/Header/HeaderFilter.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Style/StyledTextConverter.h"
@@ -2001,10 +2002,10 @@ void AppBase::closeAllTextEditors(const ot::BasicServiceInformation& _serviceInf
 // Table
 
 ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::UIDList& _visualizingEntities) {
-	ot::TableView* newTable = this->findTable(_config.getEntityName(), _visualizingEntities);
-	if (newTable != nullptr) {
+	ot::TableView* newTableView = this->findTable(_config.getEntityName(), _visualizingEntities);
+	if (newTableView != nullptr) {
 		OT_LOG_D("Table already exists { \"Table.Name\": \"" + _config.getEntityName() + "\" }. Skipping creation");
-		return newTable;
+		return newTableView;
 	}
 
 	if (ot::GlobalWidgetViewManager::instance().findView(_config.getEntityName(), ot::WidgetViewBase::ViewTable)) {
@@ -2012,26 +2013,28 @@ ot::TableView* AppBase::createNewTable(const ot::TableCfg& _config, const ot::Wi
 		return nullptr;
 	}
 
-	newTable = new ot::TableView(ot::GlobalWidgetViewManager::instance().getDockManager());
-	newTable->setViewData(_config);
-	this->addVisualizingEntityInfoToView(newTable, _visualizingEntities);
+	newTableView = new ot::TableView(ot::GlobalWidgetViewManager::instance().getDockManager());
+	newTableView->setViewData(_config);
+	this->addVisualizingEntityInfoToView(newTableView, _visualizingEntities);
 
-	newTable->getTable()->setMultilineCells(true);
-	newTable->getTable()->setupFromConfig(_config);
+	ot::Table* table = newTableView->getTable();
+	table->setMultilineCells(true);
+	table->setupFromConfig(_config);
 
 	ot::BasicServiceInformation modelInfo(OT_INFO_SERVICE_TYPE_MODEL);
 
-	this->lockManager()->uiViewCreated(modelInfo, newTable, ot::LockType::All | ot::LockType::ModelWrite);
+	this->lockManager()->uiViewCreated(modelInfo, newTableView, ot::LockType::All | ot::LockType::ModelWrite);
 
-	m_tables.insert_or_assign(_config.getEntityName(), newTable);
+	m_tables.insert_or_assign(_config.getEntityName(), newTableView);
 
-	this->connect(newTable->getTable(), &ot::Table::saveRequested, this, &AppBase::slotTableSaveRequested);
+	this->connect(table, &ot::Table::saveRequested, this, &AppBase::slotTableSaveRequested);
+	this->connect(table, &ot::Table::columnFilterChanged, this, &AppBase::slotTableColumnFilterChanged);
 
-	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newTable, _viewInsertFlags);
+	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newTableView, _viewInsertFlags);
 
 	OT_LOG_D("Table created { \"Editor.Name\": \"" + _config.getEntityName() + "\" }");
 
-	return newTable;
+	return newTableView;
 }
 
 ot::TableView* AppBase::findTable(const std::string& _entityName, const ot::UIDList& _visualizingEntities) {
@@ -2918,6 +2921,67 @@ void AppBase::slotTableSaveRequested() {
 	}
 	catch (...) {
 		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotTableColumnFilterChanged(const ot::HeaderFilter* _filter)
+{
+	ot::Table* table = dynamic_cast<ot::Table*>(sender());
+	if (table == nullptr)
+	{
+		OT_LOG_E("Table cast failed");
+		return;
+	}
+
+	ot::TableView* view = dynamic_cast<ot::TableView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(table));
+	if (!view)
+	{
+		OT_LOG_W("View not found");
+		return;
+	}
+
+	// Prepare event data
+	ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
+	ot::TableFilterChangeEvent eventData(view->getViewData());
+
+	// Get header item to determine column name
+	auto headerItem = table->horizontalHeaderItem(_filter->getLogicalIndex());
+	if (!headerItem)
+	{
+		OT_LOG_E("Failed to get header item for filter change event");
+		return;
+	}
+
+	std::string columnName = headerItem->text().toStdString();
+
+	// Create filter descriptions for all selected options
+	std::list<ot::ValueComparisonDescription> filterDescriptions;
+	QStringList selectedOptions = _filter->saveCheckedState();
+	for (const auto& opt : selectedOptions)
+	{
+		ot::ValueComparisonDescription desc;
+		desc.setName(columnName);
+		desc.setComparator("=");
+		desc.setValue(opt.toStdString());
+		filterDescriptions.push_back(std::move(desc));
+	}
+	eventData.setFilterDescriptions(std::move(filterDescriptions));
+
+	// Notify
+	ot::JsonDocument doc = ot::TableActionHandler::createTableColumnFilterChangeRequestDocument(eventData);
+
+	std::string response;
+	if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response))
+	{
+		OT_LOG_E("Failed to send http request");
+		return;
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(response);
+	if (rMsg != ot::ReturnMessage::Ok)
+	{
+		OT_LOG_E("Request failed: " + rMsg.getWhat());
+		return;
 	}
 }
 

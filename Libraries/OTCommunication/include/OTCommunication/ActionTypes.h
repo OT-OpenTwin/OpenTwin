@@ -357,6 +357,8 @@
 #define OT_ACTION_CMD_UI_TABLE_SetSelection "UI.Table.SetSelection"
 #define OT_ACTION_CMD_UI_TABLE_GetSelection "UI.Table.GetSelection"
 #define OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground "UI.Table.SetCurrentSelectionBackground"
+#define OT_ACTION_CMD_UI_TABLE_ColumnFilterChanged "UI.Table.ColumnFilterChanged"
+#define OT_ACTION_CMD_UI_TABLE_RowFilterChanged "UI.Table.RowFilterChanged"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 

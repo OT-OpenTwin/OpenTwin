@@ -111,9 +111,12 @@ void ot::TableHeader::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _s
 	}
 }
 
-void ot::TableHeader::filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions)
+void ot::TableHeader::filterHasChanged(const HeaderFilter* _filter)
 {
-	if (_selectedOptions.isEmpty())
+	const QStringList selectedOptions = _filter->saveCheckedState();
+	const int logicalIndex = _filter->getLogicalIndex();
+
+	if (selectedOptions.isEmpty())
 	{
 		if (orientation() == Qt::Horizontal)
 		{
@@ -136,8 +139,8 @@ void ot::TableHeader::filterOptionsChanged(int _logicalIndex, const QStringList&
 		{
 			for (int r = 0; r < m_table->rowCount(); r++)
 			{
-				QVariant data = m_table->model()->data(m_table->model()->index(r, _logicalIndex));
-				bool match = data.isValid() && _selectedOptions.contains(data.toString());
+				QVariant data = m_table->model()->data(m_table->model()->index(r, logicalIndex));
+				bool match = data.isValid() && selectedOptions.contains(data.toString());
 				m_table->setRowHidden(r, !match);
 			}
 		}
@@ -145,12 +148,14 @@ void ot::TableHeader::filterOptionsChanged(int _logicalIndex, const QStringList&
 		{
 			for (int c = 0; c < m_table->columnCount(); c++)
 			{
-				QVariant data = m_table->model()->data(m_table->model()->index(_logicalIndex, c));
-				bool match = data.isValid() && _selectedOptions.contains(data.toString());
+				QVariant data = m_table->model()->data(m_table->model()->index(logicalIndex, c));
+				bool match = data.isValid() && selectedOptions.contains(data.toString());
 				m_table->setColumnHidden(c, !match);
 			}
 		}
 	}
+
+	HeaderBase::filterHasChanged(_filter);
 }
 
 QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const

@@ -71,6 +71,7 @@ private:
 	void handleImportPythonScript(ot::JsonDocument& _document);
 	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex) override;
 	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
+	virtual ot::ReturnMessage tableColumnFilterChanged(const ot::TableFilterChangeEvent& _event) override;
 
 	//api @sercurity mTLS
 	//api @action OT_ACTION_CMD_UI_RequestTextData
@@ -92,8 +93,12 @@ private:
 	
 	void storeChangedText(ot::IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex);
 	void storeChangedTable(ot::IVisualisationTable* _entity, const ot::TableCfg& _cfg);
+
+	void processTableColumnFilterChanged(const ot::TableFilterChangeEvent& _event, ot::IVisualisationTable* _entity);
+
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	//! @brief Filecontent is stored as binary, thus the encoding does not matter. The filename however is stored in properties and used in the visualisation. 
 	//! Thus UTF8 encoding is required.
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
+
 };

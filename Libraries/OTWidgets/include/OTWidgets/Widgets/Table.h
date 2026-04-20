@@ -37,6 +37,7 @@ namespace ot {
 
 	class TableItem;
 	class TableHeader;
+	class HeaderFilter;
 	class TableItemDelegate;
 
 	class OT_WIDGETS_API_EXPORT Table : public QTableWidget, public WidgetBase {
@@ -93,6 +94,8 @@ namespace ot {
 	Q_SIGNALS:
 		void saveRequested();
 		void modifiedChanged(bool _isModified);
+		void columnFilterChanged(const HeaderFilter* _filter);
+		void rowFilterChanged(const HeaderFilter* _filter);
 
 	public Q_SLOTS:
 		void slotSaveRequested();
@@ -111,7 +114,9 @@ namespace ot {
 		void slotResizeColumnToContent(int _column);
 		void slotRestoreRowSize(int _row);
 		void slotResizeRowToContent(int _row);
-		
+		void slotColumnFilterChanged(const HeaderFilter* _filter);
+		void slotRowFilterChanged(const HeaderFilter* _filter);
+
 	private:
 		void ini();
 		void resizeColumnsToContentIfNeeded();
