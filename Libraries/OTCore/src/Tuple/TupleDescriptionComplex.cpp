@@ -15,8 +15,8 @@ ot::TupleDescriptionComplex::TupleDescriptionComplex()
 
 	// Define possible unit combinations for each format.
 	m_unitCombinationsByFormatName[ComplexNumbers::getFormatString(ComplexNumberFormat::Cartesian)] = { createCombinedUnitsString({"",""}) };
-	std::vector<std::string> angleUnits{ "Deg", "rad" };
-	std::vector<std::string> magnitudeUnits{ "", "dB" };
+	std::vector<std::string> angleUnits{ ot::SIUnits::getAngleUnitDegrees(), ot::SIUnits::getAngleUnitRad() };
+	std::vector<std::string> magnitudeUnits{ "", ot::SIUnits::getUnitDecibel() };
 	for (const std::string& magnitudeUnit : magnitudeUnits)
 	{
 		for (const std::string& angleUnit : angleUnits)

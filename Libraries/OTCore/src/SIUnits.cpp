@@ -81,8 +81,8 @@ SIUnits::SIUnits()
 
     // --- Angle units ---
     // SI base: radian (rad = 1 m/m, but tracked via pseudo-dimension)
-    m_registry.addUnit(helper( "rad",  "radian",      "SI",       ANGLE, 1.0 ));
-    m_registry.addUnit(helper( "deg",  "degree",      "SI",       ANGLE, pi / 180.0 ));
+    m_registry.addUnit(helper( getAngleUnitRad(), "radian", "SI", ANGLE, 1.0));
+    m_registry.addUnit(helper(getAngleUnitDegrees(), "degree", "SI", ANGLE, pi / 180.0));
     m_registry.addUnit(helper( "grad", "gradian",     "SI",       ANGLE, pi / 200.0 ));
     m_registry.addUnit(helper( "rev",  "revolution",  "SI",       ANGLE, 2.0 * pi));
     m_registry.addUnit(helper( "arcmin","arcminute",  "SI",       ANGLE, pi / 10800.0 ));

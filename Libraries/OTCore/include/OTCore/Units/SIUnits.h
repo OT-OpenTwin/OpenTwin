@@ -10,7 +10,10 @@ namespace ot
 	public:
 		static SIUnits& instance();
 		std::string getSystemName() override { return "SI"; }
-        	
+        
+		static std::string getAngleUnitDegrees() { return "deg"; }
+		static std::string getAngleUnitRad() { return "rad"; }
+		static std::string getUnitDecibel() { return "dB"; }
     private:
 		SIUnits();
     };

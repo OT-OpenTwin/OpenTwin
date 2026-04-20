@@ -33,6 +33,8 @@
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
+#include "OTCore/Units/SIUnits.h"
+
 #include "OptionsParameterHandlerFormat.h"
 #include "OptionsParameterHandlerFrequency.h"
 #include "OptionsParameterHandlerParameter.h"
@@ -171,11 +173,11 @@ DatasetDescription TouchstoneToResultdata::extractDatasetDescription(TouchstoneH
 	
 	if (selectedFormat == ts::option::Format::Decibel_angle)
 	{
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "dB", "°");
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), ot::SIUnits::getUnitDecibel(), ot::SIUnits::getAngleUnitDegrees());
 	}
 	else if (selectedFormat == ts::option::Format::magnitude_angle)
 	{
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "°");
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::getAngleUnitDegrees());
 		//quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "rad");
 	}
 	else

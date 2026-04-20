@@ -23,7 +23,7 @@ namespace ot
 		static std::string getComponentImaginary() { return "Imaginary"; }
 		static std::string getComponentMagnitude() { return "Magnitude"; }
 		static std::string getComponentPhase() { return "Phase"; }
-
+		
 		static std::string getFormatString(const ComplexNumberFormat& _format)
 		{
 			switch (_format)
