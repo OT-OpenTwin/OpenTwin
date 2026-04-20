@@ -319,7 +319,10 @@ ak::aObject * ak::aObjectManager::object(
 	const QString &									_objectUniqueName
 ) {
 	auto itm = m_mapUniqueNames.find(_objectUniqueName);
-	if (itm == m_mapUniqueNames.end()) { assert(0); throw ObjectNotFoundException(); }
+	if (itm == m_mapUniqueNames.end()) {
+		//assert(0);
+		throw ObjectNotFoundException();
+	}
 	return itm->second;
 }
 

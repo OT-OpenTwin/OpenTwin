@@ -31,7 +31,7 @@
 // OPENTWIN
 #include "OTCore/CoreTypes.h"
 #include "OTModelEntities/EntityInformation.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 
 namespace ot {
 	namespace components {

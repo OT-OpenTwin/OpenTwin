@@ -20,7 +20,7 @@
 #pragma once
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Visualization/IVisualisationCurve.h"
-#include "OTModelEntities/PropertyBundleDataLakeQuery.h"
+#include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
 
 class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve
 {

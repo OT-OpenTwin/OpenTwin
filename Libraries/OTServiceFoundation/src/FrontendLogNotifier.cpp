@@ -42,3 +42,12 @@ void ot::FrontendLogNotifier::log(const LogMessage& _message) {
 		}
 	}
 }
+
+void ot::FrontendLogNotifier::userLog(const LogMessage& _message)
+{
+	if (m_app->isUiConnected())
+	{
+		OTAssertNullptr(m_app->getUiComponent());
+		m_app->getUiComponent()->displayLogMessage(_message);
+	}
+}

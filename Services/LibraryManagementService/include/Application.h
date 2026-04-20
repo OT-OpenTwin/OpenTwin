@@ -26,7 +26,7 @@
 #include "OTGui/Dialog/ModelLibraryDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Handler/ActionHandler.h"
-
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 // std header
 #include <list>
@@ -47,6 +47,9 @@ private:
 	std::string getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
+	void updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	void addLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
 	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
@@ -61,6 +64,8 @@ private:
 	OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_UI_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_UI_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleLibraryElementRequest, Application, OT_ACTION_CMD_LMS_LibraryElementRequest, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleUpdateOrCreateRequest, Application, OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleAddNewLibraryElement, Application, OT_ACTION_CMD_LMS_AddNewLibraryElement, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

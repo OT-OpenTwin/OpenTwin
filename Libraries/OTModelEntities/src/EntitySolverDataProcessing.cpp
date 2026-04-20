@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/EntitySolverDataProcessing.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntitySolverDataProcessing> registrar("EntitySolverDataProcessing");
 

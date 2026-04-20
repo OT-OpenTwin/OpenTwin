@@ -26,7 +26,7 @@
 #include "OTGui/Style/ColorStyleTypes.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityResult1DCurve.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
@@ -133,8 +133,7 @@ bool EntityResult1DCurve::updateFromProperties()
 				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
 			}
 
-			// @Alex: Here the vis update request was send out:
-			/*ot::JsonDocument doc;
+			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());
 
 			const std::string plotName = getParent()->getName();
@@ -147,11 +146,11 @@ bool EntityResult1DCurve::updateFromProperties()
 
 			ot::VisualisationCfg visualisationCfg;
 			visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
-			visualisationCfg.setOverrideViewerContent(false);
+			visualisationCfg.setOverrideViewerContent(dataRefreshNeeded);
 			visualisationCfg.setAsActiveView(true);
 
-			doc.AddMember(OT_ACTION_PARAM_Visualisation_Config, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
-			getObserver()->sendMessageToViewer(doc);*/
+			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, ot::JsonObject(visualisationCfg, doc.GetAllocator()), doc.GetAllocator());
+			getObserver()->sendMessageToViewer(doc);
 
 		}
 		catch (std::exception& _e)

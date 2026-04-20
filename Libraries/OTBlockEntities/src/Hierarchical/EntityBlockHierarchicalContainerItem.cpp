@@ -20,8 +20,7 @@
 // OpenTwin header
 #include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
 #include "OTModelEntities/EntityFile.h"
-#include "OTModelEntities/PropertyHelper.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalContainerItem.h"
 
 static EntityFactoryRegistrar<ot::EntityBlockHierarchicalContainerItem> registrar(ot::EntityBlockHierarchicalContainerItem::className());

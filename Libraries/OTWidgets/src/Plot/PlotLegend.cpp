@@ -6,11 +6,11 @@
 #include "OTWidgets/Plot/PlotLegend.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/PlotLegendItem.h"
+#include "OTWidgets/Widgets/VerticalScrollArea.h"
 
 // Qt header
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
-#include <QtWidgets/qscrollarea.h>
 
 ot::PlotLegend::PlotLegend(PlotBase* _plot, QWidget* _parentWidget)
 	: m_plot(_plot)
@@ -19,8 +19,7 @@ ot::PlotLegend::PlotLegend(PlotBase* _plot, QWidget* _parentWidget)
 	QVBoxLayout* rootLayout = new QVBoxLayout(m_rootWidget);
 	rootLayout->setContentsMargins(0, 0, 0, 0);
 
-	QScrollArea* scrollArea = new QScrollArea(m_rootWidget);
-	scrollArea->setWidgetResizable(true);
+	VerticalScrollArea* scrollArea = new VerticalScrollArea(m_rootWidget);
 	rootLayout->addWidget(scrollArea, 1);
 
 	QWidget* entriesWidget = new QWidget(scrollArea);

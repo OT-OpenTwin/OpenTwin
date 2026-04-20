@@ -5,7 +5,7 @@
 #include "OTCore/JSON/JSONVectoriser.h"
 #include "OTCore/DataStruct/GenericDataStructMatrixMerger.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityDatasetInfo.h"
 
 static EntityFactoryRegistrar<ot::EntityDatasetInfo> registrar(ot::EntityDatasetInfo::className());

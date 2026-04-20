@@ -38,7 +38,6 @@
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
-#include "OTModelEntities/InvalidUID.h"
 #include "OTModelEntities/EntityFileCSV.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityBatchImporter.h"

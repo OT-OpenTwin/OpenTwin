@@ -22,7 +22,7 @@
 
 #include "OTCore/TypeNames.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityTableSelectedRanges> registrar("EntityTableSelectedRanges");
 

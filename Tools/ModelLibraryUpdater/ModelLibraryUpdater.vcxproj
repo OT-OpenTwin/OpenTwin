@@ -13,9 +13,11 @@
   <ItemGroup>
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\StartArgumentParser.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h" />
+    <ClInclude Include="include\StartArgumentParser.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -57,14 +59,15 @@
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;_DEBUG;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;$(OT_DEFAULT_SERVICE_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;GeneratedFiles\$(ConfigurationName);GeneratedFiles;$(OT_DEFAULT_SERVICE_INCD);$(QT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBD);%(AdditionalLibraryDirectories);$(QT_LIBPATH)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTBlockEntities.lib;$(Qt_LIBS_);Qt6Cored.lib;Qt6Networkd.lib;Qt6Widgetsd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -76,17 +79,18 @@
       <PreprocessorDefinitions>_WIN32_WINNT=0x0601;NDEBUG;_SILENCE_ALL_CXX17_DEPRECATION_WARNINGS;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)include;GeneratedFiles\$(ConfigurationName);GeneratedFiles;$(OT_DEFAULT_SERVICE_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)include;GeneratedFiles\$(ConfigurationName);GeneratedFiles;$(OT_DEFAULT_SERVICE_INCR);$(QT_INC);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(QT_LIBPATH);$(OT_BLOCKENTITIES_ROOT)\$(OT_CLIBR);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>
       </IgnoreAllDefaultLibraries>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTBlockEntities.lib;Qt6Core.lib;Qt6Network.lib;Qt6Widgets.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

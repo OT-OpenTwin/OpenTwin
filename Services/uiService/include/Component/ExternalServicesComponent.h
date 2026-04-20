@@ -433,7 +433,7 @@ public Q_SLOTS:
 	void keepAlive();
 	void slotProcessActionBuffer();
 	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
-	void slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs);
+	void slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs, bool _updatePlotConfig);
 	void slotPlotDataLoadingFailed(const std::string& _errorMessage);
 
 private:
@@ -496,7 +496,7 @@ private:
 
 	void workerImportMultipleFiles(QStringList _filesToImport, ImportFileWorkerData _info);
 
-	void workerLoadPlotData(ot::JsonDocument&& _document, ot::Plot1DCfg&& _plotConfig, ot::VisualisationCfg&& _visualizationCfg);
+	void workerLoadPlotData(ot::Plot1DCfg&& _plotConfig, std::list<ot::Plot1DCurveCfg>&& _curveConfigs, ot::VisualisationCfg&& _visualizationCfg, bool _updatePlotConfig);
 
 	// #################################################################
 

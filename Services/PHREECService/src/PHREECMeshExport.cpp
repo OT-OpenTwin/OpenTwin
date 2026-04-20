@@ -24,7 +24,6 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityMaterial.h"
-#include "OTModelEntities/EntityProperties.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityMeshTetItemDataTets.h"
 

@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTModelEntities/PropertyHelper.h"
 #include "OTBlockEntities/BlockImageNames.h"	 
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
 
 static EntityFactoryRegistrar<EntityBlockStorage> registrar(EntityBlockStorage::className());

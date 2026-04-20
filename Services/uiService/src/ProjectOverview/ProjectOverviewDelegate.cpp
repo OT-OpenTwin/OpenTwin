@@ -33,7 +33,15 @@ void ot::ProjectOverviewDelegate::paint(QPainter* _painter, const QStyleOptionVi
 
 QSize ot::ProjectOverviewDelegate::sizeHint(const QStyleOptionViewItem& _option, const QModelIndex& _index) const {
     if (!_index.data(Qt::UserRole).toBool()) {
-        return QStyledItemDelegate::sizeHint(_option, _index);
+        QSize size = QStyledItemDelegate::sizeHint(_option, _index);
+        if (_index.column() == ProjectOverviewHeader::Checked)
+        {
+            if (size.height() > size.width()) {
+                size.setWidth(size.height());
+			}
+        }
+
+        return size;
     }
 
     QFont font = _option.font;

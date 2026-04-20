@@ -30,7 +30,7 @@
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"
 #include "OTGui/VisualisationTypes.h"
 
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 static EntityFactoryRegistrar<EntityFileImage> registrar(EntityFileImage::className());
 static EntityFactoryRegistrar<EntityFileImage> extensionRegistrar({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });

@@ -46,7 +46,9 @@ namespace ot {
 
 		// ###################################################################################################################################
 
-		void log(const LogMessage& _message);
+		virtual void log(const LogMessage& _message) override;
+
+		virtual void userLog(const LogMessage& _message) override {};
 
 	private:
 		std::mutex              m_mutex;

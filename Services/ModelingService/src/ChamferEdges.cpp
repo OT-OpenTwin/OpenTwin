@@ -23,7 +23,7 @@
 #include "EntityCache.h"
 #include "UpdateManager.h"
 
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTServiceFoundation/ModelComponent.h"

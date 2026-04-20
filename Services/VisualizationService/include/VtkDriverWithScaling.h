@@ -20,7 +20,7 @@
 #pragma once
 
 #include "VtkDriver.h"
-#include "OTModelEntities/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/Properties/PropertyBundleDataHandleScaling.h"
 
 #include <vtkPolyDataMapper.h>
 #include <vtkLookupTable.h>

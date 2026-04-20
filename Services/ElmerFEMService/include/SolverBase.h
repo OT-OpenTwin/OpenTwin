@@ -20,7 +20,7 @@
 #pragma once
 
 #include "OTCore/TypeNames.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 #include "OTModelEntities/EntityInformation.h"
 
 #include <fstream>

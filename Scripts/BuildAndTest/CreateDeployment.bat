@@ -219,10 +219,6 @@ XCOPY /S "%OT_PYTHON_ROOT%\Environments\CoreEnvironment\DLLs\Release\*.*" "%OT_D
 REM NGSpice
 COPY "%NGSPICE_ROOT%\visualc\sharedspice\Release.x64\ngspice.dll" "%OT_DEPLOYMENT_DIR%"
 
-REM CircuitModels
-MKDIR "%OT_DEPLOYMENT_DIR%\CircuitModels"
-XCOPY /S "%OPENTWIN_DEV_ROOT%\Assets\CircuitModels\*.*" "%OT_DEPLOYMENT_DIR%\CircuitModels"
-
 REM Apache Server
 MKDIR "%OT_DEPLOYMENT_DIR%\Apache"
 XCOPY /S "%APACHE_ROOT%\*.*" "%OT_DEPLOYMENT_DIR%\Apache"

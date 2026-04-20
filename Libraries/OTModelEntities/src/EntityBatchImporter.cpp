@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/EntityBatchImporter.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCommunication/ActionTypes.h"
 
 static EntityFactoryRegistrar<EntityBatchImporter> registrar(EntityBatchImporter::className());

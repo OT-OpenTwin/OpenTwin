@@ -22,9 +22,9 @@
 
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityResultBase.h"
-#include "OTModelEntities/PropertyBundlePlane.h"
-#include "OTModelEntities/PropertyBundleScaling.h"
-#include "OTModelEntities/PropertyBundleVisUnstructuredVectorVolume.h"
+#include "OTModelEntities/Properties/PropertyBundlePlane.h"
+#include "OTModelEntities/Properties/PropertyBundleScaling.h"
+#include "OTModelEntities/Properties/PropertyBundleVisUnstructuredVectorVolume.h"
 
 #include <list>
 

@@ -33,6 +33,7 @@
 #include <QtGui/qcolor.h>
 
 // std header
+#include <vector>
 #include <string>
 
 class QwtSymbol;
@@ -105,7 +106,7 @@ namespace ot {
 		//! @param _ownerPlot 
 		void setOwnerPlot(PlotBase* _ownerPlot);
 
-		void setEntityName(const std::string& _name) { m_config.setEntityName(_name); };
+		void setEntityName(const std::string& _name);
 		const std::string& getEntityName() const { return m_config.getEntityName(); };
 
 		void setEntityID(UID _id) { m_config.setEntityID(_id); };
@@ -173,7 +174,14 @@ namespace ot {
 		void setDependencyInfos(DatasetDependencyInfos&& _infos) { m_dependencyInfos = std::move(_infos); };
 		const DatasetDependencyInfos& getDependencyInfos() const { return m_dependencyInfos; };
 
+		void setSecondaryDependencyInfos(const std::vector<DatasetDependencyInfos>& _infos) { m_secondaryDependencyInfos = _infos; };
+		void setSecondaryDependencyInfos(std::vector<DatasetDependencyInfos>&& _infos) { m_secondaryDependencyInfos = std::move(_infos); };
+		const std::vector<DatasetDependencyInfos>& getSecondaryDependencyInfos() const { return m_secondaryDependencyInfos; };
+
 		void setDisplayTitle(const QString& _title);
+
+		QString getSecondaryDependencyInfoString(size_t _index, const QString& _linePrefix = QString()) const;
+		QString getDependencyInfoString(const DatasetDependencyInfos& _dependencyInfo, const QString& _linePrefix = QString()) const;
 
 	private:
 		void buildCartesianCurve();
@@ -203,6 +211,7 @@ namespace ot {
 		PlotLegendItem* m_legendItem;
 
 		DatasetDependencyInfos m_dependencyInfos;
+		std::vector<DatasetDependencyInfos> m_secondaryDependencyInfos;
 
 		QString m_displayTitle;
 	};

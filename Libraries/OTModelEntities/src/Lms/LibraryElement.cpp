@@ -124,6 +124,9 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
     if (_object.HasMember("RequestingEntityID")) {
         m_requestingEntityID = ot::json::getUInt64(_object, "RequestingEntityID");
     }
+    else {
+        m_requestingEntityID = ot::invalidUID;
+    }
 
     if (_object.HasMember("CollectionName")) {
         m_collectionName = ot::json::getString(_object, "CollectionName");
@@ -204,4 +207,24 @@ bool ot::LibraryElement::deserializeCallbackInfoFromAdditionalInfo(const std::st
 
     return true;
    
+}
+
+ot::LibraryElement ot::LibraryElement::fromJson(const std::string& _jsonString) {
+    ot::LibraryElement result;
+
+    try {
+        ot::JsonDocument doc;
+        if (!doc.fromJson(_jsonString.c_str())) {
+            return result;
+        }
+
+        // Support single object
+        if (doc.IsObject()) {
+            result.setFromJsonObject(doc.getConstObject());
+        }
+    }
+    catch (const std::exception& _e) {
+        OT_LOG_E("Failed to deserialize LibraryElement from JSON: " + std::string(_e.what()));
+    }
+    return result;
 }

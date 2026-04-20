@@ -40,6 +40,7 @@ namespace ot {
 		//! @brief Called when the a log message was created.
 		virtual void log(const LogMessage& _message) = 0;
 
+		virtual void userLog(const LogMessage& _message) = 0;
 	private:
 		bool m_customDelete; //! @brief If delete later is set, the creator keeps ownership of this object even after it is added to the LogDispatcher.
 	};

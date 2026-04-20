@@ -123,6 +123,12 @@ namespace ot{
         //! @return true if deserialization was successful, false otherwise
         bool deserializeCallbackInfoFromAdditionalInfo(const std::string& _additionalInfo);
 
+
+        //! @brief Deserialize a list of LibraryElement objects from a JSON string
+        //! @param _jsonString JSON string containing an array of LibraryElement objects from the LMS
+        //! @return List of deserialized LibraryElement objects
+        //! @throw May throw an exception if the JSON string is invalid
+        static ot::LibraryElement fromJson(const std::string& _jsonString);
     private:
         // Basic information
         std::string m_name;

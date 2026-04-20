@@ -35,7 +35,6 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityVisCartesianFaceScalar.h"
-#include "OTModelEntities/InvalidUID.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -2758,7 +2757,7 @@ bool CartesianMeshCreation::meshNeedsUpdating(EntityBase* mesh, const std::list<
 
 	for (auto entity : entityInfo)
 	{
-		if (entity.getEntityID() == ot::getInvalidUID())
+		if (entity.getEntityID() == ot::invalidUID)
 		{
 			// The entity is not longer available
 			return false;

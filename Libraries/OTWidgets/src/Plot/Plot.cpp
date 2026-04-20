@@ -98,6 +98,7 @@ void ot::Plot::removeFromCache(UID _entityID) {
 	if (it != m_cache.end()) {
 		for (PlotDataset* dataset : it->second) {
 			OTAssertNullptr(dataset);
+			dataset->detach();
 			delete dataset;
 		}
 		m_cache.erase(it);

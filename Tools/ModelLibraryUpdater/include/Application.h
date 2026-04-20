@@ -34,6 +34,12 @@
 #include <sstream>
 #include <algorithm>
 
+// Service header
+#include "StartArgumentParser.h"
+
+
+// OpenTwin header
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 class Application {
 public:
@@ -45,29 +51,27 @@ public:
 	Application(const Application&) = delete;
 	Application& operator=(const Application&) = delete;
 
-	void start(const char * _databasePWD);
+	void start(ot::StartArgumentParser _argumentParser);
 
 
 private:
 	Application();
 	~Application();
 
-	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
-	std::string getAdminUserName() { return "admin"; }
+	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath);
+	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
+	std::list<ot::LibraryElement> addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath);
 
-	int connectToMongoDb(const char* _databasePWD);
-	void syncAndUpdateLocalModelsWithDB(const std::string& modelFolderPath);
-	std::string m_databaseURL = "127.0.0.1:27017tls@";
-	std::string m_dbPassword;
-	std::string m_dbUsername;
-	mongocxx::client m_adminClient;
-	const std::string m_dataBase = "Libraries";
-	const std::string m_collectionName = "CircuitModels";
+    void createJsonDocumentFromLibraryElement(std::list<ot::LibraryElement> _element, ot::JsonDocument& _doc);
+	std::list<ot::LibraryElement> createLibraryElementsFromJsonDocument(const std::string& _lmsResponse);
+
+	std::string sendToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
+	std::string sendAsyncToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
+
+	const std::string m_collectionName = "";
 	std::string m_databasePWD;
-	const std::string m_folderPath = "C:\\Arbeit_Programmierung\\repos\\OpenTwin\\Assets\\CircuitModels";
+	std::string m_folderPath = "C:\\Arbeit_Programmierung\\repos\\OpenTwin\\LibraryData\\";
 
 
 	static Application* instance;
-	
-
 };

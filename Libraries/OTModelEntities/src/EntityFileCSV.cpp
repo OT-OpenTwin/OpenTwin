@@ -17,16 +17,19 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTModelEntities/EntityFileCSV.h"
-
-#include "OTModelEntities/CSVToTableTransformer.h"
+// OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/CSVToTableTransformer.h"
 #include "OTModelEntities/CSVProperties.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
+
+// std header
 #include <string>
-#include "OTModelEntities/PropertyHelper.h"
+
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_ENTITYFILECSV_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
 #elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true

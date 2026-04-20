@@ -243,11 +243,11 @@ namespace DataStorageAPI
 			throw e;
 		}
 	}
-	void DocumentAPI::DeleteGridFSData(value id, const std::string &fileName)
+	void DocumentAPI::DeleteGridFSData(value id, const std::string &fileName, const std::string& dataBase)
 	{
 		try
 		{
-			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase("Projects");
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase(dataBase);
 			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
 			bucketOptions.bucket_name(fileName);
 			auto bucket = db.gridfs_bucket(bucketOptions);

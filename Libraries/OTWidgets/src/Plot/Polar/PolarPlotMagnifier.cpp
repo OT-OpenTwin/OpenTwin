@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/Symbol.h"
 #include "OTWidgets/Plot/PlotBase.h"
+#include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Plot/Polar/PolarPlot.h"
 #include "OTWidgets/Plot/Polar/PolarPlotMarker.h"
 #include "OTWidgets/Plot/Polar/PolarPlotMagnifier.h"
@@ -97,35 +98,55 @@ void ot::PolarPlotMagnifier::slotColorStyleChanged() {
 	m_markerText.setColor(textVal.toColor());
 }
 
-void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos) {
-	const QwtPolarCanvas* canvas = m_plot->canvas();
-	QwtPointPolar polar = canvas->invTransform(_pos);
+void ot::PolarPlotMagnifier::updateMarker(const QPoint& _pos)
+{
+	try
+	{
+		const QwtPolarCanvas* canvas = m_plot->canvas();
+		QwtPointPolar polar = canvas->invTransform(_pos);
 
-	PlotBase* ownerPlot = m_plot->getOwner();
-	OTAssertNullptr(ownerPlot);
+		PlotBase* ownerPlot = m_plot->getOwner();
+		OTAssertNullptr(ownerPlot);
 
-	size_t ix = 0;
-	QwtPolarCurve* curve = m_plot->findNearestCurve(polar, ix);
+		size_t ix = 0;
+		QwtPolarCurve* curve = m_plot->findNearestCurve(polar, ix);
 
-	if (!curve) {
-		return;
+		if (!curve)
+		{
+			return;
+		}
+
+		PlotDataset* dataset = m_plot->getOwner()->findDataset(curve);
+		if (!dataset)
+		{
+			OTAssert(0, "Dataset for curve not found.");
+			OT_LOG_E("[FATAL] Dataset for curve not found.");
+			return;
+		}
+
+		polar = curve->data()->sample(ix);
+
+		double radius = polar.radius();
+		double azimuthRad = polar.azimuth();
+		double azimuthDeg = qRadiansToDegrees(azimuthRad);
+
+		QString infoText = ownerPlot->toPositionInfoText(polar, true);
+		infoText.append("\n" + dataset->getSecondaryDependencyInfoString(ix));
+
+		m_markerText.setText(infoText, QwtText::PlainText);
+
+		m_state.set(State::MarkerShown);
+
+		m_marker->setPosition(polar);
+		m_marker->setLabel(m_markerText);
+		m_marker->setVisible(true);
+
+		m_plot->replot();
 	}
-
-	polar = curve->data()->sample(ix);
-
-	double radius = polar.radius();
-	double azimuthRad = polar.azimuth();
-	double azimuthDeg = qRadiansToDegrees(azimuthRad);
-
-	m_markerText.setText(ownerPlot->toPositionInfoText(polar, true));
-
-	m_state.set(State::MarkerShown);
-
-	m_marker->setPosition(polar);
-	m_marker->setLabel(m_markerText);
-	m_marker->setVisible(true);
-
-	m_plot->replot();
+	catch (const std::exception& ex)
+	{
+		OT_LOG_E(ex.what());
+	}
 }
 
 void ot::PolarPlotMagnifier::hideMarker() {

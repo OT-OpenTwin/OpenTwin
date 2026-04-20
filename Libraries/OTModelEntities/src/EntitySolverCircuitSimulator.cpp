@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #include "OTModelEntities/EntitySolverCircuitSimulator.h"
-#include "OTModelEntities/PropertyHelper.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 

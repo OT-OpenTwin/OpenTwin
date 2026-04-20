@@ -54,7 +54,13 @@ private:
 		Series
 	};
 
-	using DependencyInfoEntry = std::pair<ot::DatasetDependencyInfos, Datapoints>;
+	struct CurveDataInfo
+	{
+		std::vector<ot::DatasetDependencyInfos> secondaryDependencies;
+		Datapoints dataPoints;
+	};
+
+	using DependencyInfoEntry = std::pair<ot::DatasetDependencyInfos, CurveDataInfo>;
 	using DependencyInfoList = std::list<DependencyInfoEntry>;
 	
 	std::list<std::string> m_curveIDDescriptions;

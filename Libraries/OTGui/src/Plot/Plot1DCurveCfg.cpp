@@ -96,92 +96,14 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _na
 	m_pointOulinePen.setJoinStyle(LineJoinStyle::RoundJoin);
 }
 
-ot::Plot1DCurveCfg::Plot1DCurveCfg(const Plot1DCurveCfg& _other) : m_pointFillPainter(nullptr)
-{
-	this->operator=(_other);
-}
-
-ot::Plot1DCurveCfg::Plot1DCurveCfg(Plot1DCurveCfg&& _other) noexcept :
-	m_pointFillPainter(nullptr)
-{
-	this->operator=(std::move(_other));
-}
-
 ot::Plot1DCurveCfg::~Plot1DCurveCfg()
 {
-	if (m_pointFillPainter)
-	{
-		delete m_pointFillPainter;
-		m_pointFillPainter = nullptr;
-	}
+	
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Opearator
-
-ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(Plot1DCurveCfg&& _other) noexcept
-{
-	if (this != &_other)
-	{
-		BasicEntityInformation::operator=(std::move(_other));
-
-		m_navigationId = _other.m_navigationId;
-
-		m_title = std::move(_other.m_title);
-
-		m_visible = _other.m_visible;
-		m_dimmed = _other.m_dimmed;
-
-		m_linePen = std::move(_other.m_linePen);
-
-		m_pointSize = _other.m_pointSize;
-		m_pointInterval = _other.m_pointInterval;
-		m_pointColorFromCurve = _other.m_pointColorFromCurve;
-		m_pointSymbol = _other.m_pointSymbol;
-		m_pointOulinePen = std::move(_other.m_pointOulinePen);
-
-		if (m_pointFillPainter)
-		{
-			delete m_pointFillPainter;
-		}
-		m_pointFillPainter = _other.m_pointFillPainter;
-		_other.m_pointFillPainter = nullptr;
-
-		m_toolTip = std::move(_other.m_toolTip);
-	}
-
-	return *this;
-}
-
-ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const Plot1DCurveCfg& _other)
-{
-	BasicEntityInformation::operator=(_other);
-
-	if (this != &_other)
-	{
-		m_navigationId = _other.m_navigationId;
-
-		m_title = _other.m_title;
-
-		m_visible = _other.m_visible;
-		m_dimmed = _other.m_dimmed;
-
-		m_linePen = _other.m_linePen;
-
-		m_pointSize = _other.m_pointSize;
-		m_pointInterval = _other.m_pointInterval;
-		m_pointSymbol = _other.m_pointSymbol;
-		m_pointColorFromCurve = _other.m_pointColorFromCurve;
-		m_pointOulinePen = _other.m_pointOulinePen;
-
-		m_toolTip = _other.m_toolTip;
-
-		this->setPointFillPainter(_other.getPointFillPainter()->createCopy());
-	}
-
-	return *this;
-}
 
 ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const BasicEntityInformation& _other)
 {
@@ -196,8 +118,6 @@ ot::Plot1DCurveCfg& ot::Plot1DCurveCfg::operator=(const BasicEntityInformation& 
 void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	BasicEntityInformation::addToJsonObject(_object, _allocator);
-
-	OTAssertNullptr(m_pointFillPainter);
 
 	_object.AddMember("NavID", m_navigationId, _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
@@ -236,16 +156,11 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_pointInterval = json::getInt(_object, "PointInterval");
 	m_pointColorFromCurve = json::getBool(_object, "PointColorFromCurve");
 	m_pointOulinePen.setFromJsonObject(json::getObject(_object, "PointOutlinePen"));
+	m_pointFillPainter.setFromJsonObject(json::getObject(_object, "PointFillPainter"));
 
 	m_dataAccessConfig.setFromJsonObject(json::getObject(_object, "DataAccess"));
 
 	m_toolTip = json::getString(_object, "ToolTip");
-
-	Painter2D* p = Painter2DFactory::create(json::getObject(_object, "PointFillPainter"));
-	if (p)
-	{
-		this->setPointFillPainter(p);
-	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -269,16 +184,5 @@ void ot::Plot1DCurveCfg::setPointFillColor(ColorStyleValueEntry _styleReference)
 
 void ot::Plot1DCurveCfg::setPointFillPainter(Painter2D* _painter)
 {
-	OTAssertNullptr(_painter);
-	if (_painter == m_pointFillPainter)
-	{
-		return;
-	}
-
-	if (m_pointFillPainter)
-	{
-		delete m_pointFillPainter;
-	}
-
-	m_pointFillPainter = _painter;
+	m_pointFillPainter.setPainter(_painter);
 }

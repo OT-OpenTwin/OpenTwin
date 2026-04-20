@@ -21,7 +21,7 @@
 
 #include "OTCore/TypeNames.h"
 #include "OTModelEntities/EntityInformation.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 
 // STD INCLUDES
 #include <algorithm>

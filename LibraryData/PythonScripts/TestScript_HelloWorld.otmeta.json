@@ -1,0 +1,17 @@
+{
+"Name":"TestScript_HelloWorld.py",
+"Version":1,
+"FileName":"TestScript_HelloWorld.py",
+"CollectionName":"PythonScripts",
+"EntityType":"EntityPythonScript",
+"NewEntityFolder":"Python/Scripts",
+"PropertyName":"Scripts",
+"MetaData": {
+    "Port": {
+      "type": "out",
+      "name": "Dummy",
+      "label": "Dummy"
+    }
+  },
+"AdditionalInfos":{"Environment":"69afd6cb77d8206ac70abda3","Language":"Python","Type":"Script"}
+}

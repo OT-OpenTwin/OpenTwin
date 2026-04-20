@@ -28,8 +28,8 @@
 namespace ot {
 
 	class OT_WIDGETS_API_EXPORT CustomValidator : public QValidator {
-		OT_DECL_NOCOPY(CustomValidator)
-		OT_DECL_NOMOVE(CustomValidator)
+		OT_DECL_DEFCOPY(CustomValidator)
+		OT_DECL_DEFMOVE(CustomValidator)
 	public:
 		CustomValidator() = default;
 		virtual ~CustomValidator() = default;

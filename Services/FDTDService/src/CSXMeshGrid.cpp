@@ -24,7 +24,7 @@
 #include "OTCore/OTClassHelper.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityMeshCartesianData.h"
-#include "OTModelEntities/EntityProperties.h"
+#include "OTModelEntities/Properties/EntityProperties.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityAPI.h"
 
