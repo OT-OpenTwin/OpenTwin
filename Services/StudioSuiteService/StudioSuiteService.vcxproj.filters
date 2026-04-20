@@ -48,6 +48,9 @@
     <ClCompile Include="src\ParametricResult1DManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\ThirdParty\tinyxml2\tinyxml2-11.0.0\tinyxml2.cpp">
+      <Filter>Third Party Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">

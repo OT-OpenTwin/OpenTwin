@@ -60,6 +60,7 @@
 
 #include "zlib.h"
 #include "base64.h"
+#include "tinyxml2.h"
 
 // The name of this service
 #define MY_SERVICE_NAME OT_INFO_SERVICE_TYPE_STUDIOSUITE
@@ -1106,13 +1107,44 @@ void Application::extractHarnessData(const std::string &harnessData,
 									 std::map<std::string, std::tuple<double, double, double>> &harnessNodes,
 									 std::set<std::tuple<std::string, std::string>> &harnessSegments)
 {
-	// TODO: Implement
-	assert(0);
+	tinyxml2::XMLDocument doc;
+	doc.Parse(harnessData.c_str(), harnessData.size());
 
-	harnessNodes["N1"] = std::tuple<double, double, double>(-1000.0, 0.0, 50.0);
-	harnessNodes["N2"] = std::tuple<double, double, double>( 1000.0, 0.0, 50.0);
+	tinyxml2::XMLElement* root = doc.FirstChildElement("Harness");
+	if (!root) return;
 
-	harnessSegments.emplace(std::tuple <std::string, std::string>("N1", "N2"));
+	tinyxml2::XMLElement* knots = root->FirstChildElement("Knots");
+	if (!knots) return;
+
+	for (tinyxml2::XMLElement* knot = knots->FirstChildElement("Knot");
+		knot != nullptr;
+		knot = knot->NextSiblingElement("Knot")) {
+
+		const char* id = knot->Attribute("ID");
+
+		double x = 0, y = 0, z = 0;
+		knot->QueryDoubleAttribute("X", &x);
+		knot->QueryDoubleAttribute("Y", &y);
+		knot->QueryDoubleAttribute("Z", &z);
+
+		harnessNodes[id] = std::tuple<double, double, double>(x, y, z);
+	}
+
+	tinyxml2::XMLElement* segments = root->FirstChildElement("Segments");
+	if (!segments) return;
+
+	for (tinyxml2::XMLElement* segment = segments->FirstChildElement("Segment");
+		segment != nullptr;
+		segment = segment->NextSiblingElement("Segment")) {
+
+		const char* knot1 = segment->Attribute("Knot1ID");
+		const char* knot2 = segment->Attribute("Knot2ID");
+
+		std::string knot1ID = knot1 ? knot1 : "";
+		std::string knot2ID = knot2 ? knot2 : "";
+
+		harnessSegments.emplace(std::tuple <std::string, std::string>(knot1ID, knot2ID));
+	}
 }
 
 
