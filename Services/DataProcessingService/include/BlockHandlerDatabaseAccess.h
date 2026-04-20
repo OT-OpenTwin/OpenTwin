@@ -32,32 +32,21 @@ class BlockHandlerDatabaseAccess : public BlockHandler
 {
 public:
 	BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess* blockEntity, const HandlerMap& handlerMap);
-	~BlockHandlerDatabaseAccess();
-
+	
 	bool executeSpecialized() override;	
 	
 	std::string getBlockType() const override;
 private:
-	struct LabelFieldNamePair
-	{
-		std::string m_label; //Comes from the campaign
-		std::string m_fieldName;
-	};
-	
-	ResultCollectionMetadataAccess* m_resultCollectionMetadataAccess = nullptr;
-	DataLakeAccessor m_dataLakeAccessor;
-
-	std::list< BsonViewOrValue> m_comparisons;
+	ot::DataLakeAccessCfg m_accessConfig;
+	MetadataCampaign m_campaign;
 
 	BsonViewOrValue m_projection;
 	BsonViewOrValue m_sort;
 	bool m_sortByID = false;
-	const int m_documentLimit = 0;
+	uint32_t m_documentLimit = 0;
 
 	PipelineData m_queriedData;
 
 	void collectMetadataForPipeline(EntityBlockDatabaseAccess* _blockEntity);
-	void buildQuery(EntityBlockDatabaseAccess* _blockEntity);
-				
-	void applyRegexFilter(std::list<std::string>& _options, const std::string& _filter);
+
 };

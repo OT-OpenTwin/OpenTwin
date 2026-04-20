@@ -24,7 +24,6 @@
 #include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "BlockEntityHandler.h"
 #include "PipelineHandler.h"
-#include "PropertyHandlerDatabaseAccessBlock.h"
 #include "GraphHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
@@ -72,7 +71,6 @@ public:
 	//! @brief Will be called when a model service connected to the session and is ready to work
 	virtual void modelConnected(ot::components::ModelComponent * _model) override;
 
-	virtual void propertyChanged(ot::JsonDocument& _doc) override;
 
 private:
 	Application();
@@ -86,7 +84,6 @@ private:
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
 	GraphHandler _graphHandler;
-	PropertyHandlerDatabaseAccessBlock m_propertyHandlerDatabaseAccessBlock;
 	EntityCreator m_entityCreator;
 
 	void runPipeline();

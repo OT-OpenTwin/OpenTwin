@@ -26,10 +26,13 @@ public:
 	std::list<std::string> getTupleOptions(const EntityBase* _thisObject) const;
 	std::string getTupleType(const EntityBase* _thisObject) const;
 
+	bool getOrderReproducible(const EntityBase* _thisObject) const;
 	bool tuplePropertiesAreVisible(const EntityBase* _thisObject) const;
 
 	void reset(EntityBase* _thisObject, const DataLakeQueryCfg& _config);
 	void lockAllProperties(EntityBase* _thisObject);
+
+	std::string getQuerySettingsGroupName() const { return m_groupQuerySettings; }
 private:
 	const uint32_t m_maxNbOfQueries = 40;
 	const uint32_t m_maxNbOfQueriesMetadata = 10;

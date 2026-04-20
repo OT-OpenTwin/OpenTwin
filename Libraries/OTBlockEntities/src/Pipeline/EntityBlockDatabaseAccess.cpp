@@ -46,12 +46,16 @@ EntityBlockDatabaseAccess::EntityBlockDatabaseAccess(ot::UID ID, EntityBase* par
 
 void EntityBlockDatabaseAccess::createProperties()
 {
-	m_propertyBundleDataLakeQuery.setProperties(this);
+	m_queryProperties.setProperties(this);
+	const std::string group = m_queryProperties.getQuerySettingsGroupName();
+	EntityPropertiesBoolean::createProperty(group, m_propertyNameLimit, false, "default", getProperties());
+	auto base = EntityPropertiesInteger::createProperty(group, m_propertyNameLimitNb, 500, "default", getProperties());
+	base->setVisible(false);
 }
 
 std::string EntityBlockDatabaseAccess::getSelectedProjectName()
 {
-	return  m_propertyBundleDataLakeQuery.getSelectedProject(this);
+	return  m_queryProperties.getSelectedProject(this);
 }
 
 void EntityBlockDatabaseAccess::updateBlockConfig()
@@ -77,47 +81,81 @@ ot::GraphicsItemCfg* EntityBlockDatabaseAccess::createBlockCfg()
 	return graphicsItemConfig;
 }
 
-bool EntityBlockDatabaseAccess::getReproducibleOrder()
+bool EntityBlockDatabaseAccess::getReproducibleOrder()const
 {
-	//const bool orderReproducible = PropertyHelper::getBoolPropertyValue(this, m_propertyOrder, m_groupQuerySetttings);
-	//return orderReproducible;
-	return true;
+	return m_queryProperties.getOrderReproducible(this);
+}
+
+std::pair<bool, uint32_t>  EntityBlockDatabaseAccess::getResultLimit() const
+{
+	const std::string settingsGroup = m_queryProperties.getQuerySettingsGroupName();
+	int32_t limit =	PropertyHelper::getIntegerPropertyValue(this, m_propertyNameLimitNb, settingsGroup);
+	bool useLimit = PropertyHelper::getBoolPropertyValue(this, m_propertyNameLimit, settingsGroup);
+	return {useLimit,static_cast<uint32_t>(limit)};
 }
 
 bool EntityBlockDatabaseAccess::updateFromProperties()
 {
-	bool requiresUpdate = m_propertyBundleDataLakeQuery.updatePropertyVisibility(this);
+	const std::string settingsGroup = m_queryProperties.getQuerySettingsGroupName();
+	auto propertyLimitResults =	PropertyHelper::getBoolProperty(this, m_propertyNameLimit, settingsGroup);
+	bool refresh = 	propertyLimitResults->needsUpdate();
+	if (refresh)
+	{
+		PropertyHelper::getIntegerProperty(this, m_propertyNameLimitNb, settingsGroup)->setVisible(propertyLimitResults->getValue());
+	}
 	if (getObserver() != nullptr)
 	{
+		try
+		{
+			const std::string projectName = m_queryProperties.getSelectedProject(this);
+			std::string collectionName;
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
-		const std::string projectName = m_propertyBundleDataLakeQuery.getSelectedProject(this);
-		std::string collectionName;
-		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
-		assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-		requiresUpdate |= m_propertyBundleDataLakeQuery.updateOptions(this, associatedCampaign.value());
+			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
+			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
+			refresh |= dataRefreshNeeded;
 
-		DataLakeQueryCfg cfg;
-		cfg.setCollectionName(collectionName);
-		cfg.setSeriesLabel(m_propertyBundleDataLakeQuery.getSelectedSeries(this));
-		cfg.setValueDescriptionParameters(m_propertyBundleDataLakeQuery.getParameterQueries(this));
-		cfg.setValueDescriptionSeriesMD(m_propertyBundleDataLakeQuery.getMetadataQueries(this));
-		cfg.setValueDescriptionQuantities(m_propertyBundleDataLakeQuery.getQuantityQuery(this));
+			if (dataRefreshNeeded)
+			{
+				DataLakeQueryCfg queryCfg;
+				queryCfg.setCollectionName(collectionName);
+				queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+				queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+				queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+				queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
 
-		getObserver()->requestDatapointVisualisation(cfg, getEntityID(), getEntityStorageVersion());
+				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			}
+		}
+		catch (std::exception& _e)
+		{
+			std::string message = "Failed to use user given comparisons for data lake access: " + std::string(_e.what());
+			OT_LOG_E(message);
+		}
 	}
-		
-	getProperties().forceResetUpdateForAllProperties();
-	//updateBlockConfig();
 
-	return requiresUpdate;
+	getProperties().forceResetUpdateForAllProperties();
+	return refresh;
 }
 
 void EntityBlockDatabaseAccess::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::addStorageData(storage);
+	const std::string serialisedDLA = m_dataLakeAccessCfg.toJson();
+	storage.append
+	(
+		bsoncxx::builder::basic::kvp("DataLakeAccessCfg", serialisedDLA)
+	);
 }
 
 void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
+	const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
+	if (!serialisedDLA.empty())
+	{
+		ot::JsonDocument doc;
+		doc.fromJson(serialisedDLA);
+		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
+	}
 }

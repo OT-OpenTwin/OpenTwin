@@ -22,8 +22,8 @@
 // OpenTwin header
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTBlockEntities/EntityBlock.h"
-#include "OTModelEntities/PropertyBundleDataLakeQuery.h"
-
+#include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public EntityBlock
 {
 public:
@@ -33,6 +33,8 @@ public:
 	static std::string className() { return "EntityBlockDatabaseAccess"; }
 	virtual std::string getClassName(void) const override { return EntityBlockDatabaseAccess::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
+
+	ot::DataLakeAccessCfg getDataLakeAccessCfg() const { return m_dataLakeAccessCfg; }
 
 	virtual void createProperties() override;
 	
@@ -46,8 +48,8 @@ public:
 
 	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
 
-	bool getReproducibleOrder() ;
-
+	bool getReproducibleOrder() const;
+	std::pair<bool,uint32_t> getResultLimit() const;
 	static const std::string getIconName() {return "Database_access.svg"; }
 
 protected:
@@ -56,7 +58,10 @@ protected:
 
 private:
 	ot::Connector m_connectorOutput;
-	PropertyBundleDataLakeQuery m_propertyBundleDataLakeQuery;
-	
+	PropertyBundleDataLakeQuery m_queryProperties;
+	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
+	std::string m_propertyNameLimitNb = "Result limit";
+	std::string m_propertyNameLimit = "Limit results";
+
 	void updateBlockConfig();
 };

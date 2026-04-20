@@ -126,35 +126,6 @@ void Application::runPipeline()
 
 // Required functions
 
-void Application::propertyChanged(ot::JsonDocument& _doc)
-{
-	EntityBlockDatabaseAccess dbA;
-	std::list<ot::EntityInformation> dbAccessBlockInformations;
-	const std::list<ot::EntityInformation> selectedEntitiesInfos =	this->getSelectedEntityInfos();
-	for (const ot::EntityInformation& selectedEntityInfo :selectedEntitiesInfos )
-	{
-		if (selectedEntityInfo.getEntityType() == dbA.getClassName())
-		{
-			dbAccessBlockInformations.push_back(selectedEntityInfo);
-		}
-	}
-	
-	Application::instance()->prefetchDocumentsFromStorage(dbAccessBlockInformations);
-	for(ot::EntityInformation& selectedEntityInfos : dbAccessBlockInformations)
-	{
-		auto entBase = ot::EntityAPI::readEntityFromEntityIDandVersion(selectedEntityInfos.getEntityID(), selectedEntityInfos.getEntityVersion());
-		auto dbAccess = std::shared_ptr<EntityBlockDatabaseAccess>(dynamic_cast<EntityBlockDatabaseAccess*>(entBase));
-		if (dbAccess != nullptr)
-		{
-			m_propertyHandlerDatabaseAccessBlock.performEntityUpdateIfRequired(dbAccess);
-		}
-		else
-		{
-			assert(false);
-		}
-	}
-}
-
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
@@ -186,7 +157,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
-	m_propertyHandlerDatabaseAccessBlock.setUIComponent(_ui);
+	
 	
 	connectToolBarButton(m_buttonGraphicsScene, &m_entityCreator, &EntityCreator::createPipeline);
 	connectToolBarButton(m_buttonCreateSolver, &m_entityCreator, &EntityCreator::createSolver);
@@ -204,5 +175,4 @@ void Application::modelConnected(ot::components::ModelComponent * _model)
 	_blockEntityHandler.setModelComponent(_model);
 	_graphHandler.setModelComponent(_model);
 	_pipelineHandler.setModelComponent(_model);
-	m_propertyHandlerDatabaseAccessBlock.setModelComponent(_model);
 }

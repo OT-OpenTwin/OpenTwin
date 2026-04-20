@@ -56,9 +56,6 @@
     <ClCompile Include="src\MeasurementCampaignHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\PropertyHandlerDatabaseAccessBlock.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graph.cpp">
       <Filter>Source Files\GraphHandling</Filter>
     </ClCompile>
@@ -122,9 +119,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\MeasurementCampaignHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\PropertyHandlerDatabaseAccessBlock.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Graph.h">

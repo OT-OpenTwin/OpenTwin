@@ -801,3 +801,9 @@ void PropertyBundleDataLakeQuery::lockAllProperties(EntityBase* _thisObject)
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
 	}
 }
+
+
+bool PropertyBundleDataLakeQuery::getOrderReproducible(const EntityBase* _thisObject) const
+{
+	return PropertyHelper::getBoolPropertyValue(_thisObject, m_propertyOrder, m_groupQuerySettings);
+}
