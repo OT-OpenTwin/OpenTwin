@@ -68,9 +68,11 @@ namespace ot {
 		virtual void showFilterMenu(int _logicalIndex);
 
 		//! @brief Is called when the user confirms the filter menu.
-		//! @param _logicalIndex The logical index the filter menu was shown for.
-		//! @param _selectedOptions The list of selected options in the filter menu.
-		virtual void filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions);
+		//! @param _filter The filter menu that was confirmed.
+		virtual void filterHasChanged(const HeaderFilter* _filter);
+
+	Q_SIGNALS:
+		void filterChanged(const HeaderFilter* _filter);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

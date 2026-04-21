@@ -23,6 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGui/Widgets/TableCfg.h"
+#include "OTGui/Event/TableFilterChangeEvent.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 namespace ot {
@@ -39,6 +40,7 @@ namespace ot {
 		// Public: Action document helper
 
 		static ot::JsonDocument createTableSaveRequestDocument(const ot::TableCfg& _config);
+		static ot::JsonDocument createTableColumnFilterChangeRequestDocument(const ot::TableFilterChangeEvent& _event);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -51,6 +53,8 @@ namespace ot {
 		//! A return status of type OK will result in the table modified flag being cleared.
 		virtual ReturnMessage tableSaveRequested(const ot::TableCfg& _config) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled save request"); };
 
+		virtual ReturnMessage tableColumnFilterChanged(const ot::TableFilterChangeEvent& _event) { return ot::ReturnMessage(ot::ReturnMessage::Failed, "Unhandled column filter changed event"); };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Action handling
@@ -59,6 +63,7 @@ namespace ot {
 		ActionHandler m_actionHandler;
 
 		ReturnMessage handleTableSaveRequested(JsonDocument& _doc);
+		ReturnMessage handleTableColumnFilterChanged(JsonDocument& _doc);
 	};
 
 }

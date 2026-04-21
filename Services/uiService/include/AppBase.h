@@ -105,6 +105,7 @@ namespace ot { class TableView; }
 namespace ot { class WidgetView; }
 namespace ot { class PlotDataset; }
 namespace ot { class GraphicsItem; }
+namespace ot { class HeaderFilter; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class TextEditorView; }
 namespace ot { class GraphicsItemCfg; }
@@ -565,6 +566,7 @@ public Q_SLOTS:
 	// Table slots
 
 	void slotTableSaveRequested();
+	void slotTableColumnFilterChanged(const ot::HeaderFilter* _filter);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

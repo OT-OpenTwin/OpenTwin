@@ -94,9 +94,29 @@ InfoFileManager::InfoFileManager(ot::UID infoEntityID, ot::UID infoEntityVersion
 						runIdToFileNameToHash[runID][name] = hash;
 					}
 				}
+
+				// Now read the information about the harness hashes
+				std::getline(dataContent, line);
+				if (line.empty()) throw std::string("error reading number of harnesses");
+				size_t numberHarnesses = atoll(line.c_str());
+				assert(numberHarnesses >= 0 && numberHarnesses <= 1);
+
+				if (numberHarnesses == 1)
+				{
+					std::string hash;
+					std::getline(dataContent, hash);
+
+					harnessHash = hash;
+				}
+			}
+			catch (std::string& s)
+			{
+				// This case might get triggerend if an earlier version of the data item is present and not all information
+				// is stored there. The latter case is not problematic, since the default values will be taken then.
 			}
 			catch (std::exception &e)
 			{
+				// This assertion might get triggered in cased of a broken data entity.
 				assert(0);
 			}
 
@@ -132,6 +152,11 @@ std::string InfoFileManager::getRunIDMetaHash(int runID)
 
 	// The item is not available in the map, so we return an empty string as hash
 	return "";
+}
+
+std::string InfoFileManager::getHarnessHash(void)
+{
+	return harnessHash;
 }
 
 std::string InfoFileManager::getRunIDFileHash(int runID, const std::string& fileName)
@@ -170,4 +195,5 @@ size_t InfoFileManager::getNumberOfFilesForRunID(int runID)
 
 	return runIdItem->second.size();
 }
+
 

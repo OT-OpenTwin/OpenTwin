@@ -40,7 +40,9 @@ namespace ot {
 		void setName(const std::string& name) { m_name = name; }
 		const std::string& getName() const { return m_name; }
 
+		void setComparator(const std::string& _comparator) { m_comparator = _comparator; }
 		const std::string& getComparator() const { return m_comparator; }
+
 		void setValue(const std::string& _value) { m_value = _value; }
 		const std::string& getValue() const { return m_value; }
 

@@ -131,10 +131,9 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 	auto rowHeaderIt = rowHeaders.begin();
 	if (rowHeaders.size() == cfg.getRowCount())
 	{
-		OTAssert(rowHeaderIt != rowHeaders.end(), "Iterator out of range");
-
 		for (int i = 0; i < cfg.getRowCount(); i++)
 		{
+			OTAssert(rowHeaderIt != rowHeaders.end(), "Iterator out of range");
 			cfg.setRowHeader(i, *rowHeaderIt);
 			++rowHeaderIt;
 		}

@@ -65,6 +65,10 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 	_uiComponent->addMenuButton(m_buttonFileImport);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Button Handler
+
 void FileHandler::handleImportTextFileButton() {
 	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
 	const std::string fileDialogTitle = "Import Text File";
@@ -79,6 +83,10 @@ void FileHandler::handleImportPythonScriptButton() {
 	importFile(fileMask, fileDialogTitle, subsequentFunction);
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Action Handler
+
 void FileHandler::handleImportTextFile(ot::JsonDocument& _document) {
 	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::FilesFolder));
 	worker.detach();
@@ -88,6 +96,231 @@ void FileHandler::handleImportPythonScript(ot::JsonDocument& _document) {
 	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::PythonScriptFolder));
 	worker.detach();
 }
+
+ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex)
+{
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName = entityIDsByName.find(_entityName);
+	if (entityIDByName != entityIDsByName.end())
+	{
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
+		if (textVisualisationEntity != nullptr)
+		{
+			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
+			if (!handlingServices.empty())
+			{
+				for (const std::string& owner : handlingServices)
+				{
+					if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex)), owner);
+						workerThread.detach();
+					}
+				}
+			}
+			else
+			{
+				storeChangedText(textVisualisationEntity, _text, _nextChunkStartIndex);
+
+				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify))
+				{
+					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						ot::JsonDocument notify = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex);
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
+						workerThread.detach();
+					}
+				}
+			}
+
+			return ot::ReturnMessage::Ok;
+		}
+		else
+		{
+			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + _entityName + " since it does not support the corresponding visualisation interface.");
+			OT_LOG_E(ret.getWhat());
+			return ret;
+		}
+	}
+	else
+	{
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + _entityName);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+}
+
+ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg)
+{
+	const std::string entityName = _cfg.getEntityName();
+
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName = entityIDsByName.find(entityName);
+	if (entityIDByName != entityIDsByName.end())
+	{
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		ot::IVisualisationTable* tableVisualisationEntity = dynamic_cast<ot::IVisualisationTable*>(entityBase);
+		if (tableVisualisationEntity != nullptr)
+		{
+			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
+
+			if (!handlingServices.empty())
+			{
+				for (const std::string& owner : handlingServices)
+				{
+					if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableSaveRequestDocument(_cfg)), owner);
+						workerThread.detach();
+					}
+				}
+				return ot::ReturnMessage::Ok;
+			}
+			else
+			{
+				storeChangedTable(tableVisualisationEntity, _cfg);
+
+				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify))
+				{
+					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						ot::JsonDocument notify = ot::TableActionHandler::createTableSaveRequestDocument(_cfg);
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
+						workerThread.detach();
+					}
+				}
+			}
+
+			return ot::ReturnMessage::Ok;
+		}
+		else
+		{
+			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
+			OT_LOG_E(ret.getWhat());
+			return ret;
+		}
+	}
+	else
+	{
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + entityName);
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+}
+
+ot::ReturnMessage FileHandler::tableColumnFilterChanged(const ot::TableFilterChangeEvent& _event)
+{
+	const std::string entityName = _event.getTableInformation().getEntityName();
+
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	const auto entityIDsByName = model->getEntityNameToIDMap();
+	auto entityIDByName = entityIDsByName.find(entityName);
+	if (entityIDByName != entityIDsByName.end())
+	{
+		ot::UID entityID = entityIDByName->second;
+		EntityBase* entityBase = model->getEntityByID(entityID);
+		ot::IVisualisationTable* tableVisualisationEntity = dynamic_cast<ot::IVisualisationTable*>(entityBase);
+		if (tableVisualisationEntity != nullptr)
+		{
+			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
+
+			if (!handlingServices.empty())
+			{
+				for (const std::string& owner : handlingServices)
+				{
+					if (owner != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						ot::TableFilterChangeEvent event(_event);
+						event.setForwarding();
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableColumnFilterChangeRequestDocument(event)), owner);
+						workerThread.detach();
+					}
+				}
+				return ot::ReturnMessage::Ok;
+			}
+			else
+			{
+				processTableColumnFilterChanged(_event, tableVisualisationEntity);
+
+				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify))
+				{
+					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL)
+					{
+						ot::TableFilterChangeEvent event(_event);
+						event.setForwarding();
+						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableColumnFilterChangeRequestDocument(event)), notifyService);
+						workerThread.detach();
+					}
+				}
+			}
+
+			return ot::ReturnMessage::Ok;
+		}
+		else
+		{
+			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle table column filter changed event for entity \"" + entityName + "\" since it does not support the corresponding visualisation interface.");
+			OT_LOG_E(ret.getWhat());
+			return ret;
+		}
+	}
+	else
+	{
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle table column filter changed event since entity \"" + entityName + "\" was not found");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+}
+
+ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document)
+{
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+
+	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+	EntityBase* entityBase = model->findEntityFromName(entityName);
+	if (!entityBase)
+	{
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity not found  { \"Name\": \"" + entityName + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
+	if (!textVisualisationEntity)
+	{
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity has no text visualization interface { \"Name\": \"" + entityName + "\", \"Type\": \"" + entityBase->getClassName() + "\" }");
+		OT_LOG_E(ret.getWhat());
+		return ret;
+	}
+
+	std::string text = textVisualisationEntity->getText();
+
+	ot::GridFSFileInfo info;
+	info.setCollectionName(DataBase::instance().getCollectionName());
+
+	// Upload the data to gridFS
+	DataStorageAPI::DocumentAPI db;
+
+	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getCollectionName());
+	info.setDocumentId(result.get_oid().value.to_string());
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Helper
 
 void FileHandler::importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName)
 {
@@ -166,152 +399,11 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	uiComponent->displayMessage(std::to_string(passedTime) + " ms\n");
 }
 
-void FileHandler::storeChangedTable(ot::IVisualisationTable* _entity, const ot::TableCfg& _cfg)
+void FileHandler::addTextFilesToModel()
 {
+	QueuingHttpRequestsRAII wrapper;
 	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
-	assert(_entity != nullptr);
-
-	_entity->setTable(_cfg.createMatrix());
-	model->setModified();
-	model->modelChangeOperationCompleted("Updated Table.");
-}
-
-ot::ReturnMessage FileHandler::textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex)
-{
-	Model* model =	Application::instance()->getModel();
-	assert(model != nullptr);
-
-	const auto entityIDsByName = model->getEntityNameToIDMap();
-	auto entityIDByName	= entityIDsByName.find(_entityName);
-	if(entityIDByName != entityIDsByName.end())
-	{
-		ot::UID entityID = entityIDByName->second;
-		EntityBase* entityBase = model->getEntityByID(entityID);
-		ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
-		if(textVisualisationEntity != nullptr)
-		{
-			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
-			if (!handlingServices.empty())
-			{
-				for (const std::string& owner : handlingServices) {
-					if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex)), owner);
-						workerThread.detach();
-					}
-				}
-			}
-			else {
-				storeChangedText(textVisualisationEntity, _text, _nextChunkStartIndex);
-
-				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
-					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
-						ot::JsonDocument notify = ot::TextEditorActionHandler::createTextEditorSaveRequestDocument(_entityName, _text, _nextChunkStartIndex);
-						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
-						workerThread.detach();
-					}
-				}
-			}
-
-			return ot::ReturnMessage::Ok;
-		}
-		else
-		{
-			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + _entityName + " since it does not support the corresponding visualisation interface.");
-			OT_LOG_E(ret.getWhat());
-			return ret;
-		}
-	}
-	else
-	{
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + _entityName);
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-}
-
-ot::ReturnMessage FileHandler::tableSaveRequested(const ot::TableCfg& _cfg) {
-	const std::string entityName = _cfg.getEntityName();
-
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
-
-	const auto entityIDsByName = model->getEntityNameToIDMap();
-	auto entityIDByName = entityIDsByName.find(entityName);
-	if (entityIDByName != entityIDsByName.end()) {
-		ot::UID entityID = entityIDByName->second;
-		EntityBase* entityBase = model->getEntityByID(entityID);
-		ot::IVisualisationTable* tableVisualisationEntity = dynamic_cast<ot::IVisualisationTable*>(entityBase);
-		if (tableVisualisationEntity != nullptr) {
-			std::list<std::string> handlingServices = entityBase->getServicesForCallback(EntityBase::Callback::DataHandle);
-
-			if (!handlingServices.empty()) {
-				for (const std::string& owner : handlingServices) {
-					if (owner != OT_INFO_SERVICE_TYPE_MODEL) {
-						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(ot::TableActionHandler::createTableSaveRequestDocument(_cfg)), owner);
-						workerThread.detach();
-					}
-				}
-				return ot::ReturnMessage::Ok;
-			}
-			else {
-				storeChangedTable(tableVisualisationEntity, _cfg);
-
-				for (const std::string& notifyService : entityBase->getServicesForCallback(EntityBase::Callback::DataNotify)) {
-					if (notifyService != OT_INFO_SERVICE_TYPE_MODEL) {
-						ot::JsonDocument notify = ot::TableActionHandler::createTableSaveRequestDocument(_cfg);
-						std::thread workerThread(&FileHandler::NotifyOwnerAsync, this, std::move(notify), notifyService);
-						workerThread.detach();
-					}
-				}
-			}
-
-			return ot::ReturnMessage::Ok;
-		}
-		else {
-			ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to visualise " + entityName + " since it does not support the corresponding visualisation interface.");
-			OT_LOG_E(ret.getWhat());
-			return ret;
-		}
-	}
-	else {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Failed to handle changed text request since the entity could not be found by name: " + entityName);
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-}
-
-ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document) {
-	Model* model = Application::instance()->getModel();
-	assert(model != nullptr);
-
-	std::string entityName = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
-	EntityBase* entityBase = model->findEntityFromName(entityName);
-	if (!entityBase) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity not found  { \"Name\": \"" + entityName + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	ot::IVisualisationText* textVisualisationEntity = dynamic_cast<ot::IVisualisationText*>(entityBase);
-	if (!textVisualisationEntity) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Entity has no text visualization interface { \"Name\": \"" + entityName + "\", \"Type\": \"" + entityBase->getClassName() + "\" }");
-		OT_LOG_E(ret.getWhat());
-		return ret;
-	}
-
-	std::string text = textVisualisationEntity->getText();
-
-	ot::GridFSFileInfo info;
-	info.setCollectionName(DataBase::instance().getCollectionName());
-
-	// Upload the data to gridFS
-	DataStorageAPI::DocumentAPI db;
-
-	bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(text.c_str()), text.size(), info.getCollectionName());
-	info.setDocumentId(result.get_oid().value.to_string());
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
+	model->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added File", true, false, true);
 }
 
 void FileHandler::storeChangedText(ot::IVisualisationText* _entity, const std::string _text, size_t _nextChunkStartIndex)
@@ -331,6 +423,22 @@ void FileHandler::storeChangedText(ot::IVisualisationText* _entity, const std::s
 
 	model->setModified();
 	model->modelChangeOperationCompleted("Updated Text.");
+}
+
+void FileHandler::storeChangedTable(ot::IVisualisationTable* _entity, const ot::TableCfg& _cfg)
+{
+	Model* model = Application::instance()->getModel();
+	assert(model != nullptr);
+	assert(_entity != nullptr);
+
+	_entity->setTable(_cfg.createMatrix());
+	model->setModified();
+	model->modelChangeOperationCompleted("Updated Table.");
+}
+
+void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEvent& _event, ot::IVisualisationTable* _entity)
+{
+
 }
 
 void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner)
@@ -394,11 +502,4 @@ void FileHandler::clearBuffer()
 	m_entityIDsData.clear();
 	m_entityIDsTopo.clear();
 	m_forceVisible.clear();
-}
-
-void FileHandler::addTextFilesToModel()
-{
-	QueuingHttpRequestsRAII wrapper;
-	Model* model = Application::instance()->getModel();
-	model->addEntitiesToModel(m_entityIDsTopo, m_entityVersionsTopo, m_forceVisible, m_entityIDsData, m_entityVersionsData, m_entityIDsTopo, "Added File", true, false, true);
 }

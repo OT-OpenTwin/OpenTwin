@@ -24,7 +24,7 @@ namespace ot {
 		virtual QStringList getFilterOptions(int _logicalIndex) const override;
 
 		virtual void sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder) override;
-		virtual void filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions) override;
+		virtual void filterHasChanged(const HeaderFilter* _filter) override;
 
 		QStringList getFilterOptionsFromText(int _logicalIndex) const;
 

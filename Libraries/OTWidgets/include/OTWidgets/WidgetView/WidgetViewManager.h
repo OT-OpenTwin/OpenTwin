@@ -199,6 +199,7 @@ namespace ot {
 
 		//! @brief Returns the widget view from the provided widget.
 		//! This only works if the view was registered.
+		//! Returns nullptr if no view was found for the provided widget.
 		WidgetView* findViewFromWidget(QWidget* _widget) const;
 
 		//! @brief Returns true if a view with the given name exists

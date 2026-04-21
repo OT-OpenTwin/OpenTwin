@@ -155,9 +155,9 @@ void ot::ProjectOverviewHeader::sortOrderChangeRequest(int _logicalIndex, Qt::So
 	m_overview->sort(_logicalIndex, _sortOrder);
 }
 
-void ot::ProjectOverviewHeader::filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions)
+void ot::ProjectOverviewHeader::filterHasChanged(const ot::HeaderFilter* _filter)
 {
-	m_lastFilter.setSelectedFilters(_selectedOptions);
-	m_lastFilter.setLogicalIndex(_logicalIndex);
+	m_lastFilter.setSelectedFilters(_filter->saveCheckedState());
+	m_lastFilter.setLogicalIndex(_filter->getLogicalIndex());
 	m_overview->filterProjects(m_lastFilter);
 }

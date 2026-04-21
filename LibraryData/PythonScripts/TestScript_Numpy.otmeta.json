@@ -2,10 +2,6 @@
 "Name":"TestScript_Numpy.py",
 "Version":1,
 "FileName":"TestScript_Numpy.py",
-"CollectionName":"PythonScripts",
-"EntityType":"EntityPythonScript",
-"NewEntityFolder":"Python/Scripts",
-"PropertyName":"Scripts",
 "MetaData":{"Description":"Calculates determinant of a 2x2 matrix and writes it to port 'DisplayValue' as JSON"},
 "AdditionalInfos":{"Environment":"69afd6cb77d8206ac70abda3","Language":"Python","Type":"Script"}
 }

@@ -40,6 +40,7 @@ void InfoFileManager::readInformation()
 	deletedShapes.clear();
 	runIdMetaHash.clear();
 	runIdToFileNameToHash.clear();
+	harnessHash.clear();
 	hasChanged = false;
 	infoEntityID = 0;
 	infoEntityVersion = 0;
@@ -115,9 +116,29 @@ void InfoFileManager::readInformation()
 						runIdToFileNameToHash[runID][name] = hash;
 					}
 				}
+
+				// Now read the information about the harness hashes
+				std::getline(dataContent, line);
+				if (line.empty()) throw std::string("error reading number of harnesses");
+				size_t numberHarnesses = atoll(line.c_str());
+				assert(numberHarnesses >= 0 && numberHarnesses <= 1);
+
+				if (numberHarnesses == 1)
+				{
+					std::string hash;
+					std::getline(dataContent, hash);
+
+					harnessHash = hash;
+				}
+			}
+			catch (std::string)
+			{
+				// This case might get triggerend if an earlier version of the data item is present and not all information
+				// is stored there. The latter case is not problematic, since the default values will be taken then.
 			}
 			catch (std::exception)
 			{
+				// This assertion might get triggered in cased of a broken data entity.
 				assert(0);
 			}
 
@@ -155,6 +176,11 @@ void InfoFileManager::setShapeHash(const std::string& name, const std::string& h
 		shapeHashMap[name] = hash;
 		hasChanged = true;
 	}
+}
+
+void InfoFileManager::setHarnessHash(const std::string& hash)
+{
+	harnessHash = hash;
 }
 
 void InfoFileManager::deleteShape(const std::string& name)
@@ -214,6 +240,10 @@ void InfoFileManager::writeInformation()
 
 	// Write the infromation about 1D results
 	writeResult1DInformation(dataContent);
+
+	// Write information about the harness hash
+	dataContent << 1 << std::endl;
+	dataContent << harnessHash << std::endl; // Write the harness hash
 
 	dataEntity->setData(dataContent.str().c_str(), dataContent.str().length()+1);
 

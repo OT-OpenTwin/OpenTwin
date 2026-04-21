@@ -240,7 +240,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 
 		try
 		{
-			filterOptionsChanged(_logicalIndex, opt);
+			filterHasChanged(&filter);
 		}
 		catch (const std::exception& ex)
 		{
@@ -251,9 +251,9 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 	}
 }
 
-void ot::HeaderBase::filterOptionsChanged(int _logicalIndex, const QStringList& _selectedOptions)
+void ot::HeaderBase::filterHasChanged(const HeaderFilter* _filter)
 {
-
+	Q_EMIT filterChanged(_filter);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

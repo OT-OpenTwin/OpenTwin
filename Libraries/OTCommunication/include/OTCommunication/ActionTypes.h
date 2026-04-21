@@ -232,6 +232,7 @@
 #define OT_ACTION_CMD_UI_SS_PARAMETERS "StudioSuite.ParametersInformation"
 #define OT_ACTION_CMD_UI_SS_HISTORY "StudioSuite.HistoryInformation"
 #define OT_ACTION_CMD_UI_SS_SHAPEINFO "StudioSuite.ShapesInformation"
+#define OT_ACTION_CMD_UI_SS_HARNESS "StudioSuite.HarnessData"
 #define OT_ACTION_CMD_UI_SS_TRIANGLES "StudioSuite.ShapesTriangles"
 #define OT_ACTION_CMD_UI_SS_RESULT1D "StudioSuite.Result1D"
 #define OT_ACTION_CMD_UI_SS_GET_LOCAL_FILENAME "StudioSuite.GetLocalFileName"
@@ -356,6 +357,8 @@
 #define OT_ACTION_CMD_UI_TABLE_SetSelection "UI.Table.SetSelection"
 #define OT_ACTION_CMD_UI_TABLE_GetSelection "UI.Table.GetSelection"
 #define OT_ACTION_CMD_UI_TABLE_SetCurrentSelectionBackground "UI.Table.SetCurrentSelectionBackground"
+#define OT_ACTION_CMD_UI_TABLE_ColumnFilterChanged "UI.Table.ColumnFilterChanged"
+#define OT_ACTION_CMD_UI_TABLE_RowFilterChanged "UI.Table.RowFilterChanged"
 
 #define OT_ACTION_CMD_CARTESIANMESH_Run "CARTESIANMESH.Run"
 

@@ -38,6 +38,7 @@ public:
 	void readInformation();
 	void getShapes(std::map<std::string, bool>& shapes);
 	void setShapeHash(const std::string& name, const std::string& hash);
+	void setHarnessHash(const std::string& hash);
 	void deleteShape(const std::string& name);
 	void writeInformation();
 	void addDeletedShapesToList(std::list<std::string>& list);
@@ -58,4 +59,5 @@ private:
 	ot::UID infoEntityVersion;
 	std::map<int, std::string> runIdMetaHash;
 	std::map<int, std::map<std::string, std::string>> runIdToFileNameToHash;
+	std::string harnessHash;
 };

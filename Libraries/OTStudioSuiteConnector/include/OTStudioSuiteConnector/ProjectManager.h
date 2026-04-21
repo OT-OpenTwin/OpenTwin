@@ -74,6 +74,7 @@ private:
     void                       sendParameterInformation(const std::string& projectRoot);
     void                       sendHistoryInformation(const std::string& projectRoot);
     void                       sendShapeInformationAndTriangulation(const std::string& projectRoot, InfoFileManager& infoFileManager);
+    void                       sendHarnessInformation(const std::string& projectRoot, InfoFileManager& infoFileManager);
     void                       readFileContent(const std::string& fileName, std::string& content);
     std::map<std::string, int> determineAllShapes(std::stringstream fileContent);
     void                       sendTriangulations(const std::string& projectRoot, std::map<std::string, int> trianglesMap, InfoFileManager& infoFileManager);

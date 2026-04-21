@@ -420,6 +420,16 @@ void ot::Table::slotResizeRowToContent(int _row) {
 	}
 }
 
+void ot::Table::slotColumnFilterChanged(const HeaderFilter* _filter)
+{
+	Q_EMIT columnFilterChanged(_filter);
+}
+
+void ot::Table::slotRowFilterChanged(const HeaderFilter* _filter)
+{
+	Q_EMIT rowFilterChanged(_filter);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private helper
@@ -429,8 +439,11 @@ void ot::Table::ini() {
 
 	m_horizontalHeader = new TableHeader(this, Qt::Horizontal);
 	this->setHorizontalHeader(m_horizontalHeader);
+	connect(m_horizontalHeader, &TableHeader::filterChanged, this, &Table::slotColumnFilterChanged);
+
 	m_verticalHeader = new TableHeader(this, Qt::Vertical);
 	this->setVerticalHeader(m_verticalHeader);
+	connect(m_verticalHeader, &TableHeader::filterChanged, this, &Table::slotRowFilterChanged);
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
