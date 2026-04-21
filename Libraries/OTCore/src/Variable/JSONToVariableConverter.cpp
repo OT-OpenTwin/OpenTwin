@@ -59,13 +59,37 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 	else if (value.IsArray())
 	{
+		double realPart;
+		double imagPart;
 		if (value.Size() != 2)
 		{
 			throw std::exception("Not supported type for rapidjson::Value to variable_t conversion. Array does not have the required size for complex number conversion.");
 		}
-		const double realPart = ot::json::getDouble(value.GetArray(), 0);
-		const double imagPart = ot::json::getDouble(value.GetArray(), 1);
-
+		if (ot::json::isDouble(value.GetArray(), 0))
+		{
+			realPart = ot::json::getDouble(value.GetArray(), 0);
+			imagPart = ot::json::getDouble(value.GetArray(), 1);
+		}
+		else if (ot::json::isInt(value.GetArray(), 0))
+		{
+			realPart = static_cast<double>(ot::json::getInt(value.GetArray(), 0));
+			imagPart = static_cast<double>(ot::json::getInt(value.GetArray(), 1));
+		}
+		else if(ot::json::isFloat(value.GetArray(), 0))
+		{
+			realPart = static_cast<double>(ot::json::getFloat(value.GetArray(), 0));
+			imagPart = static_cast<double>(ot::json::getFloat(value.GetArray(), 1));
+		}
+		else if (ot::json::isInt64(value.GetArray(), 0))
+		{
+			realPart = static_cast<double>(ot::json::getInt64(value.GetArray(), 0));
+			imagPart = static_cast<double>(ot::json::getInt64(value.GetArray(), 1));
+		}
+		else
+		{
+			// Not supported
+			assert(false);
+		}
 		return ot::Variable(std::complex<double>(realPart, imagPart));
 	}
 	else
