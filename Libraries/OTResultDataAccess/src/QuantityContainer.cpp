@@ -92,46 +92,35 @@ bsoncxx::builder::basic::document& QuantityContainer::getMongoDocument()
 	}
 
 	VariableToBSONConverter converter;
-	// First we distinguish between matrices/vectors and single points
-	if (m_values.size() == 1)
+	
+	uint32_t counter = 0;
+	for (auto& value : m_values)
 	{
-		auto singleEntry = m_values.begin();
-		//Now we distinguish between tuples and non-tuples
-		if(singleEntry->size() == 1)
+		std::string fieldName;
+		if (m_values.size() == 1)
 		{
-			converter(m_mongoDocument, singleEntry->front(), QuantityContainer::getFieldName());
+			fieldName = QuantityContainer::getFieldName();
+		}
+		else
+		{
+			fieldName = QuantityContainer::getFieldName() + "_" + std::to_string(counter);
+			counter++;
+		}
+		
+		//Now we distinguish between tuples and non-tuples
+		if(value.size() == 1)
+		{
+			converter(m_mongoDocument, value.front(), fieldName);
 		}
 		else
 		{
 			auto tupleArray = bsoncxx::builder::basic::array();
-			for (auto& value : *singleEntry)
+			for (auto& entry : value)
 			{
-				converter(tupleArray, value);
+				converter(tupleArray, entry);
 			}
-			m_mongoDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), tupleArray));
+			m_mongoDocument.append(bsoncxx::builder::basic::kvp(fieldName, tupleArray));
 		}
-	}
-	else
-	{
-		auto valueArray = bsoncxx::builder::basic::array();
-		for (auto& value : m_values)
-		{
-			//Now we distinguish between tuples and non-tuples
-			if (value.size() == 1)
-			{
-				converter(valueArray, value.front());				
-			}
-			else
-			{
-				auto tupleArray = bsoncxx::builder::basic::array();
-				for (auto& tupleEntry: value)
-				{
-					converter(tupleArray, tupleEntry);
-				}
-				valueArray.append(tupleArray);
-			}		
-		}
-		m_mongoDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), valueArray));
 	}
 	return m_mongoDocument;
 }

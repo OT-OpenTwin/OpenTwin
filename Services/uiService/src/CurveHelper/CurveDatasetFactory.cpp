@@ -111,6 +111,13 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	std::map<std::string, ot::DataPointDecoder*> additionalParameterDecoders = dataLakeAccessCfg.getAllFieldDecoderParameterByLabel();
 	additionalParameterDecoders.erase(displayParameterLabel);
 
+	// ! Careful. This is a code duplication. The same logic is being used in the ResultCollectionAccess lib in the QuantityContainer class.
+	std::string valuesFieldName = "Values";
+	if (_curveCfg.getMatrixIndex() != -1)
+	{
+		valuesFieldName += "_" + std::to_string(_curveCfg.getMatrixIndex());
+	}
+	
 	ot::JSONToVariableConverter jsonToVariableConverter;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
 	{
@@ -205,7 +212,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			OTAssertNullptr(curveDataInfo);
 
 			// Get quantity value
-			const ot::JsonValue& entryQuantityValue = singleMongoDocument["Values"];
+			const ot::JsonValue& entryQuantityValue = singleMongoDocument[valuesFieldName.c_str()];
 			ot::Variable quantityValue = jsonToVariableConverter(entryQuantityValue);
 			
 			// Get parameter value

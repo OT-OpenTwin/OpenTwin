@@ -146,8 +146,15 @@ std::vector<ot::Variable> AdvancedQueryBuilder::getListOfValuesFromString(const 
 std::string AdvancedQueryBuilder::createFieldName(const ot::ValueComparisonDescription& _definition)
 {
 	std::string fieldName = _definition.getName();
-	bool isTuple = !_definition.getTupleInstance().isSingle();
+	
+	//If we have a matrix or a vector, the field name is followed by _<index>.
+	if(_definition.getDimensionIndex() != -1)
+	{
+		fieldName += "_" + std::to_string(_definition.getDimensionIndex());
+	}
 
+	bool isTuple = !_definition.getTupleInstance().isSingle();
+	
 	if (isTuple && !queryTargetsEntireTuple(_definition))
 	{
 		//Better here a converter that transforms the tuple into an array and also does the number transformations if indicated by the valueDescription.

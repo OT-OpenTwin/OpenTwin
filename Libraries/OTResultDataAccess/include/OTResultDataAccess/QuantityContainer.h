@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: QuantityContainer.h
 // 
 // License:
@@ -51,6 +51,19 @@ public:
 	int64_t getValueArraySize() const { return m_values.size(); };
 	bsoncxx::builder::basic::document& getMongoDocument();
 	static const std::string getFieldName() { return "Values"; }
+
+	static const std::string getFieldName(uint32_t _matrixIndex) 
+	{ 
+		// Careful. There is a code duplication in the UIService, CurveDatasetFactory class.
+		if (_matrixIndex == -1)
+		{
+			return getFieldName();
+		}
+		else
+		{
+			return "Values_" + std::to_string(_matrixIndex); 
+		}
+	}
 
 private:
 	bsoncxx::builder::basic::document m_mongoDocument;

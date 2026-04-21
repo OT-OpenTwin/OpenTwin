@@ -63,7 +63,7 @@ void DataLakeQueryCfg::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAlloc
 
 	_jsonObject.AddMember("SeriesLabel", ot::JsonString(m_seriesLabel, _allocator), _allocator);
 	_jsonObject.AddMember("CollectionName", ot::JsonString(m_collectionName, _allocator), _allocator);
-	
+	_jsonObject.AddMember("MatrixDimensions", ot::JsonArray(m_dimension, _allocator), _allocator);
 
 }
 
@@ -90,4 +90,5 @@ void DataLakeQueryCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonObject)
 
 	m_seriesLabel = ot::json::getString(_jsonObject, "SeriesLabel");
 	m_collectionName = ot::json::getString(_jsonObject, "CollectionName");
+	m_dimension =  ot::json::getUIntVector(_jsonObject, "MatrixDimensions");
 }

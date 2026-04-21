@@ -26,7 +26,12 @@ public:
 	// Inherited via Serializable
 	void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const override;
 	void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) override;
+
+	// Only for used for setting curve properties
+	void setMatrixDimensions(const std::vector<uint32_t>& _dimension) { m_dimension = _dimension; }
+	const std::vector<uint32_t>& getMatrixDimensions() const { return m_dimension; }
 private:
+	std::vector<uint32_t> m_dimension;
 	std::string m_seriesLabel;
 	std::string m_collectionName;
 	std::list<ot::ValueComparisonDescription> m_valueDescriptionsParameters;

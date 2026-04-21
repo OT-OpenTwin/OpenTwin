@@ -52,6 +52,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuan
 
 	// Only the selection the quantity necessary
 	ot::ValueComparisonDescription quantitySelection(_quantity.quantityLabel, "", "", _quantity.m_tupleDescription);
+	
 	dataLakeAccessor.createQueryDescriptionQuantity(quantitySelection);
 	queryCfg.setValueDescriptionQuantities(quantitySelection);
 
@@ -68,6 +69,8 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuan
 	}
 
 	queryCfg.setParameterOptions({ dependendParameterLabels.begin(), dependendParameterLabels.end() });
+
+	queryCfg.setMatrixDimensions(_quantity.dataDimensions);
 
 	ot::DataLakeAccessCfg config = dataLakeAccessor.createConfig();
 	_config.setDataAccessConfig(std::move(config));

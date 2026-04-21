@@ -7,6 +7,7 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTCore/Tuple/TupleInstance.h"
 #include "OTModelEntities/Properties/PropertyBundle.h"
+#include "OTCore/DataStruct/MatrixEntryPointer.h"
 
 class __declspec(dllexport) PropertyBundleDataLakeQuery : public PropertyBundle
 {
@@ -32,6 +33,8 @@ public:
 	void reset(EntityBase* _thisObject, const DataLakeQueryCfg& _config);
 	void lockAllProperties(EntityBase* _thisObject);
 
+	std::pair<uint32_t,std::string> getMatrixIndex(const EntityBase* _thisObject) const;
+
 	std::string getQuerySettingsGroupName() const { return m_groupQuerySettings; }
 private:
 	const uint32_t m_maxNbOfQueries = 40;
@@ -54,6 +57,10 @@ private:
 	const std::string m_propertyTupleFormat = "Format";
 	const std::string m_propertyTupleUnit = "Units";
 	
+	const std::string m_groupMatrixOptions = "Matrix entry";
+	const std::string m_propertyMatrixRow = "Row";
+	const std::string m_propertyMatrixColumn = "Column";
+
 	const std::string m_propertyOrder = "Order reproducible";
 
 	const std::string m_propertyDataType = "Data type";
@@ -68,5 +75,10 @@ private:
 	void vectorize(const ot::JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase);
 
 	bool setTuplePropertyVisibility(EntityBase* _thisObject, bool _visible);
+	
+	bool setMatrixPropertyVisibility(EntityBase* _thisObject, bool _visible);
+	void setMatrixDimension(EntityBase* _thisObject, const ot::MatrixEntryPointer& _matrixEntryPointer);
+	ot::MatrixEntryPointer getMatrixDimension(EntityBase* _thisObject) const;
+
 	bool setTupleSelectionOptions(EntityBase* _thisObject, const std::vector<std::string>& _formatOptions, const std::vector<std::string>& _elementOptions, const std::vector<std::string>& _unitOptions);
 };

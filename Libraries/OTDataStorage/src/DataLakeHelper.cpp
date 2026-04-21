@@ -139,11 +139,32 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 		clearTextEntry.AddMember(std::move(quantityName), ot::JsonString(quantityLabel, clearTextDoc.GetAllocator()), clearTextDoc.GetAllocator());
 
 
-		const size_t dataDimension = dataPointDecoderQu.value().getDimension().size();
-
-		if (dataDimension == 1)
+		const std::vector<uint32_t>& dataDimensions = dataPointDecoderQu.value().getDimension();
+		int numberOfEntries, startPoint;
+		if (dataDimensions.size() == 2)
 		{
-			ot::JsonValue quantityValue (singleMongoDocument["Values"], clearTextDoc.GetAllocator());
+			numberOfEntries = dataDimensions[1] * dataDimensions[0];
+			startPoint = 0;
+			assert(numberOfDocuments != 0);
+		}
+		else
+		{
+			// Here we use a trick. The Index -1 indicates to the field name creation that we are not dealing with a matrix. 
+			startPoint = -1;
+			numberOfEntries = 0;
+		}
+
+		for (int j = startPoint; j < numberOfEntries; j++)
+		{
+			// ! Careful. This is a code duplication. The same logic is being used in the ResultCollectionAccess lib in the QuantityContainer class.
+			std::string valuesFieldName = "Values";
+			if (j != -1)
+			{
+				valuesFieldName += "_" + std::to_string(j);
+			}
+			ot::JsonValue quantityValue(singleMongoDocument[valuesFieldName.c_str()], clearTextDoc.GetAllocator());
+
+					
 			// Next is the quantity value
 			const auto& quantityTupleInstance =	dataPointDecoderQu.value().getTupleInstance();
 			
@@ -172,14 +193,14 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 				const ot::ValueProcessing& singleEntryProcessing = valueProcessing.front();
 				if (singleEntryProcessing.isEmpty())
 				{
-					clearTextEntry.AddMember(ot::JsonString("Values", clearTextDoc.GetAllocator()), std::move(quantityValue), clearTextDoc.GetAllocator());
+					clearTextEntry.AddMember(ot::JsonString(valuesFieldName, clearTextDoc.GetAllocator()), std::move(quantityValue), clearTextDoc.GetAllocator());
 				}
 				else
 				{
 					ot::Variable temp = jsonToVariableConverter(quantityValue);
 					ot::Variable transformed = singleEntryProcessing.execute(temp);
 					ot::JsonValue transformedEntry = variableToJSONConverter(transformed, clearTextDoc.GetAllocator());
-					clearTextEntry.AddMember(ot::JsonString("Values", clearTextDoc.GetAllocator()), std::move(transformedEntry), clearTextDoc.GetAllocator());
+					clearTextEntry.AddMember(ot::JsonString(valuesFieldName, clearTextDoc.GetAllocator()), std::move(transformedEntry), clearTextDoc.GetAllocator());
 				}
 			}
 			else
@@ -215,13 +236,10 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 				}
 				
 				ot::JsonValue transformedEntry = variableToJSONConverter(ot::Variable(transformedComplex), clearTextDoc.GetAllocator());
-				clearTextEntry.AddMember(ot::JsonString("Values", clearTextDoc.GetAllocator()), transformedEntry, clearTextDoc.GetAllocator());
+				clearTextEntry.AddMember(ot::JsonString(valuesFieldName, clearTextDoc.GetAllocator()), transformedEntry, clearTextDoc.GetAllocator());
 			}
 		}
-		else
-		{
-			assert(false); // Currently matrices are not supported.
-		}
+
 
 		// Lastly we transform the series UID into a readable name.
 		std::string seriesID = std::to_string(singleMongoDocument[MetadataSeries::getFieldName().c_str()].GetInt64());

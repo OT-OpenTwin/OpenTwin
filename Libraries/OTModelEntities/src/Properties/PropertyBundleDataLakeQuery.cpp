@@ -9,7 +9,8 @@
 
 // std header
 #include <set>
-
+#include <unordered_set>
+#include "OTCore/DataStruct/GenericDataStructMatrix.h"
 void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 {
 	std::list<std::string> comparators = ot::ComparisonSymbols::g_comparators;
@@ -28,13 +29,18 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	// Quantity Settings
 	EntityPropertiesSelection* groupQuantityProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyName, { "" }, "", "default", _thisObject->getProperties());
 	groupQuantityProp->setAllowCustomValues(true);
-	//groupQuantityProp->setGroupChanges(true);
+		// Tuple properties
 	EntityPropertiesSelection* quantityComponentProp = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyQuantityComponent, { "" }, "", "default", _thisObject->getProperties());
 	quantityComponentProp->setVisible(false);
 	EntityPropertiesSelection* tupleFormat = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyTupleFormat, { "" }, "", "default", _thisObject->getProperties());
 	tupleFormat->setVisible(false);
 	EntityPropertiesSelection* tupleUnits = EntityPropertiesSelection::createProperty(m_groupQuantitySettings, m_propertyTupleUnit, { "" }, "", "default", _thisObject->getProperties());
 	tupleUnits->setVisible(false);
+		//Matrix properties
+	auto row = EntityPropertiesInteger::createProperty(m_groupMatrixOptions, m_propertyMatrixRow, 1,1, 500 , "default", _thisObject->getProperties());
+	row->setVisible(false);
+	auto column = EntityPropertiesInteger::createProperty(m_groupMatrixOptions, m_propertyMatrixColumn, 1,1,500, "default", _thisObject->getProperties());
+	column->setVisible(false);
 
 	EntityPropertiesString* typeLabelProperty = new EntityPropertiesString();
 	typeLabelProperty->setReadOnly(true);
@@ -56,6 +62,8 @@ void PropertyBundleDataLakeQuery::setProperties(EntityBase* _thisObject)
 	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, m_groupQuantitySettings)->setGroupChanges(true);
 
 	EntityPropertiesBoolean::createProperty(m_groupQuerySettings, m_propertyOrder, true, "default", _thisObject->getProperties());
+
+
 
 
 	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
@@ -189,6 +197,33 @@ std::string PropertyBundleDataLakeQuery::getSelectedSeries(EntityBase* _thisObje
 	return PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyNameSeriesMetadata, m_groupMetadataFilter);
 }
 
+std::pair<uint32_t, std::string>  PropertyBundleDataLakeQuery::getMatrixIndex(const EntityBase* _thisObject) const
+{
+	auto columnProp = PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixColumn, m_groupMatrixOptions);
+	if (columnProp->getVisible())
+	{
+		auto rowProp = PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixRow, m_groupMatrixOptions);
+
+		uint32_t selectedColumn = static_cast<uint32_t>(columnProp->getValue());
+		uint32_t selectedRow = static_cast<uint32_t>(rowProp->getValue());
+		std::string indexLabel = std::to_string(selectedRow) + std::to_string(selectedColumn);
+		//Switch from 1-based indexing (UI) to 0-based indexing (internal)
+		ot::MatrixEntryPointer selectedPoint(selectedRow-1, selectedColumn-1);
+
+		ot::MatrixEntryPointer dimensions;
+		dimensions.setRow(static_cast<uint32_t>(rowProp->getMax()));
+		dimensions.setColumn(static_cast<uint32_t>(columnProp->getMax()));
+
+		ot::GenericDataStructMatrix matrix(dimensions);
+		uint32_t index = matrix.getIndex(selectedPoint);
+		return { index, indexLabel };
+	}
+	else
+	{
+		return { -1,"" };
+	}
+}
+
 bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, MetadataCampaign& _campaign)
 {
 	bool projectChanged = PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName)->needsUpdate();
@@ -308,7 +343,7 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		
 		//We need to check if the selected quantities matching the entered value are tuples. If so, and they are all of the same type, we need the option to target a specific component of the tuple.
 		std::set<std::string> tupleTypes;
-
+		std::unordered_set<ot::MatrixEntryPointer> matrixDimensions;
 		const std::string currentQuantity = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyName, m_groupQuantitySettings);
 		if (currentQuantity == "")
 		{
@@ -338,6 +373,13 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 					{
 						tupleTypes.insert(quantityTupleDesc.getTupleTypeName());
 					}
+					
+					const std::vector<uint32_t>& dimensions =	matchingQuantityByLabel->second->dataDimensions;
+					if (dimensions.size() == 2)
+					{
+						matrixDimensions.insert(ot::MatrixEntryPointer(dimensions[0], dimensions[1]));
+					}
+					
 				}
 			}
 			parameterLabel.sort();
@@ -354,6 +396,12 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 			if (!quantityTuple.isSingle())
 			{
 				tupleTypes.insert(quantityTuple.getTupleTypeName());
+			}
+			
+			const std::vector<uint32_t>& dimensions = matchingQuantity->dataDimensions;
+			if (dimensions.size() == 2)
+			{
+				matrixDimensions.insert(ot::MatrixEntryPointer(dimensions[0], dimensions[1]));
 			}
 		}
 		parameterLabel.push_front("");
@@ -373,12 +421,15 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		}
 
 		// Here we set the tuple options, depending on the selected quantity. If valid
+		// First we process the tuple settings of the matched quantities
 		if (tupleTypes.size() == 0)
 		{
+			// None of the matching quantities was a tuple, thus we hide the associated properties.
 			refreshNecessary |= setTuplePropertyVisibility(_thisObject, false);
 		}
 		else if (tupleTypes.size() == 1)
 		{
+			// Valid case. We have a single tuple type among the matched quantities. Now we show the tuple properties and update the selection options accordingly
 			refreshNecessary |= setTuplePropertyVisibility(_thisObject, true);
 
 			const std::string tupleType = *tupleTypes.begin();
@@ -406,9 +457,27 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		}
 		else
 		{
+			// Invalid case. We cannot show multiple tuple types at the same time. We would need to specify the query characteristics for each tuple type separately, which is currently not supported by the property design.
 			refreshNecessary |= setTuplePropertyVisibility(_thisObject, false);
 			OT_LOG_W("Selected quantities are different types of tuple and cannot be queried simultaneously.");
 		}
+
+		// Here we set the matrix options, depending on the selected quantity.
+		if (matrixDimensions.size() == 0)
+		{
+			refreshNecessary |= setMatrixPropertyVisibility(_thisObject, false);
+		}
+		else if (matrixDimensions.size() == 1)
+		{
+			refreshNecessary |= setMatrixPropertyVisibility(_thisObject, true);
+			setMatrixDimension(_thisObject, *matrixDimensions.begin());
+		}
+		else
+		{
+			refreshNecessary |= setTuplePropertyVisibility(_thisObject, false);
+			OT_LOG_W("Selected quantities have different matrix dimensions and cannot be queried simultaneously.");
+		}
+
 	}
 
 	// Much of the tuple update logic is already handled when the quantity has changed. However, a format change also requires some updates
@@ -436,6 +505,10 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 				assert(false); 
 			}
 		}
+
+		// A change in matrix index also needs an update
+		refreshNecessary |= PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixRow, m_groupMatrixOptions)->needsUpdate();
+		refreshNecessary |= PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixColumn, m_groupMatrixOptions)->needsUpdate();
 	}
 
 	bool refreshQuantityDescription = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
@@ -475,7 +548,6 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 				single.setTupleUnits({ parameter->unit });
 				setValueProperties(_thisObject,groupName, single);
 			}
-
 		}
 	}
 
@@ -559,7 +631,12 @@ ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(Ent
 		instance.setTupleUnits({ unit });
 		valueComparisonDefinition.setTupleInstance(instance);
 
+
+
 	}
+	uint32_t index = getMatrixIndex(_thisObject).first;
+	valueComparisonDefinition.setDimensionIndex(index);
+	
 	return valueComparisonDefinition;
 }
 
@@ -613,6 +690,30 @@ bool PropertyBundleDataLakeQuery::setTuplePropertyVisibility(EntityBase* _thisOb
 	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, m_groupQuantitySettings)->setVisible(!_visible);
 	
 	return requiresRefreshing;
+}
+
+bool PropertyBundleDataLakeQuery::setMatrixPropertyVisibility(EntityBase* _thisObject, bool _visible)
+{
+	bool requiresRefreshing;
+	EntityPropertiesBase* rowProperty = PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixRow, m_groupMatrixOptions);
+	requiresRefreshing = rowProperty->getVisible() != _visible;
+	rowProperty->setVisible(_visible);
+	PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixColumn, m_groupMatrixOptions)->setVisible(_visible);
+	return requiresRefreshing;
+}
+
+void PropertyBundleDataLakeQuery::setMatrixDimension(EntityBase* _thisObject, const ot::MatrixEntryPointer& _matrixEntryPointer)
+{
+	PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixRow, m_groupMatrixOptions)->setMax(static_cast<int32_t>(_matrixEntryPointer.getRow()));
+	PropertyHelper::getIntegerProperty(_thisObject, m_propertyMatrixColumn, m_groupMatrixOptions)->setMax(static_cast<int32_t>(_matrixEntryPointer.getColumn()));
+}
+
+ot::MatrixEntryPointer PropertyBundleDataLakeQuery::getMatrixDimension(EntityBase* _thisObject) const
+{
+	ot::MatrixEntryPointer pointer;
+	pointer.setRow(static_cast<uint32_t>(PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyMatrixRow, m_groupMatrixOptions)));
+	pointer.setColumn(static_cast<uint32_t>(PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyMatrixColumn, m_groupMatrixOptions)));
+	return pointer;
 }
 
 bool PropertyBundleDataLakeQuery::setTupleSelectionOptions(EntityBase* _thisObject, const std::vector<std::string>& _formatOptions, const std::vector<std::string>& _elementOptions, const std::vector<std::string>& _unitOptions)
@@ -763,6 +864,13 @@ void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQ
 		}
 	}
 
+	const std::vector<uint32_t>& dimensions = _config.getMatrixDimensions();
+	if (dimensions.size() == 2)
+	{
+		ot::MatrixEntryPointer selectedPoint(dimensions[0], dimensions[1]);
+		setMatrixDimension(_thisObject, selectedPoint);
+		setMatrixPropertyVisibility(_thisObject, true);
+	}
 }
 
 

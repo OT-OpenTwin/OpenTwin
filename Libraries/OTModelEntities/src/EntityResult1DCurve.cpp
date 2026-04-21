@@ -349,6 +349,9 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	curveCfg.setDataAccessConfig(std::move(dlAccessCfg));
 	curveCfg.setTitle(curveLabel);
 
+	std::pair<uint32_t,std::string> selectedMatrixIndex =	m_queryProperties.getMatrixIndex(this);
+	curveCfg.setMatrixIndex(selectedMatrixIndex.first);
+	curveCfg.setMatrixIndexLabel(selectedMatrixIndex.second);
 	return curveCfg;
 }
 
@@ -604,5 +607,4 @@ ot::DataPointDecoder EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document
 	quantityContainerEntryDescription.setTupleInstance(std::move(tupleInstance));
 	return quantityContainerEntryDescription;
 }
-
 

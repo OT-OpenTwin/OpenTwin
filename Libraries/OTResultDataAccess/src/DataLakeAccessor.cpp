@@ -640,7 +640,7 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 
 		if (queryFormatName == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian))
 		{
-			assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar));
+			//assert(storedTupleType == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Polar));
 			transformFormat =
 				[](double _first, double _second) -> std::pair<double, double>
 				{
@@ -663,34 +663,55 @@ void DataLakeAccessor::storeTransformation(const ot::QueryDescription& _queryDes
 
 
 		ot::JsonDocument dataDoc;
-		
+		auto dimensions = 	storedDataDescr.getDimensions();
+		int numberOfEntries, startPoint;
+		if (dimensions.size() == 2)
+		{
+			numberOfEntries = dimensions[1] * dimensions[0];
+			startPoint = 0;
+			assert(numberOfDocuments != 0);
+		}
+		else
+		{
+			// Here we use a trick. The Index -1 indicates to the field name creation that we are not dealing with a matrix. 
+			startPoint = -1;
+			numberOfEntries = 0;
+		}
+		std::list<std::string> valueFieldNames;
+		for (int j = startPoint; j < numberOfEntries; j++)
+		{
+			valueFieldNames.push_back(QuantityContainer::getFieldName(j));
+		}
+
 		DataStorageAPI::DataLakeAPI transformationCollectionAccess(m_collectionName, m_transformedCollectionEnding);
 		for (uint32_t i = 0; i < numberOfDocuments; i++)
 		{
 			ot::ConstJsonObject singleMongoDocument = ot::json::getObject(allMongoDocuments, i);
-
-			ot::ConstJsonArray complexValue = ot::json::getArray(singleMongoDocument, QuantityContainer::getFieldName());
-			double first = ot::json::getDouble(complexValue, 0);
-			double second = ot::json::getDouble(complexValue, 1);
-			std::pair<double, double> inSIBaseUnit = transformToSI(first, second);
-			std::pair<double,double> transFormedValues = transformFormat(inSIBaseUnit.first, inSIBaseUnit.second);
-			bsoncxx::builder::basic::array values;
-			values.append(transFormedValues.first);
-			values.append(transFormedValues.second);
-
+			
 			bsoncxx::document::value parsed = bsoncxx::from_json(ot::json::toJson(singleMongoDocument));
 			bsoncxx::builder::basic::document transformedDocument{};
-
-			for (auto&& elem : parsed.view()) {
-				if (elem.key() == QuantityContainer::getFieldName()) 
+			
+			for (auto&& elem : parsed.view())
+			{
+				if (std::find(valueFieldNames.begin(), valueFieldNames.end(), elem.key()) == valueFieldNames.end())
 				{
-					// Replace "x" with the double array y
-					transformedDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(), values));
-				}
-				else {
 					// Copy all other fields unchanged
 					transformedDocument.append(bsoncxx::builder::basic::kvp(elem.key(), elem.get_value()));
 				}
+			}
+
+			for (int j = startPoint; j < numberOfEntries; j++)
+			{
+				ot::ConstJsonArray complexValue = ot::json::getArray(singleMongoDocument, QuantityContainer::getFieldName(j));
+				double first = ot::json::getDouble(complexValue, 0);
+				double second = ot::json::getDouble(complexValue, 1);
+				std::pair<double, double> inSIBaseUnit = transformToSI(first, second);
+				std::pair<double, double> transFormedValues = transformFormat(inSIBaseUnit.first, inSIBaseUnit.second);
+				bsoncxx::builder::basic::array values;
+				values.append(transFormedValues.first);
+				values.append(transFormedValues.second);
+
+				transformedDocument.append(bsoncxx::builder::basic::kvp(QuantityContainer::getFieldName(j), values));
 			}
 			transformationCollectionAccess.insertDocumentToDataLakePartition(transformedDocument, false, true);
 		}

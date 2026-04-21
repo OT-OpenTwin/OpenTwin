@@ -137,6 +137,7 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 	_object.AddMember("DataAccess", JsonObject(m_dataAccessConfig, _allocator), _allocator);
 
 	_object.AddMember("ToolTip", JsonString(m_toolTip, _allocator), _allocator);
+	_object.AddMember("MatrixIndex", m_matrixIndex, _allocator);
 }
 
 void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -161,6 +162,7 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 	m_dataAccessConfig.setFromJsonObject(json::getObject(_object, "DataAccess"));
 
 	m_toolTip = json::getString(_object, "ToolTip");
+	m_matrixIndex = json::getUInt(_object, "MatrixIndex");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

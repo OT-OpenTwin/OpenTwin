@@ -52,12 +52,16 @@ namespace ot {
 
 		void setTupleTarget(const std::string& _tupleTarget) { m_tupleTarget = _tupleTarget; }
 		const std::string& getTupleTarget() const { return m_tupleTarget; }
+
+		void setDimensionIndex(int32_t _dimensionIndex) { m_dimensionIndex = _dimensionIndex; }
+		int32_t getDimensionIndex() const { return m_dimensionIndex; }
 	private:
 		std::string m_name;
 		std::string m_comparator;
 		std::string m_value;
 		std::string m_tupleTarget;
 		TupleInstance m_tupleDescription;
+		int32_t m_dimensionIndex = -1;
 	};
 
 }

@@ -435,7 +435,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	secondaryParameter.sort();
 	secondaryParameter.unique();
 	config.setSecondaryParameter(secondaryParameter);
-
+	
 	return config;
 }
 

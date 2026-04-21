@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: GenericDataStructMatrix.h
 // 
 // License:
@@ -119,6 +119,7 @@ namespace ot {
 		std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> toTableColumns(bool _horizontalHeader = true) const { return GenericDataStructMatrix::toTableColumns(*this, _horizontalHeader); };
 		static std::vector<std::pair<ot::Variable, std::vector<ot::Variable>>> toTableColumns(const GenericDataStructMatrix& _matrix, bool _horizontalHeader = true);
 
+		constexpr uint32_t getIndex(const MatrixEntryPointer& _matrixEntryPointer) const { return getIndex(_matrixEntryPointer.getRow(), _matrixEntryPointer.getColumn()); };
 	private:
 		uint32_t m_numberOfColumns = 0;
 		uint32_t m_numberOfRows = 0;
@@ -130,7 +131,6 @@ namespace ot {
 			return _matrixEntryPointer.getColumn() < m_numberOfColumns && _matrixEntryPointer.getRow() < m_numberOfRows;
 		};
 		constexpr uint32_t getIndex(const uint32_t& _rowIndex, const uint32_t& _columnIndex) const { return (m_numberOfColumns * _rowIndex) + _columnIndex; };
-		constexpr uint32_t getIndex(const MatrixEntryPointer& _matrixEntryPointer) const { return getIndex(_matrixEntryPointer.getRow(), _matrixEntryPointer.getColumn()); };
 	};
 	
 }

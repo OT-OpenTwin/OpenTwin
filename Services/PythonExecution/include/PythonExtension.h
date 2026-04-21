@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonExtension.h
 // 
 // License:
@@ -32,6 +32,7 @@ namespace PythonExtensions {
     static PyObject* OT_GetScript(PyObject* _self, PyObject* _args);
 
     static PyObject* OT_SetPropertyValue(PyObject* _self, PyObject* _args);
+    static PyObject* OT_GetFolderEntities (PyObject* _self, PyObject* _args);
 
     static PyObject* OT_Flush(PyObject* _self, PyObject* _args);
     

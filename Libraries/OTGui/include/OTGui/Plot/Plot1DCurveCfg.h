@@ -173,6 +173,13 @@ namespace ot {
 		// Set by the curve builder to define which properties need to be set ín the curve entity.
 		void setQueryCfg(DataLakeQueryCfg _queryCfg) { m_queryCfg = _queryCfg; }
 		const DataLakeQueryCfg& getQueryCfg() const { return m_queryCfg; }
+
+		uint32_t getMatrixIndex() const { return m_matrixIndex; }
+		void setMatrixIndex(uint32_t _index) {m_matrixIndex = _index;}
+
+		const std::string& getMatrixIndexLabel() const { return m_matrixIndexLabel; }
+		void setMatrixIndexLabel(const std::string& _label) { m_matrixIndexLabel = _label; }
+
 	private:
 		UID m_navigationId;
 
@@ -182,6 +189,9 @@ namespace ot {
 		bool m_dimmed;
 
 		PenFCfg m_linePen;
+
+		uint32_t m_matrixIndex;
+		std::string m_matrixIndexLabel;
 
 		int m_pointSize;
 		int m_pointInterval;

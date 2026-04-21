@@ -1,13 +1,13 @@
-// @otlicense
+﻿// @otlicense
 
 #pragma once
 
 // OpenTwin header
 #include "OTCore/DataStruct/MatrixEntryPointerStep.h"
-
+#include "OTCore/CoreAPIExport.h"
 namespace ot {
 
-	class MatrixEntryPointer
+	class OT_CORE_API_EXPORT MatrixEntryPointer
 	{
 		OT_DECL_DEFCOPY(MatrixEntryPointer)
 		OT_DECL_DEFMOVE(MatrixEntryPointer)
@@ -15,6 +15,10 @@ namespace ot {
 		constexpr MatrixEntryPointer() = default;
 		constexpr MatrixEntryPointer(uint32_t _row, uint32_t _column) : m_column(_column), m_row(_row) {};
 		~MatrixEntryPointer() = default;
+
+		bool operator==(const MatrixEntryPointer& _other) const {
+			return m_column == _other.m_column && m_row == _other.m_row;	
+		}
 
 		inline void setColumn(uint32_t _column) { m_column = _column; };
 		inline void moveColumn(uint32_t _columnOffset = 1) { m_column += _columnOffset; };
@@ -31,8 +35,20 @@ namespace ot {
 		inline void moveBack(uint32_t _row, uint32_t _column) { m_column -= _column; m_row -= _row; };
 		inline void moveBack(const MatrixEntryPointerStep& _step) { m_column -= _step.getColumnStep(); m_row -= _step.getRowStep(); };
 
+
 	private:
 		uint32_t m_column = 0;
 		uint32_t m_row = 0;
+	};
+}
+
+namespace std {
+	template<>
+	struct hash<ot::MatrixEntryPointer> {
+		size_t operator()(const ot::MatrixEntryPointer& obj) const {
+			size_t h1 = std::hash<uint32_t>{}(obj.getColumn());
+			size_t h2 = std::hash<uint32_t>{}(obj.getRow());
+			return h1 ^ (h2 << 1); // combine hashes
+		}
 	};
 }
