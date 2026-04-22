@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBlockPython.cpp
 // 
 // License:
@@ -207,7 +207,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 	scriptEntity->setObserver(nullptr);
 
 	PythonHeaderInterpreter headerInterpreter;
-	const bool interpretationSuccessfull = headerInterpreter.interprete(scriptEntity);
+	const bool interpretationSuccessfull = headerInterpreter.interpret(scriptEntity);
 
 	if (interpretationSuccessfull)
 	{

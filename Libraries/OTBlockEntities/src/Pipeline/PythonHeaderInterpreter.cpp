@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonHeaderInterpreter.cpp
 // 
 // License:
@@ -25,250 +25,161 @@
 #include <algorithm>
 
 PythonHeaderInterpreter::~PythonHeaderInterpreter() {
-	for (auto doc : _allConnectorsAsJSON) {
-		delete doc;
-	}
-	_allConnectorsAsJSON.clear();
-
-	for (auto doc : _allPropertiesAsJSON) {
-		delete doc;
-	}
-	_allPropertiesAsJSON.clear();
-
 }
 
-bool PythonHeaderInterpreter::interprete(std::shared_ptr<EntityFile> pythonScript)
+bool PythonHeaderInterpreter::interpret(std::shared_ptr<EntityFile> pythonScript)
 {
-	_allConnectors.clear();
-	_allProperties.clear();
+	m_allConnectors.clear();
+	m_allProperties.clear();
+	m_report = "";
 
 	const auto& fileContent = pythonScript->getDataEntity()->getData();
 	std::string script(fileContent.begin(), fileContent.end());
-	std::istringstream scriptStream(script);
-	std::string scriptLine;
-	std::getline(scriptStream, scriptLine);
+	PythonHeaderAnalyser analyser;
+	analyser.analysePythonScript(script);
+	m_report =  analyser.getAnalysisReport();
+
+
+	const std::list<PythonHeaderAnalyser::ExtractedEntry>& portEntries = analyser.getEntriesOfType(PythonHeaderEntryType::Port);
+	bool success = true;
+	for (const auto& portEntry : portEntries)
+	{
+		success |= createConnectorsFromJSON(portEntry);
+	}
+
+	const std::list<PythonHeaderAnalyser::ExtractedEntry>& propertyEntries = analyser.getEntriesOfType(PythonHeaderEntryType::Property);
+	for (const auto& propertyEntry : propertyEntries)
+	{
+		success |= createPropertiesFromJSON(propertyEntry);
+	}
 	
-	bool headerSuccessfullyInterpreted = true;
-	int lineCounter = 1;
-	_report = "";
-	while (scriptLine[0] == '#' && scriptLine[1] == '@')
-	{
-		try
-		{
-			const bool lineWasInterpreted = ExtractOTHeader(scriptLine,lineCounter);
-			if (!lineWasInterpreted)
-			{
-				_report += "Line " + std::to_string(lineCounter) + " had no supported entry type.\n";
-			}
-
-			headerSuccessfullyInterpreted &= lineWasInterpreted;
-		}
-		catch (std::exception& e)
-		{
-			_report += "Exception in reading line " + std::to_string(lineCounter) + ": " + e.what() + "\n";
-			headerSuccessfullyInterpreted = false;
-		}
-
-		std::getline(scriptStream, scriptLine);
-		lineCounter++;
-
-	}
-
-	if (headerSuccessfullyInterpreted)
-	{
-		headerSuccessfullyInterpreted &= CreateObjectsFromJSON();
-	}
-
-	return headerSuccessfullyInterpreted;
+	return success;
 }
 
-const std::string  PythonHeaderInterpreter::extractType(const std::string& lineContent)
+bool PythonHeaderInterpreter::createConnectorsFromJSON(const PythonHeaderAnalyser::ExtractedEntry& _entryWithLineNb)
 {
-	//Find type substring
-	size_t endOfEntryType = lineContent.find_first_of(":") - 1;
-	const int offset = 2;
-	std::string entryType = lineContent.substr(offset, endOfEntryType - offset);
-	
-	//Remove spaces
-	auto noSpaceEnd = std::remove_if(entryType.begin(), entryType.end(), isspace);
-	entryType.erase(noSpaceEnd, entryType.end());
-	
-	//Turn all characters to lowercase
-	for (size_t i = 0; i < entryType.size(); i++)
+	const ot::JsonDocument& entry = _entryWithLineNb.m_content;
+	int lineNb = _entryWithLineNb.m_lineNumber;
+
+	bool allMemberFound = true;
+	std::string missingMember("");
+	if (!entry.HasMember(m_connectorDefName.c_str()))
 	{
-		entryType[i] = std::tolower(entryType[i]);
+		missingMember += m_connectorDefName + ", ";
+		allMemberFound = false;
 	}
-	return entryType;
-}
 
-bool PythonHeaderInterpreter::ExtractOTHeader(const std::string& scriptLine, const int scriptLineNumber)
-{
-	const std::string entryType = extractType(scriptLine);
-
-	const size_t startJSON = scriptLine.find_first_of("{");
-	const size_t endOfJSON = scriptLine.find_last_of("}");
-	const std::string entryDefinition = scriptLine.substr(startJSON, endOfJSON - startJSON + 1);
-
-	if(entryType == _entryTypeNameProperty)
+	if (!entry.HasMember(m_defTitle.c_str()))
 	{
-		ot::JsonDocument* doc = new ot::JsonDocument();
-		doc->fromJson(entryDefinition);
-		_allPropertiesAsJSON.push_back(doc);
-		_jsonEntryToScriptLine[_allPropertiesAsJSON.back()] = scriptLineNumber;
-		return true;
+		missingMember += m_defTitle + ", ";
+		allMemberFound = false;
 	}
-	else if (entryType == _entryTypeNameConnector)
+
+	ot::ConnectorType connectorType = ot::ConnectorType::UNKNOWN;
+	std::string status = "";
+	if (!entry.HasMember(m_defType.c_str()))
 	{
-		ot::JsonDocument* doc = new ot::JsonDocument();
-		doc->fromJson(entryDefinition);
-		_allConnectorsAsJSON.push_back(doc);
-		_jsonEntryToScriptLine[_allConnectorsAsJSON.back()] = scriptLineNumber;
-		return true;
+		allMemberFound = false;
+		missingMember += m_defType + ", ";
 	}
 	else
 	{
-		return false;
+
+		connectorType = getConnectorType(entry, status);
 	}
-}
 
-bool PythonHeaderInterpreter::CreateObjectsFromJSON()
-{
-
-	const bool allConnectorsCreated = CreateConnectorsFromJSON();
-	const bool allPropertiesCreated = CreatePropertiesFromJSON();
-	return allConnectorsCreated && allPropertiesCreated;
-}
-
-bool PythonHeaderInterpreter::CreateConnectorsFromJSON()
-{
-	bool allObjectsCreated = true;
-	auto connectorJSON = _allConnectorsAsJSON.begin();
-	
-	for (size_t i = 0; i < _allConnectorsAsJSON.size(); i++)
+	if (allMemberFound && connectorType != ot::ConnectorType::UNKNOWN)
 	{
-		
-		bool allMemberFound = true;
-		std::string missingMember("");
-		if (!(*connectorJSON)->HasMember(_connectorDefName.c_str()))
-		{
-			allMemberFound = false;
-			missingMember += _connectorDefName + ", ";
-		}
-
-		if (!(*connectorJSON)->HasMember(_defTitle.c_str()))
-		{
-			allMemberFound = false;
-			missingMember += _defTitle + ", ";
-		}
-
-		ot::ConnectorType connectorType = ot::ConnectorType::UNKNOWN;
-		std::string status = "";
-		if (!(*connectorJSON)->HasMember(_defType.c_str()))
-		{
-			allMemberFound = false;
-			missingMember += _defTitle + ", ";
-		}
-		else
-		{
-
-			connectorType = getConnectorType(**connectorJSON, status);
-		}
-
-		if (allMemberFound && connectorType != ot::ConnectorType::UNKNOWN)
-		{
-			const std::string title = ot::json::getString(**connectorJSON, _defTitle.c_str());
-			const std::string name = ot::json::getString(**connectorJSON, _connectorDefName.c_str());
-			_allConnectors.push_back({ connectorType, name, title });
-		}
-		else
-		{
-			int scriptLine = _jsonEntryToScriptLine[(*connectorJSON)];
-			_report += "Could not create port in line " + std::to_string(scriptLine) + " because\n"
-				"following fields are missing: " + missingMember.substr(0, missingMember.size() - 2) + "\n";
-
-			if (connectorType == ot::ConnectorType::UNKNOWN) { _report += status + "\n"; }
-			_report += "\n";
-			allObjectsCreated = false;
-		}
-		connectorJSON++;
+		const std::string title = ot::json::getString(entry, m_defTitle.c_str());
+		const std::string name = ot::json::getString(entry, m_connectorDefName.c_str());
+		m_allConnectors.push_back({ connectorType, name, title });
 	}
-	return allObjectsCreated;
+	else
+	{
+		m_report += "Could not create port in line " + std::to_string(lineNb) + " because\n"
+			"following fields are missing: " + missingMember.substr(0, missingMember.size() - 2) + "\n";
+
+		if (connectorType == ot::ConnectorType::UNKNOWN) 
+		{ 
+			m_report += status + "\n"; 
+		}
+		m_report += "\n";
+	}
+	return allMemberFound && connectorType != ot::ConnectorType::UNKNOWN;
 }
 
-bool PythonHeaderInterpreter::CreatePropertiesFromJSON()
+bool PythonHeaderInterpreter::createPropertiesFromJSON(const PythonHeaderAnalyser::ExtractedEntry& _entryWithLineNb)
 {
-	bool allObjectsCreated = true;
-	auto propertyJSON = _allPropertiesAsJSON.begin();
-	for (size_t i = 0; i < _allPropertiesAsJSON.size(); i++)
-	{
-		std::string missingEntries = "";
-		bool allEntriesFound = true;
+	const auto& propertyJSON = _entryWithLineNb.m_content;
+	int lineNb = _entryWithLineNb.m_lineNumber;
 
-		if (!(*propertyJSON)->HasMember(_defTitle.c_str()))
+	std::string missingEntries = "";
+	bool allEntriesFound = true;
+
+	if (!propertyJSON.HasMember(m_defTitle.c_str()))
+	{
+		allEntriesFound = false;
+		missingEntries += m_defTitle + ", ";
+	}
+
+	EntityPropertiesBase* propertyBase = nullptr;
+	std::string status("");
+	if (!propertyJSON.HasMember(m_defType.c_str()))
+	{
+		allEntriesFound = false;
+		missingEntries += m_defType + ", ";
+	}
+	else
+	{
+		std::string type = ot::json::getString(propertyJSON, m_defType.c_str());
+		if (type == m_propertyDefTypeSelection && !propertyJSON.HasMember(m_propertyDefOptions.c_str()))
 		{
 			allEntriesFound = false;
-			missingEntries += _defTitle + ", ";
+			missingEntries += m_propertyDefOptions + ", ";
 		}
-		
-		EntityPropertiesBase* propertyBase = nullptr;
-		std::string status("");
-		if (!(*propertyJSON)->HasMember(_defType.c_str()))
+
+		propertyBase = createPropertyEntity(propertyJSON, status);
+		if (propertyBase == nullptr)
 		{
 			allEntriesFound = false;
-			missingEntries += _defType + ", ";
 		}
-		else
-		{
-			std::string type = ot::json::getString(**propertyJSON,_defType.c_str());
-			if (type == _propertyDefTypeSelection && !(*propertyJSON)->HasMember(_propertyDefOptions.c_str()))
-			{
-				allEntriesFound = false;
-				missingEntries += _propertyDefOptions + ", ";
-			}
-			
-			propertyBase = createPropertyEntity(**propertyJSON, status);
-			if (propertyBase == nullptr)
-			{
-				allEntriesFound = false;
-			}
 
-		}
-		if (allEntriesFound)
-		{
-			const std::string title = ot::json::getString((**propertyJSON), _defTitle.c_str());
-			
-			propertyBase->setGroup(_propertyGroupName);
-			propertyBase->setName(title);
-			_allProperties.push_back(propertyBase);
-		}
-		else
-		{
-			int scriptLine = _jsonEntryToScriptLine[(*propertyJSON)];
-			_report += "Could not create property in line " +std::to_string(scriptLine) + " because\n"
-				"following fields are missing: " + missingEntries.substr(0, missingEntries.size() - 2) + "\n";
-			if (propertyBase == nullptr) { _report += status + "\n"; }
-			_report += "\n";
-			allObjectsCreated = false;
-		}		
-
-		propertyJSON++;
 	}
-	return allObjectsCreated;
+	if (allEntriesFound)
+	{
+		const std::string title = ot::json::getString(propertyJSON, m_defTitle.c_str());
+
+		propertyBase->setGroup(m_propertyGroupName);
+		propertyBase->setName(title);
+		m_allProperties.push_back(propertyBase);
+	}
+	else
+	{
+		m_report += "Could not create property in line " + std::to_string(lineNb) + " because\n"
+			"following fields are missing: " + missingEntries.substr(0, missingEntries.size() - 2) + "\n";
+		if (propertyBase == nullptr)
+		{ 
+			m_report += status + "\n"; 
+		}
+		m_report += "\n";
+	}
+
+	return allEntriesFound;
 }
 
-ot::ConnectorType PythonHeaderInterpreter::getConnectorType(ot::JsonDocument& jsonEntry, std::string& returnMessage )
+ot::ConnectorType PythonHeaderInterpreter::getConnectorType(const ot::JsonDocument& jsonEntry, std::string& returnMessage )
 {
-	std::string typeString = ot::json::getString(jsonEntry, _defType.c_str());
+	std::string typeString = ot::json::getString(jsonEntry, m_defType.c_str());
 	
-	if (_connectorDefTypeIn == typeString)
+	if (m_connectorDefTypeIn == typeString)
 	{
 		return ot::ConnectorType::In;
 	}
-	else if (_connectorDefTypeInOptional == typeString)
+	else if (m_connectorDefTypeInOptional == typeString)
 	{
 		return ot::ConnectorType::InOptional;
 	}
-	else if (_connectorDefTypeOut == typeString)
+	else if (m_connectorDefTypeOut == typeString)
 	{
 		return ot::ConnectorType::Out;
 	}
@@ -279,16 +190,16 @@ ot::ConnectorType PythonHeaderInterpreter::getConnectorType(ot::JsonDocument& js
 	}
 }
 
-EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocument& jsonEntry, std::string& returnMessage)
+EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(const ot::JsonDocument& jsonEntry, std::string& returnMessage)
 {
-	std::string typeString = ot::json::getString(jsonEntry, _defType.c_str());
+	std::string typeString = ot::json::getString(jsonEntry, m_defType.c_str());
 	
-	if (typeString == _propertyDefTypeBoolean)
+	if (typeString == m_propertyDefTypeBoolean)
 	{
 		auto entityBase = new EntityPropertiesBoolean();
-		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(m_propertyDefDefault.c_str()))
 		{
-			auto& jPropertyDefaultVal =	jsonEntry[_propertyDefDefault.c_str()];
+			auto& jPropertyDefaultVal =	jsonEntry[m_propertyDefDefault.c_str()];
 			const bool typeIsCorrect = jPropertyDefaultVal.IsBool();
 			if (typeIsCorrect)
 			{
@@ -304,12 +215,12 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocu
 		}
 		return entityBase;
 	}
-	else if (typeString == _propertyDefTypeDouble)
+	else if (typeString == m_propertyDefTypeDouble)
 	{
 		auto entityBase =new EntityPropertiesDouble();
-		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(m_propertyDefDefault.c_str()))
 		{
-			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			auto& jPropertyDefaultVal = jsonEntry[m_propertyDefDefault.c_str()];
 			const bool typeIsCorrect = jPropertyDefaultVal.IsDouble();
 			if (typeIsCorrect)
 			{
@@ -325,12 +236,12 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocu
 		}
 		return entityBase;
 	}
-	else if (typeString == _propertyDefTypeInteger)
+	else if (typeString == m_propertyDefTypeInteger)
 	{
 		auto entityBase = new EntityPropertiesInteger();
-		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(m_propertyDefDefault.c_str()))
 		{
-			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			auto& jPropertyDefaultVal = jsonEntry[m_propertyDefDefault.c_str()];
 			const bool typeIsCorrect = jPropertyDefaultVal.IsInt();
 			if (typeIsCorrect)
 			{
@@ -347,12 +258,12 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocu
 		return entityBase;
 		
 	}
-	else if (typeString == _propertyDefTypeString)
+	else if (typeString == m_propertyDefTypeString)
 	{
 		auto entityBase = new EntityPropertiesString();
-		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(m_propertyDefDefault.c_str()))
 		{
-			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			auto& jPropertyDefaultVal = jsonEntry[m_propertyDefDefault.c_str()];
 			const bool typeIsCorrect = jPropertyDefaultVal.IsString();
 			if (typeIsCorrect)
 			{
@@ -368,12 +279,12 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocu
 		}
 		return entityBase;
 	}
-	else if (typeString == _propertyDefTypeSelection)
+	else if (typeString == m_propertyDefTypeSelection)
 	{
 		auto entityBase = new EntityPropertiesSelection();
-		if (jsonEntry.HasMember(_propertyDefDefault.c_str()))
+		if (jsonEntry.HasMember(m_propertyDefDefault.c_str()))
 		{
-			auto& jPropertyDefaultVal = jsonEntry[_propertyDefDefault.c_str()];
+			auto& jPropertyDefaultVal = jsonEntry[m_propertyDefDefault.c_str()];
 			const bool typeIsCorrect = jPropertyDefaultVal.IsString();
 			if (typeIsCorrect)
 			{
@@ -388,9 +299,9 @@ EntityPropertiesBase* PythonHeaderInterpreter::createPropertyEntity(ot::JsonDocu
 				return entityBase;
 			}
 		}
-		auto& jPropertyDefOptions = jsonEntry[_propertyDefOptions.c_str()];
+		auto& jPropertyDefOptions = jsonEntry[m_propertyDefOptions.c_str()];
 		
-		std::list<std::string> options = ot::json::getStringList(jsonEntry, _propertyDefOptions.c_str());
+		std::list<std::string> options = ot::json::getStringList(jsonEntry, m_propertyDefOptions.c_str());
 		entityBase->resetOptions(options);
 		return entityBase;
 	}
