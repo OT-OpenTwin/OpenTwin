@@ -42,6 +42,17 @@ void ot::EntityDatasetInfo::addVisualizationNodes()
 bool ot::EntityDatasetInfo::updateFromProperties()
 {
 	setModified();
+	
+	bool dataUpdate = PropertyHelper::getEntityProjectListProperty(this, "Project", "General")->needsUpdate();
+	if (dataUpdate)
+	{
+		ot::VisualisationCfg visualisationCfg;
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+		visualisationCfg.setOverrideViewerContent(dataUpdate);
+		visualisationCfg.setAsActiveView(true);
+		getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
+
+	}
 
 	// Here we need to update the plot (send a message to the visualization service)
 	getProperties().forceResetUpdateForAllProperties();
