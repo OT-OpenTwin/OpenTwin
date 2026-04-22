@@ -7,7 +7,9 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityDatasetInfo.h"
-
+#include "OTModelEntities/EntityFileText.h"
+#include "OTCore/PythonHeader/PythonHeaderAnalyser.h"
+#include "OTCore/PythonHeader/PythonHeaderEventBuilder.h"
 static EntityFactoryRegistrar<ot::EntityDatasetInfo> registrar(ot::EntityDatasetInfo::className());
 
 ot::EntityDatasetInfo::EntityDatasetInfo(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)
@@ -48,10 +50,12 @@ bool ot::EntityDatasetInfo::updateFromProperties()
 	return false; 
 }
 
-void ot::EntityDatasetInfo::createProperties(const std::string& _initialProjectName)
+void ot::EntityDatasetInfo::createProperties(const std::string& _initialProjectName, ot::UID _scriptFolder, ot::UID _manifestFolder)
 {
 	EntityPropertiesProjectList* projectListProp = EntityPropertiesProjectList::createProperty("General", "Project", _initialProjectName, "", getProperties());
-	
+	m_propertyBundleEventHandling.setFolderIDManifests(_manifestFolder);
+	m_propertyBundleEventHandling.setFolderIDScripts(_scriptFolder);
+	m_propertyBundleEventHandling.setProperties(this);
 	getProperties().forceResetUpdateForAllProperties();
 }
 
@@ -170,4 +174,45 @@ void ot::EntityDatasetInfo::setProjectName(const std::string& _projectName)
 std::string ot::EntityDatasetInfo::getProjectName() const
 {
 	return PropertyHelper::getProjectPropertyValue(this, "Project", "General");
+}
+
+std::string ot::EntityDatasetInfo::getScriptName()
+{
+	std::string scriptName;
+	return scriptName;
+}
+
+std::string ot::EntityDatasetInfo::getEnvironmentName()
+{
+	std::string environmentName;
+	return environmentName;
+}
+
+std::optional<std::string> ot::EntityDatasetInfo::getEventHandlingFunction(PythonEventType _type, std::map<ot::UID, EntityBase*>& _entityMap)
+{
+	auto idAndName = m_propertyBundleEventHandling.getSelectedScript(this);
+	
+	EntityBase* base =	readEntityFromEntityID(nullptr, idAndName.first, _entityMap);
+	if (base != nullptr)
+	{
+		EntityFileText* script = dynamic_cast<EntityFileText*>(base);
+		if (script != nullptr)
+		{
+			const std::string scriptContent = script->getText();
+			PythonHeaderEventBuilder eventBuilder;
+			bool success = eventBuilder.interpret(scriptContent);
+			if (success)
+			{
+				return eventBuilder.getFunctionName(_type);
+			}
+			else
+			{
+				const std::string report = eventBuilder.getReport();
+				OT_USER_LOG_E("Failed to anaylse given python script for event handling. Errors: " + report);
+			}
+		}
+	}
+	
+	return std::nullopt;
+	
 }

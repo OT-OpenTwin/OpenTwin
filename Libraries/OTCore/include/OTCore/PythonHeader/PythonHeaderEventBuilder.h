@@ -5,13 +5,16 @@
 #include <map>
 #include "OTCore/PythonHeader/PythonEventTypes.h"
 #include "OTCore/JSON/JSON.h"
+#include <optional>
+#include "OTCore/CoreAPIExport.h"
 //! @brief Events as string: "Item Deleted", "Task Started", "Task Finished", "Table Filter Changed", "Property Updated"
-class PythonHeaderEventBuilder
+class OT_CORE_API_EXPORT PythonHeaderEventBuilder
 {
 public:
 	
 	bool interpret(const std::string& _scriptContent);
-
+	const std::string& getReport() {return m_report;}
+	std::optional<std::string> getFunctionName(PythonEventType _type);
 private:
 	std::string m_report;
 	std::map<PythonEventType, std::string> m_eventExecutionByEventType;

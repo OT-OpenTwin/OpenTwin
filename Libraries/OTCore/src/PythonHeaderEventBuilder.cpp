@@ -22,6 +22,20 @@ bool PythonHeaderEventBuilder::interpret(const std::string& _scriptContent)
 	return success;
 }
 
+std::optional<std::string> PythonHeaderEventBuilder::getFunctionName(PythonEventType _type)
+{
+	auto executionByType = m_eventExecutionByEventType.find(_type);
+	if (executionByType == m_eventExecutionByEventType.end())
+	{
+		return std::nullopt;
+	}
+	else
+	{
+		return executionByType->second;
+	}
+	
+}
+
 bool PythonHeaderEventBuilder::extractEventExecution(const ot::JsonDocument& _content)
 {
 	bool complete = true;

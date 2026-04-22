@@ -6,7 +6,7 @@ PythonHeaderAnalyser::PythonHeaderAnalyser()
 {
 	m_entriesByType[PythonHeaderEntryType::Unknown];
 }
-void PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent)
+bool PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent)
 {
 	m_report = "";
 
@@ -16,7 +16,7 @@ void PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 	std::getline(scriptStream, scriptLine);
 
 	int lineCounter = 1;
-
+	bool success = true;
 	while (scriptLine[0] == '#' && scriptLine[1] == '@')
 	{
 		try
@@ -25,6 +25,7 @@ void PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 			if (type == PythonHeaderEntryType::Unknown)
 			{
 				m_report += "Line " + std::to_string(lineCounter) + " had no supported entry type.\n";
+				success = false;
 			}
 			else
 			{
@@ -38,11 +39,13 @@ void PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 		catch (std::exception& e)
 		{
 			m_report += "Exception in reading line " + std::to_string(lineCounter) + ": " + e.what() + "\n";
+			success = false;
 		}
 
 		std::getline(scriptStream, scriptLine);
 		lineCounter++;
 	}
+	return success;
 }
 
 const std::list<PythonHeaderAnalyser::ExtractedEntry>& PythonHeaderAnalyser::getEntriesOfType(PythonHeaderEntryType _type) const

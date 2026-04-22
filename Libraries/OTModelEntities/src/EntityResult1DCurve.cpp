@@ -278,6 +278,9 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve(true));
 	
+
+	// Entity for title base
+
 	m_queryProperties.setProperties(this);
 
 	this->updatePropertyVisibilities();

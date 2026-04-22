@@ -1,14 +1,16 @@
-// @otlicense
+﻿// @otlicense
 
 #pragma once
 
 // OpenTwin header
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
+#include "OTModelEntities/IEventHandler.h"
+#include "OTModelEntities/Properties/PropertyBundleEventHandling.h"
 
 namespace ot {
 
-	class OT_MODELENTITIES_API_EXPORT EntityDatasetInfo : public EntityBase, public IVisualisationTable
+	class OT_MODELENTITIES_API_EXPORT EntityDatasetInfo : public EntityBase, public IVisualisationTable, public IEventHandler
 	{
 		OT_DECL_NOCOPY(EntityDatasetInfo)
 		OT_DECL_NOMOVE(EntityDatasetInfo)
@@ -26,7 +28,7 @@ namespace ot {
 		static std::string className() { return "EntityDatasetInfo"; }
 		virtual std::string getClassName() const override { return EntityDatasetInfo::className(); };
 
-		void createProperties(const std::string& _initialProjectName);
+		void createProperties(const std::string& _initialProjectName, ot::UID _scriptFolder, ot::UID _manifestFolder);
 
 		virtual ot::GenericDataStructMatrix getTable() override;
 		virtual void setTable(const ot::GenericDataStructMatrix& _table) override;
@@ -38,7 +40,11 @@ namespace ot {
 		void setProjectName(const std::string& _projectName);
 		std::string getProjectName() const;
 
-	private:
+		std::string getScriptName() override;
+		std::string getEnvironmentName() override;
+		std::optional<std::string>getEventHandlingFunction(PythonEventType _type, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
+	private:
+		PropertyBundleEventHandling m_propertyBundleEventHandling;
 	};
 }

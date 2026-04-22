@@ -24,7 +24,7 @@ public:
 	PythonHeaderAnalyser& operator=(const PythonHeaderAnalyser& _other) = delete;
 	PythonHeaderAnalyser& operator=(PythonHeaderAnalyser&& _other) = delete;
 
-	void analysePythonScript(const std::string& _scriptContent);
+	bool analysePythonScript(const std::string& _scriptContent);
 	const std::list<ExtractedEntry>& getEntriesOfType(PythonHeaderEntryType _type) const;
 	const std::string& getAnalysisReport() const { return m_report; }
 

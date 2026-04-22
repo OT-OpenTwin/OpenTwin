@@ -1161,7 +1161,11 @@ void Model::handleShowDatasetInformation()
 
 	ot::EntityDatasetInfo infoEntity(createEntityUID(), nullptr, nullptr, nullptr);
 	infoEntity.setName(datasetInfoEntityName);
-	infoEntity.createProperties(Application::instance()->getProjectName());
+	EntityBase* scriptFolder = findEntityFromName(ot::FolderNames::PythonScriptFolder);
+	EntityBase* manifestFolder = findEntityFromName(ot::FolderNames::PythonManifestFolder);
+	infoEntity.setDeletable(true);
+	infoEntity.setTreeItemEditable(true);
+	infoEntity.createProperties(Application::instance()->getProjectName(), scriptFolder->getEntityID(),manifestFolder->getEntityID());
 	infoEntity.storeToDataBase();
 
 	newStateInfo.addTopologyEntity(infoEntity);
