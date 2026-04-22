@@ -28,6 +28,10 @@ static EntityFactoryRegistrar<EntityCableHarness> registrar(EntityCableHarness::
 EntityCableHarness::EntityCableHarness(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) :
 	EntitySmartPart(ID, parent, obs, ms)
 {
+	ot::EntityTreeItem treeItem = getTreeItem();
+	treeItem.setVisibleIcon("Default/CableHarnessVisible");
+	treeItem.setHiddenIcon("Default/CableHarnessHidden");
+	this->setDefaultTreeItem(treeItem);
 
 }
 
