@@ -57,6 +57,8 @@ bool PythonHeaderEventBuilder::extractEventExecution(const ot::JsonDocument& _co
 			const std::string functionName = ot::json::getString(_content, m_keyFunction);
 			std::string type = ot::json::getString(_content, m_keyEventType);
 			type = ot::String::toLower(type);
+			ot::String::removeControlCharacters(type);
+			ot::String::removeWhitespaces(type);
 			auto typeByName = m_eventTypeByName.find(type);
 			if (typeByName == m_eventTypeByName.end())
 			{

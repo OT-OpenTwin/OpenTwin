@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: FileHandler.cpp
 // 
 // License:
@@ -37,6 +37,7 @@
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
 #include <assert.h>
+#include "OTModelEntities/IEventHandler.h"
 
 FileHandler::FileHandler() {
 	const std::string pageName = Application::getToolBarPageName();
@@ -438,7 +439,19 @@ void FileHandler::storeChangedTable(ot::IVisualisationTable* _entity, const ot::
 
 void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEvent& _event, ot::IVisualisationTable* _entity)
 {
-
+	IEventHandler* eventHandler = dynamic_cast<IEventHandler*>(_entity);
+	if (eventHandler != nullptr)
+	{
+		const std::string scriptName = eventHandler->getScriptName();
+		const std::string environmentName = eventHandler->getEnvironmentName();
+		auto& entityMap = Application::instance()->getModel()->getAllEntitiesByUID();
+		std::optional<std::string> functionName = eventHandler->getEventHandlingFunction(PythonEventType::TableFilterChanged,entityMap);
+		if (functionName.has_value())
+		{
+			// Otherwise there is no handler for this event in the script.
+			const std::string temp = functionName.value();
+		}
+	}
 }
 
 void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner)

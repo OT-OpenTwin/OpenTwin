@@ -189,13 +189,13 @@ std::string ot::EntityDatasetInfo::getProjectName() const
 
 std::string ot::EntityDatasetInfo::getScriptName()
 {
-	std::string scriptName;
+	std::string scriptName = m_propertyBundleEventHandling.getSelectedScript(this).second;
 	return scriptName;
 }
 
 std::string ot::EntityDatasetInfo::getEnvironmentName()
 {
-	std::string environmentName;
+	std::string environmentName = m_propertyBundleEventHandling.getSelectedManifest(this).second;
 	return environmentName;
 }
 
