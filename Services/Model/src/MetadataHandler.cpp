@@ -52,28 +52,34 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		
 			for (auto& identifier : prefetchIdAndVersion)
 			{
-				std::unique_ptr<EntityBase> baseEnt;
-				baseEnt.reset(ot::EntityAPI::readEntityFromEntityIDandVersion(identifier.first, identifier.second));
-				
-				if (baseEnt == nullptr)
+				try
 				{
-					continue;
-				}
+					std::unique_ptr<EntityBase> baseEnt;
+					baseEnt.reset(ot::EntityAPI::readEntityFromEntityIDandVersion(identifier.first, identifier.second));
 
-				if (baseEnt->getClassName() == classNameCampaign)
-				{
-					EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt.get());
-					OTAssertNullptr(campaign);
-					campaignMetadataEntity = campaign;
-				}
-				else if (baseEnt->getClassName() == classNameSeries)
-				{
-					EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.get());
-					OTAssertNullptr(series);
-					measurementMetadataEntity.push_back(series);
-				}
+					if (baseEnt == nullptr)
+					{
+						continue;
+					}
 
-				garbage.push_back(std::move(baseEnt));
+					if (baseEnt->getClassName() == classNameCampaign)
+					{
+						EntityMetadataCampaign* campaign = dynamic_cast<EntityMetadataCampaign*>(baseEnt.get());
+						OTAssertNullptr(campaign);
+						campaignMetadataEntity = campaign;
+					}
+					else if (baseEnt->getClassName() == classNameSeries)
+					{
+						EntityMetadataSeries* series = dynamic_cast<EntityMetadataSeries*>(baseEnt.get());
+						OTAssertNullptr(series);
+						measurementMetadataEntity.push_back(series);
+					}
+					garbage.push_back(std::move(baseEnt));
+				}
+				catch (std::exception _e)
+				{
+					OT_LOG_E("Failed to load entity from another project.");
+				}
 			}
 		}
 		else

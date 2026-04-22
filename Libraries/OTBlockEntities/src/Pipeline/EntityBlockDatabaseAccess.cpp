@@ -151,11 +151,14 @@ void EntityBlockDatabaseAccess::addStorageData(bsoncxx::builder::basic::document
 void EntityBlockDatabaseAccess::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
-	const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
-	if (!serialisedDLA.empty())
+	if (doc_view.find("DataLakeAccessCfg") != doc_view.end())
 	{
-		ot::JsonDocument doc;
-		doc.fromJson(serialisedDLA);
-		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
+		const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
+		if (!serialisedDLA.empty())
+		{
+			ot::JsonDocument doc;
+			doc.fromJson(serialisedDLA);
+			m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
+		}
 	}
 }
