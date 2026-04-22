@@ -587,6 +587,13 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "TINYXML2")
+        set(_tinyxml2_src "$ENV{TINYXML2_ROOT}/tinyxml2.cpp")
+        target_sources("${CORE_TARGET}" PRIVATE "${_tinyxml2_src}")
+        target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{TINYXML2_ROOT}")
+        return()
+    endif()
+
     _ot_env_get_path(_inc  "${DEP}_INC")
     _ot_env_get_path(_incd "${DEP}_INCD")
     _ot_env_get_path(_incr "${DEP}_INCR")
@@ -777,7 +784,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     endif()
 
     # Include-only tokens
-    if(DEP STREQUAL "RJSON" OR DEP STREQUAL "BASE64")
+    if(DEP STREQUAL "RJSON" OR DEP STREQUAL "BASE64" OR DEP STREQUAL "TINYXML2")
         return()
     endif()
 

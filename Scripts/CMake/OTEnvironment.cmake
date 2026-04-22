@@ -256,6 +256,7 @@ ot_get_env_path(OT_FILEHEADERUPDATER_ROOT_PATH OT_FILEHEADERUPDATER_ROOT)
 ot_get_env_path(OT_ENCRYPTIONKEY_ROOT_PATH  OT_ENCRYPTIONKEY_ROOT)
 ot_get_env_path(THIRDPARTY_ROOT_PATH        OPENTWIN_THIRDPARTY_ROOT)
 ot_get_env_path(BASE64_ROOT_PATH            BASE64_ROOT)
+ot_get_env_path(TINYXML2_ROOT_PATH          TINYXML2_ROOT)
 
 # ============================================================
 # certificates
