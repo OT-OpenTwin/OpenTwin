@@ -77,7 +77,7 @@ public:
 	long long getBrepPrefetchID(void);
 	long long getFacetsPrefetchID(void);
 
-	void createProperties(int colorR, int colorG, int colorB, const std::string &geometryFolder, ot::UID geometryFolderID, const std::string &materialsFolder, ot::UID materialsFolderID);
+	virtual void createProperties(int colorR, int colorG, int colorB, const std::string &geometryFolder, ot::UID geometryFolderID, const std::string &materialsFolder, ot::UID materialsFolderID);
 	void createGroupPropertiesOnly(const std::string& geometryFolder, ot::UID geometryFolderID);
 	void createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID);
 	void createNonMaterialProperties(void);
@@ -116,10 +116,13 @@ public:
 
 	virtual std::string serialiseAsJSON() override;
 	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept;
+
+protected:
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	virtual int getSchemaVersion(void) override { return 1; };
+
 private:
-	virtual int getSchemaVersion(void) override  { return 1; };
-	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
 	void ensureBrepIsLoaded(void);
 	void ensureFacetsAreLoaded(void);
 	bool updatePropertyVisibilities(void);

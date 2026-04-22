@@ -42,9 +42,9 @@
 #include "OTModelEntities/EntityParameter.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityResultText.h"
-#include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityCableHarness.h"
 
 // Application specific includes
 #include "InfoFileManager.h"
@@ -1036,12 +1036,6 @@ void Application::storeHarness(const std::string& harnessData, const std::string
 		return;
 	}
 
-	// Now we parse the harness xml file, extract nodes and segments and finally create the harness geometry
-	std::map<std::string, std::tuple<double, double, double>> harnessNodes;
-	std::set<std::tuple<std::string, std::string>> harnessSegments;
-
-	extractHarnessData(harnessData, harnessNodes, harnessSegments);
-
 	// Determine materials folder
 	std::string materialsFolder = "Materials";
 
@@ -1075,123 +1069,38 @@ void Application::storeHarness(const std::string& harnessData, const std::string
 
 	ot::UID entityID = getModelComponent()->createEntityUID();
 	ot::UID facetsID = getModelComponent()->createEntityUID();
+	ot::UID dataID = getModelComponent()->createEntityUID();
 
-	EntityGeometry* entityGeom = new EntityGeometry(entityID, nullptr, nullptr, nullptr);
-	entityGeom->setName(harnessEntityName);
-	entityGeom->setTreeItemEditable(false);
-	entityGeom->registerCallbacks(
+	EntityCableHarness* entityHarness = new EntityCableHarness(entityID, nullptr, nullptr, nullptr);
+	entityHarness->setName(harnessEntityName);
+	entityHarness->setTreeItemEditable(false);
+	entityHarness->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
 		ot::EntityCallbackBase::Callback::Selection |
 		ot::EntityCallbackBase::Callback::DataNotify,
 		getServiceName()
 	);
 
-	entityGeom->createProperties(colorR, colorG, colorB, geometryFolder, geometryFolderID, materialsFolder, materialsFolderID);
-	entityGeom->getFacets()->setEntityID(facetsID);
+	entityHarness->createProperties(colorR, colorG, colorB, geometryFolder, geometryFolderID, materialsFolder, materialsFolderID);
+	entityHarness->getFacets()->setEntityID(facetsID);
+	entityHarness->getData()->setEntityID(dataID);
+	
+	entityHarness->getData()->setData(harnessData.c_str(), harnessData.size()+1);
+	entityHarness->updatePart();
 
-	createHarnessFacets(harnessNodes, harnessSegments, entityGeom->getFacets()->getNodeVector(), entityGeom->getFacets()->getTriangleList(), entityGeom->getFacets()->getEdgeList());
+	entityHarness->getProperties().setAllPropertiesReadOnly();
+	entityHarness->getProperties().getProperty("Cable radius")->setReadOnly(false);
 
-	entityGeom->getProperties().setAllPropertiesReadOnly();
-	entityGeom->getFacets()->storeToDataBase();
-	entityGeom->storeToDataBase();
+	entityHarness->getFacets()->storeToDataBase();
+	entityHarness->storeToDataBase();
 
-	getModelComponent()->addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
-	getModelComponent()->addNewDataEntity(entityGeom->getBrepEntity()->getEntityID(), entityGeom->getBrepEntity()->getEntityStorageVersion(), entityGeom->getEntityID());
-	getModelComponent()->addNewTopologyEntity(entityGeom->getEntityID(), entityGeom->getEntityStorageVersion(), false);
+	getModelComponent()->addNewDataEntity(entityHarness->getFacets()->getEntityID(), entityHarness->getFacets()->getEntityStorageVersion(), entityHarness->getEntityID());
+	getModelComponent()->addNewDataEntity(entityHarness->getBrepEntity()->getEntityID(), entityHarness->getBrepEntity()->getEntityStorageVersion(), entityHarness->getEntityID());
+	getModelComponent()->addNewDataEntity(entityHarness->getData()->getEntityID(), entityHarness->getData()->getEntityStorageVersion(), entityHarness->getEntityID());
+	getModelComponent()->addNewTopologyEntity(entityHarness->getEntityID(), entityHarness->getEntityStorageVersion(), false);
 
-	delete entityGeom;
-	entityGeom = nullptr;
-}
-
-void Application::extractHarnessData(const std::string &harnessData,
-									 std::map<std::string, std::tuple<double, double, double>> &harnessNodes,
-									 std::set<std::tuple<std::string, std::string>> &harnessSegments)
-{
-	tinyxml2::XMLDocument doc;
-	doc.Parse(harnessData.c_str(), harnessData.size());
-
-	tinyxml2::XMLElement* root = doc.FirstChildElement("Harness");
-	if (!root) return;
-
-	tinyxml2::XMLElement* knots = root->FirstChildElement("Knots");
-	if (!knots) return;
-
-	for (tinyxml2::XMLElement* knot = knots->FirstChildElement("Knot");
-		knot != nullptr;
-		knot = knot->NextSiblingElement("Knot")) {
-
-		const char* id = knot->Attribute("ID");
-
-		double x = 0, y = 0, z = 0;
-		knot->QueryDoubleAttribute("X", &x);
-		knot->QueryDoubleAttribute("Y", &y);
-		knot->QueryDoubleAttribute("Z", &z);
-
-		harnessNodes[id] = std::tuple<double, double, double>(x, y, z);
-	}
-
-	tinyxml2::XMLElement* segments = root->FirstChildElement("Segments");
-	if (!segments) return;
-
-	for (tinyxml2::XMLElement* segment = segments->FirstChildElement("Segment");
-		segment != nullptr;
-		segment = segment->NextSiblingElement("Segment")) {
-
-		const char* knot1 = segment->Attribute("Knot1ID");
-		const char* knot2 = segment->Attribute("Knot2ID");
-
-		std::string knot1ID = knot1 ? knot1 : "";
-		std::string knot2ID = knot2 ? knot2 : "";
-
-		harnessSegments.emplace(std::tuple <std::string, std::string>(knot1ID, knot2ID));
-	}
-}
-
-
-void Application::createHarnessFacets(std::map<std::string, std::tuple<double, double, double>> &harnessNodes,
-									  std::set<std::tuple<std::string, std::string>> &harnessSegments,
-									  std::vector<Geometry::Node>& nodes,
-									  std::list<Geometry::Triangle>& triangles,
-									  std::list<Geometry::Edge>& edges)
-{
-	// Here we process segment by segment and create each of the segments as a little tube with a given number of segments. 
-	double totalSegmentLength = 0.0;
-
-	for (auto segment : harnessSegments)
-	{
-		std::tuple<double, double, double> startPoint = harnessNodes[std::get<0>(segment)];
-		std::tuple<double, double, double> endPoint = harnessNodes[std::get<1>(segment)];
-
-		double p1[] = { std::get<0>(startPoint), std::get<1>(startPoint), std::get<2>(startPoint) };
-		double p2[] = { std::get<0>(endPoint), std::get<1>(endPoint), std::get<2>(endPoint) };
-
-		double segmentLength = sqrt((p1[0] - p2[0]) * (p1[0] - p2[0]) + (p1[1] - p2[1]) * (p1[1] - p2[1]) + (p1[2] - p2[2]) * (p1[2] - p2[2]));
-
-		totalSegmentLength += segmentLength;
-	}
-
-	int nTubeSegments = 10;
-	std::list<Geometry::Node> nodesList;
-	double tubeRadius = 0.01 * totalSegmentLength;
-	int faceId = 1;
-
-	for (auto segment : harnessSegments)
-	{
-		std::tuple<double, double, double> startPoint = harnessNodes[std::get<0>(segment)];
-		std::tuple<double, double, double> endPoint   = harnessNodes[std::get<1>(segment)];
-
-		double p1[] = { std::get<0>(startPoint), std::get<1>(startPoint), std::get<2>(startPoint) };
-		double p2[] = { std::get<0>(endPoint), std::get<1>(endPoint), std::get<2>(endPoint) };
-
-		addCapsule(p1, p2, tubeRadius, nTubeSegments, faceId, nodesList, triangles);
-	}
-
-	// Finally, we store all nodes from the nodes list in the nodes vector
-	nodes.reserve(nodesList.size());
-	for (const auto& n : nodesList)
-	{
-		nodes.push_back(n);
-	}
+	delete entityHarness;
+	entityHarness = nullptr;
 }
 
 void Application::createFacets(const std::string& data, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges)
@@ -1452,128 +1361,55 @@ void Application::setLocalFileName(const std::string& hostName, const std::strin
 	}
 }
 
-void Application::addCapsule(const double p1[3], const double p2[3],
-							 double tubeRadius, int nTubeSegments, ot::UID faceId,
-							 std::list<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles)
+void Application::propertyChanged(ot::JsonDocument& _doc)
 {
-	// Minimal 3 segments for a valid tube, hemisphere resolution derived from it
-	const int segs = std::max(3, nTubeSegments);
-	const int hemiRings = std::max(2, segs / 2);
+	std::list<ot::UID> entityIDs = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityIDList);
+	std::list<ot::UID> entityVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_EntityVersionList);
+	std::list<ot::UID> brepVersions = ot::json::getUInt64List(_doc, OT_ACTION_PARAM_MODEL_BrepVersionList);
+	bool itemsVisible = ot::json::getBool(_doc, OT_ACTION_PARAM_MODEL_ItemsVisible);
 
-	// Simple internal vector helper
-	struct V3 {
-		double x, y, z;
-		V3 operator + (const V3& o) const { return { x + o.x, y + o.y, z + o.z }; }
-		V3 operator - (const V3& o) const { return { x - o.x, y - o.y, z - o.z }; }
-		V3 operator * (double s)   const { return { x * s, y * s, z * s }; }
-	};
+	auto itID = entityIDs.begin();
+	auto itVersion = entityVersions.begin();
 
-	// Basic vector math
-	auto dot = [](const V3& a, const V3& b) { return a.x * b.x + a.y * b.y + a.z * b.z; };
-	auto cross = [](const V3& a, const V3& b) { return V3{ a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x }; };
-	auto len = [&](const V3& v) { return std::sqrt(dot(v, v)); };
-	auto norm = [&](const V3& v) { double l = len(v); return l > 1e-20 ? v * (1.0 / l) : V3{ 0.0,0.0,1.0 }; };
+	for (; itID != entityIDs.end() && itVersion != entityVersions.end(); ++itID, ++itVersion) {
+		ot::UID id = *itID;
+		ot::UID version = *itVersion;
 
-	V3 P1{ p1[0], p1[1], p1[2] };
-	V3 P2{ p2[0], p2[1], p2[2] };
+		auto baseEnt = ot::EntityAPI::readEntityFromEntityIDandVersion(id, version);
+		
+		EntityCableHarness* harnessEntity = dynamic_cast<EntityCableHarness*>(baseEnt);
 
-	// Capsule axis and length
-	V3 axis = P2 - P1;
-	double h = len(axis);
-	if (h <= 1e-20 || tubeRadius <= 0.0) return;
+		if (harnessEntity != nullptr)
+		{
+			harnessEntity->resetBrep();
+			harnessEntity->resetFacets();
 
-	// Build orthonormal basis (u, v, w)
-	// w = axis direction, u/v span the circular cross section
-	V3 w = axis * (1.0 / h);
-	V3 tmp = (std::fabs(w.z) < 0.999) ? V3{ 0.0,0.0,1.0 } : V3{ 0.0,1.0,0.0 };
-	V3 u = norm(cross(tmp, w));
-	V3 v = cross(w, u);
+			harnessEntity->getBrepEntity()->setEntityID(getModelComponent()->createEntityUID());
+			harnessEntity->getFacets()->setEntityID(getModelComponent()->createEntityUID());
 
-	// Append a node and return its index
-	auto addNode = [&](const V3& p, const V3& n, double uu, double vv) -> ot::UID {
-		Geometry::Node nd;
-		nd.setCoords(p.x, p.y, p.z);
-		nd.setNormals(n.x, n.y, n.z);
-		nd.setUVpar(uu, vv);
-		nodes.push_back(nd);
-		return (ot::UID)(nodes.size() - 1);
-		};
+			harnessEntity->updatePart();
 
-	// Append a triangle
-	auto addTri = [&](ot::UID a, ot::UID b, ot::UID c) {
-		triangles.emplace_back(a, b, c, faceId);
-		};
+			harnessEntity->getFacets()->storeToDataBase();
+			harnessEntity->storeToDataBase();
 
-	// Create one ring of vertices around the axis
-	// center = sphere center or cylinder endpoint
-	// ringR  = radius of the ring
-	// zOff   = offset along axis from center
-	auto addRing = [&](const V3& center, double ringR, double zOff, bool /*bottomCap*/, double vTex) {
-		std::vector<ot::UID> ring;
-		ring.reserve(segs);
-
-		for (int i = 0; i < segs; ++i) {
-			double ang = 2.0 * M_PI * double(i) / double(segs);
-			double ca = std::cos(ang), sa = std::sin(ang);
-
-			// Radial direction in cross-section plane
-			V3 radial = u * ca + v * sa;
-
-			// Final vertex position
-			V3 pos = center + radial * ringR + w * zOff;
-
-			// Compute normal:
-			// - cylinder: purely radial
-			// - hemispheres: from sphere center
-			V3 nrm = norm(radial * ringR + w * zOff);
-			if (ringR == tubeRadius && zOff == 0.0)
-				nrm = radial;
-
-			ring.push_back(addNode(pos, nrm, double(i) / double(segs), vTex));
+			ot::JsonDocument requestDoc;
+			requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_UpdateGeometryEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, harnessEntity->getEntityID(), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Brep, harnessEntity->getBrepEntity()->getEntityID(), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID_Facets, harnessEntity->getFacets()->getEntityID(), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Brep, harnessEntity->getBrepEntity()->getEntityStorageVersion(), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityVersion_Facets, harnessEntity->getFacets()->getEntityStorageVersion(), requestDoc.GetAllocator());
+			requestDoc.AddMember(OT_ACTION_PARAM_MODEL_OverrideGeometry, true, requestDoc.GetAllocator());   // Here we can replace the geometry entity, since it was 
+																											 // already written during this operation as a result to the 
+																											 // parameter change
+			std::string tmp;
+			getModelComponent()->sendMessage(false, requestDoc, tmp);
 		}
-		return ring;
-		};
 
-	std::vector<std::vector<ot::UID>> rings;
-	rings.reserve(2 * hemiRings + 2);
-
-	// --- Bottom hemisphere (center = P1) ---
-	// from bottom pole (-90°) to equator (0°)
-	for (int j = 0; j <= hemiRings; ++j) {
-		double t = double(j) / double(hemiRings);
-		double phi = -0.5 * M_PI + t * 0.5 * M_PI;
-		double rr = tubeRadius * std::cos(phi);
-		double zz = tubeRadius * std::sin(phi);
-		double vv = t * 0.5;
-
-		rings.push_back(addRing(P1, rr, zz, true, vv));
-	}
-
-	// --- Cylinder top ring (center = P2) ---
-	rings.push_back(addRing(P2, tubeRadius, 0.0, false, 0.5));
-
-	// --- Top hemisphere (center = P2) ---
-	// from equator (0°) to top pole (+90°)
-	for (int j = 1; j <= hemiRings; ++j) {
-		double t = double(j) / double(hemiRings);
-		double phi = t * 0.5 * M_PI;
-		double rr = tubeRadius * std::cos(phi);
-		double zz = tubeRadius * std::sin(phi);
-		double vv = 0.5 + t * 0.5;
-
-		rings.push_back(addRing(P2, rr, zz, false, vv));
-	}
-
-	// --- Connect rings with triangles ---
-	for (size_t r = 0; r + 1 < rings.size(); ++r) {
-		for (int i = 0; i < segs; ++i) {
-			ot::UID a = rings[r][i];
-			ot::UID b = rings[r][(i + 1) % segs];
-			ot::UID c = rings[r + 1][i];
-			ot::UID d = rings[r + 1][(i + 1) % segs];
-
-			addTri(a, b, c);
-			addTri(c, b, d);
+		if (harnessEntity != nullptr)
+		{
+			delete harnessEntity;
+			harnessEntity = nullptr;
 		}
 	}
 }

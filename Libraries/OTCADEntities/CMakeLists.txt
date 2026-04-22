@@ -112,6 +112,9 @@ set(OTCADMODELENTITIES_HEADER_FILES
     include/OTCADEntities/EntityFaceAnnotation.h
     include/OTCADEntities/EntityGeometry.h
     include/OTCADEntities/GeometryOperations.h
+    include/OTCADEntities/EntitySmartPart.h
+    include/OTCADEntities/EntityCableHarness.h
+    include/OTCADEntities/tinyxml2.h
 )
 
 set(OTCADMODELENTITIES_SOURCE_FILES
@@ -120,6 +123,9 @@ set(OTCADMODELENTITIES_SOURCE_FILES
     src/EntityFaceAnnotation.cpp
     src/EntityGeometry.cpp
     src/GeometryOperations.cpp
+    src/EntitySmartPart.cpp
+    src/EntityCableHarness.cpp
+    src/tinyxml2.cpp
 )
 
 # ============================================================

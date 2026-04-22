@@ -93,14 +93,13 @@ public:
 	void addHostNameAndFileName(const std::string& hostName, const std::string& fileName, std::list<std::pair<std::string, std::string>>& hostNamesAndFileNames);
 	std::string getSimpleFileName();
 	long long getCurrentModelEntityVersion(void);
-	void extractHarnessData(const std::string& harnessData, std::map<std::string, std::tuple<double, double, double>>& harnessNodes, std::set<std::tuple<std::string, std::string>>& harnessSegments);
-	void createHarnessFacets(std::map<std::string, std::tuple<double, double, double>>& harnessNodes, std::set<std::tuple<std::string, std::string>>& harnessSegments, std::vector<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles, std::list<Geometry::Edge>& edges);
+
+	virtual void propertyChanged(ot::JsonDocument& _doc) override;
 
 private:
 	void uploadNeeded(ot::JsonDocument& _doc);
 	void downloadNeeded(ot::JsonDocument& _doc);
 	void filesUploaded(ot::JsonDocument& _doc);
-	void addCapsule(const double p1[3], const double p2[3], double tubeRadius, int nTubeSegments, ot::UID faceId, std::list<Geometry::Node>& nodes, std::list<Geometry::Triangle>& triangles);
 
 	std::map<std::string, std::tuple<double, double, double>> materialColors;
 	std::map<std::string, std::string> shapeMaterials;
