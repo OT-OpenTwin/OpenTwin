@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ActionHandler.cpp
 // 
 // License:
@@ -228,9 +228,24 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 				allParameter.emplace_back(scriptParameter);
 			}
 		}
+
+		std::list<std::string> entryPoints;
+		if (ot::json::exists(doc, OT_ACTION_CMD_PYTHON_EntryPoints))
+		{
+			entryPoints = ot::json::getStringList(doc, OT_ACTION_CMD_PYTHON_EntryPoints);
+		}
+		else
+		{
+			for (size_t i = 0; i < scripts.size(); i++)
+			{
+				entryPoints.push_back("");
+			}
+		}
+
+
 		loadPortDataToBuffer(doc);
 		//Execute
-		m_pythonAPI.execute(scripts, allParameter);
+		m_pythonAPI.execute(scripts, allParameter, entryPoints);
 
 		//put modified port data in return message. The data is not serialised here!! The buffer has to keep the data until the return message is serialised
 		const std::string gridFSDocumentID =  writeReturnDataToDatabase();

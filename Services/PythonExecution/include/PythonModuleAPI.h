@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonModuleAPI.h
 // 
 // License:
@@ -22,19 +22,22 @@
 
 #pragma once
 #include <string>
+#include <map>
 #include "CPythonObject.h"
 class PythonModuleAPI
 {
 public:
-	static const PythonModuleAPI& instance(void);
+	static PythonModuleAPI& instance(void);
+
+	void setEntryPoint(const std::string& _moduleName, const std::string& _entryPoint);
 
 	std::string getModuleEntryPoint(const std::string& _moduleName) const;
 	std::string getModuleEntryPoint(CPythonObject& _module) const;
 
-public:
+private:
 	PythonModuleAPI() = default;
 	std::string m_defaultEntryPoint = "__main__";
-
-	bool hasScriptHasEntryPoint(const CPythonObject& _module) const;
+	std::map<std::string, std::string> m_entryPointByModuleName;
+	bool hasScriptHasEntryPoint(const CPythonObject& _module, const std::string& _moduleName) const;
 };
 

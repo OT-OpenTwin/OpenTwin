@@ -1,5 +1,5 @@
-# Possible events: "Item Deleted", "Task Started", "Task Finished", "Table Filter Changed", "Property Updated"
 #@ Event : {"name": "Table Filter Changed", "function": "handle1"}
+# Possible events: "Item Deleted", "Task Started", "Task Finished", "Table Filter Changed", "Property Updated"
 
 import OpenTwin 
 import json

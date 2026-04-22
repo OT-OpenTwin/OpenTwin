@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonInterpreterAPI.h
 // 
 // License:
@@ -40,7 +40,7 @@ public:
 	void initializeEnvironment(ot::UID _manifestEntityUID);
 	void initializeEnvironment(const std::string& _environmentName);
 	void checkEnvironmentIsInitialised(ot::UID _manifestEntityUID);
-	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet) noexcept(false);
+	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet, const std::list<std::string>& _entryPoints) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
 
 	void cleanup();
@@ -52,7 +52,7 @@ private:
 	EnvironmentsGarbageCollector m_garbageCollector;
 	InterpreterPathSettings m_interpreterPathSettings;
 
-	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts);
+	std::list<ot::EntityInformation> ensureScriptsAreLoaded(const std::list<std::string>& _scripts, const std::list<std::string>& _entryPointFunctionNames);
 	std::string loadScipt(const ot::EntityInformation& _entityInformation);
-	void addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation);
+	void addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation, const std::string& _entryPointFunctionName);
 };

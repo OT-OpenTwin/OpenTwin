@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonInterpreterAPI.cpp
 // 
 // License:
@@ -96,7 +96,7 @@ void PythonInterpreterAPI::checkEnvironmentIsInitialised(ot::UID _manifestEntity
 	m_packageHandler.initializeManifest(_manifestEntityUID);
 }
 
-void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet)
+void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet, const std::list<std::string>& _entryPoints)
 {
 	if (!m_workerWaiterState.m_isWorkDone)
 	{
@@ -106,7 +106,7 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<s
 		OT_LOG_D("... continue execution.");
 	}
 	assert(_scripts.size() == _parameterSet.size());
-	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts);
+	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts, _entryPoints);
 	auto currentParameterSet = _parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
@@ -177,7 +177,7 @@ void PythonInterpreterAPI::cleanup()
 	m_packageHandler.clearBuffer();
 }
 
-std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts)
+std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(const std::list<std::string>& _scripts, const std::list<std::string>& _entryPointFunctionNames)
 {
 	//First we get the information of the used scripts
 	std::list<std::string> uniqueScriptNames = _scripts;
@@ -226,12 +226,14 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 	
 	m_packageHandler.importMissingPackages();
 	auto entityInfo = entityInfos.begin();
+	auto entryPointFunctionName = _entryPointFunctionNames.begin();
 	for (const std::string& scriptExecution : scriptExecutions)
 	{
-		addScriptAsModule(scriptExecution, *entityInfo);
+		addScriptAsModule(scriptExecution, *entityInfo, *entryPointFunctionName);
 		if (entityInfo != entityInfos.end())
 		{
 			entityInfo++;
+			entryPointFunctionName++;
 		}
 	}
 	//Now we build up a list of the execution scripts but with their entityInformation instead of their plain names
@@ -260,7 +262,7 @@ std::string PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entity
 	}
 }
 
-void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation)
+void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation, const std::string& _entryPointFunctionName)
 {
 
 	//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
@@ -275,7 +277,8 @@ void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const
 	auto result = m_wrapper.execute(_execution, moduleName);
 
 	//Since potentially multiple functions exist in a module, an entry point needs to be explicitly defined
-	PythonModuleAPI moduleAPI;
+	const PythonModuleAPI& moduleAPI = PythonModuleAPI::instance();
+	
 	const std::string entryPoint = moduleAPI.getModuleEntryPoint(moduleName);
 	OT_LOG_D("Determined entry point for " + _entityInformation.getEntityName() + " to be: " + entryPoint);
 	m_moduleEntrypointByModuleName[moduleName] = entryPoint;
