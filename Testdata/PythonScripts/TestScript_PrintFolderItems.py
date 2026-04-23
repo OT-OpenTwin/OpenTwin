@@ -4,5 +4,6 @@ import OpenTwin
 import os
 
 def __main__(this):
-    folderContent = OpenTwin.GetFolderItemNames(Dataset)
+    recursiveSearch = True
+    folderContent = OpenTwin.GetFolderItemNames("Dataset", recursiveSearch)
     print(folderContent)

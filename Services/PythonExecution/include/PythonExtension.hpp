@@ -143,14 +143,15 @@ PyObject* PythonExtensions::OT_GetFolderEntities(PyObject* _self, PyObject* _arg
     {
         CPythonObjectBorrowed args(_args);
         auto numberOfArguments = PyTuple_Size(args);
-        const int expectedNumberOfArguments = 1;
+        const int expectedNumberOfArguments = 2;
         if (numberOfArguments != expectedNumberOfArguments) {
-            throw std::exception("OT_SetPropertyValue expects three arguments");
+            throw std::exception("OT_GetFolderItemNames expects two arguments");
         }
 
         PythonObjectBuilder pyObBuilder;
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
-        std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(absoluteEntityName);
+        bool recursive = pyObBuilder.getBoolValueFromTuple(args, 1, "Parameter 1");
+        std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(absoluteEntityName, recursive);
         PythonObjectBuilder builder;
         CPythonObjectNew list = builder.setStringList(folderItems);
         Py_INCREF(list);
