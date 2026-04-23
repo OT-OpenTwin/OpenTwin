@@ -22,6 +22,7 @@
 #include <Python.h>
 
 #include <string>
+#include "TestStruct.h"
 
 //! @brief C Python Extension that hold functions for OpenTwin that can be called from a python script.
 //! Neither of the function parameter's memory is owned. They have to be turned into CPythonObjectBorrowed within the function implementation.
@@ -32,7 +33,8 @@ namespace PythonExtensions {
     static PyObject* OT_GetScript(PyObject* _self, PyObject* _args);
 
     static PyObject* OT_SetPropertyValue(PyObject* _self, PyObject* _args);
-    static PyObject* OT_GetFolderEntities (PyObject* _self, PyObject* _args);
+    
+    //static PyObject* OT_GetFolderEntities (PyObject* _self, PyObject* _args);
 
     static PyObject* OT_Flush(PyObject* _self, PyObject* _args);
     
@@ -48,6 +50,8 @@ namespace PythonExtensions {
     
     static PyObject* OT_SetPortMetaData(PyObject* _self, PyObject* _args);
 
+    static PyObject* OT_GetTestStruct(PyObject* _self, PyObject* _args);
+
     static PyMethodDef OTMethods[] = {
 
         {"GetPropertyValue", OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
@@ -60,6 +64,7 @@ namespace PythonExtensions {
         {"GetPortMetaData", OT_GetPortMetaData, METH_VARARGS, "For Block Items. Gets meta data from the ingoing ports."},
         {"SetPortData", OT_SetPortData, METH_VARARGS, "For Block Items. Sets datachunks from the outgoing ports."},
         {"SetPortMetaData", OT_SetPortMetaData, METH_VARARGS, "For Block Items. Sets metadata of the outgoing ports."},
+        {"GetTestStruct", OT_GetTestStruct, METH_NOARGS, "Testing python/c++ classes."},
         {NULL, NULL, 0, NULL}        // Sentinel
     };
 
@@ -78,7 +83,16 @@ namespace PythonExtensions {
     PyMODINIT_FUNC
         PyInit_OpenTwin(void)
     {
-        return PyModule_Create(&OTModule);
+        PyObject* m = PyModule_Create(&OTModule);
+        if (!m) return nullptr;
+
+        // Register custom types
+        if (!TestStruct_registerType(m)) {
+            Py_DECREF(m);
+            return nullptr;
+        }
+
+        return m;
     }
 
 };

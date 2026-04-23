@@ -13,6 +13,9 @@
     <Filter Include="src\DataHandling">
       <UniqueIdentifier>{33c1bb2d-ed47-468a-92e0-217063987e20}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\CustomPythonStructs">
+      <UniqueIdentifier>{24de0d71-959d-4737-8817-4c186ffbf4ca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\EntityBuffer.cpp">
@@ -67,6 +70,9 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="src\InterpreterPathSettings.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TestStruct.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -148,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="include\PythonThreadGuard.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TestStruct.h">
+      <Filter>include\CustomPythonStructs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

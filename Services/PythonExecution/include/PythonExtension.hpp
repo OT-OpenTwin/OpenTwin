@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonExtension.hpp
 // 
 // License:
@@ -29,6 +29,7 @@
 
 #include "OTModelEntities/EntityFile.h"
 
+#include "TestStruct.h"
 PyObject* PythonExtensions::OT_GetPropertyValue(PyObject* _self, PyObject* _args) 
 {
     try
@@ -295,4 +296,9 @@ PyObject* PythonExtensions::OT_SetPortMetaData(PyObject* _self, PyObject* _args)
         PyErr_SetString(PyExc_RuntimeError, _e.what());
         return nullptr;
     }
+}
+
+PyObject* PythonExtensions::OT_GetTestStruct(PyObject* _self, PyObject* _args)
+{
+    return TestStruct_create("A test struct", 42.0, 13);
 }
