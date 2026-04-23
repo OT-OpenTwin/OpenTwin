@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonObjectBuilder.h
 // 
 // License:
@@ -73,6 +73,7 @@ public:
 	CPythonObjectNew setDouble(double value);
 	CPythonObjectNew setString(const std::string& value);
 	CPythonObjectNew setBool(const bool value);
+	CPythonObjectNew setStringList(const std::list<std::string>& values);
 
 	CPythonObjectNew setVariableTuple(const std::list<ot::Variable>& values);
 	CPythonObjectNew setVariableList(const std::list<ot::Variable>& values);

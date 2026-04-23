@@ -28,6 +28,7 @@
 #include "DataBuffer.h"
 
 #include "OTModelEntities/EntityFile.h"
+#include "OTModelAPI/ModelServiceAPI.h"
 
 #include "TestStruct.h"
 PyObject* PythonExtensions::OT_GetPropertyValue(PyObject* _self, PyObject* _args) 
@@ -133,6 +134,35 @@ PyObject* PythonExtensions::OT_SetPropertyValue(PyObject* _self, PyObject* _args
         PyErr_SetString(PyExc_RuntimeError, _e.what());
         return nullptr;
     }
+}
+
+
+PyObject* PythonExtensions::OT_GetFolderEntities(PyObject* _self, PyObject* _args)
+{
+    try
+    {
+        CPythonObjectBorrowed args(_args);
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 1;
+        if (numberOfArguments != expectedNumberOfArguments) {
+            throw std::exception("OT_SetPropertyValue expects three arguments");
+        }
+
+        PythonObjectBuilder pyObBuilder;
+        std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        std::list<std::string> folderItems = ot::ModelServiceAPI::getListOfFolderItems(absoluteEntityName);
+        PythonObjectBuilder builder;
+        CPythonObjectNew list = builder.setStringList(folderItems);
+        Py_INCREF(list);
+        return list;
+    }
+    catch (std::exception& _e)
+    {
+        PyErr_SetString(PyExc_RuntimeError, _e.what());
+        return nullptr;
+    }
+
+    return nullptr;
 }
 
 PyObject* PythonExtensions::OT_Flush(PyObject* _self, PyObject* _args) 

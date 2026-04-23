@@ -34,7 +34,7 @@ namespace PythonExtensions {
 
     static PyObject* OT_SetPropertyValue(PyObject* _self, PyObject* _args);
     
-    //static PyObject* OT_GetFolderEntities (PyObject* _self, PyObject* _args);
+    static PyObject* OT_GetFolderEntities (PyObject* _self, PyObject* _args);
 
     static PyObject* OT_Flush(PyObject* _self, PyObject* _args);
     
@@ -65,6 +65,7 @@ namespace PythonExtensions {
         {"SetPortData", OT_SetPortData, METH_VARARGS, "For Block Items. Sets datachunks from the outgoing ports."},
         {"SetPortMetaData", OT_SetPortMetaData, METH_VARARGS, "For Block Items. Sets metadata of the outgoing ports."},
         {"GetTestStruct", OT_GetTestStruct, METH_NOARGS, "Testing python/c++ classes."},
+        {"GetFolderItemNames", OT_GetFolderEntities, METH_VARARGS, "Retrieving all entities of a given folder."},
         {NULL, NULL, 0, NULL}        // Sentinel
     };
 

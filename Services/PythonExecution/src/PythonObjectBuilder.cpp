@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonObjectBuilder.cpp
 // 
 // License:
@@ -344,6 +344,22 @@ CPythonObjectNew PythonObjectBuilder::setBool(const bool value)
 {
 	CPythonObjectNew returnVal(PyBool_FromLong(value));
 	return returnVal;
+}
+
+CPythonObjectNew PythonObjectBuilder::setStringList(const std::list<std::string>& _values)
+{
+	uint64_t assemblySize = _values.size();
+	PyObject* assembly = PyList_New(assemblySize);
+	uint64_t counter = 0;
+	for (const std::string& value : _values)
+	{
+		CPythonObjectNew pValue = setString(value);
+		int success = PyList_SetItem(assembly, counter, pValue);
+		assert(success == 0);
+		pValue.DropOwnership();
+		counter++;
+	}
+	return CPythonObjectNew(assembly);
 }
 
 
