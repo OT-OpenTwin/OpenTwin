@@ -2479,13 +2479,15 @@ void Model::updateEntityProperties(bool itemsVisible)
 		updateEntity(entity);
 		setEntityUpdated(entity);
 
+		bool stored = false;
 
-		entity->storeToDataBase();
-		needsWritingQueueFlush = true;
-
-
-		for (const std::string& cbService : entity->getServicesForCallback(EntityBase::Callback::Properties)) 
-		{
+		for (const std::string& cbService : entity->getServicesForCallback(EntityBase::Callback::Properties)) {
+			if (!stored) {
+				// Store the entity to the database only once
+				entity->storeToDataBase();
+				needsWritingQueueFlush = true;
+				stored = true;
+			}
 			otherServicesUpdate[cbService].push_back(std::pair<ot::UID, ot::UID>(entity->getEntityID(), entity->getEntityStorageVersion()));
 		}
 
