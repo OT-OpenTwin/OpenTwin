@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBuffer.h
 // 
 // License:
@@ -37,6 +37,7 @@ public:
 	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values);
 	std::shared_ptr<EntityBase> getEntity(const std::string& _absoluteEntityName);
 	
+	PyObject* getAllPropertyGroups(const std::string& _absoluteEntityName);
 	void saveChangedEntities();
 	bool saveChangedEntities(const std::string& _absoluteEntityName);
 

@@ -565,6 +565,20 @@ std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::
 	return propertyList;
 }
 
+std::list<std::string> EntityProperties::getListOfGroups() const
+{
+	std::list<std::string> groupNames;
+
+	for (auto prop : m_properties)
+	{
+		groupNames.push_back(prop.second->getGroup());
+	}
+	groupNames.sort();
+	groupNames.unique();
+	return groupNames;
+}
+
+
 std::string EntityProperties::createKey(const std::string& _name, const std::string& _group) {
 	return _group + "/" + _name;
 }

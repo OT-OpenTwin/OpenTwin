@@ -333,3 +333,17 @@ PyObject* PythonExtensions::OT_GetTestStruct(PyObject* _self, PyObject* _args)
 {
     return TestStruct_create("A test struct", 42.0, 13);
 }
+
+PyObject* PythonExtensions::OT_GetPropertyGroups(PyObject* _self, PyObject* _args)
+{
+    CPythonObjectBorrowed args(_args);
+    auto numberOfArguments = PyTuple_Size(args);
+    const int expectedNumberOfArguments = 1;
+    if (numberOfArguments != expectedNumberOfArguments) {
+        throw std::exception("OT_GetPropertyGroups expects one argument");
+    }
+    PythonObjectBuilder pyObBuilder;
+    std::string entityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+    PyObject* allGroups =  EntityBuffer::instance().getAllPropertyGroups(entityName);
+    return allGroups;
+}

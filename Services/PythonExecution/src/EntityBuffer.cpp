@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBuffer.cpp
 // 
 // License:
@@ -70,6 +70,16 @@ void EntityBuffer::updateEntityPropertyValue(const std::string& _absoluteEntityN
 	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName);
 	PropertyPythonObjectConverter interface(m_bufferedEntityProperties[_absoluteEntityName + _propertyName]);
 	interface.SetValue(_values);
+}
+
+PyObject* EntityBuffer::getAllPropertyGroups(const std::string& _absoluteEntityName)
+{
+	auto entity = loadEntity(_absoluteEntityName);
+	std::list<std::string> allGroups =	entity->getProperties().getListOfGroups();
+	PythonObjectBuilder builder;
+	CPythonObjectNew list =  builder.setStringList(allGroups);
+	Py_INCREF(list);
+	return list;
 }
 
 void EntityBuffer::saveChangedEntities()

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityProperties.h
 // 
 // License:
@@ -90,6 +90,7 @@ public:
 	size_t getNumberOfProperties() const { return m_properties.size(); }
 
 	std::list<std::string> getListOfPropertiesForGroup(const std::string &group) const;
+	std::list<std::string> getListOfGroups() const;
 
 	static std::string createKey(const std::string& _name, const std::string& _group);
 	bool isKey(const std::string _accesser) const;
