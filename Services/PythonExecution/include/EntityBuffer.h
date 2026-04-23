@@ -32,9 +32,9 @@ public:
 	friend class FixtureEntityBuffer;
 	static EntityBuffer& instance();
 
-	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName);
+	PyObject* getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup);
 	PyObject* getTableCellValue(const std::string& _absoluteEntityName, uint32_t _row, uint32_t _column);
-	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values);
+	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup, const CPythonObject& _values);
 	std::shared_ptr<EntityBase> getEntity(const std::string& _absoluteEntityName);
 	
 	PyObject* getAllPropertyGroups(const std::string& _absoluteEntityName);
@@ -50,7 +50,7 @@ private:
 	std::map<std::string, ot::IVisualisationTable*> m_bufferedTableEntities;
 	std::map<std::string, EntityPropertiesBase*> m_bufferedEntityProperties;
 		
-	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName);
+	void ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup);
 	void ensureTableToBeLoaded(const std::string& _absoluteEntityName);
 	void ensureValidRangeSelections(EntityBase* _entityBase);
 

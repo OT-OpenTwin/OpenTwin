@@ -33,10 +33,10 @@ EntityBuffer& EntityBuffer::instance() {
 	return g_instance;
 }
 
-PyObject* EntityBuffer::getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName)
+PyObject* EntityBuffer::getEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup)
 {
-	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName);
-	PropertyPythonObjectConverter interface(m_bufferedEntityProperties[_absoluteEntityName + _propertyName]);
+	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName, _propertyGroup);
+	PropertyPythonObjectConverter interface(m_bufferedEntityProperties[_absoluteEntityName + _propertyGroup + _propertyName]);
 	return interface.GetValue();
 }
 
@@ -65,10 +65,10 @@ PyObject* EntityBuffer::getTableCellValue(const std::string& _absoluteEntityName
 	}
 }
 
-void EntityBuffer::updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const CPythonObject& _values)
+void EntityBuffer::updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup, const CPythonObject& _values)
 {
-	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName);
-	PropertyPythonObjectConverter interface(m_bufferedEntityProperties[_absoluteEntityName + _propertyName]);
+	ensurePropertyToBeLoaded(_absoluteEntityName, _propertyName, _propertyGroup);
+	PropertyPythonObjectConverter interface(m_bufferedEntityProperties[_absoluteEntityName + _propertyGroup + _propertyName]);
 	interface.SetValue(_values);
 }
 
@@ -130,17 +130,17 @@ std::shared_ptr<EntityBase> EntityBuffer::getEntity(const std::string& _absolute
 }
 
 
-void EntityBuffer::ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName)
+void EntityBuffer::ensurePropertyToBeLoaded(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup)
 {
-	if (m_bufferedEntityProperties.find(_absoluteEntityName + _propertyName) == m_bufferedEntityProperties.end())
+	if (m_bufferedEntityProperties.find(_absoluteEntityName + _propertyGroup + _propertyName) == m_bufferedEntityProperties.end())
 	{
 		std::shared_ptr<EntityBase> entity = loadEntity(_absoluteEntityName);
-		EntityPropertiesBase* property = entity->getProperties().getProperty(_propertyName);
+		EntityPropertiesBase* property = entity->getProperties().getProperty(_propertyName, _propertyGroup);
 		if (property == nullptr)
 		{
 			throw std::exception(("Requested property " + _propertyName + " does not exist in entity " + _absoluteEntityName).c_str());
 		}
-		m_bufferedEntityProperties[_absoluteEntityName + _propertyName] = property;
+		m_bufferedEntityProperties[_absoluteEntityName + _propertyGroup + _propertyName] = property;
 	}
 }
 

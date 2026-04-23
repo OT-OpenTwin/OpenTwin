@@ -38,14 +38,20 @@ PyObject* PythonExtensions::OT_GetPropertyValue(PyObject* _self, PyObject* _args
         CPythonObjectBorrowed args(_args);
         auto numberOfArguments = PyTuple_Size(args);
         const int expectedNumberOfArguments = 2;
-        if (numberOfArguments != expectedNumberOfArguments) {
+        const int  expectedNumberOfArgumentsOptional = 3;
+        if (numberOfArguments != expectedNumberOfArguments && numberOfArguments != expectedNumberOfArgumentsOptional) {
             throw std::exception("OT_GetPropertyValue expects two arguments");
         }
         PythonObjectBuilder pyObBuilder;
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
+        std::string propertyGroup;
+        if (numberOfArguments == expectedNumberOfArgumentsOptional)
+        {
+            propertyGroup = pyObBuilder.getStringValueFromTuple(args, 2, "Parameter 2");
+        }
 
-        PyObject* returnValue = EntityBuffer::instance().getEntityPropertyValue(absoluteEntityName, propertyName);
+        PyObject* returnValue = EntityBuffer::instance().getEntityPropertyValue(absoluteEntityName, propertyName, propertyGroup);
         return returnValue;
     }
     catch (std::exception& _e)
@@ -117,7 +123,8 @@ PyObject* PythonExtensions::OT_SetPropertyValue(PyObject* _self, PyObject* _args
         CPythonObjectBorrowed args(_args);
         auto numberOfArguments = PyTuple_Size(args);
         const int expectedNumberOfArguments = 3;
-        if (numberOfArguments != expectedNumberOfArguments) {
+        const int  expectedNumberOfArgumentsOptional = 4;
+        if (numberOfArguments != expectedNumberOfArguments && numberOfArguments != expectedNumberOfArgumentsOptional) {
             throw std::exception("OT_SetPropertyValue expects three arguments");
         }
 
@@ -125,8 +132,12 @@ PyObject* PythonExtensions::OT_SetPropertyValue(PyObject* _self, PyObject* _args
         std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
         std::string propertyName = pyObBuilder.getStringValueFromTuple(args, 1, "Parameter 1");
         CPythonObjectBorrowed pvalue = pyObBuilder.getTupleItem(args, 2, "Parameter 2");
-
-        EntityBuffer::instance().updateEntityPropertyValue(absoluteEntityName, propertyName, pvalue);
+        std::string propertyGroup;
+        if (numberOfArguments == expectedNumberOfArgumentsOptional)
+        {
+            propertyGroup = pyObBuilder.getStringValueFromTuple(args, 2, "Parameter 2");
+        }
+        EntityBuffer::instance().updateEntityPropertyValue(absoluteEntityName, propertyName, propertyGroup, pvalue);
         return PyBool_FromLong(true);
     }
     catch (std::exception& _e)
