@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ModelState.h
 // 
 // License:
@@ -67,7 +67,16 @@ private:
 
 class __declspec(dllexport) ModelState
 {
+	friend class FixtureModelState;
 public:
+	struct VersionInformation
+	{
+		std::string branch; //! @brief The branch the version belongs to.
+		std::string version; //! @brief The version string.
+		bool isEndOfBranch = false; //! @brief Whether this version is the end of its branch.
+		bool isOriginalBranch = false; //! @brief Whether this version is part of the original branch.
+	};
+
 	ModelState() = delete;
 	ModelState(unsigned int sessionID, unsigned int serviceID);
 	~ModelState();
@@ -85,6 +94,8 @@ public:
 	// Open a project, load the version grap and the currently active version
 	bool openProject(const std::string& _customVersion = std::string());
 
+	std::optional<bsoncxx::v_noabi::document::value> getActiveModelState(VersionInformation& _information);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Entity handling
@@ -93,7 +104,7 @@ public:
 	unsigned long long createEntityUID();
 
 	// Load a model state with a particular version
-	bool loadModelState(const std::string& _version);
+	bool loadModelState(const std::string& _version, bool _loadFromGraph = true);
 
 	// Store an entity to the data base (it will be automatically determine whetehr the entity is new or modified)
 	void storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
@@ -213,16 +224,9 @@ public:
 	// Private: Helper
 
 private:
-	struct VersionInformation
-	{
-		std::string branch; //! @brief The branch the version belongs to.
-		std::string version; //! @brief The version string.
-		bool isEndOfBranch = false; //! @brief Whether this version is the end of its branch.
-		bool isOriginalBranch = false; //! @brief Whether this version is part of the original branch.
-	};
 
 	// This function loads the model state from a given ModelState document
-	bool loadModelFromDocument(bsoncxx::document::view docView);
+	bool loadModelFromDocument(bsoncxx::document::view docView, bool _loadFromGraph);
 	
 	// This function loads an absolute model state from a given ModelState document
 	bool loadAbsoluteState(bsoncxx::document::view docView);
@@ -305,6 +309,10 @@ private:
 
 	// Get the previous version in the active branch before the given one
 	std::string getPreviousVersion(const std::string &version);
+
+	std::string getPrecedingVersion(const std::string& _version);
+
+	std::string getProceedingVersion(const std::string& _currentVersion, const std::string& _targetVersion);
 
 	// Get the description for the given version
 	std::string getVersionDescription(const std::string &version);

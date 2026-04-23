@@ -36,7 +36,9 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
 			CrossCollectionDatabaseWrapper wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
-			secondary.openProject();
+			ModelState::VersionInformation information;
+			secondary.getActiveModelState(information);
+			secondary.loadModelState(information.version, false);
 
 			//Load entire modelState
 			std::list<ot::UID> prefetchIds;

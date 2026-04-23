@@ -676,7 +676,9 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	CrossCollectionDatabaseWrapper wrapper(collectionName);
 	
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
-	secondary.openProject();
+	ModelState::VersionInformation information;
+	secondary.getActiveModelState(information);
+	secondary.loadModelState(information.version, false);
 
 	// Load entire modelstate
 	std::list<ot::UID> prefetchIds;

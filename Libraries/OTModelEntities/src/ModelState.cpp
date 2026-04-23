@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ModelState.cpp
 // 
 // License:
@@ -78,11 +78,8 @@ void ModelState::reset()
 	m_stateModified = false;
 }
 
-bool ModelState::openProject(const std::string& _customVersion) {
-	// load the version graph
-	loadVersionGraph();
-
-	// Load the model entity to determine the currently active branch and version
+std::optional<bsoncxx::v_noabi::document::value> ModelState::getActiveModelState(VersionInformation& _information)
+{
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::stream::document{}
@@ -95,10 +92,28 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
 	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) return false;  // No model entity found
+	if (!result.has_value())
+	{
+		return std::nullopt;  // No model entity found
+	}
+	else
+	{
+		std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
+		std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
+		_information.branch = activeBranch;
+		_information.version = activeVersion;
+		return result;
+	}
+}
 
-	std::string activeBranch = result->view()["ActiveBranch"].get_utf8().value.data();
-	std::string activeVersion = result->view()["ActiveVersion"].get_utf8().value.data();
+bool ModelState::openProject(const std::string& _customVersion) {
+	// load the version graph
+	loadVersionGraph();
+
+	// Load the model entity to determine the currently active branch and version
+	VersionInformation activeState;
+	auto result = getActiveModelState(activeState);
+	std::string activeVersion(activeState.version), activeBranch(activeState.branch);
 
 	// Reset initial version infromations
 	m_originalInitialVersion = VersionInformation();
@@ -294,7 +309,7 @@ void ModelState::removeEntity(ot::UID entityID, bool considerChildren)
 	}
 }
 
-bool ModelState::loadModelState(const std::string& _version)
+bool ModelState::loadModelState(const std::string& _version, bool _loadFromGraph)
 {
 	OT_LOG_D("Loading model state { \"Version\": \"" + _version + "\" }");
 
@@ -320,7 +335,7 @@ bool ModelState::loadModelState(const std::string& _version)
 
 	clearChildrenInformation();
 
-	if (!loadModelFromDocument(result->view()))
+	if (!loadModelFromDocument(result->view(), _loadFromGraph))
 	{
 		// The model state could not be loaded
 		OT_LOG_E("Failed to load model state { \"Version\": \"" + _version + "\" }");
@@ -486,7 +501,7 @@ void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topolog
 	}
 }
 
-bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
+bool ModelState::loadModelFromDocument(bsoncxx::document::view docView, bool _loadFromGraph)
 {
 	std::string storageType = docView["Type"].get_utf8().value.data();
 
@@ -503,8 +518,6 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 	}
 	else if (storageType == "relative")
 	{
-		ot::VersionGraphVersionCfg incrementalStateVersion(docView["Version"].get_utf8().value.data());
-
 		m_currentModelBaseStateVersion = docView["BaseState"].get_utf8().value.data();
 
 		// Find and load the last absolute state
@@ -514,23 +527,58 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView)
 		// Now load the following (incremental) versions until we reach the desired version
 		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
-		std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion.getBranchName(), incrementalStateVersion.getName());
+		if (_loadFromGraph)
+		{
+			ot::VersionGraphVersionCfg incrementalStateVersion(docView["Version"].get_utf8().value.data());
 
-		for (const ot::VersionGraphVersionCfg* versionData : versionsToImport) {
-			auto queryDoc = bsoncxx::builder::basic::document{};
-			queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
-			queryDoc.append(bsoncxx::builder::basic::kvp("Version", versionData->getName()));
+			std::list<const ot::VersionGraphVersionCfg*> versionsToImport = m_graphCfg.findNextVersions(m_currentModelBaseStateVersion, incrementalStateVersion.getBranchName(), incrementalStateVersion.getName());
 
-			auto filterDoc = bsoncxx::builder::basic::document{};
+			for (const ot::VersionGraphVersionCfg* versionData : versionsToImport) {
+				auto queryDoc = bsoncxx::builder::basic::document{};
+				queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
+				queryDoc.append(bsoncxx::builder::basic::kvp("Version", versionData->getName()));
 
-			auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-			if (!result) {
-				OT_LOG_E("Model state not found { \"Version\": \"" + incrementalStateVersion.getName() + "\" }");
-				return false; // Model state not found
+				auto filterDoc = bsoncxx::builder::basic::document{};
+
+				auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+				if (!result) {
+					OT_LOG_E("Model state not found { \"Version\": \"" + incrementalStateVersion.getName() + "\" }");
+					return false; // Model state not found
+				}
+
+				this->loadIncrementalState(result->view());
+				m_relativeModelStateCount++;
 			}
 
-			this->loadIncrementalState(result->view());
-			m_relativeModelStateCount++;
+		}
+		else
+		{
+			//Simple logic which does not require the entire graph being loaded
+			std::string nextVersion = m_currentModelBaseStateVersion;
+			std::string incrementalStateVersion = docView["Version"].get_utf8().value.data();
+			do
+			{
+				nextVersion = getProceedingVersion(nextVersion,incrementalStateVersion);
+
+				if (nextVersion.empty())
+				{
+					// We have reached the end of the list without finding the desired version -> this should not happen
+					assert(0);
+					return false;
+				}
+
+				auto queryDoc = bsoncxx::builder::basic::document{};
+				queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
+				queryDoc.append(bsoncxx::builder::basic::kvp("Version", nextVersion));
+
+				auto filterDoc = bsoncxx::builder::basic::document{};
+
+				auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+				if (!result) return false; // Model state not found
+
+				loadIncrementalState(result->view());
+
+			} while (nextVersion != incrementalStateVersion);
 		}
 
 		return true;
@@ -2343,4 +2391,121 @@ void ModelState::deleteModelVersion(const std::string &version) {
 		<< bsoncxx::builder::stream::finalize;
 
 	docBase.DeleteDocuments(std::move(deleteDoc));
+}
+
+std::string ModelState::getPrecedingVersion(const std::string& _version)
+{
+	size_t lastSeparator = _version.find_last_of('.');
+	if (lastSeparator == std::string::npos)
+	{
+		//Main branch
+		int64_t version = std::stoll(_version);
+		if (version != 1)
+		{
+			version--;
+			return std::to_string(version);
+		}
+		else
+		{
+			// Version 1  is the first, there is none before
+			throw std::exception("Internal error. Model state switch to version 0 intended.");
+		}
+	}
+	else
+	{
+		int64_t version = std::stoll(_version.substr(lastSeparator+1));
+		if (version == 1)
+		{
+			// This is the end of the branch, we need to switch down to the origin of the branch. With each new branch two numbers are added .<branchID>.<ActiveState>
+			auto secondLast = _version.rfind('.', lastSeparator - 1);
+			if (secondLast == std::string::npos)
+			{
+				throw  std::exception("Internal error. Switch to Model state version not possible because of unexpected format.");
+			}
+			const std::string versionString = _version.substr(0, secondLast);
+			return versionString;
+		}
+		else
+		{
+			version--;
+			std::string versionBase = _version.substr(0, lastSeparator);
+			return  versionBase += "." + std::to_string(version);
+		}
+	}
+}
+
+int64_t findDigitOfLevel(const std::string& _digit, uint64_t _level) {
+	std::string::size_type pos = 0;
+
+	// Find the nth dot
+	for (int i = 0; i < _level; ++i) {
+		pos = _digit.find('.', pos);
+		if (pos == std::string::npos)
+		{
+			assert(false); // fewer than n dots
+			return -1;
+		}
+		if (i < _level - 1)
+		{
+			++pos; // advance past current dot for next search
+		}
+	}
+
+	// pos is now at the nth dot; token starts one after
+	std::string::size_type start = 0;
+	if (_level != 0)
+	{
+		start = pos + 1;
+	}
+	std::string::size_type end = _digit.find('.', start); // next dot, or npos
+	std::string digitAsString = _digit.substr(start, end == std::string::npos ? std::string::npos : end - start);
+	return std::stoll(digitAsString);
+}
+
+std::string ModelState::getProceedingVersion(const std::string& _currentVersion, const std::string& _targetVersion)
+{
+	size_t lastSeparator = _currentVersion.find_last_of('.');
+	size_t currentLvl = std::count(_currentVersion.begin(), _currentVersion.end(), '.');
+	int64_t currentLastDigit;
+	std::string versionBase;
+	if (lastSeparator == std::string::npos)
+	{
+		//Main branch
+		currentLastDigit = std::stoll(_currentVersion);
+		versionBase = "";
+	}
+	else
+	{
+		currentLastDigit = std::stoll(_currentVersion.substr(lastSeparator + 1));
+		versionBase = _currentVersion.substr(0, lastSeparator);
+	}
+
+	int64_t targetDigitOfSameLvl = findDigitOfLevel(_targetVersion, currentLvl);
+	
+	std::string newVersion;
+	if (currentLastDigit < targetDigitOfSameLvl)
+	{
+		currentLastDigit++;
+		if (versionBase.empty())
+		{
+			newVersion = std::to_string(currentLastDigit);
+		}
+		else
+		{
+			newVersion = versionBase + "." + std::to_string(currentLastDigit);
+		}
+	}
+	else
+	{
+		assert(currentLastDigit == targetDigitOfSameLvl);
+		if (_currentVersion == _targetVersion)
+		{
+			//assert(false); // Should not happen, since the loop on the outside should run until the versions are equal.
+			return _currentVersion;
+		}
+		// In this case we need to switch the branch.
+		int64_t branchID =	findDigitOfLevel(_targetVersion, currentLvl + 1);
+		newVersion = _currentVersion + "." + std::to_string(branchID) + ".1";
+	}
+	return newVersion;
 }
