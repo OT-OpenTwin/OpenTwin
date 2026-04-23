@@ -574,9 +574,23 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView, bool _lo
 				auto filterDoc = bsoncxx::builder::basic::document{};
 
 				auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-				if (!result) return false; // Model state not found
+				if (result.has_value())
+				{
+					loadIncrementalState(result->view());
+				}
+				else
+				{
+					if (nextVersion == incrementalStateVersion)
+					{
+						assert(false); // The target version should definitly exist.
+						return false;
+					}
+					else
+					{
+						OT_LOG_I("Relative model state not found: " + nextVersion);
+					}
+				}
 
-				loadIncrementalState(result->view());
 
 			} while (nextVersion != incrementalStateVersion);
 		}
