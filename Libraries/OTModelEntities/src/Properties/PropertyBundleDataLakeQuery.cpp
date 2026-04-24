@@ -552,6 +552,16 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 	}
 
 
+	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+	{
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+		refreshNecessary |= PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->needsUpdate();
+		refreshNecessary |= PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->needsUpdate();
+		refreshNecessary |= PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->needsUpdate();		
+	}
+
+	refreshNecessary |= PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter)->needsUpdate();
+	
 	return refreshNecessary;
 }
 
@@ -664,7 +674,7 @@ std::list<ot::ValueComparisonDescription> PropertyBundleDataLakeQuery::getMetada
 {
 	int32_t considerableQueries = PropertyHelper::getIntegerPropertyValue(_thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter);
 	std::list<ot::ValueComparisonDescription> definitions;
-	for (int32_t index = 1; index < considerableQueries; index++)
+	for (int32_t index = 1; index <= considerableQueries; index++)
 	{
 		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(index);
 		
