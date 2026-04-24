@@ -23,7 +23,7 @@
 #include "OTModelEntities/EntityFile.h"
 #include "OTBlockEntities/Connector.h"
 #include <vector>
-#include "OTCore/PythonHeader/PythonHeaderAnalyser.h"
+#include "OTCore/Python/PythonHeaderAnalyser.h"
 
 class OT_BLOCKENTITIES_API_EXPORT PythonHeaderInterpreter
 {

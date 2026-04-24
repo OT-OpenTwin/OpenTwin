@@ -277,8 +277,8 @@ void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const
 	auto result = m_wrapper.execute(_execution, moduleName);
 
 	//Since potentially multiple functions exist in a module, an entry point needs to be explicitly defined
-	const PythonModuleAPI& moduleAPI = PythonModuleAPI::instance();
-	
+	PythonModuleAPI& moduleAPI = PythonModuleAPI::instance();
+	moduleAPI.setEntryPoint(moduleName, _entryPointFunctionName);
 	const std::string entryPoint = moduleAPI.getModuleEntryPoint(moduleName);
 	OT_LOG_D("Determined entry point for " + _entityInformation.getEntityName() + " to be: " + entryPoint);
 	m_moduleEntrypointByModuleName[moduleName] = entryPoint;

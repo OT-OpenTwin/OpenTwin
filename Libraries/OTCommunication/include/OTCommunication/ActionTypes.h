@@ -311,7 +311,7 @@
 #define OT_ACTION_CMD_PYTHON_Scripts "Python.Scripts"
 #define OT_ACTION_CMD_PYTHON_Command "Python.Command"
 #define OT_ACTION_CMD_PYTHON_Parameter "Python.Parameter"
-#define OT_ACTION_CMD_PYTHON_EntryPoints "Python.Parameter"
+#define OT_ACTION_CMD_PYTHON_EntryPoints "Python.EntryPoints"
 #define OT_ACTION_CMD_PYTHON_Result "Python.Result"
 
 #define OT_ACTION_CMD_PYTHON_Portdata "Python.Portdata"

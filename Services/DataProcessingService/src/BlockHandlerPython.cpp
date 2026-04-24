@@ -76,7 +76,7 @@ bool BlockHandlerPython::executeSpecialized()
                 
         //First assemble the job for the python service
         PythonParameter parameter = PyhonParameterBuilderGeneric::create(m_entityName, {});
-        m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
+        m_pythonServiceInterface->addScriptWithParameter(m_scriptName,"", parameter);
 		m_pythonServiceInterface->addManifestUID(m_manifestUID);
 
         for (auto& dataPortEntry : m_dataPerPort)

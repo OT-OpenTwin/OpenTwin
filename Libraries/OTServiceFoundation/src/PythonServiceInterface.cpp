@@ -31,9 +31,13 @@ ot::PythonServiceInterface::PythonServiceInterface(const std::string& _pythonExe
 	: m_pythonExecutionServiceURL(_pythonExecutionServiceURL)
 {}
 
-void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scriptName, const PythonParameter& _parameter)
+void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scriptName, const std::string& _functionName, const PythonParameter& _parameter)
 {
-	m_scriptNamesWithParameter.push_back(std::make_tuple(_scriptName, _parameter));
+	ExecutionOrder order;
+	order.m_scriptName = _scriptName;
+	order.m_functionName = _functionName;
+	order.m_parameter = _parameter;
+	m_executionOrders.push_back(order);
 }
 
 void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonValue* _data, const ot::JsonValue* _metadata)
@@ -50,7 +54,7 @@ void ot::PythonServiceInterface::addManifestUID(ot::UID _manifestUID)
 
 ot::ReturnMessage ot::PythonServiceInterface::sendExecutionOrder()
 {
-	if (m_scriptNamesWithParameter.size() == 0)
+	if (m_executionOrders.size() == 0)
 	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "PythonServiceInterface got nothing to execute.");
 	}
@@ -99,22 +103,21 @@ ot::ReturnMessage ot::PythonServiceInterface::sendSingleExecutionCommand(const s
 ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 {
 	JsonDocument doc;
-	JsonArray allParameter;
-	JsonArray scripts;
+	JsonArray allParameter, scripts, functionNames;
 	ot::VariableToJSONConverter converter;
 
-	for (auto& scriptWithParameter : m_scriptNamesWithParameter)
+	for (auto& order : m_executionOrders)
 	{
-		scripts.PushBack(JsonString(std::get<0>(scriptWithParameter).c_str(), doc.GetAllocator()), doc.GetAllocator());
 		
-		PythonParameter& currentParameterSet = std::get<1>(scriptWithParameter);
-		ot::JsonObject value;
-		currentParameterSet.addToJsonObject(value, doc.GetAllocator());
-		
-		allParameter.PushBack(value, doc.GetAllocator());
+		scripts.PushBack(JsonString(order.m_scriptName, doc.GetAllocator()), doc.GetAllocator());
+		functionNames.PushBack(JsonString(order.m_functionName, doc.GetAllocator()), doc.GetAllocator());
+
+		ot::JsonObject entry;
+		order.m_parameter.addToJsonObject(entry, doc.GetAllocator());
+		allParameter.PushBack(entry, doc.GetAllocator());
 	}
 
-	m_scriptNamesWithParameter.clear();
+	m_executionOrders.clear();
 
 	std::string gridFSDocumentID = writePortDataToDatabase();
 	if (!gridFSDocumentID.empty())
@@ -124,6 +127,8 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allParameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_CMD_PYTHON_EntryPoints, functionNames, doc.GetAllocator());
+
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
 	
 	if (m_manifestUID != ot::invalidUID)

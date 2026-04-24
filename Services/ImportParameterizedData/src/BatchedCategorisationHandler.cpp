@@ -172,7 +172,7 @@ void BatchedCategorisationHandler::run(bool _lastRun, std::map<std::string, ot::
 			PythonParameter parameter =PyhonParameterBuilderGeneric::create(batchingInformation.m_selectionEntityNames, {});
 			const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
 			
-			m_pythonInterface->addScriptWithParameter(pythonScriptName, parameter);
+			m_pythonInterface->addScriptWithParameter(pythonScriptName, "", parameter);
 		}
 	}
 

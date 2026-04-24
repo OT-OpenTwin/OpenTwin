@@ -452,14 +452,14 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 		{
 			// Otherwise there is no handler for this event in the script.
 			const std::string temp = functionName.value();
-			auto asyncRequest = [_event, scriptName]()
+			auto asyncRequest = [_event, scriptName,temp]()
 				{
 					try
 					{
 						ot::PythonServiceInterface interface(Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE)->getServiceURL());
 						std::list<ot::ValueComparisonDescription> valueCompares = _event.getFilterDescriptions();
 						PythonParameter parameter = PyhonParameterBuilderValueComparisons::create("", valueCompares);
-						interface.addScriptWithParameter(scriptName, parameter);
+						interface.addScriptWithParameter(scriptName,temp, parameter);
 						ot::ReturnMessage answer = interface.sendExecutionOrder();
 					}
 					catch (std::exception& _e)

@@ -48,7 +48,8 @@ std::string PythonModuleAPI::getModuleEntryPoint(const std::string& _moduleName)
 	if (!hasScriptHasEntryPoint(pyhtonModule, _moduleName))
 	{
 		const std::string entityName = PythonLoadedModules::instance().getEntityName(_moduleName);
-		const std::string message = "Script " + entityName + " has no entry point. Each script in OpenTwin requires a function: " + m_defaultEntryPoint;
+		const std::string entryPoint = getModuleEntryPoint(pyhtonModule);
+		const std::string message = "Script " + entityName + " does not have the requested entry point: " + entryPoint;
 		throw std::exception(message.c_str());
 	}
 

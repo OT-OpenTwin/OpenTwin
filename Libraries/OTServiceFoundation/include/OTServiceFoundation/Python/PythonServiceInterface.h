@@ -45,7 +45,7 @@ namespace ot
 		PythonServiceInterface operator=(const PythonServiceInterface& _other) = delete;
 		PythonServiceInterface operator=(PythonServiceInterface&& _other) = delete;
 
-		void addScriptWithParameter(const std::string& _scriptName, const PythonParameter& _parameter = PythonParameter());
+		void addScriptWithParameter(const std::string& _scriptName, const std::string& _functionName = "", const PythonParameter& _parameter = PythonParameter());
 		void addPortData(const std::string& _portName, const ot::JsonValue*  _data, const JsonValue* _metadata);
 		void addManifestUID(ot::UID _manifestUID);
 		
@@ -54,10 +54,18 @@ namespace ot
 		ot::ReturnMessage sendSingleExecutionCommand(const std::string& command);
 
 	private:
+		struct ExecutionOrder
+		{
+			std::string m_scriptName;
+			std::string m_functionName;
+			PythonParameter m_parameter;
+		};
+
+
 		const std::string m_pythonExecutionServiceURL;
 		ot::UID m_manifestUID = ot::invalidUID;
 		
-		std::list<std::tuple<std::string, PythonParameter>> m_scriptNamesWithParameter;
+		std::list<ExecutionOrder> m_executionOrders;
 
 		std::map<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>> m_portDataByPortName;
 		
