@@ -300,6 +300,7 @@
     <ClCompile Include="src\PythonLoadedModules.cpp" />
     <ClCompile Include="src\PythonModuleAPI.cpp" />
     <ClCompile Include="src\PythonObjectBuilder.cpp" />
+    <ClCompile Include="src\PythonStructValueComparison.cpp" />
     <ClCompile Include="src\PythonWrapper.cpp" />
     <ClCompile Include="src\TestStruct.cpp" />
   </ItemGroup>
@@ -307,6 +308,7 @@
     <ClInclude Include="include\ActionHandler.h" />
     <ClInclude Include="include\EnvironmentsGarbageCollector.h" />
     <ClInclude Include="include\ExceptionRestartRequired.h" />
+    <ClInclude Include="include\PythonStructValueComparison.h" />
     <ClInclude Include="include\PythonThreadGuard.h" />
     <ClInclude Include="include\InterpreterPathSettings.h" />
     <ClInclude Include="include\OutputPipeline.h" />

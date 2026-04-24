@@ -26,6 +26,7 @@
 
 #include "OTCore/Python/PyhonParameterBuilderGeneric.h"
 #include "OTCore/Python/PyhonParameterBuilderValueComparisons.h"
+#include "PythonStructValueComparison.h"
 
 #define NO_IMPORT_ARRAY
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
@@ -528,6 +529,29 @@ CPythonObjectNew PythonObjectBuilder::ConvertKwargsMap(const PythonParameter& _p
 				return nullptr;
 			}
 		}
+	}
+	else if (_parameter.getPythonParameterType() == PyhonParameterBuilderValueComparisons::getTypeName())
+	{
+		std::list<ot::ValueComparisonDescription> comparisons =	PyhonParameterBuilderValueComparisons::extract(_parameter);
+		uint64_t assemblySize = comparisons.size();
+		PyObject* allComparisons = PyList_New(assemblySize);
+		uint64_t counter = 0;
+		for (const ot::ValueComparisonDescription& comparison : comparisons)
+		{
+			PyObject* entry =	PythonStructValueComparison_create(comparison);
+			int success = PyList_SetItem(allComparisons, counter, entry);
+			assert(success == 0);
+			counter++;
+		}
+		if (PyDict_SetItemString(kwargs, "comparisons", allComparisons) < 0)
+		{
+			Py_DECREF(kwargs);
+			return nullptr;
+		}
+	}
+	else
+	{
+		assert(false);
 	}
 
 	return CPythonObjectNew(kwargs);  // New reference — caller must Py_DECREF

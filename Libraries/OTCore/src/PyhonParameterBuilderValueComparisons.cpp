@@ -8,7 +8,7 @@ PythonParameter PyhonParameterBuilderValueComparisons::create(const std::string&
 	ot::JsonArray valueComparisons;
 	for (const auto& valueComp : _valueComp)
 	{
-		ot::JsonValue entry;
+		ot::JsonObject entry;
 		valueComp.addToJsonObject(entry, parameterDoc.GetAllocator());
 		valueComparisons.PushBack(entry, parameterDoc.GetAllocator());
 	}

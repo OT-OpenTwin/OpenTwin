@@ -75,6 +75,9 @@
     <ClCompile Include="src\TestStruct.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\PythonStructValueComparison.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -156,6 +159,9 @@
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="include\TestStruct.h">
+      <Filter>include\CustomPythonStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PythonStructValueComparison.h">
       <Filter>include\CustomPythonStructs</Filter>
     </ClInclude>
   </ItemGroup>

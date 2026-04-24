@@ -23,6 +23,7 @@
 
 #include <string>
 #include "TestStruct.h"
+#include "PythonStructValueComparison.h"
 
 //! @brief C Python Extension that hold functions for OpenTwin that can be called from a python script.
 //! Neither of the function parameter's memory is owned. They have to be turned into CPythonObjectBorrowed within the function implementation.
@@ -95,7 +96,11 @@ namespace PythonExtensions {
             Py_DECREF(m);
             return nullptr;
         }
-
+        if (!PythonStructValueComparison_registerType(m)) 
+        { 
+            Py_DECREF(m); 
+            return nullptr; 
+        }
         return m;
     }
 
