@@ -147,8 +147,24 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 		std::string collectionName = it->getCollectionName();
 		std::string elementName = it->getName();
 
+
+		// Check if additonal depenency exists if not then skip 
+		std::string dependencyID = it->getAdditionalInfoValue("DependencyID");
+		std::string dependencyCollection = it->getAdditionalInfoValue("DependencyCollection");
+
+		if (!dependencyID.empty() && !dependencyCollection.empty()) {
+			std::string dependencyDocJson = db->getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
+			if (dependencyDocJson.empty()) {
+				OT_LOG_E("No dependency document found for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
+				it = _elements.erase(it);
+				continue;
+			}
+		}
+
+
 		// Try to fetch the existing document from database
 		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+
 
 		if (!existingDocJson.empty()) {
 			// Element exists in database - compare hashes
@@ -553,7 +569,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 	}
 
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026419-122354-41", "sjfHVRjsU1RoWf1q2tfNpSGLbV5Ooe", "127.0.0.1:27017");
+	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026424-102653-41", "kwFLWJMZZIwulXgiI6EUKnqEQRBPUQ", "127.0.0.1:27017");
 
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
@@ -582,7 +598,7 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 	}
 
 	// Add or update library elements
-	addLibraryElement(receivedModels, "Sebastian-2026419-122354-41", "sjfHVRjsU1RoWf1q2tfNpSGLbV5Ooe", "127.0.0.1:27017");
+	addLibraryElement(receivedModels, "Sebastian-2026424-102653-41", "kwFLWJMZZIwulXgiI6EUKnqEQRBPUQ", "127.0.0.1:27017");
 
 	// Create response document with updated models
 	ot::JsonDocument responseDoc;
