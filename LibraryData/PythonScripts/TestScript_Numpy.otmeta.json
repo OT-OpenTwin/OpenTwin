@@ -1,7 +1,8 @@
 {
 "Name":"TestScript_Numpy.py",
 "Version":1,
+"LibraryElementID":53377476402872320,
 "FileName":"TestScript_Numpy.py",
 "MetaData":{"Description":"Calculates determinant of a 2x2 matrix and writes it to port 'DisplayValue' as JSON"},
-"AdditionalInfos":{"Environment":"69afd6cb77d8206ac70abda3","Language":"Python","Type":"Script"}
+"AdditionalInfos":{"DependencyID":"69afd6cb77d8206ac70abda3","DependencyCollection":"PythonEnvironments","Language":"Python","Type":"Script"}
 }

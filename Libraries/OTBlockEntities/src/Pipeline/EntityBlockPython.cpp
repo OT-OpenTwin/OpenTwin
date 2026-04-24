@@ -46,10 +46,10 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 
 void EntityBlockPython::createProperties()
 {
-	/*EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());*/
+	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, { "< Load from Library >" }, { "" }, "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameScripts, ot::FolderNames::PythonScriptFolder, ot::invalidUID, "", -1, "default", getProperties());
 	EntityPropertiesEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1, "default", getProperties());
-	/*EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());*/
+	//EntityPropertiesExtendedEntityList::createProperty("Python properties", m_propertyNameEnvironments, ot::FolderNames::PythonManifestFolder, ot::invalidUID, "", -1 , { "< Load from Library >" },{ "" }, "default", getProperties());
 }
 
 std::string EntityBlockPython::getSelectedScript()
@@ -130,9 +130,9 @@ bool EntityBlockPython::updateFromProperties()
 
 void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID) {
 	
-	/*auto propBase = getProperties().getProperty(m_propertyNameScripts);
-	auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
-	scriptSelection->setEntityContainerID(_scriptFolderID);*/
+	//auto propBase = getProperties().getProperty(m_propertyNameScripts);
+	//auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
+	//scriptSelection->setEntityContainerID(_scriptFolderID);
 
 	auto scriptProperty = PropertyHelper::getEntityListProperty(this, m_propertyNameScripts);
 	scriptProperty->setEntityContainerID(_scriptFolderID);
@@ -140,10 +140,10 @@ void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID) {
 
 void EntityBlockPython::setManifestFolder(ot::UID _manifestFolderID)
 {
-	/*auto propBase = getProperties().getProperty(m_propertyNameEnvironments);
-	auto selectedManifest = dynamic_cast<EntityPropertiesEntityList*>(propBase);
-	assert(selectedManifest != nullptr);
-	selectedManifest->setEntityContainerID(_manifestFolderID);*/
+	//auto propBase = getProperties().getProperty(m_propertyNameEnvironments);
+	//auto selectedManifest = dynamic_cast<EntityPropertiesEntityList*>(propBase);
+	//assert(selectedManifest != nullptr);
+	//selectedManifest->setEntityContainerID(_manifestFolderID);
 
 	auto manifestProperty = PropertyHelper::getEntityListProperty(this, m_propertyNameEnvironments);
 	manifestProperty->setEntityContainerID(_manifestFolderID);
@@ -153,18 +153,19 @@ std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::
 	
 	std::list<ot::LibraryElement> resultList;
 	
-	std::string environmentInfo = _libraryElement.getAdditionalInfoValue("Environment");
-	if (!environmentInfo.empty()) {
+	std::string dependencyID = _libraryElement.getAdditionalInfoValue("DependencyID");
+	std::string dependencyCollection = _libraryElement.getAdditionalInfoValue("DependencyCollection");
+	if (!dependencyID.empty()) {
 		// Create the LibraryElementRequest configuration
 		ot::LibraryElementRequest request;
 		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
-		request.setCollectionName("PythonEnvironments");
+		request.setCollectionName(dependencyCollection);
 		request.setCallBackAction(OT_ACTION_CMD_LMS_LibraryElementRequest);
 		request.setEntityType(EntityPythonManifest::className());
 		request.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
 		request.setPropertyName("Environment");
 		request.setCallBackService(_libraryElement.getCallBackService());
-		request.setValue(environmentInfo);  // Now passing string directly
+		request.setValue(dependencyID);
 
 		// Send the document to the observer (Model Service)
 		std::string answer = getObserver()->requestLibraryElement(request);

@@ -1,6 +1,7 @@
 {
 "Name":"TestScript_HelloWorld.py",
 "Version":1,
+"LibraryElementID":53377476134436864,
 "FileName":"TestScript_HelloWorld.py",
 "MetaData": {
     "Port": {
@@ -9,5 +10,5 @@
       "label": "Dummy"
     }
   },
-"AdditionalInfos":{"Environment":"69afd6cb77d8206ac70abda3","Language":"Python","Type":"Script"}
+"AdditionalInfos":{"DependencyID":"69afd6cb77d8206ac70abda3","DependencyCollection":"PythonEnvironments","Language":"Python","Type":"Script"}
 }
