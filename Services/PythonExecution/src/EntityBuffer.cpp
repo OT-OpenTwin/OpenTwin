@@ -271,6 +271,7 @@ std::shared_ptr<EntityBase> EntityBuffer::loadEntity(const std::string& _absolut
 		{
 			throw std::exception(("Requested entity " + _absoluteEntityName + " does not exist.").c_str());
 		}
+		
 		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (entity == nullptr)
 		{
@@ -288,6 +289,9 @@ void EntityBuffer::clearBuffer()
 	m_bufferedTableEntities.clear();
 }
 
-EntityBuffer::EntityBuffer() {
+#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
 
+EntityBuffer::EntityBuffer() {
+	// Required for the EntityFactory. Otherwise the names are not registered.
+	EntityBlockPython temp; 
 }
