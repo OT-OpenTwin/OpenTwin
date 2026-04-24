@@ -480,6 +480,7 @@ bool MongoWrapper::initializeConnection(const std::string& _dbUserName, const st
 
 bool MongoWrapper::checkCollectionExists(const std::string& _collectionName) {
     try {
+
         if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dbName, _collectionName)) {
             OT_LOG_E("Collection '" + _collectionName + "' does not exist in database '" + dbName + "'");
             return false;

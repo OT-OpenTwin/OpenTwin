@@ -69,6 +69,8 @@ public:
 	void updateGridFSContent(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument, const std::string& _newContent);
 	std::string updateGridFSAndMetadata(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _documentName, uint32_t _newVersion, const std::string& _newHash, const std::string& _newContent);
 	void addNewDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, ot::LibraryElement& _element);
+
+	std::string getAdminUserName() const { return "admin"; }
 private:
 	// Database connection and validation
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);

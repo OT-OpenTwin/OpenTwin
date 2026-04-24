@@ -568,8 +568,20 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		receivedModels.push_back(element);
 	}
 
+
+	// Admin credentials for database operations
+	std::string adminUserName = db->getAdminUserName();
+	std::string adminPassword;
+	const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
+	if (envPassword != nullptr) {
+		adminPassword = envPassword;
+	}
+	else {
+		adminPassword = ot::UserCredentials::encryptString("admin");
+	}
+
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, "Sebastian-2026424-102653-41", "kwFLWJMZZIwulXgiI6EUKnqEQRBPUQ", "127.0.0.1:27017");
+	updateOrCreateLibraryElement(receivedModels, "admin", ot::UserCredentials::decryptString(adminPassword), "127.0.0.1:27017");
 
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
@@ -597,8 +609,19 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		receivedModels.push_back(element);
 	}
 
+	// Admin credentials for database operations
+	std::string adminUserName = db->getAdminUserName();
+	std::string adminPassword;
+	const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
+	if (envPassword != nullptr) {
+		adminPassword = envPassword;
+	}
+	else {
+		adminPassword = ot::UserCredentials::encryptString("admin");
+	}
+
 	// Add or update library elements
-	addLibraryElement(receivedModels, "Sebastian-2026424-102653-41", "kwFLWJMZZIwulXgiI6EUKnqEQRBPUQ", "127.0.0.1:27017");
+	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), "127.0.0.1:27017");
 
 	// Create response document with updated models
 	ot::JsonDocument responseDoc;
