@@ -4,10 +4,10 @@
 import OpenTwin 
 import json
 
-def handle1(this):
+def handle1(this, **kwargs):
 	print("Handle table filter changed event")
 
-def __main__(this):
-    print("This should not be executed.")
-    
-    
+def __main__(self, **kwargs):
+    # Works with no kwargs — kwargs is just an empty dict {}
+    # Works with kwargs  — kwargs["measurements"], kwargs["scale"], etc.
+    print("Main")
