@@ -3,7 +3,7 @@
 #include "OTCore/CoreAPIExport.h"
 #include <string>
 #include <map>
-#include "OTCore/PythonHeader/PythonEventTypes.h"
+#include "OTCore/Python/PythonEventTypes.h"
 #include "OTCore/JSON/JSON.h"
 #include <optional>
 #include "OTCore/CoreAPIExport.h"

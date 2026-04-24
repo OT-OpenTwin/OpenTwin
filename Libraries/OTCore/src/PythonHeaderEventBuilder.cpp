@@ -1,5 +1,5 @@
-﻿#include "OTCore/PythonHeader/PythonHeaderEventBuilder.h"
-#include "OTCore/PythonHeader/PythonHeaderAnalyser.h"
+﻿#include "OTCore/Python/PythonHeaderEventBuilder.h"
+#include "OTCore/Python/PythonHeaderAnalyser.h"
 #include "OTCore/String.h"
 
 bool PythonHeaderEventBuilder::interpret(const std::string& _scriptContent)

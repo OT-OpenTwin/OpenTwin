@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonWrapper.h
 // 
 // License:
@@ -49,7 +49,7 @@ public:
 	void closePythonInterpreter();
 
 	CPythonObjectNew execute(const std::string& _executionCommand, const std::string& _moduleName = "__main__");
-	CPythonObjectNew executeFunction(const std::string& _functionName, CPythonObject& _parameter, const std::string& _moduleName = "__main__");
+	CPythonObjectNew executeFunction(const std::string& _functionName, CPythonObject& _self, CPythonObject& _kwargs, const std::string& _moduleName = "__main__");
 	CPythonObjectBorrowed getGlobalVariable(const std::string& _varName, const std::string& _moduleName);
 	CPythonObjectBorrowed getGlobalDictionary(const std::string& _moduleName);
 	CPythonObjectNew getFunction(const std::string& _functionName, const std::string& _moduleName = "__main__");

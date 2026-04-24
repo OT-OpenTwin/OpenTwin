@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerPython.h
 // 
 // License:
@@ -20,7 +20,7 @@
 #pragma once
 #include "BlockHandler.h"
 #include "OTBlockEntities/Pipeline/EntityBlockPython.h"
-#include "OTServiceFoundation/PythonServiceInterface.h"
+#include "OTServiceFoundation/Python/PythonServiceInterface.h"
 
 class BlockHandlerPython : public BlockHandler
 {

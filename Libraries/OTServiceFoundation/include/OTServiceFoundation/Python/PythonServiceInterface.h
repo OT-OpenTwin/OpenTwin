@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonServiceInterface.h
 // 
 // License:
@@ -24,7 +24,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Variable/Variable.h"
 #include "OTServiceFoundation/FoundationAPIExport.h"
-
+#include "OTCore/Python/PythonParameter.h"
 // std header
 #include <map>
 #include <tuple>
@@ -38,9 +38,14 @@ namespace ot
 	class OT_SERVICEFOUNDATION_API_EXPORT PythonServiceInterface
 	{
 	public:
-		using scriptParameter = std::optional<std::list<ot::Variable>>;
+		
 		PythonServiceInterface(const std::string& _pythonExecutionServiceURL);
-		void addScriptWithParameter(const std::string& _scriptName, const scriptParameter& _scriptParameter);
+		PythonServiceInterface(const PythonServiceInterface& _other) = delete;
+		PythonServiceInterface(PythonServiceInterface&& _other) = delete;
+		PythonServiceInterface operator=(const PythonServiceInterface& _other) = delete;
+		PythonServiceInterface operator=(PythonServiceInterface&& _other) = delete;
+
+		void addScriptWithParameter(const std::string& _scriptName, const PythonParameter& _parameter = PythonParameter());
 		void addPortData(const std::string& _portName, const ot::JsonValue*  _data, const JsonValue* _metadata);
 		void addManifestUID(ot::UID _manifestUID);
 		
@@ -52,7 +57,7 @@ namespace ot
 		const std::string m_pythonExecutionServiceURL;
 		ot::UID m_manifestUID = ot::invalidUID;
 		
-		std::list<std::tuple<std::string, scriptParameter>> m_scriptNamesWithParameter;
+		std::list<std::tuple<std::string, PythonParameter>> m_scriptNamesWithParameter;
 
 		std::map<std::string, std::pair<const ot::JsonValue*, const ot::JsonValue*>> m_portDataByPortName;
 		

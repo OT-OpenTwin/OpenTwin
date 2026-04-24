@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BatchedCategorisationHandler.h
 // 
 // License:
@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "OTServiceFoundation/PythonServiceInterface.h"
+#include "OTServiceFoundation/Python/PythonServiceInterface.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "BusinessLogicHandler.h"
 #include "BatchUpdateInformation.h"

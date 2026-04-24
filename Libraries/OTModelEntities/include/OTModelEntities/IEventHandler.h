@@ -2,7 +2,7 @@
 #pragma once
 #include <string>
 #include <optional>
-#include "OTCore/PythonHeader/PythonEventTypes.h"
+#include "OTCore/Python/PythonEventTypes.h"
 class IEventHandler
 {
 public:

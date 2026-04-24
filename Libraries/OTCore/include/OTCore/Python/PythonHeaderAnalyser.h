@@ -3,7 +3,7 @@
 #include <string>
 #include <map>
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/PythonHeader/PythonHeaderEntryType.h"
+#include "OTCore/Python/PythonHeaderEntryType.h"
 #include "OTCore/CoreAPIExport.h"
 
 //! @brief Extracts python header of the form: #@ Port : {"type": "in", "name": "DataInput", "label" : "Data Input"}

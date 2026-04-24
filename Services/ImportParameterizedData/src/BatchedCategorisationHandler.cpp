@@ -29,7 +29,8 @@
 #include "OTModelEntities/EntityFileCSV.h"
 #include "OTModelEntities/EntityBatchImporter.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
-
+#include "OTCore/Python/PythonParameter.h"
+#include "OTCore/Python/PyhonParameterBuilderGeneric.h"
 BatchedCategorisationHandler::~BatchedCategorisationHandler()
 {
 	if (m_pythonInterface != nullptr)
@@ -167,10 +168,11 @@ void BatchedCategorisationHandler::run(bool _lastRun, std::map<std::string, ot::
 		std::list<BatchUpdateInformation>& batchingInformations = batchingInformationByPriority->second;
 		for (BatchUpdateInformation& batchingInformation : batchingInformations)
 		{
-			ot::Variable parameterEntityName(batchingInformation.m_selectionEntityNames);
-			std::list<ot::Variable> parameterList{ parameterEntityName };
+			
+			PythonParameter parameter =PyhonParameterBuilderGeneric::create(batchingInformation.m_selectionEntityNames, {});
 			const std::string pythonScriptName = batchingInformation.m_pythonScriptNames;
-			m_pythonInterface->addScriptWithParameter(pythonScriptName, parameterList);
+			
+			m_pythonInterface->addScriptWithParameter(pythonScriptName, parameter);
 		}
 	}
 

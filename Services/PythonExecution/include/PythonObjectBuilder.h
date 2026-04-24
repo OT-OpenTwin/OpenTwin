@@ -25,6 +25,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTCore/Python/PythonParameter.h"
 
 #include <stdint.h>
 #include <string>
@@ -76,12 +77,13 @@ public:
 	CPythonObjectNew setStringList(const std::list<std::string>& values);
 
 	CPythonObjectNew setVariableTuple(const std::list<ot::Variable>& values);
+	
 	CPythonObjectNew setVariableList(const std::list<ot::Variable>& values);
 	CPythonObjectNew setVariableList(const std::vector<ot::Variable>& values);
 	CPythonObjectNew setVariableList(rapidjson::GenericArray<false,rapidjson::Value> & values);
 	
 	CPythonObjectNew setVariable(const ot::Variable& value);
-
+	CPythonObjectNew ConvertKwargsMap(const PythonParameter& _parameter);
 private:
 	PyObject* _assembly = nullptr;
 	int _assemblySize = 0;

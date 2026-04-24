@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerPython.cpp
 // 
 // License:
@@ -27,7 +27,9 @@
 
 #include "OTCommunication/ActionTypes.h"
 
-#include "OTServiceFoundation/PythonServiceInterface.h"
+#include "OTServiceFoundation/Python/PythonServiceInterface.h"
+#include "OTCore/Python/PythonParameter.h"
+#include "OTCore/Python/PyhonParameterBuilderGeneric.h"
 
 #include "OTModelEntities/EntityFile.h"
 
@@ -73,7 +75,7 @@ bool BlockHandlerPython::executeSpecialized()
     {
                 
         //First assemble the job for the python service
-        ot::PythonServiceInterface::scriptParameter parameter{ {ot::Variable(m_entityName)} };
+        PythonParameter parameter = PyhonParameterBuilderGeneric::create(m_entityName, {});
         m_pythonServiceInterface->addScriptWithParameter(m_scriptName, parameter);
 		m_pythonServiceInterface->addManifestUID(m_manifestUID);
 

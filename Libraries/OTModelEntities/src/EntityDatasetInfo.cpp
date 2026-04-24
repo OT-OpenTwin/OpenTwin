@@ -8,8 +8,8 @@
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTModelEntities/EntityDatasetInfo.h"
 #include "OTModelEntities/EntityFileText.h"
-#include "OTCore/PythonHeader/PythonHeaderAnalyser.h"
-#include "OTCore/PythonHeader/PythonHeaderEventBuilder.h"
+#include "OTCore/Python/PythonHeaderAnalyser.h"
+#include "OTCore/Python/PythonHeaderEventBuilder.h"
 static EntityFactoryRegistrar<ot::EntityDatasetInfo> registrar(ot::EntityDatasetInfo::className());
 
 ot::EntityDatasetInfo::EntityDatasetInfo(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)

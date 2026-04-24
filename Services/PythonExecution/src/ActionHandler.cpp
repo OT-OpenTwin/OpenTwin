@@ -25,6 +25,7 @@
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ReturnValues.h"
 #include "DataBuffer.h"
+#include "OTCore/Python/PythonParameter.h"
 
 #include "Application.h"
 #include "OTDataStorage/DocumentAPI.h"
@@ -210,23 +211,15 @@ ot::ReturnMessage ActionHandler::executeScript(const ot::JsonDocument& doc) {
 		m_pythonAPI.checkEnvironmentIsInitialised(manifestUID);
 
 		//Extract parameter array from json doc
-		auto parameterArrayArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);
-		std::list<std::list<ot::Variable>> allParameter;
+		ot::ConstJsonArray parameterArray = ot::json::getArray(doc, OT_ACTION_CMD_PYTHON_Parameter);
+		std::list<PythonParameter> allParameter;
+		ot::JsonSizeType numberOfParameterArrays = parameterArray.Size();
 
-		ot::JSONToVariableConverter converterJ2V;
-		ot::JsonSizeType numberOfParameterArrays = parameterArrayArray.Size();
-		for (ot::JsonSizeType i = 0; i < numberOfParameterArrays; i++) {
-			if (parameterArrayArray[i].IsNull()) {
-				allParameter.push_back({});
-			}
-			else {
-				
-				auto parameterArray = ot::json::getArray(parameterArrayArray, i);
-				//Todo: support of lists/maps as parameter
-
-				std::list<ot::Variable> scriptParameter = converterJ2V(parameterArray);
-				allParameter.emplace_back(scriptParameter);
-			}
+		for (const auto& entry : parameterArray) 
+		{
+			PythonParameter parameter;
+			parameter.setFromJsonObject(entry.GetObject());
+			allParameter.push_back(parameter);
 		}
 
 		std::list<std::string> entryPoints;

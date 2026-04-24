@@ -24,6 +24,9 @@
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include <iterator>
 
+#include "OTCore/Python/PyhonParameterBuilderGeneric.h"
+#include "OTCore/Python/PyhonParameterBuilderValueComparisons.h"
+
 #define NO_IMPORT_ARRAY
 #define PY_ARRAY_UNIQUE_SYMBOL PythonWrapper_ARRAY_API
 
@@ -381,6 +384,8 @@ CPythonObjectNew PythonObjectBuilder::setVariableTuple(const std::list<ot::Varia
 	return CPythonObjectNew(assembly);
 }
 
+
+
 CPythonObjectNew PythonObjectBuilder::setVariableList(const std::list<ot::Variable>& values)
 {
 	uint64_t assemblySize =values.size();
@@ -495,4 +500,35 @@ CPythonObjectNew PythonObjectBuilder::setVariableList(rapidjson::GenericArray<fa
 	}
 
 	return CPythonObjectNew(assembly);
+}
+
+
+CPythonObjectNew PythonObjectBuilder::ConvertKwargsMap(const PythonParameter& _parameter)
+{
+	PyObject* kwargs = PyDict_New();
+	if (_parameter.getPythonParameterType() == PyhonParameterBuilderGeneric::getTypeName())
+	{
+		const std::map<std::string, std::list<ot::Variable>>& kwargsMap = PyhonParameterBuilderGeneric::extract(_parameter);
+		if (!kwargs) return nullptr;
+
+		for (const auto& [key, varList] : kwargsMap)
+		{
+			// You already have this converter — reuse it
+			CPythonObjectNew pyValue = setVariableList(varList);
+			if (!pyValue)
+			{
+				Py_DECREF(kwargs);
+				return nullptr;  // ConvertListToPyObject already set the exception
+			}
+
+			// PyDict_SetItemString does NOT steal the reference — you own pyValue after this
+			if (PyDict_SetItemString(kwargs, key.c_str(), pyValue) < 0)
+			{
+				Py_DECREF(kwargs);
+				return nullptr;
+			}
+		}
+	}
+
+	return CPythonObjectNew(kwargs);  // New reference — caller must Py_DECREF
 }

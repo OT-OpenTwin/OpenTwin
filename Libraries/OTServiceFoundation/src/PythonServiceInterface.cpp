@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonServiceInterface.cpp
 // 
 // License:
@@ -17,7 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "OTServiceFoundation/PythonServiceInterface.h"
+#include "OTServiceFoundation/Python/PythonServiceInterface.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/CommunicationTypes.h"
@@ -31,9 +31,9 @@ ot::PythonServiceInterface::PythonServiceInterface(const std::string& _pythonExe
 	: m_pythonExecutionServiceURL(_pythonExecutionServiceURL)
 {}
 
-void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scriptName, const scriptParameter& _scriptParameter)
+void ot::PythonServiceInterface::addScriptWithParameter(const std::string& _scriptName, const PythonParameter& _parameter)
 {
-	m_scriptNamesWithParameter.push_back(std::make_tuple(_scriptName, _scriptParameter));
+	m_scriptNamesWithParameter.push_back(std::make_tuple(_scriptName, _parameter));
 }
 
 void ot::PythonServiceInterface::addPortData(const std::string& _portName, const ot::JsonValue* _data, const ot::JsonValue* _metadata)
@@ -99,7 +99,7 @@ ot::ReturnMessage ot::PythonServiceInterface::sendSingleExecutionCommand(const s
 ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 {
 	JsonDocument doc;
-	JsonArray allparameter;
+	JsonArray allParameter;
 	JsonArray scripts;
 	ot::VariableToJSONConverter converter;
 
@@ -107,20 +107,11 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 	{
 		scripts.PushBack(JsonString(std::get<0>(scriptWithParameter).c_str(), doc.GetAllocator()), doc.GetAllocator());
 		
-		scriptParameter& currentParameterSet = std::get<1>(scriptWithParameter);
-		if (currentParameterSet.has_value())
-		{
-			JsonArray parameter;
-			for (auto& singleParameter : currentParameterSet.value())
-			{
-				parameter.PushBack(converter(singleParameter, doc.GetAllocator()), doc.GetAllocator());
-			}
-			allparameter.PushBack(parameter, doc.GetAllocator());
-		}
-		else
-		{
-			allparameter.PushBack(JsonNullValue(), doc.GetAllocator());
-		}
+		PythonParameter& currentParameterSet = std::get<1>(scriptWithParameter);
+		ot::JsonObject value;
+		currentParameterSet.addToJsonObject(value, doc.GetAllocator());
+		
+		allParameter.PushBack(value, doc.GetAllocator());
 	}
 
 	m_scriptNamesWithParameter.clear();
@@ -131,7 +122,7 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 		doc.AddMember(OT_ACTION_CMD_PYTHON_Portdata, ot::JsonString(gridFSDocumentID, doc.GetAllocator()), doc.GetAllocator());
 	}
 
-	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allparameter, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_CMD_PYTHON_Parameter, allParameter, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_CMD_PYTHON_Scripts, scripts, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Scripts, doc.GetAllocator()), doc.GetAllocator());
 	

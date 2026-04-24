@@ -96,7 +96,7 @@ void PythonInterpreterAPI::checkEnvironmentIsInitialised(ot::UID _manifestEntity
 	m_packageHandler.initializeManifest(_manifestEntityUID);
 }
 
-void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet, const std::list<std::string>& _entryPoints)
+void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<PythonParameter>& _parameterSet, const std::list<std::string>& _entryPoints)
 {
 	if (!m_workerWaiterState.m_isWorkDone)
 	{
@@ -107,7 +107,7 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<s
 	}
 	assert(_scripts.size() == _parameterSet.size());
 	std::list<ot::EntityInformation> scriptEntities = ensureScriptsAreLoaded(_scripts, _entryPoints);
-	auto currentParameterSet = _parameterSet.begin();
+	auto currentParameters = _parameterSet.begin();
 	
 	PythonObjectBuilder pyObBuilder;
 	EntityBuffer::instance().clearBuffer();// Entities and properties are buffered by name. It needs to be cleared, so that no outdated entities are accessed in the next execution.
@@ -119,15 +119,15 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<s
 			std::string moduleName = PythonLoadedModules::instance().getModuleName(scriptEntity).value();
 			std::string entryPoint = m_moduleEntrypointByModuleName[moduleName];
 
-			std::list<ot::Variable>& parameterSetForScript = *currentParameterSet;
-			CPythonObjectNew pythonParameterSet(nullptr);
-			if (parameterSetForScript.size() != 0)
-			{
-				pythonParameterSet.reset(pyObBuilder.setVariableTuple(parameterSetForScript));
-			}
+			PythonParameter& parametersForScript = *currentParameters;
+
+			std::string executorName = parametersForScript.getCallingEntity(); // May be empty string if nothing was set on the requesting side. 
+			CPythonObjectNew args(PyTuple_Pack(1, pyObBuilder.setString(executorName)));
+
+			CPythonObjectNew kwargs (parametersForScript.getAdditionalParameter().ObjectEmpty() ? nullptr : pyObBuilder.ConvertKwargsMap(parametersForScript));
 
 			OT_LOG_D("Execute script " + scriptEntity.getEntityName());
-			CPythonObjectNew pReturnValue = m_wrapper.executeFunction(entryPoint, pythonParameterSet, moduleName);
+			CPythonObjectNew pReturnValue = m_wrapper.executeFunction(entryPoint, args,kwargs, moduleName);
 			try
 			{
 				if (pReturnValue)
@@ -137,7 +137,7 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<s
 				}
 			}
 			catch (std::exception&){}
-			currentParameterSet++;
+			currentParameters++;
 			OT_LOG_D("Script execution succeeded");
 		}
 		catch (const std::exception& e)

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PythonWrapper.cpp
 // 
 // License:
@@ -137,10 +137,11 @@ CPythonObjectNew PythonWrapper::execute(const std::string& _executionCommand, co
 	return result;
 }
 
-CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName, CPythonObject& _parameter, const std::string& _moduleName) {
+CPythonObjectNew PythonWrapper::executeFunction(const std::string& _functionName, CPythonObject& _self, CPythonObject& _kwargs, const std::string& _moduleName) {
 	assert(m_interpreterSuccessfullyInitialized);
-	CPythonObjectNew function(getFunction(_functionName, _moduleName)); //Really borrowed?
-	CPythonObjectNew returnValue(PyObject_CallObject(function, _parameter));
+	CPythonObjectNew function(getFunction(_functionName, _moduleName)); 
+	
+	CPythonObjectNew returnValue(PyObject_Call(function, _self, _kwargs));
 	
 	OutputPipeline::instance().flushOutput();
 

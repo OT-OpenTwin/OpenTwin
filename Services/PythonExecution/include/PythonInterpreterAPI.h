@@ -29,7 +29,7 @@
 #include "EnvironmentsGarbageCollector.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/EntityInformation.h"
-
+#include "OTCore/Python/PythonParameter.h"
 //! @brief This class deals with the workflow of loading python script entities, executing them and sending the results back to the service that requested the execution.
 class PythonInterpreterAPI
 {
@@ -40,7 +40,7 @@ public:
 	void initializeEnvironment(ot::UID _manifestEntityUID);
 	void initializeEnvironment(const std::string& _environmentName);
 	void checkEnvironmentIsInitialised(ot::UID _manifestEntityUID);
-	void execute(std::list<std::string>& _scripts, std::list<std::list<ot::Variable>>& _parameterSet, const std::list<std::string>& _entryPoints) noexcept(false);
+	void execute(std::list<std::string>& _scripts, std::list<PythonParameter>& _parameterSet, const std::list<std::string>& _entryPoints) noexcept(false);
 	void execute(const std::string& _command) noexcept(false);
 
 	void cleanup();

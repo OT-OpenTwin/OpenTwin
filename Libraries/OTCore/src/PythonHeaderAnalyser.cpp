@@ -1,4 +1,4 @@
-﻿#include "OTCore/PythonHeader/PythonHeaderAnalyser.h"
+﻿#include "OTCore/Python/PythonHeaderAnalyser.h"
 #include "OTCore/String.h"
 PythonHeaderAnalyser::PythonHeaderAnalyser()
 	:m_types{ 
