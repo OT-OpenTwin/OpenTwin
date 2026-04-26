@@ -32,6 +32,8 @@
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/EntityPythonManifest.h"
 
 class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
@@ -47,6 +49,7 @@ private:
 	const std::string c_groupName = "File Imports";
 	ot::ToolBarButtonCfg m_buttonFileImport;
 	ot::ToolBarButtonCfg m_buttonPythonImport;
+	ot::ToolBarButtonCfg m_buttonExportFileToLibrary;
 
 	ot::UIDList m_entityIDsTopo;
 	ot::UIDList m_entityVersionsTopo;
@@ -61,6 +64,7 @@ private:
 	ot::ButtonHandler m_buttonHandler;
 	void handleImportTextFileButton();
 	void handleImportPythonScriptButton();
+	void handleExportFilesToLibrary();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -101,4 +105,17 @@ private:
 	//! Thus UTF8 encoding is required.
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
 
+	// Export to library functions
+
+	bool validateMetaDataFile(EntityFileText* _metaFile);
+	std::string getLibraryDataPath() const;
+	bool ensureDirectoryExists(const std::string& _path) const;
+	void writeFileToPath(const std::string& _filePath, const std::string& _content) const;
+
+	void exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID);
+	void exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID);
+
+	void exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
+	void exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
+	void exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath);
 };

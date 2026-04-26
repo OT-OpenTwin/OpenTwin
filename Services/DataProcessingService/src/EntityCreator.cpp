@@ -27,6 +27,8 @@
 #include "OTCore/FolderNames.h"
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTModelEntities/EntitySolverDataProcessing.h"
+#include "OTModelEntities/EntityFileText.h"
+
 
 void EntityCreator::createManifests()
 {
@@ -107,4 +109,67 @@ void EntityCreator::createSolver()
 	entityInfos.addTopologyEntity(newSolver);
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added solver");
 
+}
+
+void EntityCreator::createPythonScript() {
+	auto modelComponent = Application::instance()->getModelComponent();
+	
+	EntityFileText newScript(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	newScript.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		Application::instance()->getServiceName()
+	);
+
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::PythonScriptFolder, ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::PythonScriptFolder), "Script");
+	newScript.setName(entityName);
+
+	size_t fileNamePos = entityName.find_last_of("/");
+	std::string path = entityName.substr(0, fileNamePos);
+	std::string name = entityName.substr(fileNamePos + 1);
+	std::string type = "py";
+
+	EntityBinaryData fileContent(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	fileContent.storeToDataBase();
+
+	newScript.setDataEntity(fileContent);
+	newScript.setFileProperties(path, name, type);
+	newScript.setTextEncoding(ot::TextEncoding::UTF8);
+	newScript.setTreeItemEditable(true);
+
+	EntityPropertiesSelection::createProperty("File", "ExportType", { "PythonScript","" }, "PythonScript", "File", newScript.getProperties());
+	newScript.storeToDataBase();
+
+	ot::NewModelStateInfo entityInfos;
+	entityInfos.addTopologyEntity(newScript);
+	entityInfos.addDataEntity(newScript, fileContent);
+	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Python Script");
+}
+
+void EntityCreator::createTextFile() {
+	auto modelComponent = Application::instance()->getModelComponent();
+	EntityFileText newTextFile(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	newTextFile.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection,
+		Application::instance()->getServiceName()
+	);
+	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::FilesFolder, ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::FilesFolder), "Text File");
+	newTextFile.setName(entityName);
+	size_t fileNamePos = entityName.find_last_of("/");
+	std::string path = entityName.substr(0, fileNamePos);
+	std::string name = entityName.substr(fileNamePos + 1);
+	std::string type = "txt";
+	EntityBinaryData fileContent(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	fileContent.storeToDataBase();
+	newTextFile.setDataEntity(fileContent);
+	newTextFile.setFileProperties(path, name, type);
+	newTextFile.setTextEncoding(ot::TextEncoding::UTF8);
+	newTextFile.setTreeItemEditable(true);
+	EntityPropertiesSelection::createProperty("File", "ExportType", { "PythonMeta","ManifestMeta","CircuitModel","CircuitMeta",""}, "", "File", newTextFile.getProperties());
+	newTextFile.storeToDataBase();
+	ot::NewModelStateInfo entityInfos;
+	entityInfos.addTopologyEntity(newTextFile);
+	entityInfos.addDataEntity(newTextFile, fileContent);
+	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Text File");
 }

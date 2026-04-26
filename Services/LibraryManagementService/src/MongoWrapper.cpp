@@ -509,8 +509,23 @@ bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchDocumentByN
             return _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
         }
         catch (const std::exception&) {
-            // If ObjectId parsing fails, fall through to name-based search
+            // If ObjectId parsing fails, fall through to other search methods
         }
+    }
+    
+    // Try to parse as LibraryElementID (numeric value)
+    try {
+        int64_t elementId = std::stoll(_documentName);
+        auto filterQuery = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("LibraryElementID", elementId)
+        );
+        auto result = _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
+        if (result) {
+            return result;
+        }
+    }
+    catch (const std::exception&) {
+        // If parsing as number fails, fall through to name-based search
     }
     
     // Query by Name field

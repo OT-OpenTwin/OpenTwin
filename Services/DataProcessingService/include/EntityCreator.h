@@ -28,6 +28,8 @@ public:
 	void createManifests();
 	void createPipeline();
 	void createSolver();
+	void createPythonScript();
+	void createTextFile();
 
 private:
 	ot::UID m_manifestFolderID = ot::invalidUID;
