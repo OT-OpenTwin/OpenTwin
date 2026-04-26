@@ -157,7 +157,7 @@ if(NOT DEFINED ENV{OT_CMAKE_DIR} OR "$ENV{OT_CMAKE_DIR}" STREQUAL "")
 endif()
 
 # ============================================================
-# common OpenTwin subdir vars from SetupEnvironment.bat
+# OpenTwin subdir vars from SetupEnvironment.bat
 # ============================================================
 ot_get_env_path(OT_INC_PATH                       OT_INC)
 ot_get_env_path(OT_SRC_PATH                       OT_SRC)
@@ -267,7 +267,7 @@ ot_get_env_path(OPEN_TWIN_SERVER_CERT_PATH      OPEN_TWIN_SERVER_CERT)
 ot_get_env_path(OPEN_TWIN_SERVER_CERT_KEY_PATH  OPEN_TWIN_SERVER_CERT_KEY)
 
 # ============================================================
-# common third-party env vars used by converted projects
+# third-party env vars
 # ============================================================
 ot_get_env_path(R_JSON_INCD_PATH                  R_JSON_INCD)
 ot_get_env_path(R_JSON_INCR_PATH                  R_JSON_INCR)
@@ -348,6 +348,34 @@ ot_get_env_path(BOOST_LIBPATHD_PATH               BOOST_LIBPATHD)
 ot_get_env_path(BOOST_LIBPATHR_PATH               BOOST_LIBPATHR)
 ot_get_env_path(EARCUT_INC_PATH                   EARCUT_INC)
 
+ot_get_env_path(OC_ROOT_PATH                      OC_ROOT)
+ot_get_env_path(OC_INCD_PATH                      OC_INCD)
+ot_get_env_path(OC_INCR_PATH                      OC_INCR)
+ot_get_env_path(OC_LIBPATHD_PATH                  OC_LIBPATHD)
+ot_get_env_path(OC_LIBPATHR_PATH                  OC_LIBPATHR)
+ot_get_env_path(OC_DLLD_PATH                      OC_DLLD)
+ot_get_env_path(OC_DLLR_PATH                      OC_DLLR)
+ot_get_env_list(OC_LIBS_LIST                      CFG_OC_LIBS)
+ot_get_env_path_list(OC_DLLS_LIST                 CFG_OC_DLLS)
+
+ot_get_env_path(TBB_ROOT_PATH                     TBB_ROOT)
+ot_get_env_path(TBB_DLLR_PATH                     TBB_DLLR)
+
+ot_get_env_path(FRI_ROOT_PATH                     FRI_ROOT)
+ot_get_env_path(FRI_DLLR_PATH                     FRI_DLLR)
+
+ot_get_env_path(FRT_ROOT_PATH                     FRT_ROOT)
+ot_get_env_path(FRT_DLLR_PATH                     FRT_DLLR)
+
+ot_get_env_path(FMP_ROOT_PATH                     FMP_ROOT)
+ot_get_env_path(FMP_DLLR_PATH                     FMP_DLLR)
+
+ot_get_env_path(OVR_ROOT_PATH                     OVR_ROOT)
+ot_get_env_path(OVR_DLLR_PATH                     OVR_DLLR)
+
+ot_get_env_path(JEM_ROOT_PATH                     JEM_ROOT)
+ot_get_env_path(JEM_DLLR_PATH                     JEM_DLLR)
+
 # ============================================================
 # derived OT library directories
 # ============================================================
@@ -409,7 +437,7 @@ ot_join_paths(OT_LTSPICECONNECTOR_DEBUG_LIB_DIR   "${OT_LTSPICECONNECTOR_ROOT_PA
 ot_join_paths(OT_LTSPICECONNECTOR_RELEASE_LIB_DIR "${OT_LTSPICECONNECTOR_ROOT_PATH}"     "${OT_LIBR_PATH}")
 
 # ============================================================
-# aggregated env vars from SetupEnvironment.bat
+# env vars from SetupEnvironment.bat
 # ============================================================
 ot_get_env_path_list(OT_DEFAULT_SERVICE_INCD_LIST     OT_DEFAULT_SERVICE_INCD)
 ot_get_env_path_list(OT_DEFAULT_SERVICE_INCR_LIST     OT_DEFAULT_SERVICE_INCR)
