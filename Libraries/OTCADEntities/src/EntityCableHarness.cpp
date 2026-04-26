@@ -21,7 +21,7 @@
 #include "OTCADEntities/EntityCableHarness.h"
 #include "OTModelEntities/EntityBinaryData.h"
 
-#include "OTCADEntities/tinyxml2.h"
+#include <tinyxml2.h>
 
 static EntityFactoryRegistrar<EntityCableHarness> registrar(EntityCableHarness::className());
 
