@@ -118,7 +118,7 @@ void FileHandler::handleExportFilesToLibrary() {
 		if (fileEntity != nullptr) {
 			EntityPropertiesBase* exportTypeProperty = entity->getProperties().getProperty("ExportType");
 			if (exportTypeProperty != nullptr) {
-				EntityPropertiesSelection* selectionProperty = dynamic_cast<EntityPropertiesSelection*>(exportTypeProperty);
+				EntityPropertiesString* selectionProperty = dynamic_cast<EntityPropertiesString*>(exportTypeProperty);
 				if (selectionProperty != nullptr) {
 					std::string exportType = selectionProperty->getValue();
 					if (exportType == "PythonScript") {
@@ -186,16 +186,20 @@ void FileHandler::handleExportFilesToLibrary() {
 
 	// Validate and perform Circuit export if selected
 	if (hasCircuitExport) {
-		if (!validateMetaDataFile(circuitMetaFile)) {
-			return;
-		}
 
-		// Perform Circuit export on separate thread
-		std::thread worker(&FileHandler::exportCircuitModelsAsync, this,
-			circuitModel->getEntityID(),
-			circuitMetaFile->getEntityID()
+		Application::instance()->getNotifier()->reportError(
+			"Circuit export is currently not supported. Please select Python files for export."
 		);
-		worker.detach();
+		//if (!validateMetaDataFile(circuitMetaFile)) {
+		//	return;
+		//}
+
+		//// Perform Circuit export on separate thread
+		//std::thread worker(&FileHandler::exportCircuitModelsAsync, this,
+		//	circuitModel->getEntityID(),
+		//	circuitMetaFile->getEntityID()
+		//);
+		//worker.detach();
 	}
 }
 

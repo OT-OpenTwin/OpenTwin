@@ -80,8 +80,9 @@ private:
 	ot::ToolBarButtonCfg m_buttonCreateSolver;
 	ot::ToolBarButtonCfg m_buttonGraphicsScene;
 	ot::ToolBarButtonCfg m_buttonCreateManifest;
+	ot::ToolBarButtonCfg m_buttonCreateManifestMeta;
 	ot::ToolBarButtonCfg m_buttonCreatePythonScript;
-	ot::ToolBarButtonCfg m_buttonCreateTextFile;
+	ot::ToolBarButtonCfg m_buttonCreatePythonMeta;
 
 	PipelineHandler _pipelineHandler;
 	BlockEntityHandler _blockEntityHandler;
