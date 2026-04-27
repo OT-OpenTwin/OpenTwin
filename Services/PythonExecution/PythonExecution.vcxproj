@@ -286,6 +286,7 @@
     <ClCompile Include="src\ActionHandler.cpp" />
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\CommunicationHandler.cpp" />
+    <ClCompile Include="src\EntityBuilder.cpp" />
     <ClCompile Include="src\EnvironmentsGarbageCollector.cpp" />
     <ClCompile Include="src\InterpreterPathSettings.cpp" />
     <ClCompile Include="src\main.cpp" />
@@ -306,6 +307,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ActionHandler.h" />
+    <ClInclude Include="include\EntityBuilder.h" />
     <ClInclude Include="include\EnvironmentsGarbageCollector.h" />
     <ClInclude Include="include\ExceptionRestartRequired.h" />
     <ClInclude Include="include\PythonStructValueComparison.h" />
