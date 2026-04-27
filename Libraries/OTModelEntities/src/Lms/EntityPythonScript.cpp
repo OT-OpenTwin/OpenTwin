@@ -30,7 +30,7 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 	std::string newEntityFolder = _libraryElement.getNewEntityFolder();
 	std::string newEntityName = _libraryElement.getName();
 
-	std::string fileName = newEntityFolder + "/" + newEntityName;
+	std::string fileName = newEntityFolder + "/" + newEntityName +".py";
 	size_t fileNamePos = fileName.find_last_of("/");
 	std::string path = fileName.substr(0, fileNamePos);
 	std::string name = fileName.substr(fileNamePos + 1);

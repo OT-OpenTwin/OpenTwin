@@ -133,7 +133,7 @@ void FileHandler::handleExportFilesToLibrary() {
 					else if (exportType == "CircuitModel") {
 						circuitModel = fileEntity;
 					}
-					else if (exportType == "CircuitModelMeta") {
+					else if (exportType == "CircuitMeta") {
 						circuitMetaFile = fileEntity;
 					}
 				}
@@ -667,7 +667,7 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 	}
 
 	// Validate mandatory fields
-	std::list<std::string> mandatoryFields = { "Name", "FileName", "MetaData", "AdditionalInfos" };
+	std::list<std::string> mandatoryFields = {"MetaData", "AdditionalInfos" };
 	for (const auto& field : mandatoryFields) {
 		if (!ot::json::exists(metaDoc, field)) {
 			model->reportError(
@@ -675,14 +675,6 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 			);
 			return false;
 		}
-	}
-
-	// Validate field types
-	if (!ot::json::isString(metaDoc, "Name") || !ot::json::isString(metaDoc, "FileName")) {
-		model->reportError(
-			"Metadata file \"" + _metaFile->getName() + "\" has invalid field types. 'Name' and 'FileName' must be strings."
-		);
-		return false;
 	}
 
 	if (!ot::json::isObject(metaDoc, "MetaData") || !ot::json::isObject(metaDoc, "AdditionalInfos")) {
@@ -855,16 +847,19 @@ void FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, En
 	metaDoc.RemoveMember("Version");
 	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
 
-	// Get filename from metadata
-	std::string baseFileName = ot::json::getString(metaDoc, "Name");
+	// Update name and filename
+	metaDoc.RemoveMember("Name");
+	metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.RemoveMember("FileName");
+	metaDoc.AddMember("FileName", ot::JsonString(_manifestEntity->getNameOnly() + ".txt", metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Export manifest .txt file
-	std::string manifestFileName = environmentPath + "/" + baseFileName + ".txt";
+	std::string manifestFileName = environmentPath + "/" + _manifestEntity->getNameOnly() + ".txt";
 	std::string manifestContent = _manifestEntity->getText();
 	writeFileToPath(manifestFileName, manifestContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = environmentPath + "/" + baseFileName + ".otmeta.json";
+	std::string metaFileName = environmentPath + "/" + _manifestEntity->getNameOnly() + ".otmeta.json";
 	std::string metaJson = ot::json::toJson(metaDoc);
 	writeFileToPath(metaFileName, metaJson);
 }
@@ -891,6 +886,12 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	metaDoc.RemoveMember("Version");
 	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
 
+	// Update name and filename
+	metaDoc.RemoveMember("Name");
+	metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.RemoveMember("FileName");
+	metaDoc.AddMember("FileName", ot::JsonString(_scriptEntity->getNameOnly() + ".py", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
 	// Update AdditionalInfos with dependency information
 	if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
 		metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
@@ -899,16 +900,13 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 		metaDoc["AdditionalInfos"].AddMember("DependencyCollection", ot::JsonString("PythonEnvironments", metaDoc.GetAllocator()), metaDoc.GetAllocator());
 	}
 
-	// Get filename from metadata
-	std::string baseFileName = ot::json::getString(metaDoc, "Name");
-
 	// Export script .py file
-	std::string scriptFileName = scriptPath + "/" + baseFileName + ".py";
+	std::string scriptFileName = scriptPath + "/" + _scriptEntity->getNameOnly() + ".py";
 	std::string scriptContent = _scriptEntity->getText();
 	writeFileToPath(scriptFileName, scriptContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = scriptPath + "/" + baseFileName + ".otmeta.json";
+	std::string metaFileName = scriptPath + "/" + _metaEntity->getNameOnly() + ".otmeta.json";
 	std::string metaJson = ot::json::toJson(metaDoc);
 	writeFileToPath(metaFileName, metaJson);
 }
@@ -916,8 +914,8 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath) {
 	assert(_modelEntity != nullptr && _metaEntity != nullptr);
 
-	// Create CircuitModels directory
-	std::string modelPath = _basePath + "/CircuitModels";
+	// Create CircuitData directory
+	std::string modelPath = _basePath + "/CircuitData";
 	if (!ensureDirectoryExists(modelPath)) {
 		throw std::runtime_error("Could not create CircuitModels directory");
 	}
@@ -931,16 +929,23 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 	metaDoc.RemoveMember("LibraryElementID");
 	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_modelEntity->getEntityID()), metaDoc.GetAllocator());
 
-	// Get filename from metadata
-	std::string baseFileName = ot::json::getString(metaDoc, "FileName");
+	// Update Version
+	metaDoc.RemoveMember("Version");
+	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+
+	// Update name and filename
+	metaDoc.RemoveMember("Name");
+	metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.RemoveMember("FileName");
+	metaDoc.AddMember("FileName", ot::JsonString(_modelEntity->getNameOnly() + ".txt", metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Export circuit model .txt file
-	std::string modelFileName = modelPath + "/" + baseFileName;
+	std::string modelFileName = modelPath + "/" + _modelEntity->getNameOnly() + ".txt";
 	std::string modelContent = _modelEntity->getText();
 	writeFileToPath(modelFileName, modelContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = modelPath + "/" + baseFileName;
+	std::string metaFileName = modelPath + "/" + _metaEntity->getNameOnly() + ".otmeta.json";
 	std::string metaJson = ot::json::toJson(metaDoc);
 	writeFileToPath(metaFileName, metaJson);
 }
