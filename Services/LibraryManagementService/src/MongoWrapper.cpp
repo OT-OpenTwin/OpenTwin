@@ -20,6 +20,7 @@
 #include "MongoWrapper.h"
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
+#include "OTModelEntities/DataBase.h"
 
 MongoWrapper::MongoWrapper(std::string _siteID) {
 
@@ -453,6 +454,8 @@ void MongoWrapper::addNewDocument(const std::string& _collectionName, const std:
 
         if (!result.empty()) {
             OT_LOG_I("Successfully added new document '" + _element.getName() + "' to collection '" + _collectionName + "'");
+
+            createIndexesIfNotExist(_collectionName);
         }
         else {
             OT_LOG_W("Document insertion returned empty result for '" + _element.getName() + "'");
@@ -708,6 +711,23 @@ std::string MongoWrapper::loadGridFSData(const bsoncxx::oid& _oid, const std::st
     catch (const std::exception& e) {
         OT_LOG_E("Error loading GridFS data: " + std::string(e.what()));
         return "";
+    }
+}
+
+void MongoWrapper::createIndexesIfNotExist(const std::string& _collectionName) {
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+        auto collection = docBase.getCollection();
+
+        auto indexKeys = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("LibraryElementID", 1)
+        );
+
+        collection.create_index(indexKeys.view());
+        OT_LOG_I("Ensured index on LibraryElementID for collection '" + _collectionName + "'");
+    }
+    catch (const std::exception& e) {
+        OT_LOG_W("Warning: Could not ensure index on LibraryElementID: " + std::string(e.what()));
     }
 }
 

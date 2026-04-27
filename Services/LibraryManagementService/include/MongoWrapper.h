@@ -71,6 +71,7 @@ public:
 	void addNewDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, ot::LibraryElement& _element);
 
 	std::string getAdminUserName() const { return "admin"; }
+
 private:
 	// Database connection and validation
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
@@ -84,6 +85,9 @@ private:
 	// Data loading helpers
 	std::string loadDocumentData(const bsoncxx::document::view& _documentView, const std::string& _collectionName);
 	std::string loadGridFSData(const bsoncxx::oid& _oid, const std::string& _collectionName);
+
+	// Index creator
+	void createIndexesIfNotExist(const std::string& _collectionName);
 
 	std::string m_databaseURL;
 	std::string m_siteID;
