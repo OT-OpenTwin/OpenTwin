@@ -574,6 +574,10 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 						PythonParameter parameter = PyhonParameterBuilderValueComparisons::create("", valueCompares);
 						interface.addScriptWithParameter(scriptName,temp, parameter);
 						ot::ReturnMessage answer = interface.sendExecutionOrder();
+						if (answer.getStatus() != ot::ReturnMessage::Ok)
+						{
+							OT_USER_LOG_E("Failed to react on table-column-header-changed-event due to an error during the python execution: " + answer.getWhat());
+						}
 					}
 					catch (std::exception& _e)
 					{
