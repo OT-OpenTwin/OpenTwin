@@ -135,7 +135,7 @@ PyObject* PythonExtensions::OT_SetPropertyValue(PyObject* _self, PyObject* _args
         std::string propertyGroup;
         if (numberOfArguments == expectedNumberOfArgumentsOptional)
         {
-            propertyGroup = pyObBuilder.getStringValueFromTuple(args, 2, "Parameter 2");
+            propertyGroup = pyObBuilder.getStringValueFromTuple(args, 3, "Parameter 3");
         }
         EntityBuffer::instance().updateEntityPropertyValue(absoluteEntityName, propertyName, propertyGroup, pvalue);
         return PyBool_FromLong(true);
