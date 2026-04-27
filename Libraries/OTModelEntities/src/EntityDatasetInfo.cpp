@@ -118,10 +118,17 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 		for (const std::string& col : columnHeader)
 		{
 			matrix.setValue(MatrixEntryPointer(0, columnIndex), ot::Variable(col));
-			const JsonValue& val = JSONVectoriser::getValue(metadata, col);
-			const std::string dbg = json::toJson(val);
-			matrix.setValue(MatrixEntryPointer(1, columnIndex), jsonVar(val));
+			auto val = JSONVectoriser::getValue(metadata, col);
+			if (val.has_value())
+			{
+				const std::string dbg = json::toJson(val.value());
+				matrix.setValue(MatrixEntryPointer(1, columnIndex), jsonVar(val.value()));
+			}
+			else
+			{
+				matrix.setValue(MatrixEntryPointer(1, columnIndex), "");
 
+			}
 			columnIndex++;
 		}
 

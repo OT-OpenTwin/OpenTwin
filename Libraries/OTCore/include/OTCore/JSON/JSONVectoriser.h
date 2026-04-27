@@ -9,6 +9,9 @@
 // std header
 #include <list>
 #include <string>
+#include <optional>
+#include <functional>
+
 
 namespace ot {
 
@@ -26,7 +29,7 @@ namespace ot {
 		typedef Flags<VectorisationFlag> VectorisationFlags;
 
 		static void vectorise(const JsonValue& _value, std::list<std::string>& _allEntries, const std::string& _nameBase, const VectorisationFlags& _flags = VectorisationFlag::Default);
-		static const JsonValue& getValue(const JsonDocument& _structure, const std::string& _fieldName);
+		static std::optional<std::reference_wrapper<const JsonValue>>getValue(const JsonDocument& _structure, const std::string& _fieldName);
 
 	private:
 		static const std::string m_separator;

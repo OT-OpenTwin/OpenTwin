@@ -36,7 +36,7 @@ void ot::JSONVectoriser::vectorise(const JsonValue& _value, std::list<std::strin
     }
 }
 
-const ot::JsonValue& ot::JSONVectoriser::getValue(const JsonDocument& _structure, const std::string& _fieldName)
+std::optional<std::reference_wrapper<const ot::JsonValue>> ot::JSONVectoriser::getValue(const JsonDocument& _structure, const std::string& _fieldName)
 {
     std::list<std::string> entries = String::split(_fieldName, m_separator);
 
@@ -45,23 +45,24 @@ const ot::JsonValue& ot::JSONVectoriser::getValue(const JsonDocument& _structure
     {
         if (!cur->IsObject())
         {
-            throw std::exception("Failed to access selected metadata.");
+            return std::nullopt;
         }
 
         auto obj = cur->GetObject();
         if (!json::exists(obj, entry))
         {
-            throw std::exception("Failed to find selected metadata.");
+            return std::nullopt;
         }
 
         const JsonValue& value = obj[entry.c_str()];
 
-        if (entry == entries.back()) {
+        if (entry == entries.back()) 
+        {
             return value;
         }
 
         cur = &value;
     }
 
-    throw std::exception("Failed to access selected metadata.");
+    return std::nullopt;
 }

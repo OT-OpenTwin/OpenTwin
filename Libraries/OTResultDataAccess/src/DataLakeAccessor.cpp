@@ -105,27 +105,36 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 			if (metadataQuery.getComparator() != "" && metadataQuery.getName() != "" && metadataQuery.getValue() != "")
 			{
 				const std::string fieldName = metadataQuery.getName();
-				const ot::JsonValue& fieldValue = ot::JSONVectoriser::getValue(metadata, fieldName);
-				const std::string temp = ot::json::toJson(fieldValue);
-				if (fieldValue.IsString())
+				auto fieldValue = ot::JSONVectoriser::getValue(metadata, fieldName);
+				if (fieldValue.has_value())
 				{
-					if (metadataQuery.getComparator() != "=")
+					const ot::JsonValue& existingFieldValue = fieldValue.value();
+					const std::string temp = ot::json::toJson(existingFieldValue);
+					if (existingFieldValue.IsString())
 					{
-						throw std::exception(("Comparison of strings are only possible with an equality check. Field: " + metadataQuery.getName()).c_str());
+						if (metadataQuery.getComparator() != "=")
+						{
+							throw std::exception(("Comparison of strings are only possible with an equality check. Field: " + metadataQuery.getName()).c_str());
+						}
+						else
+						{
+							const std::string actualSeriesMetadataValue = existingFieldValue.GetString();
+							match &= actualSeriesMetadataValue == metadataQuery.getValue();
+						}
+					}
+					else if (!existingFieldValue.IsObject() && !existingFieldValue.IsArray())
+					{
+						match &= compare(metadataQuery, existingFieldValue);
 					}
 					else
 					{
-						const std::string actualSeriesMetadataValue = fieldValue.GetString();
-						match &= actualSeriesMetadataValue == metadataQuery.getValue();
+						throw std::exception(("Metadata query targets an object, which is not yet supported. Field: " + metadataQuery.getName()).c_str());
 					}
-				}
-				else if (!fieldValue.IsObject() && !fieldValue.IsArray())
-				{
-					match &= compare(metadataQuery, fieldValue);
 				}
 				else
 				{
-					throw std::exception(("Metadata query targets an object, which is not yet supported. Field: " + metadataQuery.getName()).c_str());
+					// Series does not contain this metadata entry
+					match = false;
 				}
 			}
 			else
