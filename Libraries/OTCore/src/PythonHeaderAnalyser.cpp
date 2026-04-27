@@ -17,23 +17,27 @@ bool PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 
 	int lineCounter = 1;
 	bool success = true;
-	while (scriptLine[0] == '#' && scriptLine[1] == '@')
+	while (scriptLine.empty() || scriptLine[0] == '#')
 	{
 		try
 		{
-			PythonHeaderEntryType type = extractType(scriptLine);
-			if (type == PythonHeaderEntryType::Unknown)
+			bool isOpenTwinHeader = scriptLine[0] == '#' && scriptLine[1] == '@';
+			if (isOpenTwinHeader)
 			{
-				m_report += "Line " + std::to_string(lineCounter) + " had no supported entry type.\n";
-				success = false;
-			}
-			else
-			{
-				ot::JsonDocument content = extractDetails(scriptLine);
-				ExtractedEntry entry;
-				entry.m_lineNumber = lineCounter;
-				entry.m_content = std::move(content);
-				m_entriesByType[type].push_back(std::move(entry));
+				PythonHeaderEntryType type = extractType(scriptLine);
+				if (type == PythonHeaderEntryType::Unknown)
+				{
+					m_report += "Line " + std::to_string(lineCounter) + " had no supported entry type.\n";
+					success = false;
+				}
+				else
+				{
+					ot::JsonDocument content = extractDetails(scriptLine);
+					ExtractedEntry entry;
+					entry.m_lineNumber = lineCounter;
+					entry.m_content = std::move(content);
+					m_entriesByType[type].push_back(std::move(entry));
+				}
 			}
 		}
 		catch (std::exception& e)
