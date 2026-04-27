@@ -538,6 +538,27 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 		doc.fromJson(serialisedDLA);
 		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
 	}
+	
+	if (getObserver() != nullptr)
+	{
+		const std::string projectName = m_queryProperties.getSelectedProject(this);
+		std::string collectionName;
+		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
+		DataLakeQueryCfg queryCfg;
+		queryCfg.setCollectionName(collectionName);
+		queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+		queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+		queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+		queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+		ot::DataLakeAccessCfg temp = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+		if (temp.getQueriesByCollection() != m_dataLakeAccessCfg.getQueriesByCollection())
+		{
+			m_dataLakeAccessCfg = temp;
+			setModified();
+		}
+	}
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
