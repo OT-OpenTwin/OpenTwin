@@ -113,6 +113,11 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	// Load the model entity to determine the currently active branch and version
 	VersionInformation activeState;
 	auto result = getActiveModelState(activeState);
+	if (!result)
+	{
+		return false;
+	}
+
 	std::string activeVersion(activeState.version), activeBranch(activeState.branch);
 
 	// Reset initial version infromations
