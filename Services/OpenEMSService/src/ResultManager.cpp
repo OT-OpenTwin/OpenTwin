@@ -37,6 +37,7 @@
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include "OTModelEntities/EntityFile.h"
+#include "OTModelEntities/EntityParameter.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
@@ -71,8 +72,26 @@ void ResultManager::clear()
 
 void ResultManager::loadParameters()
 {
-	// TODO: Process the parameters and store them in the ParametricCombination::parameters
+	ot::UIDList parameterList = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("Parameters", "EntityParameter", true);
 
+	std::list<ot::EntityInformation> parameterInformation;
+	ot::ModelServiceAPI::getEntityInformation(parameterList, parameterInformation);
+
+	DataBase::instance().prefetchDocumentsFromStorage(parameterInformation);
+
+	for (auto param : parameterInformation)
+	{
+		EntityParameter* entityParam = dynamic_cast<EntityParameter*>(ot::EntityAPI::readEntityFromEntityIDandVersion(param.getEntityID(), param.getEntityVersion()));
+
+		if (entityParam != nullptr)
+		{
+			std::string parameterName = entityParam->getName().substr(std::string("Parameters/").size());
+			parameters.addParameter(parameterName, entityParam->getNumericValue());
+			
+			delete entityParam;
+			entityParam = nullptr;
+		}
+	}
 }
 
 void ResultManager::convert1D(const std::string& resultName, const std::string& fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale)
