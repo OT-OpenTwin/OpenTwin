@@ -28,6 +28,7 @@ class Application;
 class EntityBase;
 class EntityMeshCartesian;
 class EntityUnits;
+class ResultManager;
 
 class FDTDSolver
 {
@@ -41,6 +42,7 @@ public:
 private:
 	void addPreparationData(std::stringstream& runCommand);
 	void addSolverRun(std::stringstream& runCommand);
+	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit);
@@ -53,6 +55,8 @@ private:
 	bool toDouble(const std::string& s, double& value);
 	std::string doubleToString(double value);
 	double extractRangeMax(const std::vector<char>& data);
+	void convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
+	void convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
 
 	Application* application;
 	EntityBase *solverEntity;

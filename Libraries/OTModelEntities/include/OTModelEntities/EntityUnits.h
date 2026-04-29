@@ -61,6 +61,17 @@ public:
 	double getScaleToSICapacitance();
 	double getScaleToSIConductivity();
 
+	std::string getDimensionUnit();
+	std::string getFrequencyUnit();
+	std::string getTimeUnit();
+	std::string getVoltageUnit();
+	std::string getCurrentUnit();
+	std::string getConductanceUnit();
+	std::string getResistanceUnit();
+	std::string getInductanceUnit();
+	std::string getCapacitanceUnit();
+	std::string getConductivityUnit();
+
 private:
 	
 	const std::string unitGroupname = "Units";

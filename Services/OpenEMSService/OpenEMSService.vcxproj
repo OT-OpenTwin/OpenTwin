@@ -140,7 +140,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(QT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(OT_DEFAULT_SERVICE_INCD);$(MONGO_BOOST_ROOT);$(QT_INC);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -151,8 +151,8 @@
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories);$(Qt_LIBPATH_)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);%(AdditionalLibraryDirectories);$(Qt_LIBPATH_);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBD)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);$(Qt_LIBS_);OTResultDataAccess.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <QtMoc>
       <ExecutionDescription>moc %(Identity)</ExecutionDescription>
@@ -180,7 +180,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;SESSIONSERVICE_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);$(QT_INC)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\GeneratedFiles\$(ConfigurationName);.\GeneratedFiles;$(OT_DEFAULT_SERVICE_INCR);$(MONGO_BOOST_ROOT);$(QT_INC);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_INC)</AdditionalIncludeDirectories>
       <MinimalRebuild />
       <LanguageStandard>stdcpp17</LanguageStandard>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
@@ -193,8 +193,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableUAC>false</EnableUAC>
-      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories);$(QT_LIBPATH_)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);%(AdditionalLibraryDirectories);$(QT_LIBPATH_);$(OT_RESULT_DATA_ACCESS_ROOT)\$(OT_CLIBR)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);$(Qt_LIBS_);OTResultDataAccess.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
@@ -260,6 +260,7 @@
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\FDTDSolver.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\ResultManager.cpp" />
     <ClCompile Include="src\SubprocessHandler.cpp" />
     <ClCompile Include="src\SubprocessManager.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -270,6 +271,8 @@
     <ClInclude Include="include\DataBaseInfo.h" />
     <ClInclude Include="include\FDTDSolver.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\ParametricCombination.h" />
+    <ClInclude Include="include\ResultManager.h" />
     <ClInclude Include="include\SubprocessHandler.h" />
     <ClInclude Include="include\SubprocessManager.h" />
     <ClInclude Include="include\Timeouts.h" />

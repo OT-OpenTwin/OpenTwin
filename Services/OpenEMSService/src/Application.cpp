@@ -467,13 +467,13 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	// Remove the temp dir if requested
 	if (debugFlag)
 	{
-		m_subprocessManager->addLogText("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath, true);
+		m_subprocessManager->addLogText("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath + "\n", true);
 	}
 	else
 	{
 		if (!deleteDirectory(tempDirPath))
 		{
-			m_subprocessManager->addLogText("ERROR: Unable to remove the temporary working directory: " + tempDirPath, true);
+			m_subprocessManager->addLogText("ERROR: Unable to remove the temporary working directory: " + tempDirPath + "\n", true);
 		}
 	}
 

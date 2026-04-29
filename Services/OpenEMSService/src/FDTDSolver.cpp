@@ -20,8 +20,9 @@
 #include "FDTDSolver.h"
 
 #include "Application.h"
-#include "OTServiceFoundation/ModelComponent.h"
+#include "ResultManager.h"
 
+#include "OTServiceFoundation/ModelComponent.h"
 
 #include "OTModelEntities/EntitySolver.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
@@ -129,20 +130,11 @@ std::string FDTDSolver::generateRunCommand()
 		"Ef.AddBox(start, stop);\n"
 		"Et.AddBox(start, stop);\n"
 		"\n";
-		//"### Postprocessing & plotting\n"
-		//"freq = np.linspace(f_start,f_stop,201)\n"
-		//"port.CalcPort(Sim_Path, freq)\n"
-		//"\n"
-		//"s11 = ports[0].uf_ref / ports[0].uf_inc\n"
-		//"s21 = ports[1].uf_ref / ports[0].uf_inc\n"
-		//"ZL  = ports[0].uf_tot / ports[0].if_tot\n"
-		//"ZL_a = ports[0].ZL # analytic waveguide impedance\n"
-		//"\n";
 
 	runCommand << text;
 
 	addSolverRun(runCommand);
-	// addPostprocessing
+	addPostprocessing(runCommand);
 
 	return runCommand.str();
 }
@@ -191,12 +183,61 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 	runCommand << "FDTD.Run(Sim_Path, cleanup=False)\n";
 }
 
+void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
+{
+	// Define export function
+	runCommand << "\n"
+	"def save_xy_data(x, y, filename) :\n"
+		"		full_path = os.path.join(Sim_Path, filename)\n"
+		"		with open(full_path, 'w', encoding = 'utf-8') as f :\n"
+		"			for xi, yi in zip(x, y) :\n"
+		"				if isinstance(yi, complex) :\n"
+		"					f.write(f'{xi}\t{yi.real}\t{yi.imag}\\n')\n"
+		"				else :\n"
+		"					f.write(f'{xi}\t{yi}\\n')\n\n";
+
+	runCommand <<
+		"### Postprocessing & plotting\n"
+		"freq = np.linspace(f_start,f_stop,201)\n"
+		"for port in ports :\n"
+		"	port.CalcPort(Sim_Path, freq)\n"
+		"\n"
+		"s11 = ports[0].uf_ref / ports[0].uf_inc\n"
+		"s21 = ports[1].uf_ref / ports[0].uf_inc\n"
+		"ZL  = ports[0].uf_tot / ports[0].if_tot\n"
+		"ZL_a = ports[0].ZL # analytic waveguide impedance\n"
+		"save_xy_data(freq, s11, 's11')\n"
+		"save_xy_data(freq, s21, 's21')\n"
+		"save_xy_data(freq, ZL, 'Zl')\n"
+		"\n";
+}
+
 void FDTDSolver::convertAndStoreResults()
 {
 	timeStepWidth = 5.18459e-13;
 
 	convertAndStoreFrequencyDomainDump("E-Field Complex", "E-Field", "V/m");
 	convertAndStoreTimeDomainDump("E-Field Time", "E-Field", "V/m");
+
+	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getName());
+
+	convert1DTimeSignal("Energy/E-Field", "et", "E-Field Energy", result1D);
+	convert1DTimeSignal("Energy/H-Field", "ht", "H-Field Energy", result1D);
+
+	convert1DFrequencySpectrum("S-Parameter/S1,1", "s11", "S1,1", result1D);
+	convert1DFrequencySpectrum("S-Parameter/S2,1", "s21", "S2,1", result1D);
+
+	result1D.storeResults();
+}
+
+void FDTDSolver::convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager &result1D)
+{
+	result1D.convert1D(resultName, fileName, quantityName, "", "Time", entityUnits->getTimeUnit(), entityUnits->getScaleToSITime());
+}
+
+void FDTDSolver::convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D)
+{
+	result1D.convert1D(resultName, fileName, quantityName, "", "Frequency", entityUnits->getFrequencyUnit(), entityUnits->getScaleToSIFrequency());
 }
 
 void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit)

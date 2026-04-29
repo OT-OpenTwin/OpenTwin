@@ -224,6 +224,76 @@ double EntityUnits::getScaleToSIConductivity()
 	return conductivity[entity->getValue()];
 }
 
+std::string EntityUnits::getDimensionUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameDimension));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getFrequencyUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameFrequency));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getTimeUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameTime));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getVoltageUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameVoltage));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getCurrentUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameCurrent));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getConductanceUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameConductance));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getResistanceUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameResistance));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getInductanceUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameInductance));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getCapacitanceUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameCapacitance));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
+std::string EntityUnits::getConductivityUnit()
+{
+	auto entity = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty(unitNameConductivity));
+	assert(entity != nullptr);
+	return entity->getValue();
+}
+
 bool EntityUnits::updateFromProperties(void)
 {
 	// Now we need to update the entity after a property change
