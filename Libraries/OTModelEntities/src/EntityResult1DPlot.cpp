@@ -84,7 +84,7 @@ bool EntityResult1DPlot::updateFromProperties()
 	requiresDataToBeFetched |= numberOfCurves->needsUpdate();
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
-	
+	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName())->needsUpdate();
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
 	visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
