@@ -539,7 +539,8 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
 	}
 	
-	if (getObserver() != nullptr)
+	// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
+	if (getObserver() != nullptr && getObserver()->projectIsOpen())
 	{
 		try
 		{
@@ -562,8 +563,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 		}
 		catch (std::exception& _e)
 		{
-			// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
-			// Better would be to be able to check if we are in the process of project open
+			OT_LOG_E(_e.what());
 		}
 	}
 

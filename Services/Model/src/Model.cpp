@@ -4209,6 +4209,11 @@ ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& 
 	return metadataHandler.createConfig(_campaign, _collectionName, _queryCfg);
 }
 
+bool Model::projectIsOpen()
+{
+	return isProjectOpen();
+}
+
 
 
 EntityBase *Model::findEntityFromName(const std::string &name)
