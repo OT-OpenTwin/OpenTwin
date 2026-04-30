@@ -541,21 +541,29 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 	
 	if (getObserver() != nullptr)
 	{
-		const std::string projectName = m_queryProperties.getSelectedProject(this);
-		std::string collectionName;
-		auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
-		DataLakeQueryCfg queryCfg;
-		queryCfg.setCollectionName(collectionName);
-		queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
-		queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
-		queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
-		queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
-
-		ot::DataLakeAccessCfg temp = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
-		if (temp.getQueriesByCollection() != m_dataLakeAccessCfg.getQueriesByCollection())
+		try
 		{
-			m_dataLakeAccessCfg = temp;
-			setModified();
+			const std::string projectName = m_queryProperties.getSelectedProject(this);
+			std::string collectionName;
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+			ot::DataLakeAccessCfg temp = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			if (temp.getQueriesByCollection() != m_dataLakeAccessCfg.getQueriesByCollection())
+			{
+				m_dataLakeAccessCfg = temp;
+				setModified();
+			}
+		}
+		catch (std::exception& _e)
+		{
+			// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
+			// Better would be to be able to check if we are in the process of project open
 		}
 	}
 
