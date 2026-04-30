@@ -181,76 +181,8 @@ void EntityResult1DPlot::removeChild(EntityBase* _child)
 void EntityResult1DPlot::propertiesAboutToBeShown()
 {
 	EntityContainer::propertiesAboutToBeShown();
-
-	EntityObserver* obs = getObserver();
-	if (!obs)
-	{
-		OTAssert(false, "Observer not set while perparing for property grid");
-		return;
-	}
-
-	std::set<std::string> queryParameters;
-	std::set<std::string> queryQuantities;
-
-	std::list<EntityBase*> children = getChildrenList();
+	updateCurveDependencies();
 	
-	std::set<std::string> tupleTypes;
-	for (EntityBase* child : children)
-	{
-		EntityResult1DCurve* curve = dynamic_cast<EntityResult1DCurve*>(child);
-		if (curve)
-		{
-			tupleTypes.insert(curve->getTupleType());
-
-			for (const std::string& param : curve->getParameterOptions())
-			{
-				queryParameters.insert(param);
-			}
-			for (const std::string& quantity : curve->getQuantityOptions())
-			{
-				queryQuantities.insert(quantity);
-			}
-		}
-	}
-
-	bool anyPropertyNeedsUpdate = getProperties().anyPropertyNeedsUpdate();
-
-	std::vector<std::string> queryParameterList(queryParameters.begin(), queryParameters.end());
-	std::vector<std::string> queryQuantityList(queryQuantities.begin(), queryQuantities.end());
-
-	auto parameterSelection = PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName());
-	const std::string currentSelection = parameterSelection->getValue();
-	if (parameterSelection  != nullptr && parameterSelection->getOptions() != queryParameterList)
-	{
-		parameterSelection->resetOptions(queryParameterList);
-		const auto& temp = parameterSelection->getOptions();
-		if (std::find(temp.begin(), temp.end(), currentSelection) != temp.end())
-		{
-			parameterSelection->setValue(currentSelection);
-		}
-		for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
-		{
-			const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
-			PropertyHelper::setSelectionPropertyValue({ queryParameterList.begin(), queryParameterList.end()}, this, m_propertyNameSecondaryParameter, group);
-		}
-	}	
-	
-	tupleTypes.erase("");
-	if (tupleTypes.size() == 1)
-	{
-		const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type", "General");
-		setTupleSettings(*tupleTypes.begin(), plotType, queryParameterList);
-	}
-	else if(tupleTypes.size() >1)
-	{
-		//This is not valid. The plot cannot be shown.
-	}
-	else
-	{
-		PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName())->setVisible(false);
-		PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName())->setVisible(false);
-		PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName())->setVisible(false);
-	}
 }
 
 void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions)
@@ -335,6 +267,8 @@ void EntityResult1DPlot::createProperties()
 
 const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 {
+	updateCurveDependencies(); // Needs to be executed here to allow a valid state for the first visualisation
+
 	const ot::Painter2D* gridColour = PropertyHelper::getPainterPropertyValue(this, "Grid color");
 
 	const std::string entityName = getName();
@@ -694,3 +628,75 @@ void EntityResult1DPlot::setStaticCurveQueryOptions(const ot::Plot1DCfg& _config
 	getProperties().forceResetUpdateForAllProperties();
 }
 
+void EntityResult1DPlot::updateCurveDependencies()
+{
+	EntityObserver* obs = getObserver();
+	if (!obs)
+	{
+		OTAssert(false, "Observer not set while perparing for property grid");
+		return;
+	}
+
+	std::set<std::string> queryParameters;
+	std::set<std::string> queryQuantities;
+
+	std::list<EntityBase*> children = getChildrenList();
+
+	std::set<std::string> tupleTypes;
+	for (EntityBase* child : children)
+	{
+		EntityResult1DCurve* curve = dynamic_cast<EntityResult1DCurve*>(child);
+		if (curve)
+		{
+			tupleTypes.insert(curve->getTupleType());
+
+			for (const std::string& param : curve->getParameterOptions())
+			{
+				queryParameters.insert(param);
+			}
+			for (const std::string& quantity : curve->getQuantityOptions())
+			{
+				queryQuantities.insert(quantity);
+			}
+		}
+	}
+
+	bool anyPropertyNeedsUpdate = getProperties().anyPropertyNeedsUpdate();
+
+	std::vector<std::string> queryParameterList(queryParameters.begin(), queryParameters.end());
+	std::vector<std::string> queryQuantityList(queryQuantities.begin(), queryQuantities.end());
+
+	auto parameterSelection = PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName());
+	const std::string currentSelection = parameterSelection->getValue();
+	if (parameterSelection != nullptr && parameterSelection->getOptions() != queryParameterList)
+	{
+		parameterSelection->resetOptions(queryParameterList);
+		const auto& temp = parameterSelection->getOptions();
+		if (std::find(temp.begin(), temp.end(), currentSelection) != temp.end())
+		{
+			parameterSelection->setValue(currentSelection);
+		}
+		for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
+		{
+			const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
+			PropertyHelper::setSelectionPropertyValue({ queryParameterList.begin(), queryParameterList.end() }, this, m_propertyNameSecondaryParameter, group);
+		}
+	}
+
+	tupleTypes.erase("");
+	if (tupleTypes.size() == 1)
+	{
+		const std::string plotType = PropertyHelper::getSelectionPropertyValue(this, "Plot type", "General");
+		setTupleSettings(*tupleTypes.begin(), plotType, queryParameterList);
+	}
+	else if (tupleTypes.size() > 1)
+	{
+		//This is not valid. The plot cannot be shown.
+	}
+	else
+	{
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName())->setVisible(false);
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName())->setVisible(false);
+		PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName())->setVisible(false);
+	}
+}
