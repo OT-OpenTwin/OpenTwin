@@ -111,6 +111,8 @@ private:
 	std::string getLibraryDataPath() const;
 	bool ensureDirectoryExists(const std::string& _path) const;
 	void writeFileToPath(const std::string& _filePath, const std::string& _content) const;
+	bool checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent) const;
+	bool promptUserForOverwrite(const std::string& _filePath) const;
 
 	void exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID);
 	void exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID);
@@ -118,4 +120,6 @@ private:
 	void exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath);
+
+	std::string ensureFileExtension(const std::string& _fileName, const std::string& _extension) const;
 };

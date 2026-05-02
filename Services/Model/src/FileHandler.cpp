@@ -138,6 +138,29 @@ void FileHandler::handleExportFilesToLibrary() {
 					}
 				}
 			}
+			else {
+
+				EntityPropertiesBase* fileType = fileEntity->getProperties().getProperty("FileType");
+				if (!fileType) {
+					Application::instance()->getNotifier()->reportError(
+						"Selected file entity " + entity->getName() + " does not have a valid ExportType or FileType property. Please ensure that the file entities have the correct properties set for export."
+					);
+					return;
+				}
+				EntityPropertiesString* fileTypeSelection = dynamic_cast<EntityPropertiesString*>(fileType);
+				if (fileTypeSelection) {
+					std::string fileTypeValue = fileTypeSelection->getValue();
+					if (fileTypeValue == "py") {
+						pythonScript = fileEntity;
+					}
+					else {
+						Application::instance()->getNotifier()->reportError(
+							"Selected file entity " + entity->getName() + " has an unsupported file type for export. Please ensure that the file entities have the correct properties set for export."
+						);
+						return;
+					}
+				}		
+			}
 		}
 
 		// Check if it's a PythonManifest
@@ -728,6 +751,16 @@ void FileHandler::writeFileToPath(const std::string& _filePath, const std::strin
 	outFile.close();
 }
 
+std::string FileHandler::ensureFileExtension(const std::string& _fileName, const std::string& _extension) const {
+	if (_fileName.size() >= _extension.size()) {
+		std::string fileEnd = _fileName.substr(_fileName.size() - _extension.size());
+		if (fileEnd == _extension) {
+			return _fileName; 
+		}
+	}
+	return _fileName + _extension;
+}
+
 void FileHandler::exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID) {
 	auto uiComponent = Application::instance()->getUiComponent();
 	ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
@@ -740,7 +773,7 @@ void FileHandler::exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID) {
 		EntityBase* modelEntityBase = model->getEntityByID(_modelID);
 		EntityBase* metaEntityBase = model->getEntityByID(_metaID);
 
-		if(modelEntityBase == nullptr || metaEntityBase == nullptr) {
+		if (modelEntityBase == nullptr || metaEntityBase == nullptr) {
 			OT_LOG_E("Error: Circuit model or metadata entity could not be retrieved.");
 			model->reportError("Error: Circuit model or metadata entity could not be retrieved.");
 			return;
@@ -791,7 +824,7 @@ void FileHandler::exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifest
 		EntityBase* pythonMetaEntityBase = model->getEntityByID(_pythonMetaID);
 		EntityBase* manifestMetaEntityBase = model->getEntityByID(_manifestMetaID);
 
-		if(scriptEntityBase == nullptr || manifestEntityBase == nullptr || pythonMetaEntityBase == nullptr || manifestMetaEntityBase == nullptr) {
+		if (scriptEntityBase == nullptr || manifestEntityBase == nullptr || pythonMetaEntityBase == nullptr || manifestMetaEntityBase == nullptr) {
 			OT_LOG_E("Error: One or more entities could not be retrieved.");
 			return;
 		}
@@ -855,16 +888,28 @@ void FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, En
 	metaDoc.RemoveMember("Name");
 	metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(_manifestEntity->getNameOnly() + ".txt", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_manifestEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Export manifest .txt file
-	std::string manifestFileName = environmentPath + "/" + _manifestEntity->getNameOnly() + ".txt";
+	std::string manifestFileName = environmentPath + "/" + ensureFileExtension(_manifestEntity->getNameOnly(), ".txt");
 	std::string manifestContent = _manifestEntity->getText();
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(manifestFileName, manifestContent)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(manifestFileName, manifestContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = environmentPath + "/" + _manifestEntity->getNameOnly() + ".otmeta.json";
+	std::string metaFileName = environmentPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
 	std::string metaJson = ot::json::toJson(metaDoc);
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(metaFileName, metaJson)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(metaFileName, metaJson);
 }
 
@@ -894,7 +939,7 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	metaDoc.RemoveMember("Name");
 	metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(_scriptEntity->getNameOnly() + ".py", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_scriptEntity->getNameOnly(), ".py"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Update AdditionalInfos with dependency information
 	if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
@@ -905,13 +950,25 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	}
 
 	// Export script .py file
-	std::string scriptFileName = scriptPath + "/" + _scriptEntity->getNameOnly() + ".py";
+	std::string scriptFileName = scriptPath + "/" + ensureFileExtension(_scriptEntity->getNameOnly(), ".py");
 	std::string scriptContent = _scriptEntity->getText();
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(scriptFileName, scriptContent)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(scriptFileName, scriptContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = scriptPath + "/" + _metaEntity->getNameOnly() + ".otmeta.json";
+	std::string metaFileName = scriptPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
 	std::string metaJson = ot::json::toJson(metaDoc);
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(metaFileName, metaJson)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(metaFileName, metaJson);
 }
 
@@ -941,26 +998,83 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 	metaDoc.RemoveMember("Name");
 	metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(_modelEntity->getNameOnly() + ".txt", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_modelEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Export circuit model .txt file
-	std::string modelFileName = modelPath + "/" + _modelEntity->getNameOnly() + ".txt";
+	std::string modelFileName = modelPath + "/" + ensureFileExtension(_modelEntity->getNameOnly(), ".txt");
 	std::string modelContent = _modelEntity->getText();
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(modelFileName, modelContent)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(modelFileName, modelContent);
 
 	// Export metadata .otmeta.json file
-	std::string metaFileName = modelPath + "/" + _metaEntity->getNameOnly() + ".otmeta.json";
+	std::string metaFileName = modelPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
 	std::string metaJson = ot::json::toJson(metaDoc);
+	
+	// Check if file exists and handle accordingly
+	if (!checkAndHandleFileOverwrite(metaFileName, metaJson)) {
+		return; // User cancelled or file is identical
+	}
+	
 	writeFileToPath(metaFileName, metaJson);
 }
 
-
-
-void FileHandler::clearBuffer()
-{
+void FileHandler::clearBuffer() {
 	m_entityVersionsData.clear();
 	m_entityVersionsTopo.clear();
 	m_entityIDsData.clear();
 	m_entityIDsTopo.clear();
 	m_forceVisible.clear();
+}
+
+bool FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent) const {
+	// Check if file exists
+	std::ifstream file(_filePath, std::ios::binary | std::ios::ate);
+	if (!file.is_open()) {
+		// File does not exist, can proceed
+		return true;
+	}
+
+	// File exists, check if content is identical
+	std::ifstream::pos_type fileSize = file.tellg();
+	file.seekg(0, std::ios::beg);
+
+	// Compare file sizes first
+	if (static_cast<size_t>(fileSize) != _newContent.size()) {
+		// Different size, ask user for confirmation
+		return promptUserForOverwrite(_filePath);
+	}
+
+	// Files have same size, compare content
+	std::vector<char> fileContent(fileSize);
+	file.read(fileContent.data(), fileSize);
+	file.close();
+
+	if (std::equal(fileContent.begin(), fileContent.end(), _newContent.begin())) {
+		// Content is identical, skip writing
+		OT_LOG_D("Skipping file export: content is identical for \"" + _filePath + "\"");
+		return false;
+	}
+
+	// Content is different, ask user for confirmation
+	return promptUserForOverwrite(_filePath);
+}
+
+bool FileHandler::promptUserForOverwrite(const std::string& _filePath) const {
+	//// Create a dialog to ask the user for confirmation
+	//ot::MessageDialogCfg cfg;
+	//cfg.setTitle("File Already Exists");
+	//cfg.setText("The file \"" + _filePath + "\" already exists with different content.\n\n"
+	//	"Do you want to overwrite it?");
+	//cfg.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+	//cfg.setIcon(ot::MessageDialogCfg::Question);
+
+	////ot::MessageDialogCfg::BasicButton result = Application::instance()->getUiComponent()->sendMessage()
+
+	//return result == ot::MessageDialogCfg::Yes;
+	return true; // For now, we will just overwrite without asking
 }
