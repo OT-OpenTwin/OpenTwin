@@ -3882,8 +3882,7 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	resetModified();
 }
 
-void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1)
-{
+void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1) {
 	if (_type == "DiscardRedoInfoAndSave") {
 		if (_answer != ot::MessageDialogCfg::Yes) {
 			// We need to remove the redo information
@@ -3895,6 +3894,17 @@ void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::Basic
 		}
 
 		projectSave(_parameter1, true);
+	}
+	else if (_type == "OverwriteFile") {
+		// Handle file overwrite response
+		if ((_answer & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes) {
+			// User wants to overwrite
+			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, true);
+		}
+		else if ((_answer & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
+			// User doesn't want to overwrite - add counter to filename
+			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, false);
+		}
 	}
 	else {
 		OT_LOG_E("Unknown promt type \"" + _type + "\"");

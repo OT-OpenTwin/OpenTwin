@@ -44,7 +44,7 @@ public:
 	virtual ~FileHandler() = default;
 
 	void addButtons(ot::components::UiComponent* _uiComponent);
-
+	void handleOverwriteResponse(const std::string& _filePath, bool _overwrite);
 private:
 	const std::string c_groupName = "File Imports";
 	ot::ToolBarButtonCfg m_buttonFileImport;
@@ -65,6 +65,7 @@ private:
 	void handleImportTextFileButton();
 	void handleImportPythonScriptButton();
 	void handleExportFilesToLibrary();
+	
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -111,8 +112,21 @@ private:
 	std::string getLibraryDataPath() const;
 	bool ensureDirectoryExists(const std::string& _path) const;
 	void writeFileToPath(const std::string& _filePath, const std::string& _content) const;
-	bool checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent) const;
-	bool promptUserForOverwrite(const std::string& _filePath) const;
+	bool checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent, 
+	const std::string& _metaFilePath, const std::string& _metaContent) const;
+
+//! @brief Stores information about pending file overwrites (content + metadata together)
+struct PendingFileOverwrite {
+	std::string contentFilePath;
+	std::string contentNewContent;
+	std::string metaFilePath;
+	std::string metaNewContent;
+};
+
+std::map<std::string, PendingFileOverwrite> m_pendingFileOverwrites;
+
+void promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath, 
+	const std::string& _contentNewContent, const std::string& _metaNewContent) const;
 
 	void exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID);
 	void exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID);
