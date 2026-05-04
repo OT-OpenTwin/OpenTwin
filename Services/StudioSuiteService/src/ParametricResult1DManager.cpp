@@ -89,7 +89,7 @@ void ParametricResult1DManager::extractData(Result1DManager& result1DManager)
 
 		for (const std::string& category : runIDContainer->getListOfCategories())
 		{
-			if (category == "1D Results/S-Parameters")
+			if (category == "1D Results/S-Parameters" && 0)   // Temporarily disabled specific S-parameter handling due to limitations of matrix visualization
 			{
 				DatasetDescription sparameterDescriptions;
 				if (extractDataDescriptionSParameter(category, runIDContainer, runID, sparameterDescriptions))
