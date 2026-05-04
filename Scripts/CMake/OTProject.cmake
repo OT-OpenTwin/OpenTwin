@@ -58,7 +58,38 @@ set(_OT_CFG_DEBUG   "$<CONFIG:Debug>")
 set(_OT_CFG_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
 
 if(MSVC)
-    add_compile_options(/Zc:__cplusplus /permissive- /Zc:preprocessor /MP /external:anglebrackets /external:W0 /external:templates-)
+    add_compile_options(
+        /Zc:__cplusplus
+        /Zc:wchar_t
+        /Zc:inline
+        /Zc:forScope
+        /permissive-
+        /Zc:preprocessor
+        /MP
+        /Gm-
+        /external:anglebrackets
+        /external:W0
+        /external:templates-
+        /GS
+        /fp:precise
+        /EHsc
+        /Gd
+        /WX-
+        /errorReport:queue
+        /FC
+        /diagnostics:column
+    )
+
+    if(NOT DEFINED CMAKE_MSVC_RUNTIME_LIBRARY)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+    endif()
+
+    add_compile_definitions(
+        WIN32 _WIN32 _WINDOWS UNICODE _UNICODE
+        $<$<CONFIG:Debug>:QT_NO_CAST_TO_ASCII>
+        $<$<CONFIG:Debug>:_CRT_SECURE_NO_WARNINGS>
+        $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_WARNINGS>
+    )
 endif()
 
 # ------------------------------------------------------------
@@ -288,7 +319,7 @@ endfunction()
 # ------------------------------------------------------------
 # initialize_lib / initialize_app
 # ------------------------------------------------------------
-function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
+function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     if(NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "")
         message(FATAL_ERROR
             "ot_initialize_lib(${TARGET_NAME} ...): root path var '${ROOT_PATH_VAR}' is not set. "
@@ -316,15 +347,6 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
         CXX_EXTENSIONS NO
     )
 
-    # export function
-    if(WIN32)
-        target_compile_definitions(${_core} PRIVATE
-            UNICODE
-            _UNICODE
-            _WINDOWS
-            _USRDLL
-        )
-    endif()
     target_compile_definitions(${_core} PRIVATE
         $<${_OT_CFG_DEBUG}:_DEBUG>
         $<${_OT_CFG_RELEASE}:NDEBUG>
@@ -350,8 +372,20 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     )
 endfunction()
 
+function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
+    _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR})
+    _ot_target_core_name(_core ${TARGET_NAME})
+
+    if(WIN32)
+        target_compile_definitions(${_core} PRIVATE 
+            _USRDLL
+        )
+    endif()
+
+endfunction()
+
 function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
-    ot_initialize_lib(${TARGET_NAME} ${ROOT_PATH_VAR})
+    _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR})
     _ot_target_core_name(_core ${TARGET_NAME})
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
 endfunction()
@@ -530,6 +564,12 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "QtEntryPoint")
+        ot_define_qt6_targets("EntryPoint")
+        target_link_libraries("${CORE_TARGET}" PRIVATE Qt6::EntryPoint)
+        return()
+    endif()
+
     # RapidJSON headers
     if(DEP STREQUAL "RJSON")
         if(R_JSON_INCD_PATH)
@@ -573,7 +613,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
-    if(DEP STREQUAL "OC")
+    if(DEP STREQUAL "OCCT")
         if(OC_INCD_PATH)
             target_include_directories("${CORE_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OC_INCD_PATH}>)
         endif()
@@ -614,7 +654,6 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
 
 endfunction()
 
-# Adds BOTH new (CMake build output) and old (x64/<Config>) link dir layouts.
 function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
     if("${ROOT_DIR}" STREQUAL "")
         return()
@@ -682,6 +721,14 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         ot_define_qt6_targets("Core;Gui;Widgets")
         target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::Widgets)
         return()
+    endif()
+
+    if(DEP STREQUAL "QtEntryPoint")
+        if(MSVC)
+            ot_define_qt6_targets("EntryPoint")
+            target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::EntryPoint)
+            return()
+        endif()
     endif()
 
     if(DEP STREQUAL "QtFull")
@@ -757,7 +804,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
-    if(DEP STREQUAL "OC")
+    if(DEP STREQUAL "OCCT")
         if(OC_LIBPATHD_PATH)
             target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OC_LIBPATHD_PATH}>)
         endif()
@@ -890,10 +937,6 @@ function(ot_finalize_bin TARGET_NAME)
 
     if(WIN32)
         set_property(TARGET ${TARGET_NAME} PROPERTY WIN32_EXECUTABLE "${_OT_CFG_RELEASE}")
-
-        if(MSVC)
-            target_link_options(${TARGET_NAME} PRIVATE "/ENTRY:mainCRTStartup")
-        endif()
     endif()
 
     if(NOT "${_output_name}" STREQUAL "")

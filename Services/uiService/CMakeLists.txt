@@ -26,6 +26,7 @@ ot_add_dependency(uiService
 
     RJSON
     QtFull
+    QtEntryPoint
     QT_TT
     ADS
     QWT
@@ -37,5 +38,6 @@ ot_add_dependency(uiService
 )
 
 ot_finalize_bin(uiService uiFrontend)
+set_target_properties(uiService PROPERTIES WIN32_EXECUTABLE ON)
 ot_deploy_app_configuration(uiService)
 ot_add_test(uiService)

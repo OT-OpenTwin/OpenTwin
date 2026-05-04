@@ -17,7 +17,7 @@ ot_add_dependency(OTCADEntities
     RJSON
     MONGO_CXX
     MONGO_C
-    OC
+    OCCT
     TINYXML2
 )
 

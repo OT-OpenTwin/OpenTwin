@@ -338,6 +338,12 @@ function(ot_define_qt6_targets COMPONENTS_LIST)
                 target_link_libraries(Qt6::WebSockets INTERFACE Qt6::Core)
             endif()
 
+        elseif(c STREQUAL "EntryPoint")
+            ot_import_qt6_module(EntryPoint Qt6EntryPoint)
+            if(TARGET Qt6::EntryPoint)
+                target_link_libraries(Qt6::EntryPoint INTERFACE Qt6::EntryPoint)
+            endif()
+
         else()
             message(FATAL_ERROR "ot_define_qt6_targets: unsupported Qt component '${c}'")
         endif()
