@@ -224,15 +224,20 @@ void FDTDSolver::convertAndStoreResults()
 	convert1DTimeSignal("Energy/E-Field", "et", "E-Field Energy", result1D);
 	convert1DTimeSignal("Energy/H-Field", "ht", "H-Field Energy", result1D);
 
+	convert1DTimeSignal("Ports/Currents/I1", "port_it_0", "Port 1 Current", result1D, 1);
+	convert1DTimeSignal("Ports/Currents/I2", "port_it_1", "Port 2 Current", result1D, 1);
+	convert1DTimeSignal("Ports/Voltages/V1", "port_ut_0", "Port 1 Voltage", result1D, 1);
+	convert1DTimeSignal("Ports/Voltages/V2", "port_ut_1", "Port 2 Voltage", result1D, 1);
+
 	convert1DFrequencySpectrum("S-Parameter/S1,1", "s11", "S1,1", result1D);
 	convert1DFrequencySpectrum("S-Parameter/S2,1", "s21", "S2,1", result1D);
 
 	result1D.storeResults();
 }
 
-void FDTDSolver::convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager &result1D)
+void FDTDSolver::convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager &result1D, int readDataColumnOnly)
 {
-	result1D.convert1D(resultName, fileName, quantityName, "", "Time", entityUnits->getTimeUnit(), entityUnits->getScaleToSITime());
+	result1D.convert1D(resultName, fileName, quantityName, "", "Time", entityUnits->getTimeUnit(), entityUnits->getScaleToSITime(), readDataColumnOnly);
 }
 
 void FDTDSolver::convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D)

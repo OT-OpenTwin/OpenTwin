@@ -40,14 +40,14 @@ public:
 
 	void clear();
 	void loadParameters();
-	void convert1D(const std::string &resultName, const std::string &fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale);
+	void convert1D(const std::string &resultName, const std::string &fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale, int readDataColumnOnly = -1);
 	void storeResults();
 
 private:
 	void addParameterDescriptions(ParametricCombination& currentRun, const std::string& xAxis, const std::string& xUnit, std::list<ot::Variable> parameterValuesXAxis, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
 	void addCurveData(const std::string& resultName, const std::string& quantityName, const std::string& quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions);
 	void storeCurves(std::list<DatasetDescription>& allCurveDescriptions);
-	bool load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale);
+	bool load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale, int readDataColumnOnly);
 	std::string getPlotName(const std::string& resultName);
 
 	std::string tmpDirPath;

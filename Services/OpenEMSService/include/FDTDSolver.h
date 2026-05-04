@@ -55,7 +55,7 @@ private:
 	bool toDouble(const std::string& s, double& value);
 	std::string doubleToString(double value);
 	double extractRangeMax(const std::vector<char>& data);
-	void convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
+	void convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D, int readDataColumnOnly = -1);
 	void convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
 
 	Application* application;

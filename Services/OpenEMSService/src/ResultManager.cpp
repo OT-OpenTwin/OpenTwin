@@ -94,12 +94,17 @@ void ResultManager::loadParameters()
 	}
 }
 
-void ResultManager::convert1D(const std::string& resultName, const std::string& fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale)
+void ResultManager::convert1D(const std::string& resultName, const std::string& fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale, int readDataColumnOnly)
 {
+	// The optional parameter readDataColumnOnly determines whether only a single result column should be read in case that multiple columns are present in the file.
+	// By default, the parameter is set to -1 which means that all columns are read.
+	// If the parameter is set to a value larger or equal to 1, only the corresponding column will be read (0 corresponds to the x axis).
+	assert(readDataColumnOnly == -1 || readDataColumnOnly >= 1);
+
 	std::vector<std::pair<double, std::complex<double>>> curveData;
 	bool isComplex = false;
 
-	if (load1Ddata(tmpDirPath + "/" + fileName, curveData, isComplex, xScale))
+	if (load1Ddata(tmpDirPath + "/" + fileName, curveData, isComplex, xScale, readDataColumnOnly))
 	{
 		std::list<ot::Variable> parameterValuesXAxis;
 		
@@ -139,7 +144,7 @@ std::string ResultManager::getPlotName(const std::string& resultName)
 }
 
 
-bool ResultManager::load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale)
+bool ResultManager::load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale, int readDataColumnOnly)
 {
 	std::ifstream file(filePath);
 	if (!file.is_open())
@@ -159,29 +164,57 @@ bool ResultManager::load1Ddata(const std::string filePath, std::vector<std::pair
 			continue;
 		}
 
+		// Skip comment lines
+		if (line[0] == '%')
+		{
+			continue;
+		}
+
 		std::istringstream iss(line);
 
 		double x;
-		double realPart;
+		double realPart = 0.0;
 		double imagPart = 0.0;
 
-		// The first two values are mandatory
-		if (!(iss >> x >> realPart))
+		// The first two value is mandatory
+		if (!(iss >> x))
 		{
 			return false;
 		}
 
-		// Third value is optional (imaginary part)
-		if (iss >> imagPart)
+		if (readDataColumnOnly > 0)
 		{
-			isComplex = true;
+			// Now we skip all columns before the requested one
+			for (int i = 1; i < readDataColumnOnly; i++)
+			{
+				double dummy = 0.0;
+				if (!(iss >> dummy))
+				{
+					return false;
+				}
+			}
 		}
 
-		// Check for unexpected additional values
-		double extra;
-		if (iss >> extra)
+		// Read the first data column
+		if (!(iss >> realPart))
 		{
 			return false;
+		}
+
+		if (readDataColumnOnly == -1)
+		{
+			// Third value is optional (imaginary part)
+			if (iss >> imagPart)
+			{
+				isComplex = true;
+			}
+
+			// Check for unexpected additional values
+			double extra;
+			if (iss >> extra)
+			{
+				return false;
+			}
 		}
 
 		// Store the parsed values
