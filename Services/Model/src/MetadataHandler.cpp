@@ -6,6 +6,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/DataLakeAccessor.h"
+#include <chrono>
 
 MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
@@ -14,7 +15,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		const std::string sessionServiceURL = Application::instance()->getSessionServiceURL();
 		m_projectToCollectionConverter.reset(new ProjectToCollectionConverter(sessionServiceURL));
 	}
-
+	std::map<std::string, uint64_t> timings;
 	if (!_projectName.empty())
 	{
 		const std::string classNameSeries = EntityMetadataSeries::className();
@@ -25,6 +26,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		std::list<std::unique_ptr<EntityBase>> garbage;
 
 		Model* model = Application::instance()->getModel();
+		auto start = std::chrono::high_resolution_clock::now();
 		if (Application::instance()->getProjectName() != _projectName)
 		{
 			// We need to load another model state. List of projects is already reduced to those which the user has access to, so permission to the collection is guaranteed.
@@ -34,11 +36,13 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			// Getting information of session service. Potential to reduce communication with buffer.
 			_collectionName = m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
+			auto startModelState = std::chrono::high_resolution_clock::now();
 			CrossCollectionDatabaseWrapper wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
 			ModelState::VersionInformation information;
 			secondary.getActiveModelState(information);
 			secondary.loadModelState(information.version, false);
+			auto modelStateLoaded = std::chrono::high_resolution_clock::now();
 
 			//Load entire modelState
 			std::list<ot::UID> prefetchIds;
@@ -51,7 +55,8 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 				prefetchIdAndVersion.push_back(std::pair<ot::UID, ot::UID>(entityID, entityVersion));
 			}
 			DataBase::instance().prefetchDocumentsFromStorage(prefetchIdAndVersion);
-		
+			auto entitiesLoaded = std::chrono::high_resolution_clock::now();
+
 			for (auto& identifier : prefetchIdAndVersion)
 			{
 				try
@@ -83,12 +88,24 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 					OT_LOG_E("Failed to load entity from another project.");
 				}
 			}
+			auto filtered = std::chrono::high_resolution_clock::now();
+
+			uint64_t modelSTateTime = std::chrono::duration_cast<std::chrono::milliseconds>(modelStateLoaded - startModelState).count();
+			uint64_t entityLoadedTime = std::chrono::duration_cast<std::chrono::milliseconds>(entitiesLoaded - modelStateLoaded).count();
+			uint64_t filteredTime = std::chrono::duration_cast<std::chrono::milliseconds>( filtered - entitiesLoaded ).count();
+			timings["ModelStateLoaded"] = modelSTateTime;
+			timings["entityLoaded"] = entityLoadedTime;
+			timings["filteredTime"] = filteredTime;
+
 		}
 		else
 		{
 			_collectionName = Application::instance()->getCollectionName();
 			ot::UIDList entityIDs = model->getIDsOfFolderItems(ot::FolderNames::DatasetFolder, true);
+			auto loadingEnt = std::chrono::high_resolution_clock::now();
 			model->prefetchDocumentsFromStorage(entityIDs);
+			auto entLoaded = std::chrono::high_resolution_clock::now();
+
 			for (ot::UID entityID : entityIDs)
 			{
 				EntityBase* baseEnt = model->readEntityFromEntityID(nullptr, entityID, model->getAllEntitiesByUID());
@@ -105,8 +122,14 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 					campaignMetadataEntity = campaign;
 				}
 			}
-		}
+			auto filtered = std::chrono::high_resolution_clock::now();
+			uint64_t loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(entLoaded-loadingEnt).count();
+			uint64_t filteredTime = std::chrono::duration_cast<std::chrono::milliseconds>(filtered - entLoaded).count();
+			timings["LoadingEnt"] = loadingTime;
+			timings["FilterTime"] = filteredTime;
 
+		}
+		auto loaded = std::chrono::high_resolution_clock::now();
 		if (!campaignMetadataEntity)
 		{
 			OT_LOG_E("Campaign metadata entity for for project \"" + _projectName + "\" not found");
@@ -114,7 +137,14 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		}
 
 		MetadataEntityInterface campaignFactory;
+		auto startCreated = std::chrono::high_resolution_clock::now();
 		MetadataCampaign campaign = campaignFactory.createCampaign(campaignMetadataEntity, measurementMetadataEntity);
+		auto created = std::chrono::high_resolution_clock::now();
+		
+		uint64_t totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(created - start).count();
+		uint64_t creationTime = std::chrono::duration_cast<std::chrono::milliseconds>(created - startCreated).count();
+		timings["CreateCampaign"] = creationTime;
+		timings["total"] = totalTime;
 		return campaign;
 	}
 	else
