@@ -33,10 +33,20 @@
 
 MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*> _msmds)
 {
+
 	MetadataCampaign measurementCampaign;
+	auto start = std::chrono::high_resolution_clock::now();
 	extractCampaignMetadata(measurementCampaign, _rmd);
+	auto camp = std::chrono::high_resolution_clock::now();
 	extractSeriesMetadata(measurementCampaign, _msmds);
+	auto series = std::chrono::high_resolution_clock::now();
 	measurementCampaign.updateMetadataOverview();
+	auto update = std::chrono::high_resolution_clock::now();
+	
+	uint64_t totalTime = std::chrono::duration_cast<std::chrono::milliseconds>(update - start).count();
+	uint64_t seriesTime = std::chrono::duration_cast<std::chrono::milliseconds>(camp - start).count();
+	uint64_t campTime = std::chrono::duration_cast<std::chrono::milliseconds>(series- camp).count();
+	uint64_t updateTime = std::chrono::duration_cast<std::chrono::milliseconds>(update - series).count();
 	return measurementCampaign;
 }
 
@@ -45,8 +55,11 @@ MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetad
 	return createSeries(_seriesMetadataEntity.get());
 }
 
+__declspec(noinline)
 MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seriesMetadataEntity)
 {
+	auto first = std::chrono::high_resolution_clock::now();
+
 	std::string entityName = _seriesMetadataEntity->getName();
 	//const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
 	//MetadataSeries seriesMetadata(name);
@@ -58,7 +71,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 	//First we extract the series meta data
 	ot::JsonDocument& doc = _seriesMetadataEntity->getMetadata();
 	seriesMetadata.setMetadata(doc);
-
+	auto second = std::chrono::high_resolution_clock::now();
 	//Now we extract the parameter meta data
 	const GenericDocument* parameterTopLevel = _seriesMetadataEntity->getDocument(_seriesMetadataEntity->getParameterDocumentName());
 	const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();
@@ -67,7 +80,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 		MetadataParameter parameter;
 		parameter.parameterUID = std::stoll(parameterDocument->getDocumentName());
 		auto parameterFields = extractMetadataFields(*parameterDocument);
-		for (std::shared_ptr<MetadataEntry> entry : parameterFields)
+		for (const std::shared_ptr<MetadataEntry>& entry : parameterFields)
 		{
 			const std::string currentEntryName = entry->getEntryName();
 			if (currentEntryName == m_nameField)
@@ -97,13 +110,13 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 		}
 
 		auto objectList = extractMetadataObjects(*parameterDocument);
-		for (auto& object : objectList)
+		for (const auto& object : objectList)
 		{
 			parameter.metaData[object->getEntryName()] = object;
 		}
-		seriesMetadata.addParameter(parameter);
+		seriesMetadata.addParameter(std::move(parameter));
 	}
-
+	auto third = std::chrono::high_resolution_clock::now();
 	//Now the quantity meta data
 	const GenericDocument* quantityTopLevel = _seriesMetadataEntity->getDocument(_seriesMetadataEntity->getQuantityDocumentName());
 	const std::vector<const GenericDocument*> allQuantityDocuments = quantityTopLevel->getSubDocuments();
@@ -113,7 +126,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 		quantity.quantityIndex = std::stoll(quantityDocument->getDocumentName());
 		// First the regular fields
 		auto quantityFields = extractMetadataFields(*quantityDocument);
-		for (std::shared_ptr<MetadataEntry> entry : quantityFields)
+		for (const std::shared_ptr<MetadataEntry>& entry : quantityFields)
 		{
 			const std::string entryName = entry->getEntryName();
 			if (entryName == m_nameField)
@@ -141,7 +154,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 
 		//Next the additional information and the tuple description. Both of which are subdocuments
 		auto objectList = extractMetadataObjects(*quantityDocument);
-		for (auto& object : objectList)
+		for (const auto& object : objectList)
 		{
 			const std::string entryName = object->getEntryName();
 			bool isTupleDescriptionObject = entryName.find(m_tupleDescriptionsField) != std::string::npos;
@@ -154,7 +167,7 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 				auto allTupleDescriptionEntries = objectEntry->getEntries();
 				
 				
-				for (const auto tupleDescriptionEntry : allTupleDescriptionEntries)
+				for (const auto& tupleDescriptionEntry : allTupleDescriptionEntries)
 				{
 					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
 					if (fieldEntry != nullptr)
@@ -240,6 +253,12 @@ MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seri
 
 		seriesMetadata.addQuantity(quantity);
 	}
+
+	auto forth = std::chrono::high_resolution_clock::now();
+	uint64_t total = std::chrono::duration_cast<std::chrono::milliseconds>(forth - first).count();
+	uint64_t firstT = std::chrono::duration_cast<std::chrono::milliseconds>(second - first).count();
+	uint64_t secondT = std::chrono::duration_cast<std::chrono::milliseconds>(third - second ).count();
+	uint64_t thirdT = std::chrono::duration_cast<std::chrono::milliseconds>(forth - third).count();
 
 	return seriesMetadata;
 }
