@@ -581,6 +581,11 @@ void FileHandler::storeChangedTable(ot::IVisualisationTable* _entity, const ot::
 
 void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEvent& _event, ot::IVisualisationTable* _entity)
 {
+	assert(_entity != nullptr);
+
+	// Store the event data
+	_entity->setActiveFilters(_event.getFilterDescriptions());
+
 	IEventHandler* eventHandler = dynamic_cast<IEventHandler*>(_entity);
 	if (eventHandler != nullptr)
 	{
@@ -613,10 +618,33 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 						OT_LOG_E(_e.what());
 					}
 
+					Model* model = Application::instance()->getModel();
+					assert(model != nullptr);
+					model->setModified();
+					model->modelChangeOperationCompleted("Updated Table Filters.");
 				};
+
 			std::thread worker(asyncRequest);
 			worker.detach();
 		}
+		else
+		{
+			// No event handler function set, save state (filter have changed)
+
+			Model* model = Application::instance()->getModel();
+			assert(model != nullptr);
+			model->setModified();
+			model->modelChangeOperationCompleted("Updated Table Filters.");
+		}
+	}
+	else
+	{
+		// No event handler found, save state (filter have changed)
+
+		Model* model = Application::instance()->getModel();
+		assert(model != nullptr);
+		model->setModified();
+		model->modelChangeOperationCompleted("Updated Table Filters.");
 	}
 }
 

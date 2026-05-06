@@ -175,6 +175,15 @@ bool EntityFileCSV::getEvaluateEscapeCharacter() {
 	return prop->getValue();
 }
 
+void EntityFileCSV::setActiveFilters(const std::list<ot::ValueComparisonDescription>& _filters)
+{
+	if (m_activeFilters != _filters)
+	{
+		m_activeFilters = _filters;
+		setModified();
+	}
+}
+
 void EntityFileCSV::setSpecializedProperties() {
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
@@ -197,14 +206,51 @@ void EntityFileCSV::setSpecializedProperties() {
 		"default", getProperties());
 }
 
-void EntityFileCSV::addStorageData(bsoncxx::builder::basic::document & storage)
+void EntityFileCSV::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
-	EntityFile::addStorageData(storage);
+	EntityFile::addStorageData(_storage);
+
+	ot::JsonDocument filtersArr(rapidjson::kArrayType);
+
+	for (const auto& filter : m_activeFilters)
+	{
+		ot::JsonObject filterObj;
+		filter.addToJsonObject(filterObj, filtersArr.GetAllocator());
+		filtersArr.PushBack(filterObj, filtersArr.GetAllocator());
+	}
+
+	_storage.append(bsoncxx::builder::basic::kvp("ActiveFilters", filtersArr.toJson()));
 }
 
-void EntityFileCSV::readSpecificDataFromDataBase(const bsoncxx::document::view & doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void EntityFileCSV::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap)
 {
-	EntityFile::readSpecificDataFromDataBase(doc_view, entityMap);
+	EntityFile::readSpecificDataFromDataBase(_docView, _entityMap);
+
+	m_activeFilters.clear();
+	auto docIt = _docView.find("ActiveFilters");
+	if (docIt != _docView.end())
+	{
+		std::string filterJsonStr(docIt->get_string().value);
+
+		if (!filterJsonStr.empty())
+		{
+			ot::JsonDocument filtersArr;
+			if (!filtersArr.fromJson(std::string(docIt->get_string().value)))
+			{
+				OT_LOG_E("Failed to parse active filters for EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+			}
+			else
+			{
+				for (ot::JsonSizeType i = 0; i < filtersArr.Size(); i++)
+				{
+					const ot::ConstJsonObject filterObj = ot::json::getObject(filtersArr, i);
+					ot::ValueComparisonDescription filter;
+					filter.setFromJsonObject(filterObj);
+					m_activeFilters.push_back(std::move(filter));
+				}
+			}
+		}
+	}
 }
 
 ot::GenericDataStructMatrix EntityFileCSV::getTable()

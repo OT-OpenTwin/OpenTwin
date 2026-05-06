@@ -183,6 +183,15 @@ ot::TableCfg::TableHeaderMode ot::EntityDatasetInfo::getHeaderMode()
 	return ot::TableCfg::TableHeaderMode::Horizontal;
 }
 
+void ot::EntityDatasetInfo::setActiveFilters(const std::list<ValueComparisonDescription>& _filters)
+{
+	if (m_activeFilters != _filters)
+	{
+		m_activeFilters = _filters;
+		setModified();
+	}
+}
+
 void ot::EntityDatasetInfo::setProjectName(const std::string& _projectName)
 {
 	PropertyHelper::setProjectPropertyValue(_projectName, this, "Project", "General");
@@ -233,4 +242,51 @@ std::optional<std::string> ot::EntityDatasetInfo::getEventHandlingFunction(Pytho
 	
 	return std::nullopt;
 	
+}
+
+void ot::EntityDatasetInfo::addStorageData(bsoncxx::builder::basic::document& _storage)
+{
+	EntityBase::addStorageData(_storage);
+
+	JsonDocument filtersArr(rapidjson::kArrayType);
+
+	for (const auto& filter : m_activeFilters)
+	{
+		JsonObject filterObj;
+		filter.addToJsonObject(filterObj, filtersArr.GetAllocator());
+		filtersArr.PushBack(filterObj, filtersArr.GetAllocator());
+	}
+
+	_storage.append(bsoncxx::builder::basic::kvp("ActiveFilters", filtersArr.toJson()));
+}
+
+void ot::EntityDatasetInfo::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap)
+{
+	EntityBase::readSpecificDataFromDataBase(_docView, _entityMap);
+
+	m_activeFilters.clear();
+	auto docIt = _docView.find("ActiveFilters");
+	if (docIt != _docView.end())
+	{
+		std::string filterJsonStr(docIt->get_string().value);
+		
+		if (!filterJsonStr.empty())
+		{
+			JsonDocument filtersArr;
+			if (!filtersArr.fromJson(std::string(docIt->get_string().value)))
+			{
+				OT_LOG_E("Failed to parse active filters for EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+			}
+			else
+			{
+				for (JsonSizeType i = 0; i < filtersArr.Size(); i++)
+				{
+					const ConstJsonObject filterObj = json::getObject(filtersArr, i);
+					ValueComparisonDescription filter;
+					filter.setFromJsonObject(filterObj);
+					m_activeFilters.push_back(std::move(filter));
+				}
+			}
+		}
+	}
 }

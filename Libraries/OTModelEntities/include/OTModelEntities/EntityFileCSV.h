@@ -47,6 +47,9 @@ public:
 	char getDecimalDelimiter() override;
 	bool getEvaluateEscapeCharacter(void);
 
+	virtual void setActiveFilters(const std::list<ot::ValueComparisonDescription>& _filters) override;
+	virtual std::list<ot::ValueComparisonDescription> getActiveFilters() const override { return m_activeFilters; };
+
 private:
 	void setSpecializedProperties() override;
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -55,5 +58,5 @@ private:
 	std::string m_rowDelimiterDefault = "\\n";
 	std::string m_columnDelimiterDefault = ";";
 	bool m_evaluateEscapeCharacterDefault = false;
-
+	std::list<ot::ValueComparisonDescription> m_activeFilters;
 };

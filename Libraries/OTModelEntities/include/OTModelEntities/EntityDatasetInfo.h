@@ -37,6 +37,9 @@ namespace ot {
 		virtual bool visualiseTable() override;
 		virtual ot::TableCfg::TableHeaderMode getHeaderMode() override;
 
+		virtual void setActiveFilters(const std::list<ValueComparisonDescription>& _filters) override;
+		virtual std::list<ValueComparisonDescription> getActiveFilters() const override { return m_activeFilters; };
+
 		void setProjectName(const std::string& _projectName);
 		std::string getProjectName() const;
 
@@ -44,7 +47,13 @@ namespace ot {
 		std::string getEnvironmentName() override;
 		std::optional<std::string>getEventHandlingFunction(PythonEventType _type, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
+	protected:
+
+		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
 	private:
 		PropertyBundleEventHandling m_propertyBundleEventHandling;
+		std::list<ValueComparisonDescription> m_activeFilters;
 	};
 }

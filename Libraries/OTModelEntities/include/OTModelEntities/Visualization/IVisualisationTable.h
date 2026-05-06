@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTGui/Widgets/TableCfg.h"
 
 // std header
@@ -35,9 +36,16 @@ namespace ot {
 		virtual ot::GenericDataStructMatrix getTable() = 0;
 		virtual void setTable(const ot::GenericDataStructMatrix& _table) = 0;
 		virtual ot::TableCfg getTableConfig(bool _includeData) = 0;
-		virtual char getDecimalDelimiter() = 0; //Needed for text to numeric conversions
+
+		//! @brief Returns the decimal delimiter used for numeric values in the table (e.g., '.' or ',').
+		//! This is important for correctly parsing and displaying numeric values, especially in international contexts where the decimal delimiter may vary.
+		virtual char getDecimalDelimiter() = 0;
+
 		virtual bool visualiseTable() = 0;
 		virtual ot::TableCfg::TableHeaderMode getHeaderMode() = 0;
+
+		virtual void setActiveFilters(const std::list<ValueComparisonDescription>& _filters) = 0;
+		virtual std::list<ValueComparisonDescription> getActiveFilters() const = 0;
 	};
 
 }
