@@ -106,7 +106,7 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 
 	for (const auto& seriesMetadata : campaign->getSeriesMetadata())
 	{
-		rowHeaders.push_back(seriesMetadata.getName());
+		rowHeaders.push_back(seriesMetadata.getLabel());
 
 		const JsonDocument& metadata = seriesMetadata.getMetadata();
 		std::string dooc = json::toJson(metadata);

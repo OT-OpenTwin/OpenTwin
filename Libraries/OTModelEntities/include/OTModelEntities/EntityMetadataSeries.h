@@ -31,9 +31,9 @@ public:
 	std::string getClassName() const override { return EntityMetadataSeries::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
+	virtual void setName(const std::string& _name) override;
 	
 	virtual void addVisualizationNodes() override;
-
 	void setSeries(const MetadataSeries& _series) 
 	{ 
 		m_series = _series; 

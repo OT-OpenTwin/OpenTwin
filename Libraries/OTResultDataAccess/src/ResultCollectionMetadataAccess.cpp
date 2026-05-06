@@ -146,14 +146,14 @@ const std::list<std::string> ResultCollectionMetadataAccess::listAllQuantityLabe
 	return allQuantityLabel;
 }
 
-const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(const std::string& _name) const
+const MetadataSeries* ResultCollectionMetadataAccess::findMetadataSeries(const std::string& _label) const
 {
 	const std::list<MetadataSeries>& allSeriesMetadata = m_metadataCampaign.getSeriesMetadata();
 
 	const MetadataSeries* selectedMetadataSeries = nullptr;
 	for (auto& metadataSeries : allSeriesMetadata)
 	{
-		if (metadataSeries.getName() == _name)
+		if (metadataSeries.getLabel() == _label)
 		{
 			selectedMetadataSeries = &metadataSeries;
 			break;

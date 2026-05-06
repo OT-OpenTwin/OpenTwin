@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityName.h
 // 
 // License:
@@ -39,7 +39,7 @@ namespace ot {
 		};
 
 		//! @brief Extract a name from the full topology entity name.
-		//! @param _topologyLevel -1 = Entity name, 0 = root folder, 1 = next level container .... n = short name of entity (default).
+		//! @param _topologyLevel -1 = Entity short name without parents, 0 = root folder, 1 = next level container .... n = short name of entity (default).
 		//! @return Empty optional if the topology is out of range.
 		static std::optional<std::string> getSubName(const std::string& _fullEntityName, int32_t _topologyLevel = -1);
 		

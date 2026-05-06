@@ -21,7 +21,7 @@
 
 #include "OTCommunication/ActionTypes.h"
 #include "bsoncxx/json.hpp"
-
+#include "OTCore/EntityName.h"
 static EntityFactoryRegistrar<EntityMetadataSeries> registrar("EntityMetadataSeries");
 
 EntityMetadataSeries::EntityMetadataSeries(ot::UID ID, EntityBase* parent, EntityObserver* mdl, ModelState* ms)
@@ -56,18 +56,20 @@ bool EntityMetadataSeries::getEntityBox(double& xmin, double& xmax, double& ymin
 	return false;
 }
 
-
+void EntityMetadataSeries::setName(const std::string& _name)
+{
+	EntityBase::setName(_name);
+	m_series.setLabel(_name);
+}
 using bsoncxx::builder::basic::kvp;
 #include "OTModelEntities/VariableToBSONConverter.h"
 void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
 	EntityBase::addStorageData(_storage);
 
-	_storage.append(bsoncxx::builder::basic::kvp("SeriesLabel",m_series.getLabel()));
 	_storage.append(bsoncxx::builder::basic::kvp("SeriesName",m_series.getName()));
 	_storage.append(bsoncxx::builder::basic::kvp("SeriesIndex", static_cast<int64_t>(m_series.getSeriesIndex())));
 	
-
 	bsoncxx::builder::basic::array parameter;
 	for (const auto& param : m_series.getParameter())
 	{
@@ -152,7 +154,10 @@ void EntityMetadataSeries::readSpecificDataFromDataBase(const bsoncxx::document:
 
 	const std::string name = std::string(doc_view["SeriesName"].get_string().value);
 	MetadataSeries series(name);
-	series.setLabel(std::string(doc_view["SeriesLabel"].get_string().value));
+
+	auto label = ot::EntityName::getSubName(getName());
+	assert(label.has_value());
+	series.setLabel(label.value());
 	series.setIndex(static_cast<uint64_t>(doc_view["SeriesIndex"].get_int64().value));
 	m_series = series;
 
