@@ -39,7 +39,7 @@ public:
 	
 	PyObject* getAllPropertyGroups(const std::string& _absoluteEntityName);
 	void saveChangedEntities();
-	bool saveChangedEntities(const std::string& _absoluteEntityName);
+	
 
 	void clearBuffer();
 

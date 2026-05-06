@@ -137,19 +137,24 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 	}
 
 	auto numberOfMetadataQueries = PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueriesMetadataSeries);
-	bool metadataQueryRequiresUpdate = numberOfMetadataQueries->needsUpdate();
-	if (metadataQueryRequiresUpdate)
+	
+	uint32_t numberVisible = static_cast<uint32_t>(numberOfMetadataQueries->getValue());
+	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
 	{
-		uint32_t numberVisible = static_cast<uint32_t>(numberOfMetadataQueries->getValue());
-		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
+		bool shallBeVisible = (i <= numberVisible);
+		const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
+		auto valueProp = PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName);
+
+		if (valueProp->getVisible() != shallBeVisible)
 		{
-			const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
-			PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(i <= numberVisible);
-			PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(i <= numberVisible);
+			valueProp->setVisible(shallBeVisible);
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(shallBeVisible);
+			PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setVisible(shallBeVisible);
+			requiresUpdate |= true;
 		}
 	}
-	return requiresUpdate || metadataQueryRequiresUpdate;
+	
+	return requiresUpdate;
 }
 
 

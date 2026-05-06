@@ -36,6 +36,7 @@ public:
 	std::pair<uint32_t,std::string> getMatrixIndex(const EntityBase* _thisObject) const;
 
 	std::string getQuerySettingsGroupName() const { return m_groupQuerySettings; }
+
 private:
 	const uint32_t m_maxNbOfQueries = 40;
 	const uint32_t m_maxNbOfQueriesMetadata = 10;

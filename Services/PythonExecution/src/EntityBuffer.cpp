@@ -25,7 +25,7 @@
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
-
+#include "OTModelEntities/Interfaces/IPropertyHandling.h"
 #include "OTBlockEntities/EntityBlock.h"
 
 EntityBuffer& EntityBuffer::instance() {
@@ -92,6 +92,11 @@ void EntityBuffer::saveChangedEntities()
 		auto entity = bufferedEntity.second;
 		if (entity->getModified())
 		{
+			IPropertyHandling* propertyHandling = dynamic_cast<IPropertyHandling*>(entity.get());
+			if (propertyHandling != nullptr)
+			{
+				propertyHandling->updatePropertyVisibilities();
+			}
 			entity->storeToDataBase();
 			topoEntID.push_back(entity->getEntityID());
 			topoEntVersion.push_back(entity->getEntityStorageVersion());
@@ -105,23 +110,6 @@ void EntityBuffer::saveChangedEntities()
 		ot::ModelServiceAPI::updatePropertyGrid();
 	}
 	clearBuffer();
-}
-
-bool EntityBuffer::saveChangedEntities(const std::string& _absoluteEntityName)
-{
-	if (m_bufferedEntities.find(_absoluteEntityName) != m_bufferedEntities.end())
-	{
-		std::shared_ptr<EntityBase> entity = m_bufferedEntities[_absoluteEntityName];
-		entity->storeToDataBase();
-		ot::UIDList topoEntID, topoEntVersion, dataEnt;
-		std::list<bool> forceVis;
-		topoEntID.push_back(entity->getEntityID());
-		topoEntVersion.push_back(entity->getEntityStorageVersion());
-		ot::ModelServiceAPI::addEntitiesToModel(topoEntID, topoEntVersion, forceVis, dataEnt, dataEnt, dataEnt, "Entity property update by python execution service");
-		m_bufferedEntities.erase(_absoluteEntityName);
-		return true;
-	}
-	return false;
 }
 
 std::shared_ptr<EntityBase> EntityBuffer::getEntity(const std::string& _absoluteEntityName)
