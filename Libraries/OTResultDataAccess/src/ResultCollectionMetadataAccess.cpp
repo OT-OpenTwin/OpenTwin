@@ -235,39 +235,6 @@ const MetadataQuantity* ResultCollectionMetadataAccess::findMetadataQuantity(ot:
 	}
 }
 
-std::list<MetadataQuantity*> ResultCollectionMetadataAccess::findQuantityWithSameName(const std::string& _name)
-{
-	std::list<MetadataQuantity*> matchingQuantities;
-	auto& quantitiesByLabel = m_metadataCampaign.getMetadataQuantitiesByLabel();
-	
-	for (auto quantityByLabel : quantitiesByLabel)
-	{
-		MetadataQuantity* quantity = 	quantityByLabel.second;
-		if (quantity->quantityName == _name)
-		{
-			matchingQuantities.push_back(quantity);
-		}
-	}
-
-	return matchingQuantities;
-}
-
-std::list<MetadataParameter*> ResultCollectionMetadataAccess::findParameterWithSameName(const std::string& _name)
-{
-	std::list<MetadataParameter*> matchingParameter;
-	auto& parametersByLabel = m_metadataCampaign.getMetadataParameterByLabel();
-
-	for (auto parameterByLabel : parametersByLabel)
-	{
-		MetadataParameter* parameter = parameterByLabel.second;
-		if (parameter->parameterName == _name)
-		{
-			matchingParameter.push_back(parameter);
-		}
-	}
-	return matchingParameter;
-}
-
 void ResultCollectionMetadataAccess::loadExistingCampaignData()
 {
 	std::vector<EntityBase*> allExistingMetadata = findAllExistingMetadata();

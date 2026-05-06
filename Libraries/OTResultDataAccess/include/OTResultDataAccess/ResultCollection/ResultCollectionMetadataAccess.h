@@ -61,9 +61,6 @@ public:
 	//! <returns>nullptr if not found</returns>
 	const MetadataQuantity* findMetadataQuantity(ot::UID _index) const; //Needs to look through the value descriptions!
 
-	std::list< MetadataQuantity*>findQuantityWithSameName(const std::string& _name);
-	std::list< MetadataParameter*>findParameterWithSameName(const std::string& _name);
-
 	MetadataCampaign& getMetadataCampaign() { return m_metadataCampaign; }
 
 	const std::string& getCollectionName() const { return m_collectionName; }

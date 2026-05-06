@@ -65,13 +65,17 @@ protected:
 
 	ResultImportLogger m_logger;
 
+	//! @brief  Here we are checking for a free parameter label. Also we assign the parameter UID.
+	//! @return List of parameter UIDs occuring in the dataset
 	ot::UIDList addCampaignContextDataToParameters(DatasetDescription& _dataDescription);
 	void addCampaignContextDataToQuantities(DatasetDescription& _dataDescription, ot::UIDList& _dependingParameter);
 	ot::UID createNewSeries(std::list< DatasetDescription>& _dataDescription, const std::string& _seriesName, const ot::JsonDocument& _seriesMetadata);
 	void addMetadataToSeries(std::list< DatasetDescription>& _dataDescription, MetadataSeries& _newSeries);
 
-	std::map<std::string, std::list<MetadataQuantity*>> m_quantitiesUpForStorageByName;
-	std::map<std::string, std::list<MetadataParameter*>> m_parameterUpForStorageByName;
+	std::map<std::string, MetadataQuantity*> m_quantitiesUpForStorageByLabel;
+	//Buffer throughout all dataset descriptions during the creation of a single series with multiple datasetDescription. 
+	// Important since the parameter by label overview is only updated by the campaign after the series was added.
+	std::map<std::string,MetadataParameter*> m_parameterUpForStorageByLabel;
 
 	virtual const uint64_t findNextFreeSeriesIndex();
 	virtual const uint64_t findNextFreeQuantityIndex();

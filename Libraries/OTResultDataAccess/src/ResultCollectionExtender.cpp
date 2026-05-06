@@ -54,8 +54,8 @@ ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescripti
 		addCampaignContextDataToQuantities(datasetDescription, parameterIDs);
 	}
 	const ot::UID newSeriesID = createNewSeries(_datasetDescriptions, _seriesName, _seriesMetadata);
-	m_quantitiesUpForStorageByName.clear();
-	m_parameterUpForStorageByName.clear();
+	m_quantitiesUpForStorageByLabel.clear();
+	m_parameterUpForStorageByLabel.clear();
 	return newSeriesID;
 }
 
@@ -172,84 +172,50 @@ ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(Dataset
 	ot::UIDList dependingParameterIDs;
 	auto& allParameterDescriptions = _dataDescription.getParameters();
 	assert(allParameterDescriptions.size() > 0);
+	const auto& parametersInCampaignByLabel =	getMetadataCampaign().getMetadataParameterByLabel();
 	for (auto& parameterDescription : allParameterDescriptions)
-	{
+	{		
 		MetadataParameter& newParameter = parameterDescription->getMetadataParameter();
-		//Parameter was not dealed with.
+		//Parameter was not dealt with. They are held within a shared_ptr and may occur in multiple dataDescriptions, so the second time they appear, they have an uid.
 		if (newParameter.parameterUID == 0)
 		{
-			const std::string parameterName = newParameter.parameterName;
-			std::list<MetadataParameter*> existingParameterInSeries = findParameterWithSameName(parameterName);
+			std::map<std::string, MetadataParameter*> parameterToConsiderByLabel = parametersInCampaignByLabel;
+			parameterToConsiderByLabel.merge(m_parameterUpForStorageByLabel);
 
-			//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
-			std::list<MetadataParameter*> existingParameters;
-			if (!existingParameterInSeries.empty())
+			// First we try the parameter name as label and see if such a parameter already exists
+			std::string parameterLabel = newParameter.parameterName;
+			auto existingParameterByLabel = parameterToConsiderByLabel.find(parameterLabel);
+			if(existingParameterByLabel != parameterToConsiderByLabel.end())
 			{
-				m_logger.log("Parameter name " + parameterName + " already exists in this campaign");
-			}
-			existingParameters.splice(existingParameters.end(), existingParameterInSeries);
-			auto parameterUpForStorageByName = m_parameterUpForStorageByName.find(parameterName);
-			if (parameterUpForStorageByName != m_parameterUpForStorageByName.end())
-			{
-				m_logger.log("Parameter name " + parameterName + " appears more then once in the dataset");
-				std::list<MetadataParameter*> existingParameterUpForStorage = parameterUpForStorageByName->second;
-				existingParameters.splice(existingParameters.end(), existingParameterUpForStorage);
-			}
-
-			//Parameter exists in the campaign.
-			if (existingParameters.size()>0)
-			{
-				MetadataParameter* identicalParameter = nullptr;
-				for (auto parameter : existingParameters)
+				// Now we check if the found parameter is identical with the new parameter
+				if (*existingParameterByLabel->second != newParameter)
 				{
-					if (newParameter == *parameter)
-					{
-						m_logger.log("Parameter " + parameterName + " is identical to an already existing parameter entry.");
-						identicalParameter = parameter;
-					}
-				}
-
-				if (identicalParameter == nullptr)
-				{
-					//Parameter have the same name, but are in fact different. We need to set a new label and ID
+					// Here we have a new parameter with the same label, so we search for a new, free label
 					int counter = 1;
-					bool newLabelFound = true;
-					std::string newParameterLabel = "";
-					do
+					while (existingParameterByLabel != parameterToConsiderByLabel.end())
 					{
-						newParameterLabel = newParameter.parameterName+ "_" + std::to_string(counter);
+						parameterLabel = newParameter.parameterName + "_" + std::to_string(counter);
 						counter++;
-						newLabelFound = true;
-						for (MetadataParameter* existingParameter: existingParameters)
-						{
-							if (existingParameter->parameterLabel == newParameterLabel)
-							{
-								newLabelFound = false;
-								break;
-							}
-						}
-
-					} while (!newLabelFound);
-					newParameter.parameterLabel = newParameterLabel;
-					m_logger.log("Parameter was given a new unique label: " + newParameterLabel);
+						existingParameterByLabel = parameterToConsiderByLabel.find(parameterLabel);
+					}
+					m_logger.log("Parameter " + newParameter.parameterName + " stored as new parameter with label: " + parameterLabel);
+					newParameter.parameterUID = findNextFreeParameterIndex(); // New parameter get a new UID
+					m_parameterUpForStorageByLabel[newParameter.parameterName] = (&newParameter);
 				}
 				else
 				{
-					//Parameter are identically
-					newParameter.parameterLabel = identicalParameter->parameterLabel;
-					newParameter.parameterUID = identicalParameter->parameterUID;
+					newParameter.parameterUID = existingParameterByLabel->second->parameterUID; // Here the parameter are identical. Thus we take the already existing UID
+					// Label ramains the name
 				}
 			}
 			else
 			{
-				newParameter.parameterLabel = newParameter.parameterName;
+				// Here we introduce a new parameter, whichs label is not in use yet
+				newParameter.parameterUID = findNextFreeParameterIndex(); // New parameter get a new UID
+				m_parameterUpForStorageByLabel[newParameter.parameterName] = (&newParameter);
+				// Label ramains the name
 			}
-			if (newParameter.parameterUID == 0)
-			{
-				m_logger.log("Parameter " + parameterName + " stored as new parameter with label: " + newParameter.parameterLabel);
-				newParameter.parameterUID = findNextFreeParameterIndex();
-				m_parameterUpForStorageByName[newParameter.parameterName].push_back(&newParameter);
-			}
+			newParameter.parameterLabel = parameterLabel; // This is either the newly found unique label or the name
 		}
 		
 		dependingParameterIDs.push_back(newParameter.parameterUID);
@@ -262,126 +228,46 @@ void ResultCollectionExtender::addCampaignContextDataToQuantities(DatasetDescrip
 	QuantityDescription* quantityDescription = _dataDescription.getQuantityDescription();
 	assert(quantityDescription != nullptr);
 	MetadataQuantity& newQuantity = quantityDescription->getMetadataQuantity();
-
-	std::string quantityName = newQuantity.quantityName;
-	std::list<MetadataQuantity*> existingQuantitiesInSeries = findQuantityWithSameName(quantityName);
 	
-	if (!existingQuantitiesInSeries.empty())
-	{
-		m_logger.log("Quantity name " + quantityName+ " already exists in this campaign");
-	}
-	//Since multiple dataset descriptions are considered, it may be that duplicates exists amongst them
-	std::list<MetadataQuantity*> existingQuantities;
-	existingQuantities.splice(existingQuantities.end(),existingQuantitiesInSeries);
-	auto quantityUpForStorageByName = m_quantitiesUpForStorageByName.find(quantityName);
-	if (quantityUpForStorageByName != m_quantitiesUpForStorageByName.end())
-	{
-		m_logger.log("Quantity name " + quantityName + " appears more then once in the dataset");
-		std::list<MetadataQuantity*> existingQuantityUpForStorage = quantityUpForStorageByName->second;
-		existingQuantities.splice(existingQuantities.end(), existingQuantityUpForStorage);
-	}
-		
-	if (existingQuantities.size() >0)
-	{
-		MetadataQuantity* identicalQuantity =  nullptr;
-		for (MetadataQuantity* existingQuantity : existingQuantities)
-		{
-			if (newQuantity == *existingQuantity)
-			{
-				m_logger.log("Quantity " + quantityName + " is identical to an already existing quantity entry.");
-				identicalQuantity = existingQuantity;
-			}
-		}
+	std::map<std::string,MetadataQuantity*> quantitiesToConsiderByLabel  =  getMetadataCampaign().getMetadataQuantitiesByLabel();
+	m_quantitiesUpForStorageByLabel.merge(m_quantitiesUpForStorageByLabel);
 
-		if (identicalQuantity != nullptr)
+	std::string quantityLabel = newQuantity.quantityName;
+	auto existingQuantityByLabel = quantitiesToConsiderByLabel.find(quantityLabel);
+	if (existingQuantityByLabel != quantitiesToConsiderByLabel.end())
+	{
+		// Now we check if the found quantity is identical with the new quantity
+		if (*existingQuantityByLabel->second != newQuantity)
 		{
-			//Quantity exists already by name in campaign and is in fact identically with the existing one.
-			newQuantity.quantityLabel =  identicalQuantity->quantityLabel;
-			newQuantity.quantityIndex=  identicalQuantity->quantityIndex;
-			newQuantity.m_tupleDescription =identicalQuantity->m_tupleDescription;
-			newQuantity.dataDimensions = identicalQuantity->dataDimensions;
-			
+			// Here we have a new quantity with the same label, so we search for a new, free label
+			int counter = 1;
+			while (existingQuantityByLabel != quantitiesToConsiderByLabel.end())
+			{
+				quantityLabel = newQuantity.quantityName+ "_" + std::to_string(counter);
+				counter++;
+				existingQuantityByLabel = quantitiesToConsiderByLabel.find(quantityLabel);
+			}
+			m_logger.log("Quantity " + newQuantity.quantityName+ " stored as new quantity with label: " + quantityLabel);
+			newQuantity.quantityIndex = findNextFreeParameterIndex(); // New quantity get a new UID
+			m_quantitiesUpForStorageByLabel[newQuantity.quantityName] = (&newQuantity);
 		}
 		else
 		{
-			//Quantities have the same name, but are in fact different. We need to set a new label and ID
-			int counter = 1;
-			bool newLabelFound = true;
-			std::string newQuantityLabel = "";
-			do
-			{
-				newQuantityLabel = newQuantity.quantityName + "_" + std::to_string(counter);
-				counter++;
-				newLabelFound = true;
-				for (MetadataQuantity* existingQuantity : existingQuantities)
-				{
-					if (existingQuantity->quantityLabel == newQuantityLabel)
-					{
-						newLabelFound = false;
-						break;
-					}
-				}
-
-			} while (!newLabelFound);
-			newQuantity.quantityLabel = newQuantityLabel;
-			m_logger.log("Quantity was given a new unique label: " + newQuantityLabel);
-			//Discarded aproach, which copies the shared value descriptions
-			// ot::UID newQuantityIndex = 0;
-			////First possible difference: The quantities are the same, except of a difference in the value descriptions:
-			////We need to figure out which of the value descriptions is different or newly added.
-			////for (auto& newValueDescription : quantity.valueDescriptions)
-			////{
-			////	Check if this valuedescription is the same in both quanities and 
-			////	for (auto& existingValueDescription : existingQuantity->valueDescriptions)
-			////	{
-			////		if (newValueDescription == existingValueDescription)
-			////		{
-			////			newValueDescription.quantityIndex = existingValueDescription.quantityIndex;
-			////			newValueDescription.quantityValueLabel = existingValueDescription.quantityValueLabel;
-			////			break;
-			////		}
-			////	}
-			////	
-			////	This value description is indeed new
-			////	if (newValueDescription.quantityIndex == 0)
-			////	{
-			////		newValueDescription.quantityIndex = findNextFreeQuantityIndex();
-			////		The first new value description ID is also used for the quantity.
-			////		if (newQuantityIndex == 0)
-			////		{
-			////			newQuantityIndex = newValueDescription.quantityIndex;
-			////		}
-			////		newValueDescription.quantityValueLabel = newValueDescription.quantityValueName;
-			////	}
-			////}
-
-			////Second possible difference: The quantities differ in the data dimensionality
-			////if (newQuantityIndex == 0)
-			////{
-			////	newQuantityIndex = findNextFreeQuantityIndex();
-			////}
-			////quantity.quantityIndex = newQuantityIndex;
+			newQuantity.quantityIndex= existingQuantityByLabel->second->quantityIndex; // Here the quantities are identical. Thus we take the already existing UID
+			newQuantity.quantityLabel = existingQuantityByLabel->second->quantityLabel;
+			newQuantity.m_tupleDescription = existingQuantityByLabel->second->m_tupleDescription;
+			newQuantity.dataDimensions = existingQuantityByLabel->second->dataDimensions;
+			// Label ramains the name
 		}
 	}
 	else
 	{
-		newQuantity.quantityLabel = newQuantity.quantityName;
+		newQuantity.quantityIndex = findNextFreeParameterIndex(); // New quantity get a new UID
+		m_quantitiesUpForStorageByLabel[newQuantity.quantityName] = (&newQuantity);
 	}
-	
+	newQuantity.quantityLabel= quantityLabel; // This is either the newly found unique label or the name
 	newQuantity.dependingParameterIds = std::vector<ot::UID>(_dependingParameterIDs.begin(), _dependingParameterIDs.end());
 	m_logger.log("Quantity depends on " + std::to_string(_dependingParameterIDs.size()) + " parameter.");
-	if (newQuantity.quantityIndex == 0)
-	{
-		newQuantity.quantityIndex = findNextFreeQuantityIndex();
-	}
-
-	//The quantity shall only be stored if the quantity was not stored for this series yet.
-	quantityUpForStorageByName = m_quantitiesUpForStorageByName.find(quantityName);
-	if (quantityUpForStorageByName == m_quantitiesUpForStorageByName.end())
-	{
-		m_logger.log("Quantity " + newQuantity.quantityName + " is stored as new quantity.");
-		m_quantitiesUpForStorageByName[newQuantity.quantityName].push_back(&newQuantity);
-	}
 }
 
 ot::UID ResultCollectionExtender::createNewSeries(std::list<DatasetDescription>& _dataDescription, const std::string& _seriesName, const ot::JsonDocument& _seriesMetadata)
