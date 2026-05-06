@@ -225,7 +225,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 
 		try
 		{
-			filterHasChanged(&filter);
+			filterHasChanged(m_filterState);
 		}
 		catch (const std::exception& ex)
 		{
@@ -236,9 +236,9 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 	}
 }
 
-void ot::HeaderBase::filterHasChanged(const HeaderFilter* _filter)
+void ot::HeaderBase::filterHasChanged(const HeaderFilterState& _filterState)
 {
-	Q_EMIT filterChanged(_filter);
+	Q_EMIT filterChanged(_filterState);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

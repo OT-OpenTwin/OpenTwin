@@ -37,6 +37,8 @@ namespace ot {
 
 		void setDefaultHeaderFlags();
 
+		const HeaderFilterState& getFilterState() const { return m_filterState; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected: Events
@@ -67,10 +69,10 @@ namespace ot {
 
 		//! @brief Is called when the user confirms the filter menu.
 		//! @param _filter The filter menu that was confirmed.
-		virtual void filterHasChanged(const HeaderFilter* _filter);
+		virtual void filterHasChanged(const HeaderFilterState& _filterState);
 
 	Q_SIGNALS:
-		void filterChanged(const HeaderFilter* _filter);
+		void filterChanged(const HeaderFilterState& _filterState);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

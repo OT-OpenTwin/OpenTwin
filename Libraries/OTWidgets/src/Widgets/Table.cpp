@@ -420,14 +420,14 @@ void ot::Table::slotResizeRowToContent(int _row) {
 	}
 }
 
-void ot::Table::slotColumnFilterChanged(const HeaderFilter* _filter)
+void ot::Table::slotColumnFilterChanged(const HeaderFilterState& _filterState)
 {
-	Q_EMIT columnFilterChanged(_filter);
+	Q_EMIT columnFilterChanged(_filterState);
 }
 
-void ot::Table::slotRowFilterChanged(const HeaderFilter* _filter)
+void ot::Table::slotRowFilterChanged(const HeaderFilterState& _filterState)
 {
-	Q_EMIT rowFilterChanged(_filter);
+	Q_EMIT rowFilterChanged(_filterState);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

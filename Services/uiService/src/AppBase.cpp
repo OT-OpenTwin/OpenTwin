@@ -78,7 +78,7 @@
 #include "OTWidgets/Dialog/CreateProjectDialog.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
 #include "OTWidgets/Dialog/MessageBoxManager.h"
-#include "OTWidgets/Header/HeaderFilter.h"
+#include "OTWidgets/Header/HeaderFilterState.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Style/StyledTextConverter.h"
@@ -2924,7 +2924,7 @@ void AppBase::slotTableSaveRequested() {
 	}
 }
 
-void AppBase::slotTableColumnFilterChanged(const ot::HeaderFilter* _filter)
+void AppBase::slotTableColumnFilterChanged(const ot::HeaderFilterState& _filterState)
 {
 	ot::Table* table = dynamic_cast<ot::Table*>(sender());
 	if (table == nullptr)
@@ -2944,27 +2944,31 @@ void AppBase::slotTableColumnFilterChanged(const ot::HeaderFilter* _filter)
 	ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
 	ot::TableFilterChangeEvent eventData(view->getViewData());
 
-	// Get header item to determine column name
-	auto headerItem = table->horizontalHeaderItem(_filter->getLogicalIndex());
-	if (!headerItem)
-	{
-		OT_LOG_E("Failed to get header item for filter change event");
-		return;
-	}
-
-	std::string columnName = headerItem->text().toStdString();
-
-	// Create filter descriptions for all selected options
 	std::list<ot::ValueComparisonDescription> filterDescriptions;
-	QStringList selectedOptions = _filter->saveCheckedState();
-	for (const auto& opt : selectedOptions)
+	for (const auto& [logicalIndex, options] : _filterState.getActiveFilters())
 	{
-		ot::ValueComparisonDescription desc;
-		desc.setName(columnName);
-		desc.setComparator("=");
-		desc.setValue(opt.toStdString());
-		filterDescriptions.push_back(std::move(desc));
+		// Get header item to determine column name
+		auto headerItem = table->horizontalHeaderItem(logicalIndex);
+		if (!headerItem)
+		{
+			OT_LOG_E("Failed to get header item for filter change event");
+			return;
+		}
+
+		std::string columnName = headerItem->text().toStdString();
+
+		// Create filter descriptions for all selected options
+		QStringList selectedOptions = options;
+		for (const auto& opt : selectedOptions)
+		{
+			ot::ValueComparisonDescription desc;
+			desc.setName(columnName);
+			desc.setComparator("=");
+			desc.setValue(opt.toStdString());
+			filterDescriptions.push_back(std::move(desc));
+		}
 	}
+
 	eventData.setFilterDescriptions(std::move(filterDescriptions));
 
 	// Notify

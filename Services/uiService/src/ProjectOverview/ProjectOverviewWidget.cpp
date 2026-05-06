@@ -237,14 +237,14 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 
 	std::list<ot::ProjectInformation> projects;
 	m_resultsExceeded = false;
-	projectManager.findProjects(m_currentFilter, m_basicFilter->text().toStdString(), ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
+	projectManager.findProjects(m_header->getProjectFilterData(), m_basicFilter->text().toStdString(), ProjectManagement::defaultMaxProjects(), projects, m_resultsExceeded);
 	setProjects(projects);
 }
 
 void ot::ProjectOverviewWidget::updateFilterOptions() {
 	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
 	ProjectFilterData data = projectManager.getProjectFilterData();
-	m_header->setFilterData(std::move(data));
+	m_header->setProjectFilterData(std::move(data));
 }
 
 void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder) {
@@ -255,12 +255,8 @@ void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder
 	}
 }
 
-void ot::ProjectOverviewWidget::filterProjects(const ProjectOverviewFilterData& _filterData) {
-	if (_filterData.getLogicalIndex() >= 0) {
-		m_currentFilter = _filterData.toProjectFilterData();
-
-		refreshProjects();
-	}
+void ot::ProjectOverviewWidget::filterProjects() {
+	refreshProjects();
 }
 
 QString ot::ProjectOverviewWidget::getCurrentQuickFilter() const {

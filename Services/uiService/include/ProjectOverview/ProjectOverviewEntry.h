@@ -20,7 +20,6 @@
 #pragma once
 
 // OpenTwin header
-#include "ProjectOverview/ProjectOverviewFilterData.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTWidgets/Widgets/TreeWidgetItem.h"
 

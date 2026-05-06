@@ -105,7 +105,6 @@ namespace ot { class TableView; }
 namespace ot { class WidgetView; }
 namespace ot { class PlotDataset; }
 namespace ot { class GraphicsItem; }
-namespace ot { class HeaderFilter; }
 namespace ot { class GraphicsPicker; }
 namespace ot { class TextEditorView; }
 namespace ot { class GraphicsItemCfg; }
@@ -113,6 +112,7 @@ namespace ot { class PlotManagerView; }
 namespace ot { class GraphicsViewView; }
 namespace ot { class PropertyGridView; }
 namespace ot { class PropertyGridItem; }
+namespace ot { class HeaderFilterState; }
 namespace ot { class PlainTextEditView; }
 namespace ot { class GraphicsPickerView; }
 namespace ot { class NavigationTreeView; }
@@ -566,7 +566,7 @@ public Q_SLOTS:
 	// Table slots
 
 	void slotTableSaveRequested();
-	void slotTableColumnFilterChanged(const ot::HeaderFilter* _filter);
+	void slotTableColumnFilterChanged(const ot::HeaderFilterState& _filterState);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

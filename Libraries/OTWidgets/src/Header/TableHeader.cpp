@@ -111,12 +111,9 @@ void ot::TableHeader::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _s
 	}
 }
 
-void ot::TableHeader::filterHasChanged(const HeaderFilter* _filter)
+void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 {
-	const QStringList selectedOptions = _filter->saveCheckedState();
-	const int logicalIndex = _filter->getLogicalIndex();
-
-	if (selectedOptions.isEmpty())
+	if (!_filterState.hasActiveFilter())
 	{
 		if (orientation() == Qt::Horizontal)
 		{
@@ -135,12 +132,23 @@ void ot::TableHeader::filterHasChanged(const HeaderFilter* _filter)
 	}
 	else
 	{
+		auto filterData = _filterState.getActiveFilters();
+
 		if (orientation() == Qt::Horizontal)
 		{
 			for (int r = 0; r < m_table->rowCount(); r++)
 			{
-				QVariant data = m_table->model()->data(m_table->model()->index(r, logicalIndex));
-				bool match = data.isValid() && selectedOptions.contains(data.toString());
+				bool match = true;
+				for (const auto& [logicalIndex, selectedOptions] : filterData)
+				{
+					QVariant data = m_table->model()->data(m_table->model()->index(r, logicalIndex));
+					if (!data.isValid() || !selectedOptions.contains(data.toString()))
+					{
+						match = false;
+						break;
+					}
+				}
+
 				m_table->setRowHidden(r, !match);
 			}
 		}
@@ -148,14 +156,23 @@ void ot::TableHeader::filterHasChanged(const HeaderFilter* _filter)
 		{
 			for (int c = 0; c < m_table->columnCount(); c++)
 			{
-				QVariant data = m_table->model()->data(m_table->model()->index(logicalIndex, c));
-				bool match = data.isValid() && selectedOptions.contains(data.toString());
+				bool match = true;
+				for (const auto& [logicalIndex, selectedOptions] : filterData)
+				{
+					QVariant data = m_table->model()->data(m_table->model()->index(logicalIndex, c));
+					if (!data.isValid() || !selectedOptions.contains(data.toString()))
+					{
+						match = false;
+						break;
+					}
+				}
+
 				m_table->setColumnHidden(c, !match);
 			}
 		}
 	}
 
-	HeaderBase::filterHasChanged(_filter);
+	HeaderBase::filterHasChanged(_filterState);
 }
 
 QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const

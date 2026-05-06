@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "ProjectOverview/ProjectOverviewFilterData.h"
+#include "OTCore/ProjectFilterData.h"
 #include "OTWidgets/Header/HeaderBase.h"
 
 // std header
@@ -52,7 +52,9 @@ namespace ot {
 		explicit ProjectOverviewHeader(ProjectOverviewWidget* _overview, QWidget* _parent);
 		virtual ~ProjectOverviewHeader();
 
-		void setFilterData(const ProjectFilterData& _filterData);
+		void setProjectFilterData(const ProjectFilterData& _filterData);
+
+		ProjectFilterData getProjectFilterData() const;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -64,15 +66,16 @@ namespace ot {
 		virtual QStringList getFilterOptions(int _logicalIndex) const override;
 
 		virtual void sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _sortOrder) override;
-		virtual void filterHasChanged(const ot::HeaderFilter* _filter) override;
+		virtual void filterHasChanged(const ot::HeaderFilterState& _filterState) override;
+
+		static QString getEmptyProjectGroupFilterName() { return "< No Group >"; };
+		static QString getEmptyUserGroupFilterName() { return "< No Groups >"; };
+		static QString getEmptyTagsFilterName() { return "< No Tags >"; };
 
 	private:
 		ProjectOverviewWidget* m_overview;
 
-		std::map<int, QStringList> m_filterOptions;
-		ProjectOverviewFilterData m_lastFilter;
-
-		
+		std::map<int, QStringList> m_filterOptions;		
 	};
 
 }

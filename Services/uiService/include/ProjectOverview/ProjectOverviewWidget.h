@@ -20,7 +20,6 @@
 #pragma once
 
 // OpenTwin header
-#include "ProjectOverview/ProjectOverviewFilterData.h"
 #include "OTCore/ProjectFilterData.h"
 #include "OTCore/ProjectInformation.h"
 #include "OTGui/ExtendedProjectInformation.h"
@@ -90,7 +89,7 @@ namespace ot {
 		std::list<ProjectInformation> getAllProjects() const;
 		std::list<ProjectInformation> getSelectedProjects() const;
 
-		void filterProjects(const ProjectOverviewFilterData& _filterData);
+		void filterProjects();
 
 		QString getCurrentQuickFilter() const;
 
@@ -147,8 +146,6 @@ namespace ot {
 		std::unique_ptr<std::thread> m_loadingThread;
 		ProjectInformation m_currentlyLoadingProject;
 		ExtendedProjectInformation m_importedProjectData;
-
-		ot::ProjectFilterData m_currentFilter;
 
 		std::map<std::string, TreeWidgetItem*> m_projectGroupItems;
 

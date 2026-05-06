@@ -23,6 +23,8 @@ namespace ot {
 		HeaderFilterState() = default;
 		virtual ~HeaderFilterState() = default;
 
+		void clear();
+
 		inline void setHoveredIndex(int _index) { m_hoveredFilter = _index; };
 		inline int getHoveredIndex() const { return m_hoveredFilter; };
 
@@ -31,9 +33,10 @@ namespace ot {
 
 		void setFilter(int _index, const QStringList& _filters) { m_selectedFilters.insert_or_assign(_index, _filters); };
 		QStringList getFilter(int _index) const;
+		std::map<int, QStringList> getActiveFilters() const;
 
+		bool hasActiveFilter() const;
 		bool isFilterActive(int _index) const;
-		std::list<int> getActiveFilters() const;
 
 	private:
 		int m_hoveredFilter = -1;
