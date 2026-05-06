@@ -78,6 +78,12 @@ void MetadataCampaign::updateMetadataOverview()
 	{
 		updateMetadataOverview(seriesMetadata);
 	}
+
+	for (auto& entry : m_parameterOverviewByUID)
+	{
+		entry.second.values.sort();
+		entry.second.values.unique();
+	}
 }
 
 void MetadataCampaign::updateMetadataOverviewFromLastAddedSeries()
@@ -88,8 +94,8 @@ void MetadataCampaign::updateMetadataOverviewFromLastAddedSeries()
 void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 {
 	//First we are adding the parameter of the series to the parameter overview of the entire campaign
-	auto allParameter = seriesMetadata.getParameter();
-	for (auto& parameter : allParameter)
+	const auto& allParameter = seriesMetadata.getParameter();
+	for (const auto& parameter : allParameter)
 	{
 		auto existingParameterEntry = m_parameterOverviewByUID.find(parameter.parameterUID);
 		if (existingParameterEntry == m_parameterOverviewByUID.end())
@@ -101,11 +107,10 @@ void MetadataCampaign::updateMetadataOverview(MetadataSeries& seriesMetadata)
 		{
 			//If the parameter was already added, we extend the list of possible values
 			std::list<ot::Variable>& values = existingParameterEntry->second.values;
-			values.splice(values.begin(), parameter.values);
-			values.sort();
+			values.insert(values.begin(), parameter.values.begin(), parameter.values.end());
 		}
 	}
-	
+
 	const std::list<MetadataQuantity>& allQuantities = seriesMetadata.getQuantities();
 	auto& temp = const_cast<std::list<MetadataQuantity>&>(allQuantities);
 	for (MetadataQuantity& quantity : temp)

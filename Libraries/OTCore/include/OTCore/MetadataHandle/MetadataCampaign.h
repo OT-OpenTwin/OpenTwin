@@ -43,7 +43,7 @@ public:
 	void swap(MetadataCampaign& _a, MetadataCampaign& _b);
 	~MetadataCampaign() {};
 	
-	void addSeriesMetadata(MetadataSeries&& seriesMetadata) { m_seriesMetadata.push_back(seriesMetadata); }
+	void addSeriesMetadata(MetadataSeries&& seriesMetadata) { m_seriesMetadata.push_back(std::move(seriesMetadata)); }
 	const std::list<MetadataSeries>& getSeriesMetadata() const { return m_seriesMetadata; };
 
 	void setCampaignName(const std::string _name) { m_campaignName = _name; }
@@ -79,7 +79,7 @@ private:
 	std::string m_campaignName;
 	
 	ot::JsonDocument m_metaData;
-
+	
 	void updateMetadataOverview(MetadataSeries& _series);
 
 	std::map<std::string, MetadataParameter*> extractParameter();
