@@ -84,6 +84,7 @@ void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _st
 
 		bsoncxx::document::value subdoc = bsoncxx::builder::basic::make_document(
 			kvp("label", param.parameterLabel),
+			kvp("type", param.typeName),
 			kvp("name", param.parameterName),
 			kvp("uid", static_cast<int64_t>(param.parameterUID)),
 			kvp("unit", param.unit),
@@ -117,6 +118,7 @@ void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _st
 		for (const auto& dimension : quantity.dataDimensions) {
 			dimensions.append(static_cast<int32_t>(dimension));
 		}
+		
 		bsoncxx::document::value subdoc = bsoncxx::builder::basic::make_document(
 			kvp("label", quantity.quantityLabel),
 			kvp("name", quantity.quantityName),
@@ -171,7 +173,8 @@ void EntityMetadataSeries::readSpecificDataFromDataBase(const bsoncxx::document:
 		param.parameterName = std::string(paramDoc["name"].get_string().value);
 		param.parameterUID = static_cast<uint64_t>(paramDoc["uid"].get_int64().value);
 		param.unit = std::string(paramDoc["unit"].get_string().value);
-
+		param.typeName = std::string(paramDoc["type"].get_string().value);
+		
 		BSONToVariableConverter converter;
 		for (const auto& valElem : paramDoc["values"].get_array().value)
 		{
