@@ -85,6 +85,13 @@ bool EntityResult1DPlot::updateFromProperties()
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName())->needsUpdate();
+
+	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
+	{
+		const std::string group = m_propertyGroupSecondaryParameter + " " + std::to_string(i);
+		requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, m_propertyNameSecondaryParameter, group)->needsUpdate();
+	}
+
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setVisualisationType(OT_ACTION_CMD_VIEW1D_Setup);
 	visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
@@ -93,6 +100,9 @@ bool EntityResult1DPlot::updateFromProperties()
 	
 	bool gridRefresh = updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
+
+
+
 
 	return gridRefresh;
 }
@@ -243,7 +253,8 @@ void EntityResult1DPlot::createProperties()
 	EntityPropertiesSelection::createProperty(getXAxisPropertyGroupName(), "Parameter", {}, "", "default", getProperties());
 	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
 	{
-		EntityPropertiesSelection::createProperty(m_propertyGroupSecondaryParameter + " " + std::to_string(i),m_propertyNameSecondaryParameter, {}, "", "default", getProperties());
+		EntityPropertiesSelection* selection = EntityPropertiesSelection::createProperty(m_propertyGroupSecondaryParameter + " " + std::to_string(i),m_propertyNameSecondaryParameter, {}, "", "default", getProperties());
+		selection->setGroupChanges(true);
 	}
 	EntityPropertiesSelection* quYAxis =	EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
 	quYAxis->setVisible(false);
