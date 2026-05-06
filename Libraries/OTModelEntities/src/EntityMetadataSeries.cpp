@@ -157,9 +157,7 @@ void EntityMetadataSeries::readSpecificDataFromDataBase(const bsoncxx::document:
 	const std::string name = std::string(doc_view["SeriesName"].get_string().value);
 	MetadataSeries series(name);
 
-	auto label = ot::EntityName::getSubName(getName());
-	assert(label.has_value());
-	series.setLabel(label.value());
+	series.setLabel(getName());
 	series.setIndex(static_cast<uint64_t>(doc_view["SeriesIndex"].get_int64().value));
 	m_series = series;
 
