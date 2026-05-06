@@ -102,13 +102,13 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		{
 			_collectionName = Application::instance()->getCollectionName();
 			ot::UIDList entityIDs = model->getIDsOfFolderItems(ot::FolderNames::DatasetFolder, true);
-			auto loadingEnt = std::chrono::high_resolution_clock::now();
-			model->prefetchDocumentsFromStorage(entityIDs);
+			Model* model =	Application::instance()->getModel();
+			
 			auto entLoaded = std::chrono::high_resolution_clock::now();
 
 			for (ot::UID entityID : entityIDs)
 			{
-				EntityBase* baseEnt = model->readEntityFromEntityID(nullptr, entityID, model->getAllEntitiesByUID());
+				EntityBase* baseEnt = model->getEntityByID(entityID);
 				
 				assert(baseEnt != nullptr);
 				if (baseEnt->getClassName() == classNameSeries)
@@ -123,9 +123,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 				}
 			}
 			auto filtered = std::chrono::high_resolution_clock::now();
-			uint64_t loadingTime = std::chrono::duration_cast<std::chrono::milliseconds>(entLoaded-loadingEnt).count();
 			uint64_t filteredTime = std::chrono::duration_cast<std::chrono::milliseconds>(filtered - entLoaded).count();
-			timings["LoadingEnt"] = loadingTime;
 			timings["FilterTime"] = filteredTime;
 
 		}
