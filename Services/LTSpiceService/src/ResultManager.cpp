@@ -27,7 +27,6 @@
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataParameter.h"
 
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"

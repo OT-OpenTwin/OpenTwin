@@ -18,10 +18,10 @@
 // @otlicense-end
 
 #pragma once
-#include "OTModelEntities/EntityWithDynamicFields.h"
+#include "OTModelEntities/EntityBase.h"
 #include "OTCore/JSON/JSON.h"
 
-class __declspec(dllexport) EntityMetadataSeries : public EntityWithDynamicFields
+class __declspec(dllexport) EntityMetadataSeries : public EntityBase
 {
 public:
 	EntityMetadataSeries() : EntityMetadataSeries(0, nullptr, nullptr, nullptr) {};
@@ -32,21 +32,18 @@ public:
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
 	
-	std::vector<std::string> getAllParameterDocumentNames();
-	std::vector<std::string> getAllQuantityDocumentNames();
-	const std::string getParameterDocumentName() const { return _parameterDocument; }
-	const std::string getQuantityDocumentName() const { return _quantityDocument; }
+	virtual void addVisualizationNodes() override;
 
-	void InsertToParameterField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "");
-	void InsertToQuantityField(std::string fieldName, std::list<ot::Variable>&& values, std::string documentName = "");
-
-	void setMetadata(const ot::JsonDocument& _metadata);
-	ot::JsonDocument& getMetadata() { return m_metadata; };
+	void setSeries(const MetadataSeries& _series) 
+	{ 
+		m_series = _series; 
+		setModified();
+	};
+	MetadataSeries& getSeries() { return m_series; };
+	
 private:
-	const std::string _parameterDocument = "Parameter";
-	const std::string _quantityDocument = "Quantity";
-	ot::JsonDocument m_metadata;
-
+	MetadataSeries m_series;
+	
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

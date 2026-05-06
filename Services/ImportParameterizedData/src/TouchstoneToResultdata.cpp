@@ -28,7 +28,7 @@
 
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+
 #include "OTResultDataAccess/SerialisationInterfaces/ParameterDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"

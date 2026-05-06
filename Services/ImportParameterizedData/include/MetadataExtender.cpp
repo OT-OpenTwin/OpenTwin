@@ -62,9 +62,11 @@ void MetadataExtender::extendWithJsonFile()
 			{
 				currentSeriesName = series->getName();
 				ot::JsonDocument individualMetadata;
-				individualMetadata.CopyFrom(series->getMetadata(), individualMetadata.GetAllocator());
+				MetadataSeries& seriesMD =	series->getSeries();
+				individualMetadata.CopyFrom(seriesMD.getMetadata(), individualMetadata.GetAllocator());
 				ot::json::mergeObjects(individualMetadata, newMetadata, individualMetadata.GetAllocator());
-				series->setMetadata(individualMetadata);
+				seriesMD.setMetadata(individualMetadata);
+				series->setSeries(seriesMD);
 			}
 		}
 		catch (std::exception& _e)

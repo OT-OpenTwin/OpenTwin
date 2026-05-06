@@ -23,6 +23,55 @@
 // std header
 #include <cassert>
 
+MetadataCampaign::MetadataCampaign(const MetadataCampaign& _other)
+	:m_seriesMetadata(_other.m_seriesMetadata),
+	m_quantityOverviewByUID(_other.m_quantityOverviewByUID),
+	m_parameterOverviewByUID(_other.m_parameterOverviewByUID)
+{ 
+
+	for (auto& entry : m_quantityOverviewByUID)
+	{
+		m_quantityOverviewByLabel[entry.second.quantityLabel] = &(entry.second);
+	}
+	
+	for (auto& entry : m_parameterOverviewByUID)
+	{
+		m_parameterOverviewByLabel[entry.second.parameterLabel] = &(entry.second);
+	}
+
+	m_metaData.CopyFrom(_other.m_metaData, m_metaData.GetAllocator());
+}	 
+
+MetadataCampaign& MetadataCampaign::operator=(const MetadataCampaign& _other)
+{
+	MetadataCampaign temp(_other);
+	swap(*this, temp);
+	return *this;
+}
+
+MetadataCampaign::MetadataCampaign(MetadataCampaign&& _other) noexcept
+{
+	swap(*this, _other);
+}
+
+MetadataCampaign& MetadataCampaign::operator=(MetadataCampaign&& _other) noexcept
+{
+	MetadataCampaign temp;
+	swap(*this, _other);
+	return *this;
+}
+
+void MetadataCampaign::swap(MetadataCampaign& _a, MetadataCampaign& _b)
+{
+	std::swap(_a.m_seriesMetadata,_b.m_seriesMetadata);
+	std::swap(_a.m_quantityOverviewByUID,_b.m_quantityOverviewByUID);
+	std::swap(_a.m_parameterOverviewByUID,_b.m_parameterOverviewByUID);
+	std::swap(_a.m_quantityOverviewByLabel,_b.m_quantityOverviewByLabel);
+	std::swap(_a.m_parameterOverviewByLabel,_b.m_parameterOverviewByLabel);
+	std::swap(_a.m_campaignName,_b.m_campaignName);
+	m_metaData.Swap(_b.m_metaData);
+}
+
 void MetadataCampaign::updateMetadataOverview()
 {
 	for (auto& seriesMetadata : m_seriesMetadata)
@@ -152,7 +201,6 @@ void MetadataCampaign::reset()
 	m_seriesMetadata.clear();
 	m_quantityOverviewByLabel.clear();
 	m_parameterOverviewByLabel.clear();
-	m_metaData.clear();
 }
 
 void MetadataCampaign::setFromJsonObject(const ot::ConstJsonObject& _object)

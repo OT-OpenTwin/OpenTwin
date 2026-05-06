@@ -19,9 +19,6 @@
 
 #include "FixtureResultCollectionExtender.h"
 
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
-#include "OTCore/MetadataEntry/MetadataEntryArray.h"
-
 void FixtureResultCollectionExtender::initiateCampaignWithOneSeries()
 {
 	MetadataSeries seriesMetadata("seriesOne");
@@ -63,7 +60,7 @@ MetadataParameter FixtureResultCollectionExtender::createFrequency()
 	parameter.unit = "Hz";
 	parameter.values = { 1.0,1.5,2.0,2.5 };
 	parameter.typeName = ot::TypeNames::getDoubleTypeName();
-	parameter.metaData["Meta"] = std::make_shared<MetadataEntrySingle>("Meta",ot::Variable(13));
+	
 	return parameter;
 }
 
@@ -75,7 +72,7 @@ MetadataQuantity FixtureResultCollectionExtender::createPower()
 	quantity.quantityIndex = 1;
 	quantity.dataDimensions = { 1 };
 	quantity.dependingParameterIds = { 1 };
-	quantity.metaData["Meta"] = std::make_shared<MetadataEntrySingle>("Meta", ot::Variable(13));
+	
 
 
 
@@ -107,6 +104,6 @@ MetadataParameter FixtureResultCollectionExtender::createRadius()
 	parameter.unit = "cm";
 	parameter.values = { 4.0 };
 	parameter.typeName = ot::TypeNames::getDoubleTypeName();
-	parameter.metaData["Meta"] = std::make_shared<MetadataEntrySingle>("Meta", ot::Variable(13));
+	
 	return parameter;
 }

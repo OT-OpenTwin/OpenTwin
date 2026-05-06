@@ -616,6 +616,8 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 			worker.detach();
 		}
 	}
+
+	
 }
 
 void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner)

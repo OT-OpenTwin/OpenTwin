@@ -53,9 +53,6 @@
     <ClCompile Include="src\BlockEntityHandler.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\MeasurementCampaignHandler.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="src\Graph.cpp">
       <Filter>Source Files\GraphHandling</Filter>
     </ClCompile>
@@ -116,9 +113,6 @@
       <Filter>Header Files\BlockFunctionality</Filter>
     </ClInclude>
     <ClInclude Include="include\BlockEntityHandler.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="include\MeasurementCampaignHandler.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\Graph.h">

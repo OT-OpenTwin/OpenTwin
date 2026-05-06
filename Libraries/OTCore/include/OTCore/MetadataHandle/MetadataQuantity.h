@@ -21,7 +21,6 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
-#include "OTCore/MetadataEntry/MetadataEntry.h"
 
 #include "OTCore/Tuple/TupleDescription.h"
 #include "OTCore/Tuple/TupleInstance.h"
@@ -39,6 +38,13 @@
 class OT_CORE_API_EXPORT MetadataQuantity : public ot::Serializable
 {
 public:
+	MetadataQuantity() = default;
+	MetadataQuantity(const MetadataQuantity& _other);
+	MetadataQuantity& operator=(const MetadataQuantity& _other);
+	MetadataQuantity(MetadataQuantity&& _other) noexcept;
+	MetadataQuantity& operator=(MetadataQuantity&& _other) noexcept;
+	void swap(MetadataQuantity& _a, MetadataQuantity& _b);
+
 	std::string quantityName = "";
 
 	/****************** Is set by the campaign handling class *********************/
@@ -59,36 +65,13 @@ public:
 	
 	ot::TupleInstance m_tupleDescription;
 
-	std::map < std::string, std::shared_ptr<MetadataEntry>> metaData;
+	ot::JsonDocument metaData;
 
 	/*************************** Quantity Container Database field key ***************************************/
 	static const std::string getFieldName() { return "Quantity"; }
 	/********************************************************************************************************/
 	
-	MetadataQuantity& operator=(const MetadataQuantity& _other)
-	{
-		this->quantityIndex = _other.quantityIndex;
-		this->quantityName = _other.quantityName;
-		this->quantityLabel = _other.quantityLabel;
-		this->dataDimensions = _other.dataDimensions;
-		this->dependingParameterLabels = _other.dependingParameterLabels;
-		this->dependingParameterIds = _other.dependingParameterIds;
-		m_tupleDescription = _other.m_tupleDescription;
-		this->metaData = _other.metaData;
-		return *this;
-	}
 
-	MetadataQuantity(const MetadataQuantity& _other)
-		: quantityName(_other.quantityName), 
-		quantityIndex(_other.quantityIndex), 
-		quantityLabel(_other.quantityLabel), 
-		dataDimensions(_other.dataDimensions), 
-		dependingParameterIds(_other.dependingParameterIds), 
-		dependingParameterLabels(_other.dependingParameterLabels), 
-		metaData(_other.metaData),
-		m_tupleDescription(_other.m_tupleDescription)
-	{}
-	MetadataQuantity() = default;
 	
 	const bool operator==(const MetadataQuantity& _other) const
 	{
@@ -106,4 +89,6 @@ public:
 
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+private:
 };

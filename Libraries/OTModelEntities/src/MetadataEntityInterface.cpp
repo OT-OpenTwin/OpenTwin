@@ -20,10 +20,6 @@
 // OpenTwin header
 #include "OTCore/Variable/VariableListToStringListConverter.h"
 
-#include "OTCore/MetadataEntry/MetadataEntry.h"
-#include "OTCore/MetadataEntry/MetadataEntryArray.h"
-#include "OTCore/MetadataEntry/MetadataEntryObject.h"
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTCore/Tuple/TupleFactory.h"
 #include "OTModelEntities/DataBase.h"
@@ -31,14 +27,19 @@
 // std header
 #include <vector>
 
-MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*> _msmds)
+MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*>& _allSeries)
 {
 
 	MetadataCampaign measurementCampaign;
 	auto start = std::chrono::high_resolution_clock::now();
-	extractCampaignMetadata(measurementCampaign, _rmd);
+	
 	auto camp = std::chrono::high_resolution_clock::now();
-	extractSeriesMetadata(measurementCampaign, _msmds);
+	for (EntityMetadataSeries* oneSeries : _allSeries)
+	{
+		MetadataSeries seriesMD = oneSeries->getSeries();
+		measurementCampaign.addSeriesMetadata(std::move(seriesMD));
+	}
+
 	auto series = std::chrono::high_resolution_clock::now();
 	measurementCampaign.updateMetadataOverview();
 	auto update = std::chrono::high_resolution_clock::now();
@@ -48,219 +49,6 @@ MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign*
 	uint64_t campTime = std::chrono::duration_cast<std::chrono::milliseconds>(series- camp).count();
 	uint64_t updateTime = std::chrono::duration_cast<std::chrono::milliseconds>(update - series).count();
 	return measurementCampaign;
-}
-
-MetadataSeries MetadataEntityInterface::createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity)
-{
-	return createSeries(_seriesMetadataEntity.get());
-}
-
-__declspec(noinline)
-MetadataSeries MetadataEntityInterface::createSeries(EntityMetadataSeries* _seriesMetadataEntity)
-{
-	auto first = std::chrono::high_resolution_clock::now();
-
-	std::string entityName = _seriesMetadataEntity->getName();
-	//const std::string name = entityName.substr(entityName.find_last_of("/") + 1);
-	//MetadataSeries seriesMetadata(name);
-	MetadataSeries seriesMetadata(entityName);
-	seriesMetadata.setIndex(_seriesMetadataEntity->getEntityID());
-
-	std::vector<std::string> allTopLevelDocumentNames = _seriesMetadataEntity->getDocumentsNames();
-
-	//First we extract the series meta data
-	ot::JsonDocument& doc = _seriesMetadataEntity->getMetadata();
-	seriesMetadata.setMetadata(doc);
-	auto second = std::chrono::high_resolution_clock::now();
-	//Now we extract the parameter meta data
-	const GenericDocument* parameterTopLevel = _seriesMetadataEntity->getDocument(_seriesMetadataEntity->getParameterDocumentName());
-	const std::vector<const GenericDocument*> allParameterDocuments = parameterTopLevel->getSubDocuments();
-	for (const GenericDocument* parameterDocument : allParameterDocuments)
-	{
-		MetadataParameter parameter;
-		parameter.parameterUID = std::stoll(parameterDocument->getDocumentName());
-		auto parameterFields = extractMetadataFields(*parameterDocument);
-		for (const std::shared_ptr<MetadataEntry>& entry : parameterFields)
-		{
-			const std::string currentEntryName = entry->getEntryName();
-			if (currentEntryName == m_nameField)
-			{
-				parameter.parameterName = convertToString(entry.get());
-			}
-			else if (currentEntryName == m_labelField)
-			{
-				parameter.parameterLabel = convertToString(entry.get());
-			}
-			else if (currentEntryName == m_valuesField)
-			{
-				parameter.values = convertToVariableList(entry.get());
-			}
-			else if (currentEntryName == m_unitField)
-			{
-				parameter.unit = convertToString(entry.get());
-			}
-			else if (currentEntryName == m_dataTypeNameField)
-			{
-				parameter.typeName = convertToString(entry.get());
-			}
-			else
-			{
-				parameter.metaData[entry->getEntryName()] = entry;
-			}
-		}
-
-		auto objectList = extractMetadataObjects(*parameterDocument);
-		for (const auto& object : objectList)
-		{
-			parameter.metaData[object->getEntryName()] = object;
-		}
-		seriesMetadata.addParameter(std::move(parameter));
-	}
-	auto third = std::chrono::high_resolution_clock::now();
-	//Now the quantity meta data
-	const GenericDocument* quantityTopLevel = _seriesMetadataEntity->getDocument(_seriesMetadataEntity->getQuantityDocumentName());
-	const std::vector<const GenericDocument*> allQuantityDocuments = quantityTopLevel->getSubDocuments();
-	for (const GenericDocument* quantityDocument : allQuantityDocuments)
-	{
-		MetadataQuantity quantity;
-		quantity.quantityIndex = std::stoll(quantityDocument->getDocumentName());
-		// First the regular fields
-		auto quantityFields = extractMetadataFields(*quantityDocument);
-		for (const std::shared_ptr<MetadataEntry>& entry : quantityFields)
-		{
-			const std::string entryName = entry->getEntryName();
-			if (entryName == m_nameField)
-			{
-				quantity.quantityName = convertToString(entry.get());
-			}
-			else if (entryName == m_labelField)
-			{
-				quantity.quantityLabel = convertToString(entry.get());
-			}
-			else if (entry->getEntryName() == m_dataDimensionsField)
-			{
-				quantity.dataDimensions = convertToUInt32Vector(entry.get());
-			}
-			else if (entry->getEntryName() == m_dependingParameterField)
-			{
-				quantity.dependingParameterIds = convertToUInt64Vector(entry.get());
-			}
-			else
-			{
-
-				quantity.metaData[entry->getEntryName()] = entry;
-			}
-		}
-
-		//Next the additional information and the tuple description. Both of which are subdocuments
-		auto objectList = extractMetadataObjects(*quantityDocument);
-		for (const auto& object : objectList)
-		{
-			const std::string entryName = object->getEntryName();
-			bool isTupleDescriptionObject = entryName.find(m_tupleDescriptionsField) != std::string::npos;
-			if (isTupleDescriptionObject)
-			{
-				MetadataEntry* entry = object.get();
-				auto objectEntry = dynamic_cast<MetadataEntryObject*>(entry);
-				assert(objectEntry != nullptr);
-
-				auto allTupleDescriptionEntries = objectEntry->getEntries();
-				
-				
-				for (const auto& tupleDescriptionEntry : allTupleDescriptionEntries)
-				{
-					auto fieldEntry = dynamic_cast<MetadataEntrySingle*>(tupleDescriptionEntry.get());
-					if (fieldEntry != nullptr)
-					{
-						if (fieldEntry->getEntryName() == m_nameField)
-						{
-							assert(fieldEntry->getValue().isConstCharPtr());
-							const std::string name = (fieldEntry->getValue().getConstCharPtr());
-							quantity.m_tupleDescription.setTupleTypeName(name);
-						}
-						else if (fieldEntry->getEntryName() == m_tupleFormat)
-						{
-							assert(fieldEntry->getValue().isConstCharPtr());
-							quantity.m_tupleDescription.setTupleFormatName(fieldEntry->getValue().getConstCharPtr());
-						}
-						else if (fieldEntry->getEntryName() == m_unitField)
-						{
-							
-							auto& unit = fieldEntry->getValue();
-							std::vector<std::string> unitsAsString;
-							assert(unit.isConstCharPtr());
-							unitsAsString.push_back(unit.getConstCharPtr());
-							quantity.m_tupleDescription.setTupleUnits(unitsAsString);
-						}
-						else if (fieldEntry->getEntryName() == m_dataTypeNameField)
-						{
-							auto& dataType = fieldEntry->getValue();
-							std::vector<std::string> dataTypeAsString;
-							assert(dataType.isConstCharPtr());
-							dataTypeAsString.push_back(dataType.getConstCharPtr());
-							quantity.m_tupleDescription.setTupleElementDataTypes(dataTypeAsString);
-						}
-						else
-						{
-							assert(false);
-						}
-						
-					}
-					else
-					{
-						auto arrayEntry = dynamic_cast<MetadataEntryArray*>(tupleDescriptionEntry.get());
-						if (arrayEntry != nullptr)
-						{
-							if (arrayEntry->getEntryName() == m_unitField)
-							{
-								auto& units = arrayEntry->getValues();
-								std::vector<std::string> unitsAsString;
-								for (ot::Variable unit : units)
-								{
-									assert(unit.isConstCharPtr());
-									unitsAsString.push_back(unit.getConstCharPtr());
-								}
-								quantity.m_tupleDescription.setTupleUnits(unitsAsString);
-							}
-							else if (arrayEntry->getEntryName() == m_dataTypeNameField)
-							{
-								auto& dataTypes = arrayEntry->getValues();
-								std::vector<std::string> dataTypeAsString;
-								for (ot::Variable dataType : dataTypes)
-								{
-									assert(dataType.isConstCharPtr());
-									dataTypeAsString.push_back(dataType.getConstCharPtr());
-								}
-								quantity.m_tupleDescription.setTupleElementDataTypes(dataTypeAsString);
-							}
-							else
-							{
-								assert(false);
-							}
-						}
-						else
-						{
-							assert(false);
-						}
-					}
-				}
-			}
-			else
-			{
-				quantity.metaData[object->getEntryName()] = object;
-			}
-		}
-
-		seriesMetadata.addQuantity(quantity);
-	}
-
-	auto forth = std::chrono::high_resolution_clock::now();
-	uint64_t total = std::chrono::duration_cast<std::chrono::milliseconds>(forth - first).count();
-	uint64_t firstT = std::chrono::duration_cast<std::chrono::milliseconds>(second - first).count();
-	uint64_t secondT = std::chrono::duration_cast<std::chrono::milliseconds>(third - second ).count();
-	uint64_t thirdT = std::chrono::duration_cast<std::chrono::milliseconds>(forth - third).count();
-
-	return seriesMetadata;
 }
 
 ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _metaDataCampaign)
@@ -275,11 +63,7 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _
 
 	EntityMetadataCampaign entityCampaign(entityID, nullptr, nullptr, nullptr);
 	entityCampaign.setCallbackData(this->getCallbackData());
-
-	for (auto& metadata : _metaDataCampaign.getMetaData())
-	{
-		insertMetadata(&entityCampaign, metadata.second.get());
-	}
+	entityCampaign.setCampaign(_metaDataCampaign);
 	entityCampaign.storeToDataBase();
 	ot::NewModelStateInfo newEntity;
 	newEntity.addTopologyEntity(entityCampaign);
@@ -305,192 +89,12 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(std::list<const Met
 		entitySeries.setName(name);
 		entitySeries.setTreeItemEditable(true);
 		entitySeries.setCallbackData(this->getCallbackData());
-
-		for (const MetadataParameter& parameter : newSeriesMetadata->getParameter())
-		{
-			MetadataParameter& parameterForChange = const_cast<MetadataParameter&>(parameter);
-			const std::string parameterUID =	std::to_string(parameterForChange.parameterUID);
-			entitySeries.InsertToParameterField(m_nameField, { ot::Variable(parameter.parameterName) }, parameterUID);
-			entitySeries.InsertToParameterField(m_labelField, { ot::Variable(parameter.parameterLabel) }, parameterUID);
-			entitySeries.InsertToParameterField(m_valuesField, std::move(parameterForChange.values), parameterUID);
-			entitySeries.InsertToParameterField(m_unitField, { ot::Variable(parameterForChange.unit) }, parameterUID);
-			entitySeries.InsertToParameterField(m_dataTypeNameField, { ot::Variable(parameterForChange.typeName) }, parameterUID);
-
-			for (auto& metadata : parameter.metaData)
-			{
-				insertMetadata(&entitySeries,metadata.second.get());
-			}
-		}
-		for (const MetadataQuantity& quantity : newSeriesMetadata->getQuantities())
-		{
-			const std::string quantityName = quantity.quantityLabel;
-
-			//Fields of the quantity itself
-			uint64_t firstValueIndex = quantity.quantityIndex;
-			const std::string quantityFieldKey = std::to_string(firstValueIndex);
-			entitySeries.InsertToQuantityField(m_nameField, { ot::Variable(quantity.quantityName) }, quantityFieldKey);
-			entitySeries.InsertToQuantityField(m_labelField, { ot::Variable(quantity.quantityLabel) }, quantityFieldKey);
-			
-			const std::vector<uint32_t>& dataDimensions = quantity.dataDimensions;
-			std::list<ot::Variable> dataDimensionsAsVariable = convertFromUInt32Vector(dataDimensions);
-			entitySeries.InsertToQuantityField(m_dataDimensionsField, std::move(dataDimensionsAsVariable), quantityFieldKey);
-	
-			std::list<ot::Variable> dependingParameter =convertFromUInt64Vector(quantity.dependingParameterIds);
-			entitySeries.InsertToQuantityField(m_dependingParameterField, std::move(dependingParameter), quantityFieldKey);
-
-			const std::string tupleDocumentsFieldName = quantityFieldKey + "/" + m_tupleDescriptionsField;
-			const auto& tupleDescription = quantity.m_tupleDescription;
-			
-			entitySeries.InsertToQuantityField(m_nameField, { tupleDescription.getTupleTypeName() }, tupleDocumentsFieldName);
-			
-			std::list<ot::Variable> tupleUnitNames;
-			for (const std::string unitName : tupleDescription.getTupleUnits())
-			{
-				tupleUnitNames.push_back(ot::Variable(unitName));
-			}
-			entitySeries.InsertToQuantityField(m_unitField, std::move(tupleUnitNames), tupleDocumentsFieldName);
-			
-			std::list<ot::Variable> tupleElementDataTypes;
-			for(const std::string dataTypeName : tupleDescription.getTupleElementDataTypes())
-			{
-				tupleElementDataTypes.push_back(ot::Variable(dataTypeName));
-			}
-			entitySeries.InsertToQuantityField(m_dataTypeNameField, std::move(tupleElementDataTypes), tupleDocumentsFieldName);
-
-			entitySeries.InsertToQuantityField(m_tupleFormat, { tupleDescription.getTupleFormatName() }, tupleDocumentsFieldName);
-									
-			for (auto& metadata : quantity.metaData)
-			{
-				insertMetadata(&entitySeries, metadata.second.get());
-			}
-
-		}
-		if (!newSeriesMetadata->getMetadata().ObjectEmpty())
-		{
-			entitySeries.setMetadata(newSeriesMetadata->getMetadata());
-		}
+		entitySeries.setSeries(*newSeriesMetadata);
 		
 		entitySeries.storeToDataBase();
 		newEntitiesInfos.addTopologyEntity(entitySeries);
 	}
 	return newEntitiesInfos;
-}
-
-void MetadataEntityInterface::extractCampaignMetadata(MetadataCampaign& _measurementCampaign, EntityMetadataCampaign* _rmd)
-{
-	const GenericDocument* topLevel= _rmd->getDocumentTopLevel();
-	auto fieldList = extractMetadataFields(*topLevel);
-	_measurementCampaign.setCampaignName(_rmd->getName());
-	for (auto& field : fieldList)
-	{
-		_measurementCampaign.addMetaInformation(field->getEntryName(), field);
-	}
-	auto objectList = extractMetadataObjects(*topLevel);
-	for (auto& object : objectList)
-	{
-		_measurementCampaign.addMetaInformation(object->getEntryName(), object);
-	}
-}
-
-std::vector<std::string> MetadataEntityInterface::convertToStringVector(const MetadataEntry* _metaData) const
-{
-	std::vector<std::string> output;
-	ot::VariableListToStringListConverter converter;
-
-	auto valueEntryArr = dynamic_cast<const MetadataEntryArray*>(_metaData);
-	if (valueEntryArr != nullptr)
-	{
-		std::list<std::string> values = converter(valueEntryArr->getValues());
-		assert(values.size() == valueEntryArr->getValues().size());
-		output = { values.begin(), values.end() };
-	}
-	else
-	{
-		auto valueEntry = dynamic_cast<const MetadataEntrySingle*>(_metaData);
-		assert(valueEntry != nullptr);
-
-		const ot::Variable& value = valueEntry->getValue();
-		assert(value.isConstCharPtr());
-		output = { value.getConstCharPtr() };
-	}
-	return output;
-}
-
-std::vector<uint32_t> MetadataEntityInterface::convertToUInt32Vector(const MetadataEntry* _metaData) const
-{
-	std::vector<uint32_t> output;
-
-	auto valueEntryArr = dynamic_cast<const MetadataEntryArray*>(_metaData);
-	if (valueEntryArr != nullptr)
-	{
-		output.reserve(valueEntryArr->getValues().size());
-		for (auto& value : valueEntryArr->getValues())
-		{
-			assert(value.isInt32());
-			output.push_back(static_cast<uint32_t>(value.getInt32()));
-		}
-	}
-	else
-	{
-		auto valueEntry = dynamic_cast<const MetadataEntrySingle*>(_metaData);
-		assert(valueEntry != nullptr);
-
-		const ot::Variable& value = valueEntry->getValue();
-		assert(value.isInt32());
-		output = { static_cast<uint32_t>(value.getInt32())};
-	}
-	return output;
-}
-
-std::vector<uint64_t> MetadataEntityInterface::convertToUInt64Vector(const MetadataEntry* _metaData) const
-{
-	std::vector<uint64_t> output;
-
-	auto valueEntryArr = dynamic_cast<const MetadataEntryArray*>(_metaData);
-	if (valueEntryArr != nullptr)
-	{
-		output.reserve(valueEntryArr->getValues().size());
-		for (auto& value : valueEntryArr->getValues())
-		{
-			assert(value.isInt64());
-			output.push_back(static_cast<uint64_t>(value.getInt64()));
-		}
-	}
-	else
-	{
-		auto valueEntry = dynamic_cast<const MetadataEntrySingle*>(_metaData);
-		assert(valueEntry != nullptr);
-
-		const ot::Variable& value = valueEntry->getValue();
-		assert(value.isInt64());
-		output = { static_cast<uint64_t>(value.getInt64()) };
-	}
-	return output;
-}
-
-std::string MetadataEntityInterface::convertToString(const MetadataEntry* _metaData) const
-{
-	auto entry = dynamic_cast<const MetadataEntrySingle*>(_metaData);
-	assert(entry != nullptr);
-	assert(entry->getValue().isConstCharPtr());
-	return entry->getValue().getConstCharPtr();
-}
-
-std::list<ot::Variable> MetadataEntityInterface::convertToVariableList(const MetadataEntry* _metaData) const
-{
-	std::list<ot::Variable> output;
-	auto valueEntryArr = dynamic_cast<const MetadataEntryArray*>(_metaData);
-	if (valueEntryArr != nullptr)
-	{
-		output = valueEntryArr->getValues();
-	}
-	else
-	{
-		auto valueEntry = dynamic_cast<const MetadataEntrySingle*>(_metaData);
-		assert(valueEntry != nullptr);
-		output = { valueEntry->getValue() };
-	}
-	return output;
 }
 
 std::list<ot::Variable> MetadataEntityInterface::convertFromStringVector(const std::vector<std::string> _values) const
@@ -524,80 +128,4 @@ std::list<ot::Variable> MetadataEntityInterface::convertFromUInt64Vector(const s
 	}
 
 	return output;
-}
-
-std::list<std::shared_ptr<MetadataEntry>> MetadataEntityInterface::extractMetadataObjects(const GenericDocument& _document)
-{
-	auto& subDocuments = _document.getSubDocuments();
-	std::list<std::shared_ptr<MetadataEntry>> allMetadata;
-	for (const GenericDocument* subDoc : subDocuments)
-	{
-		std::shared_ptr<MetadataEntryObject> object(new MetadataEntryObject(subDoc->getDocumentName()));
-		auto fieldList = extractMetadataFields(*subDoc);
-		object->AddMetadataEntry(fieldList);
-		auto subObjectList = extractMetadataObjects(*subDoc);
-		object->AddMetadataEntry(subObjectList);
-		allMetadata.push_back(object);
-	}
-	return allMetadata;
-}
-
-std::list<std::shared_ptr<MetadataEntry>> MetadataEntityInterface::extractMetadataFields(const GenericDocument& _document)
-{
-	auto fields = _document.getFields();
-	std::list<std::shared_ptr<MetadataEntry>> metadata;
-	for (auto field = fields->begin(); field != fields->end(); field++)
-	{
-		const std::string name = field->first;
-		const std::list<ot::Variable>& values = field->second;
-		if (values.size() == 1)
-		{
-			metadata.push_back(std::shared_ptr<MetadataEntry>(new MetadataEntrySingle(name, *values.begin())));
-		} 
-		else
-		{
-			metadata.push_back(std::shared_ptr<MetadataEntry>(new MetadataEntryArray(name, values)));
-		}
-	}
-	return metadata;
-}
-
-void MetadataEntityInterface::extractSeriesMetadata(MetadataCampaign& measurementCampaign, std::list<EntityMetadataSeries*> _msmds)
-{
-	for (auto msmd : _msmds)
-	{
-		MetadataSeries seriesMetadata = createSeries(msmd);
-		measurementCampaign.addSeriesMetadata(std::move(seriesMetadata));
-	}
-}
-
-void MetadataEntityInterface::insertMetadata(EntityWithDynamicFields* _entity, MetadataEntry* _metadata, const std::string _documentName)
-{
-	auto singleEntry = dynamic_cast<MetadataEntrySingle*>(_metadata);
-	if(singleEntry != nullptr)
-	{
-		_entity->InsertInField(singleEntry->getEntryName(), { singleEntry->getValue() }, _documentName);
-	}
-	else
-	{
-		auto arrayEntry = dynamic_cast<MetadataEntryArray*>(_metadata);
-		if (arrayEntry != nullptr)
-		{
-			_entity->InsertInField(arrayEntry->getEntryName(), arrayEntry->getValues(), _documentName);
-		}
-		else
-		{
-			auto objectEntry = dynamic_cast<MetadataEntryObject*>(_metadata);
-			assert(objectEntry != nullptr);
-			const std::string& name = _documentName + "/" + objectEntry->getEntryName();
-			for (auto entry : objectEntry->getEntries())
-			{
-				insertMetadata(_entity, entry.get(), name);
-			}
-		}
-
-	}
-
-
-	
 }

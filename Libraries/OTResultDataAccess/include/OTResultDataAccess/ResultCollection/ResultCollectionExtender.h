@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "OTCore/MetadataEntry/MetadataEntry.h"
+
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
@@ -46,24 +46,14 @@ public:
 	void setSaveModel(bool _saveModel) { m_saveModel = _saveModel; }
 
 	ot::UID buildSeriesMetadata(std::list<DatasetDescription>& _datasetDescriptions, const std::string& _seriesName, const ot::JsonDocument& seriesMetadata = ot::JsonDocument{});
-
-	bool campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _metadata);
-	bool campaignMetadataWithSameValueExists(std::shared_ptr<MetadataEntry> _metadata);
 	
 	//! @brief Throws exception if any parameter/quantity constellation is unvalid.
 	void processDataPoints(DatasetDescription* dataDescription, uint64_t seriesMetadataIndex);
-
-	/// <summary>
-	/// Potentially overrides an entry with the same field name. Use existence checks beforehand to look into that matter.
-	/// </summary>
-	/// <param name="metadata"></param>
-	void addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata);
-	
+			
 	void storeCampaignChanges();
 	bool removeSeries(ot::UID _uid);
 
 	ResultImportLogger& getLogger() { return m_logger; }
-
 protected:
 	inline bool invariant() { return true; }
 

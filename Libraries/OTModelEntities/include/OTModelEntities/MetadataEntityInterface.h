@@ -24,7 +24,7 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/EntityMetadataCampaign.h"
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
-#include "OTCore/MetadataEntry/MetadataEntry.h"
+
 #include "OTModelEntities/ModelEntitiesAPIExport.h"
 #include "OTModelEntities/NewModelStateInfo.h"
 // std header
@@ -34,44 +34,15 @@ class OT_MODELENTITIES_API_EXPORT MetadataEntityInterface : public ot::EntityCal
 {
 public:
 	MetadataEntityInterface() = default;
-	MetadataCampaign createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*> _msmds);
-	MetadataSeries createSeries(std::shared_ptr<EntityMetadataSeries> _seriesMetadataEntity);
-	MetadataSeries createSeries(EntityMetadataSeries* _seriesMetadataEntity);
+	MetadataCampaign createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*>& _allSeries);
+		
 	ot::NewModelStateInfo storeCampaign(MetadataCampaign& _metaDataCampaign);
 	ot::NewModelStateInfo storeCampaign(std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 	ot::NewModelStateInfo storeCampaign(MetadataCampaign& _metaDataCampaign, std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel);
 
 private:
-	const std::string m_dataDimensionsField = "DataDimensions";
-	const std::string m_dependingParameterField = "ParameterDependencies";
-	const std::string m_tupleDescriptionsField = "TupleDescription";
-
-	const std::string m_nameField = "Name";
-	const std::string m_labelField = "Label";
-	const std::string m_unitField = "Unit";
-	const std::string m_dataTypeNameField = "DataTypeName";
-	
-	const std::string m_tupleFormat = "TupleFormat";
-		
-	const std::string m_valuesField = "Values";
-
-	void extractCampaignMetadata(MetadataCampaign& _measurementCampaign, EntityMetadataCampaign* _rmd);
-	void extractSeriesMetadata(MetadataCampaign& _measurementCampaign, std::list<EntityMetadataSeries*> _msmds);
-	
-	void insertMetadata(EntityWithDynamicFields* _entity, MetadataEntry* _metadata, const std::string _documentName = "");
-
-	std::vector<std::string> convertToStringVector(const MetadataEntry* _metaData)const;
-	std::vector<uint32_t> convertToUInt32Vector(const MetadataEntry* _metaData) const;
-	std::vector<uint64_t> convertToUInt64Vector(const MetadataEntry* _metaData) const;
-	std::string convertToString(const MetadataEntry* _metaData) const;
-	std::list<ot::Variable> convertToVariableList(const MetadataEntry* _metaData)const;
-
 	std::list<ot::Variable> convertFromStringVector(const std::vector<std::string> _values) const;
 	std::list<ot::Variable> convertFromUInt32Vector(const std::vector<uint32_t> _values) const;
 	std::list<ot::Variable> convertFromUInt64Vector(const std::vector<uint64_t> _values) const;
-	
-
-	std::list<std::shared_ptr<MetadataEntry>> extractMetadataObjects(const GenericDocument& _document);
-	std::list<std::shared_ptr<MetadataEntry>> extractMetadataFields(const GenericDocument& document);
 };
 

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityMetadataCampaign.h
 // 
 // License:
@@ -18,10 +18,12 @@
 // @otlicense-end
 
 #pragma once
-#include "OTModelEntities/EntityWithDynamicFields.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "EntityBase.h"
+
 #include <string>
 
-class __declspec(dllexport) EntityMetadataCampaign : public EntityWithDynamicFields
+class __declspec(dllexport) EntityMetadataCampaign : public EntityBase
 {
 public:
 	EntityMetadataCampaign() : EntityMetadataCampaign(0, nullptr, nullptr, nullptr) {};
@@ -31,4 +33,18 @@ public:
 	std::string getClassName() const override { return EntityMetadataCampaign::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override;
+
+	virtual void addVisualizationNodes() override;
+
+	void setCampaign(const MetadataCampaign& _campaign) 
+	{ 
+		m_campaign = _campaign; 
+		setModified();
+	}
+	const MetadataCampaign& getCampaign() { return m_campaign; }
+private:
+	MetadataCampaign m_campaign;
+	
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 };

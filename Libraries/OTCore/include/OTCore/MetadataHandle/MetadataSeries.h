@@ -33,12 +33,10 @@
 class OT_CORE_API_EXPORT MetadataSeries : public ot::Serializable
 {
 public:
-	MetadataSeries(const std::string& name):m_name(name){};
 	MetadataSeries() = default;
-	
+	MetadataSeries(const std::string& name):m_name(name){};
 	MetadataSeries(const MetadataSeries& _other);
-	MetadataSeries& operator=(const MetadataSeries& _other);
-	
+	MetadataSeries& operator=(const MetadataSeries& _other);	
 	MetadataSeries(MetadataSeries&& _other) noexcept;
 	MetadataSeries& operator=(MetadataSeries&& _other) noexcept;
 	
@@ -49,6 +47,7 @@ public:
 	void addParameterReference(ot::UID _parameterUID) { m_parameterReferences.push_back(_parameterUID); m_parameterReferences.unique(); };
 	
 	void addQuantity(MetadataQuantity& quantity) { m_quantity.push_back(quantity); }
+	void addQuantity(MetadataQuantity&& quantity) { m_quantity.push_back(std::move(quantity)); }
 	void addQuantityReference(ot::UID _quantityUID) { m_quantityReferences.push_back(_quantityUID); m_quantityReferences.unique(); };
 	
 	void setMetadata(const ot::JsonDocument& _metadata);

@@ -21,7 +21,7 @@
 #include "OTCore/DefensiveProgramming.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTCore/MetadataEntry/MetadataEntryComperator.h"
+
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
@@ -57,28 +57,6 @@ ot::UID ResultCollectionExtender::buildSeriesMetadata(std::list<DatasetDescripti
 	m_quantitiesUpForStorageByName.clear();
 	m_parameterUpForStorageByName.clear();
 	return newSeriesID;
-}
-
-bool ResultCollectionExtender::campaignMetadataWithSameNameExists(std::shared_ptr<MetadataEntry> _otherMetadata)
-{
-	auto& allMetadata = m_metadataCampaign.getMetaData();
-	return allMetadata.find(_otherMetadata->getEntryName()) != allMetadata.end();
-}
-
-bool ResultCollectionExtender::campaignMetadataWithSameValueExists(std::shared_ptr<MetadataEntry> _otherMetadata)
-{
-	auto& allMetadata = m_metadataCampaign.getMetaData();
-	auto metadataEntryByName = allMetadata.find(_otherMetadata->getEntryName());
-	if (metadataEntryByName == allMetadata.end())
-	{
-		return false;
-	}
-	else
-	{
-		std::shared_ptr<MetadataEntry> metadataEntry = metadataEntryByName->second;
-		MetadataEntryComperator comperator;
-		return comperator(metadataEntry, _otherMetadata);
-	}
 }
 
 void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescription, uint64_t _seriesMetadataIndex)
@@ -147,12 +125,6 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 	quantityContainerSerialiser.storeDataPoints(_seriesMetadataIndex, parameterIndices, sharedParameterValues, allParameterValueIt, numberOfParameter, currentQuantityDescription);
 
 	//DataLakeHelper::createDefaultIndexes(m_collectionName);
-}
-
-void ResultCollectionExtender::addCampaignMetadata(std::shared_ptr<MetadataEntry> _metadata)
-{
-	m_requiresUpdateMetadataCampaign = true;
-	m_metadataCampaign.addMetaInformation(_metadata->getEntryName(), _metadata);
 }
 
 void ResultCollectionExtender::storeCampaignChanges()

@@ -37,9 +37,6 @@
 
 #include "OTCore/MetadataHandle/MetadataParameter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTCore/MetadataEntry/MetadataEntryArray.h"
-#include "OTCore/MetadataEntry/MetadataEntryObject.h"
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
@@ -142,15 +139,13 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		//Filling a new EntityMetadataSeries object with its fields.
 		KeyValuesExtractor rmdData;
 		rmdData.loadAllRangeSelectionInformation(*rmdAssemblyData, loadedTables);
-		std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries = rangeData2MetadataEntries(std::move(rmdData));
-		for (std::shared_ptr<MetadataEntry> metadataEntry : allMetadataEntries)
+		ot::JsonDocument allMetadataEntries;
+		rangeData2Json(allMetadataEntries, std::move(rmdData));
+		if(!allMetadataEntries.ObjectEmpty())
 		{
-			const bool fieldExists = resultCollectionExtender.campaignMetadataWithSameNameExists(metadataEntry) && resultCollectionExtender.campaignMetadataWithSameValueExists(metadataEntry);
-			if (fieldExists)
-			{
-				Documentation::INSTANCE()->AddToDocumentation("Update of campaign metadata field: " + metadataEntry->getEntryName() + "\n");
-				resultCollectionExtender.addCampaignMetadata(metadataEntry);
-			}
+			MetadataCampaign& campaign =	resultCollectionExtender.getMetadataCampaign();
+			ot::JsonDocument& currentMetadata = campaign.getMetadata();
+			ot::json::mergeObjects(currentMetadata, allMetadataEntries, currentMetadata.GetAllocator(),false);			
 		}
 		fullReport += logger.getLog();
 		logger.clearLog();
@@ -465,30 +460,6 @@ void TabledataToResultdataHandler::unsetConsiderForImport(MetadataAssemblyData& 
 	}
 
 	ot::ModelServiceAPI::addEntitiesToModel(newModelEntities, "Unset the consider for storage", true, false);
-}
-
-//! @brief Turning the selection ranges in a generic format, holding different options of data structures
-std::list<std::shared_ptr<MetadataEntry>> TabledataToResultdataHandler::rangeData2MetadataEntries(KeyValuesExtractor&& _assembyRangeData)
-{
-	std::list<std::shared_ptr<MetadataEntry>> allMetadataEntries;
-	auto field = _assembyRangeData.getFields()->begin();
-
-	for (field; field != _assembyRangeData.getFields()->end(); field++)
-	{
-		const std::string& fieldName = field->first;
-		const std::list<ot::Variable>& values = field->second;
-		std::shared_ptr<MetadataEntry> metadata;
-		if (values.size() == 1)
-		{
-			metadata.reset(new MetadataEntrySingle(fieldName, *values.begin()));
-		}
-		else if (values.size() > 1)
-		{
-			metadata.reset(new MetadataEntryArray(fieldName, values));
-		}
-		allMetadataEntries.push_back(metadata);
-	}
-	return allMetadataEntries;	
 }
 
 void TabledataToResultdataHandler::rangeData2Json(ot::JsonDocument& _doc, KeyValuesExtractor&& _assembyRangeData)

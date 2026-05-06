@@ -25,7 +25,6 @@
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTCore/MetadataHandle/MetadataParameter.h"
-#include "OTCore/MetadataEntry/MetadataEntry.h"
 #include "OTCore/CoreAPIExport.h"
 
 // std header
@@ -37,14 +36,12 @@ class OT_CORE_API_EXPORT MetadataCampaign : public ot::Serializable
 {
 public:
 	MetadataCampaign() = default;
-	MetadataCampaign(const MetadataCampaign& _other) = default;
-	MetadataCampaign& operator=(const MetadataCampaign& _other) = default;
-	MetadataCampaign(MetadataCampaign&& other) noexcept =default;
-	MetadataCampaign& operator=(MetadataCampaign&& other) noexcept = default;
+	MetadataCampaign(const MetadataCampaign& _other);
+	MetadataCampaign& operator=(const MetadataCampaign& _other);
+	MetadataCampaign(MetadataCampaign&& _other) noexcept;
+	MetadataCampaign& operator=(MetadataCampaign&& _other) noexcept;
+	void swap(MetadataCampaign& _a, MetadataCampaign& _b);
 	~MetadataCampaign() {};
-
-	void addMetaInformation(const std::string& key, std::shared_ptr<MetadataEntry> _metadata) { m_metaData[key] = _metadata; }
-	const std::map <std::string, std::shared_ptr<MetadataEntry>>&	getMetaData() const { return m_metaData; }
 	
 	void addSeriesMetadata(MetadataSeries&& seriesMetadata) { m_seriesMetadata.push_back(seriesMetadata); }
 	const std::list<MetadataSeries>& getSeriesMetadata() const { return m_seriesMetadata; };
@@ -65,6 +62,11 @@ public:
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object);
 	
+	ot::JsonDocument& getMetadata() { return m_metaData; }
+	void setMetadata(const ot::JsonDocument& _metadata)
+	{
+		m_metaData.CopyFrom(_metadata, m_metaData.GetAllocator());
+	}
 
 private:
 	std::list<MetadataSeries> m_seriesMetadata;
@@ -76,7 +78,7 @@ private:
 
 	std::string m_campaignName;
 	
-	std::map <std::string, std::shared_ptr<MetadataEntry>> m_metaData;
+	ot::JsonDocument m_metaData;
 
 	void updateMetadataOverview(MetadataSeries& _series);
 

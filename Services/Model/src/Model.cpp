@@ -3199,8 +3199,7 @@ void Model::handleShowSelectedShapeInformation()
 		
 		if (series != nullptr)
 		{
-			MetadataEntityInterface metadataInterface;
-			MetadataSeries seriesMetadata=	metadataInterface.createSeries(series);
+			const MetadataSeries& seriesMetadata = series->getSeries();
 			
 			ot::JsonDocument document;
 			seriesMetadata.addToJsonObject(document, document.GetAllocator());

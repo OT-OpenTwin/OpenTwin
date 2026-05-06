@@ -33,7 +33,7 @@
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataParameter.h"
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"

@@ -29,7 +29,7 @@
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTSystem/DateTime.h"
-#include "OTCore/MetadataEntry/MetadataEntrySingle.h"
+
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/Variable/StringToVariableConverter.h"

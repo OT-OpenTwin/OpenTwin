@@ -64,7 +64,7 @@ public:
 	std::list< MetadataQuantity*>findQuantityWithSameName(const std::string& _name);
 	std::list< MetadataParameter*>findParameterWithSameName(const std::string& _name);
 
-	const MetadataCampaign& getMetadataCampaign() const { return m_metadataCampaign; }
+	MetadataCampaign& getMetadataCampaign() { return m_metadataCampaign; }
 
 	const std::string& getCollectionName() const { return m_collectionName; }
 
