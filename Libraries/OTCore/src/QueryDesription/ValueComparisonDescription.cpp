@@ -33,6 +33,16 @@ ot::ValueComparisonDescription::ValueComparisonDescription(const std::string& _n
 {
 }
 
+bool ot::ValueComparisonDescription::operator==(const ValueComparisonDescription& _other) const
+{
+	return m_name == _other.m_name
+		&& m_comparator == _other.m_comparator
+		&& m_value == _other.m_value
+		&& m_tupleTarget == _other.m_tupleTarget
+		&& m_tupleDescription == _other.m_tupleDescription
+		&& m_dimensionIndex == _other.m_dimensionIndex;
+}
+
 void ot::ValueComparisonDescription::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
 {
 	_object.AddMember("Comparator", ot::JsonString(m_comparator, _allocator), _allocator);

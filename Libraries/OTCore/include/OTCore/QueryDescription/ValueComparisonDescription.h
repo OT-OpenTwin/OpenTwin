@@ -37,6 +37,9 @@ namespace ot {
 		ValueComparisonDescription(const std::string& _name, const std::string& _comparator, const std::string& _value, TupleInstance _tupleInstance);
 		virtual ~ValueComparisonDescription() = default;
 
+		bool operator == (const ValueComparisonDescription& _other) const;
+		bool operator != (const ValueComparisonDescription& _other) const { return !(*this == _other); };
+
 		void setName(const std::string& name) { m_name = name; }
 		const std::string& getName() const { return m_name; }
 

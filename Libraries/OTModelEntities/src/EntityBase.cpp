@@ -168,27 +168,27 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	}
 }
 
-void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
+void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase *>& _entityMap) {
 	try {
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();
-		int schemaVersion = (int) DataBase::getIntFromView(doc_view, schemaVersionKey.c_str());
+		int schemaVersion = (int) DataBase::getIntFromView(_docView, schemaVersionKey.c_str());
 		if (schemaVersion != getSchemaVersion()) throw (std::exception());
 
-		m_treeItem.setEntityID(DataBase::getIntFromView(doc_view, "EntityID"));
-		m_treeItem.setEntityVersion(DataBase::getIntFromView(doc_view, "Version"));
-		m_treeItem.setEntityName(std::string(doc_view["Name"].get_utf8().value.data()));
-		m_initiallyHidden      = doc_view["initiallyHidden"].get_bool();
-		auto bsonObj           = doc_view["Properties"].get_document();
+		m_treeItem.setEntityID(DataBase::getIntFromView(_docView, "EntityID"));
+		m_treeItem.setEntityVersion(DataBase::getIntFromView(_docView, "Version"));
+		m_treeItem.setEntityName(std::string(_docView["Name"].get_utf8().value.data()));
+		m_initiallyHidden      = _docView["initiallyHidden"].get_bool();
+		auto bsonObj           = _docView["Properties"].get_document();
 
 		clearCallbacks(true);
 
-		auto docIt = doc_view.find("Owner");
-		if (docIt != doc_view.end()) {
+		auto docIt = _docView.find("Owner");
+		if (docIt != _docView.end()) {
 			registerCallbacks(Callback::Properties | Callback::Selection | Callback::DataNotify, docIt->get_utf8().value.data(), true);
 		}
 		
-		docIt = doc_view.find("Callbacks");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("Callbacks");
+		if (docIt != _docView.end()) {
 			for (auto&& it : docIt->get_array().value) {
 				auto kvp = it.get_document().view();
 				CallbackFlags cb(DataBase::getIntFromView(kvp, "Callbacks"));
@@ -198,35 +198,35 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 		}
 				
 		m_manageParentVisibility = true;
-		docIt = doc_view.find("manageParentVisibility");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("manageParentVisibility");
+		if (docIt != _docView.end()) {
 			m_manageParentVisibility = docIt->get_bool();
 		}
 		
 		m_manageChildVisibility = true;
-		docIt = doc_view.find("manageChildVisibility");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("manageChildVisibility");
+		if (docIt != _docView.end()) {
 			m_manageChildVisibility = docIt->get_bool();
 		}
 
 		m_isDeletable = true;
-		docIt = doc_view.find("isDeletable");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("isDeletable");
+		if (docIt != _docView.end()) {
 			m_isDeletable = docIt->get_bool();
 		}
 
-		docIt = doc_view.find("isEditable");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("isEditable");
+		if (docIt != _docView.end()) {
 			m_treeItem.setIsEditable(docIt->get_bool());
 		}
 
-		docIt = doc_view.find("selectChildren");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("selectChildren");
+		if (docIt != _docView.end()) {
 			m_treeItem.setSelectChilds(docIt->get_bool());
 		}
 
-		docIt = doc_view.find("VisibleTreeIcon");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("VisibleTreeIcon");
+		if (docIt != _docView.end()) {
 			m_treeItem.setVisibleIcon(docIt->get_string().value.data());
 			if (m_treeItem.getIcons().getVisibleIcon().find('/') == std::string::npos) {
 				// Old format without path, update to new format
@@ -234,8 +234,8 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			}
 		}
 
-		docIt = doc_view.find("HiddenTreeIcon");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("HiddenTreeIcon");
+		if (docIt != _docView.end()) {
 			m_treeItem.setHiddenIcon(docIt->get_string().value.data());
 			if (m_treeItem.getIcons().getHiddenIcon().find('/') == std::string::npos) {
 				// Old format without path, update to new format
@@ -243,13 +243,13 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			}
 		}
 
-		docIt = doc_view.find("VisualizationTypes");
-		if (docIt != doc_view.end()) {
-			m_visualizationTypes.setVisualisations(ot::VisualisationTypes::VisTypes(static_cast<uint64_t>(DataBase::getIntFromView(doc_view, "VisualizationTypes"))));
+		docIt = _docView.find("VisualizationTypes");
+		if (docIt != _docView.end()) {
+			m_visualizationTypes.setVisualisations(ot::VisualisationTypes::VisTypes(static_cast<uint64_t>(DataBase::getIntFromView(_docView, "VisualizationTypes"))));
 		}
 
-		docIt = doc_view.find("CustomViewFlags");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("CustomViewFlags");
+		if (docIt != _docView.end()) {
 			m_visualizationTypes.clearCustomViewFlags();
 			auto customViewFlagsArray = docIt->get_array().value;
 			for (auto&& it : customViewFlagsArray) {
@@ -260,13 +260,13 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view &doc
 			}
 		}
 
-		docIt = doc_view.find("IsCopyable");
-		if (docIt != doc_view.end()) {
+		docIt = _docView.find("IsCopyable");
+		if (docIt != _docView.end()) {
 			setIsCopyable(docIt->get_bool());
 		}
 
-		readDependencyArray(doc_view, "InputDependency", m_inputDependency);
-		readDependencyArray(doc_view, "OutputDependency", m_outputDependency);
+		readDependencyArray(_docView, "InputDependency", m_inputDependency);
+		readDependencyArray(_docView, "OutputDependency", m_outputDependency);
 
 		m_updateSelfDepedency = false; // Since we are loading the dependencies, we should never modify them again
 

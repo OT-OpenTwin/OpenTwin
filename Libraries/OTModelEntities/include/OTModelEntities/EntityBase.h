@@ -252,7 +252,9 @@ public:
 
 	//!@brief Set whether the entity should update its own version in the dependency lists during the next save operation
 	void setUpdateSelfDependency(bool _updateSelfDepedency) { m_updateSelfDepedency = _updateSelfDepedency; }
+
 protected:
+
 	//! @brief Will set the default tree item.
 	//! Will reset the modified flags for all entries of the tree item.
 	//! This method should be called from the constructor of a entity to set the default item.
@@ -272,8 +274,8 @@ protected:
 	virtual void callbackDataChanged() override { setModified(); };
 
 	virtual int getSchemaVersion() { return 1; };
-	virtual void addStorageData(bsoncxx::builder::basic::document &storage) {};
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap);
+	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) {};
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase *>& _entityMap);
 	void storeDependencyArray(bsoncxx::builder::basic::document& _doc, const std::string& _dependencyName, const std::list<std::pair<ot::UID, ot::UID>>& _dependencies);
 	void readDependencyArray(const bsoncxx::document::view& _doc_view, const std::string& _dependencyName, std::list<std::pair<ot::UID, ot::UID>>& _dependencies);
 
@@ -285,6 +287,7 @@ protected:
 	bsoncxx::builder::basic::document serialiseAsMongoDocument();
 
 private:
+
 	// Persistent attributes
 	bool                    m_initiallyHidden;
 	bool				    m_isDeletable;
