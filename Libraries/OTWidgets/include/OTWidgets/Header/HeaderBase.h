@@ -5,6 +5,7 @@
 // OpenTwin header
 #include "OTWidgets/WidgetTypes.h"
 #include "OTWidgets/Header/HeaderFilter.h"
+#include "OTWidgets/Header/HeaderFilterState.h"
 
 // Qt header
 #include <QtCore/qsize.h>
@@ -55,9 +56,6 @@ namespace ot {
 		virtual QString getFilterTitle(int _logicalIndex) const;
 		virtual QStringList getFilterOptions(int _logicalIndex) const;
 		
-		inline void setActiveFilterIndex(int _logicalIndex) { m_filterState.activeFilter = _logicalIndex; };
-		inline bool getActiveFilterIndex() const { return m_filterState.activeFilter; };
-
 		virtual QRect filterIconRect(int _logicalIndex) const;
 
 		//! @brief Displays the filter menu for the specified logical index if filtering is enabled for that index.
@@ -88,17 +86,7 @@ namespace ot {
 		void slotSectionClicked(int _logicalIndex);
 
 	private:
-		struct FilterState
-		{
-			FilterState() = default;
-
-			int hoveredFilter = -1;
-			int pressedFilter = -1;
-			int activeFilter = -1;
-
-			std::map<int, QStringList> filterData; //! @brief Map <logical index, last selection>
-		};
-		FilterState m_filterState;
+		HeaderFilterState m_filterState;
 
 		QPoint m_lastMousePressPos;
 		QSize m_buttonSize;

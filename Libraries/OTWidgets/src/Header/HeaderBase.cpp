@@ -84,15 +84,15 @@ void ot::HeaderBase::paintSection(QPainter* _painter, const QRect& _rect, int _l
 
 	// Choose icon based on hover/press state
 	QIcon icon;
-	if (m_filterState.pressedFilter == _logicalIndex)
+	if (m_filterState.getPressedIndex() == _logicalIndex)
 	{
 		icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterPressedIcon));
 	}
-	else if (m_filterState.hoveredFilter == _logicalIndex)
+	else if (m_filterState.getHoveredIndex() == _logicalIndex)
 	{
 		icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterHoverIcon));
 	}
-	else if (m_filterState.activeFilter == _logicalIndex)
+	else if (m_filterState.isFilterActive(_logicalIndex))
 	{
 		icon = QIcon(cs.getFile(ColorStyleFileEntry::HeaderFilterActiveIcon));
 	}
@@ -143,9 +143,9 @@ void ot::HeaderBase::mouseMoveEvent(QMouseEvent* _event)
 		ix = -1;
 	}
 
-	if (ix != m_filterState.hoveredFilter)
+	if (ix != m_filterState.getHoveredIndex())
 	{
-		m_filterState.hoveredFilter = ix;
+		m_filterState.setHoveredIndex(ix);
 		update();
 		QHeaderView::mouseMoveEvent(_event);
 	}
@@ -153,12 +153,12 @@ void ot::HeaderBase::mouseMoveEvent(QMouseEvent* _event)
 
 void ot::HeaderBase::leaveEvent(QEvent* _event)
 {
-	if (m_filterState.hoveredFilter == -1)
+	if (m_filterState.getHoveredIndex() == -1)
 	{
 		return;
 	}
 
-	m_filterState.hoveredFilter = -1;
+	m_filterState.setHoveredIndex(-1);
 	update();
 	QHeaderView::leaveEvent(_event);
 }
@@ -209,12 +209,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 
 	filter.setTitle(getFilterTitle(_logicalIndex));
 	filter.setOptions(getFilterOptions(_logicalIndex));
-
-	auto it = m_filterState.filterData.find(_logicalIndex);
-	if (it != m_filterState.filterData.end())
-	{
-		filter.updateCheckedState(it->second);
-	}
+	filter.updateCheckedState(m_filterState.getFilter(_logicalIndex));
 
 	connect(&filter, &HeaderFilter::sortOrderChanged, this, &HeaderBase::sortOrderChangeRequest);
 
@@ -226,17 +221,7 @@ void ot::HeaderBase::showFilterMenu(int _logicalIndex)
 	{
 		QStringList selectedOptions = filter.saveCheckedState();
 
-		if (selectedOptions.isEmpty())
-		{
-
-			m_filterState.activeFilter = (-1);
-		}
-		else
-		{
-			m_filterState.activeFilter = _logicalIndex;
-		}
-
-		const QStringList& opt = m_filterState.filterData.insert_or_assign(_logicalIndex, std::move(selectedOptions)).first->second;
+		m_filterState.setFilter(_logicalIndex, selectedOptions);
 
 		try
 		{
@@ -274,9 +259,9 @@ void ot::HeaderBase::slotSectionClicked(int _logicalIndex)
 	QRect iconRect = filterIconRect(_logicalIndex);
 	if (iconRect.contains(m_lastMousePressPos))
 	{
-		m_filterState.pressedFilter = _logicalIndex;
+		m_filterState.setPressedIndex(_logicalIndex);
 		update();
 		showFilterMenu(_logicalIndex);
-		m_filterState.pressedFilter = -1;
+		m_filterState.setPressedIndex(-1);
 	}
 }
