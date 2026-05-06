@@ -596,6 +596,8 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 				{
 					try
 					{
+						auto uiComponent = Application::instance()->getUiComponent();
+						ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
 						ot::PythonServiceInterface interface(Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE)->getServiceURL());
 						std::list<ot::ValueComparisonDescription> valueCompares = _event.getFilterDescriptions();
 						PythonParameter parameter = PyhonParameterBuilderValueComparisons::create("", valueCompares);
@@ -616,8 +618,6 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 			worker.detach();
 		}
 	}
-
-	
 }
 
 void FileHandler::NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner)
