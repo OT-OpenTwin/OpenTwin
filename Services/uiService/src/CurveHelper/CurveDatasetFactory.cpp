@@ -129,18 +129,23 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 		{
 			ot::DatasetDependencyInfos dependencies, secondaryParameterDependencies;
 			const std::string quantityName = singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetString();
-			std::optional<ot::DataPointDecoder> decoder = dataLakeAccessCfg.getFieldDecoderQuantityByLabel(quantityName);
-			if(decoder.has_value())
+			std::optional<ot::DataPointDecoder> quantityDecoder = dataLakeAccessCfg.getFieldDecoderQuantityByLabel(quantityName);
+			if(quantityDecoder.has_value())
 			{
-				ot::DatasetDependencyInfo additionalParameterInfo;
-				additionalParameterInfo.setLabel(MetadataQuantity::getFieldName());
-				additionalParameterInfo.setValue(decoder.value().getLabel());
-				additionalParameterInfo.setUnit(decoder.value().getTupleInstance().getTupleUnits().front());
+				ot::DatasetDependencyInfo quantityParameterInfo;
+				quantityParameterInfo.setLabel(MetadataQuantity::getFieldName());
+				quantityParameterInfo.setValue(quantityDecoder.value().getLabel());
 
-				dependencies.addDependency(additionalParameterInfo);
+				const auto& quantityUnits = quantityDecoder->getTupleInstance().getTupleUnits();
+				if (!quantityUnits.empty()) {
+					quantityParameterInfo.setUnit(quantityUnits.front());
+				}
+
+				dependencies.addDependency(quantityParameterInfo);
 			}
 			else
 			{
+				OT_LOG_E("Quantity decoder has no value");
 				assert(false);
 			}
 
@@ -150,13 +155,19 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			const auto& allSeriesDecoder = dataLakeAccessCfg.getAllFieldDecoderSeriesByLabel();
 			auto series = singleMongoDocument.FindMember(MetadataSeries::getFieldName().c_str());
 			auto seriesDecoder = allSeriesDecoder.find(series->value.GetString());
+			
+			ot::DatasetDependencyInfo seriesParameterInfo;
+			seriesParameterInfo.setLabel(MetadataSeries::getFieldName());
+			seriesParameterInfo.setValue(seriesDecoder->second->getLabel());
 
-			ot::DatasetDependencyInfo additionalParameterInfo;
-			additionalParameterInfo.setLabel(MetadataSeries::getFieldName());
-			additionalParameterInfo.setValue(seriesDecoder->second->getLabel());
+			const auto& seriesUnits = seriesDecoder->second->getTupleInstance().getTupleUnits();
+			if (!seriesUnits.empty()) {
+				seriesParameterInfo.setUnit(seriesUnits.front());
+			}
+			
 			// unit should already be normalised during the data point extraction
 
-			dependencies.addDependency(additionalParameterInfo);
+			dependencies.addDependency(seriesParameterInfo);
 
 			for (const auto& additionalParameter : additionalParameterDecoders)
 			{
@@ -172,6 +183,12 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 					ot::DatasetDependencyInfo additionalParameterInfo;
 					additionalParameterInfo.setLabel(additionalParameter.first);
 					additionalParameterInfo.setValue(value);
+
+					const auto& parameterUnits = parameterTuple.getTupleUnits();
+					if (!parameterUnits.empty()) {
+						additionalParameterInfo.setUnit(parameterUnits.front());
+					}
+
 					//unit should already be normalised during the data point extraction
 					//additionalParameterInfo.m_unit = parameterTuple.getTupleUnits().front(); 
 
