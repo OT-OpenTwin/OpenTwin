@@ -197,35 +197,38 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 
 void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions)
 {
-	EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
-	EntityPropertiesSelection* quCompRadiusAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName()));
-	EntityPropertiesSelection* quCompPhaseAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName()));
-
-	bool showCartesian = (_tupleFormat == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
-
-	ot::TupleDescription* description = TupleFactory::create(_tupleType);
-	if (description != nullptr)
+	if (_tupleType != "")
 	{
-		std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
-		if (quCompYAxis->getOptions() != tupleOptionsVec)
-		{
-			quCompYAxis->resetOptions(tupleOptionsVec);
-		}
-		//For the other two axis settings it is also possible to select the parameter, but we skip the empty entry at the beginning of the list.
-		tupleOptionsVec.insert(tupleOptionsVec.end(), ++_parameterOptions.begin(), _parameterOptions.end());
-		if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
-		{
-			quCompRadiusAxis->resetOptions(tupleOptionsVec);
-			quCompPhaseAxis->resetOptions(tupleOptionsVec);
-		}
+		EntityPropertiesSelection* quCompYAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getYAxisPropertyGroupName()));
+		EntityPropertiesSelection* quCompRadiusAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getRadiusAxisPropertyGroupName()));
+		EntityPropertiesSelection* quCompPhaseAxis = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(this, "Quantity component", getAzimuthAxisPropertyGroupName()));
 
-		quCompYAxis->setVisible(showCartesian);
-		quCompRadiusAxis->setVisible(!showCartesian);
-		quCompPhaseAxis->setVisible(!showCartesian);
-	}
-	else
-	{
-		assert(false);
+		bool showCartesian = (_tupleFormat == ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
+
+		ot::TupleDescription* description = TupleFactory::create(_tupleType);
+		if (description != nullptr)
+		{
+			std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
+			if (quCompYAxis->getOptions() != tupleOptionsVec)
+			{
+				quCompYAxis->resetOptions(tupleOptionsVec);
+			}
+			//For the other two axis settings it is also possible to select the parameter, but we skip the empty entry at the beginning of the list.
+			tupleOptionsVec.insert(tupleOptionsVec.end(), ++_parameterOptions.begin(), _parameterOptions.end());
+			if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
+			{
+				quCompRadiusAxis->resetOptions(tupleOptionsVec);
+				quCompPhaseAxis->resetOptions(tupleOptionsVec);
+			}
+
+			quCompYAxis->setVisible(showCartesian);
+			quCompRadiusAxis->setVisible(!showCartesian);
+			quCompPhaseAxis->setVisible(!showCartesian);
+		}
+		else
+		{
+			assert(false);
+		}
 	}
 }
 
@@ -681,7 +684,12 @@ void EntityResult1DPlot::updateCurveDependencies()
 	const std::string currentSelection = parameterSelection->getValue();
 	if (parameterSelection != nullptr && parameterSelection->getOptions() != queryParameterList)
 	{
+		const std::string currentParameterSelection = parameterSelection->getValue();
 		parameterSelection->resetOptions(queryParameterList);
+		if (std::find(queryParameterList.begin(), queryParameterList.end(), currentParameterSelection) != queryParameterList.end())
+		{
+			parameterSelection->setValue(currentParameterSelection);
+		}
 		const auto& temp = parameterSelection->getOptions();
 		if (std::find(temp.begin(), temp.end(), currentSelection) != temp.end())
 		{
