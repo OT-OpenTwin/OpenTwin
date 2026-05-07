@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ProjectManagement.cpp
 // 
 // License:
@@ -28,7 +28,6 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
 #include "OTCore/ReturnMessage.h"
-#include "OTCore/ResultCollectionDefaultIndexes.h"
 #include "OTModelEntities/DataBase.h"
 
 // DB header
@@ -38,7 +37,7 @@
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTDataStorage/Helper/BsonValuesHelper.h"
-
+#include "OTDataStorage/DataLakeHelper.h"
 // MongoDB header
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -1084,14 +1083,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 			
 			// IndexHandler class in the ResultDatabaseAccess lib also creates these indexes
-			bsoncxx::builder::basic::document index{};
-			for (size_t i = 0; i < ResultCollectionDefaultIndexes::getDefaultIndexes().size(); i++)
-			{
-				const std::string& indexName = ResultCollectionDefaultIndexes::getDefaultIndexes()[i];
-				index.append(bsoncxx::builder::basic::kvp(indexName, 1));
-			}
-			collection.create_index(index.view());
-
+			DataLakeHelper::createDefaultIndexes(collectionName);
 			std::list<bsoncxx::builder::basic::document*> cachedDocuments;
 
 			for (size_t index = 0; index < numberResultDocuments; index++)

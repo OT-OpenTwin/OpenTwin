@@ -26,7 +26,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/TimeFormatter.h"
-#include "OTCore/ResultCollectionDefaultIndexes.h"
+
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTCore/DataStruct/GenericDataStructSingle.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
@@ -79,13 +79,8 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 		options.sort(m_sort);
 		bsoncxx::builder::basic::document hintDoc;
 		//Here we switched to a compound index. Bad style, but for now it works.
-		auto index = ResultCollectionDefaultIndexes::getDefaultIndexes().begin();
-		hintDoc.append(bsoncxx::builder::basic::kvp(*index, 1));
-		index++;
-		hintDoc.append(bsoncxx::builder::basic::kvp(*index, 1));
+		mongocxx::v_noabi::hint hint = DataLakeHelper::getDefaultIndexHint();
 		SolverReport::instance().addToContent("Hint: " + bsoncxx::to_json(hintDoc) + "\n");
-
-		mongocxx::v_noabi::hint hint(hintDoc.extract());
 		options.hint(hint);
 	}
 	DataLakeHelper dataLakeHelper;

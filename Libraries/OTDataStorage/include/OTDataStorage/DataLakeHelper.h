@@ -14,6 +14,7 @@ public:
 	static std::string getResultCollectionEnding() { return ".results"; }
 	static void createDefaultIndexes(DataStorageAPI::DataLakeAPI& _dataLakeAPI);
 	static void createDefaultIndexes(const std::string& _collectionName);
+	static mongocxx::v_noabi::hint getDefaultIndexHint();
 	static const std::string& getDataFieldName() { return m_resultDataField; }
 private:
 	static const std::string m_resultDataField;

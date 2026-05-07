@@ -532,6 +532,8 @@ bool DataLakeAccessor::transformationNecessary(const ot::TupleInstance& _storedF
 
 bool DataLakeAccessor::alreadyStoredTransformation(const ot::QueryDescription& _queryDescription)
 {
+
+	DataLakeHelper::createDefaultIndexes(m_collectionName);
 	DataStorageAPI::DataLakeAPI transformedCollectionAccess(m_collectionName, m_transformedCollectionEnding);
 
 	const std::string fieldValue = _queryDescription.getQueryTargetDescription().getMongoDBFieldName();

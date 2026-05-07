@@ -12,9 +12,9 @@ ot::JsonDocument DataLakeHelper::executeQuery(const ot::DataLakeAccessCfg& _conf
 {
 	ot::JsonDocument result;
 	ot::JsonArray data;
-
-	auto startTime = std::chrono::high_resolution_clock::now();
 	const std::string& collectionName = _config.getCollectionName();
+	createDefaultIndexes(collectionName);
+	auto startTime = std::chrono::high_resolution_clock::now();
 	for (auto queryByCollection : _config.getQueriesByCollection())
 	{
 		
@@ -48,11 +48,12 @@ ot::JsonDocument DataLakeHelper::executeQuery(const ot::DataLakeAccessCfg& _conf
 	return clearTextResult;
 }
 
+const std::vector<std::string> g_defaultIndexes = { "Quantity" ,"Series" };
+
 void DataLakeHelper::createDefaultIndexes(DataStorageAPI::DataLakeAPI& _dataLakeAPI)
 {
-	std::vector<std::string> defaultIndexes = { "Quantity" ,"Series" };
 	bsoncxx::builder::basic::document index{};
-	for (const std::string& indexName : defaultIndexes)
+	for (const std::string& indexName : g_defaultIndexes)
 	{
 		index.append(bsoncxx::builder::basic::kvp(indexName, 1));
 	}
@@ -61,10 +62,21 @@ void DataLakeHelper::createDefaultIndexes(DataStorageAPI::DataLakeAPI& _dataLake
 
 void DataLakeHelper::createDefaultIndexes(const std::string& _collectionName)
 {
-	DataStorageAPI::DataLakeAPI results(_collectionName + getResultCollectionEnding());
+	DataStorageAPI::DataLakeAPI results(_collectionName, getResultCollectionEnding());
 	createDefaultIndexes(results);
-	DataStorageAPI::DataLakeAPI transformed(_collectionName + getTransformedCollectionEnding());
+	DataStorageAPI::DataLakeAPI transformed(_collectionName, getTransformedCollectionEnding());
 	createDefaultIndexes(transformed);
+}
+
+mongocxx::v_noabi::hint DataLakeHelper::getDefaultIndexHint()
+{
+	assert(g_defaultIndexes.size() >= 2);
+	bsoncxx::builder::basic::document hintDoc;
+	hintDoc.append(bsoncxx::builder::basic::kvp(g_defaultIndexes.front(), 1));
+	hintDoc.append(bsoncxx::builder::basic::kvp(g_defaultIndexes.back(), 1));
+	auto docValue = hintDoc.extract();
+	mongocxx::v_noabi::hint hint(std::move(docValue));
+	return hint;
 }
 
 ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessCfg& _config, const ot::JsonDocument& _databaseResults, std::string& _log)
