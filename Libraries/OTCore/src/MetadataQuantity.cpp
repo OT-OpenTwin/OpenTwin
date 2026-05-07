@@ -54,7 +54,6 @@ void MetadataQuantity::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	}
 
 	dependingParameterLabels = ot::json::getStringVector(_object, "DependingParametersLabels");
-	auto allValueDesriptions = ot::json::getArray(_object, "ValueDescriptions");
 	if (ot::json::exists(_object, "TupleDescription"))
 	{
 		auto tupleDescriptionObject = ot::json::getObject(_object, "TupleDescription");
