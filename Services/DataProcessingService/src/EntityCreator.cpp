@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityCreator.cpp
 // 
 // License:
@@ -42,7 +42,7 @@ void EntityCreator::createManifests()
 		ot::EntityCallbackBase::Callback::Selection,
 		Application::instance()->getServiceName()
 	);
-
+	newManifest.setTreeItemEditable(true);
 	newManifest.storeToDataBase();
 	ot::NewModelStateInfo newModelState;
 	newModelState.addTopologyEntity(newManifest);
