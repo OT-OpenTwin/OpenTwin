@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBlockDisplay.cpp
 // 
 // License:
@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTBlockEntities/BlockImageNames.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
-
+#include "OTModelEntities/Properties/PropertyHelper.h"
 static EntityFactoryRegistrar<EntityBlockDisplay> registrar(EntityBlockDisplay::className());
 
 EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
@@ -42,6 +42,8 @@ EntityBlockDisplay::EntityBlockDisplay(ot::UID ID, EntityBase* parent, EntityObs
 void EntityBlockDisplay::createProperties()
 {
 	EntityPropertiesString::createProperty("Display", "Description", "", "default", getProperties());
+	EntityPropertiesBoolean::createProperty("Display", "Show metadata", true, "default", getProperties());
+	EntityPropertiesBoolean::createProperty("Display", "Show data", true, "default", getProperties());
 }
 
 const std::string& EntityBlockDisplay::getDescription()
@@ -65,4 +67,14 @@ ot::GraphicsItemCfg* EntityBlockDisplay::createBlockCfg()
 
 	ot::GraphicsItemCfg* graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
+}
+
+bool EntityBlockDisplay::showData()
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Show data", "Display");
+}
+
+bool EntityBlockDisplay::showMetadata()
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Show metadata", "Display");
 }

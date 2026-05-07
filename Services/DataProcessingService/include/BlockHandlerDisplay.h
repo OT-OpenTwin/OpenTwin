@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerDisplay.h
 // 
 // License:
@@ -34,4 +34,6 @@ private:
 	ot::Connector m_input;
 	std::string m_description;
 
+	bool m_showData;
+	bool m_showMetadata;
 };

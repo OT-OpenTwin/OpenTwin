@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockHandlerDisplay.cpp
 // 
 // License:
@@ -27,6 +27,8 @@ BlockHandlerDisplay::BlockHandlerDisplay(EntityBlockDisplay* _blockEntity, const
 {
 	m_input = _blockEntity->getConnectorInput();
 	m_description = _blockEntity->getDescription();
+	m_showData = _blockEntity->showData();
+	m_showMetadata = _blockEntity->showMetadata();
 }
 
 bool BlockHandlerDisplay::executeSpecialized()
@@ -36,15 +38,21 @@ bool BlockHandlerDisplay::executeSpecialized()
 	auto incomming = m_dataPerPort.find(m_input.getConnectorName());
 	if (incomming->second != nullptr)
 	{
-		ot::JsonValue& data = incomming->second->getData();
-		const std::string dataPretty = ot::json::toPrettyString(data);
+		if (m_showData)
+		{
+			ot::JsonValue& data = incomming->second->getData();
+			const std::string dataPretty = ot::json::toPrettyString(data);
 		
-		displayMessage += "Data: \n" + dataPretty;
+			displayMessage += "Data: \n" + dataPretty;
+		}
 
+		if (m_showMetadata)
+		{
+			ot::JsonValue& metadata =incomming->second->getMetadata();
+			const std::string metaDataPretty = ot::json::toPrettyString(metadata);
+			displayMessage += "\nMetadata:\n" + metaDataPretty;
+		}
 		
-		ot::JsonValue& metadata =incomming->second->getMetadata();
-		const std::string metaDataPretty = ot::json::toPrettyString(metadata);
-		displayMessage += "\nMetadata:\n" + metaDataPretty;
 		_uiComponent->displayMessage(displayMessage + "\n");
 	}
 	else
