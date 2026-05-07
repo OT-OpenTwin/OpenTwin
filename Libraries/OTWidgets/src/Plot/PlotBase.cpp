@@ -712,11 +712,20 @@ void ot::PlotBase::updateDatasetTitleFromDependency(const std::list<PlotDataset*
 
 			if (dependency.has_value())
 			{
-				nameInfo.title.append(" (" + _dependencyInfo.getLabel() + " = " + dependency->getValue() + ")");
-			}
-			else
-			{
-				nameInfo.title.append(" (" + _dependencyInfo.getLabel() + " = NaN)");
+				std::string unitStr;
+				if (!dependency->getUnit().empty())
+				{
+					unitStr = " " + dependency->getUnit();
+				}
+				
+				if (dependency->getLabel() == MetadataQuantity::getFieldName())
+				{
+					nameInfo.title.append(" (" + dependency->getValue() + unitStr + ")");
+				}
+				else
+				{
+					nameInfo.title.append(" (" + dependency->getLabel() + " = " + dependency->getValue() + unitStr + ")");
+				}
 			}
 			break;
 
