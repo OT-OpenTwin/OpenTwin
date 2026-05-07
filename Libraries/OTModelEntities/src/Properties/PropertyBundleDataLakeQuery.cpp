@@ -256,12 +256,12 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		}
 		std::list<std::string> allOptions;
 		vectorize(overView, allOptions, "");
+		allOptions.push_front("");
 		for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
 		{
 			const std::string groupName = m_groupSeriesMetadata + "_" + std::to_string(i);
 			PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->resetOptions(allOptions);
 		}
-		allOptions.push_front("");
 		setNameOptions(_thisObject, seriesNames, m_groupMetadataFilter, m_propertyNameSeriesMetadata);
 	}
 
