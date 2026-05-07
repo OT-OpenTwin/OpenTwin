@@ -163,6 +163,7 @@ namespace ot {
 		//! The curve keeps ownership of the painter.
 		const Painter2D* getPointFillPainter() const { return m_pointFillPainter.getPainter(); };
 
+		void setDataAccessConfig(const DataLakeAccessCfg& _dataAccessConfig) { m_dataAccessConfig = _dataAccessConfig; };
 		void setDataAccessConfig(DataLakeAccessCfg&& _dataAccessConfig) { m_dataAccessConfig = std::move(_dataAccessConfig); };
 		const DataLakeAccessCfg& getDataAccessConfig() const { return m_dataAccessConfig; };
 

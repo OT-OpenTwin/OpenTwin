@@ -91,6 +91,9 @@ public:
 	std::list<std::string> getQuantityOptions() const;
 	std::list<std::string> getTupleOptions() const;
 	std::string getTupleType() const;
+
+	std::string getCustomCurveTitle() const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	bool tuplePropertiesAreVisible();

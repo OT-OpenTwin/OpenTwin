@@ -278,8 +278,9 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve(true));
 	
-
-	// Entity for title base
+	// Custom title
+	EntityPropertiesString* titleProp = EntityPropertiesString::createProperty("General", "Custom Title", "", "", getProperties());
+	titleProp->setToolTip("Custom curve title to be shown in the plot legend. If empty, the curve name will be used as title.");
 
 	m_queryProperties.setProperties(this);
 
@@ -335,22 +336,8 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 
 	curveCfg.setLinePen(penCfg);
 
-	std::string curveLabel("");
-
-	curveLabel = getName();
-	auto shortName = ot::EntityName::getSubName(curveLabel);
-	if (shortName.has_value())
-	{
-		curveLabel = shortName.value();
-	}
-	else
-	{
-		assert(false); //Failed to get the short name which should always be possible
-		curveLabel = "";
-	}
-	auto dlAccessCfg = m_dataLakeAccessCfg;
-	curveCfg.setDataAccessConfig(std::move(dlAccessCfg));
-	curveCfg.setTitle(curveLabel);
+	curveCfg.setDataAccessConfig(m_dataLakeAccessCfg);
+	curveCfg.setTitle(getCustomCurveTitle());
 
 	std::pair<uint32_t,std::string> selectedMatrixIndex =	m_queryProperties.getMatrixIndex(this);
 	curveCfg.setMatrixIndex(selectedMatrixIndex.first);
@@ -417,7 +404,13 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 		{
 			symbolFillColorProp->setValue(_curve.getPointFillPainter());
 		}
-		
+
+		EntityPropertiesString* titleProp = PropertyHelper::getStringProperty(this, "Custom Title");
+		if (titleProp)
+		{
+			titleProp->setValue(_curve.getTitle());
+		}
+
 		m_dataLakeAccessCfg = _curve.getDataAccessConfig();
 	}
 	catch (...)
@@ -454,6 +447,11 @@ std::list<std::string> EntityResult1DCurve::getTupleOptions() const
 std::string EntityResult1DCurve::getTupleType() const
 {
 	return m_queryProperties.getTupleType(this);
+}
+
+std::string EntityResult1DCurve::getCustomCurveTitle() const
+{
+	return PropertyHelper::getStringPropertyValue(this, "Custom Title", "General");
 }
 
 void EntityResult1DCurve::setStaticCurveQueryOptions(const ot::Plot1DCurveCfg& _curve)
