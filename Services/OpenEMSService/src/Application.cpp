@@ -464,22 +464,23 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		fdtdSolver.convertAndStoreResults();
 	}
 
+	// Stop the python subprocess to ensure that all file handles are closed
+	std::string logFileText;
+	m_subprocessManager->endLogging(logFileText);
+	m_subprocessManager->shutdownSubprocess();
+
 	// Remove the temp dir if requested
 	if (debugFlag)
 	{
-		m_subprocessManager->addLogText("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath + "\n", true);
+		this->getUiComponent()->displayMessage("\n\nWARNING: The working folder has not been deleted for debugging purposes: " + tempDirPath + "\n");
 	}
 	else
 	{
 		if (!deleteDirectory(tempDirPath))
 		{
-			m_subprocessManager->addLogText("ERROR: Unable to remove the temporary working directory: " + tempDirPath + "\n", true);
+			this->getUiComponent()->displayMessage("ERROR: Unable to remove the temporary working directory: " + tempDirPath + "\n");
 		}
 	}
-
-	std::string logFileText;
-	m_subprocessManager->endLogging(logFileText);
-	m_subprocessManager->shutdownSubprocess();
 
 	// Store the log text in a result item
 	EntityResultText* text = this->getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
