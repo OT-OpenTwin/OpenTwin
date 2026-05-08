@@ -1797,7 +1797,7 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 
 		this->setEntityContainerName(ot::json::getString(dataDoc, "ContainerName"));
 		this->setEntityContainerID(ot::json::getUInt64(dataDoc, "ContainerID"));
-		this->setValueID(ot::json::getUInt64(dataDoc, "ValueID"));
+		this->setValueID(ot::invalidUID);
 	}
 
 
