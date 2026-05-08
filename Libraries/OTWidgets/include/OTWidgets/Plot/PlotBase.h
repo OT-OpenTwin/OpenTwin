@@ -191,6 +191,9 @@ namespace ot {
 		
 		virtual void showEvent(QShowEvent* _event) override;
 
+	private Q_SLOTS:
+		void slotColorStyleChanged();
+
 	private:
 		struct PreferredDatasetNameInfo
 		{
