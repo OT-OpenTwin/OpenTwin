@@ -98,6 +98,7 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\LibraryManagementService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\HierarchicalProjectService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\FileManagementProjectService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenEMSService.dll" 2>NUL
+DEL "%OPENTWIN_DEPLOYMENT_DIR%\UpdateModelLibraries.bat" 2>NUL
 
 ECHO Delete color styles
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles\*.otcsf" 2>NUL
@@ -221,7 +222,10 @@ REM ====================================================================
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateBuildInformation.bat"
 
-
+REM ====================================================================
+REM  Copy Update model library script
+REM ====================================================================
+COPY "%OPENTWIN_DEV_ROOT%\Scripts\Other\UpdateModelLibraries.bat" "%OT_DEPLOYMENT_DIR%"
 GOTO END
 
 :PAUSE_END

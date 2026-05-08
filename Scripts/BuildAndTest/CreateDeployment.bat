@@ -32,13 +32,14 @@ REM Shutdown the session and authorisation services if they are still running
 REM ===========================================================================
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\ShutdownAll.bat"
-
 REM Clean up the Deployment directory
 RMDIR /S /Q "%OT_DEPLOYMENT_DIR%"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Deployment_Documentation"
 
 MKDIR "%OT_DEPLOYMENT_DIR%"
 MKDIR "%OT_DEPLOYMENT_DIR%\Certificates"
+
+
 
 REM ===========================================================================
 REM Copy the library files
@@ -259,6 +260,9 @@ COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem" "%OT_DE
 
 ECHO [Paths] > "%OT_DEPLOYMENT_DIR%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OT_DEPLOYMENT_DIR%\qt.conf"
+
+REM Update model library script
+CALL "%OT_DEPLOYMENT_DIR%\UpdateModelLibraries.bat"
 
 GOTO END
 
