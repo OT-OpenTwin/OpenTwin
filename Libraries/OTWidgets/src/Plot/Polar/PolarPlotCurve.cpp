@@ -106,18 +106,10 @@ namespace ot {
 }
 
 ot::PolarPlotCurve::PolarPlotCurve(const QString& _title) :
-	QwtPolarCurve(_title), m_highlightPen(Qt::NoPen), m_pointInterval(1), m_hasHighlight(false)
+	QwtPolarCurve(_title), m_pointInterval(1)
 {
     setZ(PlotBase::ItemZOrder::visibleCurves());
     setRenderHint(QwtPolarItem::RenderHint::RenderAntialiased, true);
-}
-
-void ot::PolarPlotCurve::setHighlight(bool _highlight) {
-	if (_highlight == m_hasHighlight) {
-		return;
-	}
-
-	m_hasHighlight = _highlight;
 }
 
 void ot::PolarPlotCurve::drawCurve(QPainter* _painter, int _style, const QwtScaleMap& _azimuthMap, const QwtScaleMap& _radialMap, const QPointF& _pole, int _from, int _to) const
@@ -248,13 +240,6 @@ void ot::PolarPlotCurve::drawLines(QPainter* _painter, const QwtScaleMap& _azimu
         clipRect = clipRect.toRect().adjusted(-off, -off, off, off);
         QwtClipper::clipPolygonF(clipRect, polyline);
     }
-
-    if (m_hasHighlight) {
-        _painter->save();
-		_painter->setPen(m_highlightPen);
-        QwtPainter::drawPolyline(_painter, polyline);
-		_painter->restore();
-	}
 
     QwtPainter::drawPolyline(_painter, polyline);
 }

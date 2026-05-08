@@ -46,10 +46,6 @@ namespace ot {
 
 		// Setter / Getter
 
-		void setHighlightPen(const QPen& _pen) { m_highlightPen = _pen; };
-
-		void setHighlight(bool _highlight);
-
 		void setPointInterval(int _interval) { m_pointInterval = _interval; };
 		int getPointInterval() const { return m_pointInterval; };
 
@@ -61,8 +57,6 @@ namespace ot {
 		virtual void drawLines(QPainter* _painter, const QwtScaleMap& _azimuthMap, const QwtScaleMap& _radialMap, const QPointF& _pole, int _from, int _to) const override;
 
 	private:
-		QPen m_highlightPen;
-		bool m_hasHighlight;
 		int m_pointInterval;
 	};
 

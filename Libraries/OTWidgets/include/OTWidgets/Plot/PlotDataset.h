@@ -149,6 +149,7 @@ namespace ot {
 		bool isSelected() const { return m_isSelected; };
 
 		void setHighlighted(bool _hasHighlight);
+		void setOtherHasHighlight(bool _otherHasHighlight);
 
 		void setNavigationId(UID _id) { m_config.setNavigationId(_id); };
 		UID getNavigationId() const { return m_config.getNavigationId(); };
@@ -194,7 +195,8 @@ namespace ot {
 
 		bool m_isAttatched = false;
 		bool m_isSelected = true;
-
+		bool m_otherHasHighlight = false;
+		
 		PlotDatasetData m_data;
 
 		// Plot elements

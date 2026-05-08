@@ -129,14 +129,44 @@ void ot::PlotLegendItem::detach()
 
 void ot::PlotLegendItem::slotHovered()
 {
+	OTAssertNullptr(m_legend);
 	OTAssertNullptr(m_dataset);
+
+	auto plot = m_legend->getPlot();
+	OTAssertNullptr(plot);
+
 	m_dataset->setHighlighted(true);
+
+	for (auto dataset : m_legend->getPlot()->getAllDatasets())
+	{
+		if (dataset != m_dataset)
+		{
+			dataset->setOtherHasHighlight(true);
+		}
+	}
+
+	plot->replot();
 }
 
 void ot::PlotLegendItem::slotUnhovered()
 {
+	OTAssertNullptr(m_legend);
 	OTAssertNullptr(m_dataset);
+
+	auto plot = m_legend->getPlot();
+	OTAssertNullptr(plot);
+
 	m_dataset->setHighlighted(false);
+
+	for (auto dataset : m_legend->getPlot()->getAllDatasets())
+	{
+		if (dataset != m_dataset)
+		{
+			dataset->setOtherHasHighlight(false);
+		}
+	}
+
+	plot->replot();
 }
 
 void ot::PlotLegendItem::slotClicked(Qt::KeyboardModifiers _modifiers)

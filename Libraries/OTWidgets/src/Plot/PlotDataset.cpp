@@ -390,17 +390,23 @@ void ot::PlotDataset::setHighlighted(bool _hasHighlight)
 
 	if (m_cartesianCurve)
 	{
-		m_cartesianCurve->setHighlight(_hasHighlight);
 		m_cartesianCurve->setZ(zVal);
 	}
 	if (m_polarCurve)
 	{
-		m_polarCurve->setHighlight(_hasHighlight);
 		m_polarCurve->setZ(zVal);
 	}
+}
 
-	OTAssertNullptr(m_ownerPlot);
-	m_ownerPlot->replot();
+void ot::PlotDataset::setOtherHasHighlight(bool _otherHasHighlight)
+{
+	if (m_otherHasHighlight == _otherHasHighlight)
+	{
+		return;
+	}
+
+	m_otherHasHighlight = _otherHasHighlight;
+	updateCurveVisualization();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -423,10 +429,6 @@ void ot::PlotDataset::updateCurveVisualization()
 	dimmedPen.setWidthF(linePen.width());
 
 	QPen invisPen(QBrush(), 0., Qt::NoPen);
-
-	QPen highlightPen = linePen;
-	highlightPen.setBrush(cs.getValue(ColorStyleValueEntry::PlotCurveHighlight).toBrush());
-	highlightPen.setWidthF(linePen.width() + 2.);
 
 	Plot1DCurveCfg::Symbol pointSymbol = m_config.getPointSymbol();
 	int pointSize = m_config.getPointSize();
@@ -458,26 +460,24 @@ void ot::PlotDataset::updateCurveVisualization()
 
 	double zVal = PlotBase::ItemZOrder::visibleCurves();
 
-	if (!m_isSelected)
+	if (!m_isSelected || m_otherHasHighlight)
 	{
 		zVal = PlotBase::ItemZOrder::dimmedCurves();
 	}
 
 	if (m_cartesianCurve)
 	{
-		m_cartesianCurve->setHighlightPen(highlightPen);
 		m_cartesianCurve->setZ(zVal);
 	}
 	if (m_polarCurve)
 	{
-		m_polarCurve->setHighlightPen(highlightPen);
 		m_polarCurve->setZ(zVal);
 	}
 
 	// Setup curve pen
 	if (m_config.getVisible())
 	{
-		if (m_config.getDimmed())
+		if (m_config.getDimmed() || m_otherHasHighlight)
 		{
 			// Dimmend curve pen
 			if (m_cartesianCurve)
@@ -518,7 +518,7 @@ void ot::PlotDataset::updateCurveVisualization()
 	// Setup points
 	if (pointSymbol != Plot1DCurveCfg::NoSymbol)
 	{
-		if (m_config.getDimmed())
+		if (m_config.getDimmed() || m_otherHasHighlight)
 		{
 			if (m_config.getLinePen().getStyle() == LineStyle::NoLine)
 			{
