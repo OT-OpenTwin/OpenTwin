@@ -101,9 +101,6 @@ bool EntityResult1DPlot::updateFromProperties()
 	bool gridRefresh = updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 
-
-
-
 	return gridRefresh;
 }
 
@@ -421,13 +418,13 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 	EntityPropertiesString::createProperty(_axisName, "Label override", "", "", getProperties());
 
 	std::list<std::string> displayNumberFormatOptions = {
-		ot::String::toString(ot::String::Auto),
+		//ot::String::toString(ot::String::Auto),
 		ot::String::toString(ot::String::Integer),
 		ot::String::toString(ot::String::Decimal),
 		ot::String::toString(ot::String::Scientific),
 		ot::String::toString(ot::String::Engineering)
 	};
-	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Auto), "", getProperties());
+	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Decimal), "", getProperties());
 	EntityPropertiesInteger::createProperty(_axisName, "Display number precision", 3, 1, 99, "", getProperties())->setAllowCustomValues(false);
 }
 
