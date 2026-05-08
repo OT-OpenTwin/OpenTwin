@@ -387,7 +387,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Voltages");
 		plotCfg.setXAxisParameter(defaultAxis);
-		newPlotVoltages.setPlot(plotCfg);
+		newPlotVoltages.setStaticCurveQueryOptions(plotCfg);
 		newPlotVoltages.storeToDataBase();
 		_modelComponent->addNewTopologyEntity(newPlotVoltages.getEntityID(), newPlotVoltages.getEntityStorageVersion(), false);
 	}
@@ -404,7 +404,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 		plotCfg.setTitle("Currents");
 		plotCfg.setXAxisParameter(defaultAxis);
 
-		newPlotCurrents.setPlot(plotCfg);
+		newPlotCurrents.setStaticCurveQueryOptions(plotCfg);
 		newPlotCurrents.storeToDataBase();
 
 		_modelComponent->addNewTopologyEntity(newPlotCurrents.getEntityID(), newPlotCurrents.getEntityStorageVersion(), false);
