@@ -204,6 +204,8 @@ private:
 	std::string getAdminUserName() { return "admin"; }
 	std::string createRandomPassword();
 	bool removeOldSessionsWorker();
+	void setDatabaseVersion(int version);
+	int getDatabaseVersion();
 
 	std::string m_serviceURL;
 	std::string m_databaseURL;
@@ -212,6 +214,8 @@ private:
 	std::string m_dbUsername;
 	std::string m_dbPassword;
 	std::mutex m_mutex;
+
+	const int m_dataBaseVersion = 1;
 
 	ServiceBase() = default;
 };

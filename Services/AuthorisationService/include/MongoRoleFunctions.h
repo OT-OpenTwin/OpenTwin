@@ -23,6 +23,7 @@
 #include <cstdint>
 #include <iostream>
 #include <vector>
+#include <set>
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/types.hpp>
 #include <mongocxx/client.hpp>
@@ -53,6 +54,7 @@ namespace MongoRoleFunctions
 	bool createInitialProjectRole(mongocxx::client& adminClient);
 	bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient);
 
+	bool createUserPermissionsRole(mongocxx::client& adminClient);
 	bool createInitialUserRole(mongocxx::client& adminClient);
 	bool createInitialUserDbListCollectionsRole(mongocxx::client& adminClient);
 
@@ -88,6 +90,10 @@ namespace MongoRoleFunctions
 
 	void removeRoleFromUser(std::string roleName, std::string username, mongocxx::client& adminClient);
 
-
 	void removeRole(std::string roleName, mongocxx::client& adminClient);
+
+	void getListOfAllUserRoles(std::set<std::string>& userRoles, mongocxx::client& adminClient);
+	void revokeRoleFromRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
+	void grantRoleToRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
+
 }

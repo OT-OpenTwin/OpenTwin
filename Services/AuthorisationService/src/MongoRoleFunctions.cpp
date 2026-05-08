@@ -21,6 +21,8 @@
 #include "MongoUserFunctions.h"
 #include "Group.h"
 
+#include <mongocxx/exception/operation_exception.hpp>
+
 namespace MongoRoleFunctions
 {
 
@@ -86,7 +88,7 @@ namespace MongoRoleFunctions
 
 	bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient)
 	{
-		
+
 		auto builder = document{};
 
 		// This Role is to be used when the user is first created!
@@ -129,6 +131,48 @@ namespace MongoRoleFunctions
 
 		return false;
 
+	}
+
+	bool createUserPermissionsRole(mongocxx::client& adminClient)
+	{
+		using bsoncxx::builder::basic::array;
+
+		bsoncxx::builder::basic::array roles;
+		roles.append(MongoConstants::PROJECT_CATALOG_ROLE);
+		roles.append(MongoConstants::PROJECT_DB_LIST_COLLECTIONS_ROLE);
+		roles.append(MongoConstants::GROUP_ROLE);
+		roles.append(MongoConstants::PROJECT_TEMPLATES_ROLE);
+		roles.append(MongoConstants::PROJECTS_LARGE_DATA_ROLE);
+		roles.append(MongoConstants::SYSTEM_DB_ROLE);
+		roles.append(MongoConstants::SETTINGS_DB_ROLE);
+		roles.append(MongoConstants::LIBRARIES_DB_ROLE);
+
+		bsoncxx::array::value userPermissionRoles = roles.extract();
+
+		auto db = adminClient.database(MongoConstants::ADMIN_DB);
+
+		try {
+			value createCommand = document{}
+				<< "createRole" << MongoConstants::USER_PERMISSIONS_ROLE
+				<< "privileges" << open_array << close_array
+				<< "roles" << userPermissionRoles.view()
+				<< finalize;
+
+			auto result = db.run_command(createCommand.view());
+			return result.view()["ok"].get_double().value == 1.0;
+		}
+		catch (const mongocxx::operation_exception&) {
+			value updateCommand = document{}
+				<< "updateRole" << MongoConstants::USER_PERMISSIONS_ROLE
+				<< "privileges" << open_array << close_array
+				<< "roles" << userPermissionRoles.view()
+				<< finalize;
+
+			auto result = db.run_command(updateCommand.view());
+			return result.view()["ok"].get_double().value == 1.0;
+		}
+
+		return false;
 	}
 
 	bool createInitialUserRole(mongocxx::client& adminClient)
@@ -641,5 +685,174 @@ namespace MongoRoleFunctions
 		view command_view = drop_role_command.view();
 
 		value command_result = adminClient.database(MongoConstants::ADMIN_DB).run_command(command_view);
+	}
+
+	void getListOfAllUserRoles(std::set<std::string>& userRoles, mongocxx::client& adminClient)
+	{
+		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB);
+
+		// Fetch all users of the current database
+		auto usersInfo = db.run_command(
+			bsoncxx::builder::stream::document{}
+			<< "usersInfo" << 1
+			<< bsoncxx::builder::stream::finalize
+		);
+
+		auto users = usersInfo.view()["users"].get_array().value;
+
+		for (auto& userElement : users)
+		{
+			auto userDoc = userElement.get_document().value;
+
+			auto roles = userDoc["roles"].get_array().value;
+
+			for (auto& roleElement : roles)
+			{
+				auto roleDoc = roleElement.get_document().value;
+				std::string currentRole = std::string(roleDoc["role"].get_string().value);
+
+				if (currentRole.size() > 5 && currentRole.substr(0, 5) == "user-")
+				{
+					userRoles.emplace(currentRole);
+				}
+			}
+		}
+	}
+
+	void revokeRoleFromRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient)
+	{
+		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB);
+
+		for (const auto& targetRole : roleNames)
+		{
+			// Fetch current role details
+			auto roleInfo = db.run_command(
+				bsoncxx::builder::stream::document{}
+				<< "rolesInfo"
+				<< bsoncxx::builder::stream::open_document
+				<< "role" << targetRole
+				<< "db" << MongoConstants::ADMIN_DB
+				<< bsoncxx::builder::stream::close_document
+				<< "showPrivileges" << false
+				<< "showBuiltinRoles" << false
+				<< bsoncxx::builder::stream::finalize
+			);
+
+			bool roleFound = false;
+
+			auto outerRoles = roleInfo.view()["roles"].get_array().value;
+
+			for (auto&& outerRoleElem : outerRoles) {
+				auto outerRoleDoc = outerRoleElem.get_document().value;
+
+				auto innerRolesElem = outerRoleDoc["roles"];
+				if (innerRolesElem && innerRolesElem.type() == bsoncxx::type::k_array) {
+					auto innerRoles = innerRolesElem.get_array().value;
+
+					for (auto&& innerRoleElem : innerRoles) {
+						auto innerRoleDoc = innerRoleElem.get_document().value;
+
+						auto currentRoleName = innerRoleDoc["role"].get_string().value;
+						auto dbName = innerRoleDoc["db"].get_string().value;
+
+						if (currentRoleName == roleName)
+						{
+							roleFound = true;
+							break;
+						}
+					}
+				}
+			}			
+		
+			// Skip if role is not assigned
+			if (!roleFound)
+			{
+				continue;
+			}
+
+			// Revoke role
+			auto revokeCmd = bsoncxx::builder::stream::document{}
+				<< "revokeRolesFromRole" << targetRole
+				<< "roles"
+				<< bsoncxx::builder::stream::open_array
+				<< bsoncxx::builder::stream::open_document
+				<< "role" << roleName
+				<< "db" << MongoConstants::ADMIN_DB
+				<< bsoncxx::builder::stream::close_document
+				<< bsoncxx::builder::stream::close_array
+				<< bsoncxx::builder::stream::finalize;
+
+			auto result = db.run_command(revokeCmd.view());
+
+			std::cout << "Role '" << roleName
+				<< "' revoked from role: " << targetRole
+				<< std::endl;
+ 		}
+	}
+
+	void grantRoleToRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient)
+	{
+		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB);
+
+		for (const auto& targetRole : roleNames)
+		{
+			// Fetch current role details
+			auto roleInfo = db.run_command(
+				bsoncxx::builder::stream::document{}
+				<< "rolesInfo"
+				<< bsoncxx::builder::stream::open_document
+				<< "role" << targetRole
+				<< "db" << MongoConstants::ADMIN_DB
+				<< bsoncxx::builder::stream::close_document
+				<< "showPrivileges" << false
+				<< "showBuiltinRoles" << false
+				<< bsoncxx::builder::stream::finalize
+			);
+
+			auto roles = roleInfo.view()["roles"].get_array().value;
+			if (roles.begin() == roles.end())
+			{
+				std::cout << "Role '" << targetRole << "' not found - skipping" << std::endl;
+				continue;
+			}
+
+			auto inheritedRoles = roles.begin()->get_document().value["inheritedRoles"].get_array().value;
+
+			// Check if the role is already assigned
+			auto it = std::find_if(std::begin(inheritedRoles), std::end(inheritedRoles),
+				[&](const bsoncxx::array::element& roleElement)
+				{
+					auto roleDoc = roleElement.get_document().value;
+					std::string role = std::string(roleDoc["role"].get_string().value);
+					return role == roleName;
+				});
+
+			// Skip if role is already assigned
+			if (it != std::end(inheritedRoles))
+			{
+				std::cout << "Role '" << roleName
+					<< "' already assigned to role '" << targetRole
+					<< "' - skipping" << std::endl;
+				continue;
+			}
+
+			// Grant role
+			auto grantCmd = bsoncxx::builder::stream::document{}
+				<< "grantRolesToRole" << targetRole
+				<< "roles"
+				<< bsoncxx::builder::stream::open_array
+				<< bsoncxx::builder::stream::open_document
+				<< "role" << roleName
+				<< "db" << MongoConstants::ADMIN_DB
+				<< bsoncxx::builder::stream::close_document
+				<< bsoncxx::builder::stream::close_array
+				<< bsoncxx::builder::stream::finalize;
+
+			db.run_command(grantCmd.view());
+
+			std::cout << "Role '" << roleName
+				<< "' granted to role: " << targetRole
+				<< std::endl;
+		}
 	}
 }

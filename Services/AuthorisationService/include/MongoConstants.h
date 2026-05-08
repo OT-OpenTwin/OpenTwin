@@ -58,4 +58,6 @@ namespace MongoConstants
 	std::string const SESSIONS_COLLECTION = "Sessions";
 	std::string const SESSIONS_ROLE = "sessions_collection_role";
 
+	std::string const USER_PERMISSIONS = "UserPermissions";  // This the general role which is assigned to every user and which has all necessary user permissions
+	std::string const USER_PERMISSIONS_ROLE = "user_permissions_role";
 }

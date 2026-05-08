@@ -979,6 +979,16 @@ void ServiceBase::initializeDatabase() {
 	/* HANDLING USER ROLE AND INDEXES */
 
 	try {
+		MongoRoleFunctions::createUserPermissionsRole(m_adminClient);
+	}
+	catch (std::runtime_error err) {
+		std::string errMsg(err.what());
+		if (errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != std::string::npos && errMsg.find(DB_ERROR_MESSAGE_ALREADY_EXISTS) != errMsg.length() - strlen(DB_ERROR_MESSAGE_ALREADY_EXISTS)) {
+			OT_LOG_E("Error creating user permissions db role in database: " + std::string(err.what()));
+		}
+	}
+
+	try {
 		MongoRoleFunctions::createInitialUserRole(m_adminClient);
 	}
 	catch (std::runtime_error err) {
@@ -1016,6 +1026,39 @@ void ServiceBase::initializeDatabase() {
 	catch (std::runtime_error err) {
 		OT_LOG_E("Error creating db index user_id_unique: " + std::string(err.what()));
 	}
+
+	// Check whether the version of the database has changed and an upgrade is necessary
+	int dataBaseVersion = getDatabaseVersion();
+	if (dataBaseVersion < m_dataBaseVersion)
+	{
+		OT_LOG_I("Database schema upgrade from version " + std::to_string(dataBaseVersion) + " to version " + std::to_string(m_dataBaseVersion));
+	}
+
+	if (dataBaseVersion < 1)
+	{
+		// Add the new user permissions role to all users and remove the obsolete user roles
+		std::set<std::string> userRoles;
+		MongoRoleFunctions::getListOfAllUserRoles(userRoles, m_adminClient);
+
+		try {
+			MongoRoleFunctions::grantRoleToRoles(userRoles, MongoConstants::USER_PERMISSIONS_ROLE, m_adminClient);
+
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::PROJECT_CATALOG_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::PROJECT_CATALOG_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::PROJECT_DB_LIST_COLLECTIONS_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::GROUP_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::PROJECT_TEMPLATES_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::PROJECTS_LARGE_DATA_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::SYSTEM_DB_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::SETTINGS_DB_ROLE, m_adminClient);
+			MongoRoleFunctions::revokeRoleFromRoles(userRoles, MongoConstants::LIBRARIES_DB_ROLE, m_adminClient);
+		}
+		catch (std::runtime_error err) {
+			OT_LOG_E("Error updating user roles: " + std::string(err.what()));
+		}
+	}
+
+	setDatabaseVersion(m_dataBaseVersion);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1057,5 +1100,62 @@ bool ServiceBase::removeOldSessionsWorker() {
 
 		using namespace std::chrono_literals;
 		std::this_thread::sleep_for(3600s);  // Wait for one hour
+	}
+}
+
+void ServiceBase::setDatabaseVersion(int version)
+{
+	mongocxx::database db = m_adminClient.database(MongoConstants::ADMIN_DB);
+
+	auto collection = db["db_version"];
+
+	collection.update_one(
+		bsoncxx::builder::basic::make_document(
+			bsoncxx::builder::basic::kvp("_id", "schema")
+		),
+		bsoncxx::builder::basic::make_document(
+			bsoncxx::builder::basic::kvp(
+				"$set",
+				bsoncxx::builder::basic::make_document(
+					bsoncxx::builder::basic::kvp("version", version)
+				)
+			)
+		),
+		mongocxx::options::update{}.upsert(true)
+	);
+}
+
+int ServiceBase::getDatabaseVersion()
+{
+	mongocxx::database db = m_adminClient.database(MongoConstants::ADMIN_DB);
+
+	auto collection = db["db_version"];
+
+	auto result = collection.find_one(
+		bsoncxx::builder::basic::make_document(
+			bsoncxx::builder::basic::kvp("_id", "schema")
+		)
+	);
+
+	if (!result) {
+		return 0;
+	}
+
+	auto view = result->view();
+	auto versionElement = view["version"];
+
+	if (!versionElement) {
+		return 0;
+	}
+
+	switch (versionElement.type()) {
+	case bsoncxx::type::k_int32:
+		return versionElement.get_int32().value;
+
+	case bsoncxx::type::k_int64:
+		return static_cast<int>(versionElement.get_int64().value);
+
+	default:
+		return 0;
 	}
 }

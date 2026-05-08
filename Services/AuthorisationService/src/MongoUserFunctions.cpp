@@ -158,15 +158,8 @@ namespace MongoUserFunctions
 		// Now we create a new role for this user without permissions
 		MongoRoleFunctions::createUserRole(userRoleName, adminClient);
 
-		// Now add the mandatory roles to this user role
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_CATALOG_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_DB_LIST_COLLECTIONS_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::GROUP_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECT_TEMPLATES_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::PROJECTS_LARGE_DATA_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SYSTEM_DB_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::SETTINGS_DB_ROLE, userRoleName, adminClient);
-		MongoRoleFunctions::addRoleToUserRole(MongoConstants::LIBRARIES_DB_ROLE, userRoleName, adminClient);
+		// Now add the permissions role to this user role
+		MongoRoleFunctions::addRoleToUserRole(MongoConstants::USER_PERMISSIONS_ROLE, userRoleName, adminClient);
 
 		return true;
 	}
