@@ -18,10 +18,12 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/Polar/PolarPlot.h"
 #include "OTWidgets/Plot/Polar/PolarPlotGrid.h"
 
 ot::PolarPlotGrid::PolarPlotGrid(PolarPlot* _plot) : m_plot(_plot) {
+	setZ(PlotBase::ItemZOrder::grid());
 	this->attach(m_plot);
 }
 

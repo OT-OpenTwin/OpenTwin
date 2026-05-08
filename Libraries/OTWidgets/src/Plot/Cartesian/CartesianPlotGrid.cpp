@@ -18,10 +18,12 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTWidgets/Plot/PlotBase.h"
 #include "OTWidgets/Plot/Cartesian/CartesianPlotGrid.h"
 
 ot::CartesianPlotGrid::CartesianPlotGrid() {
-	this->setPen(QColor(100, 100, 100), 0.5);
+	setZ(PlotBase::ItemZOrder::grid());
+	setPen(QColor(100, 100, 100), 0.5);
 }
 
 ot::CartesianPlotGrid::~CartesianPlotGrid() {}
