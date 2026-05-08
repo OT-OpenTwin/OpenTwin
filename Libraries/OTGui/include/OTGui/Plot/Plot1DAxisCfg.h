@@ -135,7 +135,7 @@ namespace ot {
 
 		//! @brief Set the quantity scaling flags for the axis.
 		//! @param _scaling The quantity scaling flags to set for the axis.
-		inline void setQuantityScaling(const ValueScalingFlag& _scaling) { m_valueScaling = _scaling; };
+		inline void setValueScaling(const ValueScalingFlag& _scaling) { m_valueScaling = _scaling; };
 
 		//! @brief Get the quantity scaling flags for the axis.
 		constexpr const ValueScaling& getValueScaling() const { return m_valueScaling; };

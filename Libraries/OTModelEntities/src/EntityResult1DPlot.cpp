@@ -443,6 +443,9 @@ void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot:
 	const ot::String::DisplayNumberFormat displayNumberFormat = ot::String::stringToDisplayNumberFormat(PropertyHelper::getSelectionPropertyValue(this, "Display number format", _axisName));
 	const int displayNumberPrecision = PropertyHelper::getIntegerPropertyValue(this, "Display number precision", _axisName);
 
+	const std::string valueScalingStr = PropertyHelper::getSelectionPropertyValue(this, "Value scaling", _axisName);
+	ot::Plot1DAxisCfg::ValueScalingFlag valueScaling = ot::Plot1DAxisCfg::stringToValueScalingFlag(valueScalingStr);
+
 	_axis.setMin(min);
 	_axis.setMax(max);
 
@@ -454,6 +457,8 @@ void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot:
 
 	_axis.setDisplayNumberFormat(displayNumberFormat);
 	_axis.setDisplayNumberPrecision(displayNumberPrecision);
+
+	_axis.setValueScaling(valueScaling);
 }
 
 bool EntityResult1DPlot::setAxisPropertiesVisibility(const std::string& _axisName, bool _visible)
