@@ -41,8 +41,10 @@ public:
 		AxisCrossButton,
 		CenterAxisCrossButton,
 		CutplaneButton,
+
 		TextEditorSaveButton,
 		TextEditorExportButton,
+
 		TableSaveButton,
 		TableExportCSVButton,
 		TableAddRowBefore,
@@ -52,31 +54,34 @@ public:
 		TabbleAddColumnAfter,
 		TableRemoveColumn,
 
+		PlotExportImage,
+
 		NoButton
 	};
 
-	static ViewerToolBar& instance(void);
+	static ViewerToolBar& instance();
 
 	ButtonType getButtonTypeFromUID(ot::UID _uid) const;
 
 	void viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _type, bool _isModified);
 
-	void setupDefaultControls(void);
+	void setupDefaultControls();
 	void setupUIControls3D(Model* model);
-	void setupUIControlsText(void);
-	void setupUIControlsTable(void);
+	void setupUIControlsText();
+	void setupUIControlsTable();
+	void setupUIControlsPlot();
 	
-	void removeUIControls(void);
+	void removeUIControls();
 
 	void updateViewEnabledState(const ot::UIDList& _selectedTreeItems, Model* model);
-	void updateTextEditorEnabledState(void);
-	void updateTextEditorSaveEnabledState(void);
+	void updateTextEditorEnabledState();
+	void updateTextEditorSaveEnabledState();
 
-	void updateTableEnabledState(void);
-	void updateTableSaveEnabledState(void);
+	void updateTableEnabledState();
+	void updateTableSaveEnabledState();
 
 private:
-	void resetControlsData(void);
+	void resetControlsData();
 
 	ViewerToolBar();
 	~ViewerToolBar();
@@ -112,4 +117,6 @@ private:
 	ot::UID m_tableAddColumnBeforeID;
 	ot::UID m_tableAddColumnAfterID;
 	ot::UID m_tableRemoveColumnID;
+
+	ot::UID m_plotExportImage;
 };

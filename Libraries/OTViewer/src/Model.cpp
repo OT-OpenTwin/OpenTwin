@@ -22,8 +22,10 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 
+#include "OTWidgets/Plot/Plot.h"
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/TextEditor.h"
+#include "OTWidgets/WidgetView/PlotView.h"
 #include "OTWidgets/WidgetView/TableView.h"
 #include "OTWidgets/WidgetView/TextEditorView.h"
 
@@ -82,6 +84,7 @@
 
 // Qt header
 #include <QtWidgets/qheaderview.h>
+#include <QtWidgets/qfiledialog.h>
 
 // std header
 #include <fstream>
@@ -1958,6 +1961,52 @@ void Model::removeTableColumn() {
 	}
 }
 
+void Model::exportPlotAsImage()
+{
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api)
+	{
+		return;
+	}
+
+	ot::PlotView* view = dynamic_cast<ot::PlotView*>(api->getCurrentView());
+
+	if (!view)
+	{
+		OT_LOG_E("Current view is not a plot");
+		return;
+	}
+
+	ot::Plot* plot = view->getPlot();
+	OTAssertNullptr(plot);
+
+	bool infoVis = plot->getInfoLabelVisible();
+	plot->setInfoLabelVisible(false);
+
+	QPixmap screenshot = plot->grab();
+
+	plot->setInfoLabelVisible(infoVis);
+
+	std::string filePath = api->getSaveFileName("Export Plot As Image", "", 
+		ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg })
+	);
+
+	if (filePath.empty())
+	{
+		return;
+	}
+
+	if (!screenshot.save(QString::fromStdString(filePath)))
+	{
+		OT_USER_LOG_E("Failed to save plot image to file: " + filePath);
+	}
+	else
+	{
+		OT_USER_LOG_I("Plot exported as image successfully: " + filePath);
+	}
+}
+
 void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 	// If we switch Main->Navigation->Main we don't want the tool bar to change
 	if (_viewInfo.getTitle() == m_currentCentralView.getTitle() && _viewInfo.getViewType() == m_currentCentralView.getViewType()) {
@@ -1991,6 +2040,15 @@ void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
 		break;
 
+	case ot::WidgetViewBase::View1D:
+		m_hasModalMenu = true;
+		m_previousMenu = FrontendAPI::instance()->getCurrentMenuPage();
+
+		ViewerToolBar::instance().setupUIControlsPlot();
+
+		m_currentMenu = FrontendAPI::instance()->getCurrentMenuPage();
+		break;
+
 	default:
 		break;
 	}
@@ -2012,8 +2070,10 @@ void Model::executeAction(ot::UID _buttonID) {
 	case ViewerToolBar::AxisCrossButton: toggleAxisCross(); break;
 	case ViewerToolBar::CenterAxisCrossButton: toggleCenterAxisCross(); break;
 	case ViewerToolBar::CutplaneButton: toggleCutplane(); break;
+
 	case ViewerToolBar::TextEditorSaveButton: saveTextEditor(); break;
 	case ViewerToolBar::TextEditorExportButton: exportTextEditor(); break;
+
 	case ViewerToolBar::TableSaveButton: saveTable(); break;
 	case ViewerToolBar::TableExportCSVButton: exportTableAsCSV(); break;
 	case ViewerToolBar::TableAddRowBefore: addTableRowBefore(); break;
@@ -2022,6 +2082,9 @@ void Model::executeAction(ot::UID _buttonID) {
 	case ViewerToolBar::TableAddColumnBefore: addTableColumnBefore(); break;
 	case ViewerToolBar::TabbleAddColumnAfter: addTableColumnAfter(); break;
 	case ViewerToolBar::TableRemoveColumn: removeTableColumn(); break;
+
+	case ViewerToolBar::PlotExportImage: exportPlotAsImage(); break;
+
 	case ViewerToolBar::NoButton: break;
 	default:
 		OT_LOG_W("Unknown button (" + std::to_string(_buttonID) + ")");

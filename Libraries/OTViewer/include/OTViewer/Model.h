@@ -240,6 +240,8 @@ private:
 	void addTableColumnAfter();
 	void removeTableColumn();
 
+	void exportPlotAsImage();
+
 	void viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo);
 
 	void	   resetSelection(SceneNodeBase *root);

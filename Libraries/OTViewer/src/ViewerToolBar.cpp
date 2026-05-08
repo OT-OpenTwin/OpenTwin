@@ -27,7 +27,7 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 
-ViewerToolBar& ViewerToolBar::instance(void) {
+ViewerToolBar& ViewerToolBar::instance() {
 	static ViewerToolBar g_instance;
 	return g_instance;
 }
@@ -57,6 +57,8 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 	else if (_uid == m_tableAddColumnAfterID) return ButtonType::TabbleAddColumnAfter;
 	else if (_uid == m_tableRemoveColumnID) return ButtonType::TableRemoveColumn;
 
+	else if (_uid == m_plotExportImage) return ButtonType::PlotExportImage;
+
 	else return ButtonType::NoButton;
 }
 
@@ -75,7 +77,7 @@ void ViewerToolBar::viewDataModifiedHasChanged(ot::WidgetViewBase::ViewType _typ
 	}
 }
 
-void ViewerToolBar::setupDefaultControls(void) {
+void ViewerToolBar::setupDefaultControls() {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
 	if (!m_removeItemIDList.empty()) return;
@@ -117,7 +119,7 @@ void ViewerToolBar::setupUIControls3D(Model *model) {
 	this->updateViewEnabledState(ot::UIDList(), model);
 }
 
-void ViewerToolBar::setupUIControlsText(void) {
+void ViewerToolBar::setupUIControlsText() {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
 	if (!m_removeItemIDList.empty()) return;
@@ -137,7 +139,7 @@ void ViewerToolBar::setupUIControlsText(void) {
 	FrontendAPI::instance()->setCurrentMenuPage("Text Editor");
 }
 
-void ViewerToolBar::setupUIControlsTable(void) {
+void ViewerToolBar::setupUIControlsTable() {
 	assert(FrontendAPI::instance() != nullptr);
 	if (FrontendAPI::instance() == nullptr) return;
 	if (!m_removeItemIDList.empty()) return;
@@ -172,7 +174,24 @@ void ViewerToolBar::setupUIControlsTable(void) {
 	FrontendAPI::instance()->setCurrentMenuPage("Table");
 }
 
-void ViewerToolBar::removeUIControls(void) {
+void ViewerToolBar::setupUIControlsPlot()
+{
+	assert(FrontendAPI::instance() != nullptr);
+	if (FrontendAPI::instance() == nullptr) return;
+	if (!m_removeItemIDList.empty()) return;
+
+	ot::UID pageID = FrontendAPI::instance()->addMenuPage("Plot");
+	ot::UID plotGroupID = FrontendAPI::instance()->addMenuGroup(pageID, "Plot");
+
+	m_removeItemIDList.push_front(pageID);
+	m_removeItemIDList.push_front(plotGroupID);
+
+	m_removeItemIDList.push_front(m_plotExportImage = FrontendAPI::instance()->addMenuPushButton(plotGroupID, "Export Image", "ImageSave"));
+
+	FrontendAPI::instance()->setCurrentMenuPage("Plot");
+}
+
+void ViewerToolBar::removeUIControls() {
 	if (m_removeItemIDList.empty()) {
 		return;
 	}
@@ -234,11 +253,11 @@ void ViewerToolBar::updateViewEnabledState(const ot::UIDList& _selectedTreeItems
 	}
 }
 
-void ViewerToolBar::updateTextEditorEnabledState(void) {
+void ViewerToolBar::updateTextEditorEnabledState() {
 	this->updateTextEditorSaveEnabledState();
 }
 
-void ViewerToolBar::updateTextEditorSaveEnabledState(void) {
+void ViewerToolBar::updateTextEditorSaveEnabledState() {
 	if (!m_removeItemIDList.empty()) {
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
@@ -255,11 +274,11 @@ void ViewerToolBar::updateTextEditorSaveEnabledState(void) {
 	}
 }
 
-void ViewerToolBar::updateTableEnabledState(void) {
+void ViewerToolBar::updateTableEnabledState() {
 	this->updateTableSaveEnabledState();
 }
 
-void ViewerToolBar::updateTableSaveEnabledState(void) {
+void ViewerToolBar::updateTableSaveEnabledState() {
 	if (!m_removeItemIDList.empty()) {
 		std::list<unsigned long long> enabled;
 		std::list<unsigned long long> disabled;
@@ -276,7 +295,7 @@ void ViewerToolBar::updateTableSaveEnabledState(void) {
 	}
 }
 
-void ViewerToolBar::resetControlsData(void) {
+void ViewerToolBar::resetControlsData() {
 	m_viewPageID = 0;
 	m_operationsGroupID = 0;
 	m_visiblityGroupID = 0;
@@ -297,6 +316,16 @@ void ViewerToolBar::resetControlsData(void) {
 	m_textEditorDataID = 0;
 	m_textEditorExportID = 0;
 	m_textEditorSaveID = 0;
+
+	m_tableSaveID = 0;
+	m_tableAddColumnAfterID = 0;
+	m_tableAddColumnBeforeID = 0;
+	m_tableAddRowAfterID = 0;
+	m_tableAddRowBeforeID = 0;
+	m_tableRemoveColumnID = 0;
+	m_tableRemoveRowID = 0;
+	
+	m_plotExportImage = 0;
 }
 
 ViewerToolBar::ViewerToolBar() {

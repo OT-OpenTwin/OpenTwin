@@ -591,6 +591,16 @@ void ot::PlotBase::updateDatasetTitles()
 	*/
 }
 
+void ot::PlotBase::setInfoLabelVisible(bool _visible)
+{
+	m_infoLabel->setVisible(_visible);
+}
+
+bool ot::PlotBase::getInfoLabelVisible() const
+{
+	return m_infoLabel->isVisible();
+}
+
 void ot::PlotBase::updateAxisTitles(bool _replot)
 {
 	// Update data info

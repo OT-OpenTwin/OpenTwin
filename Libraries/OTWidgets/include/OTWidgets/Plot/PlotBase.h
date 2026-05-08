@@ -170,6 +170,9 @@ namespace ot {
 		//! @param _dependencyLabelInfoList 
 		void updateDatasetTitles();
 
+		void setInfoLabelVisible(bool _visible);
+		bool getInfoLabelVisible() const;
+
 	Q_SIGNALS:
 		void resetItemSelectionRequest();
 		void curveDoubleClicked(PlotDataset* _dataset, bool _hasControlModifier);
