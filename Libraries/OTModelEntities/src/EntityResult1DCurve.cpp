@@ -119,6 +119,9 @@ bool EntityResult1DCurve::updateFromProperties()
 
 			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
 			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
+
+			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Custom Title", "General")->needsUpdate();
+
 			refresh |= dataRefreshNeeded;
 
 			if(dataRefreshNeeded)
