@@ -906,32 +906,60 @@ void FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, En
 	ot::JsonDocument metaDoc;
 	metaDoc.fromJson(metaContent);
 
-	// Update LibraryElementID to manifest ID
-	metaDoc.RemoveMember("LibraryElementID");
-	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_manifestEntity->getManifestID()), metaDoc.GetAllocator());
-
-	// Update Version 
-	metaDoc.RemoveMember("Version");
-	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
-
-	// Update name and filename
-	metaDoc.RemoveMember("Name");
-	metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_manifestEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-
 	// Export manifest .txt file
 	std::string manifestFileName = environmentPath + "/" + ensureFileExtension(_manifestEntity->getNameOnly(), ".txt");
 	std::string manifestContent = _manifestEntity->getText();
-	
-	// Export metadata .otmeta.json file
+
+	// Export metadata .otmeta.json file (WITHOUT dynamic parameters yet)
 	std::string metaFileName = environmentPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
 	std::string metaJson = ot::json::toJson(metaDoc);
-	
-	// Check if files exist and handle accordingly
-	if (checkAndHandleFileOverwrite(manifestFileName, manifestContent, metaFileName, metaJson)) {
+
+	FileOverwriteStatus status = checkAndHandleFileOverwrite(manifestFileName, manifestContent, metaFileName, metaJson);
+
+	// Check if files exist and if content changed (only checks, no prompt yet!)
+	if (status == FileOverwriteStatus::Write)
+	{
+		// File check passed - NOW add the dynamic parameters
+		metaDoc.RemoveMember("LibraryElementID");
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_manifestEntity->getManifestID()), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Version");
+		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Name");
+		metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		metaDoc.RemoveMember("FileName");
+		metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_manifestEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+		// Update metaJson with dynamic parameters
+		metaJson = ot::json::toJson(metaDoc);
+
 		writeFileToPath(manifestFileName, manifestContent);
 		writeFileToPath(metaFileName, metaJson);
+	}
+	else if(status == FileOverwriteStatus::PromptUser)
+	{
+		// File check indicated changes - NOW add dynamic parameters and prompt
+		metaDoc.RemoveMember("LibraryElementID");
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_manifestEntity->getManifestID()), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Version");
+		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Name");
+		metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		metaDoc.RemoveMember("FileName");
+		metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_manifestEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+		// Update metaJson with dynamic parameters
+		metaJson = ot::json::toJson(metaDoc);
+
+		// NOW prompt with the updated content
+		promptUserForOverwrite(manifestFileName, metaFileName, manifestContent, metaJson);
+	}
+	else if (status == FileOverwriteStatus::Skip) 
+	{
+		return;
 	}
 }
 
@@ -949,84 +977,120 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	ot::JsonDocument metaDoc;
 	metaDoc.fromJson(metaContent);
 
-	// Update LibraryElementID to script entity ID
-	metaDoc.RemoveMember("LibraryElementID");
-	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_scriptEntity->getEntityID()), metaDoc.GetAllocator());
-
-	// Update Version
-	metaDoc.RemoveMember("Version");
-	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
-
-	// Update name and filename
-	metaDoc.RemoveMember("Name");
-	metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_scriptEntity->getNameOnly(), ".py"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-
-	// Update AdditionalInfos with dependency information
-	if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
-		metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
-		metaDoc["AdditionalInfos"].RemoveMember("DependencyCollection");
-		metaDoc["AdditionalInfos"].AddMember("DependencyID", ot::JsonString(std::to_string(_environmentID), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-		metaDoc["AdditionalInfos"].AddMember("DependencyCollection", ot::JsonString("PythonEnvironments", metaDoc.GetAllocator()), metaDoc.GetAllocator());
-	}
-
 	// Export script .py file
 	std::string scriptFileName = scriptPath + "/" + ensureFileExtension(_scriptEntity->getNameOnly(), ".py");
 	std::string scriptContent = _scriptEntity->getText();
-	
-	// Export metadata .otmeta.json file
+
+	// Export metadata .otmeta.json file (WITHOUT dynamic parameters yet)
 	std::string metaFileName = scriptPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
 	std::string metaJson = ot::json::toJson(metaDoc);
-	
-	// Check if files exist and handle accordingly
-	if (checkAndHandleFileOverwrite(scriptFileName, scriptContent, metaFileName, metaJson)) {
+
+	FileOverwriteStatus status = checkAndHandleFileOverwrite(scriptFileName, scriptContent, metaFileName, metaJson);
+	// Check if files exist and if content changed (only checks, no prompt yet!)
+	if (status == FileOverwriteStatus::Write) {
+		// File check passed - NOW add the dynamic parameters
+		metaDoc.RemoveMember("LibraryElementID");
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_scriptEntity->getEntityID()), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Version");
+		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Name");
+		metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		metaDoc.RemoveMember("FileName");
+		metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_scriptEntity->getNameOnly(), ".py"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+		// Update AdditionalInfos with dependency information
+		if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
+			metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
+			metaDoc["AdditionalInfos"].RemoveMember("DependencyCollection");
+			metaDoc["AdditionalInfos"].AddMember("DependencyID", ot::JsonString(std::to_string(_environmentID), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+			metaDoc["AdditionalInfos"].AddMember("DependencyCollection", ot::JsonString("PythonEnvironments", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		}
+
+		// Update metaJson with dynamic parameters
+		metaJson = ot::json::toJson(metaDoc);
+
 		writeFileToPath(scriptFileName, scriptContent);
 		writeFileToPath(metaFileName, metaJson);
+	}
+	else if (status == FileOverwriteStatus::PromptUser) {
+		// File check indicated changes - NOW add dynamic parameters and prompt
+		metaDoc.RemoveMember("LibraryElementID");
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_scriptEntity->getEntityID()), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Version");
+		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+
+		metaDoc.RemoveMember("Name");
+		metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		metaDoc.RemoveMember("FileName");
+		metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_scriptEntity->getNameOnly(), ".py"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+		// Update AdditionalInfos with dependency information
+		if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
+			metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
+			metaDoc["AdditionalInfos"].RemoveMember("DependencyCollection");
+			metaDoc["AdditionalInfos"].AddMember("DependencyID", ot::JsonString(std::to_string(_environmentID), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+			metaDoc["AdditionalInfos"].AddMember("DependencyCollection", ot::JsonString("PythonEnvironments", metaDoc.GetAllocator()), metaDoc.GetAllocator());
+		}
+
+		// Update metaJson with dynamic parameters
+		metaJson = ot::json::toJson(metaDoc);
+
+		// NOW prompt with the updated content
+		promptUserForOverwrite(scriptFileName, metaFileName, scriptContent, metaJson);
+	} 
+	else if(status == FileOverwriteStatus::Skip)
+	{
+		return;
 	}
 }
 
 void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath) {
-	assert(_modelEntity != nullptr && _metaEntity != nullptr);
+	//assert(_modelEntity != nullptr && _metaEntity != nullptr);
 
-	// Create CircuitData directory
-	std::string modelPath = _basePath + "/CircuitData";
-	if (!ensureDirectoryExists(modelPath)) {
-		throw std::runtime_error("Could not create CircuitModels directory");
-	}
+	//// Create CircuitData directory
+	//std::string modelPath = _basePath + "/CircuitData";
+	//if (!ensureDirectoryExists(modelPath)) {
+	//	throw std::runtime_error("Could not create CircuitModels directory");
+	//}
 
-	// Read and validate metadata
-	std::string metaContent = _metaEntity->getText();
-	ot::JsonDocument metaDoc;
-	metaDoc.fromJson(metaContent);
+	//// Read and validate metadata
+	//std::string metaContent = _metaEntity->getText();
+	//ot::JsonDocument metaDoc;
+	//metaDoc.fromJson(metaContent);
 
-	// Update LibraryElementID to model entity ID
-	metaDoc.RemoveMember("LibraryElementID");
-	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_modelEntity->getEntityID()), metaDoc.GetAllocator());
+	//// Export circuit model .txt file
+	//std::string modelFileName = modelPath + "/" + ensureFileExtension(_modelEntity->getNameOnly(), ".txt");
+	//std::string modelContent = _modelEntity->getText();
+	//
+	//// Export metadata .otmeta.json file
+	//std::string metaFileName = modelPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
+	//std::string metaJson = ot::json::toJson(metaDoc);
+	//
+	//// Check if files exist and handle accordingly
+	//if (checkAndHandleFileOverwrite(modelFileName, modelContent, metaFileName, metaJson)) {
+	//	// Update LibraryElementID to model entity ID
+	//	metaDoc.RemoveMember("LibraryElementID");
+	//	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_modelEntity->getEntityID()), metaDoc.GetAllocator());
 
-	// Update Version
-	metaDoc.RemoveMember("Version");
-	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+	//	// Update Version
+	//	metaDoc.RemoveMember("Version");
+	//	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
 
-	// Update name and filename
-	metaDoc.RemoveMember("Name");
-	metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
-	metaDoc.RemoveMember("FileName");
-	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_modelEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	//	// Update name and filename
+	//	metaDoc.RemoveMember("Name");
+	//	metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
+	//	metaDoc.RemoveMember("FileName");
+	//	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_modelEntity->getNameOnly(), ".txt"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
-	// Export circuit model .txt file
-	std::string modelFileName = modelPath + "/" + ensureFileExtension(_modelEntity->getNameOnly(), ".txt");
-	std::string modelContent = _modelEntity->getText();
-	
-	// Export metadata .otmeta.json file
-	std::string metaFileName = modelPath + "/" + ensureFileExtension(_metaEntity->getNameOnly(), ".otmeta.json");
-	std::string metaJson = ot::json::toJson(metaDoc);
-	
-	// Check if files exist and handle accordingly
-	if (checkAndHandleFileOverwrite(modelFileName, modelContent, metaFileName, metaJson)) {
-		writeFileToPath(modelFileName, modelContent);
-		writeFileToPath(metaFileName, metaJson);
-	}
+	//	// Export metadata .otmeta.json file with updated content
+	//	metaJson = ot::json::toJson(metaDoc);
+
+	//	writeFileToPath(modelFileName, modelContent);
+	//	writeFileToPath(metaFileName, metaJson);
+	//}
 }
 
 void FileHandler::clearBuffer() {
@@ -1037,18 +1101,17 @@ void FileHandler::clearBuffer() {
 	m_forceVisible.clear();
 }
 
-bool FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent,
+FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent,
 	const std::string& _metaFilePath, const std::string& _metaNewContent) const {
-	
+
 	// Check if content file exists
 	std::ifstream contentFile(_filePath, std::ios::binary | std::ios::ate);
 	bool contentFileExists = contentFile.is_open();
-	std::string contentFileKey = _filePath;
-	
+
 	// Check if meta file exists
 	std::ifstream metaFile(_metaFilePath, std::ios::binary | std::ios::ate);
 	bool metaFileExists = metaFile.is_open();
-	
+
 	bool contentChanged = false;
 	bool metaChanged = false;
 
@@ -1097,26 +1160,58 @@ bool FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, cons
 			OT_LOG_W("Failed to parse metadata JSON for comparison: " + std::string(_e.what()));
 			// If parsing fails, fall back to full content comparison
 			metaChanged = !std::equal(metaFileContent.begin(), metaFileContent.end(), _metaNewContent.begin());
-			return !metaChanged;
 		}
 
 		// Extract and compare only MetaData and AdditionalInfos
-		try {
-			// Extract MetaData objects and convert directly to JSON strings
-			std::string newMetaDataStr = ot::json::toJson(ot::json::getObject(newMetaDoc, "MetaData"));
-			std::string existingMetaDataStr = ot::json::toJson(ot::json::getObject(existingMetaDoc, "MetaData"));
+		if (!metaChanged) {
+			try {
+				// Extract MetaData objects and convert directly to JSON strings
+				std::string newMetaDataStr = ot::json::toJson(ot::json::getObject(newMetaDoc, "MetaData"));
+				std::string existingMetaDataStr = ot::json::toJson(ot::json::getObject(existingMetaDoc, "MetaData"));
 
-			// Extract AdditionalInfos objects and convert directly to JSON strings
-			std::string newAdditionalInfosStr = ot::json::toJson(ot::json::getObject(newMetaDoc, "AdditionalInfos"));
-			std::string existingAdditionalInfosStr = ot::json::toJson(ot::json::getObject(existingMetaDoc, "AdditionalInfos"));
+				// Extract AdditionalInfos objects
+				ot::ConstJsonObject newAdditionalInfos = ot::json::getObject(newMetaDoc, "AdditionalInfos");
+				ot::ConstJsonObject existingAdditionalInfos = ot::json::getObject(existingMetaDoc, "AdditionalInfos");
 
-			// Only consider metadata changed if MetaData or AdditionalInfos differ
-			metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr);
-		}
-		catch (const std::exception& _e) {
-			OT_LOG_W("Failed to extract MetaData or AdditionalInfos for comparison: " + std::string(_e.what()));
-			// If extraction fails, fall back to full content comparison
-			metaChanged = !std::equal(metaFileContent.begin(), metaFileContent.end(), _metaNewContent.begin());
+				// Create copies to remove dynamic fields
+				ot::JsonDocument newAdditionalInfosClean;
+				ot::JsonDocument existingAdditionalInfosClean;
+
+				// Copy all fields except DependencyID and DependencyCollection
+				for (auto it = newAdditionalInfos.MemberBegin(); it != newAdditionalInfos.MemberEnd(); ++it) {
+					const std::string memberName = it->name.GetString();
+					if (memberName != "DependencyID" && memberName != "DependencyCollection") {
+						newAdditionalInfosClean.AddMember(
+							ot::JsonString(memberName, newAdditionalInfosClean.GetAllocator()),
+							ot::JsonValue(it->value, newAdditionalInfosClean.GetAllocator()),
+							newAdditionalInfosClean.GetAllocator()
+						);
+					}
+				}
+
+				for (auto it = existingAdditionalInfos.MemberBegin(); it != existingAdditionalInfos.MemberEnd(); ++it) {
+					const std::string memberName = it->name.GetString();
+					if (memberName != "DependencyID" && memberName != "DependencyCollection") {
+						existingAdditionalInfosClean.AddMember(
+							ot::JsonString(memberName, existingAdditionalInfosClean.GetAllocator()),
+							ot::JsonValue(it->value, existingAdditionalInfosClean.GetAllocator()),
+							existingAdditionalInfosClean.GetAllocator()
+						);
+					}
+				}
+
+				// Convert cleaned objects to JSON strings for comparison
+				std::string newAdditionalInfosStr = ot::json::toJson(newAdditionalInfosClean);
+				std::string existingAdditionalInfosStr = ot::json::toJson(existingAdditionalInfosClean);
+
+				// Only consider metadata changed if MetaData or AdditionalInfos differ
+				metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr);
+			}
+			catch (const std::exception& _e) {
+				OT_LOG_W("Failed to extract MetaData or AdditionalInfos for comparison: " + std::string(_e.what()));
+				// If extraction fails, fall back to full content comparison
+				metaChanged = !std::equal(metaFileContent.begin(), metaFileContent.end(), _metaNewContent.begin());
+			}
 		}
 	}
 	else {
@@ -1125,22 +1220,25 @@ bool FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, cons
 
 	// If neither file exists, write both files
 	if (!contentFileExists && !metaFileExists) {
-		return true;
+		OT_LOG_D("Creating new files: \"" + _filePath + "\" and \"" + _metaFilePath + "\"");
+		return FileOverwriteStatus::Write;
+	}
+
+	// Both files exist and content is identical - skip without any action
+	if (contentFileExists && metaFileExists && !contentChanged && !metaChanged) {
+		OT_LOG_D("Skipping file export: content and metadata are identical for \"" + _filePath + "\"");
+		return FileOverwriteStatus::Skip;
 	}
 
 	// If either has changed, prompt user
 	if (contentChanged || metaChanged) {
-		promptUserForOverwrite(_filePath, _metaFilePath, _newContent, _metaNewContent);
-		return false;
+		OT_LOG_D("File changes detected - prompt required for \"" + _filePath + "\"");
+		return FileOverwriteStatus::PromptUser;
 	}
 
-	// Both files exist and content is identical
-	if (contentFileExists && metaFileExists) {
-		OT_LOG_D("Skipping file export: content and metadata are identical for \"" + _filePath + "\"");
-		return false;
-	}
-
-	return true;
+	// One file exists, the other doesn't - treat as changed and prompt
+	OT_LOG_D("File mismatch detected - one file exists, other doesn't for \"" + _filePath + "\"");
+	return FileOverwriteStatus::PromptUser;
 }
 
 void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath,
@@ -1161,7 +1259,45 @@ void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, co
 		"OverwriteFile",
 		_contentFilePath
 	);
-	return;
+}
+
+std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
+	size_t lastSlash = _filePath.find_last_of("/\\");
+
+	std::string directory = (lastSlash != std::string::npos) ? _filePath.substr(0, lastSlash + 1) : "";
+	std::string filename = (lastSlash != std::string::npos) ? _filePath.substr(lastSlash + 1) : _filePath;
+
+	std::string baseName;
+	std::string extension;
+
+	size_t dotInFilename = filename.find_last_of('.');
+	if (dotInFilename != std::string::npos) {
+		baseName = filename.substr(0, dotInFilename);
+		extension = filename.substr(dotInFilename);
+	}
+	else {
+		baseName = filename;
+		extension = "";
+	}
+
+	// Special handling for .otmeta.json files - put counter before .otmeta.json
+	if (extension == ".json" && baseName.size() >= 6) {
+		std::string baseSuffix = baseName.substr(baseName.size() - 6);
+		if (baseSuffix == ".otmeta") {
+			baseName = baseName.substr(0, baseName.size() - 6); // Remove ".otmeta"
+			extension = ".otmeta.json";
+		}
+	}
+
+	// Find a unique filename with counter
+	std::string newFilePath;
+	int counter = 1;
+	do {
+		newFilePath = directory + baseName + "_" + std::to_string(counter) + extension;
+		counter++;
+	} while (std::filesystem::exists(newFilePath));
+
+	return newFilePath;
 }
 
 void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _overwrite) {
@@ -1180,38 +1316,6 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 	}
 	else {
 		// Don't overwrite - add counter to both filenames
-		auto createIncrementedPath = [](const std::string& _filePath) -> std::string {
-			size_t lastSlash = _filePath.find_last_of("/\\");
-			size_t lastDot = _filePath.find_last_of('.');
-
-			std::string directory = (lastSlash != std::string::npos) ? _filePath.substr(0, lastSlash + 1) : "";
-			std::string filename = (lastSlash != std::string::npos) ? _filePath.substr(lastSlash + 1) : _filePath;
-
-			std::string baseName;
-			std::string extension;
-
-			size_t dotInFilename = filename.find_last_of('.');
-			if (dotInFilename != std::string::npos) {
-				baseName = filename.substr(0, dotInFilename);
-				extension = filename.substr(dotInFilename);
-			}
-			else {
-				baseName = filename;
-				extension = "";
-			}
-
-			// Find a unique filename with counter
-			std::string newFilePath;
-			int counter = 1;
-			do {
-				newFilePath = directory + baseName + "_" + std::to_string(counter) + extension;
-				counter++;
-			} while (std::filesystem::exists(newFilePath));
-
-			return newFilePath;
-		};
-
-		// Create new paths with incremented names for both files
 		std::string newContentPath = createIncrementedPath(pending.contentFilePath);
 		std::string newMetaPath = createIncrementedPath(pending.metaFilePath);
 
@@ -1219,7 +1323,6 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 		writeFileToPath(newContentPath, pending.contentNewContent);
 		writeFileToPath(newMetaPath, pending.metaNewContent);
 		OT_LOG_D("Files written with new names: \"" + newContentPath + "\" and \"" + newMetaPath + "\"");
-
 	}
 
 	// Remove from pending list

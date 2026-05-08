@@ -112,21 +112,27 @@ private:
 	std::string getLibraryDataPath() const;
 	bool ensureDirectoryExists(const std::string& _path) const;
 	void writeFileToPath(const std::string& _filePath, const std::string& _content) const;
-	bool checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent, 
-	const std::string& _metaFilePath, const std::string& _metaContent) const;
 
-//! @brief Stores information about pending file overwrites (content + metadata together)
-struct PendingFileOverwrite {
-	std::string contentFilePath;
-	std::string contentNewContent;
-	std::string metaFilePath;
-	std::string metaNewContent;
-};
+	//! @brief Stores information about pending file overwrites (content + metadata together)
+	struct PendingFileOverwrite {
+		std::string contentFilePath;
+		std::string contentNewContent;
+		std::string metaFilePath;
+		std::string metaNewContent;
+	};
 
-std::map<std::string, PendingFileOverwrite> m_pendingFileOverwrites;
+	// Enum for file overwrite handling
+	enum class FileOverwriteStatus {
+		Skip,        
+		Write,       
+		PromptUser   
+	};
 
-void promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath, 
-	const std::string& _contentNewContent, const std::string& _metaNewContent) const;
+	std::map<std::string, PendingFileOverwrite> m_pendingFileOverwrites;
+
+	FileOverwriteStatus checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent, const std::string& _metaFilePath, const std::string& _metaNewContent) const;
+
+	void promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath, const std::string& _contentNewContent, const std::string& _metaNewContent) const;
 
 	void exportCircuitModelsAsync(ot::UID _modelID, ot::UID _metaID);
 	void exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID);
@@ -135,5 +141,6 @@ void promptUserForOverwrite(const std::string& _contentFilePath, const std::stri
 	void exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath);
 
+	std::string createIncrementedPath(const std::string& _filePath);
 	std::string ensureFileExtension(const std::string& _fileName, const std::string& _extension) const;
 };
