@@ -269,6 +269,10 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 
     // First iterate through all local models and create a list of LibraryElements
     std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath,collectionName);
+
+    if (localModels.empty()) {
+        return;
+    }
     
 	// Pack the list of LibraryElements into a json document to send it to LMS
 	ot::JsonDocument doc;
