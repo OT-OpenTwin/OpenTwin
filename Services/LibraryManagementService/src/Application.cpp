@@ -152,7 +152,7 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 		std::string dependencyID = it->getAdditionalInfoValue("DependencyID");
 		std::string dependencyCollection = it->getAdditionalInfoValue("DependencyCollection");
 
-		if (!dependencyID.empty() && !dependencyCollection.empty()) {
+		if (dependencyID != std::to_string(ot::invalidUID) && !dependencyID.empty() && !dependencyCollection.empty()) {
 			std::string dependencyDocJson = db->getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
 			if (dependencyDocJson.empty()) {
 				OT_LOG_E("No dependency document found for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
