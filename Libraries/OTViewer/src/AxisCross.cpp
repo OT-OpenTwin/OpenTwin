@@ -20,7 +20,7 @@
 // Project header
 #include "OTViewer/AxisCross.h"
 #include "OTViewer/ViewerSettings.h"
-#include "OTViewer/SceneNodeMaterial.h"
+#include "OTViewer/Node/SceneNodeMaterial.h"
 
 // osg header
 #include <osg/Group>

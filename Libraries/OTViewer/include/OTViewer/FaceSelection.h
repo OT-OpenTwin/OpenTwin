@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #pragma once
-#include "SceneNodeGeometry.h"
+#include  "OTViewer/Node/SceneNodeGeometry.h"
 
 class FaceSelection
 {

@@ -29,9 +29,9 @@
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/HandleArrow.h"
 #include "OTViewer/HandleWheel.h"
-#include "OTViewer/SceneNodeBase.h"
-#include "OTViewer/SceneNodeGeometry.h"
-#include "OTViewer/SceneNodeCoordinateSystem.h"
+#include "OTViewer/Node/SceneNodeBase.h"
+#include "OTViewer/Node/SceneNodeGeometry.h"
+#include "OTViewer/Node/SceneNodeCoordinateSystem.h"
 #include "OTViewer/TransformManipulator.h"
 
 // RapidJSON header

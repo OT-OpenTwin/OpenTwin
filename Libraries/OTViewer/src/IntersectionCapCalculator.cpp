@@ -27,8 +27,8 @@
 
 #include "OTViewer/IntersectionCapCalculator.h"
 
-#include "OTViewer/SceneNodeGeometry.h"
-#include "OTViewer/SceneNodeMaterial.h"
+#include "OTViewer/Node/SceneNodeGeometry.h"
+#include "OTViewer/Node/SceneNodeMaterial.h"
 #include "OTViewer/ViewerSettings.h"
 #include "OTViewer/TextureMapManager.h"
 

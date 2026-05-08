@@ -21,8 +21,8 @@
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/ViewerToolBar.h"
 #include "OTViewer/Model.h"
-#include "OTViewer/SceneNodeMesh.h"
-#include "OTViewer/SceneNodeCartesianMesh.h"
+#include "OTViewer/Node/SceneNodeMesh.h"
+#include "OTViewer/Node/SceneNodeCartesianMesh.h"
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"

@@ -26,7 +26,7 @@
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionData.h"
 #include "OTModelEntities/Geometry.h"
-#include "SceneNodeBase.h"
+#include  "OTViewer/Node/SceneNodeBase.h"
 #include "ViewChangedStates.h"
 
 // std header

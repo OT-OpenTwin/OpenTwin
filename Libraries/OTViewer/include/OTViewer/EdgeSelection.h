@@ -18,8 +18,8 @@
 // @otlicense-end
 
 #pragma once
-#include "EdgeSelection.h"
-#include "SceneNodeGeometry.h"
+
+#include "OTViewer/Node/SceneNodeGeometry.h"
 
 class EdgeSelection
 {

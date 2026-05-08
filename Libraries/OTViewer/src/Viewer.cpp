@@ -40,7 +40,7 @@
 #include "OTViewer/HandlerBase.h"
 #include "OTViewer/HandleArrow.h"
 #include "OTViewer/PlotManager.h"
-#include "OTViewer/SceneNodeVTK.h"
+#include "OTViewer/Node/SceneNodeVTK.h"
 #include "OTViewer/WorkingPlane.h"
 #include "OTViewer/GlobalFontPath.h"
 #include "OTViewer/ViewerSettings.h"
