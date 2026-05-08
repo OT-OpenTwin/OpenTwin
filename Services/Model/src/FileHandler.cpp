@@ -170,33 +170,53 @@ void FileHandler::handleExportFilesToLibrary() {
 		}
 	}
 
-	// Determine what to export (Python or Circuit)
-	bool hasPythonExport = (pythonScript != nullptr || pythonManifest != nullptr || pythonMetaFile != nullptr || manifestMetaFile != nullptr);
+	// Check for Circuit export (both files required)
 	bool hasCircuitExport = (circuitModel != nullptr && circuitMetaFile != nullptr);
 
-	if (!hasPythonExport && !hasCircuitExport) {
+	if (hasCircuitExport) {
 		Application::instance()->getNotifier()->reportError(
-			"Please select either:\n"
-			"- PythonScript, PythonManifest, PythonMeta, and ManifestMeta files, or\n"
-			"- CircuitModel and CircuitModelMeta files."
+			"Circuit export is currently not supported. Please select Python files for export."
 		);
 		return;
 	}
 
-	// Validate Python export if selected
-	if (hasPythonExport) {
-		if (pythonScript == nullptr || pythonManifest == nullptr || pythonMetaFile == nullptr || manifestMetaFile == nullptr) {
-			Application::instance()->getNotifier()->reportError(
-				"For Python export: Please select PythonScript, PythonManifest, PythonMeta, and ManifestMeta files."
-			);
-			return;
-		}
+	// Determine Python export scenario
+	bool hasMinimalPythonExport = (pythonScript != nullptr && pythonMetaFile != nullptr && 
+	                                pythonManifest == nullptr && manifestMetaFile == nullptr);
+	bool hasFullPythonExport = (pythonScript != nullptr && pythonManifest != nullptr && 
+	                             pythonMetaFile != nullptr && manifestMetaFile != nullptr);
 
-		if (!validateMetaDataFile(pythonMetaFile) || !validateMetaDataFile(manifestMetaFile)) {
-			return;
-		}
+	if (!hasMinimalPythonExport && !hasFullPythonExport) {
+		Application::instance()->getNotifier()->reportError(
+			"For Python export: Please select either:\n"
+			"- A Python script with its metadata file (.py + .otmeta.json), or\n"
+			"- All four files: PythonScript, PythonManifest, PythonMeta, and ManifestMeta."
+		);
+		return;
+	}
 
-		// Perform Python export on separate thread
+	// Validate Python export
+	if (!validateMetaDataFile(pythonMetaFile)) {
+		return;
+	}
+
+	if (hasFullPythonExport && !validateMetaDataFile(manifestMetaFile)) {
+		return;
+	}
+
+	// Case 1: Minimal export (script + metadata only)
+	if (hasMinimalPythonExport) {
+		std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
+			pythonScript->getEntityID(),
+			ot::invalidUID,  // No manifest
+			pythonMetaFile->getEntityID(),
+			ot::invalidUID,  // No manifest meta
+			ot::invalidUID                // No environment ID needed
+		);
+		worker.detach();
+	}
+	// Case 2: Full export (all four files)
+	else if (hasFullPythonExport) {
 		std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
 			pythonScript->getEntityID(),
 			pythonManifest->getEntityID(),
@@ -205,24 +225,6 @@ void FileHandler::handleExportFilesToLibrary() {
 			pythonManifest->getManifestID()
 		);
 		worker.detach();
-	}
-
-	// Validate and perform Circuit export if selected
-	if (hasCircuitExport) {
-
-		Application::instance()->getNotifier()->reportError(
-			"Circuit export is currently not supported. Please select Python files for export."
-		);
-		//if (!validateMetaDataFile(circuitMetaFile)) {
-		//	return;
-		//}
-
-		//// Perform Circuit export on separate thread
-		//std::thread worker(&FileHandler::exportCircuitModelsAsync, this,
-		//	circuitModel->getEntityID(),
-		//	circuitMetaFile->getEntityID()
-		//);
-		//worker.detach();
 	}
 }
 
@@ -848,25 +850,39 @@ void FileHandler::exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifest
 		Model* model = Application::instance()->getModel();
 		assert(model != nullptr);
 
-		// Retrieve entities
+		// Retrieve script and metadata entities (always required)
 		EntityBase* scriptEntityBase = model->getEntityByID(_scriptID);
-		EntityBase* manifestEntityBase = model->getEntityByID(_manifestID);
 		EntityBase* pythonMetaEntityBase = model->getEntityByID(_pythonMetaID);
-		EntityBase* manifestMetaEntityBase = model->getEntityByID(_manifestMetaID);
 
-		if (scriptEntityBase == nullptr || manifestEntityBase == nullptr || pythonMetaEntityBase == nullptr || manifestMetaEntityBase == nullptr) {
-			OT_LOG_E("Error: One or more entities could not be retrieved.");
+		if (scriptEntityBase == nullptr || pythonMetaEntityBase == nullptr) {
+			OT_LOG_E("Error: Python script or metadata entity could not be retrieved.");
 			return;
 		}
 
 		EntityFileText* scriptEntity = dynamic_cast<EntityFileText*>(scriptEntityBase);
-		EntityPythonManifest* manifestEntity = dynamic_cast<EntityPythonManifest*>(manifestEntityBase);
 		EntityFileText* pythonMetaEntity = dynamic_cast<EntityFileText*>(pythonMetaEntityBase);
-		EntityFileText* manifestMetaEntity = dynamic_cast<EntityFileText*>(manifestMetaEntityBase);
 
-		if (scriptEntity == nullptr || manifestEntity == nullptr || pythonMetaEntity == nullptr || manifestMetaEntity == nullptr) {
-			OT_LOG_E("Error: Failed to cast one or more entities.");
+		if (scriptEntity == nullptr || pythonMetaEntity == nullptr) {
+			OT_LOG_E("Error: Failed to cast script or metadata entity.");
 			return;
+		}
+
+		// Retrieve optional manifest entities
+		EntityPythonManifest* manifestEntity = nullptr;
+		EntityFileText* manifestMetaEntity = nullptr;
+
+		if (_manifestID != ot::invalidUID) {
+			EntityBase* manifestEntityBase = model->getEntityByID(_manifestID);
+			if (manifestEntityBase != nullptr) {
+				manifestEntity = dynamic_cast<EntityPythonManifest*>(manifestEntityBase);
+			}
+		}
+
+		if (_manifestMetaID != ot::invalidUID) {
+			EntityBase* manifestMetaEntityBase = model->getEntityByID(_manifestMetaID);
+			if (manifestMetaEntityBase != nullptr) {
+				manifestMetaEntity = dynamic_cast<EntityFileText*>(manifestMetaEntityBase);
+			}
 		}
 
 		// Get base export path
@@ -876,14 +892,24 @@ void FileHandler::exportFilesToLibraryAsync(ot::UID _scriptID, ot::UID _manifest
 			return;
 		}
 
+		// Determine number of steps based on what we're exporting
+		int totalSteps = 1; // At minimum, we export the script
+		if (manifestEntity != nullptr && manifestMetaEntity != nullptr) {
+			totalSteps = 2; // Export both manifest and script
+		}
+
 		ProgressUpdater updater(uiComponent, "Exporting files to library", false);
-		updater.setTotalNumberOfSteps(2);
+		updater.setTotalNumberOfSteps(totalSteps);
 
-		exportPythonManifest(manifestEntity, manifestMetaEntity, libDataPath, _environmentID);
-		updater.triggerUpdate(1);
+		// Export manifest if available
+		if (manifestEntity != nullptr && manifestMetaEntity != nullptr) {
+			exportPythonManifest(manifestEntity, manifestMetaEntity, libDataPath, _environmentID);
+			updater.triggerUpdate(1);
+		}
 
+		// Export script
 		exportPythonScript(scriptEntity, pythonMetaEntity, libDataPath, _environmentID);
-		updater.triggerUpdate(2);
+		updater.triggerUpdate(totalSteps);
 
 		uiComponent->displayMessage("Files successfully exported to library.\n");
 	}
