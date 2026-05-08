@@ -330,7 +330,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Title");
 		plotCfg.setXAxisParameter(defaultAxis);
-		newPlot.setPlot(plotCfg);
+		newPlot.setStaticCurveQueryOptions(plotCfg);
 		newPlot.storeToDataBase();
 		_modelComponent->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
 
