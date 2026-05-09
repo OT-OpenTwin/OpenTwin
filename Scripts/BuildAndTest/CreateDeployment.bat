@@ -262,7 +262,7 @@ ECHO [Paths] > "%OT_DEPLOYMENT_DIR%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OT_DEPLOYMENT_DIR%\qt.conf"
 
 REM Update model library script
-CALL "%OT_DEPLOYMENT_DIR%\UpdateModelLibraries.bat"
+CALL "%OT_DEPLOYMENT_DIR%\UpdateModelLibraries.bat" %OT_DEPLOYMENT_DIR% 
 
 GOTO END
 

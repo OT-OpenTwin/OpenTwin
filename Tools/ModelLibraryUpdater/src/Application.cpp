@@ -265,6 +265,7 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 
     std::string collectionName = _argumentParser.getCollectionName().toStdString();
     std::string _lmsUrl = _argumentParser.getLmsUrl().toStdString();
+	std::string databasePsw = _argumentParser.getDatabasePsw().toStdString();
     m_folderPath += collectionName;
 
     // First iterate through all local models and create a list of LibraryElements
@@ -277,6 +278,10 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 	// Pack the list of LibraryElements into a json document to send it to LMS
 	ot::JsonDocument doc;
     doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, doc.GetAllocator()), doc.GetAllocator());
+    if(!databasePsw.empty()) {
+        doc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	
 	createJsonDocumentFromLibraryElement(localModels, doc);
     localModels.clear();
 
@@ -286,6 +291,10 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 
 	// Deserialize the LMS response and create a list of LibraryElements which need to be updated or initiall added
 	localModels = createLibraryElementsFromJsonDocument(lmsResponse);
+
+    if(localModels.empty()) {
+        return;
+	}
     
 	// Add the content data to the LibraryElements based on the file names and folder path
 	localModels = addDataToLibraryElements(localModels, m_folderPath);
@@ -293,6 +302,9 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
     // Pack the list of LibraryElements into a json document to send it to LMS
 	ot::JsonDocument updateDoc;
 	updateDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_AddNewLibraryElement, updateDoc.GetAllocator()), updateDoc.GetAllocator());
+    if (!databasePsw.empty()) {
+        updateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
+    }
 	createJsonDocumentFromLibraryElement(localModels, updateDoc);
 
     // Send to Lms

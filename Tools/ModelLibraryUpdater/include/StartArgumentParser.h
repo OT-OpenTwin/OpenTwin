@@ -43,9 +43,13 @@ namespace ot {
 		void setLmsUrl(const QString& _lmsUrl) { m_lmsUrl = _lmsUrl; }
 		QString getLmsUrl() const { return m_lmsUrl; }
 
+		void setDatabasePsw(const QString& _databasePsw) { m_databasePsw = _databasePsw; }
+		QString getDatabasePsw() const { return m_databasePsw; }
+
 
 	private:
 		QString m_collectionName;
 		QString m_lmsUrl;
+		QString m_databasePsw;
 	};
 }

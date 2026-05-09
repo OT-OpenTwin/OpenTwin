@@ -38,6 +38,10 @@ bool ot::StartArgumentParser::parse() {
 
 	QCommandLineOption lmsUrlOption(QStringList() << "l" << "lmsurl", "URL of the LMS to connect to", "lmsurl");
 	parser.addOption(lmsUrlOption);
+
+	QCommandLineOption databasePswOption(QStringList() << "d" << "dbpsw", "Password for the database connection", "dbpsw");
+	parser.addOption(databasePswOption);
+
 	QStringList arguments = QCoreApplication::arguments();
 	parser.process(QCoreApplication::arguments());
 
@@ -47,6 +51,10 @@ bool ot::StartArgumentParser::parse() {
 
 	if (parser.isSet(lmsUrlOption)) {
 		m_lmsUrl = parser.value(lmsUrlOption);
+	}
+
+	if(parser.isSet(databasePswOption)) {
+		m_databasePsw = parser.value(databasePswOption);
 	}
 
 	return true;

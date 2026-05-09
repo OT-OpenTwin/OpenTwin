@@ -557,27 +557,31 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 
 std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
 
+	// Admin credentials for database operations
+	std::string adminUserName = db->getAdminUserName();
+	std::string adminPassword;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
+		adminPassword = ot::UserCredentials::encryptString(ot::json::getString(_document, OT_ACTION_PARAM_Value));
+	}
+	else {
+		const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
+		if (envPassword != nullptr) {
+			adminPassword = envPassword;
+		}
+		else {
+			adminPassword = ot::UserCredentials::encryptString("admin");
+		}
+	}
+
 	// Hole das Array der LibraryElements
 	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document,OT_ACTION_PARAM_Config);
-
+	
 	// Deserialisiere jedes Element
 	std::list<ot::LibraryElement> receivedModels;
 	for (const ot::ConstJsonObject& elementObj : elementObjects) {
 		ot::LibraryElement element;
 		element.setFromJsonObject(elementObj);
 		receivedModels.push_back(element);
-	}
-
-
-	// Admin credentials for database operations
-	std::string adminUserName = db->getAdminUserName();
-	std::string adminPassword;
-	const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
-	if (envPassword != nullptr) {
-		adminPassword = envPassword;
-	}
-	else {
-		adminPassword = ot::UserCredentials::encryptString("admin");
 	}
 
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
@@ -598,6 +602,23 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 }
 
 std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
+	
+	// Admin credentials for database operations
+	std::string adminUserName = db->getAdminUserName();
+	std::string adminPassword;
+	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
+		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+	}
+	else {
+		const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
+		if (envPassword != nullptr) {
+			adminPassword = envPassword;
+		}
+		else {
+			adminPassword = ot::UserCredentials::encryptString("admin");
+		}
+	}
+	
 	// Hole das Array der LibraryElements
 	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
 
@@ -607,17 +628,6 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		ot::LibraryElement element;
 		element.setFromJsonObject(elementObj);
 		receivedModels.push_back(element);
-	}
-
-	// Admin credentials for database operations
-	std::string adminUserName = db->getAdminUserName();
-	std::string adminPassword;
-	const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
-	if (envPassword != nullptr) {
-		adminPassword = envPassword;
-	}
-	else {
-		adminPassword = ot::UserCredentials::encryptString("admin");
 	}
 
 	// Add or update library elements

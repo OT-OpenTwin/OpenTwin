@@ -1,6 +1,8 @@
 @echo off
 if not "%1"=="" set "OT_DEPLOYMENT_DIR=%1"
 if not defined OT_DEPLOYMENT_DIR set "OT_DEPLOYMENT_DIR=%OPENTWIN_DEV_ROOT%\Deployment"
+if not "%2"=="" set "DATABASE_PWD=%2"
+if not defined DATABASE_PWD set "DATABASE_PWD="
 
 if not exist "%OT_DEPLOYMENT_DIR%\" (
     echo ERROR: Deployment directory not found: %OT_DEPLOYMENT_DIR%
@@ -36,11 +38,10 @@ if not exist "%OT_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" (
 )
 
 echo [1/2] Updating PythonEnvironments collection...
-"%OT_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" --collection PythonEnvironments --lmsurl "%LMS_URL%"
-
+"%OT_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" --collection PythonEnvironments --lmsurl "%LMS_URL%" --dbpsw "%DATABASE_PWD%"
 
 echo [2/2] Updating PythonScripts collection...
-"%OT_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" --collection PythonScripts --lmsurl "%LMS_URL%"
+"%OT_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" --collection PythonScripts --lmsurl "%LMS_URL%" --dbpsw "%DATABASE_PWD%"    
 
 :shutdown
 if exist "%OT_DEPLOYMENT_DIR%\shutdownall.bat" call "%OT_DEPLOYMENT_DIR%\shutdownall.bat"
