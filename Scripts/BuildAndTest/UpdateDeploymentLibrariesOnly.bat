@@ -225,7 +225,7 @@ CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateBuildInformation.bat"
 REM ====================================================================
 REM  Copy Update model library script
 REM ====================================================================
-COPY "%OPENTWIN_DEV_ROOT%\Scripts\Other\UpdateModelLibraries.bat" "%OT_DEPLOYMENT_DIR%"
+COPY "%OPENTWIN_DEV_ROOT%\Scripts\Other\UpdateModelLibraries.bat" "%OPENTWIN_DEPLOYMENT_DIR%"
 GOTO END
 
 :PAUSE_END
