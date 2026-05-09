@@ -70,6 +70,7 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation, QWidget* _paren
 	m_splitter->addWidget(m_navigation->getQWidget());
 
 	QScrollArea* scrollArea = new QScrollArea(m_splitter);
+	scrollArea->setMinimumHeight(m_previewSize.height() + 60);
 	scrollArea->setWidgetResizable(true);
 	scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	scrollArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
@@ -170,41 +171,21 @@ void ot::GraphicsPicker::slotSelectionChanged() {
 
 	std::list<GraphicsView *> previews;
 
-	ImagePainterManager& pManager = ImagePainterManager::instance();
-
-	for (QTreeWidgetItem* selectedItem : m_navigation->getTreeWidget()->selectedItems()) {
+	std::list<GraphicsPickerItemInfo*> pickerItemsToAdd;
+	QList<QTreeWidgetItem*> selectedItems = m_navigation->getTreeWidget()->selectedItems();
+	for (QTreeWidgetItem* selectedItem : selectedItems) {
 		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(selectedItem);
 		OTAssertNullptr(itm);
 		auto it = m_previewData.find(itm);
 		if (it != m_previewData.end()) {
-			for (const GraphicsPickerItemInfo& info : *it->second) {
-				// Preload image
-				pManager.importFromFile(info.getPreviewIcon());
-
-				PreviewBox box;
-				box.layoutWidget = new QWidget(m_viewLayoutW);
-
-				box.layout = new QVBoxLayout(box.layoutWidget);
-
-				box.view = new GraphicsItemPreview(box.layoutWidget);
-				box.view->setMaximumSize(m_previewSize);
-				box.view->setMinimumSize(m_previewSize);
-				box.view->setPainter(pManager.getPainter(info.getPreviewIcon())->createCopy());
-				box.view->setItemName(info.getName());
-				//box.view->setAlignment(Qt::AlignCenter);
-				box.view->setPickerKey(m_key);
-				box.layout->addWidget(box.view, 0, Qt::AlignCenter);
-
-				box.label = new Label(QString::fromStdString(info.getTitle()), box.layoutWidget);
-				box.label->setAlignment(Qt::AlignCenter);
-				box.layout->addWidget(box.label, 1, Qt::AlignTop | Qt::AlignHCenter);
-
-				m_viewLayout->addWidget(box.layoutWidget);
-
-				m_previews.push_back(std::move(box));
+			for (GraphicsPickerItemInfo& info : *it->second) {
+				pickerItemsToAdd.push_back(&info);
 			}
 		}
 	}
+
+	int maxLength = this->determineMaxLabelWidth(pickerItemsToAdd);
+	this->fillPicker(pickerItemsToAdd, maxLength);
 }
 
 // ##############################################################################################################################
@@ -334,6 +315,65 @@ void ot::GraphicsPicker::applyState(const PickerState& _state, TreeWidgetItem* _
 		TreeWidgetItem* itm = dynamic_cast<TreeWidgetItem*>(_item->child(i));
 		OTAssertNullptr(itm);
 		this->applyState(_state, itm);
+	}
+}
+
+int ot::GraphicsPicker::determineMaxLabelWidth(const std::list<GraphicsPickerItemInfo*>& _itemsToAdd) const
+{
+	int maxWidth = 0;
+	QLabel tmpLabel;
+	QFont defaultFont = tmpLabel.font();
+	QFontMetrics fm(defaultFont);
+
+	for (const GraphicsPickerItemInfo* info : _itemsToAdd)
+	{
+		QString txt = QString::fromStdString(info->getTitle());
+		
+		const QStringList words = txt.split(QRegularExpression("\\s+"), Qt::SkipEmptyParts);
+		for (const QString& word : words)
+		{
+			maxWidth = std::max(maxWidth, fm.horizontalAdvance(word));
+		}
+	}
+
+	return maxWidth;
+}
+
+void ot::GraphicsPicker::fillPicker(const std::list<GraphicsPickerItemInfo*>& _itemsToAdd, int _maxLabelWidth)
+{
+	ImagePainterManager& pManager = ImagePainterManager::instance();
+
+	int labelWidth = std::max(_maxLabelWidth, m_previewSize.width());
+	labelWidth += 10; // Add some padding
+
+	for (const GraphicsPickerItemInfo* info : _itemsToAdd)
+	{
+		// Preload image
+		pManager.importFromFile(info->getPreviewIcon());
+
+		PreviewBox box;
+		box.layoutWidget = new QWidget(m_viewLayoutW);
+
+		box.layout = new QVBoxLayout(box.layoutWidget);
+
+		box.view = new GraphicsItemPreview(box.layoutWidget);
+		box.view->setMaximumSize(m_previewSize);
+		box.view->setMinimumSize(m_previewSize);
+		box.view->setPainter(pManager.getPainter(info->getPreviewIcon())->createCopy());
+		box.view->setItemName(info->getName());
+		//box.view->setAlignment(Qt::AlignCenter);
+		box.view->setPickerKey(m_key);
+		box.layout->addWidget(box.view, 0, Qt::AlignCenter);
+
+		box.label = new Label(QString::fromStdString(info->getTitle()), box.layoutWidget);
+		box.label->setAlignment(Qt::AlignCenter);
+		box.label->setWordWrap(true);
+		box.label->setFixedWidth(labelWidth);
+		box.layout->addWidget(box.label, 1, Qt::AlignTop | Qt::AlignHCenter);
+
+		m_viewLayout->addWidget(box.layoutWidget);
+
+		m_previews.push_back(std::move(box));
 	}
 }
 

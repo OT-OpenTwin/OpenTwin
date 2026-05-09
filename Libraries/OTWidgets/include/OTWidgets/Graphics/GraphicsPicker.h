@@ -98,6 +98,9 @@ namespace ot {
 		void getCurrentState(PickerState& _state, TreeWidgetItem* _item) const;
 		void applyState(const PickerState& _state, TreeWidgetItem* _item);
 
+		int determineMaxLabelWidth(const std::list<GraphicsPickerItemInfo*>& _itemsToAdd) const;
+		void fillPicker(const std::list<GraphicsPickerItemInfo*>& _itemsToAdd, int _maxLabelWidth);
+
 		struct PreviewBox {
 			QWidget* layoutWidget = nullptr;
 			QVBoxLayout* layout = nullptr;
