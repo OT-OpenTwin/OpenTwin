@@ -57,5 +57,7 @@ bool ot::StartArgumentParser::parse() {
 		m_databasePsw = parser.value(databasePswOption);
 	}
 
+	OT_LOG_IS("Starting Model Library Updater with { \"CollectionName\": \"" << m_collectionName.toStdString() << "\", \"LMSUrl\": \"" << m_lmsUrl.toStdString() << "\", \"DatabasePassword\": \"" << m_databasePsw.toStdString() << "\" }");
+
 	return true;
 }

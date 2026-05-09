@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
+#include "OTCore/Logging/LogNotifierStdCout.h"
 #include "OTCore/Logging/LogNotifierFileWriter.h"
 
 // Service header
@@ -38,6 +39,7 @@ void initializeLogging(void)
 #endif // DEBUG
 
 	ot::LogDispatcher& dispatcher = ot::LogDispatcher::instance();
+	dispatcher.addReceiver(new ot::LogNotifierStdCout());
 	dispatcher.addReceiver(new ot::LogNotifierFileWriter(_filePath));
 }
 

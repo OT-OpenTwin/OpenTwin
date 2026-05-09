@@ -24,6 +24,7 @@
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -262,11 +263,16 @@ std::string Application::sendAsyncToLms(const ot::JsonDocument& _doc, std::strin
 
 
 void Application::start(ot::StartArgumentParser _argumentParser) {
+    std::string devRoot = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+    if (devRoot.empty()) {
+        OT_LOG_E("Environment variable OPENTWIN_DEV_ROOT is not set");
+        return;
+	}
 
     std::string collectionName = _argumentParser.getCollectionName().toStdString();
     std::string _lmsUrl = _argumentParser.getLmsUrl().toStdString();
 	std::string databasePsw = _argumentParser.getDatabasePsw().toStdString();
-    m_folderPath += collectionName;
+    m_folderPath = devRoot + "/LibraryData/" + collectionName;
 
     // First iterate through all local models and create a list of LibraryElements
     std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath,collectionName);
@@ -315,7 +321,6 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 
 
 Application::Application() {
-
 
 }
 

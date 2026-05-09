@@ -70,7 +70,7 @@ private:
 
 	const std::string m_collectionName = "";
 	std::string m_databasePWD;
-	std::string m_folderPath = "C:\\Arbeit_Programmierung\\repos\\OpenTwin\\LibraryData\\";
+	std::string m_folderPath;
 
 
 	static Application* instance;
