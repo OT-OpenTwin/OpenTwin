@@ -159,12 +159,22 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 				it = _elements.erase(it);
 				continue;
 			}
+			else if (dependencyDocJson == "failed") {
+				OT_LOG_E("Failed to fetch dependency document for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
+				++it;
+				continue;
+			}
 		}
 
 
 		// Try to fetch the existing document from database
 		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
+		if(existingDocJson == "failed") {
+			OT_LOG_E("Failed to fetch existing document for element '" + elementName + "' in collection '" + collectionName + "'. Skipping this element.");
+			++it;
+			continue;
+		}
 
 		if (!existingDocJson.empty()) {
 			// Element exists in database - compare hashes
@@ -628,6 +638,16 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		ot::LibraryElement element;
 		element.setFromJsonObject(elementObj);
 		receivedModels.push_back(element);
+	}
+
+	// Ensure database and collections exist for each received model
+	std::string dbUserPassword = ot::UserCredentials::decryptString(adminPassword);
+	for (const auto& model : receivedModels) {
+		std::string collectionName = model.getCollectionName();
+		if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, dbUserPassword, "127.0.0.1:27017")) {
+			OT_LOG_E("Failed to ensure database and collection '" + collectionName + "' for model '" + model.getName() + "'");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
+		}
 	}
 
 	// Add or update library elements

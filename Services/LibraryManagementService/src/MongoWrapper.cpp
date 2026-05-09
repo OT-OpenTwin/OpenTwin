@@ -91,12 +91,12 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
 std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument) {
     // Initialization of MongoDB connection
     if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
-        return "";
+        return "failed";
     }
 
     // Check if collection exists
     if (!checkCollectionExists(_collectionName)) {
-        return "";
+        return "failed";
     }
 
     try {
@@ -495,6 +495,57 @@ bool MongoWrapper::checkCollectionExists(const std::string& _collectionName) {
         return false;
     }
 }
+
+bool MongoWrapper::ensureDatabaseAndCollection(const std::string & _collectionName, const std::string & _dbUserName, const std::string & _dbUserPassword, const std::string & _dbServerUrl) {
+    try {
+        // Initialize connection
+        if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+            OT_LOG_E("Failed to initialize database connection for ensuring database and collection");
+            return false;
+        }
+
+        // Try to create the collection by inserting a placeholder document
+        try {
+            DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+            // Insert a placeholder document to ensure collection is created
+            auto placeholderDoc = bsoncxx::builder::basic::make_document(
+                kvp("_ensureCollection", true)
+            );
+
+            std::string result = docBase.InsertDocument(placeholderDoc.view(), false);
+
+            if (!result.empty()) {
+                OT_LOG_I("Collection '" + _collectionName + "' successfully created/ensured in database '" + dbName + "'");
+
+                // Delete the placeholder document
+                auto deleteFilter = bsoncxx::builder::basic::make_document(
+                    kvp("_ensureCollection", true)
+                );
+                auto deleteResult = docBase.DeleteDocument(deleteFilter.view());
+
+                if (deleteResult && deleteResult->deleted_count() > 0) {
+                    OT_LOG_D("Placeholder document removed from collection '" + _collectionName + "'");
+                }
+
+                return true;
+            }
+            else {
+                OT_LOG_W("Placeholder document insertion returned empty result for collection '" + _collectionName + "'");
+                return true; // Collection likely exists
+            }
+        }
+        catch (const std::exception& e) {
+            OT_LOG_E("Error creating collection '" + _collectionName + "': " + std::string(e.what()));
+            return false;
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error in ensureDatabaseAndCollection: " + std::string(e.what()));
+        return false;
+    }
+}
+
 
 bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchDocumentByName(
     DataStorageAPI::DocumentAccessBase& _docBase, 

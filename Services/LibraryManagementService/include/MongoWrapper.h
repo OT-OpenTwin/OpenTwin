@@ -69,7 +69,8 @@ public:
 	void updateGridFSContent(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument, const std::string& _newContent);
 	std::string updateGridFSAndMetadata(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _documentName, uint32_t _newVersion, const std::string& _newHash, const std::string& _newContent);
 	void addNewDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, ot::LibraryElement& _element);
-
+	// Database creation helper
+	bool ensureDatabaseAndCollection(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getAdminUserName() const { return "admin"; }
 
 private:
@@ -77,6 +78,8 @@ private:
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
 	bool initializeConnection(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	bool checkCollectionExists(const std::string& _collectionName);
+
+	
 
 	// Document query helpers
 	bsoncxx::document::value buildCombinedFilterQuery(const std::list<std::pair<std::string, std::string>>& _additionalFilters, const std::list<std::pair<std::string, std::string>>& _metadataFilters);
