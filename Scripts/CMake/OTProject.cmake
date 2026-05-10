@@ -166,6 +166,11 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
         return()
     endif()
 
+    if(DEP_TOKEN STREQUAL "OTCADEntities")
+        set(${OUT_VAR} "OT_CADMODELENTITIES_ROOT" PARENT_SCOPE)
+        return()
+    endif()
+
     if(DEP_TOKEN STREQUAL "UICore")
         set(${OUT_VAR} "OT_UICORE_ROOT" PARENT_SCOPE)
         return()
@@ -512,6 +517,13 @@ endfunction()
 # dependency resolution helpers
 # ------------------------------------------------------------
 function(_ot_apply_dep_to_core CORE_TARGET DEP)
+    if(DEP STREQUAL "OTEncryptionKey")
+        if(DEFINED ENV{OT_ENCRYPTIONKEY_ROOT} AND NOT "$ENV{OT_ENCRYPTIONKEY_ROOT}" STREQUAL "")
+            target_include_directories("${CORE_TARGET}" PRIVATE "$ENV{OT_ENCRYPTIONKEY_ROOT}")
+        endif()
+        return()
+    endif()
+
     _ot_get_ot_root_envvar(_rootVar "${DEP}")
     if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
         _ot_get_ot_inc_suffix(_incSuffix)
@@ -682,6 +694,10 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
 endfunction()
 
 function(_ot_apply_dep_to_final FINAL_TARGET DEP)
+    if(DEP STREQUAL "OTEncryptionKey")
+        return()
+    endif()
+
     _ot_get_ot_root_envvar(_rootVar "${DEP}")
 
     if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
