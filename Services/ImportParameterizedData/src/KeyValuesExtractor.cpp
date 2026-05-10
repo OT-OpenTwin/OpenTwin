@@ -244,13 +244,22 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 			{
 				std::string fieldValueStringFixed = fieldValueRaw.getConstCharPtr();
 				ot::StringToVariableConverter converter;
-				converter.normaliseNumericString(fieldValueStringFixed, _decimalSeparator);
-				if (fieldValueStringFixed == "")
+				const std::string& targetType = _rangeTypesByRangeNames[fieldName];
+
+				if (targetType == ot::TypeNames::getDateTimeTypeName())
 				{
-					fieldValueStringFixed = "0";
+					converter.normaliseNumericString(fieldValueStringFixed, '.');
+				}
+				else
+				{
+					converter.normaliseNumericString(fieldValueStringFixed, _decimalSeparator);
+					if (fieldValueStringFixed == "")
+					{
+						fieldValueStringFixed = "0";
+					}
 				}
 
-				if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDoubleTypeName())
+				if (targetType == ot::TypeNames::getDoubleTypeName())
 				{
 					const bool dataTypeFits =	ot::StringToNumericCheck::fitsInDouble(fieldValueStringFixed);
 					if (dataTypeFits)
@@ -264,7 +273,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						allFieldsConverted = false;
 					}
 				}
-				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getFloatTypeName())
+				else if (targetType == ot::TypeNames::getFloatTypeName())
 				{
 					const bool dataTypeFits = ot::StringToNumericCheck::fitsInFloat(fieldValueStringFixed);
 					if (dataTypeFits)
@@ -278,7 +287,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						allFieldsConverted = false;
 					}
 				}
-				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt32TypeName())
+				else if (targetType == ot::TypeNames::getInt32TypeName())
 				{
 					bool dataTypeFits = ot::StringToNumericCheck::fitsInInt32(fieldValueStringFixed);
 					if (dataTypeFits)
@@ -292,7 +301,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						allFieldsConverted = false;
 					}
 				}
-				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getInt64TypeName())
+				else if (targetType == ot::TypeNames::getInt64TypeName())
 				{
 					bool dataTypeFits = ot::StringToNumericCheck::fitsInInt64(fieldValueStringFixed);
 					if (dataTypeFits)
@@ -306,7 +315,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						allFieldsConverted = false;
 					}
 				}
-				else if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getDateTimeTypeName())
+				else if (targetType == ot::TypeNames::getDateTimeTypeName())
 				{
 					auto fmt = ot::DateTime::detectDateTimeFormat(fieldValueStringFixed);
 					if (fmt.has_value())

@@ -38,7 +38,7 @@ namespace ot {
             ISO8601UTC, //! @brief ISO 8601, UTC time ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000Z").
             RFC3339,    //! @brief ISO 8601, explicit timezone ("yyyy-mm-ddThh:MM:ss.zzzZ", e.g. "2000-01-01T00:00:00.000+00:00").
 			Msec,       //! @brief Milliseconds since epoch, UTC time.
-			Duration,   //! @brief Time delta format (e.g. "DD:HH:MM:SS.sss" or "HH:MM:SS.sss" or "MM:SS.sss").
+			Duration,   //! @brief Time delta format (e.g. "D+:HH:MM:SS.sss", "H+:MM:SS.sss", or "M+:SS.sss").
         };
 
 		// ###########################################################################################################################################################################################################################################################################################################################

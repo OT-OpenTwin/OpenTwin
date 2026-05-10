@@ -33,25 +33,101 @@
 namespace ot {
     namespace intern {
 
-		//! @brief Regular expression for validating duration strings.
-		//! 
-        //! Used by isValidTimestamp() for duration format detection.
-        static inline const std::regex getDurationValidationRegex() { return std::regex(R"(^(?=.*[:])(?:(?:(?:\d+:)?\d+:)?\d+:)?\d+(?:\.\d+)?$)"); };
+        static inline bool tryParseInt64Field(const std::string& _value, int64_t& _parsedValue)
+        {
+            if (_value.empty())
+            {
+                return false;
+            }
 
-		//! @brief Regular expression for parsing duration strings with day component.
-		//! 
-        //! (e.g. "01:12:30:45.500" for 1 day, 12 hours, 30 minutes, 45 seconds and 500 milliseconds).
-        static inline const std::regex getDurationDayParserRegex() { return std::regex(R"(^(?:(\d+):)?(\d{1,2}):(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+            const auto [ptr, ec] = std::from_chars(_value.data(), _value.data() + _value.size(), _parsedValue);
+            return ec == std::errc() && ptr == _value.data() + _value.size();
+        }
 
-		//! @brief Regular expression for parsing duration strings with hour component.
-		//! 
-        //! (e.g. "12:30:45.500" for 12 hours, 30 minutes, 45 seconds and 500 milliseconds).
-		static inline const std::regex getDurationHourParserRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2}):(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+        static inline bool tryParseFractionField(const std::string& _value, int64_t& _parsedValue)
+        {
+            if (_value.empty())
+            {
+                return false;
+            }
 
-		//! @brief Regular expression for parsing duration strings with minute component.
-        //! 
-        //! (e.g. "30:45.500" for 30 minutes, 45 seconds and 500 milliseconds).
-        static inline const std::regex getDurationMinuteParserRegex() { return std::regex(R"(^(?:(\d{1,2}):)?(\d{1,2})(?:\.(\d{1,3}))?$)"); };
+            std::string normalized = _value.substr(0, 3);
+            while (normalized.size() < 3)
+            {
+                normalized.push_back('0');
+            }
+
+            return tryParseInt64Field(normalized, _parsedValue);
+        }
+
+        static inline bool tryParseDuration(const std::string& _duration, int64_t& _days, int64_t& _hours, int64_t& _minutes, int64_t& _seconds, int64_t& _msec)
+        {
+            std::string fields[4];
+            size_t fieldCount = 0;
+            size_t start = 0;
+
+            while (true)
+            {
+                const size_t separatorPos = _duration.find(':', start);
+                if (fieldCount >= 4)
+                {
+                    return false;
+                }
+
+                fields[fieldCount++] = _duration.substr(start, separatorPos == std::string::npos ? std::string::npos : separatorPos - start);
+
+                if (separatorPos == std::string::npos)
+                {
+                    break;
+                }
+
+                start = separatorPos + 1;
+            }
+
+            if (fieldCount < 2 || fieldCount > 4)
+            {
+                return false;
+            }
+
+            _days = 0;
+            _hours = 0;
+            _minutes = 0;
+            _seconds = 0;
+            _msec = 0;
+
+            auto parseTrailingField = [&](const std::string& _value, int64_t& _secondsValue, int64_t& _msecValue) -> bool
+            {
+                const size_t dotPos = _value.find('.');
+                if (dotPos == std::string::npos)
+                {
+                    return tryParseInt64Field(_value, _secondsValue);
+                }
+
+                return tryParseInt64Field(_value.substr(0, dotPos), _secondsValue) &&
+                    tryParseFractionField(_value.substr(dotPos + 1), _msecValue);
+            };
+
+            switch (fieldCount)
+            {
+            case 4:
+                return tryParseInt64Field(fields[0], _days) &&
+                    tryParseInt64Field(fields[1], _hours) &&
+                    tryParseInt64Field(fields[2], _minutes) &&
+                    parseTrailingField(fields[3], _seconds, _msec);
+
+            case 3:
+                return tryParseInt64Field(fields[0], _hours) &&
+                    tryParseInt64Field(fields[1], _minutes) &&
+                    parseTrailingField(fields[2], _seconds, _msec);
+
+            case 2:
+                return tryParseInt64Field(fields[0], _minutes) &&
+                    parseTrailingField(fields[1], _seconds, _msec);
+
+            default:
+                return false;
+            }
+        }
 
         std::string toTimeStamp(std::chrono::system_clock::time_point _timePoint, ot::DateTime::DateFormat _format) {
             auto timeT = std::chrono::system_clock::to_time_t(_timePoint);
@@ -238,77 +314,13 @@ int64_t ot::DateTime::timestampToMsec(const std::string& _timestamp, DateFormat 
 
 int64_t ot::DateTime::durationToMsec(const std::string& _duration)
 {
-    std::smatch match;
-
     int64_t days = 0;
     int64_t hours = 0;
     int64_t minutes = 0;
     int64_t seconds = 0;
     int64_t msec = 0;
 
-    auto normalizeFraction = [](const std::string& _fraction) -> int64_t
-        {
-            std::string value = _fraction;
-
-            if (value.size() > 3)
-            {
-                value = value.substr(0, 3);
-            }
-
-            while (value.size() < 3)
-            {
-                value.push_back('0');
-            }
-
-            return std::stoll(value);
-        };
-
-    if (std::regex_match(_duration, match, intern::getDurationDayParserRegex()))
-    {
-        if (match[1].matched)
-        {
-            days = std::stoll(match[1].str());
-        }
-
-        hours = std::stoll(match[2].str());
-        minutes = std::stoll(match[3].str());
-        seconds = std::stoll(match[4].str());
-
-        if (match[5].matched)
-        {
-            msec = normalizeFraction(match[5].str());
-        }
-    }
-    else if (std::regex_match(_duration, match, intern::getDurationHourParserRegex()))
-    {
-        if (match[1].matched)
-        {
-            hours = std::stoll(match[1].str());
-        }
-
-        minutes = std::stoll(match[2].str());
-        seconds = std::stoll(match[3].str());
-
-        if (match[4].matched)
-        {
-            msec = normalizeFraction(match[4].str());
-        }
-    }
-    else if (std::regex_match(_duration, match, intern::getDurationMinuteParserRegex()))
-    {
-        if (match[1].matched)
-        {
-            minutes = std::stoll(match[1].str());
-        }
-
-        seconds = std::stoll(match[2].str());
-
-        if (match[3].matched)
-        {
-            msec = normalizeFraction(match[3].str());
-        }
-    }
-    else
+    if (!intern::tryParseDuration(_duration, days, hours, minutes, seconds, msec))
     {
         throw std::runtime_error("Invalid duration format: " + _duration);
     }
@@ -495,7 +507,14 @@ bool ot::DateTime::isValidTimestamp(const std::string& _timestamp, DateFormat _f
     case Msec:
         return true;
     case Duration:
-        return std::regex_match(_timestamp, intern::getDurationValidationRegex());
+    {
+        int64_t days = 0;
+        int64_t hours = 0;
+        int64_t minutes = 0;
+        int64_t seconds = 0;
+        int64_t msec = 0;
+        return intern::tryParseDuration(_timestamp, days, hours, minutes, seconds, msec);
+    }
     default:
         return false;
     }
