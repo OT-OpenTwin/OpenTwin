@@ -90,6 +90,12 @@ if(MSVC)
         $<$<CONFIG:Debug>:_CRT_SECURE_NO_WARNINGS>
         $<$<CONFIG:Debug>:_CRT_NONSTDC_NO_WARNINGS>
     )
+
+    add_link_options(
+        $<${_OT_CFG_RELEASE}:/OPT:REF>
+        $<${_OT_CFG_RELEASE}:/OPT:ICF>
+    )
+
 endif()
 
 # ------------------------------------------------------------
