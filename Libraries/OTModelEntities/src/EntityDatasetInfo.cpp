@@ -10,6 +10,11 @@
 #include "OTModelEntities/EntityFileText.h"
 #include "OTCore/Python/PythonHeaderAnalyser.h"
 #include "OTCore/Python/PythonHeaderEventBuilder.h"
+#include "OTCore/FolderNames.h"
+#include "OTModelEntities/Lms/EntityPythonScript.h"
+#include "OTModelEntities/EntityPythonManifest.h"
+#include "OTCore/ReturnMessage.h"
+
 static EntityFactoryRegistrar<ot::EntityDatasetInfo> registrar(ot::EntityDatasetInfo::className());
 
 ot::EntityDatasetInfo::EntityDatasetInfo(ot::UID _ID, EntityBase* _parent, EntityObserver* _mdl, ModelState* _ms)
@@ -42,6 +47,46 @@ void ot::EntityDatasetInfo::addVisualizationNodes()
 bool ot::EntityDatasetInfo::updateFromProperties()
 {
 	setModified();
+
+	// Check if LoadFromLibrary was selected
+	auto basePropertyModel = getProperties().getProperty("Script");
+	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
+	if (modelProperty == nullptr) {
+		OT_LOG_E("Model selection property cast failed");
+		return false;
+	}
+
+	auto basePropertyManifest = getProperties().getProperty("Environment");
+	auto manifestProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyManifest);
+	if (manifestProperty == nullptr) {
+		OT_LOG_E("Manifest selection property cast failed");
+		return false;
+	}
+
+	if (modelProperty->getValueName() == "< Load from Library >") {
+
+		ot::LibraryElementSelectionCfg config;
+		config.setRequestingEntityID(this->getEntityID());
+		config.setCollectionName("PythonScripts");
+		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+		config.setEntityType(EntityPythonScript::className());
+		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
+		config.setPropertyName("Script");
+
+		// if it was selected use observer to send message to LMS
+		getObserver()->requestConfigForModelDialog(config);
+	}
+	else if (manifestProperty->getValueName() == "< Load from Library >") {
+		ot::LibraryElementSelectionCfg config;
+		config.setRequestingEntityID(this->getEntityID());
+		config.setCollectionName("PythonEnvironments");
+		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+		config.setEntityType(EntityPythonManifest::className());
+		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+		config.setPropertyName("Environment");
+		// if it was selected use observer to send message to LMS
+		getObserver()->requestConfigForModelDialog(config);
+	}
 	
 	bool dataUpdate = PropertyHelper::getEntityProjectListProperty(this, "Project", "General")->needsUpdate();
 	if (dataUpdate)
@@ -243,6 +288,44 @@ std::optional<std::string> ot::EntityDatasetInfo::getEventHandlingFunction(Pytho
 	return std::nullopt;
 	
 }
+
+std::list<ot::LibraryElement> ot::EntityDatasetInfo::libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo) {
+
+	std::list<ot::LibraryElement> resultList;
+
+	std::string dependencyID = _libraryElement.getAdditionalInfoValue("DependencyID");
+	std::string dependencyCollection = _libraryElement.getAdditionalInfoValue("DependencyCollection");
+	if (!dependencyID.empty() && dependencyID != std::to_string(ot::invalidUID)) {
+		// Create the LibraryElementRequest configuration
+		ot::LibraryElementRequest request;
+		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
+		request.setCollectionName(dependencyCollection);
+		request.setCallBackAction(OT_ACTION_CMD_LMS_LibraryElementRequest);
+		request.setEntityType(EntityPythonManifest::className());
+		request.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+		request.setPropertyName("Environment");
+		request.setCallBackService(_libraryElement.getCallBackService());
+		request.setValue(dependencyID);
+
+		// Send the document to the observer (Model Service)
+		std::string answer = getObserver()->requestLibraryElement(request);
+
+		// Process the answer
+		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(answer);
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(rMsg.getWhat());
+
+		ot::LibraryElement returnedElement;
+		returnedElement.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_Config));
+
+		resultList.push_back(returnedElement);
+
+
+		return resultList;
+	}
+	return resultList;
+}
+
 
 void ot::EntityDatasetInfo::addStorageData(bsoncxx::builder::basic::document& _storage)
 {

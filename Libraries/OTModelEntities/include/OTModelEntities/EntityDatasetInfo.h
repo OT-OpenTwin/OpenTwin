@@ -7,10 +7,12 @@
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/IEventHandler.h"
 #include "OTModelEntities/Properties/PropertyBundleEventHandling.h"
+#include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
+#include "OTModelEntities/Lms/LibraryElement.h"
 
 namespace ot {
 
-	class OT_MODELENTITIES_API_EXPORT EntityDatasetInfo : public EntityBase, public IVisualisationTable, public IEventHandler
+	class OT_MODELENTITIES_API_EXPORT EntityDatasetInfo : public EntityBase, public IVisualisationTable, public IEventHandler, public EntityBlockLibraryInterface
 	{
 		OT_DECL_NOCOPY(EntityDatasetInfo)
 		OT_DECL_NOMOVE(EntityDatasetInfo)
@@ -46,6 +48,9 @@ namespace ot {
 		std::string getScriptName() override;
 		std::string getEnvironmentName() override;
 		std::optional<std::string>getEventHandlingFunction(PythonEventType _type, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
+		// Special library interface function
+		virtual std::list<ot::LibraryElement> libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo) override;
 
 	protected:
 
