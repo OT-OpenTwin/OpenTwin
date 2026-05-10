@@ -104,6 +104,14 @@ bool EntityBlockPython::updateFromProperties()
 		return false;
 	}
 
+	auto basePropertyManifest = getProperties().getProperty(m_propertyNameEnvironments);
+	auto manifestProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyManifest);
+	if(manifestProperty == nullptr)
+	{
+		OT_LOG_E("Manifest selection property cast failed");
+		return false;
+	}
+
 	if (modelProperty->getValueName() == "< Load from Library >") {
 
 		ot::LibraryElementSelectionCfg config;
@@ -114,6 +122,17 @@ bool EntityBlockPython::updateFromProperties()
 		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
 		config.setPropertyName(m_propertyNameScripts);
 
+		// if it was selected use observer to send message to LMS
+		getObserver()->requestConfigForModelDialog(config);
+	} else if(manifestProperty->getValueName() == "< Load from Library >")
+	{
+		ot::LibraryElementSelectionCfg config;
+		config.setRequestingEntityID(this->getEntityID());
+		config.setCollectionName("PythonEnvironments");
+		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+		config.setEntityType(EntityPythonManifest::className());
+		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+		config.setPropertyName(m_propertyNameEnvironments);
 		// if it was selected use observer to send message to LMS
 		getObserver()->requestConfigForModelDialog(config);
 	}
