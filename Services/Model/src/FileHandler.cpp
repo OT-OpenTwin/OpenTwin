@@ -72,7 +72,9 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 
 	_uiComponent->addMenuButton(m_buttonPythonImport);
 	_uiComponent->addMenuButton(m_buttonFileImport);
-	_uiComponent->addMenuButton(m_buttonExportFileToLibrary);
+	if (!std::string(getenv("OPENTWIN_DEV_ROOT")).empty()) {
+		_uiComponent->addMenuButton(m_buttonExportFileToLibrary);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

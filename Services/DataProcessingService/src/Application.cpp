@@ -153,16 +153,17 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName, "Create Manifest", "Default/AddMaterial");
 	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));
 
-	m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Manifest Meta", "Default/Add");
-	_ui->addMenuButton(m_buttonCreateManifestMeta.setButtonLockFlags(modelWrite));
+	if (!std::string(getenv("OPENTWIN_DEV_ROOT")).empty()) {
+		m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Manifest Meta", "Default/Add");
+		_ui->addMenuButton(m_buttonCreateManifestMeta.setButtonLockFlags(modelWrite));
 
+		m_buttonCreatePythonMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Text File", "Default/Add");
+		_ui->addMenuButton(m_buttonCreatePythonMeta.setButtonLockFlags(modelWrite));
+	}
+	
 	m_buttonCreatePythonScript = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Python Script", "Default/Add");
 	_ui->addMenuButton(m_buttonCreatePythonScript.setButtonLockFlags(modelWrite));
 
-	m_buttonCreatePythonMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Text File", "Default/Add");
-	_ui->addMenuButton(m_buttonCreatePythonMeta.setButtonLockFlags(modelWrite));
-
-	
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.createBlockPicker();
 	
