@@ -59,6 +59,8 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 	ot::EncodingGuesser guesser;
 	this->setFileProperties(path, name, type);
 
+	this->setTreeItemEditable(true);
+
 	// Set text encoding to UTF-8
 	this->setTextEncoding(guesser(_libraryElement.getData().data(), _libraryElement.getData().size()));
 

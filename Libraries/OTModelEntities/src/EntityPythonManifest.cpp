@@ -114,6 +114,8 @@ void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryE
 	);
 
 	this->setText(_libraryElement.getData());
+
+	this->setTreeItemEditable(true);	
 	
 	// Add additional infos as properties
 	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
