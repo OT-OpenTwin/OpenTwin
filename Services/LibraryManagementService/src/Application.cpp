@@ -30,7 +30,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
-
+#include "OTSystem/OperatingSystem.h"
 
 
 
@@ -593,9 +593,10 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		element.setFromJsonObject(elementObj);
 		receivedModels.push_back(element);
 	}
-
+	
+	
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, "admin", ot::UserCredentials::decryptString(adminPassword), "127.0.0.1:27017");
+	updateOrCreateLibraryElement(receivedModels, "admin", ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
@@ -644,14 +645,14 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 	std::string dbUserPassword = ot::UserCredentials::decryptString(adminPassword);
 	for (const auto& model : receivedModels) {
 		std::string collectionName = model.getCollectionName();
-		if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, dbUserPassword, "127.0.0.1:27017")) {
+		if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, dbUserPassword, ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
 			OT_LOG_E("Failed to ensure database and collection '" + collectionName + "' for model '" + model.getName() + "'");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
 		}
 	}
 
 	// Add or update library elements
-	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), "127.0.0.1:27017");
+	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
 	// Create response document with updated models
 	ot::JsonDocument responseDoc;
