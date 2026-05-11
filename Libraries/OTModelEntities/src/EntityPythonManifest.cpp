@@ -116,18 +116,6 @@ void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryE
 	this->setText(_libraryElement.getData());
 
 	this->setTreeItemEditable(true);	
-	
-	// Add additional infos as properties
-	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
-		EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
-			"Metadata",
-			additionalInfos.first,
-			additionalInfos.second,
-			"Default",
-			this->getProperties()
-		);
-		additionalInfoProp->setReadOnly(true);
-	}
 }
 
 bool EntityPythonManifest::checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) {

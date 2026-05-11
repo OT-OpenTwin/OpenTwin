@@ -237,18 +237,6 @@ void EntityFileText::setLibraryElement(const ot::LibraryElement& _libraryElement
 	// Set text encoding to UTF-8
 	this->setTextEncoding(ot::TextEncoding::UTF8);
 
-	// Add additional infos as properties
-	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
-		EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
-			"Metadata",
-			additionalInfos.first,
-			additionalInfos.second,
-			"Default",
-			this->getProperties()
-		);
-		additionalInfoProp->setReadOnly(true);
-	}
-
 	// Hide default properties
 	EntityPropertiesBase* pathProp = this->getProperties().getProperty("Path", "Selected File");
 	EntityPropertiesBase* filenameProp = this->getProperties().getProperty("Filename", "Selected File");

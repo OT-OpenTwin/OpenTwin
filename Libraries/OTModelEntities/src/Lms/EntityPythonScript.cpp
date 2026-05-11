@@ -63,17 +63,4 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 
 	// Set text encoding to UTF-8
 	this->setTextEncoding(guesser(_libraryElement.getData().data(), _libraryElement.getData().size()));
-
-	// Add additional infos as properties
-	for (const auto& additionalInfos : _libraryElement.getAdditionalInfos()) {
-		EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
-			"Metadata",
-			additionalInfos.first,
-			additionalInfos.second,
-			"Default",
-			this->getProperties()
-		);
-		additionalInfoProp->setReadOnly(true);
-	}
-
 }
