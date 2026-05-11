@@ -136,9 +136,6 @@ void EntityCreator::createPythonScript() {
 	newScript.setFileProperties(path, name, type);
 	newScript.setTextEncoding(ot::TextEncoding::UTF8);
 	newScript.setTreeItemEditable(true);
-
-	EntityPropertiesString* exportTypeProperty = EntityPropertiesString::createProperty("File", "ExportType", "PythonScript", "default", newScript.getProperties());
-	exportTypeProperty->setReadOnly(true);
 	newScript.storeToDataBase();
 
 	ot::NewModelStateInfo entityInfos;
@@ -168,9 +165,6 @@ void EntityCreator::createPythonMeta() {
 	newTextFile.setTextEncoding(ot::TextEncoding::UTF8);
 	newTextFile.setTreeItemEditable(true);
 
-	EntityPropertiesString* exportTypeProperty = EntityPropertiesString::createProperty("File", "ExportType", "PythonMeta", "default", newTextFile.getProperties());
-	exportTypeProperty->setReadOnly(true);
-
 	newTextFile.storeToDataBase();
 	ot::NewModelStateInfo entityInfos;
 	entityInfos.addTopologyEntity(newTextFile);
@@ -199,9 +193,6 @@ void EntityCreator::createManifestMeta() {
 	newTextFile.setFileProperties(path, name, type);
 	newTextFile.setTextEncoding(ot::TextEncoding::UTF8);
 	newTextFile.setTreeItemEditable(true);
-
-	EntityPropertiesString* exportTypeProperty = EntityPropertiesString::createProperty("File", "ExportType", "ManifestMeta", "default", newTextFile.getProperties());
-	exportTypeProperty->setReadOnly(true);
 
 	newTextFile.storeToDataBase();
 	ot::NewModelStateInfo entityInfos;
