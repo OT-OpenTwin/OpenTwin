@@ -100,6 +100,9 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\FileManagementProjectService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenEMSService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\UpdateModelLibraries.bat" 2>NUL
 
+ECHO Delete library data 
+RMDIR /Q /S "%OPENTWIN_DEPLOYMENT_DIR%\LibraryData" 2>NUL
+
 ECHO Delete color styles
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\ColorStyles\*.otcsf" 2>NUL
 
@@ -192,6 +195,12 @@ COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\x64\Release\OToolkitAPI.dll" "%OPENT
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool\x64\Release\OTSystemInformationTool.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\x64\Release\ModelLibraryUpdater.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
+REM ====================================================================
+REM  Copy Library data
+REM ====================================================================
+
+ECHO Copy LibraryData
+XCOPY /E /I /Y "%OPENTWIN_DEV_ROOT%\LibraryData" "%OPENTWIN_DEPLOYMENT_DIR%\LibraryData"
 
 REM ====================================================================
 REM  Copy Color Styles
