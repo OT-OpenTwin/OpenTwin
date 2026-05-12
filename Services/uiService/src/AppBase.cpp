@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: AppBase.cpp
 // 
 // License:
@@ -1676,7 +1676,7 @@ bool AppBase::checkForContinue(const std::string& _title) {
 	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	return true;
 }
-
+#include "OTModelEntities/Properties/EntityPropertiesItems.h"
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 	OTAssertNullptr(m_propertyGrid);
 
@@ -1715,6 +1715,12 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 			}
 		}
 		
+		const std::string currentProjectName = m_currentProjectInfo.getProjectName();
+		auto projectNameEntry = std::find(userProjectNames.begin(), userProjectNames.end(), currentProjectName);
+		assert(projectNameEntry != userProjectNames.end());
+		userProjectNames.remove(currentProjectName);
+		
+		userProjectNames.insert(userProjectNames.begin(), EntityPropertiesProjectList::getCurrentProjectPlaceholder());
 		actualProp->setList(userProjectNames);
 	}
 

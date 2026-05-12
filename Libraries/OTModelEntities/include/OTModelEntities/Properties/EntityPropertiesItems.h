@@ -536,6 +536,7 @@ public:
 
 	void setValue(const std::string& _value) { if (m_value != _value) setNeedsUpdate(); m_value = _value; }
 	std::string getValue() const {return m_value;}
+	static std::string getCurrentProjectPlaceholder() { return "<Current project>"; }
 private:
 	std::string m_value;
 };

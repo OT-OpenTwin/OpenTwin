@@ -47,7 +47,7 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuan
 	dataLakeAccessor.createQueryDescriptionsSeries({}, seriesLabel);
 
 	DataLakeQueryCfg queryCfg;
-	queryCfg.setCollectionName(_appBase->getProjectName());
+	queryCfg.setCollectionName(EntityPropertiesProjectList::getCurrentProjectPlaceholder());
 	queryCfg.setSeriesLabel(seriesLabel);
 
 	// Only the selection the quantity necessary

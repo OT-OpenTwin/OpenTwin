@@ -4208,7 +4208,12 @@ void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visua
 
 std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
-	return m_metadataHandler.getMetadataCampaign(_projectName,_collectionName);
+	std::string projectName = _projectName;
+	if (EntityPropertiesProjectList::getCurrentProjectPlaceholder() == projectName)
+	{
+		projectName = Application::instance()->getProjectName();
+	}
+	return m_metadataHandler.getMetadataCampaign(projectName,_collectionName);
 }
 
 
