@@ -3,7 +3,6 @@
 #include <vector>
 #include <unordered_map>
 #include <Python.h>
-#include "RequirementSpec.h"
 
 class InstalledPackageChecker
 {
