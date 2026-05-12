@@ -81,6 +81,9 @@
     <ClCompile Include="src\EntityBuilder.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\InstalledPackageChecker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\CPythonObject.h">
@@ -169,6 +172,9 @@
     </ClInclude>
     <ClInclude Include="include\EntityBuilder.h">
       <Filter>include\CustomPythonStructs</Filter>
+    </ClInclude>
+    <ClInclude Include="include\InstalledPackageChecker.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

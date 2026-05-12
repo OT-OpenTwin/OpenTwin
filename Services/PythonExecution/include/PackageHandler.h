@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PackageHandler.h
 // 
 // License:
@@ -25,6 +25,7 @@
 #include "WorkerWaiterState.h"
 #include "OTModelEntities/EntityPythonManifest.h"
 #include "OTModelEntities/NewModelStateInfo.h"
+#include "InstalledPackageChecker.h"
 
 class PackageHandler
 {
@@ -77,8 +78,7 @@ private:
 		fixed,
 		core
 	};
-	
-	std::map<std::string, std::string> m_installedPackageVersionsByName;
+	InstalledPackageChecker m_installedPackageChecker;
 	EntityPythonManifest* m_currentManifest = nullptr;
 	std::string m_environmentPath;
 	WorkerWaiterState* m_installationNotifier = nullptr; //Used for letting other threads wait for the installation to finish
@@ -87,17 +87,15 @@ private:
 	std::string m_installationLog;
 
 	void requestRestart();
-	const std::list<std::string> parseImportedPackages(const std::string _scriptContent);
-	bool isPackageInstalled(const std::string& _packageName);
+		
 	void installPackage(const std::string& _packageName);
 	void dropImportCache();
 	EntityPythonManifest* loadManifestEntity(ot::UID _manifestUID);
 	ot::UID getUIDFromString(const std::string& _uid);
 	
 	// Runs pip --freeze and returns the list of installed packages as a string
-	std::string getListOfInstalledPackages();
 	void storeInstallationLog(ot::NewModelStateInfo& _newState);
-	void buildInstalledPackageMap(const std::string& _packageList);
+	
 	std::string trim(const std::string& _line);
 	std::pair<std::string, std::string> splitPackageIntoNameAndVersion(const std::string& _requirementLine);
 };

@@ -37,6 +37,7 @@
 #include "ExceptionRestartRequired.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EntityName.h"
+#include "InstalledPackageChecker.h"
 
 PackageHandler::~PackageHandler()
 {
@@ -110,15 +111,9 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
 			OT_LOG_D("Environment folder does not exist. It will be created.");
             m_environmentState = EnvironmentState::empty;
         }
-        
-        std::string installedPackages;
-        {
-		    OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
-            installedPackages = getListOfInstalledPackages();
-        }
-		OT_LOG_D("Installed packages:\n" + installedPackages);
+        m_installedPackageChecker.refreshPackageCaches();
+		OT_LOG_D("Installed packages:\n" + m_installedPackageChecker.buildRequirementsText());
 
-        buildInstalledPackageMap(installedPackages);
 
         std::optional<std::list<std::string>> packagesInManifest = m_currentManifest->getManifestPackages();
         if (!packagesInManifest.has_value())
@@ -127,6 +122,8 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
         }
         else
         {
+
+            std::list<std::string> packagesToInstall;
             if (packagesInManifest.value().size() == 0)
             {
                 OT_LOG_D("Manifest" + m_currentManifest->getName() + " does not contain any packages.");
@@ -134,21 +131,68 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
             else
             {
                 assert(m_environmentState == EnvironmentState::empty); //Otherwise the manifest UID should have been a different one
-
-                OT_LOG_D("Initialize environment with manifest packages.");
+                for (const std::string& requirementLine : packagesInManifest.value())
                 {
-					OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
-                    for (const std::string& packageName : packagesInManifest.value())
+                    if (!m_installedPackageChecker.isRequirementSatisfied(requirementLine))
                     {
-                        if (!isPackageInstalled(packageName))
+                        packagesToInstall.push_back(requirementLine);
+                    }
+                }
+            }
+
+            if (packagesToInstall.size() > 0 )
+            {
+
+                if (m_environmentState == EnvironmentState::initialised)
+                {
+                    // Needs a restart with a new environment
+                    // Should not be reached since the manifest UID changes on content change
+                    throw std::exception("Internal error: Initialised environment matches a manifest with different content.");
+                }
+                else if (m_environmentState == EnvironmentState::empty || m_environmentState == EnvironmentState::firstFilling)
+                {
+                    OT_LOG_D("Initialize environment with manifest packages.");
+                    {
+                        OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
+                        for (const std::string& requirementLine : packagesToInstall)
                         {
-                            installPackage(packageName);
-                            m_environmentState = EnvironmentState::firstFilling;
+                            installPackage(requirementLine);
+                        }
+                        m_installationLog = OutputPipeline::instance().flushOutput();
+                    }
+                    // Depending on the order of package installments, prior package may be overwritten with another version. So we need to double check the if the manifest is still valid
+                    m_installedPackageChecker.refreshPackageCaches();
+                    if (m_installedPackageChecker.getNumberOfInstalledPackages() != packagesToInstall.size())
+                    {
+                        const std::string newManifest = m_installedPackageChecker.buildRequirementsText();
+                        m_currentManifest->replaceManifest(newManifest);
+                    }
+                    else
+                    {
+                        bool allPackagesInstalledAsIntended = true;
+                        for (const std::string& requirementLine : packagesInManifest.value())
+                        {
+                            allPackagesInstalledAsIntended &= m_installedPackageChecker.isRequirementSatisfied(requirementLine);
+                        }
+                        if (!allPackagesInstalledAsIntended)
+                        {
+                            const std::string newManifest = m_installedPackageChecker.buildRequirementsText();
+                            m_currentManifest->replaceManifest(newManifest);
                         }
                     }
-                    m_installationLog = OutputPipeline::instance().flushOutput();
+                    dropImportCache();
                 }
-                dropImportCache();
+                else if (m_environmentState == EnvironmentState::core || m_environmentState == EnvironmentState::fixed)
+                {
+                    // Needs a restart with a new environment
+                    // Should not be reached since the manifest UID changes on content change
+                    throw std::exception("Internal error: Core environment loaded but a manifest with with packages was given.");
+                }
+                else
+                {
+                    assert(false); //Missed an enum 
+                }
+
             }
         }
 
@@ -165,19 +209,15 @@ void PackageHandler::initializeEnvironmentWithManifest(const std::string& _envir
 
 void PackageHandler::extractMissingPackages(const std::string& _scriptContent)
 {
-    std::list<std::string> moduleNames = parseImportedPackages(_scriptContent);
-    
-    for (const std::string moduleName : moduleNames)
-    {
-        if (!isPackageInstalled(moduleName))
-        {
-            m_uninstalledPackages.push_back(moduleName);
-        }
-    }
+    std::vector<std::string> moduleNames = m_installedPackageChecker.findMissingDistributionsForScriptImports(_scriptContent);
+
+    m_uninstalledPackages.insert(m_uninstalledPackages.end(),moduleNames.begin(), moduleNames.end());   
 }
 
 void PackageHandler::importMissingPackages()
 {
+    m_uninstalledPackages.sort();
+    m_uninstalledPackages.unique();
 
     if (m_uninstalledPackages.size() != 0)
     {
@@ -242,27 +282,50 @@ void PackageHandler::importMissingPackages()
             //Update manifest
             ot::NewModelStateInfo newModelStateInfo;
 			storeInstallationLog(newModelStateInfo);
-
-            std::string newManifest = getListOfInstalledPackages();
+            m_installedPackageChecker.refreshPackageCaches();
+            std::string newManifest = m_installedPackageChecker.buildRequirementsText();
             
             m_currentManifest->replaceManifest(newManifest);
             m_currentManifest->storeToDataBase();
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
             ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Manifest requires a new environment");
-
-            buildInstalledPackageMap(newManifest);
         }
         m_uninstalledPackages.clear();
 		m_installationLog.clear();
     }
     else
     {
-        if (!m_installationLog.empty())
+        ot::NewModelStateInfo newModelStateInfo;
+        bool logUpdate = !m_installationLog.empty();
+        if (logUpdate)
         {
-            ot::NewModelStateInfo newModelStateInfo;
 			storeInstallationLog(newModelStateInfo);
-            ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, "Installation log updated");
 			m_installationLog.clear();
+        }
+        bool manifestUpdate = m_currentManifest->getModified();
+        if (manifestUpdate)
+        {
+            // Could already been adjusted during loading of environment.
+            m_currentManifest->storeToDataBase();
+            newModelStateInfo.addTopologyEntity(*m_currentManifest);
+        }
+        if (newModelStateInfo.hasTopologyEntities())
+        {
+            std::string message;
+            if (logUpdate && manifestUpdate)
+            {
+                message = "Manifest and installation log updated";
+            }
+            else if (logUpdate)
+            {
+                message = "Installation log updated";
+            }
+            else
+            {
+                assert(manifestUpdate);
+                message = "Manifest updated";
+            }
+            ot::ModelServiceAPI::addEntitiesToModel(newModelStateInfo, message);
         }
     }
 
@@ -285,61 +348,14 @@ void PackageHandler::requestRestart()
     throw ExceptionRestartRequired();
 }
 
-const std::list<std::string> PackageHandler::parseImportedPackages(const std::string _scriptContent)
-{
-	std::list<std::string> packageList;
-	std::stringstream scriptStream(_scriptContent);
-    std::string line;
-	while(std::getline(scriptStream, line)) 
-    {
-        line = trim(line);
-        // Skip empty lines and comments
-        if (line.empty() || line[0] == '#')
-        {
-            continue;
-        }
-        // Check for "import ..." statements
-        if (line.find("import ") == 0) {
-            std::string rest = line.substr(7); // after "import "
-            
-            //we may have a statement like import numpy as np
-            auto positionOfAs = rest.find(" as ");
-            rest = rest.substr(0, positionOfAs);
 
-            // handle multiple imports
-            auto modules = ot::String::split(rest, ','); 
-			packageList.insert(packageList.end(), modules.begin(), modules.end());
-        }
-        // Check for "from ... import ..." statements
-        else if (line.find("from ") == 0) {
-            // Example: "from os.path import join"
-            size_t pos = line.find("import ");
-            if (pos != std::string::npos) {
-                std::string module = trim(line.substr(5, pos - 5)); // after "from " before "import"
-                if (!module.empty())
-                {
-                    packageList.push_back(module);
-                }
-            }
-        }
-	}
-    
-
-    for (std::string& packageName : packageList)
-    {
-		ot::String::removeControlCharacters(packageName);
-		ot::String::removeWhitespaces(packageName);
-	}
-
-	return packageList;
-}
-
- std::string PackageHandler::trim(const std::string& _line) {
+std::string PackageHandler::trim(const std::string& _line) {
     size_t start = _line.find_first_not_of(" \t");
     if (start == std::string::npos) return "";
     size_t end = _line.find_last_not_of(" \t");
     return _line.substr(start, end - start + 1);
 }
+
 
  std::pair<std::string, std::string> PackageHandler::splitPackageIntoNameAndVersion(const std::string& _requirementLine)
  {
@@ -360,39 +376,6 @@ const std::list<std::string> PackageHandler::parseImportedPackages(const std::st
      }
  }
 
-bool PackageHandler::isPackageInstalled(const std::string& _packageName)
-{
-    //First option, does not work with packages like tensorflow
-    CPythonObjectNew temp = PyImport_ImportModule(_packageName.c_str());
-    bool importableModule = temp != nullptr;
-    if (importableModule)
-    {
-        return true;
-    }
-    else
-    {
-        //Alternative way checks the list of pip insstalled packages.
-        auto nameAndVersion = splitPackageIntoNameAndVersion(_packageName);
-        if (!nameAndVersion.first.empty())
-        {
-            auto installedPackage = m_installedPackageVersionsByName.find(nameAndVersion.first);
-            if (installedPackage != m_installedPackageVersionsByName.end())
-            {
-                bool fits = installedPackage->second == nameAndVersion.second;
-                return fits;
-            }
-            else
-            {
-                return false;
-            }
-        }
-        else
-        {
-            bool found = m_installedPackageVersionsByName.find(_packageName) != m_installedPackageVersionsByName.end();
-            return found;
-        }
-    }
-}
 
 void PackageHandler::installPackage(const std::string& _packageName)
 {
@@ -483,7 +466,14 @@ EntityPythonManifest* PackageHandler::loadManifestEntity(ot::UID _manifestUID)
     EntityBase* entityBase = ot::EntityAPI::readEntityFromEntityIDandVersion(info);
     if(entityBase == nullptr)
     {
-        throw std::exception("Failed to load manifest entity from database.");
+        if (info.getEntityVersion() == ot::invalidUID)
+        {
+            throw std::exception("Failed to load manifest entity from database. Check if the selected environment in the python block is outdated.");
+        }
+        else
+        {
+            throw std::exception("Failed to load manifest entity from database.");
+        }
 	}
     return dynamic_cast<EntityPythonManifest*>(entityBase);        
 }
@@ -502,70 +492,6 @@ ot::UID PackageHandler::getUIDFromString(const std::string& _uid)
     }
 }
 
-std::string PackageHandler::getListOfInstalledPackages()
-{
-    CPythonObjectNew sys_module = PyImport_ImportModule("sys");
-    if (!sys_module)
-    {
-        throw std::exception("Failed to import sys module");
-    }
-
-    // sys.argv = ["pip", "freeze"]
-    CPythonObjectNew argv = PyList_New(2);
-    PyList_SetItem(argv, 0, PyUnicode_FromString("pip"));
-    PyList_SetItem(argv, 1, PyUnicode_FromString("freeze"));
-
-    if (PyObject_SetAttrString(sys_module, "argv", argv) != 0)
-    {
-        throw std::exception("Failed to set sys.argv");
-    }
-
-    // Import runpy
-    CPythonObjectNew runpy = PyImport_ImportModule("runpy");
-    if (!runpy)
-    {
-        throw std::exception("Failed to import runpy");
-    }
-
-    CPythonObjectNew run_module = PyObject_GetAttrString(runpy, "run_module");
-    if (!run_module)
-    {
-        throw std::exception("Failed to get run_module");
-    }
-
-    // run_module('pip.__main__', run_name='__main__', alter_sys=True)
-    CPythonObjectNew args = Py_BuildValue("(s)", "pip.__main__");
-    CPythonObjectNew kwargs = Py_BuildValue(
-        "{s:s, s:O}",
-        "run_name", "__main__",
-        "alter_sys", Py_True
-    );
-
-    CPythonObjectNew result = PyObject_Call(run_module, args, kwargs);
-	std::string allInstalledPackages = OutputPipeline::instance().flushOutput();
-    // Extract the "result" variable (a Python list)
-
-        /*for(const std::string& pkg : installedPackages)
-        {
-            allInstalledPackages += pkg + "\n";
-        }*/
-
-    // Check if the error was SystemExit
-    if (PyErr_ExceptionMatches(PyExc_SystemExit))
-    {
-        // Clear the error and continue
-        PyErr_Clear();
-        // Pip ran successfully but exited the interpreter
-    }
-    else
-    {
-        PyErr_Print();
-        throw std::exception("pip execution failed");
-    }
-
-    return allInstalledPackages;
-}
-
 void PackageHandler::storeInstallationLog(ot::NewModelStateInfo& _newState)
 {
     EntityResultText installLogEntity;
@@ -580,17 +506,3 @@ void PackageHandler::storeInstallationLog(ot::NewModelStateInfo& _newState)
     m_installationLog.clear();
 }
 
-void PackageHandler::buildInstalledPackageMap(const std::string& _packageList)
-{
-    std::stringstream stringStream(_packageList);
-    std::string line;
-    const std::string delim = "==";
-    while (std::getline(stringStream, line))
-    {
-        auto nameAndVersion = splitPackageIntoNameAndVersion(line);
-        if (!nameAndVersion.first.empty())
-        {
-            m_installedPackageVersionsByName[nameAndVersion.first] = nameAndVersion.second;
-        }
-    }
-}

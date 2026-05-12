@@ -288,6 +288,7 @@
     <ClCompile Include="src\CommunicationHandler.cpp" />
     <ClCompile Include="src\EntityBuilder.cpp" />
     <ClCompile Include="src\EnvironmentsGarbageCollector.cpp" />
+    <ClCompile Include="src\InstalledPackageChecker.cpp" />
     <ClCompile Include="src\InterpreterPathSettings.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\OutputPipeline.cpp" />
@@ -310,6 +311,7 @@
     <ClInclude Include="include\EntityBuilder.h" />
     <ClInclude Include="include\EnvironmentsGarbageCollector.h" />
     <ClInclude Include="include\ExceptionRestartRequired.h" />
+    <ClInclude Include="include\InstalledPackageChecker.h" />
     <ClInclude Include="include\PythonStructValueComparison.h" />
     <ClInclude Include="include\PythonThreadGuard.h" />
     <ClInclude Include="include\InterpreterPathSettings.h" />
