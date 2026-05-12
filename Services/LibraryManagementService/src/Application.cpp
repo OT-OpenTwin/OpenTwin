@@ -574,8 +574,8 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
-		const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
-		if (envPassword != nullptr) {
+		std::string envPassword =ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD"));
+		if (!envPassword.empty()) {
 			adminPassword = envPassword;
 		}
 		else {
@@ -596,7 +596,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 	
 	
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, "admin", ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
+	updateOrCreateLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
 	// Create response document with received models
 	ot::JsonDocument responseDoc;
@@ -621,8 +621,8 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
-		const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
-		if (envPassword != nullptr) {
+		std::string envPassword = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD");
+		if (!envPassword.empty()) {
 			adminPassword = envPassword;
 		}
 		else {
