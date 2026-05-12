@@ -571,7 +571,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 	std::string adminUserName = db->getAdminUserName();
 	std::string adminPassword;
 	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
-		adminPassword = ot::UserCredentials::encryptString(ot::json::getString(_document, OT_ACTION_PARAM_Value));
+		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
 		const char* envPassword = std::getenv("OPEN_TWIN_MONGODB_PWD");
