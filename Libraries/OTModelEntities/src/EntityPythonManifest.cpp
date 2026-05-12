@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityPythonManifest.cpp
 // 
 // License:
@@ -182,17 +182,10 @@ std::optional<std::list<std::string>> EntityPythonManifest::getPackageList(const
 			moduleName = line.substr(0, posAt);
 			version = line.substr(posAt);
 		}
-		if(!moduleName.empty() && !version.empty())
+		packageList.value().push_back(line);
+		if(moduleName.empty() && version.empty())
 		{
-			if (packageList.has_value())
-			{
-				packageList.value().push_back(line);
-			}
-		}
-		else
-		{
-			packageList.reset();
-			OT_LOG_E("Invalid line in manifest: line" + std::to_string(lineNumber));
+			OT_LOG_D("Possibly an invalid line in manifest: line" + std::to_string(lineNumber) + ". Packages have to be entered as name only, with '=='<version> or '@'<local path>.");
 		}
 	}
 
