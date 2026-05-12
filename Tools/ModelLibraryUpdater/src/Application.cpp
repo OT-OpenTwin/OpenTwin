@@ -294,7 +294,8 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
     doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, doc.GetAllocator()), doc.GetAllocator());
     if(!databasePsw.empty()) {
         doc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
-	}
+    }
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName.c_str(), doc.GetAllocator()), doc.GetAllocator());
 	
 	createJsonDocumentFromLibraryElement(localModels, doc);
     localModels.clear();
@@ -319,6 +320,8 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
     if (!databasePsw.empty()) {
         updateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
     }
+
+	updateDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName.c_str(), updateDoc.GetAllocator()), updateDoc.GetAllocator());
 	createJsonDocumentFromLibraryElement(localModels, updateDoc);
 
     // Send to Lms

@@ -574,7 +574,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
-		std::string envPassword =ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD"));
+		std::string envPassword =ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD");
 		if (!envPassword.empty()) {
 			adminPassword = envPassword;
 		}
@@ -594,7 +594,17 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		receivedModels.push_back(element);
 	}
 	
-	
+	// Ensure database and collections exist
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
+	}
+	else {
+		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
+
+	}
+
 	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
 	updateOrCreateLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
@@ -641,16 +651,18 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		receivedModels.push_back(element);
 	}
 
-	// Ensure database and collections exist for each received model
-	std::string dbUserPassword = ot::UserCredentials::decryptString(adminPassword);
-	for (const auto& model : receivedModels) {
-		std::string collectionName = model.getCollectionName();
-		if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, dbUserPassword, ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
-			OT_LOG_E("Failed to ensure database and collection '" + collectionName + "' for model '" + model.getName() + "'");
-			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
-		}
+	// Ensure database and collections exist
+	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
 	}
-
+	else {
+		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
+			
+	}
+	
+	
 	// Add or update library elements
 	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
