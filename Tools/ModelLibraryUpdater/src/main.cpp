@@ -40,7 +40,6 @@ void initializeLogging(void)
 
 	ot::LogDispatcher& dispatcher = ot::LogDispatcher::instance();
 	dispatcher.addReceiver(new ot::LogNotifierStdCout());
-	dispatcher.addReceiver(new ot::LogNotifierFileWriter(_filePath));
 }
 
 
