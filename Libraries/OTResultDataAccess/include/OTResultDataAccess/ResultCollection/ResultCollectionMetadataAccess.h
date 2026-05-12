@@ -40,7 +40,6 @@ public:
 
 	virtual ~ResultCollectionMetadataAccess() {};
 
-	std::list<std::string> listAllSeriesNames() const;
 	std::list<std::string> listAllSeriesLabels() const;
 	std::list<std::string> listAllParameterLabels() const;
 	std::list<std::string> listAllQuantityLabels() const;

@@ -76,17 +76,6 @@ ResultCollectionMetadataAccess& ResultCollectionMetadataAccess::operator=(Result
 	return *this;
 }
 
-std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesNames() const
-{
-	auto& seriesMetadataEntries= m_metadataCampaign.getSeriesMetadata();
-	std::list<std::string> seriesMetadataNames;
-	for (auto& seriesMetadata: seriesMetadataEntries)
-	{
-		seriesMetadataNames.push_back(seriesMetadata.getName());
-	}
-	return seriesMetadataNames;
-}
-
 std::list<std::string> ResultCollectionMetadataAccess::listAllSeriesLabels() const
 {
 	auto& seriesMetadataEntries = m_metadataCampaign.getSeriesMetadata();

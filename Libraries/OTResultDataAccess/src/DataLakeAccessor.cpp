@@ -74,13 +74,15 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 		}
 		else
 		{
-			std::list<std::string> allSeriesLabels = m_resultCollectionMetadataAccess->listAllSeriesNames();
+			std::list<std::string> allSeriesLabels = m_resultCollectionMetadataAccess->listAllSeriesLabels();
 			RegexHelper::applyRegexFilter(allSeriesLabels, _seriesLabel);
 			for (const std::string& seriesName : allSeriesLabels)
 			{
 				const MetadataSeries* series = m_resultCollectionMetadataAccess->findMetadataSeries(seriesName);
-				assert(series != nullptr);
-				matchingSeries.push_back(series);
+				if (series != nullptr)
+				{
+					matchingSeries.push_back(series);
+				}
 			}
 		}
 	}
@@ -382,14 +384,18 @@ ot::DataLakeAccessCfg DataLakeAccessor::createConfig()
 	}
 	config.setCollectionName(m_collectionName);
 
-	std::list<std::string> seriesNames = m_resultCollectionMetadataAccess->listAllSeriesNames();
-	for (const std::string& seriesName : seriesNames)
+	std::list<std::string> seriesLabels = m_resultCollectionMetadataAccess->listAllSeriesLabels();
+	for (const std::string& seriesLabel : seriesLabels)
 	{
-		const MetadataSeries* series =	m_resultCollectionMetadataAccess->findMetadataSeries(seriesName);
+		const MetadataSeries* series =	m_resultCollectionMetadataAccess->findMetadataSeries(seriesLabel);
 		const ot::JsonDocument& metadata =	series->getMetadata();
 		ot::JsonDocument doc;
-		doc.CopyFrom(metadata, doc.GetAllocator());
-		config.addSeriesMetadata(std::to_string(series->getSeriesIndex()), std::move( doc));
+		const std::string tt = ot::json::toJson(metadata);
+		if (!metadata.ObjectEmpty())
+		{
+			doc.CopyFrom(metadata, doc.GetAllocator());
+			config.addSeriesMetadata(std::to_string(series->getSeriesIndex()), std::move( doc));
+		}
 	}
 
 	for (auto& parameterQueryDescription : m_queryDescriptionsParameters)
