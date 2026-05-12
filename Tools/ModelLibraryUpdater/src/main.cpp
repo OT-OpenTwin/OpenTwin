@@ -21,6 +21,7 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/Logging/LogNotifierStdCout.h"
 #include "OTCore/Logging/LogNotifierFileWriter.h"
+#include "OTSystem/DateTime.h"
 
 // Service header
 #include "Application.h"
@@ -45,6 +46,8 @@ void initializeLogging(void)
 
 int main(int _argc, char* _argv[]) {
 
+	int64_t startTime = ot::DateTime::msSinceEpoch();
+	OT_LOG_I("Model Library Updater started at: " + ot::DateTime::intervalToString(startTime));
 	initializeLogging();
 
 	QCoreApplication app(_argc, _argv);
@@ -53,6 +56,8 @@ int main(int _argc, char* _argv[]) {
 	argumentParser.parse();
 
 	Application::getInstance()->start(argumentParser);
-
+	int64_t endTime = ot::DateTime::msSinceEpoch();
+	OT_LOG_I("Model Library Updater finished at: " + ot::DateTime::intervalToString(endTime));
+	OT_LOG_I("Model Library Updater duration: " + ot::DateTime::intervalToString(endTime - startTime));
 	return 0;
 }
