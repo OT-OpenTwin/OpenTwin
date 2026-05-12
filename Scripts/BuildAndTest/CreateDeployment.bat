@@ -27,6 +27,13 @@ IF "%OT_DEPLOYMENT_DIR%" == "" (
     SET OT_DEPLOYMENT_DIR="%OPENTWIN_DEV_ROOT%\Deployment"
 )
 
+REM ============================================================================
+REM Set the environment as flag to update the model libraries
+REM ============================================================================
+
+SET OPENTWIN_LIBRARIES_UPDATE_REQUIRED = 1
+SETX OPENTWIN_LIBRARIES_UPDATE_REQUIRED 1
+
 REM ===========================================================================
 REM Shutdown the session and authorisation services if they are still running 
 REM ===========================================================================
@@ -260,9 +267,6 @@ COPY "%OPENTWIN_DEV_ROOT%\Certificates\Generated\certificateKeyFile.pem" "%OT_DE
 
 ECHO [Paths] > "%OT_DEPLOYMENT_DIR%\qt.conf"
 ECHO Plugins = .\\plugins >> "%OT_DEPLOYMENT_DIR%\qt.conf"
-
-REM Update model library script
-CALL "%OT_DEPLOYMENT_DIR%\UpdateModelLibraries.bat" %OT_DEPLOYMENT_DIR% 
 
 GOTO END
 
