@@ -110,8 +110,6 @@ CALL OpenTwin_admin.bat
 REM ===========================================================================
 REM Update the model libraries
 REM ===========================================================================
-ECHO Deployment Directory: %OT_DEPLOYMENT_DIR%
-ECHO MongoDB Password: %OPEN_TWIN_MONGODB_PWD%
 
 CALL UpdateModelLibraries.bat %OT_DEPLOYMENT_DIR% %OPEN_TWIN_MONGODB_PWD%
 
