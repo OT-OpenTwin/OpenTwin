@@ -31,8 +31,7 @@ REM ============================================================================
 REM Set the environment as flag to update the model libraries
 REM ============================================================================
 
-SET OPENTWIN_LIBRARIES_UPDATE_REQUIRED = 1
-SETX OPENTWIN_LIBRARIES_UPDATE_REQUIRED 1
+SETX OPEN_TWIN_UPDATE_LIBRARY 1
 
 REM ===========================================================================
 REM Shutdown the session and authorisation services if they are still running 
