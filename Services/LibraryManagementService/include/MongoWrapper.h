@@ -60,7 +60,7 @@ using BsonViewOrValue = bsoncxx::document::view_or_value;
 
 class MongoWrapper {
 public:
-	MongoWrapper(std::string _siteID);
+	MongoWrapper() = default;
 	~MongoWrapper() = default;
 
 	std::string getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
@@ -72,6 +72,9 @@ public:
 	// Database creation helper
 	bool ensureDatabaseAndCollection(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getAdminUserName() const { return "admin"; }
+
+	void setSiteID(const std::string& _siteID) { m_siteID = _siteID; }
+	const std::string& getSiteID() const { return m_siteID; }
 
 private:
 	// Database connection and validation
@@ -92,7 +95,6 @@ private:
 	// Index creator
 	void createIndexesIfNotExist(const std::string& _collectionName);
 
-	std::string m_databaseURL;
 	std::string m_siteID;
 	std::string dbName = "Libraries";
 };

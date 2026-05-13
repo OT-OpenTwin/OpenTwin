@@ -89,7 +89,7 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 		} while (!ok && ct++ <= maxCt);
 
 		if (!ok) {
-			OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attemts. Exiting...");
+			OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attempts. Exiting...");
 			exit(ot::AppExitCode::GSSRegistrationFailed);
 		}
 
@@ -99,6 +99,8 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			exit(ot::AppExitCode::GSSRegistrationFailed);
 		}
 
+		db.setSiteID(_siteID);
+
 		// Get DBUrl and AuthUrl from gss response
 
 		ot::JsonDocument gssRespoonseUrls;
@@ -106,18 +108,6 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 
 		std::string dbUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_DBURL);
 		std::string authUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_AUTHURL);
-
-		
-
-				
-
-
-
-		// Initialzation of MongoDB connection
-		db = new MongoWrapper(_siteID);
-
-
-
 	}
 	catch (std::exception& e) {
 		OT_LOG_E(std::string{"Uncaught exception: "}.append(e.what()));
@@ -128,15 +118,12 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 		exit(ot::AppExitCode::UnknownError);
 	}
 
-	
-	
-	
 	OT_LOG_D("Initialization finished");
 	return ot::AppExitCode::Success;
 }
 
 std::string Application::getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	auto result = db->getDocumentList(_selectionCfg, _dbUserName, _dbUserPassword, _dbServerUrl);
+	auto result = db.getDocumentList(_selectionCfg, _dbUserName, _dbUserPassword, _dbServerUrl);
 	return result;
 }
 
@@ -153,7 +140,7 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 		std::string dependencyCollection = it->getAdditionalInfoValue("DependencyCollection");
 
 		if (dependencyID != std::to_string(ot::invalidUID) && !dependencyID.empty() && !dependencyCollection.empty()) {
-			std::string dependencyDocJson = db->getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
+			std::string dependencyDocJson = db.getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
 			if (dependencyDocJson.empty()) {
 				OT_LOG_E("No dependency document found for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
 				it = _elements.erase(it);
@@ -168,7 +155,7 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 
 
 		// Try to fetch the existing document from database
-		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		if(existingDocJson == "failed") {
 			OT_LOG_E("Failed to fetch existing document for element '" + elementName + "' in collection '" + collectionName + "'. Skipping this element.");
@@ -204,7 +191,7 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 		std::string elementName = model.getName();
 
 		// Try to fetch existing document from database
-		std::string existingDocJson = db->getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		uint32_t newVersion = 1;
 
@@ -225,7 +212,7 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
 			// Update existing data to GridFS and update metadata (version, hash)
-			std::string gridfsIdResult = db->updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.toJson());
+			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.toJson());
 
 			if (!gridfsIdResult.empty()) {
 				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
@@ -236,7 +223,7 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
        	}
 		else {
 			// Migrate new entry data to GridFS
-			db->addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, model);
+			db.addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, model);
 		}
 	}
 }
@@ -383,7 +370,7 @@ std::string Application::handleGetCompleteSelectedDocument(ot::JsonDocument& _do
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db->getCompleteDocument(collectionName,dbUserName,dbUserPassword,dbServerUrl,selectedDocument);
+	auto result = db.getCompleteDocument(collectionName,dbUserName,dbUserPassword,dbServerUrl,selectedDocument);
 	if (!result.empty()) {	
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
@@ -530,7 +517,7 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	std::string environmentInfo = requestConfig.getValue();
 
 	// Get the complete document from database
-	auto documentResult = db->getCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, environmentInfo);
+	auto documentResult = db.getCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, environmentInfo);
 
 	if (documentResult.empty()) {
 		OT_LOG_E("Failed to load document: " + environmentInfo + " from collection: " + collectionName);
@@ -568,7 +555,7 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
 
 	// Admin credentials for database operations
-	std::string adminUserName = db->getAdminUserName();
+	std::string adminUserName = db.getAdminUserName();
 	std::string adminPassword;
 	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
@@ -596,7 +583,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 	
 	// Ensure database and collections exist
 	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
 		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
 	}
@@ -625,7 +612,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
 	
 	// Admin credentials for database operations
-	std::string adminUserName = db->getAdminUserName();
+	std::string adminUserName = db.getAdminUserName();
 	std::string adminPassword;
 	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
@@ -653,7 +640,7 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 
 	// Ensure database and collections exist
 	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	if (!db->ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
 		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
 	}
@@ -691,6 +678,4 @@ Application::Application() :
 }
 
 Application::~Application() {
-	delete db;
-	db = nullptr;
 }

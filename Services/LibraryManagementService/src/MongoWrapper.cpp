@@ -22,11 +22,6 @@
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/DataBase.h"
 
-MongoWrapper::MongoWrapper(std::string _siteID) {
-
-    this->m_siteID = _siteID;
-}
-
 std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg,
                                           const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
     
