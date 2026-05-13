@@ -128,6 +128,8 @@ void Application::runPipeline()
 
 void Application::uiConnected(ot::components::UiComponent * _ui)
 {
+	OT_LOG_T("UI Connected: Start");
+
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 
 	const std::string pageName = "Data Processing";
@@ -135,6 +137,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	const std::string groupName2 = "Creation";
 	const std::string subGroupName = "Library Element Creation";
 	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
+
+	OT_LOG_T("UI Connected: Create tool bar");
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
@@ -164,6 +168,8 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreatePythonScript = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Python Script", "Default/Add");
 	_ui->addMenuButton(m_buttonCreatePythonScript.setButtonLockFlags(modelWrite));
 
+	OT_LOG_T("UI Connected: Setup handlers");
+
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.createBlockPicker();
 	
@@ -172,6 +178,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_graphHandler.setUIComponent(_ui);
 	_pipelineHandler.setUIComponent(_ui);
 	
+	OT_LOG_T("UI Connected: Connect buttons");
 	
 	connectToolBarButton(m_buttonGraphicsScene, &m_entityCreator, &EntityCreator::createPipeline);
 	connectToolBarButton(m_buttonCreateSolver, &m_entityCreator, &EntityCreator::createSolver);
@@ -186,11 +193,17 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 			worker.detach();
 		}
 	);
+
+	OT_LOG_T("UI Connected: Finished");
 }
 
 void Application::modelConnected(ot::components::ModelComponent * _model)
 {
+	OT_LOG_T("Model Connected: Start");
+
 	_blockEntityHandler.setModelComponent(_model);
 	_graphHandler.setModelComponent(_model);
 	_pipelineHandler.setModelComponent(_model);
+
+	OT_LOG_T("Model Connected: Finished");
 }
