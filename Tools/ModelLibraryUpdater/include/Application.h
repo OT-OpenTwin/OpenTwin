@@ -42,15 +42,10 @@
 #include "OTModelEntities/Lms/LibraryElement.h"
 
 class Application {
+	OT_DECL_NOCOPY(Application)
+	OT_DECL_NOMOVE(Application)
 public:
-	static Application* getInstance();
-
-	static void deleteInstance(void);
-
-	// Delete Copy & Move Constructors
-	Application(const Application&) = delete;
-	Application& operator=(const Application&) = delete;
-
+	static Application& getInstance();
 	void start(ot::StartArgumentParser _argumentParser);
 
 
@@ -67,11 +62,5 @@ private:
 
 	std::string sendToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
 	std::string sendAsyncToLms(const ot::JsonDocument& _doc, std::string _lmsUrl);
-
-	const std::string m_collectionName = "";
-	std::string m_databasePWD;
-	std::string m_folderPath;
-
-
-	static Application* instance;
+	
 };

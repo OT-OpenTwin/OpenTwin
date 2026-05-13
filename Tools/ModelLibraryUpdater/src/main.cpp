@@ -55,7 +55,7 @@ int main(int _argc, char* _argv[]) {
 	ot::StartArgumentParser argumentParser;
 	argumentParser.parse();
 
-	Application::getInstance()->start(argumentParser);
+	Application::getInstance().start(argumentParser);
 	int64_t endTime = ot::DateTime::msSinceEpoch();
 	OT_LOG_I("Model Library Updater finished at: " + ot::DateTime::intervalToString(endTime));
 	OT_LOG_I("Model Library Updater duration: " + ot::DateTime::intervalToString(endTime - startTime));

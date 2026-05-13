@@ -33,17 +33,24 @@ bool ot::StartArgumentParser::parse() {
 	parser.setApplicationDescription("Model Library Updater");
 	parser.addHelpOption();
 
+	QCommandLineOption dataPathOption(QStringList() << "d" << "data", "Path to the data directory", "datapath");
+	parser.addOption(dataPathOption);
+
 	QCommandLineOption collectionNameOption(QStringList() << "c" << "collection", "Name of the collection to update", "collection");
 	parser.addOption(collectionNameOption);
 
 	QCommandLineOption lmsUrlOption(QStringList() << "l" << "lmsurl", "URL of the LMS to connect to", "lmsurl");
 	parser.addOption(lmsUrlOption);
 
-	QCommandLineOption databasePswOption(QStringList() << "d" << "dbpsw", "Password for the database connection", "dbpsw");
+	QCommandLineOption databasePswOption(QStringList() << "p" << "dbpwd", "Password for the database connection", "dbpwd");
 	parser.addOption(databasePswOption);
 
 	QStringList arguments = QCoreApplication::arguments();
 	parser.process(QCoreApplication::arguments());
+
+	if(parser.isSet(dataPathOption)) {
+		m_dataPath = parser.value(dataPathOption);
+	}
 
 	if (parser.isSet(collectionNameOption)) {
 		m_collectionName = parser.value(collectionNameOption);
@@ -57,7 +64,7 @@ bool ot::StartArgumentParser::parse() {
 		m_databasePsw = parser.value(databasePswOption);
 	}
 
-	OT_LOG_IS("Starting Model Library Updater with { \"CollectionName\": \"" << m_collectionName.toStdString() << "\", \"LMSUrl\": \"" << m_lmsUrl.toStdString() << "\", \"DatabasePassword\": \"" << m_databasePsw.toStdString() << "\" }");
+	OT_LOG_IS("Starting Model Library Updater with { \"DataPath\": \"" << m_dataPath.toStdString() << "\", \"CollectionName\": \"" << m_collectionName.toStdString() << "\", \"LMSUrl\": \"" << m_lmsUrl.toStdString() << "\", \"DatabasePassword\": \"" << m_databasePsw.toStdString() << "\" }");
 
 	return true;
 }

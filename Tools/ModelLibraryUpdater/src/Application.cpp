@@ -42,23 +42,10 @@
 #include <QtCore/qcryptographichash.h>
 
 
-Application* Application::instance = nullptr;
-
-Application* Application::getInstance() {
-	if (instance == nullptr) {
-		instance = new Application();
-	}
-
+Application& Application::getInstance() {
+	static Application instance;
 	return instance;
 }
-
-void Application::deleteInstance(void) {
-	if (instance) {
-		delete instance;
-	}
-	instance = nullptr;
-}
-
 
 
 std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName)
@@ -263,27 +250,15 @@ std::string Application::sendAsyncToLms(const ot::JsonDocument& _doc, std::strin
 
 
 void Application::start(ot::StartArgumentParser _argumentParser) {
-#ifdef _DEBUG
-    std::string devRoot = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
-    if (!devRoot.empty()) {
-        m_folderPath =  devRoot + "\\Deployment\\LibraryData\\";
-    }
-    else {
-        OT_LOG_E("OPENTWIN_DEV_ROOT environment not set");
-        m_folderPath = ".\\LibraryData\\";
-    }
-#else
-	m_folderPath = ot::OperatingSystem::getCurrentExecutableDirectory() + "/LibraryData/";
+    
 
-#endif
-  
+	std::string dataPath = _argumentParser.getDataPath().toStdString();
     std::string collectionName = _argumentParser.getCollectionName().toStdString();
     std::string _lmsUrl = _argumentParser.getLmsUrl().toStdString();
 	std::string databasePsw = _argumentParser.getDatabasePsw().toStdString();
-    m_folderPath += collectionName;
 
     // First iterate through all local models and create a list of LibraryElements
-    std::list<ot::LibraryElement> localModels = getLocalModels(m_folderPath,collectionName);
+    std::list<ot::LibraryElement> localModels = getLocalModels(dataPath, collectionName);
 
     if (localModels.empty()) {
         return;
@@ -293,9 +268,9 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 	ot::JsonDocument doc;
     doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, doc.GetAllocator()), doc.GetAllocator());
     if(!databasePsw.empty()) {
-        doc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
+        doc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw, doc.GetAllocator()), doc.GetAllocator());
     }
-	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName.c_str(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, doc.GetAllocator()), doc.GetAllocator());
 	
 	createJsonDocumentFromLibraryElement(localModels, doc);
     localModels.clear();
@@ -312,16 +287,16 @@ void Application::start(ot::StartArgumentParser _argumentParser) {
 	}
     
 	// Add the content data to the LibraryElements based on the file names and folder path
-	localModels = addDataToLibraryElements(localModels, m_folderPath);
+	localModels = addDataToLibraryElements(localModels, dataPath);
 
     // Pack the list of LibraryElements into a json document to send it to LMS
 	ot::JsonDocument updateDoc;
 	updateDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_LMS_AddNewLibraryElement, updateDoc.GetAllocator()), updateDoc.GetAllocator());
     if (!databasePsw.empty()) {
-        updateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw.c_str(), doc.GetAllocator()), doc.GetAllocator());
+        updateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePsw, doc.GetAllocator()), doc.GetAllocator());
     }
 
-	updateDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName.c_str(), updateDoc.GetAllocator()), updateDoc.GetAllocator());
+	updateDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, updateDoc.GetAllocator()), updateDoc.GetAllocator());
 	createJsonDocumentFromLibraryElement(localModels, updateDoc);
 
     // Send to Lms

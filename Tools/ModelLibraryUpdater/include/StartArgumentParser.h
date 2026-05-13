@@ -37,6 +37,9 @@ namespace ot {
 
 		bool parse();
 
+		void setDataPath(const QString& _dataPath) { m_dataPath = _dataPath; }
+		QString getDataPath() const { return m_dataPath; }
+
 		void setCollectionName(const QString& _collectionName) { m_collectionName = _collectionName; }
 		QString getCollectionName() const { return m_collectionName; }
 
@@ -48,6 +51,7 @@ namespace ot {
 
 
 	private:
+		QString m_dataPath;
 		QString m_collectionName;
 		QString m_lmsUrl;
 		QString m_databasePsw;
