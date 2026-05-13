@@ -451,6 +451,8 @@ void ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
 		}
 	}
 
+	OT_LOG_D("Running application...");
+
 	m_application->run();
 }
 

@@ -837,6 +837,9 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 			OT_LOG_E("UI component already registered. Multiple UIs not supported");
 			return;
 		}
+
+		OT_LOG_D("UI service connected { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
+
 		// Store information
 		m_uiComponent = new components::UiComponent(_service, this);
 
@@ -859,8 +862,13 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 			m_initialSelectionHelper->setUiUrl(_service.getServiceURL());
 			m_initialSelectionHelper->runIfReady();
 		}
+
+		OT_LOG_D("Initial UI setup completed");
 	}
 	else if (_service.getServiceType() == OT_INFO_SERVICE_TYPE_MODEL) {
+
+		OT_LOG_D("Model service connected { \"Name\": \"" + _service.getServiceName() + "\", \"Type\": \"" + _service.getServiceType() + "\", \"URL\": \"" + _service.getServiceURL() + "\", \"ID\": " + std::to_string(_service.getServiceID()) + " }");
+
 		// Store information
 		assert(m_modelComponent == nullptr);
 		ot::ModelAPIManager::setModelServiceURL(_service.getServiceURL());
@@ -875,6 +883,8 @@ void ot::ApplicationBase::serviceConnectedPrivate(const ot::ServiceBase& _servic
 			m_initialSelectionHelper->setModelUrl(_service.getServiceURL());
 			m_initialSelectionHelper->runIfReady();
 		}
+
+		OT_LOG_D("Initial model setup completed");
 	}
 	else {
 		// Store information
