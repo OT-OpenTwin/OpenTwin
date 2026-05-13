@@ -229,7 +229,7 @@ std::string Application::sendToLms(const ot::JsonDocument& _doc, std::string _lm
     do {
         lmsResponse.clear();
         if (!(ok = ot::msg::send("", _lmsUrl, ot::MessageType::EXECUTE, _doc.toJson(), lmsResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-            OT_LOG_E("Request create dialog failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+            OT_LOG_E("Request failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
             using namespace std::chrono_literals;
             std::this_thread::sleep_for(500ms);
 
@@ -237,7 +237,7 @@ std::string Application::sendToLms(const ot::JsonDocument& _doc, std::string _lm
     } while (!ok && ct++ <= maxCt);
 
     if (!ok) {
-        OT_LOG_E("Request create dialog failed");
+        OT_LOG_E("Request failed");
         return "";
     }
 	return lmsResponse;

@@ -111,5 +111,5 @@ REM ===========================================================================
 REM Update the model libraries
 REM ===========================================================================
 
-CALL UpdateModelLibraries.bat "%~dp0\LibraryData" "%OPEN_TWIN_MONGODB_PWD%"
+CALL UpdateModelLibraries.bat "%~dp0LibraryData" "%OPEN_TWIN_MONGODB_PWD%"
 

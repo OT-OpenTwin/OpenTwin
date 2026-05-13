@@ -4,11 +4,8 @@ if "%1"=="" (
     exit /b 1
 )
 
-if not "%2"=="" set "DATABASE_PWD=%2"
-if not defined DATABASE_PWD set "DATABASE_PWD="
-
 echo [ModelLibraryUpdater] LibraryData directory: %1
-echo [ModelLibraryUpdater] Database password: %DATABASE_PWD%
+echo [ModelLibraryUpdater] Database password: %2
 
 if not "%OPEN_TWIN_UPDATE_LIBRARY%" == "1" (
     echo [ModelLibraryUpdater] No update required for model libraries
@@ -35,10 +32,10 @@ set "LMS_URL=%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LMS_PORT%"
 echo [ModelLibraryUpdater] LMS URL: %LMS_URL%
 
 echo [1/2] Updating PythonEnvironments collection...
-ModelLibraryUpdater.exe --data "%1\PythonEnvironments" --collection PythonEnvironments --lmsurl "%LMS_URL%" --dbpwd "%DATABASE_PWD%"
+ModelLibraryUpdater.exe --data "%1\PythonEnvironments" --collection PythonEnvironments --lmsurl "%LMS_URL%" --dbpwd %2
 
 echo [2/2] Updating PythonScripts collection...
-ModelLibraryUpdater.exe --data "%1\PythonScripts" --collection PythonScripts --lmsurl "%LMS_URL%" --dbpwd "%DATABASE_PWD%"    
+ModelLibraryUpdater.exe --data "%1\PythonScripts" --collection PythonScripts --lmsurl "%LMS_URL%" --dbpwd %2    
 
 SETX OPEN_TWIN_UPDATE_LIBRARY 0
 
