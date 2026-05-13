@@ -61,8 +61,6 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			exit(ot::AppExitCode::GSSUrlMissing);
 		}
 
-		ot::DebugHelper::serviceSetupCompleted(*this);
-
 		// Register at GSS
 		ot::JsonDocument gssDoc;
 		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
@@ -86,7 +84,7 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 				std::this_thread::sleep_for(500ms);
 				
 			}
-		} while (!ok && ct++ <= maxCt);
+		} while ((ot::ReturnMessage::fromJson(gssResponse) != ot::ReturnMessage::Ok || !ok) && ct++ <= maxCt);
 
 		if (!ok) {
 			OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attempts. Exiting...");
@@ -118,7 +116,7 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 		exit(ot::AppExitCode::UnknownError);
 	}
 
-	OT_LOG_D("Initialization finished");
+	ot::DebugHelper::serviceSetupCompleted(*this);
 	return ot::AppExitCode::Success;
 }
 
