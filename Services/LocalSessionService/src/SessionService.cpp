@@ -232,6 +232,7 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &SessionService::handleGetDebugInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CheckStartupCompleted, this, &SessionService::handleCheckStartupCompleted, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_AddMandatoryService, this, &SessionService::handleAddMandatoryService, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_RemoveMandatoryService, this, &SessionService::handleRemoveMandatoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, this, &SessionService::handleRegisterNewGlobalDirectoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &SessionService::handleRegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceStartupFailed, this, &SessionService::handleServiceStartupFailed, ot::SECURE_MESSAGE_TYPES);
@@ -1098,6 +1099,53 @@ ot::ReturnMessage SessionService::handleAddMandatoryService(ot::JsonDocument& _c
 		OT_LOG_D("Mandatory service for project type \"" + sessionType + "\": Added service \"" + serviceName + "\"");
 		
 		return ot::ReturnMessage::Ok;
+	}
+}
+
+ot::ReturnMessage SessionService::handleRemoveMandatoryService(ot::JsonDocument& _commandDoc)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	std::string sessionType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_TYPE));
+	std::string serviceName(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME));
+	std::string serviceType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE)); 
+
+	// Locate current data
+	auto it = m_mandatoryServicesMap.find(sessionType);
+	std::list<ot::ServiceBase>* data = nullptr;
+	if (it == m_mandatoryServicesMap.end())
+	{
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Mandatory services for session type \"" + sessionType + "\" not found");
+	}
+	else
+	{
+		data = &it->second;
+	}
+
+	OTAssertNullptr(data);
+	bool found = false;
+	for (auto it = data->begin(); it != data->end(); )
+	{
+		if (ot::String::toLower(it->getServiceName()) == ot::String::toLower(serviceName) &&
+			ot::String::toLower(it->getServiceType()) == ot::String::toLower(serviceType))
+		{
+			it = data->erase(it);
+			found = true;
+		}
+		else
+		{
+			++it;
+		}
+	}
+
+	if (found)
+	{
+		OT_LOG_D("Mandatory service removed { \"SessionType\": \"" + sessionType + "\", \"ServiceName\": \"" + serviceName + "\", \"ServiceType\": \"" + serviceType + "\" }");
+		return ot::ReturnMessage::Ok;
+	}
+	else
+	{
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Service is not contained in mandatory services list { \"SessionType\": \"" + sessionType + "\", \"ServiceName\": \"" + serviceName + "\", \"ServiceType\": \"" + serviceType + "\" }");
 	}
 }
 

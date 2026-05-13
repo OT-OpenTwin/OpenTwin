@@ -64,6 +64,7 @@
 #define OT_ACTION_CMD_ServiceFailure "Session.ServiceFailure"
 #define OT_ACTION_CMD_ServiceStartupFailed "Service.Startup.Failed"
 #define OT_ACTION_CMD_AddMandatoryService "Session.AddMandatory"
+#define OT_ACTION_CMD_RemoveMandatoryService "Session.RemoveMandatory"
 #define OT_ACTION_CMD_SetLogFlags "Logger.SetFlags"
 #define OT_ACTION_CMD_Ping "Ping"
 #define OT_ACTION_CMD_Init "Initialize"
