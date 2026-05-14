@@ -107,9 +107,3 @@ REM ===========================================================================
 
 CALL OpenTwin_admin.bat
 
-REM ===========================================================================
-REM Update the model libraries
-REM ===========================================================================
-
-CALL UpdateModelLibraries.bat "%~dp0LibraryData" "%OPEN_TWIN_MONGODB_PWD%"
-

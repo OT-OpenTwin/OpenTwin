@@ -27,12 +27,6 @@ IF "%OT_DEPLOYMENT_DIR%" == "" (
     SET OT_DEPLOYMENT_DIR="%OPENTWIN_DEV_ROOT%\Deployment"
 )
 
-REM ============================================================================
-REM Set the environment as flag to update the model libraries
-REM ============================================================================
-
-SETX OPEN_TWIN_UPDATE_LIBRARY 1
-
 REM ===========================================================================
 REM Shutdown the session and authorisation services if they are still running 
 REM ===========================================================================
