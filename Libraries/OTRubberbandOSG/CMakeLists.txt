@@ -3,8 +3,7 @@ project(OTRubberbandOSG LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTRubberbandOSG OT_RUBBERBAND_OSG_ROOT_PATH)
-ot_add_export(OTRubberbandOSG RBE_OSG_WRAPPER_PROJ_BUILD)
+ot_initialize_lib(OTRubberbandOSG OT_RUBBERBAND_OSG_ROOT_PATH RBE_OSG_WRAPPER_PROJ_BUILD)
 
 ot_add_dependency(OTRubberbandOSG
     OTSystem
@@ -13,11 +12,7 @@ ot_add_dependency(OTRubberbandOSG
     QtFull
     OSG
     RJSON
-    WINLIB:userenv
-    WINLIB:ws2_32
-    WINLIB:advapi32
-    WINLIB:shell32
-    WINLIB:bcrypt
+    OSLibs
 )
 
 ot_finalize_lib(OTRubberbandOSG)

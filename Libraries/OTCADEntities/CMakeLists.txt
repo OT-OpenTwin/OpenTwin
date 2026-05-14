@@ -3,8 +3,7 @@ project(OTCADEntities LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTCADEntities OT_CADMODELENTITIES_ROOT_PATH)
-ot_add_export(OTCADEntities OPENTWINCADMODELENTITIES_EXPORTS)
+ot_initialize_lib(OTCADEntities OT_CADMODELENTITIES_ROOT_PATH OPENTWINCADMODELENTITIES_EXPORTS)
 
 ot_add_dependency(OTCADEntities
     OTSystem

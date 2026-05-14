@@ -27,8 +27,7 @@ include_guard(GLOBAL)
 #   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 #   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 #
-#   ot_initialize_lib(<LIB_NAME> <LIB>_ROOT_PATH)
-#   ot_add_export(<LIB_NAME>)
+#   ot_initialize_lib(<LIB_NAME> <LIB>_ROOT_PATH [EXPORT_MACRO])
 #
 #   ot_add_dependency(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
 #
@@ -43,7 +42,7 @@ include_guard(GLOBAL)
 #   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 #   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 #
-#   ot_initialize_bin(<APP_NAME> <APP>_ROOT_PATH)
+#   ot_initialize_bin(<APP_NAME> <APP>_ROOT_PATH [EXPORT_MACRO])
 #
 #   ot_add_dependency(<APP_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
 #
@@ -383,6 +382,25 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     )
 endfunction()
 
+function(_ot_apply_export_macro TARGET_NAME EXPORT_MACRO)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "_ot_apply_export_macro: core target '${_core}' not found.")
+    endif()
+
+    if(NOT "${EXPORT_MACRO}" STREQUAL "")
+        set(_selected_macro "${EXPORT_MACRO}")
+    else()
+        string(REGEX REPLACE "^OT" "" _lib_raw "${TARGET_NAME}")
+        string(TOUPPER "${_lib_raw}" _lib_upper)
+        set(_selected_macro "OPENTWIN${_lib_upper}_EXPORTS")
+    endif()
+
+    target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
+    set_property(TARGET ${_core} PROPERTY OT_EXPORT_MACRO "${_selected_macro}")
+    message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
+endfunction()
+
 function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
     _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR})
     _ot_target_core_name(_core ${TARGET_NAME})
@@ -393,31 +411,17 @@ function(ot_initialize_lib TARGET_NAME ROOT_PATH_VAR)
         )
     endif()
 
+    _ot_apply_export_macro(${TARGET_NAME} "${ARGV2}")
 endfunction()
 
 function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
     _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR})
     _ot_target_core_name(_core ${TARGET_NAME})
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
-endfunction()
 
-# Usage:
-#
-# - ot_add_export(target_name)              -> this will default to: "OPENTWINTARGET_EXPORT"
-# - ot_add_export(target_name EXPORT_MACRO) -> this will apply and overwrite the default export macro
-function(ot_add_export TARGET_NAME)
-    _ot_target_core_name(_core ${TARGET_NAME})
-    if(NOT "${ARGV1}" STREQUAL "")
-        set(_selected_macro "${ARGV1}")
-    else()
-        string(REGEX REPLACE "^OT" "" _lib_raw "${TARGET_NAME}")
-        string(TOUPPER "${_lib_raw}" _lib_upper)
-        set(_selected_macro "OPENTWIN${_lib_upper}_EXPORTS")
+    if(NOT "${ARGV2}" STREQUAL "")
+        _ot_apply_export_macro(${TARGET_NAME} "${ARGV2}")
     endif()
-
-    target_compile_definitions(${_core} PRIVATE "${_selected_macro}")
-    set_property(TARGET ${_core} PROPERTY OT_EXPORT_MACRO "${_selected_macro}")
-    message(STATUS "[${TARGET_NAME}] Export Macro: ${_selected_macro}")
 endfunction()
 
 function(ot_add_resources TARGET_NAME)

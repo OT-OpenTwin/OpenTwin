@@ -3,8 +3,7 @@ project(OTLTSpiceConnector LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTLTSpiceConnector OT_LTSPICE_CONNECTOR_ROOT_PATH)
-ot_add_export(OTLTSpiceConnector OT_LTSPICE_CONNECTOR_EXPORTS)
+ot_initialize_lib(OTLTSpiceConnector OT_LTSPICE_CONNECTOR_ROOT_PATH OT_LTSPICE_CONNECTOR_EXPORTS)
 
 ot_add_dependency(OTLTSpiceConnector
     OTSystem

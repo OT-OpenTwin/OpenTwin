@@ -3,8 +3,7 @@ project(UICore LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(UICore OT_UICORE_ROOT_PATH)
-ot_add_export(UICore UICORE_EXPORT)
+ot_initialize_lib(UICore OT_UICORE_ROOT_PATH UICORE_EXPORT)
 
 ot_add_dependency(UICore
     OTSystem
@@ -15,8 +14,7 @@ ot_add_dependency(UICore
     QT_TT
     QtWidgets
     QtOpenGLWidgets
-    WINLIB:advapi32
-    WINLIB:odbc32
+    OSLibs
 )
 
 ot_finalize_lib(UICore)

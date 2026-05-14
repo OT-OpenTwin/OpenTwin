@@ -3,8 +3,7 @@ project(OTFMC LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTFMC OT_FILE_MANAGER_CONNECTOR_ROOT_PATH)
-ot_add_export(OTFMC OT_FMC_EXPORTS)
+ot_initialize_lib(OTFMC OT_FILE_MANAGER_CONNECTOR_ROOT_PATH OT_FMC_EXPORTS)
 
 ot_add_dependency(OTFMC
     OTSystem
@@ -20,9 +19,7 @@ ot_add_dependency(OTFMC
     MONGO_CXX
     QtWidgets
     QtNetwork
-    WINLIB:userenv
-    WINLIB:wsock32
-    WINLIB:advapi32
+    OSLibs
 )
 
 ot_finalize_lib(OTFMC)

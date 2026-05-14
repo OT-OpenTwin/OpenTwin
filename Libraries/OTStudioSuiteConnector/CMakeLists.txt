@@ -3,8 +3,7 @@ project(OTStudioSuiteConnector LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTStudioSuiteConnector OT_STUDIOSUITECONNECTOR_ROOT_PATH)
-ot_add_export(OTStudioSuiteConnector OT_STUDIOSUITE_CONNECTOR_EXPORTS)
+ot_initialize_lib(OTStudioSuiteConnector OT_STUDIOSUITECONNECTOR_ROOT_PATH OT_STUDIOSUITE_CONNECTOR_EXPORTS)
 
 ot_add_dependency(OTStudioSuiteConnector
     OTSystem

@@ -3,8 +3,7 @@ project(OTFrontendConnectorAPI LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
-ot_initialize_lib(OTFrontendConnectorAPI OT_FRONTEND_CONNECTOR_API_ROOT_PATH)
-ot_add_export(OTFrontendConnectorAPI OT_FRONTEND_CONNECTOR_API_EXPORTS)
+ot_initialize_lib(OTFrontendConnectorAPI OT_FRONTEND_CONNECTOR_API_ROOT_PATH OT_FRONTEND_CONNECTOR_API_EXPORTS)
 
 ot_add_dependency(OTFrontendConnectorAPI
     OTSystem
