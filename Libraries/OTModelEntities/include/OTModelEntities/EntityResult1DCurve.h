@@ -23,10 +23,11 @@
 #include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
 #include "OTModelEntities/Interfaces/IPropertyHandling.h"
 
-class __declspec(dllexport) EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve, public IPropertyHandling
+class OT_MODELENTITIES_API_EXPORT EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve, public IPropertyHandling
 {
 public:
-	enum DefaultCurveStyle {
+	enum DefaultCurveStyle
+	{
 		Default,
 		ScatterPlot
 	};
@@ -94,6 +95,10 @@ public:
 
 	std::string getCustomCurveTitle() const;
 
+	ot::Plot1DCurveCfg::CurveNamingBehavior getCurveNamingBehavior() const;
+
+	bool getDisplayDependencyDifference() const;
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	bool tuplePropertiesAreVisible();
@@ -103,14 +108,14 @@ public:
 	//! @return True if the visibility has changed.
 	virtual bool updatePropertyVisibilities() override;
 protected:
-	
+
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	
+
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
-	
+
 
 private:
 	PropertyBundleDataLakeQuery m_queryProperties;

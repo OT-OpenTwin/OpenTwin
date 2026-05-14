@@ -26,7 +26,7 @@
 #include "OTModelEntities/Properties/PropertyBundleQuerySettings.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 
-class __declspec(dllexport) EntityResult1DPlot: public EntityContainer, public ot::IVisualisationPlot1D
+class OT_MODELENTITIES_API_EXPORT EntityResult1DPlot: public EntityContainer, public ot::IVisualisationPlot1D
 {
 public:
 	EntityResult1DPlot() : EntityResult1DPlot(0, nullptr, nullptr, nullptr) {};

@@ -361,8 +361,8 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setYAxis(std::move(yAxisCfg));
 
 	ot::Plot1DCfg::DependencyLabelInfoList fixedDatasetLabelInfos = {
-		{ MetadataSeries::getFieldName(), ot::Plot1DCfg::DependencyLabelBehavior::ShowInBrackets },
-		{ MetadataQuantity::getFieldName(), ot::Plot1DCfg::DependencyLabelBehavior::ShowInBrackets }
+		{ MetadataSeries::getFieldName() },
+		{ MetadataQuantity::getFieldName() }
 	};
 	config.setFixedDatasetLabelInfos(std::move(fixedDatasetLabelInfos));
 

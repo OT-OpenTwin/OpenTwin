@@ -60,12 +60,25 @@ namespace ot {
 			Hexagon
 		};
 
+		enum CurveNamingBehavior : uint32_t
+		{
+			Custom,
+			Name,
+			NameSeries,
+			NameSeriesQuantity,
+			NameQuantity
+		};
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Static helper
 
 		static std::string toString(Symbol _symbol);
 		static Symbol stringToSymbol(const std::string& _symbol);
+
+		static std::string toString(CurveNamingBehavior _behavior);
+		static CurveNamingBehavior stringToCurveNamingBehavior(const std::string& _behavior);
+		static std::list<std::string> getAllCurveNamingBehaviorStrings();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -181,6 +194,12 @@ namespace ot {
 		const std::string& getMatrixIndexLabel() const { return m_matrixIndexLabel; }
 		void setMatrixIndexLabel(const std::string& _label) { m_matrixIndexLabel = _label; }
 
+		void setNamingBehavior(CurveNamingBehavior _behavior) { m_curveNamingBehavior = _behavior; };
+		CurveNamingBehavior getNamingBehavior() const { return m_curveNamingBehavior; };
+
+		void setDisplayDependencyDifference(bool _display) { m_displayDependencyDifference = _display; };
+		bool getDisplayDependencyDifference() const { return m_displayDependencyDifference; };
+
 	private:
 		UID m_navigationId;
 
@@ -205,6 +224,9 @@ namespace ot {
 		DataLakeQueryCfg m_queryCfg;
 
 		std::string m_toolTip;
+
+		CurveNamingBehavior m_curveNamingBehavior = CurveNamingBehavior::Name;
+		bool m_displayDependencyDifference = true;
 	};
 
 }

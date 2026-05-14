@@ -139,7 +139,6 @@ void ot::Plot1DCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocato
 	{
 		JsonObject labelInfoObj;
 		labelInfoObj.AddMember("Label", JsonString(labelInfo.label, _allocator), _allocator);
-		labelInfoObj.AddMember("Behavior", static_cast<uint32_t>(labelInfo.behavior), _allocator);
 		fixedDatasetLabelInfosArr.PushBack(labelInfoObj, _allocator);
 	}
 	_object.AddMember("FixedDatasetLabelInfos", fixedDatasetLabelInfosArr, _allocator);
@@ -197,7 +196,6 @@ void ot::Plot1DCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	{
 		DependencyLabelInfo labelInfo;
 		labelInfo.label = json::getString(labelInfoObj, "Label");
-		labelInfo.behavior = static_cast<Plot1DCfg::DependencyLabelBehavior>(json::getUInt(labelInfoObj, "Behavior"));
 		m_fixedDatasetLabelInfos.push_back(labelInfo);
 	}
 

@@ -206,7 +206,7 @@ namespace ot {
 		using PreferredDatasetNameInfoList = std::list<PreferredDatasetNameInfo>;
 
 		void updateDatasetTitleSimple(const std::list<PlotDataset*>& _datasets);
-		void updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo, Plot1DCfg::DependencyLabelBehavior _labelBehavior);
+		void updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo);
 
 		void updateDatasetTitles(const PreferredDatasetNameInfoList& _preferredTitlesList);
 

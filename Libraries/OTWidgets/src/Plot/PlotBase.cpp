@@ -20,6 +20,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Symbol.h"
+#include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/Logging/Logger.h"
@@ -448,20 +449,7 @@ void ot::PlotBase::updateDatasetTitles()
 	// If there is only one non-matching dependency, we can use this for the dataset titles
 	if (nonMatchingDependencies.getDependencyCount() == 1)
 	{
-		const auto& dependency = nonMatchingDependencies.getFirstDependency();
-
-		Plot1DCfg::DependencyLabelBehavior labelBehavior = Plot1DCfg::DependencyLabelBehavior::ShowInBrackets;
-
-		for (const auto& fixedDep : m_config.getFixedDatasetLabelInfos())
-		{
-			if (dependency.getLabel() == fixedDep.label)
-			{
-				labelBehavior = fixedDep.behavior;
-				break;
-			}
-		}
-
-		updateDatasetTitleFromDependency(datasets, nonMatchingDependencies.getFirstDependency(), labelBehavior);
+		updateDatasetTitleFromDependency(datasets, nonMatchingDependencies.getFirstDependency());
 		return;
 	}
 	
@@ -489,11 +477,11 @@ void ot::PlotBase::updateDatasetTitles()
 
 	if (!nonMatchingFixedDependencies.empty())
 	{
-		updateDatasetTitleFromDependency(datasets, nonMatchingFixedDependencies.front().first, nonMatchingFixedDependencies.front().second.behavior);
+		updateDatasetTitleFromDependency(datasets, nonMatchingFixedDependencies.front().first);
 	}
 	else if (!nonMatchingParameterDependencies.empty())
 	{
-		updateDatasetTitleFromDependency(datasets, nonMatchingParameterDependencies.front(), Plot1DCfg::DependencyLabelBehavior::ShowInBrackets);
+		updateDatasetTitleFromDependency(datasets, nonMatchingParameterDependencies.front());
 	}
 	else
 	{
@@ -708,13 +696,13 @@ void ot::PlotBase::updateDatasetTitleSimple(const std::list<PlotDataset*>& _data
 		PreferredDatasetNameInfo nameInfo;
 		nameInfo.dataset = dataset;
 
-		if (config.getTitle().empty())
+		if (config.getNamingBehavior() == Plot1DCurveCfg::CurveNamingBehavior::Custom)
 		{
-			nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
+			nameInfo.title = config.getTitle();
 		}
 		else
 		{
-			nameInfo.title = config.getTitle();
+			nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
 		}
 
 		list.push_back(nameInfo);
@@ -723,7 +711,7 @@ void ot::PlotBase::updateDatasetTitleSimple(const std::list<PlotDataset*>& _data
 	updateDatasetTitles(list);
 }
 
-void ot::PlotBase::updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo, Plot1DCfg::DependencyLabelBehavior _labelBehavior)
+void ot::PlotBase::updateDatasetTitleFromDependency(const std::list<PlotDataset*>& _datasets, const DatasetDependencyInfo& _dependencyInfo)
 {
 	PreferredDatasetNameInfoList list;
 	
@@ -735,44 +723,51 @@ void ot::PlotBase::updateDatasetTitleFromDependency(const std::list<PlotDataset*
 		nameInfo.dataset = dataset;
 
 		auto dependency = dataset->getDependencyInfos().getDependency(_dependencyInfo.getLabel());
-		
-		switch (_labelBehavior)
+		std::string dependencyLabel;
+		if (dependency.has_value())
 		{
-		case Plot1DCfg::DependencyLabelBehavior::ShowInBrackets:
-			if (config.getTitle().empty())
+			dependencyLabel = dependency->getLabel();
+		}
+
+		if (config.getNamingBehavior() == Plot1DCurveCfg::CurveNamingBehavior::Custom)
+		{
+			nameInfo.title = config.getTitle();
+		}
+		else
+		{
+			nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
+
+			if ((!config.getDisplayDependencyDifference() || dependencyLabel != MetadataSeries::getFieldName()) && (config.getNamingBehavior() == Plot1DCurveCfg::NameSeries ||
+				config.getNamingBehavior() == Plot1DCurveCfg::NameSeriesQuantity))
 			{
-				nameInfo.title = EntityName::getSubName(dataset->getEntityName()).value();
+				auto seriesDependency = dataset->getDependencyInfos().getDependency(MetadataSeries::getFieldName());
+				if (seriesDependency.has_value())
+				{
+					nameInfo.title.append(", " + seriesDependency->getValue());
+				}
+			}
+
+			if ((!config.getDisplayDependencyDifference() || dependencyLabel != MetadataQuantity::getFieldName()) && (config.getNamingBehavior() == Plot1DCurveCfg::NameQuantity ||
+				config.getNamingBehavior() == Plot1DCurveCfg::NameSeriesQuantity))
+			{
+				auto quantityDependency = dataset->getDependencyInfos().getDependency(MetadataQuantity::getFieldName());
+				if (quantityDependency.has_value())
+				{
+					nameInfo.title.append(", " + quantityDependency->getValue());
+				}
+			}
+		}
+
+		if (dependency.has_value() && config.getDisplayDependencyDifference())
+		{
+			if (dependency->getLabel() == MetadataQuantity::getFieldName())
+			{
+				nameInfo.title.append(" (" + dependency->getValue() + ")");
 			}
 			else
 			{
-				nameInfo.title = config.getTitle();
+				nameInfo.title.append(" (" + dependency->getLabel() + " = " + dependency->getValue() + ")");
 			}
-
-			if (dependency.has_value())
-			{
-				std::string unitStr;
-				if (!dependency->getUnit().empty())
-				{
-					unitStr = " " + dependency->getUnit();
-				}
-				
-				if (dependency->getLabel() == MetadataQuantity::getFieldName())
-				{
-					nameInfo.title.append(" (" + dependency->getValue() + unitStr + ")");
-				}
-				else
-				{
-					nameInfo.title.append(" (" + dependency->getLabel() + " = " + dependency->getValue() + unitStr + ")");
-				}
-			}
-			break;
-
-		case Plot1DCfg::DependencyLabelBehavior::ReplaceTitle:
-			nameInfo.title = dependency->getValue();
-			break;
-
-		default:
-			break;
 		}
 
 		list.push_back(nameInfo);

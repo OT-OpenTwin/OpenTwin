@@ -73,6 +73,46 @@ ot::Plot1DCurveCfg::Symbol ot::Plot1DCurveCfg::stringToSymbol(const std::string&
 	}
 }
 
+std::string ot::Plot1DCurveCfg::toString(CurveNamingBehavior _behavior)
+{
+	switch (_behavior)
+	{
+	case ot::Plot1DCurveCfg::Custom: return "Custom";
+	case ot::Plot1DCurveCfg::Name: return "Name";
+	case ot::Plot1DCurveCfg::NameSeries: return "Name, Series";
+	case ot::Plot1DCurveCfg::NameSeriesQuantity: return "Name, Series, Quantity";
+	case ot::Plot1DCurveCfg::NameQuantity: return "Name, Quantity";
+	default:
+		OT_LOG_E("Unknown curve naming behavior (" + std::to_string(static_cast<int>(_behavior)) + ")");
+		return "Custom";
+	}
+}
+
+ot::Plot1DCurveCfg::CurveNamingBehavior ot::Plot1DCurveCfg::stringToCurveNamingBehavior(const std::string& _behavior)
+{
+	if (_behavior == toString(CurveNamingBehavior::Custom)) return CurveNamingBehavior::Custom;
+	else if (_behavior == toString(CurveNamingBehavior::Name)) return CurveNamingBehavior::Name;
+	else if (_behavior == toString(CurveNamingBehavior::NameSeries)) return CurveNamingBehavior::NameSeries;
+	else if (_behavior == toString(CurveNamingBehavior::NameSeriesQuantity)) return CurveNamingBehavior::NameSeriesQuantity;
+	else if (_behavior == toString(CurveNamingBehavior::NameQuantity)) return CurveNamingBehavior::NameQuantity;
+	else
+	{
+		OT_LOG_E("Unknown curve naming behavior \"" + _behavior + "\"");
+		return CurveNamingBehavior::Custom;
+	}
+}
+
+std::list<std::string> ot::Plot1DCurveCfg::getAllCurveNamingBehaviorStrings()
+{
+	return std::list<std::string>{
+		toString(CurveNamingBehavior::Custom),
+		toString(CurveNamingBehavior::Name),
+		toString(CurveNamingBehavior::NameSeries),
+		toString(CurveNamingBehavior::NameSeriesQuantity),
+		toString(CurveNamingBehavior::NameQuantity)
+	};
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Constructor / Destructor
@@ -86,6 +126,7 @@ ot::Plot1DCurveCfg::Plot1DCurveCfg(UID _id, UID _version, const std::string& _na
 	BasicEntityInformation(_name, _id, _version), m_navigationId(0), m_visible(true), m_dimmed(false),
 	m_linePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurve)),
 	m_pointSize(5), m_pointInterval(1), m_pointSymbol(NoSymbol), m_pointColorFromCurve(false),
+	m_matrixIndex(-1),
 	m_pointFillPainter(new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol)),
 	m_pointOulinePen(1., new StyleRefPainter2D(ColorStyleValueEntry::PlotCurveSymbol))
 {
@@ -138,6 +179,9 @@ void ot::Plot1DCurveCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocat
 
 	_object.AddMember("ToolTip", JsonString(m_toolTip, _allocator), _allocator);
 	_object.AddMember("MatrixIndex", m_matrixIndex, _allocator);
+
+	_object.AddMember("NamingBehavior", JsonString(toString(m_curveNamingBehavior), _allocator), _allocator);
+	_object.AddMember("DisplayDependencyDiff", m_displayDependencyDifference, _allocator);
 }
 
 void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
@@ -163,6 +207,9 @@ void ot::Plot1DCurveCfg::setFromJsonObject(const ot::ConstJsonObject& _object)
 
 	m_toolTip = json::getString(_object, "ToolTip");
 	m_matrixIndex = json::getUInt(_object, "MatrixIndex");
+
+	m_curveNamingBehavior = stringToCurveNamingBehavior(json::getString(_object, "NamingBehavior"));
+	m_displayDependencyDifference = json::getBool(_object, "DisplayDependencyDiff");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

@@ -45,12 +45,6 @@ namespace ot {
 			Polar
 		};
 
-		enum class DependencyLabelBehavior : uint32_t
-		{
-			ShowInBrackets,
-			ReplaceTitle
-		};
-
 		struct DependencyLabelInfo
 		{
 			DependencyLabelInfo() = default;
@@ -60,12 +54,11 @@ namespace ot {
 			DependencyLabelInfo& operator=(DependencyLabelInfo&&) = default;
 			~DependencyLabelInfo() = default;
 
-			DependencyLabelInfo(const std::string& _label, DependencyLabelBehavior _behavior)
-				: label(_label), behavior(_behavior)
+			DependencyLabelInfo(const std::string& _label)
+				: label(_label)
 			{}
 
 			std::string label;
-			DependencyLabelBehavior behavior = DependencyLabelBehavior::ShowInBrackets;
 		};
 		typedef std::list<DependencyLabelInfo> DependencyLabelInfoList;
 

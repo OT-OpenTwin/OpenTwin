@@ -100,7 +100,6 @@ void EntityResult1DCurve::addVisualizationNodes()
 	getObserver()->sendMessageToViewer(doc);
 }
 
-
 bool EntityResult1DCurve::tuplePropertiesAreVisible()
 {
 	return m_queryProperties.tuplePropertiesAreVisible(this);
@@ -109,6 +108,7 @@ bool EntityResult1DCurve::tuplePropertiesAreVisible()
 bool EntityResult1DCurve::updateFromProperties()
 {
 	bool refresh = this->updatePropertyVisibilities();
+
 	if (getObserver() != nullptr)
 	{
 		try
@@ -121,10 +121,12 @@ bool EntityResult1DCurve::updateFromProperties()
 			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
 
 			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Custom Title", "General")->needsUpdate();
+			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Naming Behavior", "General")->needsUpdate();
+			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Display Dependency Diff", "General")->needsUpdate();
 
 			refresh |= dataRefreshNeeded;
 
-			if(dataRefreshNeeded)
+			if (dataRefreshNeeded)
 			{
 				DataLakeQueryCfg queryCfg;
 				queryCfg.setCollectionName(collectionName);
@@ -172,9 +174,8 @@ bool EntityResult1DCurve::updateFromProperties()
 
 void  EntityResult1DCurve::updateMetadataProperties()
 {
-	
-}
 
+}
 
 // Configuration
 
@@ -280,10 +281,17 @@ void EntityResult1DCurve::createProperties(DefaultCurveStyle _style)
 	EntityPropertiesGuiPainter* symbolFillColorProp = EntityPropertiesGuiPainter::createProperty("General", "Symbol Fill Color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotCurveSymbol), "", getProperties());
 	symbolFillColorProp->setToolTip("The fill color of the curve data point symbols in the plot.");
 	symbolFillColorProp->setFilter(ot::Painter2DDialogFilterDefaults::plotCurve(true));
-	
-	// Custom title
+
+	// Title
+	EntityPropertiesSelection* titleNamingBehavProp = EntityPropertiesSelection::createProperty("General", "Naming Behavior",
+		ot::Plot1DCurveCfg::getAllCurveNamingBehaviorStrings(), ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Name), "", getProperties());
+
 	EntityPropertiesString* titleProp = EntityPropertiesString::createProperty("General", "Custom Title", "", "", getProperties());
 	titleProp->setToolTip("Custom curve title to be shown in the plot legend. If empty, the curve name will be used as title.");
+	titleProp->setVisible(false);
+
+	EntityPropertiesBoolean* displayDependencyDiffProp = EntityPropertiesBoolean::createProperty("General", "Display Dependency Diff", true, "", getProperties());
+	displayDependencyDiffProp->setToolTip("If enabled, a single non matching dependency will be displayed in the curve title");
 
 	m_queryProperties.setProperties(this);
 
@@ -342,9 +350,13 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	curveCfg.setDataAccessConfig(m_dataLakeAccessCfg);
 	curveCfg.setTitle(getCustomCurveTitle());
 
-	std::pair<uint32_t,std::string> selectedMatrixIndex =	m_queryProperties.getMatrixIndex(this);
+	std::pair<uint32_t, std::string> selectedMatrixIndex = m_queryProperties.getMatrixIndex(this);
 	curveCfg.setMatrixIndex(selectedMatrixIndex.first);
 	curveCfg.setMatrixIndexLabel(selectedMatrixIndex.second);
+
+	curveCfg.setNamingBehavior(this->getCurveNamingBehavior());
+	curveCfg.setDisplayDependencyDifference(this->getDisplayDependencyDifference());
+
 	return curveCfg;
 }
 
@@ -408,10 +420,22 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 			symbolFillColorProp->setValue(_curve.getPointFillPainter());
 		}
 
+		EntityPropertiesSelection* titleNamingBehaviorProp = PropertyHelper::getSelectionProperty(this, "Naming Behavior", "General");
+		if (titleNamingBehaviorProp)
+		{
+			titleNamingBehaviorProp->setValue(ot::Plot1DCurveCfg::toString(_curve.getNamingBehavior()));
+		}
+
 		EntityPropertiesString* titleProp = PropertyHelper::getStringProperty(this, "Custom Title");
 		if (titleProp)
 		{
 			titleProp->setValue(_curve.getTitle());
+		}
+
+		EntityPropertiesBoolean* displayDependencyDiffProp = PropertyHelper::getBoolProperty(this, "Display Dependency Diff");
+		if (displayDependencyDiffProp)
+		{
+			displayDependencyDiffProp->setValue(_curve.getDisplayDependencyDifference());
 		}
 
 		m_dataLakeAccessCfg = _curve.getDataAccessConfig();
@@ -428,8 +452,8 @@ void EntityResult1DCurve::setCurve(const ot::Plot1DCurveCfg& _curve)
 
 void EntityResult1DCurve::setDataLakeAccessCfg(ot::DataLakeAccessCfg&& _cfg)
 {
-	 m_dataLakeAccessCfg = std::move(_cfg); 
-	 setModified();
+	m_dataLakeAccessCfg = std::move(_cfg);
+	setModified();
 }
 
 std::list<std::string> EntityResult1DCurve::getParameterOptions() const
@@ -457,6 +481,17 @@ std::string EntityResult1DCurve::getCustomCurveTitle() const
 	return PropertyHelper::getStringPropertyValue(this, "Custom Title", "General");
 }
 
+ot::Plot1DCurveCfg::CurveNamingBehavior EntityResult1DCurve::getCurveNamingBehavior() const
+{
+	const std::string namingBehaviorStr = PropertyHelper::getSelectionPropertyValue(this, "Naming Behavior", "General");
+	return ot::Plot1DCurveCfg::stringToCurveNamingBehavior(namingBehaviorStr);
+}
+
+bool EntityResult1DCurve::getDisplayDependencyDifference() const
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Display Dependency Diff", "General");
+}
+
 void EntityResult1DCurve::setStaticCurveQueryOptions(const ot::Plot1DCurveCfg& _curve)
 {
 	setCurve(_curve);
@@ -473,6 +508,21 @@ bool EntityResult1DCurve::updatePropertyVisibilities()
 {
 	bool visibilityChanged = false;
 
+	// Title
+	EntityPropertiesSelection* titleNamingBehaviorProp = PropertyHelper::getSelectionProperty(this, "Naming Behavior", "General");
+	if (titleNamingBehaviorProp)
+	{
+		EntityPropertiesString* titleProp = PropertyHelper::getStringProperty(this, "Custom Title", "General");
+		OTAssertNullptr(titleProp);
+		bool titleVisible = titleNamingBehaviorProp->getValue() == ot::Plot1DCurveCfg::toString(ot::Plot1DCurveCfg::Custom);
+		if (titleProp->getVisible() != titleVisible)
+		{
+			titleProp->setVisible(titleVisible);
+			visibilityChanged = true;
+		}
+	}
+
+	// Symbol
 	EntityPropertiesSelection* symbolProp = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Symbol"));
 	if (symbolProp)
 	{
@@ -511,9 +561,10 @@ bool EntityResult1DCurve::updatePropertyVisibilities()
 		}
 
 	}
-	
+
+	// Query
 	visibilityChanged |= m_queryProperties.updatePropertyVisibility(this);
-	
+
 	return visibilityChanged;
 }
 
@@ -539,7 +590,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 		doc.fromJson(serialisedDLA);
 		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
 	}
-	
+
 	// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
 	if (getObserver() != nullptr && getObserver()->projectIsOpen())
 	{
