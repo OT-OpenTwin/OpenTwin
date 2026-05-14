@@ -21,7 +21,12 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTGui/OTGuiAPIExport.h"
+
+// std header
+#include <list>
+#include <string>
 
 namespace ot {
 
@@ -59,9 +64,16 @@ namespace ot {
 		void setFilterBehavior(FilterBehavior _behavior) { m_filterBehavior = _behavior; };
 		FilterBehavior getFilterBehavior() const { return m_filterBehavior; };
 
+		void setActiveFilters(const std::list<ValueComparisonDescription>& _filters) { m_activeFilters = _filters; };
+		void setActiveFilters(std::list<ValueComparisonDescription>&& _filters) { m_activeFilters = std::move(_filters); };
+		void addActiveFilter(const ValueComparisonDescription& _filter) { m_activeFilters.push_back(_filter); };
+		void addActiveFilter(ValueComparisonDescription&& _filter) { m_activeFilters.push_back(std::move(_filter)); };
+		const std::list<ValueComparisonDescription>& getActiveFilters() const { return m_activeFilters; };
+
 	private:
 		std::string m_text;
 		FilterBehavior m_filterBehavior = FilterBehavior::NoFilter;
+		std::list<ValueComparisonDescription> m_activeFilters;
 	};
 
 }

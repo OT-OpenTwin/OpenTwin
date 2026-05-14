@@ -39,6 +39,10 @@ namespace ot {
 
 		const HeaderFilterState& getFilterState() const { return m_filterState; };
 
+		void addActiveFilter(int _logicalIndex, const QStringList& _filters);
+
+		void applyActiveFilters();
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Protected: Events

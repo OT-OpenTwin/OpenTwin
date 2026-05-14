@@ -127,6 +127,16 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			if (headerItem) {
 				m_verticalHeaderItemCfgs.push_back(headerItem->createCopy());
 				this->setVerticalHeaderItem(r, createHeaderItem(headerItem));
+				
+				if (!headerItem->getActiveFilters().empty())
+				{
+					QStringList filterList;
+					for (const auto& filter : headerItem->getActiveFilters())
+					{
+						filterList.append(QString::fromStdString(filter.getValue()));
+					}
+					m_verticalHeader->addActiveFilter(r, filterList);
+				}
 			}
 			else
 			{
@@ -144,6 +154,16 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			{
 				m_horizontalHeaderItemCfgs.push_back(headerItem->createCopy());
 				this->setHorizontalHeaderItem(c, createHeaderItem(headerItem));
+
+				if (!headerItem->getActiveFilters().empty())
+				{
+					QStringList filterList;
+					for (const auto& filter : headerItem->getActiveFilters())
+					{
+						filterList.append(QString::fromStdString(filter.getValue()));
+					}
+					m_horizontalHeader->addActiveFilter(c, filterList);
+				}
 			}
 			else
 			{
@@ -171,6 +191,15 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 	m_filterColumnSortingEnabled = _config.getColumnSortingEnabled();
 	m_filterRowSortingEnabled = _config.getRowSortingEnabled();
 
+	{
+		QSignalBlocker verticalBlock(m_verticalHeader);
+		m_verticalHeader->applyActiveFilters();
+	}
+	{
+		QSignalBlocker horizontalBlock(m_horizontalHeader);
+		m_horizontalHeader->applyActiveFilters();
+	}
+	
 	this->setResizeRequired();
 }
 

@@ -52,6 +52,21 @@ void ot::HeaderBase::setDefaultHeaderFlags()
 	setSectionsClickable(true);
 }
 
+void ot::HeaderBase::addActiveFilter(int _logicalIndex, const QStringList& _filters)
+{
+	m_filterState.setFilter(_logicalIndex, _filters);
+	updateSection(_logicalIndex);
+}
+
+void ot::HeaderBase::applyActiveFilters()
+{
+	if (m_filterState.hasActiveFilter())
+	{
+		filterHasChanged(m_filterState);
+		update();
+	}
+}
+
 void ot::HeaderBase::paintSection(QPainter* _painter, const QRect& _rect, int _logicalIndex) const
 {
 	// Draw default section background & text

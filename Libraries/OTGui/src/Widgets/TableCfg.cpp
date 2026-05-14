@@ -445,9 +445,35 @@ void ot::TableCfg::setRowHeader(int _row, TableHeaderItemCfg* _item) {
 	m_rowHeader[_row] = _item;
 }
 
+ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row)
+{
+	OTAssert(_row < m_rows, "Index out of range");
+	return m_rowHeader[_row];
+}
+
 const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeader(int _row) const {
 	OTAssert(_row < m_rows, "Index out of range");
 	return m_rowHeader[_row];
+}
+
+ot::TableHeaderItemCfg* ot::TableCfg::getRowHeaderByText(const std::string& _headerText)
+{
+	for (TableHeaderItemCfg* itm : m_rowHeader) {
+		if (itm && itm->getText() == _headerText) {
+			return itm;
+		}
+	}
+	return nullptr;
+}
+
+const ot::TableHeaderItemCfg* ot::TableCfg::getRowHeaderByText(const std::string& _headerText) const
+{
+	for (const TableHeaderItemCfg* itm : m_rowHeader) {
+		if (itm && itm->getText() == _headerText) {
+			return itm;
+		}
+	}
+	return nullptr;
 }
 
 void ot::TableCfg::setColumnHeader(int _column, TableHeaderItemCfg* _item) {
@@ -479,9 +505,35 @@ void ot::TableCfg::setColumnHeaderFilterBehavior(int _column, TableHeaderItemCfg
 	getOrCreateColumnHeaderItem(_column)->setFilterBehavior(_behavior);
 }
 
+ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column)
+{
+	OTAssert(_column < m_columns, "Index out of range");
+	return m_columnHeader[_column];
+}
+
 const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeader(int _column) const {
 	OTAssert(_column < m_columns, "Index out of range");
 	return m_columnHeader[_column];
+}
+
+ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeaderByText(const std::string& _headerText)
+{
+	for (TableHeaderItemCfg* itm : m_columnHeader) {
+		if (itm && itm->getText() == _headerText) {
+			return itm;
+		}
+	}
+	return nullptr;
+}
+
+const ot::TableHeaderItemCfg* ot::TableCfg::getColumnHeaderByText(const std::string& _headerText) const
+{
+	for (const TableHeaderItemCfg* itm : m_columnHeader) {
+		if (itm && itm->getText() == _headerText) {
+			return itm;
+		}
+	}
+	return nullptr;
 }
 
 void ot::TableCfg::initialize(void) {

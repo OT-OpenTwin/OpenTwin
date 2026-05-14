@@ -77,12 +77,18 @@ namespace ot {
 		
 		void setRowHeader(int _row, const std::string& _headerText);
 		void setRowHeader(int _row, TableHeaderItemCfg* _item);
+		TableHeaderItemCfg* getRowHeader(int _row);
 		const TableHeaderItemCfg* getRowHeader(int _row) const;
+		TableHeaderItemCfg* getRowHeaderByText(const std::string& _headerText);
+		const TableHeaderItemCfg* getRowHeaderByText(const std::string& _headerText) const;
 
 		void setColumnHeader(int _column, TableHeaderItemCfg* _item);
 		void setColumnHeaderText(int _column, const std::string& _headerText);
 		void setColumnHeaderFilterBehavior(int _column, TableHeaderItemCfg::FilterBehavior _behavior);
+		TableHeaderItemCfg* getColumnHeader(int _column);
 		const TableHeaderItemCfg* getColumnHeader(int _column) const;
+		TableHeaderItemCfg* getColumnHeaderByText(const std::string& _headerText);
+		const TableHeaderItemCfg* getColumnHeaderByText(const std::string& _headerText) const;
 
 		void setColumnSortingEnabled(bool _enable = true) { m_columnsSortable = _enable; };
 		bool getColumnSortingEnabled() const { return m_columnsSortable; };

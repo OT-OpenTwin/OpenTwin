@@ -210,6 +210,19 @@ ot::TableCfg ot::EntityDatasetInfo::getTableConfig(bool _includeData)
 		OT_LOG_E("Row header size mismatch for { \"Entity\": \"" + getName() + "\", \"ExpectedRowHeaderSize\": " + std::to_string(cfg.getRowCount()) + ", \"ActualRowHeaderSize\": " + std::to_string(rowHeaders.size()) + " }");
 	}
 
+	for (const ValueComparisonDescription& filter : m_activeFilters)
+	{
+		auto headerItem = cfg.getColumnHeaderByText(filter.getName());
+		if (headerItem)
+		{
+			headerItem->addActiveFilter(filter);
+		}
+		else
+		{
+			OT_LOG_W("Could not find column header for active filter \"" + filter.getName() + "\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+		}
+	}
+
 	return cfg;
 }
 

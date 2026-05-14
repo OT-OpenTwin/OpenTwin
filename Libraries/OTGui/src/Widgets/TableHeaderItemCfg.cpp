@@ -54,9 +54,22 @@ ot::TableHeaderItemCfg::TableHeaderItemCfg(const std::string& _text)
 void ot::TableHeaderItemCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Text", JsonString(m_text, _allocator), _allocator);
 	_object.AddMember("FilterEnabled", JsonString(toString(m_filterBehavior), _allocator), _allocator);
+
+	JsonArray filterArr;
+	for (const auto& filter : m_activeFilters) {
+		filterArr.PushBack(JsonObject(filter, _allocator), _allocator);
+	}
+	_object.AddMember("ActiveFilters", filterArr, _allocator);
 }
 
 void ot::TableHeaderItemCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	m_text = json::getString(_object, "Text");
 	m_filterBehavior = stringToFilterBehavior(json::getString(_object, "FilterEnabled"));
+
+	m_activeFilters.clear();
+	for (const ConstJsonObject& filterObj : json::getObjectList(_object, "ActiveFilters")) {
+		ValueComparisonDescription filter;
+		filter.setFromJsonObject(filterObj);
+		m_activeFilters.push_back(std::move(filter));
+	}
 }
