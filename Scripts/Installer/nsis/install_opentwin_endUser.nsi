@@ -1012,9 +1012,6 @@ Section "OpenTwin Main Files (Required)" SEC02
 	# The 32bit version is required for Apache
 	ExecWait '"$INSTDIR\VC_Redist\VC_redist.x86.exe" /install /quiet /norestart'
 	ExecWait '"$INSTDIR\VC_Redist\VC_redist.x64.exe" /install /quiet /norestart'
-	
-	# Set the environment variable forcing the library manager to update its libraries on next start
-	WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_UPDATE_LIBRARY" "1"
 
 	; Check whether a reboot is required
 	Push $R1
