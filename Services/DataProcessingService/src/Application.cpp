@@ -24,6 +24,7 @@
 
 
 // Open twin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/OwnerServiceGlobal.h"
@@ -157,7 +158,9 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName, "Create Manifest", "Default/AddMaterial");
 	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));
 
-	if (!std::string(getenv("OPENTWIN_DEV_ROOT")).empty()) {
+	std::string devEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+
+	if (!devEnv.empty()) {
 		m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Manifest Meta", "Default/Add");
 		_ui->addMenuButton(m_buttonCreateManifestMeta.setButtonLockFlags(modelWrite));
 
