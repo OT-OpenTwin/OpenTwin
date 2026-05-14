@@ -82,6 +82,8 @@ ot::GraphicsPicker::GraphicsPicker(Qt::Orientation _orientation, QWidget* _paren
 	m_viewLayout = new FlowLayout(m_viewLayoutW);
 
 	connect(m_navigation->getTreeWidget(), &QTreeWidget::itemSelectionChanged, this, &GraphicsPicker::slotSelectionChanged);
+
+	m_splitter->setSizes({ 1,1 });
 }
 
 ot::GraphicsPicker::~GraphicsPicker() {
