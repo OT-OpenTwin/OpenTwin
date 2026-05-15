@@ -93,12 +93,10 @@ DEL "%OPENTWIN_DEPLOYMENT_DIR%\CircuitExecution.exe" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OToolkit.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTResultDataAccess.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OTSystemInformationTool.dll" 2>NUL
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\ModelLibraryUpdater.exe" 2>Nul
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\LibraryManagementService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\HierarchicalProjectService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\FileManagementProjectService.dll" 2>NUL
 DEL "%OPENTWIN_DEPLOYMENT_DIR%\OpenEMSService.dll" 2>NUL
-DEL "%OPENTWIN_DEPLOYMENT_DIR%\UpdateModelLibraries.bat" 2>NUL
 
 ECHO Delete library data 
 RMDIR /Q /S "%OPENTWIN_DEPLOYMENT_DIR%\LibraryData" 2>NUL
@@ -194,7 +192,6 @@ ECHO Copy Tools
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI\x64\Release\OToolkitAPI.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OToolkit\x64\Release\OToolkit.dll" "%OPENTWIN_DEPLOYMENT_DIR%"
 COPY "%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool\x64\Release\OTSystemInformationTool.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
-COPY "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\x64\Release\ModelLibraryUpdater.exe" "%OPENTWIN_DEPLOYMENT_DIR%"
 REM ====================================================================
 REM  Copy Library data
 REM ====================================================================
@@ -231,10 +228,6 @@ REM ====================================================================
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CreateBuildInformation.bat"
 
-REM ====================================================================
-REM  Copy Update model library script
-REM ====================================================================
-COPY "%OPENTWIN_DEV_ROOT%\Scripts\Other\UpdateModelLibraries.bat" "%OPENTWIN_DEPLOYMENT_DIR%"
 GOTO END
 
 :PAUSE_END
