@@ -454,7 +454,7 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
 			// Update existing data to GridFS and update metadata (version, hash)
-			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.toJson());
+			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.getData());
 
 			if (!gridfsIdResult.empty()) {
 				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
