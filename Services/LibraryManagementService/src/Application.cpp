@@ -119,7 +119,6 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			adminPassword = ot::UserCredentials::encryptString(db.getAdminUserName());
 		}
 
-
 		// Get and set build information
 		ot::JsonDocument buildReqDoc;
 		buildReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, buildReqDoc.GetAllocator()), buildReqDoc.GetAllocator());
@@ -133,7 +132,13 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			if(storedBuildInformation != buildInfoResponseStrGss) {
 				OT_LOG_I("Build information has changed. Updating database...");
 				if(db.setBuildInformation(db.getAdminUserName(), ot::UserCredentials::decryptString(adminPassword), dbUrl, buildInfoResponseStrGss)) {
-					launchModelLibraryUpdate(getServiceURL(), adminPassword);
+					bool updateSuccess = launchModelLibraryUpdate(getServiceURL(), adminPassword);
+					if(updateSuccess) {
+						OT_LOG_I("Model library update completed successfully.");
+					}
+					else {
+						OT_LOG_E("Model library update failed. Please check the logs for more details.");
+					}
 					OT_LOG_I("Build information updated successfully.");
 				}
 				else {
@@ -163,37 +168,37 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 }
 
 bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD) {
-	
+
 	OT_LOG_I("Launching Model Library Updater");
 
 	std::string lmsUrl = _ownURL;
 	std::string databasePassword = _databasePWD;
-	std::string libraryDataPath;
+	std::string libraryDataBasePath;
 
 
 #ifdef _DEBUG
-	libraryDataPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "\\LibraryData";
-	OT_LOG_D("Using development LibraryData path: " + libraryDataPath);
+	libraryDataBasePath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "\\LibraryData";
+	OT_LOG_D("Using development LibraryData path: " + libraryDataBasePath);
 #else
-	libraryDataPath = ot::OperatingSystem::getCurrentExecutableDirectory() + "\\LibraryData";
+	libraryDataBasePath = ot::OperatingSystem::getCurrentExecutableDirectory() + "\\LibraryData";
 #endif
 
-	OT_LOG_D("Determined library data path: " + libraryDataPath);
+	OT_LOG_D("Determined library data path: " + libraryDataBasePath);
 	OT_LOG_D("Using LMS URL: " + lmsUrl);
 
-	if(databasePassword.empty()) {
+	if (databasePassword.empty()) {
 		OT_LOG_W("No database password provided. Attempting to use empty password for database operations.");
 	}
 	else {
 		OT_LOG_D("Database password provided via command line argument.");
 	}
 
-	if(libraryDataPath.empty()) {
+	if (libraryDataBasePath.empty()) {
 		OT_LOG_E("Failed to determine library data path. Aborting Model Library Updater launch.");
 		return false;
 	}
 
-	if(lmsUrl.empty()) {
+	if (lmsUrl.empty()) {
 		OT_LOG_E("Service URL is empty. Aborting Model Library Updater launch.");
 		return false;
 	}
@@ -201,44 +206,45 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 	// Collections to update - can be extended if needed
 	std::list<std::string> collections = { "PythonEnvironments", "PythonScripts" };
 
-	for (auto collectionName : collections) {
-		std::list<ot::LibraryElement> localModels = getLocalModels(libraryDataPath + "\\" + collectionName, collectionName);
+	// Resolve DB address and decrypted admin password once
+	const std::string dbAddress = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS");
+	const std::string adminUserName = db.getAdminUserName();
+	const std::string adminPasswordPlain = ot::UserCredentials::decryptString(databasePassword);
+
+	for (const auto& collectionName : collections) {
+		const std::string libraryDataPath = libraryDataBasePath + "\\" + collectionName;
+
+		std::list<ot::LibraryElement> localModels = getLocalModels(libraryDataPath, collectionName);
 		if (localModels.empty()) {
 			OT_LOG_DS("No local models found in the specified folder: " << libraryDataPath);
 			OT_LOG_DS("Skipping LMS update and creation process for " << collectionName);
 			continue;
 		}
 
-		// Create JSON document for update request
-		ot::JsonDocument checkUpdateDoc;
-		if (!databasePassword.empty()) {
-			checkUpdateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePassword, checkUpdateDoc.GetAllocator()), checkUpdateDoc.GetAllocator());
+		// Ensure db / collection exists (once per collection)
+		if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, adminPasswordPlain, dbAddress)) {
+			OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
+			continue;
 		}
-		checkUpdateDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, checkUpdateDoc.GetAllocator()), checkUpdateDoc.GetAllocator());
-		createJsonDocumentFromLibraryElement(localModels, checkUpdateDoc);
-		localModels.clear();
-		
-		// Use the already available handler to check for updates and create or update library elements in the database (No sending here since the handler is used directly and not via an action)
-		std::string status = handleUpdateOrCreateRequest(checkUpdateDoc);
-		
-		// Deserialize the response to check the status of the update process and add the necessary data to the library elements if needed
-		localModels = createLibraryElementsFromJsonDocument(status);
+		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
+
+		// Filter out models that are already up-to-date (this modifies localModels in-place)
+		updateOrCreateLibraryElement(localModels, adminUserName, adminPasswordPlain, dbAddress);
+
+		// If no models remain after the check, nothing to do
 		if (localModels.empty()) {
 			OT_LOG_I("No models needed to be updated or created for collection: " + collectionName);
 			continue;
 		}
-		localModels = addDataToLibraryElements(localModels, libraryDataPath + "\\" + collectionName);
 
-		ot::JsonDocument addDoc;
-		if (!databasePassword.empty()) {
-			addDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePassword, addDoc.GetAllocator()), addDoc.GetAllocator());
-		}
+		// Attach binary content from disk
+		localModels = addDataToLibraryElements(localModels, libraryDataPath);
 
-		addDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, addDoc.GetAllocator()), addDoc.GetAllocator());
-		createJsonDocumentFromLibraryElement(localModels, addDoc);
-		std::string response = handleAddNewLibraryElement(addDoc);
-		OT_LOG_D("Response after adding new library elements for collection: " + collectionName + " - " + response);
+		// Add or update remaining library elements in DB
+		addLibraryElement(localModels, adminUserName, adminPasswordPlain, dbAddress);
+		OT_LOG_D("Completed add/update for collection: " + collectionName);
 	}
+
 	return true;
 }
 
