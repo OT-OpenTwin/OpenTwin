@@ -52,6 +52,22 @@ Application& Application::instance(void) {
 // Public functions
 
 int Application::initialize(const char* _siteID,const char* _ownURL, const char* _globalSessionServiceURL, const char * _databasePWD) {
+
+	//! @brief Initialization of the service. This includes:
+	//! - Setting up the db url by requesting it from the GSS and setting it in the db wrapper
+	//! - Getting and setting the build information from the GSS
+	//! - Updating the model library if necessary by comparing the build information from the GSS with the one stored in the database. If they differ, the model library will be updated and the new build information will be stored in the database.
+	//! - Registration in the GSS 
+
+
+	// In case of error:
+	// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
+	// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
+	const int maxCt = 30;
+	int ct = 1;
+	bool ok = false;
+
+
 	try {
 		OT_LOG_I("Library Management Service initialization");
 		setSiteID(_siteID);
@@ -63,96 +79,101 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 		if (_globalSessionServiceURL == nullptr) {
 			exit(ot::AppExitCode::GSSUrlMissing);
 		}
-
-		// Register at GSS
-		ot::JsonDocument gssDoc;
-		gssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, gssDoc.GetAllocator()), gssDoc.GetAllocator());
-		gssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(getServiceURL(), gssDoc.GetAllocator()), gssDoc.GetAllocator());
-
-		// Send request to GSS
-			std::string gssResponse;
-
-		// In case of error:
-		// Minimum timeout: attempts * thread sleep                  = 30 * 500ms       =   15sec
-		// Maximum timeout; attempts * (thread sleep + send timeout) = 30 * (500ms + 3s) = 1.45min
-		const int maxCt = 30;
-		int ct = 1;
-		bool ok = false;
-	
-		do {
-			gssResponse.clear();
-			if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE, gssDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
-				OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
-				using namespace std::chrono_literals;
-				std::this_thread::sleep_for(500ms);
-				
-			}
-		} while ((ot::ReturnMessage::fromJson(gssResponse) != ot::ReturnMessage::Ok || !ok) && ct++ <= maxCt);
-
-		if (!ok) {
-			OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attempts. Exiting...");
-			exit(ot::AppExitCode::GSSRegistrationFailed);
-		}
-
-		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(gssResponse);
-		if (rMsg != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Registration failed: " + rMsg.getWhat());
-			exit(ot::AppExitCode::GSSRegistrationFailed);
-		}
-
 		db.setSiteID(_siteID);
-
-		// Get DBUrl and AuthUrl from gss response
-		ot::JsonDocument gssRespoonseUrls;
-		gssRespoonseUrls.fromJson(rMsg.getWhat());
-		std::string dbUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_DBURL);
-		std::string authUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_AUTHURL);
-
 
 		// Admin credentials for database operations
 		std::string adminUserName = db.getAdminUserName();
 		std::string adminPassword = _databasePWD;
-		if (!adminPassword.empty()){
+		if (!adminPassword.empty()) {
 			adminPassword = std::string(_databasePWD);
 		}
 		else {
 			adminPassword = ot::UserCredentials::encryptString(db.getAdminUserName());
 		}
 
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Get and set the database URL
+
+		std::string dbUrl;
+		std::string gssResponseDbUrl;
+		ot::JsonDocument dbUrlReqDoc;
+		dbUrlReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetGlobalServicesUrl, dbUrlReqDoc.GetAllocator()), dbUrlReqDoc.GetAllocator());
+
+		do {
+			gssResponseDbUrl.clear();
+			if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, dbUrlReqDoc.toJson(), gssResponseDbUrl, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+				OT_LOG_E("Failed to get database URL from GSS [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
+			}
+		} while ((ot::ReturnMessage::fromJson(gssResponseDbUrl) != ot::ReturnMessage::Ok || !ok) && ct++ <= maxCt);
+
+		if (!ok) {
+				OT_LOG_E("Failed to get database URL from GSS after " + std::to_string(maxCt) + " attempts. Exiting...");
+				exit(ot::AppExitCode::GeneralError);
+		}
+
+		ot::ReturnMessage dbUrlResponseMsg = ot::ReturnMessage::fromJson(gssResponseDbUrl);
+		if (dbUrlResponseMsg != ot::ReturnMessage::Ok) {
+			OT_LOG_E("Failed to get database URL from GSS: " + dbUrlResponseMsg.getWhat());
+			exit(ot::AppExitCode::GeneralError);
+		}
+
+		ot::JsonDocument dbUrlResponseDoc;
+		dbUrlResponseDoc.fromJson(dbUrlResponseMsg.getWhat());
+		dbUrl = ot::json::getString(dbUrlResponseDoc, OT_ACTION_PARAM_SERVICE_DBURL);
+
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	
+		// Reset attempt counter for further requests to GSS and reset ok for further checks
+		ct = 1;
+		ok = false;
+
 		// Get and set build information
+		std::string gssResponseBuildInformation;
 		ot::JsonDocument buildReqDoc;
 		buildReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, buildReqDoc.GetAllocator()), buildReqDoc.GetAllocator());
 		
-		gssResponse.clear();
-		if(ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, buildReqDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			std::string buildInfoResponseStrGss = gssResponse;
+		do {
+			gssResponseBuildInformation.clear();
+			if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, buildReqDoc.toJson(), gssResponseBuildInformation, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+				OT_LOG_E("Failed to get build information from GSS [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
+			}
+		} while (!ok && ct++ <= maxCt);
 
-			// Get the stored build information from the database
-			std::string storedBuildInformation = db.getBuildInformation(db.getAdminUserName(),ot::UserCredentials::decryptString(adminPassword), dbUrl);
-			if(storedBuildInformation != buildInfoResponseStrGss) {
-				OT_LOG_I("Build information has changed. Updating database...");
-				if(db.setBuildInformation(db.getAdminUserName(), ot::UserCredentials::decryptString(adminPassword), dbUrl, buildInfoResponseStrGss)) {
-					bool updateSuccess = launchModelLibraryUpdate(getServiceURL(), adminPassword);
-					if(updateSuccess) {
-						OT_LOG_I("Model library update completed successfully.");
-					}
-					else {
-						OT_LOG_E("Model library update failed. Please check the logs for more details.");
-					}
-					OT_LOG_I("Build information updated successfully.");
+		if (!ok) {
+			OT_LOG_E("Failed to get build information from GSS after " + std::to_string(maxCt) + " attempts. Exiting...");
+			exit(ot::AppExitCode::GeneralError);
+		}
+
+		if (gssResponseBuildInformation.empty()) {
+			OT_LOG_E("Received empty build information from GSS");
+		}
+		std::string buildInfoResponseStrGss = gssResponseBuildInformation;
+	
+
+		// Get the stored build information from the database
+		std::string storedBuildInformation = db.getBuildInformation(db.getAdminUserName(),ot::UserCredentials::decryptString(adminPassword), dbUrl);
+		if(storedBuildInformation != buildInfoResponseStrGss) {
+			OT_LOG_I("Build information has changed. Updating database...");
+			if(db.setBuildInformation(db.getAdminUserName(), ot::UserCredentials::decryptString(adminPassword), dbUrl, buildInfoResponseStrGss)) {
+				bool updateSuccess = launchModelLibraryUpdate(getServiceURL(), adminPassword);
+				if(updateSuccess) {
+					OT_LOG_I("Model library update completed successfully.");
 				}
 				else {
-					OT_LOG_E("Failed to update build information in the database.");
+					OT_LOG_E("Model library update failed. Please check the logs for more details.");
 				}
 			}
 			else {
-				OT_LOG_I("Build information is up to date. No update needed.");
+				OT_LOG_E("Failed to update build information in the database.");
 			}
 		}
 		else {
-			OT_LOG_E("Failed to send build information request to GSS");
+			OT_LOG_I("Build information is up to date. No update needed.");
 		}
-
 	}
 	catch (std::exception& e) {
 		OT_LOG_E(std::string{"Uncaught exception: "}.append(e.what()));
@@ -161,6 +182,36 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	catch (...) {
 		assert(0);
 		exit(ot::AppExitCode::UnknownError);
+	}
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// Register at GSS
+	std::string gssResponseRegister;
+	ot::JsonDocument gssDocRegister;
+	gssDocRegister.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, gssDocRegister.GetAllocator()), gssDocRegister.GetAllocator());
+	gssDocRegister.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(getServiceURL(), gssDocRegister.GetAllocator()), gssDocRegister.GetAllocator());
+
+
+	do {
+		gssResponseRegister.clear();
+		if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE, gssDocRegister.toJson(), gssResponseRegister, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+			OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
+			using namespace std::chrono_literals;
+			std::this_thread::sleep_for(500ms);
+
+		}
+	} while ((ot::ReturnMessage::fromJson(gssResponseRegister) != ot::ReturnMessage::Ok || !ok) && ct++ <= maxCt);
+
+	if (!ok) {
+		OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attempts. Exiting...");
+		exit(ot::AppExitCode::GSSRegistrationFailed);
+	}
+
+	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(gssResponseRegister);
+	if (rMsg != ot::ReturnMessage::Ok) {
+		OT_LOG_E("Registration failed: " + rMsg.getWhat());
+		exit(ot::AppExitCode::GSSRegistrationFailed);
 	}
 
 	ot::DebugHelper::serviceSetupCompleted(*this);
