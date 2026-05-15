@@ -80,8 +80,8 @@ private:
 	OT_HANDLER(handleLibraryElementRequest, Application, OT_ACTION_CMD_LMS_LibraryElementRequest, ot::SECURE_MESSAGE_TYPES)
 
     // ModelLibraryUpdater functions
-	OT_HANDLER(handleUpdateOrCreateRequest, Application, OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, ot::SECURE_MESSAGE_TYPES)
-	OT_HANDLER(handleAddNewLibraryElement, Application, OT_ACTION_CMD_LMS_AddNewLibraryElement, ot::SECURE_MESSAGE_TYPES)
+	//OT_HANDLER(handleUpdateOrCreateRequest, Application, OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, ot::SECURE_MESSAGE_TYPES)
+	//OT_HANDLER(handleAddNewLibraryElement, Application, OT_ACTION_CMD_LMS_AddNewLibraryElement, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
