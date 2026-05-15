@@ -796,107 +796,107 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 
-std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
+//std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
+//
+//	// Admin credentials for database operations
+//	std::string adminUserName = db.getAdminUserName();
+//	std::string adminPassword;
+//	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
+//		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+//	}
+//	else {
+//		adminPassword = ot::UserCredentials::encryptString("admin");
+//	}
+//
+//	// Hole das Array der LibraryElements
+//	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document,OT_ACTION_PARAM_Config);
+//	
+//	// Deserialisiere jedes Element
+//	std::list<ot::LibraryElement> receivedModels;
+//	for (const ot::ConstJsonObject& elementObj : elementObjects) {
+//		ot::LibraryElement element;
+//		element.setFromJsonObject(elementObj);
+//		receivedModels.push_back(element);
+//	}
+//	
+//	// Ensure database and collections exist
+//	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+//	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+//		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
+//		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
+//	}
+//	else {
+//		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
+//
+//	}
+//
+//	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
+//	updateOrCreateLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
+//
+//	// Create response document with received models
+//	ot::JsonDocument responseDoc;
+//	// Add the models array to response
+//	ot::JsonArray modelsArray;
+//	for (const ot::LibraryElement& model : receivedModels) {
+//		ot::JsonObject modelObj;
+//		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
+//		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
+//	}
+//	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
+//
+//	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
+//}
 
-	// Admin credentials for database operations
-	std::string adminUserName = db.getAdminUserName();
-	std::string adminPassword;
-	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
-		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	}
-	else {
-		adminPassword = ot::UserCredentials::encryptString("admin");
-	}
-
-	// Hole das Array der LibraryElements
-	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document,OT_ACTION_PARAM_Config);
-	
-	// Deserialisiere jedes Element
-	std::list<ot::LibraryElement> receivedModels;
-	for (const ot::ConstJsonObject& elementObj : elementObjects) {
-		ot::LibraryElement element;
-		element.setFromJsonObject(elementObj);
-		receivedModels.push_back(element);
-	}
-	
-	// Ensure database and collections exist
-	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
-		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
-	}
-	else {
-		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
-
-	}
-
-	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-	updateOrCreateLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
-
-	// Create response document with received models
-	ot::JsonDocument responseDoc;
-	// Add the models array to response
-	ot::JsonArray modelsArray;
-	for (const ot::LibraryElement& model : receivedModels) {
-		ot::JsonObject modelObj;
-		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
-		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
-	}
-	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
-}
-
-std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
-	
-	// Admin credentials for database operations
-	std::string adminUserName = db.getAdminUserName();
-	std::string adminPassword;
-	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
-		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-	}
-	else {
-		adminPassword = ot::UserCredentials::encryptString("admin");
-	}
-
-	// Hole das Array der LibraryElements
-	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
-
-	// Deserialisiere jedes Element
-	std::list<ot::LibraryElement> receivedModels;
-	for (const ot::ConstJsonObject& elementObj : elementObjects) {
-		ot::LibraryElement element;
-		element.setFromJsonObject(elementObj);
-		receivedModels.push_back(element);
-	}
-
-	// Ensure database and collections exist
-	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
-		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
-	}
-	else {
-		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
-			
-	}
-	
-	// Add or update library elements
-	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
-
-	// Create response document with updated models
-	ot::JsonDocument responseDoc;
-	ot::JsonArray modelsArray;
-
-	for (const ot::LibraryElement& model : receivedModels) {
-		ot::JsonObject modelObj;
-		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
-		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
-	}
-
-	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
-	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
-}
+//std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
+//	
+//	// Admin credentials for database operations
+//	std::string adminUserName = db.getAdminUserName();
+//	std::string adminPassword;
+//	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
+//		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
+//	}
+//	else {
+//		adminPassword = ot::UserCredentials::encryptString("admin");
+//	}
+//
+//	// Hole das Array der LibraryElements
+//	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
+//
+//	// Deserialisiere jedes Element
+//	std::list<ot::LibraryElement> receivedModels;
+//	for (const ot::ConstJsonObject& elementObj : elementObjects) {
+//		ot::LibraryElement element;
+//		element.setFromJsonObject(elementObj);
+//		receivedModels.push_back(element);
+//	}
+//
+//	// Ensure database and collections exist
+//	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+//	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
+//		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
+//		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
+//	}
+//	else {
+//		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
+//			
+//	}
+//	
+//	// Add or update library elements
+//	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
+//
+//	// Create response document with updated models
+//	ot::JsonDocument responseDoc;
+//	ot::JsonArray modelsArray;
+//
+//	for (const ot::LibraryElement& model : receivedModels) {
+//		ot::JsonObject modelObj;
+//		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
+//		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
+//	}
+//
+//	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
+//	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
+//}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
