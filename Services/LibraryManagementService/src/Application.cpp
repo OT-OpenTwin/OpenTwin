@@ -31,13 +31,16 @@
 #include "OTModelEntities/Lms/LibraryElement.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
 #include "OTSystem/OperatingSystem.h"
-
-
+#include "OTSystem/FileSystem/DirectoryIterator.h"
+#include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
 
 //std header
 #include <chrono>
 #include <thread>
 #include <optional>
+
+// Third party header
+#include <QtCore/qcryptographichash.h>
 
 Application& Application::instance(void) {
 	static Application g_instance;
@@ -100,12 +103,51 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 		db.setSiteID(_siteID);
 
 		// Get DBUrl and AuthUrl from gss response
-
 		ot::JsonDocument gssRespoonseUrls;
 		gssRespoonseUrls.fromJson(rMsg.getWhat());
-
 		std::string dbUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_DBURL);
 		std::string authUrl = ot::json::getString(gssRespoonseUrls, OT_ACTION_PARAM_SERVICE_AUTHURL);
+
+
+		// Admin credentials for database operations
+		std::string adminUserName = db.getAdminUserName();
+		std::string adminPassword = _databasePWD;
+		if (!adminPassword.empty()){
+			adminPassword = std::string(_databasePWD);
+		}
+		else {
+			adminPassword = ot::UserCredentials::encryptString(db.getAdminUserName());
+		}
+
+
+		// Get and set build information
+		ot::JsonDocument buildReqDoc;
+		buildReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, buildReqDoc.GetAllocator()), buildReqDoc.GetAllocator());
+		
+		gssResponse.clear();
+		if(ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE_ONE_WAY_TLS, buildReqDoc.toJson(), gssResponse, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			std::string buildInfoResponseStrGss = gssResponse;
+
+			// Get the stored build information from the database
+			std::string storedBuildInformation = db.getBuildInformation(db.getAdminUserName(),ot::UserCredentials::decryptString(adminPassword), dbUrl);
+			if(storedBuildInformation != buildInfoResponseStrGss) {
+				OT_LOG_I("Build information has changed. Updating database...");
+				if(db.setBuildInformation(db.getAdminUserName(), ot::UserCredentials::decryptString(adminPassword), dbUrl, buildInfoResponseStrGss)) {
+					launchModelLibraryUpdate(getServiceURL(), adminPassword);
+					OT_LOG_I("Build information updated successfully.");
+				}
+				else {
+					OT_LOG_E("Failed to update build information in the database.");
+				}
+			}
+			else {
+				OT_LOG_I("Build information is up to date. No update needed.");
+			}
+		}
+		else {
+			OT_LOG_E("Failed to send build information request to GSS");
+		}
+
 	}
 	catch (std::exception& e) {
 		OT_LOG_E(std::string{"Uncaught exception: "}.append(e.what()));
@@ -118,6 +160,252 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 
 	ot::DebugHelper::serviceSetupCompleted(*this);
 	return ot::AppExitCode::Success;
+}
+
+bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD) {
+	
+	OT_LOG_I("Launching Model Library Updater");
+
+	std::string lmsUrl = _ownURL;
+	std::string databasePassword = _databasePWD;
+	std::string libraryDataPath;
+
+
+#ifdef _DEBUG
+	libraryDataPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "\\LibraryData";
+	OT_LOG_D("Using development LibraryData path: " + libraryDataPath);
+#else
+	libraryDataPath = ot::OperatingSystem::getCurrentExecutableDirectory() + "\\LibraryData";
+#endif
+
+	OT_LOG_D("Determined library data path: " + libraryDataPath);
+	OT_LOG_D("Using LMS URL: " + lmsUrl);
+
+	if(databasePassword.empty()) {
+		OT_LOG_W("No database password provided. Attempting to use empty password for database operations.");
+	}
+	else {
+		OT_LOG_D("Database password provided via command line argument.");
+	}
+
+	if(libraryDataPath.empty()) {
+		OT_LOG_E("Failed to determine library data path. Aborting Model Library Updater launch.");
+		return false;
+	}
+
+	if(lmsUrl.empty()) {
+		OT_LOG_E("Service URL is empty. Aborting Model Library Updater launch.");
+		return false;
+	}
+
+	// Collections to update - can be extended if needed
+	std::list<std::string> collections = { "PythonEnvironments", "PythonScripts" };
+
+	for (auto collectionName : collections) {
+		std::list<ot::LibraryElement> localModels = getLocalModels(libraryDataPath + "\\" + collectionName, collectionName);
+		if (localModels.empty()) {
+			OT_LOG_DS("No local models found in the specified folder: " << libraryDataPath);
+			OT_LOG_DS("Skipping LMS update and creation process for " << collectionName);
+			continue;
+		}
+
+		// Create JSON document for update request
+		ot::JsonDocument checkUpdateDoc;
+		if (!databasePassword.empty()) {
+			checkUpdateDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePassword, checkUpdateDoc.GetAllocator()), checkUpdateDoc.GetAllocator());
+		}
+		checkUpdateDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, checkUpdateDoc.GetAllocator()), checkUpdateDoc.GetAllocator());
+		createJsonDocumentFromLibraryElement(localModels, checkUpdateDoc);
+		localModels.clear();
+		
+		// Use the already available handler to check for updates and create or update library elements in the database (No sending here since the handler is used directly and not via an action)
+		std::string status = handleUpdateOrCreateRequest(checkUpdateDoc);
+		
+		// Deserialize the response to check the status of the update process and add the necessary data to the library elements if needed
+		localModels = createLibraryElementsFromJsonDocument(status);
+		if (localModels.empty()) {
+			OT_LOG_I("No models needed to be updated or created for collection: " + collectionName);
+			continue;
+		}
+		localModels = addDataToLibraryElements(localModels, libraryDataPath + "\\" + collectionName);
+
+		ot::JsonDocument addDoc;
+		if (!databasePassword.empty()) {
+			addDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(databasePassword, addDoc.GetAllocator()), addDoc.GetAllocator());
+		}
+
+		addDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, addDoc.GetAllocator()), addDoc.GetAllocator());
+		createJsonDocumentFromLibraryElement(localModels, addDoc);
+		std::string response = handleAddNewLibraryElement(addDoc);
+		OT_LOG_D("Response after adding new library elements for collection: " + collectionName + " - " + response);
+	}
+	return true;
+}
+
+void Application::createJsonDocumentFromLibraryElement(const std::list<ot::LibraryElement>& _elements, ot::JsonDocument& _doc) {
+	// Pack the list of LibraryElements
+	ot::JsonArray elementsArray;
+	for (const auto& element : _elements) {
+		ot::JsonObject elementObj;
+		element.addToJsonObject(elementObj, _doc.GetAllocator());
+		elementsArray.PushBack(elementObj, _doc.GetAllocator());
+	}
+	_doc.AddMember(OT_ACTION_PARAM_Config, elementsArray, _doc.GetAllocator());
+
+	return;
+}
+
+std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName) {
+	std::list<ot::LibraryElement> localModels;
+	try {
+
+		if (!std::filesystem::exists(_modelFolderPath)) {
+			OT_LOG_E("Model folder path does not exist: " + _modelFolderPath);
+			return {};
+		}
+
+		ot::IgnoreRules ignoreRules;
+		ignoreRules.addRule("*");
+		ignoreRules.addRule("!*.otmeta.json");
+
+		ot::AdvancedDirectoryIterator directoryIterator(_modelFolderPath, ot::DirectoryIterator::Files, ignoreRules);
+
+		// Iterate through all
+		while (directoryIterator.hasNext()) {
+			ot::FileInformation fileInfo = directoryIterator.next();
+			const std::string filePath = fileInfo.getPath().string();
+
+			try {
+				std::ifstream file(filePath);
+				if (!file) {
+					OT_LOG_E("Cannot open file: " + filePath);
+					continue;
+				}
+
+				std::stringstream buffer;
+				buffer << file.rdbuf();
+				std::string content = buffer.str();
+				file.close();
+
+				// Deserialize the content into a LibraryElement
+				ot::LibraryElement element = ot::LibraryElement::fromJson(content);
+				element.setCollectionName(_collectionName);
+				// Fill library element with hash value calculated from content file
+				fillLibraryElementWithHash(element, _modelFolderPath);
+
+				// Add the element to the list of local models
+				localModels.push_back(element);
+
+			}
+			catch (const std::exception& e) {
+				OT_LOG_E("Error processing .otmeta.json file '" + filePath + "': " + std::string(e.what()));
+				continue;
+			}
+		}
+	}
+	catch (const std::exception& e) {
+		OT_LOG_E("Error while reading local models: " + std::string(e.what()));
+		return {};
+	}
+	return localModels;	
+}
+
+void Application::fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath) {
+	// Get content file to calculate hash and set it to LibraryElement
+	std::string contentFileName = _element.getFileName();
+	std::filesystem::path contentFilePath = std::filesystem::path(_modelFolderPath) / contentFileName;
+	if (std::filesystem::exists(contentFilePath)) {
+		try {
+			std::ifstream contentFile(contentFilePath, std::ios::binary);
+			if (!contentFile) {
+				OT_LOG_E("Cannot open content file: " + contentFilePath.string());
+			}
+			else {
+				std::stringstream contentBuffer;
+				contentBuffer << contentFile.rdbuf();
+				std::string fileContent = contentBuffer.str();
+				contentFile.close();
+
+				// Calculate hash from content file and set it to LibraryElement
+				QCryptographicHash hashCalculator(QCryptographicHash::Algorithm::Md5);
+				hashCalculator.addData(QByteArrayView(fileContent.data(), fileContent.size()));
+				std::string hashValue = hashCalculator.result().toHex().toStdString();
+				_element.setHash(hashValue);
+			}
+		}
+		catch (const std::exception& e) {
+			OT_LOG_E("Error reading content file '" + contentFilePath.string() + "': " + std::string(e.what()));
+		}
+	}
+}
+
+std::list<ot::LibraryElement> Application::createLibraryElementsFromJsonDocument(const std::string& _lmsResponse) {
+	std::list<ot::LibraryElement> receivedModels;
+	try {
+		// Parse the LMS response and check if it is successful
+		ot::ReturnMessage returnMessage = ot::ReturnMessage::fromJson(_lmsResponse);
+
+		if (!returnMessage.isOk()) {
+			OT_LOG_E("LMS returned error: " + returnMessage.getWhat());
+			return {};
+		}
+
+		ot::JsonDocument responseDoc;
+		if (responseDoc.fromJson(returnMessage.getWhat().c_str())) {
+
+			// Get the list of library elements from the response JSON
+			std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_Config);
+
+			// Deserialise each library element and add it to the list of received models
+			for (const ot::ConstJsonObject& elementObj : elementObjects) {
+				ot::LibraryElement element;
+				element.setFromJsonObject(elementObj);
+				receivedModels.push_back(element);
+			}
+
+			return receivedModels;
+		}
+		else {
+			OT_LOG_E("Failed to parse LMS response JSON");
+			return {};
+		}
+	}
+	catch (const std::exception& e) {
+		OT_LOG_E("Error deserializing LMS response: " + std::string(e.what()));
+		return {};
+	}
+}
+
+std::list<ot::LibraryElement> Application::addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath) {
+	std::list<ot::LibraryElement> updatedElements = _elements;
+
+	for (ot::LibraryElement& element : updatedElements) {
+		std::string contentFileName = element.getFileName();
+		std::filesystem::path contentFilePath = std::filesystem::path(_modelFolderPath) / contentFileName;
+		if (std::filesystem::exists(contentFilePath)) {
+			try {
+				std::ifstream contentFile(contentFilePath, std::ios::binary);
+				if (!contentFile) {
+					OT_LOG_E("Cannot open content file: " + contentFilePath.string());
+				}
+				else {
+					std::stringstream contentBuffer;
+					contentBuffer << contentFile.rdbuf();
+					std::string fileContent = contentBuffer.str();
+					contentFile.close();
+					// Set the file content to the LibraryElement
+					element.setData(fileContent);
+				}
+			}
+			catch (const std::exception& e) {
+				OT_LOG_E("Error reading content file '" + contentFilePath.string() + "': " + std::string(e.what()));
+			}
+		}
+		else {
+			OT_LOG_E("Content file does not exist: " + contentFilePath.string());
+		}
+	}
+	return updatedElements;
 }
 
 std::string Application::getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
@@ -262,8 +550,10 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 
 			ot::LibraryModel model(name, "", "");
 
+			
+
 			if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {
-				ot::ConstJsonObject metaDataObj = doc["metaData"].GetObject();
+				ot::ConstJsonObject metaDataObj = ot::json::getObject(doc, "metaData");
 
 				for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
 					std::string key = it->name.GetString();
@@ -559,13 +849,7 @@ std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
-		std::string envPassword =ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD");
-		if (!envPassword.empty()) {
-			adminPassword = envPassword;
-		}
-		else {
-			adminPassword = ot::UserCredentials::encryptString("admin");
-		}
+		adminPassword = ot::UserCredentials::encryptString("admin");
 	}
 
 	// Hole das Array der LibraryElements
@@ -616,15 +900,9 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
 	}
 	else {
-		std::string envPassword = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_PWD");
-		if (!envPassword.empty()) {
-			adminPassword = envPassword;
-		}
-		else {
-			adminPassword = ot::UserCredentials::encryptString("admin");
-		}
+		adminPassword = ot::UserCredentials::encryptString("admin");
 	}
-	
+
 	// Hole das Array der LibraryElements
 	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
 
@@ -647,7 +925,6 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 			
 	}
 	
-	
 	// Add or update library elements
 	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
 
@@ -662,7 +939,6 @@ std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document)
 	}
 
 	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
-
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
 }
 

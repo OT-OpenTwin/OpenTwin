@@ -29,8 +29,15 @@
 #include "OTModelEntities/Lms/LibraryElement.h"
 
 // std header
-#include <list>
+//std Header
 #include <string>
+#include <thread>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <list>
 
 class Application : public ot::ServiceBase {
 	OT_DECL_ACTION_HANDLER(Application)
@@ -41,8 +48,17 @@ public:
 
 	// Public functions
 	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL, const char* _databasePWD);
+	
 
 private:
+
+	// Model library update functions
+	bool launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD);
+	void createJsonDocumentFromLibraryElement(const std::list<ot::LibraryElement>& _elements, ot::JsonDocument& _doc);
+	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName);
+	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
+	std::list<ot::LibraryElement> createLibraryElementsFromJsonDocument(const std::string& _lmsResponse);
+	std::list<ot::LibraryElement> addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath);
 
 	std::string getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);

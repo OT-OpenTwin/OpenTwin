@@ -499,35 +499,68 @@ bool MongoWrapper::ensureDatabaseAndCollection(const std::string & _collectionNa
             return false;
         }
 
-        // Try to create the collection by inserting a placeholder document
+        // First, check whether the collection already exists -> do nothing if it does
         try {
-            DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+            if (DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dbName, _collectionName)) {
+                OT_LOG_D("Collection '" + _collectionName + "' already exists in database '" + dbName + "'");
+                return true;
+            }
+        }
+        catch (const std::exception& e) {
+            OT_LOG_W("Failed to check collection existence before creation attempt: " + std::string(e.what()));
+            // continue to attempt creation (fallthrough)
+        }
 
-            // Insert a placeholder document to ensure collection is created
-            auto placeholderDoc = bsoncxx::builder::basic::make_document(
-                kvp("_ensureCollection", true)
-            );
-
-            std::string result = docBase.InsertDocument(placeholderDoc.view(), false);
-
-            if (!result.empty()) {
-                OT_LOG_I("Collection '" + _collectionName + "' successfully created/ensured in database '" + dbName + "'");
-
-                // Delete the placeholder document
-                auto deleteFilter = bsoncxx::builder::basic::make_document(
-                    kvp("_ensureCollection", true)
-                );
-                auto deleteResult = docBase.DeleteDocument(deleteFilter.view());
-
-                if (deleteResult && deleteResult->deleted_count() > 0) {
-                    OT_LOG_D("Placeholder document removed from collection '" + _collectionName + "'");
-                }
-
+        // Try to create the collection using ConnectionAPI::createCollection (preferred)
+        try {
+            if (DataStorageAPI::ConnectionAPI::getInstance().createCollection(dbName, _collectionName)) {
+                OT_LOG_I("Collection '" + _collectionName + "' created in database '" + dbName + "' via createCollection");
                 return true;
             }
             else {
-                OT_LOG_W("Placeholder document insertion returned empty result for collection '" + _collectionName + "'");
-                return true; // Collection likely exists
+                OT_LOG_W("ConnectionAPI::createCollection returned false for collection '" + _collectionName + "'. Will try fallback creation.");
+            }
+        }
+        catch (const std::exception& e) {
+            OT_LOG_W("createCollection threw an exception: " + std::string(e.what()) + " - trying fallback creation method.");
+        }
+
+        // Fallback: attempt to create the collection by inserting a placeholder document,
+        // but only if the collection still does not exist (re-check to avoid races).
+        try {
+            if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dbName, _collectionName)) {
+                DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+                // Insert a placeholder document to ensure collection is created
+                auto placeholderDoc = bsoncxx::builder::basic::make_document(
+                    kvp("_ensureCollection", true)
+                );
+
+                std::string result = docBase.InsertDocument(placeholderDoc.view(), false);
+
+                if (!result.empty()) {
+                    OT_LOG_I("Collection '" + _collectionName + "' successfully created/ensured in database '" + dbName + "' (placeholder insert)");
+
+                    // Delete the placeholder document
+                    auto deleteFilter = bsoncxx::builder::basic::make_document(
+                        kvp("_ensureCollection", true)
+                    );
+                    auto deleteResult = docBase.DeleteDocument(deleteFilter.view());
+
+                    if (deleteResult && deleteResult->deleted_count() > 0) {
+                        OT_LOG_D("Placeholder document removed from collection '" + _collectionName + "'");
+                    }
+
+                    return true;
+                }
+                else {
+                    OT_LOG_W("Placeholder document insertion returned empty result for collection '" + _collectionName + "' - assuming collection exists or insert queued");
+                    return true; // Collection likely exists or insert queued
+                }
+            }
+            else {
+                OT_LOG_D("Collection '" + _collectionName + "' was created by another process during creation attempt");
+                return true;
             }
         }
         catch (const std::exception& e) {
@@ -774,6 +807,119 @@ void MongoWrapper::createIndexesIfNotExist(const std::string& _collectionName) {
     }
     catch (const std::exception& e) {
         OT_LOG_W("Warning: Could not ensure index on LibraryElementID: " + std::string(e.what()));
+    }
+}
+
+std::string MongoWrapper::getBuildInformation(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+    try {
+        // Initialize connection
+        if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+            OT_LOG_E("Failed to initialize database connection for getting build information");
+            return "";
+        }
+
+        // Check if collection exists
+        if (!DataStorageAPI::ConnectionAPI::getInstance().checkCollectionExists(dbName, "BuildInfo")) {
+            OT_LOG_D("BuildInfo collection does not exist yet");
+            return "";
+        }
+
+        DataStorageAPI::DocumentAccessBase docBase(dbName, "BuildInfo");
+
+        // Create filter to find document by Name = "BuildInformation"
+        auto filterBuilder = bsoncxx::builder::basic::document{};
+        filterBuilder.append(kvp("Name", "BuildInformation"));
+
+        // Get the document
+        auto queryResult = docBase.GetDocument(filterBuilder.view(), bsoncxx::document::view{});
+
+        if (!queryResult) {
+            OT_LOG_D("No BuildInformation document found");
+            return "";
+        }
+
+        bsoncxx::document::view documentView = queryResult->view();
+
+        // Extract BuildInfo field
+        if (documentView["BuildInfo"]) {
+            std::string buildInfo = std::string(documentView["BuildInfo"].get_utf8().value);
+            OT_LOG_D("Retrieved BuildInfo for SiteID '" + m_siteID + "': " + buildInfo);
+            return buildInfo;
+        }
+        else {
+            OT_LOG_W("BuildInfo field not found in BuildInformation document");
+            return "";
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error getting build information: " + std::string(e.what()));
+        return "";
+    }
+}
+
+bool MongoWrapper::setBuildInformation(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _buildInfo) {
+    try {
+        // Initialize connection
+        if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+            OT_LOG_E("Failed to initialize database connection for setting build information");
+            return false;
+        }
+
+        // Ensure BuildInfo collection exists
+        if (!ensureDatabaseAndCollection("BuildInfo", _dbUserName, _dbUserPassword, _dbServerUrl)) {
+            OT_LOG_E("Failed to ensure BuildInfo collection exists");
+            return false;
+        }
+
+        DataStorageAPI::DocumentAccessBase docBase(dbName, "BuildInfo");
+
+        // Create filter to find document by Name = "BuildInformation"
+        auto filterBuilder = bsoncxx::builder::basic::document{};
+        filterBuilder.append(kvp("Name", "BuildInformation"));
+
+        // Check if document already exists
+        auto existingDoc = docBase.GetDocument(filterBuilder.view(), bsoncxx::document::view{});
+
+        // Build update document
+        auto updateBuilder = bsoncxx::builder::basic::document{};
+        updateBuilder.append(kvp("Name", "BuildInformation"));
+        updateBuilder.append(kvp("BuildInfo", _buildInfo));
+
+        auto collection = docBase.getCollection();
+
+        if (existingDoc) {
+            // Document exists: update it
+            auto updateOp = bsoncxx::builder::basic::document{};
+            updateOp.append(kvp("$set", updateBuilder.view()));
+
+            auto result = collection.update_one(filterBuilder.view(), updateOp.view());
+
+            if (result && result->modified_count() > 0) {
+                OT_LOG_I("Updated BuildInformation document with BuildInfo: " + _buildInfo);
+                return true;
+            }
+            else {
+                OT_LOG_W("BuildInformation update completed but no documents were modified");
+                return true;
+            }
+        }
+        else {
+            // Document doesn't exist: insert new one
+            std::string result = docBase.InsertDocument(updateBuilder.view(), false);
+
+            if (!result.empty()) {
+                OT_LOG_I("Created new BuildInformation document with BuildInfo: " + _buildInfo);
+                return true;
+            }
+            else {
+                OT_LOG_W("BuildInformation insertion returned empty result");
+                return false;
+            }
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error setting build information: " + std::string(e.what()));
+        return false;
     }
 }
 

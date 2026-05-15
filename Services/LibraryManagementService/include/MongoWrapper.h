@@ -76,6 +76,9 @@ public:
 	void setSiteID(const std::string& _siteID) { m_siteID = _siteID; }
 	const std::string& getSiteID() const { return m_siteID; }
 
+	// Get buildInformation
+	std::string getBuildInformation(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	bool setBuildInformation(const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _buildInfo);
 private:
 	// Database connection and validation
 	std::string getMongoURL(std::string _databaseURL, std::string _dbUserName, std::string _dbPassword);
