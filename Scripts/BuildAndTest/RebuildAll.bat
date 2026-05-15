@@ -437,11 +437,6 @@ ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\build.bat" %1 %2
 
 ECHO ===============================================================
-ECHO Build Executable: ModelLibraryUpdater
-ECHO ===============================================================
-CALL "%OPENTWIN_DEV_ROOT%\Tools\ModelLibraryUpdater\build.bat" %1 %2
-
-ECHO ===============================================================
 ECHO Build Executable: FileHeaderUpdater
 ECHO ===============================================================
 CALL "%OT_FILEHEADERUPDATER_ROOT%\build.bat" %1 %2
