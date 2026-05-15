@@ -248,19 +248,6 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 	return true;
 }
 
-void Application::createJsonDocumentFromLibraryElement(const std::list<ot::LibraryElement>& _elements, ot::JsonDocument& _doc) {
-	// Pack the list of LibraryElements
-	ot::JsonArray elementsArray;
-	for (const auto& element : _elements) {
-		ot::JsonObject elementObj;
-		element.addToJsonObject(elementObj, _doc.GetAllocator());
-		elementsArray.PushBack(elementObj, _doc.GetAllocator());
-	}
-	_doc.AddMember(OT_ACTION_PARAM_Config, elementsArray, _doc.GetAllocator());
-
-	return;
-}
-
 std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName) {
 	std::list<ot::LibraryElement> localModels;
 	try {
@@ -342,43 +329,6 @@ void Application::fillLibraryElementWithHash(ot::LibraryElement& _element, const
 		catch (const std::exception& e) {
 			OT_LOG_E("Error reading content file '" + contentFilePath.string() + "': " + std::string(e.what()));
 		}
-	}
-}
-
-std::list<ot::LibraryElement> Application::createLibraryElementsFromJsonDocument(const std::string& _lmsResponse) {
-	std::list<ot::LibraryElement> receivedModels;
-	try {
-		// Parse the LMS response and check if it is successful
-		ot::ReturnMessage returnMessage = ot::ReturnMessage::fromJson(_lmsResponse);
-
-		if (!returnMessage.isOk()) {
-			OT_LOG_E("LMS returned error: " + returnMessage.getWhat());
-			return {};
-		}
-
-		ot::JsonDocument responseDoc;
-		if (responseDoc.fromJson(returnMessage.getWhat().c_str())) {
-
-			// Get the list of library elements from the response JSON
-			std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_Config);
-
-			// Deserialise each library element and add it to the list of received models
-			for (const ot::ConstJsonObject& elementObj : elementObjects) {
-				ot::LibraryElement element;
-				element.setFromJsonObject(elementObj);
-				receivedModels.push_back(element);
-			}
-
-			return receivedModels;
-		}
-		else {
-			OT_LOG_E("Failed to parse LMS response JSON");
-			return {};
-		}
-	}
-	catch (const std::exception& e) {
-		OT_LOG_E("Error deserializing LMS response: " + std::string(e.what()));
-		return {};
 	}
 }
 
