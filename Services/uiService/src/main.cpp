@@ -24,6 +24,7 @@
 
 // OT header
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
@@ -98,13 +99,13 @@ void operator delete[](void* ptr, std::size_t) noexcept {
 
 void initializeLogging(void) {
 	// Get logging URL
-	QByteArray loggingenv = qgetenv("OPEN_TWIN_LOGGING_URL");
+	std::string loggingenv = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL");
 
 	// Initialize logging
 	#ifdef OT_RELEASE_DEBUG
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), true);
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv, true);
 	#else
-		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv.toStdString(), false);
+		ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_UI, loggingenv, false);
 	#endif
 
 	#if OT_UI_USE_CUSTOM_DELETE == true
@@ -155,7 +156,7 @@ bool initializeOpenGL(bool checkGraphics) {
 
 		if (!std::filesystem::exists(sourceFile)) 
 		{
-			std::string dev_root = qgetenv("OPENTWIN_DEV_ROOT").constData();
+			std::string dev_root = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 
 			if (dev_root.empty())
 			{
@@ -195,13 +196,13 @@ bool initializeAssets() {
 	int graphicsPathCounter = 0;
 
 #ifdef _DEBUG
-	if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+	if (ot::IconManager::addSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 		iconPathCounter++;
 	}
-	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
+	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
 		stylePathCounter++;
 	}
-	if (ot::GraphicsItemLoader::instance().addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/GraphicsItems/"))) {
+	if (ot::GraphicsItemLoader::instance().addSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/GraphicsItems/"))) {
 		graphicsPathCounter++;
 	}
 #else

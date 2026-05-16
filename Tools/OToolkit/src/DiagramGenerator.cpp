@@ -25,6 +25,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTGui/Graphics/GraphicsLineItemCfg.h"
 #include "OTGui/Graphics/GraphicsTextItemCfg.h"
@@ -129,7 +130,7 @@ bool DiagramGenerator::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 void DiagramGenerator::restoreToolSettings(QSettings& _settings) {
 	QString pth = _settings.value("DiagramGenerator.RootPath", "").toString();
 	if (pth.isEmpty()) {
-		pth = qgetenv("OPENTWIN_DEV_ROOT");
+		pth = QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT"));
 	}
 	m_rootPathEdit->setPath(pth);
 

@@ -31,7 +31,4 @@ public:
 	static bool checkFileOrDirExists(const std::string &path);
 	static bool deleteDirectory(const std::string &pathName);
 
-private:
-	static std::string readEnvironmentVariable(const std::string &variableName);
-
 };

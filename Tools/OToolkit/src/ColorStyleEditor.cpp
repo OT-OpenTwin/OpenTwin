@@ -24,6 +24,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
@@ -165,9 +166,9 @@ bool ColorStyleEditor::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content
 		auto settings = otoolkit::api::getGlobalInterface()->createSettingsInstance();
 		m_lastBaseFile = settings.get()->value("ColorStlyeEditor.LastBaseExport", QString()).toString();
 		if (m_lastBaseFile.isEmpty()) {
-			QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
-			if (!arr.isEmpty()) {
-				m_lastBaseFile = QString::fromStdString(arr.toStdString()) + "/Tools/OToolkit/data/StyleSheetBase.otssb";
+			std::string devRootEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+			if (!devRootEnv.empty()) {
+				m_lastBaseFile = QString::fromStdString(devRootEnv) + "/Tools/OToolkit/data/StyleSheetBase.otssb";
 			}
 			else {
 				this->selectStyleSheetBase();

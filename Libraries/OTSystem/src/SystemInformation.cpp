@@ -155,12 +155,7 @@ std::string ot::SystemInformation::getBuildInformation()
 	if (!std::filesystem::exists(fileName))
 	{
 		// Get the development root environment variable and build the path to the deployment cert file
-		char buffer[4096];
-		size_t environmentVariableValueStringLength;
-
-		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
-
-		std::string dev_root(buffer);
+		std::string dev_root = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 		fileName = dev_root + "\\Deployment\\BuildInfo.txt";
 	}
 

@@ -5,6 +5,7 @@
 #include "ProjectHelperBatchHelper.h"
 #include "ProjectHelperBatchHelperCustomItem.h"
 #include "ProjectHelperBatchHelperProjectItem.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/PushButton.h"
@@ -80,7 +81,7 @@ QString ProjectHelperBatchHelper::getRootPath() const {
 void ProjectHelperBatchHelper::restoreState(QSettings& _settings) {
 	QString batchPth = _settings.value("ProjectHelper.BatchHelper.RootPath", "").toString();
 	if (batchPth.isEmpty()) {
-		batchPth = qgetenv("OPENTWIN_DEV_ROOT");
+		batchPth = QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT"));
 	}
 	setRootPath(batchPth);
 	refreshData();

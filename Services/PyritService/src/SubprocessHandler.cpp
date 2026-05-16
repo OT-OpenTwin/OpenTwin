@@ -82,12 +82,9 @@ bool SubprocessHandler::ensureSubprocessRunning(const std::string& _serverName) 
 
 std::string SubprocessHandler::findSubprocessPath(void) const {
 #ifdef _DEBUG
-	const char* otRootFolder = ot::OperatingSystem::getEnvironmentVariable("OPENTWIN_DEV_ROOT");
-	if (otRootFolder) {
-		std::string result = std::string(otRootFolder) + "\\Deployment\\";
-		delete[] otRootFolder;
-		otRootFolder = nullptr;
-		return result;
+	std::string otRootFolder = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	if (!otRootFolder.empty()) {
+		return otRootFolder + "\\Deployment\\";
 	}
 	else {
 		OT_LOG_E("OPENTWIN_DEV_ROOT environment not set");

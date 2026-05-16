@@ -54,7 +54,6 @@ private:
 	std::string readOutputFile(const std::string &fileName);
 	std::string getUniqueTempDir(void);
 	std::string getSystemTempDir(void);
-	std::string readEnvironmentVariable(const std::string &variableName);
 	bool checkFileOrDirExists(const std::string &path);
 	bool deleteDirectory(const std::string &pathName);
 	void readMeshItemInfo(ot::UID meshDataID, std::map<ot::UID, ot::EntityInformation>& meshItemInfo);

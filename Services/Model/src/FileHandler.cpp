@@ -18,31 +18,42 @@
 // @otlicense-end
 
 #include "stdafx.h"
+
+// Service header
 #include "Model.h"
 #include "FileHandler.h"
 #include "Application.h"
-#include "OTModelEntities/DataBase.h"
-#include "OTModelEntities/EntityFileCSV.h"
-#include "OTModelEntities/EntityFileText.h"
+#include "QueuingHttpRequestsRAII.h"
+#include "QueuingDatabaseWritingRAII.h"
+
+// OpenTwin header
+#include "OTSystem/OperatingSystem.h"
+
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/EncodingGuesser.h"
+#include "OTCore/Python/PyhonParameterBuilderValueComparisons.h"
+
 #include "OTCommunication/ActionTypes.h"
+
 #include "OTServiceFoundation/Encryption.h"
 #include "OTServiceFoundation/ModelComponent.h"
-#include "QueuingHttpRequestsRAII.h"
-#include "QueuingDatabaseWritingRAII.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include "OTServiceFoundation/Python/PythonServiceInterface.h"
+
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
-#include <assert.h>
-#include "OTModelEntities/IEventHandler.h"
-#include "OTServiceFoundation/Python/PythonServiceInterface.h"
-#include "OTCore/Python/PyhonParameterBuilderValueComparisons.h"
-#include "OTModelEntities/EntityPythonManifest.h"
-#include <filesystem>
 
+#include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/EntityFileCSV.h"
+#include "OTModelEntities/EntityFileText.h"
+#include "OTModelEntities/IEventHandler.h"
+#include "OTModelEntities/EntityPythonManifest.h"
+
+// std header
+#include <assert.h>
+#include <filesystem>
 
 FileHandler::FileHandler() {
 	const std::string pageName = Application::getToolBarPageName();
@@ -72,7 +83,8 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 
 	_uiComponent->addMenuButton(m_buttonPythonImport);
 	_uiComponent->addMenuButton(m_buttonFileImport);
-	if (!std::string(getenv("OPENTWIN_DEV_ROOT")).empty()) {
+
+	if (!ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT").empty()) {
 		_uiComponent->addMenuButton(m_buttonExportFileToLibrary);
 	}
 }
@@ -749,14 +761,13 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 }
 
 std::string FileHandler::getLibraryDataPath() const {
-	const char* devRoot = std::getenv("OPENTWIN_DEV_ROOT");
+	std::string path = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 
-	if (devRoot == nullptr) {
-		return "";
+	if (!path.empty())
+	{
+		path += "/LibraryData";
 	}
 
-	std::string path(devRoot);
-	path += "/LibraryData";
 	return path;
 }
 

@@ -42,64 +42,77 @@ namespace ot {
 }
 #endif
 
-ot::LogDispatcher& ot::LogDispatcher::instance(void) {
+ot::LogDispatcher& ot::LogDispatcher::instance(void)
+{
 	static LogDispatcher g_instance;
 	return g_instance;
 }
 
-ot::LogDispatcher& ot::LogDispatcher::initialize(const std::string& _serviceName, bool _addCoutReceiver) {
+ot::LogDispatcher& ot::LogDispatcher::initialize(const std::string& _serviceName, bool _addCoutReceiver)
+{
 	ot::LogDispatcher& dispatcher = ot::LogDispatcher::instance();
 
 	// Setup name
-	if (!_serviceName.empty()) {
+	if (!_serviceName.empty())
+	{
 		dispatcher.setServiceName(_serviceName);
 	}
 
 	// Add cout notifier if need
-	if (_addCoutReceiver) {
+	if (_addCoutReceiver)
+	{
 		dispatcher.addReceiver(new LogNotifierStdCout);
 	}
 
 	// Add file notifier if needed
-	if (String::toLower(OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_FILE_LOGGING")) == "true") {
+	if (String::toLower(OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_FILE_LOGGING")) == "true")
+	{
 		dispatcher.addFileWriter();
 	}
 
 	return dispatcher;
 }
 
-void ot::LogDispatcher::addFileWriter(void) {
+void ot::LogDispatcher::addFileWriter(void)
+{
 	LogDispatcher& dispatcher = LogDispatcher::instance();
 	dispatcher.addReceiver(new LogNotifierFileWriter(dispatcher.m_serviceName + ".otlog"));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::LogDispatcher::addReceiver(AbstractLogNotifier* _receiver) {
+void ot::LogDispatcher::addReceiver(AbstractLogNotifier* _receiver)
+{
 	m_messageReceiver.push_back(_receiver);
 }
 
-void ot::LogDispatcher::forgetReceiver(AbstractLogNotifier* _receiver) {
+void ot::LogDispatcher::forgetReceiver(AbstractLogNotifier* _receiver)
+{
 	auto it = std::find(m_messageReceiver.begin(), m_messageReceiver.end(), _receiver);
-	if (it != m_messageReceiver.end()) {
+	if (it != m_messageReceiver.end())
+	{
 		m_messageReceiver.erase(it);
 	}
 }
 
-void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _functionName, const LogFlags& _logFlags) {
+void ot::LogDispatcher::dispatch(const std::string& _text, const std::string& _functionName, const LogFlags& _logFlags)
+{
 	this->dispatch(LogMessage(m_serviceName, _functionName, _text, _logFlags));
 }
 
-void ot::LogDispatcher::dispatch(const LogMessage& _message) {
+void ot::LogDispatcher::dispatch(const LogMessage& _message)
+{
 #if OT_LOGGER_USE_MUTEX==true
-	if (!intern::g_logInitialized) {
+	if (!intern::g_logInitialized)
+	{
 		intern::g_logInitialized = true;
 		OT_LOG_W("Mutex in use for LogDispatcher!");
 	}
 	std::lock_guard<std::mutex> lock(intern::g_logMutex);
 #endif
 
-	if ((_message.getFlags() & m_logFlags) != _message.getFlags()) {
+	if ((_message.getFlags() & m_logFlags) != _message.getFlags())
+	{
 		return;
 	}
 
@@ -109,11 +122,14 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message) {
 	msg.setUserName(m_userName);
 	msg.setProjectName(m_projectName);
 
-	for (AbstractLogNotifier* r : m_messageReceiver) {
-		try {
+	for (AbstractLogNotifier* r : m_messageReceiver)
+	{
+		try
+		{
 			r->log(msg);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OTAssert(0, "Error occured while dispatching log message");
 		}
 	}
@@ -166,7 +182,8 @@ void ot::LogDispatcher::dispatchUserLog(const LogMessageStream& _messageStream)
 	this->dispatchUserLog(msg);
 }
 
-void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
+void ot::LogDispatcher::applyEnvFlag(const std::string& _str)
+{
 	if (_str == "INFORMATION_LOG") m_logFlags |= ot::INFORMATION_LOG;
 	else if (_str == "DETAILED_LOG") m_logFlags |= ot::DETAILED_LOG;
 	else if (_str == "WARNING_LOG") m_logFlags |= ot::WARNING_LOG;
@@ -182,7 +199,8 @@ void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
 	else if (_str == "ALL_MESSAGE_LOG_FLAGS") m_logFlags |= ot::ALL_MESSAGE_LOG_FLAGS;
 	else if (_str == "ALL_LOG_FLAGS") m_logFlags |= ot::ALL_LOG_FLAGS;
 	else if (_str == "NO_LOG") {}
-	else {
+	else
+	{
 		OTAssert(0, "Unknown log flag");
 	}
 }
@@ -190,36 +208,52 @@ void ot::LogDispatcher::applyEnvFlag(const std::string& _str) {
 ot::LogDispatcher::LogDispatcher() : m_serviceName("NO SERVICE NAME PROVIDED"), m_logFlags(NO_LOG)
 {
 	// Get env
-	char buffer[4096];
-	size_t bufferLen;
-	getenv_s(&bufferLen, buffer, sizeof(buffer) - 1, "OPEN_TWIN_LOGGING_MODE");
-	std::string type(buffer);
+	std::string type = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_MODE");
 
-	while (type.length() > 0 && type.at(0) == '\"') type.erase(type.begin());
-	while (type.length() > 0 && type.at(type.length() - 1) == '\"') type.erase(type.begin() + (type.length() - 1));
+	while (type.length() > 0 && type.at(0) == '\"')
+	{
+		type.erase(type.begin());
+	}
 
-	if (!type.empty()) {
+	while (type.length() > 0 && type.at(type.length() - 1) == '\"')
+	{
+		type.erase(type.begin() + (type.length() - 1));
+	}
+
+	if (!type.empty())
+	{
 		// Split
 		auto ix = type.find('|');
-		while (ix != std::string::npos) {
+		while (ix != std::string::npos)
+		{
 			std::string sub = type.substr(0, ix);
 			type = type.substr(ix + 1);
 			ix = type.find('|');
 
-			if (!sub.empty()) applyEnvFlag(sub);
+			if (!sub.empty())
+			{
+				applyEnvFlag(sub);
+			}
 		}
 
 		// Last entry
-		if (!type.empty()) applyEnvFlag(type);
+		if (!type.empty())
+		{
+			applyEnvFlag(type);
+		}
 	}
-	else {
+	else
+	{
 		m_logFlags = WARNING_LOG | ERROR_LOG;
 	}
 }
 
-ot::LogDispatcher::~LogDispatcher() {
-	for (auto r : m_messageReceiver) {
-		if (!r->getCustomDeleteLogNotifier()) {
+ot::LogDispatcher::~LogDispatcher()
+{
+	for (auto r : m_messageReceiver)
+	{
+		if (!r->getCustomDeleteLogNotifier())
+		{
 			delete r;
 		}
 	}

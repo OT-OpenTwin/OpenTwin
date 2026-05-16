@@ -52,10 +52,11 @@
 #include "akWidgets/aTreeWidget.h"
 
 // OpenTwin header
+#include "OTSystem/Flags.h"
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
+#include "OTSystem/OperatingSystem.h"
 
-#include "OTSystem/Flags.h"
 #include "OTCore/String.h"
 #include "OTCore/Geometry/Point2D.h"
 #include "OTCore/RuntimeTests.h"
@@ -1145,7 +1146,7 @@ void AppBase::createUi() {
 			fontPath.append("/fonts/Vera.ttf");
 			if (!QFile::exists(fontPath))
 			{
-				fontPath = qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Fonts/Vera.ttf";
+				fontPath = QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT")) + "/Assets/Fonts/Vera.ttf";
 				if (!QFile::exists(fontPath)) {
 					OT_LOG_E("Font does not exist: " + fontPath.toStdString());
 

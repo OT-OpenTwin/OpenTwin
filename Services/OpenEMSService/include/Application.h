@@ -84,7 +84,6 @@ private:
 	EntityMeshCartesian* updateAndLoadMeshEntity(const std::string& meshName, std::list<ot::EntityInformation>& meshInfo);
 	std::string getUniqueTempDir(void);
 	std::string getSystemTempDir(void);
-	std::string readEnvironmentVariable(const std::string& variableName);
 	bool checkFileOrDirExists(const std::string& path);
 	bool deleteDirectory(const std::string& pathName);
 	std::string getOpenEMSDir();

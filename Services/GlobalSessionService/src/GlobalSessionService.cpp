@@ -26,6 +26,7 @@
 #include "GlobalSessionService.h"
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTSystem/SystemInformation.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
@@ -963,11 +964,7 @@ void GlobalSessionService::loadFrontendInstallerFile() {
 		OT_LOG_D("Could not find installer relative to current path. Trying environment... Tested path: \"" + relPath + "\"");
 
 		// Get the development root environment variable and build the path to the deployment cert file
-		char buffer[4096];
-		size_t environmentVariableValueStringLength;
-		getenv_s(&environmentVariableValueStringLength, buffer, sizeof(buffer) - 1, "OPENTWIN_DEV_ROOT");
-
-		std::string devPath(buffer);
+		std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 		devPath.append("\\Deployment\\FrontendInstaller\\Install_OpenTwin_Frontend.exe");
 
 		if (std::filesystem::exists(devPath)) {

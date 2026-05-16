@@ -22,6 +22,7 @@
 #include "SDSLSSEntry.h"
 #include "ServiceDebugSwitch.h"
 #include "OToolkitAPI/OToolkitAPI.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -80,10 +81,10 @@ bool ServiceDebugSwitch::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _conte
 void ServiceDebugSwitch::restoreToolSettings(QSettings& _settings) {
 	QString gssUrl = _settings.value("ServiceDebugSwitch.GSSUrl", "").toString();
 	if (gssUrl.isEmpty()) {
-		QByteArray envServicesUrl = qgetenv("OPEN_TWIN_SERVICES_ADDRESS");
-		QByteArray envGssPort = qgetenv("OPEN_TWIN_GSS_PORT");
-		if (!envServicesUrl.isEmpty() && !envGssPort.isEmpty()) {
-			gssUrl = QString::fromUtf8(envServicesUrl) + ":" + QString::fromUtf8(envGssPort);
+		std::string envServicesUrl = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_SERVICES_ADDRESS");
+		std::string envGssPort = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_GSS_PORT");
+		if (!envServicesUrl.empty() && !envGssPort.empty()) {
+			gssUrl = QString::fromStdString(envServicesUrl) + ":" + QString::fromStdString(envGssPort);
 		}
 	}
 

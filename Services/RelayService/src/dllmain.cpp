@@ -22,6 +22,7 @@
 
 // Open Twin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/JSON/JSON.h"					// rapidjson wrapper
 #include "OTCore/DebugHelper.h"
 #include "OTCore/Logging/Logger.h"				// Logger
@@ -111,7 +112,7 @@ extern "C"
 	_declspec(dllexport) int init(const char * _ownUrl, const char * _websocketUrl, const char * _unused1, const char * _unused2)
 	{
 		try {
-			std::string logUrl = qgetenv("OPEN_TWIN_LOGGING_URL").toStdString();
+			std::string logUrl = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL");
 
 #if defined(_DEBUG) || defined(OT_RELEASE_DEBUG)
 			ot::ServiceLogNotifier::initialize(OT_INFO_SERVICE_TYPE_RelayService, logUrl, true);

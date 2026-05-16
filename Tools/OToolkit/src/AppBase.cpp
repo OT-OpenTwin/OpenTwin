@@ -46,6 +46,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/RAII/ValueRAII.h"
 #include "OTCore/String.h"
@@ -328,8 +329,8 @@ void AppBase::slotInitializeTools(void) {
 	m_toolManager->addTool(new Terminal);
 	m_toolManager->addTool(new TypeHelper);
 
-	QByteArray arr = qgetenv("OPENTWIN_DEV_ROOT");
-	if (!arr.isEmpty()) {
+	std::string devRootEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	if (!devRootEnv.empty()) {
 		m_toolManager->addTool(new WidgetTest);
 	}
 

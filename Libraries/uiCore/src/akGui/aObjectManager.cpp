@@ -49,20 +49,6 @@
 #define SETTING_VERSION_APPLICATION "Version-Application"
 #define CONFIG_VERSION_WINDOWSTATE "2.0"
 
-#ifdef _DEBUG
-#define DEBUG_OUT(__message)											\
-			if (getenv("UICORE_API_DEBUG") != nullptr)					\
-			{															\
-				if (getenv("UICORE_API_DEBUG")[0] == '1') {				\
-						OutputDebugStringA(__message);					\
-				}														\
-			}															
-#else
-#define DEBUG_OUT(__message)
-#endif // _DEBUG
-
-
-
 ak::aObjectManager::aObjectManager(
 	aMessenger *										_messenger,
 	aUidManager *									_uidManager
@@ -400,13 +386,6 @@ void ak::aObjectManager::destroy(
 			}
 		}
 
-#ifdef _DEBUG
-		std::string _debugMessage{ "[UICORE] [DEBUG] [OBJECT MANAGER]: Object destroyed (UID:" };
-		_debugMessage.append(std::to_string(_objectUID)).append("; Type: ");
-		_debugMessage.append(toQString(m_mapObjects.find(_objectUID)->second->type()).toStdString()).append(")\n");
-		DEBUG_OUT(_debugMessage.c_str());
-#endif // _DEBUG
-
 		m_mapOwners.erase(_objectUID);
 		m_mapObjects.erase(_objectUID);
 
@@ -473,17 +452,6 @@ void ak::aObjectManager::setObjectUniqueName(
 	if (!_uniqueName.isEmpty()) {
 		m_mapUniqueNames.insert_or_assign(_uniqueName, actualObject);
 	}
-
-#ifdef _DEBUG
-	{
-		std::string _debugMessage{ "[UICORE] [DEBUG] [OBJECT MANAGER]: Object unique name set (Name:" };
-		_debugMessage.append(_uniqueName.toStdString());
-		_debugMessage.append("; UID: ");
-		_debugMessage.append(std::to_string(actualObject->uid()));
-		_debugMessage.append(")\n");
-		DEBUG_OUT(_debugMessage.c_str());
-	}
-#endif // _DEBUG
 }
 
 /*
@@ -554,13 +522,6 @@ void ak::aObjectManager::addCreatedUid(
 	// Store owner information
 	assert(m_mapOwners.find(_createdUid) == m_mapOwners.end());	// Created UID already stored
 	m_mapOwners.insert_or_assign(_createdUid, _creatorUid);
-
-#ifdef _DEBUG
-	std::string _debugMessage{ "[UICORE] [DEBUG] [OBJECT MANAGER]: Object created (UID:" };
-	_debugMessage.append(std::to_string(_createdUid)).append("; Type: ");
-	_debugMessage.append(toQString(m_mapObjects.find(_createdUid)->second->type()).toStdString()).append(")\n");
-	DEBUG_OUT(_debugMessage.c_str());
-#endif // _DEBUG
 }
 
 QWidget * ak::aObjectManager::castToWidget(

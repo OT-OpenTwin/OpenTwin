@@ -108,19 +108,6 @@ size_t writeFunction(void *ptr, size_t size, size_t nmemb, std::string* data) {
 	return size * nmemb;
 }
 
-std::string get_env_var(std::string const& key)
-{
-	char buffer[4096];
-	size_t environmentVariableValueStringLength;
-
-	getenv_s(&environmentVariableValueStringLength, buffer,
-		sizeof(buffer) - 1, key.c_str());
-
-	return std::string(buffer);
-}
-
-
-
 const std::string ot::msg::getLastError()
 {
 	std::lock_guard<std::mutex> guard(g_errorState);
@@ -217,7 +204,7 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 
 	if (_type == EXECUTE_ONE_WAY_TLS) {
 		if (ca_cert_file.empty()) {
-			ca_cert_file = get_env_var("OPEN_TWIN_CA_CERT");
+			ca_cert_file = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_CA_CERT");
 
 			if (!std::filesystem::exists(ca_cert_file)) {
 				// Get the path of the executable 
@@ -236,7 +223,7 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 				// Check whether local cert file ca.pem exists
 				if (!std::filesystem::exists(ca_cert_file)) {
 					// Get the development root environment variable and build the path to the deployment cert file
-					std::string dev_root = get_env_var("OPENTWIN_DEV_ROOT");
+					std::string dev_root = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 					ca_cert_file = dev_root + "\\Deployment\\Certificates\\ca.pem";
 				}
 			}
@@ -247,9 +234,9 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 	else {
 		// If the environment variables are set, then we perform a call through mTLS
 		if (ca_client_cert.empty() || ca_client_key.empty() || ca_cert_file.empty()) {
-			ca_cert_file = get_env_var("OPEN_TWIN_CA_CERT");
-			ca_client_cert = get_env_var("OPEN_TWIN_SERVER_CERT");
-			ca_client_key = get_env_var("OPEN_TWIN_SERVER_CERT_KEY");
+			ca_cert_file = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_CA_CERT");
+			ca_client_cert = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_SERVER_CERT");
+			ca_client_key = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_SERVER_CERT_KEY");
 		}
 
 		if (ca_client_cert != "" && ca_client_key != "" && ca_cert_file != "") {

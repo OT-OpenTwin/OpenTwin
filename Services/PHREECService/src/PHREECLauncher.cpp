@@ -22,6 +22,7 @@
 #include "PHREECMeshExport.h"
 
 #include "Application.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTModelEntities/DataBase.h"
 
 #include <windows.h> // winapi
@@ -121,22 +122,7 @@ std::string PHREECLauncher::getUniqueTempDir(void)
 
 std::string PHREECLauncher::getSystemTempDir(void)
 {
-	return readEnvironmentVariable("TMP");
-}
-
-std::string PHREECLauncher::readEnvironmentVariable(const std::string &variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char *buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
+	return ot::OperatingSystem::getEnvironmentVariableString("TMP");
 }
 
 bool PHREECLauncher::checkFileOrDirExists(const std::string &path)
@@ -189,7 +175,7 @@ bool PHREECLauncher::deleteDirectory(const std::string &pathName)
 
 std::string PHREECLauncher::runPHREECSolver(const std::string &pmdFileName, const std::string &outputDirectory, const std::string &frequencyHz, const std::string &uiUrl)
 {
-	std::string phreecPath = readEnvironmentVariable("PHREEC_PATH");
+	std::string phreecPath = ot::OperatingSystem::getEnvironmentVariableString("PHREEC_PATH");
 	if (phreecPath.empty()) return "ERROR: Unable to read PHREEC_PATH environment variable";
 
 	std::string commandLine = "\"" + phreecPath + "\\phreec2.bat\"" + " -e \"['R','L']\" -f " + frequencyHz + " -o \"" + outputDirectory + "\" -ui \"" + uiUrl + "\" \"" + pmdFileName+ "\"";

@@ -25,6 +25,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 
 // Open Twin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
@@ -98,10 +99,10 @@ void mainApplicationThread()
 		int iconPathCounter{ 0 };
 		int stylePathCounter{ 0 };
 #ifdef _DEBUG
-		if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+		if (ot::IconManager::addSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 			iconPathCounter++;
 		}
-		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
+		if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
 			stylePathCounter++;
 		}
 #endif // _DEBUG

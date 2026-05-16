@@ -55,7 +55,7 @@ void SolverBase::runSolverExe(const std::string& inputFileName, const std::strin
 {
 	std::string exePath;
 #ifdef _DEBUG
-	exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT") + "\\Deployment";
+	exePath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "\\Deployment";
 #else 
 	exePath = ot::OperatingSystem::getCurrentExecutableDirectory();
 #endif // _DEBUG
@@ -178,19 +178,4 @@ void SolverBase::ReadFromPipe(HANDLE g_hChildStd_OUT_Rd, ot::components::UiCompo
 
 		if (!bSuccess) break;
 	}
-}
-
-std::string SolverBase::readEnvironmentVariable(const std::string& variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char* buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
 }

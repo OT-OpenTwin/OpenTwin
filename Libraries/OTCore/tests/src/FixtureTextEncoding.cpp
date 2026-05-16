@@ -17,14 +17,15 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "OTSystem/OperatingSystem.h"
 #include "FixtureTextEncoding.h"
 #include <fstream>
 
 std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStandard encoding)
 {
-	const char* envVal = std::getenv("OT_CORE_ROOT");
+	std::string envVal = ot::OperatingSystem::getEnvironmentVariableString("OT_CORE_ROOT");
 
-	if (!envVal) {
+	if (envVal.empty()) {
 		throw std::exception("Environment variable OT_CORE_ROOT not set.");
 	}
 

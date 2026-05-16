@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "OTSystem/OperatingSystem.h"
 #include "TmpFileManager.h"
 
 #include <windows.h> // winapi
@@ -26,7 +27,7 @@
 
 std::string TmpFileManager::createTmpDir(void)
 {
-	std::string tempDir = readEnvironmentVariable("TMP");
+	std::string tempDir = ot::OperatingSystem::getEnvironmentVariableString("TMP");
 
 	size_t count = 1;
 	std::string uniqueTempDir;
@@ -52,21 +53,6 @@ bool TmpFileManager::checkFileOrDirExists(const std::string &path)
 		return true;   // This is a directoy
 	else
 		return true;   // This might be a file
-}
-
-std::string TmpFileManager::readEnvironmentVariable(const std::string &variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char *buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
 }
 
 bool TmpFileManager::deleteDirectory(const std::string &pathName)

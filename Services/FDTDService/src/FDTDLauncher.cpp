@@ -20,21 +20,24 @@
 #include "FDTDLauncher.h"
 #include "FDTDConfig.h"
 
-#include "OTModelEntities/DataBase.h"
 #include "Application.h"
 #include "SolverBase.h"
 #include "SolverFDTD.h"
 
+#include "CartesianMeshToSTL.h"
+
+#include "OTSystem/OperatingSystem.h"
+#include "OTCore/Logging/Logger.h"
+
+#include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
+
 #include "OTModelEntities/EntityMeshTet.h"
 #include "OTModelEntities/EntityMeshTetData.h"
 #include "OTModelEntities/EntityBinaryData.h"
-
-#include "CartesianMeshToSTL.h"
-
-#include "OTCore/Logging/Logger.h"
-#include "OTServiceFoundation/ModelComponent.h"
-#include "OTServiceFoundation/UiComponent.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
+
 #include "OTModelAPI/ModelServiceAPI.h"
 
 #include <windows.h> // winapi
@@ -315,22 +318,7 @@ std::string FDTDLauncher::getUniqueTempDir(void)
 
 std::string FDTDLauncher::getSystemTempDir(void)
 {
-	return readEnvironmentVariable("TMP");
-}
-
-std::string FDTDLauncher::readEnvironmentVariable(const std::string &variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char *buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
+	return ot::OperatingSystem::getEnvironmentVariableString("TMP");
 }
 
 bool FDTDLauncher::checkFileOrDirExists(const std::string &path)

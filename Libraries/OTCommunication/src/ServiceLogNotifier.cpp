@@ -20,6 +20,7 @@
 //#define _CRT_SECURE_NO_WARNINGS
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/ServiceBase.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCommunication/Msg.h"
@@ -110,11 +111,7 @@ void ot::ServiceLogNotifier::log(const LogMessage& _message) {
 ot::ServiceLogNotifier::ServiceLogNotifier()
 {
 	this->setCustomDeleteLogNotifier(true);
-
-	char buffer[128];
-	size_t bufferLen;
-	getenv_s(&bufferLen, buffer, sizeof(buffer) - 1, "OPEN_TWIN_LOGGING_URL");
-	this->setLoggingServiceURL(std::string(buffer));
+	this->setLoggingServiceURL(ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL"));
 }
 
 ot::ServiceLogNotifier::~ServiceLogNotifier() {

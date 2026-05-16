@@ -17,11 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
+#include "OTSystem/OperatingSystem.h"
 #include <gtest/gtest.h>
 
 int main(int argc, char** argv) {
-	char* allDLLPaths = std::getenv("OT_ALL_DLLD");
-	char* Path = std::getenv("PATH");
+	//std::string allDLLPaths = ot::OperatingSystem::getEnvironmentVariableString("OT_ALL_DLLD");
+	//std::string path = ot::OperatingSystem::getEnvironmentVariableString("PATH");
 
 	testing::InitGoogleTest(&argc, argv);
 	return RUN_ALL_TESTS();

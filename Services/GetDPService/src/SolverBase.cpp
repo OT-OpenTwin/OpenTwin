@@ -19,6 +19,7 @@
 
 #include "SolverBase.h"
 
+#include "OTSystem/OperatingSystem.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 #include <windows.h> // winapi
@@ -52,7 +53,7 @@ bool SolverBase::isPECMaterial(const std::string& materialName)
 
 void SolverBase::runSolverExe(const std::string& inputFileName, const std::string& solvTarget, const std::string& postTarget, const std::string& workingDirectory, ot::components::UiComponent* uiComponent)
 {
-	std::string exePath = readEnvironmentVariable("OPENTWIN_DEV_ROOT");
+	std::string exePath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 	if (exePath.empty())
 	{
 		// Get the path of the executable
@@ -286,19 +287,4 @@ void SolverBase::updateSolverLogAndProgress(const std::string &text, ot::compone
 
 	uiComponent->displayMessage(output.str());
 	solverOutput << output.str();
-}
-
-std::string SolverBase::readEnvironmentVariable(const std::string& variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char* buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
 }

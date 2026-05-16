@@ -48,6 +48,9 @@ namespace ot {
 
 		//! @brief Environment entry.
 		enum EnvironemntEntry {
+			EnvDevRoot,                       //! @brief OpenTwin development root directory.
+			EnvLoggingUrl,                    //! @brief OpenTwin Logging URL.
+			EnvLoggingMode,                   //! @brief OpenTwin Logging Mode.
 			EnvAdminPort,                     //! @brief Admin Panel port.
 			EnvAuthPort,                      //! @brief Authorization Service (Auth) port.
 			EnvCertPath,                      //! @brief Certificate path.
@@ -64,6 +67,9 @@ namespace ot {
 		//! @brief Environment data.
 		struct EnvData {
 			bool dataSet;                     //! @brief True if data is set (i.e. information was gathered).
+			std::string devRoot;              //! @brief OpenTwin development root directory.
+			std::string loggingUrl;           //! @brief OpenTwin Logging URL.
+			std::string loggingMode;          //! @brief OpenTwin Logging Mode.
 			std::string adminPort;            //! @brief Admin Panel port.
 			std::string authorizationPort;    //! @brief Authorization Service (Auth) port.
 			std::string certificatePath;      //! @brief Certificate path.

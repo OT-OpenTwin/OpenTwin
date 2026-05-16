@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTSystem/OTAssert.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 
@@ -74,10 +75,10 @@ bool otoolkit::api::initialize(APIInterface* _interface) {
 	int iconPathCounter{ 0 };
 	int stylePathCounter{ 0 };
 #ifdef _DEBUG
-	if (ot::IconManager::addSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
+	if (ot::IconManager::addSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/Icons/"))) {
 		iconPathCounter++;
 	}
-	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString(qgetenv("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
+	if (ot::GlobalColorStyle::instance().addStyleRootSearchPath(QString::fromStdString(ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT") + "/Assets/ColorStyles/"))) {
 		stylePathCounter++;
 	}
 #endif // _DEBUG

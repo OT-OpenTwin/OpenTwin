@@ -27,16 +27,22 @@
 // std header
 #include <fstream>
 
-std::string ot::ThisComputerInfo::toInfoString(const InformationModeFlags& _mode) {
+std::string ot::ThisComputerInfo::toInfoString(const InformationModeFlags& _mode)
+{
 	return ThisComputerInfo(_mode).toInfoString();
 }
 
-std::string ot::ThisComputerInfo::getEnvEntry(EnvironemntEntry entry) {
+std::string ot::ThisComputerInfo::getEnvEntry(EnvironemntEntry entry)
+{
 	using os = OperatingSystem;
 
 	// Otherwise, retrieve from the environment
 
-	switch (entry) {
+	switch (entry)
+	{
+	case EnvDevRoot:               return os::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+	case EnvLoggingUrl:            return os::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL");
+	case EnvLoggingMode:           return os::getEnvironmentVariableString("OPEN_TWIN_LOGGING_MODE");
 	case EnvAdminPort:             return os::getEnvironmentVariableString("OPEN_TWIN_ADMIN_PORT");
 	case EnvAuthPort:              return os::getEnvironmentVariableString("OPEN_TWIN_AUTH_PORT");
 	case EnvCertPath:              return os::getEnvironmentVariableString("OPEN_TWIN_CERTS_PATH");
@@ -48,11 +54,14 @@ std::string ot::ThisComputerInfo::getEnvEntry(EnvironemntEntry entry) {
 	case EnvMessageTimeout:        return os::getEnvironmentVariableString("OPEN_TWIN_GLOBAL_TIMEOUT");
 	case EnvMongoDBAddress:        return os::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS");
 	case EnvMongoServicesAddress:  return os::getEnvironmentVariableString("OPEN_TWIN_SERVICES_ADDRESS");
-	default:                        return ""; // Handle unexpected values gracefully
+	default:
+		OT_LOG_E("Unknown environment entry requeted (" + std::to_string(static_cast<int>(entry)) + ")");
+		return std::string();
 	}
 }
 
-ot::ThisComputerInfo::ThisComputerInfo(const InformationModeFlags& _mode) {
+ot::ThisComputerInfo::ThisComputerInfo(const InformationModeFlags& _mode)
+{
 	m_envData.dataSet = false;
 	m_mongoData.dataSet = false;
 
@@ -60,13 +69,18 @@ ot::ThisComputerInfo::ThisComputerInfo(const InformationModeFlags& _mode) {
 	this->gatherInformation(_mode);
 }
 
-ot::ThisComputerInfo& ot::ThisComputerInfo::gatherInformation(const InformationModeFlags& _mode) {
-	if (_mode & InformationModeFlag::Environment) {
+ot::ThisComputerInfo& ot::ThisComputerInfo::gatherInformation(const InformationModeFlags& _mode)
+{
+	if (_mode & InformationModeFlag::Environment)
+	{
 		this->gatherEnvData();
 	}
-	if (_mode & InformationModeFlag::MongoDBConfig) {
-		if (this->gatherMongoDBData()) {
-			if (_mode & InformationModeFlag::MongoDBConfigFileContent) {
+	if (_mode & InformationModeFlag::MongoDBConfig)
+	{
+		if (this->gatherMongoDBData())
+		{
+			if (_mode & InformationModeFlag::MongoDBConfigFileContent)
+			{
 				this->gatherMongoDBConfigFileContent();
 			}
 		}
@@ -75,14 +89,17 @@ ot::ThisComputerInfo& ot::ThisComputerInfo::gatherInformation(const InformationM
 	return *this;
 }
 
-std::string ot::ThisComputerInfo::toInfoString(void) {
+std::string ot::ThisComputerInfo::toInfoString(void)
+{
 	std::stringstream ss;
 	bool empty = true;
 	const std::string delimiterLine = "---------------------------------------------------------------------------";
 
 	// Environment
-	if (m_envData.dataSet) {
-		if (!empty) {
+	if (m_envData.dataSet)
+	{
+		if (!empty)
+		{
 			ss << std::endl;
 		}
 		empty = false;
@@ -90,6 +107,9 @@ std::string ot::ThisComputerInfo::toInfoString(void) {
 		ss << delimiterLine << std::endl;
 		ss << "         ENVIRONMENT" << std::endl;
 		ss << "" << std::endl;
+		ss << "OpenTwin Dev Root:             " + m_envData.devRoot << std::endl;
+		ss << "Logging URL:                   " + m_envData.loggingUrl << std::endl;
+		ss << "Logging Mode:                  " + m_envData.loggingMode << std::endl;
 		ss << "Admin Port:                    " + m_envData.adminPort << std::endl;
 		ss << "Authorization Port:            " + m_envData.authorizationPort << std::endl;
 		ss << "Certificate Path:              " + m_envData.certificatePath << std::endl;
@@ -104,8 +124,10 @@ std::string ot::ThisComputerInfo::toInfoString(void) {
 	}
 
 	// MongoDB
-	if (m_mongoData.dataSet) {
-		if (!empty) {
+	if (m_mongoData.dataSet)
+	{
+		if (!empty)
+		{
 			ss << std::endl;
 		}
 		empty = false;
@@ -126,19 +148,21 @@ std::string ot::ThisComputerInfo::toInfoString(void) {
 		ss << "         MONGODB CONFIG FILE CONTENT" << std::endl;
 		ss << "" << std::endl;
 
-		if (!m_mongoData.configFileContent.empty()) {
+		if (!m_mongoData.configFileContent.empty())
+		{
 			ss << "File (" << m_mongoData.info.getConfigPath() << "):" << std::endl;
 			ss << std::endl;
 			ss << m_mongoData.configFileContent << std::endl;
 		}
-		else {
+		else
+		{
 			ss << "" << std::endl;
 			ss << "<Mongo config file is empty>" << std::endl;
 		}
 
 		ss << "";
 	}
-		
+
 	return ss.str();
 }
 
@@ -146,47 +170,58 @@ std::string ot::ThisComputerInfo::toInfoString(void) {
 
 // Private
 
-void ot::ThisComputerInfo::gatherEnvData(void) {
-	m_envData.adminPort            = this->getEnvEntry(EnvAdminPort);
-	m_envData.authorizationPort    = this->getEnvEntry(EnvAuthPort);
-	m_envData.certificatePath      = this->getEnvEntry(EnvCertPath);
-	m_envData.downloadPort         = this->getEnvEntry(EnvDownloadPort);
-	m_envData.gssPort              = this->getEnvEntry(EnvGssPort);
-	m_envData.lssPort              = this->getEnvEntry(EnvLssPort);
-	m_envData.gdsPort              = this->getEnvEntry(EnvGdsPort);
-	m_envData.ldsPort              = this->getEnvEntry(EnvLdsPort);
+void ot::ThisComputerInfo::gatherEnvData(void)
+{
+	m_envData.devRoot = this->getEnvEntry(EnvDevRoot);
+	m_envData.loggingUrl = this->getEnvEntry(EnvLoggingUrl);
+	m_envData.loggingMode = this->getEnvEntry(EnvLoggingMode);
+	m_envData.adminPort = this->getEnvEntry(EnvAdminPort);
+	m_envData.authorizationPort = this->getEnvEntry(EnvAuthPort);
+	m_envData.certificatePath = this->getEnvEntry(EnvCertPath);
+	m_envData.downloadPort = this->getEnvEntry(EnvDownloadPort);
+	m_envData.gssPort = this->getEnvEntry(EnvGssPort);
+	m_envData.lssPort = this->getEnvEntry(EnvLssPort);
+	m_envData.gdsPort = this->getEnvEntry(EnvGdsPort);
+	m_envData.ldsPort = this->getEnvEntry(EnvLdsPort);
 	m_envData.globalMessageTimeout = this->getEnvEntry(EnvMessageTimeout);
-	m_envData.mongoDBAddress       = this->getEnvEntry(EnvMongoDBAddress);
+	m_envData.mongoDBAddress = this->getEnvEntry(EnvMongoDBAddress);
 	m_envData.mongoServicesAddress = this->getEnvEntry(EnvMongoServicesAddress);
 
 	m_envData.dataSet = true;
 }
 
-bool ot::ThisComputerInfo::gatherMongoDBData(void) {
-	if (m_mongoData.info.loadSystemServiceConfig("MongoDB")) {
+bool ot::ThisComputerInfo::gatherMongoDBData(void)
+{
+	if (m_mongoData.info.loadSystemServiceConfig("MongoDB"))
+	{
 		m_mongoData.dataSet = true;
 		return true;
 	}
-	else {
+	else
+	{
 		return false;
 	}
 }
 
-void ot::ThisComputerInfo::gatherMongoDBConfigFileContent(void) {
-	if (m_mongoData.info.getConfigPath().empty()) {
+void ot::ThisComputerInfo::gatherMongoDBConfigFileContent(void)
+{
+	if (m_mongoData.info.getConfigPath().empty())
+	{
 		OT_LOG_E("Configuration file path is empty");
 		return;
 	}
 
 	std::ifstream file(m_mongoData.info.getConfigPath());
-	if (!file) {
+	if (!file)
+	{
 		OT_LOG_E("Failed to open file: \"" + m_mongoData.info.getConfigPath() + "\"");
 	}
-	else {
+	else
+	{
 		std::ostringstream ss;
 		ss << file.rdbuf();
 		m_mongoData.configFileContent = ss.str();
-		
+
 		file.close();
 	}
 }

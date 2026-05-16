@@ -24,6 +24,8 @@
 #include "SolverBase.h"
 #include "SolverElectrostatics.h"
 
+#include "OTSystem/OperatingSystem.h"
+
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityMeshTet.h"
@@ -332,22 +334,7 @@ std::string ElmerFEMLauncher::getUniqueTempDir(void)
 
 std::string ElmerFEMLauncher::getSystemTempDir(void)
 {
-	return readEnvironmentVariable("TMP");
-}
-
-std::string ElmerFEMLauncher::readEnvironmentVariable(const std::string &variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char *buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
+	return ot::OperatingSystem::getEnvironmentVariableString("TMP");
 }
 
 bool ElmerFEMLauncher::checkFileOrDirExists(const std::string &path)

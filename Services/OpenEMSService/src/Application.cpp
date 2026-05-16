@@ -586,22 +586,7 @@ std::string Application::getUniqueTempDir(void)
 
 std::string Application::getSystemTempDir(void)
 {
-	return readEnvironmentVariable("TMP");
-}
-
-std::string Application::readEnvironmentVariable(const std::string& variableName)
-{
-	std::string variableValue;
-
-	const int nSize = 32767;
-	char* buffer = new char[nSize];
-
-	if (GetEnvironmentVariableA(variableName.c_str(), buffer, nSize))
-	{
-		variableValue = buffer;
-	}
-
-	return variableValue;
+	return ot::OperatingSystem::getEnvironmentVariableString("TMP");
 }
 
 bool Application::checkFileOrDirExists(const std::string& path)
