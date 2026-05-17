@@ -288,6 +288,7 @@ ot_get_env_string(CURL_LIBR_NAME                  CURL_LIBR)
 
 ot_get_env_path(MONGO_C_INC_PATH                  MONGO_C_INC)
 ot_get_env_path(MONGO_CXX_INC_PATH                MONGO_CXX_INC)
+ot_get_env_path(MONGO_BOOST_ROOT_PATH             MONGO_BOOST_ROOT)
 ot_get_env_path(MONGO_BOOST_INCD_PATH             MONGO_BOOST_INCD)
 ot_get_env_path(MONGO_BOOST_INCR_PATH             MONGO_BOOST_INCR)
 ot_get_env_path(MONGO_C_LIBPATHD_PATH             MONGO_C_LIBPATHD)

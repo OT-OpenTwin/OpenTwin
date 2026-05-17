@@ -371,6 +371,14 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     set_property(TARGET ${_core} PROPERTY OT_ROOT_PATH "${_rootPath}")
     set_property(TARGET ${_core} PROPERTY OT_DEPS "")
 
+    # Set SubSystem for core target
+    if(WIN32)
+        set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM "WINDOWS")
+    else()
+        set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM "")
+    endif()
+    set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM_OVERRIDES "")
+
     # Add root include path using OT_INC suffix (or include)
     set(_incSuffix "${OT_INC_PATH}")
     if("${_incSuffix}" STREQUAL "")
@@ -500,6 +508,53 @@ function(ot_add_compile_definitions TARGET_NAME)
     foreach(def IN LISTS ARGN)
         target_compile_definitions(${_core} PRIVATE "${def}")
     endforeach()
+endfunction()
+
+function(ot_set_subsystem_for_config TARGET_NAME CONFIG_NAME SUBSYSTEM)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_set_subsystem_for_config: target '${_core}' not found.")
+    endif()
+
+    string(TOUPPER "${SUBSYSTEM}" _subsystem)
+    if(NOT (_subsystem STREQUAL "WINDOWS" OR _subsystem STREQUAL "CONSOLE"))
+        message(FATAL_ERROR "ot_set_subsystem_for_config(${TARGET_NAME} ...): unsupported subsystem '${SUBSYSTEM}'. Use WINDOWS or CONSOLE.")
+    endif()
+
+    string(TOUPPER "${CONFIG_NAME}" _config_upper)
+    if(_config_upper STREQUAL "DEBUG")
+        set(_config "Debug")
+    elseif(_config_upper STREQUAL "RELEASE")
+        set(_config "Release")
+    elseif(_config_upper STREQUAL "RELWITHDEBINFO")
+        set(_config "RelWithDebInfo")
+    elseif(_config_upper STREQUAL "MINSIZEREL")
+        set(_config "MinSizeRel")
+    else()
+        message(FATAL_ERROR
+            "ot_set_subsystem_for_config(${TARGET_NAME} ...): unsupported config '${CONFIG_NAME}'. "
+            "Use Debug, Release, RelWithDebInfo, or MinSizeRel."
+        )
+    endif()
+
+    get_property(_overrides TARGET ${_core} PROPERTY OT_SUBSYSTEM_OVERRIDES)
+    if(NOT _overrides)
+        set(_overrides "")
+    endif()
+
+    set(_filtered_overrides "")
+    foreach(_entry IN LISTS _overrides)
+        string(FIND "${_entry}" ":" _sep)
+        if(_sep GREATER -1)
+            string(SUBSTRING "${_entry}" 0 ${_sep} _entry_config)
+            if(NOT _entry_config STREQUAL "${_config}")
+                list(APPEND _filtered_overrides "${_entry}")
+            endif()
+        endif()
+    endforeach()
+
+    list(APPEND _filtered_overrides "${_config}:${_subsystem}")
+    set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM_OVERRIDES "${_filtered_overrides}")
 endfunction()
 
 # ------------------------------------------------------------
@@ -659,10 +714,41 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "EXPREVAL")
+        if(NOT DEFINED ENV{EXPREVAL_ROOT} OR "$ENV{EXPREVAL_ROOT}" STREQUAL "")
+            message(FATAL_ERROR "EXPREVAL token used but EXPREVAL_ROOT is not set.")
+        endif()
+
+        get_property(_enabled_langs GLOBAL PROPERTY ENABLED_LANGUAGES)
+        list(FIND _enabled_langs "C" _c_lang_idx)
+        if(_c_lang_idx EQUAL -1)
+            enable_language(C)
+        endif()
+
+        set(_expr_src "$ENV{EXPREVAL_ROOT}/tinyexpr.c")
+        set_source_files_properties("${_expr_src}" PROPERTIES LANGUAGE C)
+        target_sources("${CORE_TARGET}" PRIVATE "${_expr_src}")
+
+        if(DEFINED ENV{EXPREVAL_INC} AND NOT "$ENV{EXPREVAL_INC}" STREQUAL "")
+            target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_INC}")
+        else()
+            target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_ROOT}")
+        endif()
+        return()
+    endif()
+
     if(DEP STREQUAL "TINYXML2")
         set(_tinyxml2_src "$ENV{TINYXML2_ROOT}/tinyxml2.cpp")
         target_sources("${CORE_TARGET}" PRIVATE "${_tinyxml2_src}")
         target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{TINYXML2_ROOT}")
+        return()
+    endif()
+
+    if(DEP STREQUAL "MONGO_BOOST")
+        _ot_env_get_path(_mongo_boost_root "MONGO_BOOST_ROOT")
+        if(NOT "${_mongo_boost_root}" STREQUAL "")
+            target_include_directories("${CORE_TARGET}" PRIVATE "${_mongo_boost_root}")
+        endif()
         return()
     endif()
 
@@ -880,11 +966,10 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     endif()
 
     # Include-only tokens
-    if(DEP STREQUAL "RJSON" OR DEP STREQUAL "BASE64" OR DEP STREQUAL "TINYXML2")
+    if(DEP STREQUAL "RJSON" OR DEP STREQUAL "BASE64" OR DEP STREQUAL "TINYXML2" OR DEP STREQUAL "EXPREVAL" OR DEP STREQUAL "MONGO_BOOST")
         return()
     endif()
 
-    # Friendly alias: EARCUT (header-only)
     if(DEP STREQUAL "EARCUT")
         _ot_apply_tp_to_final("${FINAL_TARGET}" "EARCUT")
         return()
@@ -924,6 +1009,46 @@ function(_ot_apply_all_deps TARGET_NAME CORE_NAME DEPS)
     endforeach()
 endfunction()
 
+function(_ot_apply_subsystem_if_requested TARGET_NAME CORE_NAME)
+    if(NOT WIN32)
+        return()
+    endif()
+
+    get_property(_subsystem TARGET ${CORE_NAME} PROPERTY OT_SUBSYSTEM)
+    get_property(_overrides TARGET ${CORE_NAME} PROPERTY OT_SUBSYSTEM_OVERRIDES)
+
+    if(NOT _overrides)
+        set(_overrides "")
+    endif()
+
+    set(_overridden_configs "")
+    foreach(_entry IN LISTS _overrides)
+        string(FIND "${_entry}" ":" _sep)
+        if(_sep GREATER -1)
+            math(EXPR _value_start "${_sep} + 1")
+            string(SUBSTRING "${_entry}" 0 ${_sep} _config)
+            string(SUBSTRING "${_entry}" ${_value_start} -1 _entry_subsystem)
+
+            if(NOT "${_config}" STREQUAL "" AND NOT "${_entry_subsystem}" STREQUAL "")
+                list(APPEND _overridden_configs "${_config}")
+                target_link_options(${TARGET_NAME} PRIVATE
+                    "$<$<CONFIG:${_config}>:/SUBSYSTEM:${_entry_subsystem}>"
+                )
+            endif()
+        endif()
+    endforeach()
+
+    if(NOT "${_subsystem}" STREQUAL "")
+        foreach(_cfg IN ITEMS Debug Release RelWithDebInfo MinSizeRel)
+            if(NOT _cfg IN_LIST _overridden_configs)
+                target_link_options(${TARGET_NAME} PRIVATE
+                    "$<$<CONFIG:${_cfg}>:/SUBSYSTEM:${_subsystem}>"
+                )
+            endif()
+        endforeach()
+    endif()
+endfunction()
+
 # ------------------------------------------------------------
 # finalize_lib / finalize_bin
 # ------------------------------------------------------------
@@ -940,6 +1065,7 @@ function(ot_finalize_lib TARGET_NAME)
 
     add_library(${TARGET_NAME} SHARED $<TARGET_OBJECTS:${_core}>)
     target_include_directories(${TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
+    _ot_apply_subsystem_if_requested(${TARGET_NAME} ${_core})
 
     _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
 
@@ -970,6 +1096,8 @@ function(ot_finalize_bin TARGET_NAME)
             OUTPUT_NAME "${_output_name}"
         )
     endif()
+
+    _ot_apply_subsystem_if_requested(${TARGET_NAME} ${_core})
 
     _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
 
@@ -1053,3 +1181,4 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
 
     add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})
 endfunction()
+
