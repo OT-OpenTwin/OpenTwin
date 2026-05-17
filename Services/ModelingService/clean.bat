@@ -30,6 +30,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Building Project
 
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ModelingService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ModelingService\build"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ModelingService\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ModelingService\packages"
 

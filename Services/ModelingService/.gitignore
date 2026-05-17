@@ -45,6 +45,7 @@ packages
 
 # VS internal build directory
 /**/.vs
+build/
 
 [Dd]ebug/
 [Dd]ebugPublic/
