@@ -218,9 +218,10 @@ void PackageHandler::importMissingPackages()
 {
     m_uninstalledPackages.sort();
     m_uninstalledPackages.unique();
-
+    
     if (m_uninstalledPackages.size() != 0)
     {
+        OT_LOG_DS("Uninstalled packages to import: " << m_uninstalledPackages);
 
         if (m_environmentState == EnvironmentState::initialised)
         {
@@ -267,7 +268,6 @@ void PackageHandler::importMissingPackages()
         }
         else
         {
-            
 			OutputPipelineRAII outputRedirectionGuard(OutputPipeline::RedirectionMode::applicationRead);
 
             //Environment is not yet initialised, so we can just install the packages but we need to update the manifest
@@ -302,13 +302,18 @@ void PackageHandler::importMissingPackages()
 			storeInstallationLog(newModelStateInfo);
 			m_installationLog.clear();
         }
-        bool manifestUpdate = m_currentManifest->getModified();
+        
+        bool manifestUpdate = false;
+        if (m_currentManifest) {
+            manifestUpdate = m_currentManifest->getModified();
+        }
         if (manifestUpdate)
         {
             // Could already been adjusted during loading of environment.
             m_currentManifest->storeToDataBase();
             newModelStateInfo.addTopologyEntity(*m_currentManifest);
         }
+        
         if (newModelStateInfo.hasTopologyEntities())
         {
             std::string message;

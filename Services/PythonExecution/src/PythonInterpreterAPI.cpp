@@ -118,12 +118,12 @@ void PythonInterpreterAPI::execute(std::list<std::string>& _scripts, std::list<P
 		{
 			std::string moduleName = PythonLoadedModules::instance().getModuleName(scriptEntity).value();
 			std::string entryPoint = m_moduleEntrypointByModuleName[moduleName];
-
+			
 			PythonParameter& parametersForScript = *currentParameters;
 
 			std::string executorName = parametersForScript.getCallingEntity(); // May be empty string if nothing was set on the requesting side. 
 			CPythonObjectNew args(PyTuple_Pack(1, pyObBuilder.setString(executorName)));
-
+			
 			CPythonObjectNew kwargs (parametersForScript.getAdditionalParameter().ObjectEmpty() ? nullptr : pyObBuilder.ConvertKwargsMap(parametersForScript));
 
 			OT_LOG_D("Execute script " + scriptEntity.getEntityName());
@@ -218,7 +218,7 @@ std::list<ot::EntityInformation> PythonInterpreterAPI::ensureScriptsAreLoaded(co
 		const std::string scriptExecution = loadScipt(entityInfo);
 		scriptExecutions.push_back(scriptExecution);
 	}
-
+	
 	for (const std::string& scriptExecution : scriptExecutions)
 	{
 		m_packageHandler.extractMissingPackages(scriptExecution);
@@ -251,7 +251,13 @@ std::string PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entity
 	try
 	{
 		EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(_entityInformation.getEntityID(), _entityInformation.getEntityVersion());
+		if (!baseEntity) {
+			throw ot::Exception::ObjectNotFound("Failed to read entity from ID and Version { \"ID\": " + std::to_string(_entityInformation.getEntityID()) + ", \"Version\": " + std::to_string(_entityInformation.getEntityVersion()) + " }");
+		}
 		std::unique_ptr<EntityFileText> script(dynamic_cast<EntityFileText*>(baseEntity));
+		if (!script) {
+			throw ot::Exception::InvalidType("Invalid entity type { \"Expected\": \"" + EntityFileText::className() + "\", \"Actual\": \"" + baseEntity->getClassName() + "\" }");
+		}
 		std::string execution = script->getText();
 		return execution;
 	}
@@ -264,7 +270,6 @@ std::string PythonInterpreterAPI::loadScipt(const ot::EntityInformation& _entity
 
 void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const ot::EntityInformation& _entityInformation, const std::string& _entryPointFunctionName)
 {
-
 	//First we add a module for the script execution. This way there won't be any namespace conflicts between the scripts since they are all executed in the same namespace
 	const std::string moduleName = PythonLoadedModules::instance().addModuleForEntity(_entityInformation);
 	if (moduleName == "")
@@ -272,10 +277,10 @@ void PythonInterpreterAPI::addScriptAsModule(const std::string _execution, const
 		const std::string message = "failed to determine a module name for script: " + _entityInformation.getEntityName();
 		throw std::exception(message.c_str());
 	}
-
+	
 	//Executing the script in this module will only add the contained functions to the module. No return value expected. Error handling by the wrapper
 	auto result = m_wrapper.execute(_execution, moduleName);
-
+	
 	//Since potentially multiple functions exist in a module, an entry point needs to be explicitly defined
 	PythonModuleAPI& moduleAPI = PythonModuleAPI::instance();
 	moduleAPI.setEntryPoint(moduleName, _entryPointFunctionName);
