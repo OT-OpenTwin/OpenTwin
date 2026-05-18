@@ -62,7 +62,7 @@ void InterpreterPathSettings::setupBasePaths()
 {
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
 	std::string devEnvRoot = ot::OperatingSystem::getEnvironmentVariableString(devEnvRootName.c_str());
-	m_customEnvironmentBase = ot::OperatingSystem::getEnvironmentVariableString("LOCALAPPDATA");
+	m_customEnvironmentBase = ot::OperatingSystem::getEnvironmentVariableString("PROGRAMDATA");
 #ifdef _DEBUG
 	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
 	std::string pythonRoot = ot::OperatingSystem::getEnvironmentVariableString(pythonRootEnvVarName.c_str());
