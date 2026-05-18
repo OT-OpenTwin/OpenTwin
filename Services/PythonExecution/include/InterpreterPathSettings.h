@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: InterpreterPathSettings.h
 // 
 // License:
@@ -47,7 +47,8 @@ public:
 		}
 		else
 		{
-			return m_environmentsBase + "\\" + m_customEnvironmentName;
+			
+			return m_customEnvironmentBase + "\\OpenTwin\\PythonEnvironments\\" + m_customEnvironmentName;
 		}
 	}
 	std::string getHomePath() const
@@ -86,12 +87,19 @@ public:
 		assert(!m_libPath.empty());
 		return m_libPath;
 	}
+	std::string getCustomEnvironmentsBasePath() const
+	{
+		assert(m_pathsAreSet);
+		assert(!m_environmentsBase.empty());
+		return m_customEnvironmentBase;
+	}
 
 private:
 	std::string m_environmentsBase;
 	std::string m_home;
 	std::string m_dllPath;
 	std::string m_binPath;
+	std::string m_customEnvironmentBase;
 	std::string m_customEnvironmentName = ""; //per default core environment only, no custom environment
 	std::string m_libPath;
 	std::list<std::string> m_defaultEnvironments;
