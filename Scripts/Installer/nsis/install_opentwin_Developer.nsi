@@ -53,7 +53,10 @@
 
 	Var lds_port
 	Var lds_port_content
-
+	
+	Var lms_port
+	Var lms_port_content
+	
 	Var admin_port
 	Var admin_port_content
 	
@@ -73,6 +76,7 @@
 	Var lss_entry
 	Var gds_entry
 	Var lds_entry
+	Var lms_entry
 	Var admin_entry
 	Var download_entry
 	
@@ -481,24 +485,30 @@ Function PortPage
 		EnableWindow $lds_port 0		
 			SendMessage $lds_port ${EM_SETLIMITTEXT} 5 0
 
-	${NSD_CreateLabel} 230 85u 90u 10% "MongoDB"
-		${NSD_CreateNumber} 380 85u 10% 8% "27017"
+	${NSD_CreateLabel} 230 85u 90u 10% "Library Service"
+		${NSD_CreateNumber} 380 85u 10% 8% "8002"
+		Pop $lms_port
+		EnableWindow $lms_port 0		
+			SendMessage $lms_port ${EM_SETLIMITTEXT} 5 0
+
+	${NSD_CreateLabel} 0 100u 90u 10% "MongoDB"
+		${NSD_CreateNumber} 150 100u 10% 8% "27017"
 		Pop $MongoDBCustomPortField
 		EnableWindow $MongoDBCustomPortField 0		
 			SendMessage $MongoDBCustomPortField ${EM_SETLIMITTEXT} 5 0
 
-	${NSD_CreateLabel} 0 100u 90u 10% "Admin Panel"
-		${NSD_CreateNumber} 150 100u 10% 8% "8000"
+	${NSD_CreateLabel} 0 115u 90u 10% "Admin Panel"
+		${NSD_CreateNumber} 150 115u 10% 8% "8000"
 		Pop $admin_port
 		EnableWindow $admin_port 0		
 			SendMessage $admin_port ${EM_SETLIMITTEXT} 5 0
 
-	${NSD_CreateLabel} 230 100u 90u 10% "Frontend Download"
-		${NSD_CreateNumber} 380 100u 10% 8% "80"
+	${NSD_CreateLabel} 230 115u 90u 10% "Frontend Download"
+		${NSD_CreateNumber} 380 115u 10% 8% "80"
 		Pop $download_port
 		EnableWindow $download_port 0		
 			SendMessage $download_port ${EM_SETLIMITTEXT} 5 0
-			
+
 	${If} $PortReturnChecker <> 0
 		${If} $standardPortValuesRadioBtnState == ${BST_CHECKED}
 			${NSD_Check} $standardPortValuesRadioBtn
@@ -511,6 +521,7 @@ Function PortPage
 			EnableWindow $lss_port 1
 			EnableWindow $gds_port 1
 			EnableWindow $lds_port 1
+			EnableWindow $lms_port 1
 			EnableWindow $MongoDBCustomPortField 1
 			EnableWindow $admin_port 1
 			EnableWindow $download_port 1
@@ -521,10 +532,11 @@ Function PortPage
 		${NSD_SetText} $lss_port $lss_port_content
 		${NSD_SetText} $gds_port $gds_port_content
 		${NSD_SetText} $lds_port $lds_port_content
+		${NSD_SetText} $lms_port $lms_port_content
 		${NSD_SetText} $MongoDBCustomPortField $MongoDBCustomPortField_content
 		${NSD_SetText} $admin_port $admin_port_content
 		${NSD_SetText} $download_port $download_port_content
-		
+
 	${EndIf}
 	nsDialogs::Show
 FunctionEnd
@@ -537,6 +549,7 @@ FunctionEnd
 			EnableWindow $lss_port 1
 			EnableWindow $gds_port 1
 			EnableWindow $lds_port 1
+			EnableWindow $lms_port 1
 			EnableWindow $MongoDBCustomPortField 1
 			EnableWindow $admin_port 1
 			EnableWindow $download_port 1
@@ -546,6 +559,7 @@ FunctionEnd
 			EnableWindow $lss_port 0
 			EnableWindow $gds_port 0
 			EnableWindow $lds_port 0
+			EnableWindow $lms_port 0
 			EnableWindow $MongoDBCustomPortField 0
 			EnableWindow $admin_port 0
 			EnableWindow $download_port 0
@@ -563,15 +577,17 @@ FunctionEnd
 		${NSD_GetText} $lss_port $lss_port_content
 		${NSD_GetText} $gds_port $gds_port_content
 		${NSD_GetText} $lds_port $lds_port_content	
+		${NSD_GetText} $lms_port $lms_port_content	
 		${NSD_GetText} $MongoDBCustomPortField $MongoDBCustomPortField_content
 		${NSD_GetText} $admin_port $admin_port_content
 		${NSD_GetText} $download_port $download_port_content
-
+		
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_AUTH_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GSS_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
+		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LMS_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT"
 		DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT"
@@ -589,6 +605,7 @@ FunctionEnd
 			StrCpy $lss_entry "8093"
 			StrCpy $gds_entry "9094"
 			StrCpy $lds_entry "9095"
+			StrCpy $lms_entry "8002"
 			StrCpy $MONGODB_CUSTOM_PORT "27017"
 			StrCpy $admin_entry "8000"
 			StrCpy $download_entry "80"
@@ -598,6 +615,7 @@ FunctionEnd
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
+			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LMS_PORT" "$lms_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT" "$admin_entry"
 			WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT" "$download_entry"
@@ -609,9 +627,10 @@ FunctionEnd
 			${NSD_GetText} $lss_port $2
 			${NSD_GetText} $gds_port $3
 			${NSD_GetText} $lds_port $4
-			${NSD_GetText} $MongoDBCustomPortField $5
-			${NSD_GetText} $admin_port $6
-			${NSD_GetText} $download_port $7
+			${NSD_GetText} $lms_port $5
+			${NSD_GetText} $MongoDBCustomPortField $6
+			${NSD_GetText} $admin_port $7
+			${NSD_GetText} $download_port $8
 
 			#check for empty fields
 			${If} $0 == "" 
@@ -622,6 +641,7 @@ FunctionEnd
 			${OrIf} $5 == ""
 			${OrIf} $6 == ""
 			${OrIf} $7 == ""
+			${OrIf} $8 == ""
 				MessageBox MB_ICONSTOP|MB_OK "Please fill all port fields before proceeding."
 				Abort
 			${EndIf}
@@ -643,6 +663,8 @@ FunctionEnd
 				${OrIf} $6 < 1
 			${OrIf} $7 > 65535
 				${OrIf} $7 < 1
+			${OrIf} $8 > 65535
+				${OrIf} $8 < 1
 				MessageBox MB_ICONSTOP|MB_OK "One or more port numbers exceed the valid range of 1 - 65535."
 				Abort
 			${EndIf}	
@@ -655,6 +677,7 @@ FunctionEnd
 			${OrIf} $0 == $5
 			${OrIf} $0 == $6
 			${OrIf} $0 == $7
+			${OrIf} $0 == $8
 
 			${OrIf} $1 == $2 
 			${OrIf} $1 == $3 
@@ -662,26 +685,34 @@ FunctionEnd
 			${OrIf} $1 == $5 
 			${OrIf} $1 == $6 
 			${OrIf} $1 == $7 
+			${OrIf} $1 == $8 
 
 			${OrIf} $2 == $3 
 			${OrIf} $2 == $4 
 			${OrIf} $2 == $5
 			${OrIf} $2 == $6
 			${OrIf} $2 == $7
+			${OrIf} $2 == $8
 
 			${OrIf} $3 == $4
 			${OrIf} $3 == $5
 			${OrIf} $3 == $6
 			${OrIf} $3 == $7
+			${OrIf} $3 == $8
 
 			${OrIf} $4 == $5
 			${OrIf} $4 == $6
 			${OrIf} $4 == $7
+			${OrIf} $4 == $8
 
 			${OrIf} $5 == $6
 			${OrIf} $5 == $7
+			${OrIf} $5 == $8
 
 			${OrIf} $6 == $7
+			${OrIf} $6 == $8
+
+			${OrIf} $7 == $8
 				MessageBox MB_ICONSTOP|MB_OK "Port values must be unique. Please ensure no two ports are the same"
 				Abort
 			${EndIf}
@@ -690,6 +721,7 @@ FunctionEnd
 				${NSD_GetText} $lss_port $lss_entry
 				${NSD_GetText} $gds_port $gds_entry
 				${NSD_GetText} $lds_port $lds_entry
+				${NSD_GetText} $lms_port $lms_entry
 				${NSD_GetText} $MongoDBCustomPortField $MONGODB_CUSTOM_PORT
 				${NSD_GetText} $admin_port $admin_entry
 				${NSD_GetText} $download_port $download_entry
@@ -700,12 +732,13 @@ FunctionEnd
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT" "$lss_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT" "$gds_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT" "$lds_entry"
+				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LMS_PORT" "$lms_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS" "$NetworkModeSelection:$MONGODB_CUSTOM_PORT"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT" "$admin_entry"
 				WriteRegStr HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT" "$download_entry"
 		EndCheck:	
-		
-		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000		
+
+		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
 	FunctionEnd
 
@@ -721,7 +754,7 @@ FunctionEnd
 		
 		${NSD_CreateLabel} 0 0 100% 12u "You selected the following Ports:"
 			${NSD_CreateLabel} 0 15u 100% 12u $auth_entry
-				${NSD_CreateLabel} 55 15u 100% 12u "Auth Port"
+				${NSD_CreateLabel} 55 15u 100% 12u "Auth Port
 			${NSD_CreateLabel} 0 30u 100% 12u $gss_entry
 				${NSD_CreateLabel} 55 30u 100% 12u "GSS Port"
 			${NSD_CreateLabel} 0 45u 100% 12u $lss_entry
@@ -730,13 +763,15 @@ FunctionEnd
 				${NSD_CreateLabel} 55 60u 100% 12u "GDS Port"
 			${NSD_CreateLabel} 0 75u 100% 12u $lds_entry
 				${NSD_CreateLabel} 55 75u 100% 12u "LDS Port"
-			${NSD_CreateLabel} 0 90u 100% 12u $MONGODB_CUSTOM_PORT
-				${NSD_CreateLabel} 55 90u 100% 12u "Mongo Custom"
-			${NSD_CreateLabel} 0 105u 100% 12u $admin_entry
-				${NSD_CreateLabel} 55 105u 100% 12u "Admin Panel Port"
-			${NSD_CreateLabel} 0 125u 100% 12u $download_entry
-				${NSD_CreateLabel} 55 125u 100% 12u "Frontend Download Port"
-		
+			${NSD_CreateLabel} 0 90u 100% 12u $lms_entry
+				${NSD_CreateLabel} 55 90u 100% 12u "LMS Port"
+			${NSD_CreateLabel} 0 105u 100% 12u $MONGODB_CUSTOM_PORT
+				${NSD_CreateLabel} 55 105u 100% 12u "Mongo Custom"
+			${NSD_CreateLabel} 0 120u 100% 12u $admin_entry
+				${NSD_CreateLabel} 55 120u 100% 12u "Admin Panel Port"
+			${NSD_CreateLabel} 0 135u 100% 12u $download_entry
+				${NSD_CreateLabel} 55 135u 100% 12u "Frontend Download Port"
+	
 		nsDialogs::Show
 	FunctionEnd
 */
@@ -1384,6 +1419,7 @@ Section Uninstall
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LSS_PORT"
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_GDS_PORT"
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LDS_PORT"
+	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_LMS_PORT"
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_MONGODB_ADDRESS"
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_ADMIN_PORT"
 	DeleteRegValue HKLM "SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "OPEN_TWIN_DOWNLOAD_PORT"
