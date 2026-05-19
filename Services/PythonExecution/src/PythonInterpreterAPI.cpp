@@ -53,7 +53,12 @@ void PythonInterpreterAPI::initializeEnvironment(ot::UID _manifestEntityUID)
 	else
 	{
 		//Installation may take some time, do it in a separate thread. Executions are stopped via the WorkerWaiterState until installation is done.
-		std::thread workerThread(&PackageHandler::initializeEnvironmentWithManifest, &m_packageHandler, m_interpreterPathSettings.getCustomEnvironmentPath());
+		std::string manifestEnvironmentPath = "";
+		if (!m_interpreterPathSettings.getCustomEnvironmentName().empty())
+		{
+			manifestEnvironmentPath = m_interpreterPathSettings.getManifestEnvironmentsBasePath() + "/" + m_interpreterPathSettings.getCustomEnvironmentName();
+		}
+		std::thread workerThread(&PackageHandler::initializeEnvironmentWithManifest, &m_packageHandler, manifestEnvironmentPath);
 		workerThread.detach();
 	}
 

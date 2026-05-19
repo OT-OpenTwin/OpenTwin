@@ -42,7 +42,7 @@ public:
 	void initializeManifest(ot::UID _manifestUID);
 	
 	//! @brief Analyses the current environment and installs missing packages according to the manifest. If anything fails it will kill the process.
-	void initializeEnvironmentWithManifest(const std::string& _environmentPath);
+	void initializeEnvironmentWithManifest(std::string _environmentPath);
 
 	void extractMissingPackages(const std::string& _scriptContent);
 	void importMissingPackages();

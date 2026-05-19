@@ -30,7 +30,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
 {
     OT_LOG_D("Marking environments for cleanup");
     ot::DateTime currentTime = ot::DateTime::current();
-    const std::string homePath = m_interpreterPathSettings.getCustomEnvironmentPath();
+    const std::string homePath = m_interpreterPathSettings.getManifestEnvironmentsBasePath();
     std::list<std::filesystem::path> allEnvironments;
     for (const auto& entry : std::filesystem::directory_iterator(homePath))
     {
@@ -41,7 +41,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
     }
 
     auto allPredefinedEnvironments = PredefinedEnvironments::getAll();
-    auto numberOfCustomEnvironments = allEnvironments.size() - allPredefinedEnvironments.size();
+    auto numberOfCustomEnvironments = allEnvironments.size(); // -allPredefinedEnvironments.size(); not needed anymore since the manifest environments are stored at a different location. Because of folder access rights in the installed version.
 
     if (numberOfCustomEnvironments > m_numberOfEnvironmentsLimit)
     {
@@ -50,7 +50,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
         {
             std::string fileName = environment.filename().string();
             if (std::find(allPredefinedEnvironments.begin(), allPredefinedEnvironments.end(), fileName) == allPredefinedEnvironments.end()
-                && fileName != m_interpreterPathSettings.getCustomEnvironmentPath())
+                && fileName != m_interpreterPathSettings.getManifestEnvironmentsBasePath())
             {
 				//We only consider custom environments for removal
 
@@ -76,7 +76,7 @@ void EnvironmentsGarbageCollector::markForCleanup()
 void EnvironmentsGarbageCollector::removeMarkedEnvironments()
 {
     OT_LOG_D("Removing marked environments");
-    const std::string homePath = m_interpreterPathSettings.getCustomEnvironmentPath();
+    const std::string homePath = m_interpreterPathSettings.getManifestEnvironmentsBasePath();
     std::list<std::filesystem::path> allEnvironments;
     for (const auto& entry : std::filesystem::directory_iterator(homePath))
     {

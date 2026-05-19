@@ -32,6 +32,7 @@ InterpreterPathSettings::InterpreterPathSettings(ot::UID _manifestUID)
 
 InterpreterPathSettings::InterpreterPathSettings(const std::string& _predefinedEnvironmentName)
 {
+	m_predefinedEnvironment = true;
 	OT_LOG_D("Initialize interpreter path settings for predefined environment: " + _predefinedEnvironmentName);
 	setupBasePaths();
 
@@ -62,7 +63,15 @@ void InterpreterPathSettings::setupBasePaths()
 {
 	std::string devEnvRootName = "OPENTWIN_DEV_ROOT";
 	std::string devEnvRoot = ot::OperatingSystem::getEnvironmentVariableString(devEnvRootName.c_str());
-	m_customEnvironmentBase = ot::OperatingSystem::getEnvironmentVariableString("PROGRAMDATA");
+	const std::string sharedNoAdminRightsPath = ot::OperatingSystem::getEnvironmentVariableString("PROGRAMDATA");
+	if (sharedNoAdminRightsPath.empty())
+	{
+		OT_LOG_E("Failed to find PROGRAMDATA folder. Custom package installation for python will fail.");
+	}
+	else
+	{
+		m_manifestEnvironmentBase = sharedNoAdminRightsPath + "\\OpenTwin\\PythonEnvironments\\";
+	}
 #ifdef _DEBUG
 	const std::string pythonRootEnvVarName = "OT_PYTHON_ROOT";
 	std::string pythonRoot = ot::OperatingSystem::getEnvironmentVariableString(pythonRootEnvVarName.c_str());

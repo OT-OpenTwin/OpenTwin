@@ -79,7 +79,7 @@ void PackageHandler::initializeManifest(ot::UID _manifestUID)
     }
 }
 
-void PackageHandler::initializeEnvironmentWithManifest(const std::string& _environmentPath)
+void PackageHandler::initializeEnvironmentWithManifest(std::string _environmentPath)
 {
 	OT_LOG_D("Initialising environment at " + _environmentPath);
     assert(m_installationNotifier != nullptr);

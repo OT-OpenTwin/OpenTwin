@@ -74,7 +74,8 @@ void PythonWrapper::initializePythonInterpreter(InterpreterPathSettings& _interp
 	
 	if (!_interpreterPathSettings.getCustomEnvironmentName().empty())
 	{
-		std::string customEnvironmentPath = _interpreterPathSettings.getCustomEnvironmentPath();
+		std::string customEnvironmentPath = _interpreterPathSettings.isPredefinedEnvironment() ?  _interpreterPathSettings.getEnvironmentsBasePath() : _interpreterPathSettings.getManifestEnvironmentsBasePath();
+		customEnvironmentPath += "/" + _interpreterPathSettings.getCustomEnvironmentName();
 		lookupPaths.push_back(ot::String::toWString(customEnvironmentPath));
 		OT_LOG_D("Custom environment: " + customEnvironmentPath);
 	}

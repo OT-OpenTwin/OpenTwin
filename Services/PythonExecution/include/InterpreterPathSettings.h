@@ -38,19 +38,20 @@ public:
 		return m_defaultEnvironments;
 	}
 
-	std::string getCustomEnvironmentPath() const
+	std::string getManifestEnvironmentsBasePath() const
 	{
 		assert(m_pathsAreSet);
-		if (m_customEnvironmentName.empty())
-		{
-			return "";
-		}
-		else
-		{
-			
-			return m_customEnvironmentBase + "\\OpenTwin\\PythonEnvironments\\" + m_customEnvironmentName;
-		}
+		assert(!m_environmentsBase.empty());
+		return m_manifestEnvironmentBase;
 	}
+
+	std::string getEnvironmentsBasePath() const
+	{
+		assert(m_pathsAreSet);
+		assert(!m_environmentsBase.empty());
+		return m_environmentsBase;
+	}
+
 	std::string getHomePath() const
 	{
 		assert(m_pathsAreSet);
@@ -74,12 +75,7 @@ public:
 		assert(m_pathsAreSet);
 		return m_customEnvironmentName;
 	}
-	std::string getEnvironmentsBasePath() const
-	{
-		assert(m_pathsAreSet);
-		assert(!m_environmentsBase.empty());
-		return m_environmentsBase;
-	}
+
 
 	std::string getLibPath() const
 	{
@@ -87,24 +83,22 @@ public:
 		assert(!m_libPath.empty());
 		return m_libPath;
 	}
-	std::string getCustomEnvironmentsBasePath() const
+	
+	bool isPredefinedEnvironment() const
 	{
-		assert(m_pathsAreSet);
-		assert(!m_environmentsBase.empty());
-		return m_customEnvironmentBase;
+		return m_predefinedEnvironment;
 	}
-
 private:
 	std::string m_environmentsBase;
 	std::string m_home;
 	std::string m_dllPath;
 	std::string m_binPath;
-	std::string m_customEnvironmentBase;
+	std::string m_manifestEnvironmentBase;
 	std::string m_customEnvironmentName = ""; //per default core environment only, no custom environment
 	std::string m_libPath;
 	std::list<std::string> m_defaultEnvironments;
 
 	bool m_pathsAreSet = false;
-
+	bool m_predefinedEnvironment = false;
 	void setupBasePaths();
 };
