@@ -46,6 +46,11 @@ BlockHandlerDatabaseAccess::BlockHandlerDatabaseAccess(EntityBlockDatabaseAccess
 {
 	//First get handler of the selected project result data.
 	m_accessConfig =blockEntity->getDataLakeAccessCfg();
+
+	if (m_accessConfig.getQueriesByCollection().size() == 0 || m_accessConfig.getCollectionName().empty())
+	{
+		throw std::exception("No valid queries to execute");
+	}
 	std::pair<bool, uint32_t> resultLimit = blockEntity->getResultLimit();
 	if (resultLimit.first)
 	{
@@ -98,9 +103,16 @@ void BlockHandlerDatabaseAccess::collectMetadataForPipeline(EntityBlockDatabaseA
 {
 	const std::string targetCollectionName = m_accessConfig.getCollectionName();
 	const std::string thisCollectionNme = Application::instance()->getCollectionName();
-	ResultCollectionMetadataAccess metadataAccess(targetCollectionName, Application::instance()->getModelComponent(), targetCollectionName!= thisCollectionNme);
+	if (!targetCollectionName.empty())
+	{
+		ResultCollectionMetadataAccess metadataAccess(targetCollectionName, Application::instance()->getModelComponent(), targetCollectionName!= thisCollectionNme);
+		m_campaign = metadataAccess.getMetadataCampaign();
+	}
+	else
+	{
+		assert(false); 
+	}
 	
-	m_campaign = metadataAccess.getMetadataCampaign();
 
 	////Now we setup the datastream
 	ot::Connector outputConnector = _blockEntity->getConnectorOutput();

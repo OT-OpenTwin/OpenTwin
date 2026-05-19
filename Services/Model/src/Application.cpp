@@ -667,7 +667,13 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 		throw ot::Exception::ObjectNotFound("No model created yet");
 	}
 
+
 	std::string	collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
+	if (collectionName.empty())
+	{
+		OT_LOG_E("Trying to access another collections entities without giving a collection name.");
+		throw std::exception("Internal error. Collection name is empty.");
+	}
 	std::string folder = ot::json::getString(_document, OT_ACTION_PARAM_Folder);
 	std::string className = ot::json::getString(_document, OT_ACTION_PARAM_Type);
 	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
