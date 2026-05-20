@@ -21,6 +21,7 @@
 
 #include "Application.h"
 #include "CartesianMeshTree.h"
+#include "MeshLineCalculator.h"
 
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -716,42 +717,17 @@ EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::li
 {
 	EntityMeshCartesianData *data = new EntityMeshCartesianData(0, nullptr, nullptr, nullptr);
 
-	// Get the bounding box
-	BoundingBox geometryBoundingBox;
+	MeshLineCalculator lineCalculator;
+	lineCalculator.setMesh(getEntityMesh());
+	lineCalculator.setMeshEntities(meshEntities);
+	lineCalculator.setMaximumEdgeLength(maximumEdgeLength);
+	lineCalculator.setStepsAlongDiagonal(stepsAlongDiagonalProperty);
 
-	for (auto entity : meshEntities)
-	{
-		// Ignore the background shape which does not have a name assigned yet
-		if (!entity->getName().empty())
-		{
-			if (entity->getClassName() != "EntityContainer")
-			{
-				double xmin = 0.0, xmax = 0.0, ymin = 0.0, ymax = 0.0, zmin = 0.0, zmax = 0.0;
+	lineCalculator.updateMeshLines();
 
-				if (entity->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax))
-				{
-					geometryBoundingBox.extend(xmin, xmax, ymin, ymax, zmin, zmax);
-				}
-			}
-		}
-	}
-
-	// Now extend the bounding box by the settings if needed
-	double offsetXmin = 0.0, offsetXmax = 0.0, offsetYmin = 0.0, offsetYmax = 0.0, offsetZmin = 0.0, offsetZmax = 0.0;
-
-	double deltaX = geometryBoundingBox.getXmax() - geometryBoundingBox.getXmin();
-	double deltaY = geometryBoundingBox.getYmax() - geometryBoundingBox.getYmin();
-	double deltaZ = geometryBoundingBox.getZmax() - geometryBoundingBox.getZmin();
-
-	determineBoundingBoxExtension(deltaX, deltaY, deltaZ, offsetXmin, offsetXmax, offsetYmin, offsetYmax, offsetZmin, offsetZmax);
-
-	// Find the base step width
-	double baseStepWidth = std::min(maximumEdgeLength, geometryBoundingBox.getDiagonal() / stepsAlongDiagonalProperty);
-
-	// Now get the mesh lines in the coordinate directions
-	determineMeshLinesOneDirection(geometryBoundingBox.getXmin() - offsetXmin, geometryBoundingBox.getXmax() + offsetXmax, baseStepWidth, data->getMeshLinesX());
-	determineMeshLinesOneDirection(geometryBoundingBox.getYmin() - offsetYmin, geometryBoundingBox.getYmax() + offsetYmax, baseStepWidth, data->getMeshLinesY());
-	determineMeshLinesOneDirection(geometryBoundingBox.getZmin() - offsetZmin, geometryBoundingBox.getZmax() + offsetZmax, baseStepWidth, data->getMeshLinesZ());
+	data->getMeshLinesX() = lineCalculator.getMeshLines(0);
+	data->getMeshLinesY() = lineCalculator.getMeshLines(1);
+	data->getMeshLinesZ() = lineCalculator.getMeshLines(2);
 
 	// Store the mesh statistics in read-only properties
 	EntityPropertiesBoolean::createProperty("Mesh Visualization", "Show mesh lines", false, "", data->getProperties());
@@ -774,82 +750,6 @@ EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::li
 	data->getProperties().getProperty("Mesh step ratio")->setReadOnly(true);
 
 	return data;
-}
-
-void CartesianMeshCreation::determineBoundingBoxExtension(double deltaX, double deltaY, double deltaZ,
-														  double &offsetXmin, double &offsetXmax, double &offsetYmin, double &offsetYmax, double &offsetZmin, double &offsetZmax)
-{
-	EntityPropertiesSelection *backgroundMode = dynamic_cast<EntityPropertiesSelection*>(getEntityMesh()->getProperties().getProperty("Background mode"));
-	EntityPropertiesBoolean *extendFlag = dynamic_cast<EntityPropertiesBoolean*>(getEntityMesh()->getProperties().getProperty("Extend in all directions"));
-	EntityPropertiesEntityList *backgroundMaterial = dynamic_cast<EntityPropertiesEntityList*>(getEntityMesh()->getProperties().getProperty("Background material"));
-	EntityPropertiesDouble *boundaryDistanceAllAbs = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAllRel = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance (rel)"));
-	EntityPropertiesDouble *boundaryDistanceAbsXmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at xmin (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAbsXmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at xmax (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAbsYmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at ymin (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAbsYmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at ymax (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAbsZmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at zmin (abs)"));
-	EntityPropertiesDouble *boundaryDistanceAbsZmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at zmax (abs)"));
-	EntityPropertiesDouble *boundaryDistanceRelXmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at xmin (rel)"));
-	EntityPropertiesDouble *boundaryDistanceRelXmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at xmax (rel)"));
-	EntityPropertiesDouble *boundaryDistanceRelYmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at ymin (rel)"));
-	EntityPropertiesDouble *boundaryDistanceRelYmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at ymax (rel)"));
-	EntityPropertiesDouble *boundaryDistanceRelZmin = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at zmin (rel)"));
-	EntityPropertiesDouble *boundaryDistanceRelZmax = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Boundary distance at zmax (rel)"));
-
-	if (backgroundMode != nullptr && extendFlag != nullptr && backgroundMaterial != nullptr && boundaryDistanceAllAbs != nullptr && boundaryDistanceAllRel != nullptr
-		&& boundaryDistanceAbsXmin != nullptr && boundaryDistanceAbsXmax != nullptr && boundaryDistanceAbsYmin != nullptr && boundaryDistanceAbsYmax != nullptr
-		&& boundaryDistanceAbsZmin != nullptr && boundaryDistanceAbsZmax != nullptr
-		&& boundaryDistanceRelXmin != nullptr && boundaryDistanceRelXmax != nullptr && boundaryDistanceRelYmin != nullptr && boundaryDistanceRelYmax != nullptr
-		&& boundaryDistanceRelZmin != nullptr && boundaryDistanceRelZmax != nullptr)
-	{
-		if (backgroundMode->getValue() == "Extend relative")
-		{
-			if (extendFlag->getValue())
-			{
-				// Same relative extension in all directions
-				offsetXmin = boundaryDistanceAllRel->getValue() * deltaX;
-				offsetXmax = boundaryDistanceAllRel->getValue() * deltaX;
-				offsetYmin = boundaryDistanceAllRel->getValue() * deltaY;
-				offsetYmax = boundaryDistanceAllRel->getValue() * deltaY;
-				offsetZmin = boundaryDistanceAllRel->getValue() * deltaZ;
-				offsetZmax = boundaryDistanceAllRel->getValue() * deltaZ;
-			}
-			else
-			{
-				// Direction specific relative extension
-				offsetXmin = boundaryDistanceRelXmin->getValue() * deltaX;
-				offsetXmax = boundaryDistanceRelXmax->getValue() * deltaX;
-				offsetYmin = boundaryDistanceRelYmin->getValue() * deltaY;
-				offsetYmax = boundaryDistanceRelYmax->getValue() * deltaY;
-				offsetZmin = boundaryDistanceRelZmin->getValue() * deltaZ;
-				offsetZmax = boundaryDistanceRelZmax->getValue() * deltaZ;
-			}
-		}
-		else if (backgroundMode->getValue() == "Extend absolute")
-		{
-			if (extendFlag->getValue())
-			{
-				// Same absolute extension in all directions
-				offsetXmin = boundaryDistanceAllAbs->getValue();
-				offsetXmax = boundaryDistanceAllAbs->getValue();
-				offsetYmin = boundaryDistanceAllAbs->getValue();
-				offsetYmax = boundaryDistanceAllAbs->getValue();
-				offsetZmin = boundaryDistanceAllAbs->getValue();
-				offsetZmax = boundaryDistanceAllAbs->getValue();
-			}
-			else
-			{
-				// Direction specific absolute extension
-				offsetXmin = boundaryDistanceAbsXmin->getValue();
-				offsetXmax = boundaryDistanceAbsXmax->getValue();
-				offsetYmin = boundaryDistanceAbsYmin->getValue();
-				offsetYmax = boundaryDistanceAbsYmax->getValue();
-				offsetZmin = boundaryDistanceAbsZmin->getValue();
-				offsetZmax = boundaryDistanceAbsZmax->getValue();
-			}
-		}
-	}
 }
 
 EntityGeometry *CartesianMeshCreation::addBackgroundCubeTopology(void)
@@ -907,22 +807,6 @@ void CartesianMeshCreation::addBackgroundCubeGeometry(EntityGeometry *background
 	EntityPropertiesSelection::createProperty("Mesh", "Mesh refinement", { "Global setting", "Local setting" }, "Local setting", "", backgroundCube->getProperties());
 
 	backgroundCube->facetEntity(false);
-}
-
-
-void CartesianMeshCreation::determineMeshLinesOneDirection(double min, double max, double step, std::vector<double> &coords)
-{
-	double numberSteps = (max - min) / step;
-	size_t meshSteps = (size_t) numberSteps;
-	if (numberSteps > meshSteps + 1e-3) meshSteps++;
-
-	coords.clear();
-	coords.resize(meshSteps + 1);
-
-	for (size_t step = 0; step <= meshSteps; step++)
-	{
-		coords[step] = min + step * (max - min) / meshSteps;
-	}
 }
 
 void CartesianMeshCreation::determineVolumeFill(std::list<EntityGeometry *> &geometryEntities, EntityMeshCartesianData *meshData, bool conformalMeshing)

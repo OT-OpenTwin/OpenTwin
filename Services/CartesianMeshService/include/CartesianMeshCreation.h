@@ -309,8 +309,6 @@ private:
 	void reportTime(const std::string &message, std::time_t &timer);
 	std::list<ot::UID> getAllGeometryEntitiesForMeshing(void);
 	EntityMeshCartesianData *determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty);
-	void determineBoundingBoxExtension(double deltaX, double deltaY, double deltaZ, double &offsetXmin, double &offsetXmax, double &offsetYmin, double &offsetYmax, double &offsetZmin, double &offsetZmax);
-	void determineMeshLinesOneDirection(double min, double max, double step, std::vector<double> &coords);
 	EntityGeometry *addBackgroundCubeTopology(void);
 	void addBackgroundCubeGeometry(EntityGeometry *backgroundCube, EntityMeshCartesianData *meshData, double stepWidth);
 	void determineVolumeFill(std::list<EntityGeometry *> &geometryEntities, EntityMeshCartesianData *meshData, bool conformalMeshing);

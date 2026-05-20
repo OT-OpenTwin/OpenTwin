@@ -189,6 +189,7 @@
     <ClCompile Include="src\CartesianMeshCreation.cpp" />
     <ClCompile Include="src\CartesianMeshTree.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\MeshLineCalculator.cpp" />
     <ClCompile Include="src\MeshSlicer.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
@@ -197,6 +198,7 @@
     <ClInclude Include="include\Application.h" />
     <ClInclude Include="include\CartesianMeshCreation.h" />
     <ClInclude Include="include\CartesianMeshTree.h" />
+    <ClInclude Include="include\MeshLineCalculator.h" />
     <ClInclude Include="include\MeshSlicer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
     <ClInclude Include="include\UiNotifier.h" />
