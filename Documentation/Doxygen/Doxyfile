@@ -1027,6 +1027,7 @@ EXCLUDE_SYMLINKS       = YES
 
 EXCLUDE_PATTERNS       = */x64/* \
                          */.vs/* \
+                         */build/* \
                          */packages/* \
                          */AdminPanel/*
 
