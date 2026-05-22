@@ -101,7 +101,7 @@ const std::string EntitySolverFITTD::GetPropertyValueVolumeFull()
 
 void EntitySolverFITTD::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
-	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("FIT-TD/Solver/Run Solver");
+	_menuCfg.addButton("Run", "Run", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("FIT-TD/Solver/Run Solver");
 
 	_menuCfg.addSeparator();
 

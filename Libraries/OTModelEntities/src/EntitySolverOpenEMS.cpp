@@ -86,7 +86,7 @@ bool EntitySolverOpenEMS::updateFromProperties(void)
 
 void EntitySolverOpenEMS::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
-	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("OpenEMS/Solver/Run Solver");
+	_menuCfg.addButton("Run", "Run", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("OpenEMS/Solver/Run Solver");
 
 	_menuCfg.addSeparator();
 

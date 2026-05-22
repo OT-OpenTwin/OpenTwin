@@ -79,7 +79,7 @@ bool EntitySolverGetDP::updateFromProperties(void)
 
 void EntitySolverGetDP::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
-	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("GetDP/Solver/Run Solver");
+	_menuCfg.addButton("Run", "Run", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("GetDP/Solver/Run Solver");
 
 	_menuCfg.addSeparator();
 

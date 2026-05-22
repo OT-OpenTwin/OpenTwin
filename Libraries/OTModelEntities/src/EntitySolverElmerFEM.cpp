@@ -79,7 +79,7 @@ bool EntitySolverElmerFEM::updateFromProperties(void)
 
 void EntitySolverElmerFEM::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
 {
-	_menuCfg.addButton("Update", "Update", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("ElmerFEM/Solver/Run Solver");
+	_menuCfg.addButton("Run", "Run", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("ElmerFEM/Solver/Run Solver");
 
 	_menuCfg.addSeparator();
 
