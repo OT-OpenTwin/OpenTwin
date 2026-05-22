@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "MeshLineCalculator.h"
+#include "CartesianMeshMaterial.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 
@@ -52,11 +53,15 @@ void MeshLineCalculator::updateMeshLines()
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesY = mergeWeightedPoints(mergedFixPlanesY, smallestMeshStep);
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesZ = mergeWeightedPoints(mergedFixPlanesZ, smallestMeshStep);
 
+	// Next, we determine the stepwidth profile from the objects bounding boxes
+	std::vector<MeshLineCalculatorStepRange> densityRangesX = determineDensityRanges(0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax(), baseStepWidth);
+	std::vector<MeshLineCalculatorStepRange> densityRangesY = determineDensityRanges(1, meshBoundingBox.getYmin(), meshBoundingBox.getYmax(), baseStepWidth);
+	std::vector<MeshLineCalculatorStepRange> densityRangesZ = determineDensityRanges(2, meshBoundingBox.getZmin(), meshBoundingBox.getZmax(), baseStepWidth);
+
+
 
 	// Naechste Schritte:
-	// 1. Priority bestimmen in determineFixPlanes (basierend auf Materialsettings plus lokalen Shape settings)
 	// 2. Grobe Gitterlinienarrays bestimmen: bounding box hinzufügen und dann fix planes
-	// 3. Schrittweitenfunktion bestimmen basierend auf Bounding boxen der Objekte und Schrittweiten innerhalb der Objekte
 	// 4. Aus Density und grobem Gitterlinienarray gemeinsam ein eigentliches Gitterlinienarray bestimmen.
 	// 5. Zusätzliche Linien einfügen, um die Anforderungen an die Glattheit des Gitters zu erfüllen
 	// 6. Setzen der Ergebnisse in meshCoords, loeschen der Funktion determineMeshLinesOneDirection
@@ -172,7 +177,9 @@ BoundingBox MeshLineCalculator::determineBoundingBoxExtension(const BoundingBox 
 	}
 
 	BoundingBox meshBoundingBox = geometryBoundingBox;
-	meshBoundingBox.extend(offsetXmin, offsetXmax, offsetYmin, offsetYmax, offsetZmin, offsetZmax);
+	meshBoundingBox.extend(geometryBoundingBox.getXmin() - offsetXmin, geometryBoundingBox.getXmax() + offsetXmax, 
+						   geometryBoundingBox.getYmin() - offsetYmin, geometryBoundingBox.getYmax() + offsetYmax, 
+						   geometryBoundingBox.getZmin() - offsetZmin, geometryBoundingBox.getZmax() + offsetZmax);
 
 	return meshBoundingBox;
 }
@@ -208,6 +215,18 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlane
 			EntityFacetData* facetData = geometryEntity->getFacets();
 			if (facetData != nullptr)
 			{
+				// Determine the shape priority
+				double meshPriority = 0.0;
+
+				EntityPropertiesDouble* meshPriorityProperty = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("Mesh priority"));
+				if (meshPriorityProperty != nullptr) meshPriority = meshPriorityProperty->getValue();
+
+				CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial*>(geometryEntity->getData());
+				if (material != nullptr)
+				{
+					meshPriority += material->getPriority();
+				}
+
 				for (auto triangle : facetData->getTriangleList())
 				{
 					Geometry::Node n1 = facetData->getNodeVector()[triangle.getNode(0)];
@@ -224,9 +243,9 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlane
 						double location = (n1.getCoord(direction) + n2.getCoord(direction) + n3.getCoord(direction)) / 3.0;
 
 						MeshLineCalculatorWeightedPoint point;
-						point.area = triangleArea;
-						point.coord = location;
-						point.priority = 1.0;
+						point.area     = triangleArea;
+						point.coord    = location;
+						point.priority = meshPriority;
 
 						weightedFixpointList.push_back(point);
 					}
@@ -457,4 +476,142 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::mergeWeightedPoin
 	result.push_back(point);
 
 	return result;
+}
+
+std::vector<MeshLineCalculatorStepRange> MeshLineCalculator::determineDensityRanges(int direction, double boundingBoxMin, double boundingBoxMax, double baseStepWidth)
+{
+	std::vector<MeshLineCalculatorStepRange> ranges;
+
+	// Add the background step width
+	addRange(ranges, boundingBoxMin, boundingBoxMax, baseStepWidth);
+
+	// Loop through all solids and determine the bounds and the local stepwidth. Add this as density range
+	for (auto meshEntity : meshEntities)
+	{
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(meshEntity);
+		if (geometryEntity != nullptr)
+		{
+			double xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
+			geometryEntity->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax);
+
+			double stepWidth = getVolumeMeshStepWidth(geometryEntity, baseStepWidth);
+
+			switch(direction)
+			{
+			case 0:
+				addRange(ranges, xmin, xmax, stepWidth);
+				break;
+			case 1:
+				addRange(ranges, ymin, ymax, stepWidth);
+				break;
+			case 2:
+				addRange(ranges, zmin, zmax, stepWidth);
+				break;
+			default:
+				assert(0); // Invalid direction
+			}
+		}
+	}
+
+	return ranges;
+}
+
+double MeshLineCalculator::getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth)
+{
+	// Determine the base mesh step width for this entity (if specified)
+	EntityPropertiesDouble* meshStepWidth = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty("Maximum edge length"));
+	if (meshStepWidth == nullptr)
+	{
+		// This is for backward compatibility with oder models only.
+		meshStepWidth = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty("Mesh step width"));
+	}
+
+	double shapeMeshStepWidth = baseStepWidth;
+
+	if (meshStepWidth != nullptr)
+	{
+		if (meshStepWidth->getValue() > 0.0)
+		{
+			shapeMeshStepWidth = meshStepWidth->getValue();
+		}
+	}
+
+	return shapeMeshStepWidth;
+}
+
+void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep)
+{
+	if (ranges.empty())
+	{
+		MeshLineCalculatorStepRange newRange;
+		newRange.min = newMin;
+		newRange.max = newMax;
+		newRange.step = newStep;
+
+		ranges.push_back(newRange);
+
+		return;
+	}
+
+	constexpr double EPS = 1e-12;
+
+	if (newMax <= newMin)
+		return;
+
+	std::vector<MeshLineCalculatorStepRange> result;
+
+	for (const auto& r : ranges)
+	{
+		// No overlap
+		if (r.max <= newMin || r.min >= newMax)
+		{
+			result.push_back(r);
+			continue;
+		}
+
+		// Part before new range
+		if (r.min < newMin)
+		{
+			result.push_back({ r.min, newMin, r.step });
+		}
+
+		// Overlapping part
+		double overlapMin = std::max(r.min, newMin);
+		double overlapMax = std::min(r.max, newMax);
+
+		result.push_back({
+			overlapMin,
+			overlapMax,
+			std::min(r.step, newStep)
+			});
+
+		// Part after new range
+		if (r.max > newMax)
+		{
+			result.push_back({ newMax, r.max, r.step });
+		}
+	}
+
+	std::sort(result.begin(), result.end(),
+		[](const MeshLineCalculatorStepRange& a, const MeshLineCalculatorStepRange& b)
+		{
+			return a.min < b.min;
+		});
+
+	// Merge neighboring ranges with same step size
+	ranges.clear();
+
+	for (const auto& r : result)
+	{
+		if (!ranges.empty() &&
+			std::abs(ranges.back().step - r.step) < EPS
+			&& std::abs(ranges.back().max - r.min) < EPS)
+		{
+			ranges.back().max = r.max;
+		}
+		else
+		{
+			ranges.push_back(r);
+		}
+	}
 }

@@ -48,6 +48,9 @@
     <ClInclude Include="include\MeshLineCalculator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="include\CartesianMeshMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Source Files">

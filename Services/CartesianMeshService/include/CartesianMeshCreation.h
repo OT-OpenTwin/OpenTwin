@@ -44,34 +44,7 @@ class EntityMaterial;
 
 #include <embree3/rtcore.h>
 
-class CartesianMeshMaterial
-{
-public:
-	CartesianMeshMaterial() : isPEC(false), epsilon(1.0), mu(1.0), sigma(0.0), priority(0.0) {};
-	virtual ~CartesianMeshMaterial() {};
-
-	void setIsPEC(bool flag) { isPEC = flag; }
-	void setEpsilon(double value) { epsilon = value; }
-	void setMu(double value) { mu = value; }
-	void setSigma(double value) { sigma = value; }
-
-	void setPriority(double value) { priority = value; }
-
-	bool   getIsPEC(void) { return isPEC; }
-	double getEpsilon(void) { return epsilon; }
-	double getMu(void) { return mu; }
-	double getSigma(void) { return sigma; }
-
-	double getPriority(void) { return priority; }
-
-private:
-	bool isPEC;
-	double epsilon;
-	double mu;
-	double sigma;
-
-	double priority;
-};
+#include "CartesianMeshMaterial.h"
 
 class CartesianMeshFillFront
 {

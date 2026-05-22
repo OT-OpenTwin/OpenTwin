@@ -33,6 +33,13 @@ struct MeshLineCalculatorWeightedPoint
 	double priority;
 };
 
+struct MeshLineCalculatorStepRange
+{
+	double min;
+	double max;
+	double step;
+};
+
 class MeshLineCalculator
 {
 public:
@@ -59,6 +66,9 @@ private:
 	double calculateTriangleArea(Geometry::Node& n1, Geometry::Node& n2, Geometry::Node& n3);
 	std::list<MeshLineCalculatorWeightedPoint> mergeValuesAndAveragePositions(const std::list<MeshLineCalculatorWeightedPoint>& input, double tolerance);
 	std::list<MeshLineCalculatorWeightedPoint> mergeWeightedPoints(std::list<MeshLineCalculatorWeightedPoint> input, double tolerance);
+	std::vector<MeshLineCalculatorStepRange> determineDensityRanges(int direction, double boundingBoxMin, double boundingBoxMax, double baseStepWidth);
+	void addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep);
+	double getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth);
 
 	// Data
 	EntityMeshCartesian* meshEntity;
