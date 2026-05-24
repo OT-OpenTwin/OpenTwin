@@ -248,7 +248,17 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 
 				if (targetType == ot::TypeNames::getDateTimeTypeName())
 				{
-					converter.normaliseNumericString(fieldValueStringFixed, '.');
+					fieldValueStringFixed.erase(std::remove(fieldValueStringFixed.begin(), fieldValueStringFixed.end(), '"'), fieldValueStringFixed.end());
+					const size_t firstNonSpace = fieldValueStringFixed.find_first_not_of(" \t\r\n");
+					if (firstNonSpace == std::string::npos)
+					{
+						fieldValueStringFixed.clear();
+					}
+					else
+					{
+						const size_t lastNonSpace = fieldValueStringFixed.find_last_not_of(" \t\r\n");
+						fieldValueStringFixed = fieldValueStringFixed.substr(firstNonSpace, lastNonSpace - firstNonSpace + 1);
+					}
 				}
 				else
 				{
