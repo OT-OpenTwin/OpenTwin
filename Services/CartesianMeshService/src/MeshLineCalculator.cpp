@@ -32,14 +32,11 @@ void MeshLineCalculator::updateMeshLines()
 	double baseStepWidth = std::min(maximumEdgeLength, geometryBoundingBox.getDiagonal() / stepsAlongDiagonal);
 	double geometryToleranceAbsolute = geometryTolerance * geometryBoundingBox.getDiagonal();
 	double smallestMeshStep = smallestCellRatio * baseStepWidth;
+	double maximumMeshRatio = 2.0;
 
-	determineMeshLinesOneDirection(meshBoundingBox.getXmin(), meshBoundingBox.getXmax(), baseStepWidth, meshCoords[0]);
-	determineMeshLinesOneDirection(meshBoundingBox.getYmin(), meshBoundingBox.getYmax(), baseStepWidth, meshCoords[1]);
-	determineMeshLinesOneDirection(meshBoundingBox.getZmin(), meshBoundingBox.getZmax(), baseStepWidth, meshCoords[2]);
-
-	std::list<MeshLineCalculatorWeightedPoint> fixPlanesX = determineFixPlanes(0, 1.0, 0.0, 0.0);
-	std::list<MeshLineCalculatorWeightedPoint> fixPlanesY = determineFixPlanes(1, 0.0, 1.0, 0.0);
-	std::list<MeshLineCalculatorWeightedPoint> fixPlanesZ = determineFixPlanes(2, 0.0, 0.0, 1.0);
+	std::list<MeshLineCalculatorWeightedPoint> fixPlanesX = determineFixPlanes(0, 1.0, 0.0, 0.0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax());
+	std::list<MeshLineCalculatorWeightedPoint> fixPlanesY = determineFixPlanes(1, 0.0, 1.0, 0.0, meshBoundingBox.getYmin(), meshBoundingBox.getYmax());
+	std::list<MeshLineCalculatorWeightedPoint> fixPlanesZ = determineFixPlanes(2, 0.0, 0.0, 1.0, meshBoundingBox.getZmin(), meshBoundingBox.getZmax());
 
 	// The next step merges triangles which are close within the geometric tolerance and adds their areas. This is relevant for the 
 	// case that a planar face is built by multiple triangles. Afterward, the face will have one location together with its total area.
@@ -58,13 +55,18 @@ void MeshLineCalculator::updateMeshLines()
 	std::vector<MeshLineCalculatorStepRange> densityRangesY = determineDensityRanges(1, meshBoundingBox.getYmin(), meshBoundingBox.getYmax(), baseStepWidth);
 	std::vector<MeshLineCalculatorStepRange> densityRangesZ = determineDensityRanges(2, meshBoundingBox.getZmin(), meshBoundingBox.getZmax(), baseStepWidth);
 
+	// Now we calculate the actual mesh line distribution based on the fix planes and the density profiles
+	std::vector<double> meshLinesX = determineMeshLines(finalFixPlanesX, densityRangesX);
+	std::vector<double> meshLinesY = determineMeshLines(finalFixPlanesY, densityRangesY);
+	std::vector<double> meshLinesZ = determineMeshLines(finalFixPlanesZ, densityRangesZ);
 
+	// Equilibrate mesh to ensure smoothness and store the mesh lines in the arrays
+	meshCoords[0] = equilibrateMeshLines(meshLinesX, maximumMeshRatio);
+	meshCoords[1] = equilibrateMeshLines(meshLinesY, maximumMeshRatio);
+	meshCoords[2] = equilibrateMeshLines(meshLinesZ, maximumMeshRatio);
+	
 
 	// Naechste Schritte:
-	// 2. Grobe Gitterlinienarrays bestimmen: bounding box hinzufügen und dann fix planes
-	// 4. Aus Density und grobem Gitterlinienarray gemeinsam ein eigentliches Gitterlinienarray bestimmen.
-	// 5. Zusätzliche Linien einfügen, um die Anforderungen an die Glattheit des Gitters zu erfüllen
-	// 6. Setzen der Ergebnisse in meshCoords, loeschen der Funktion determineMeshLinesOneDirection
 	// 7. Parameter der Gittergenerierung einstellbar machen.
 	// 8. Anzeige der Gitterlinien in der Schnittebene
 
@@ -184,28 +186,23 @@ BoundingBox MeshLineCalculator::determineBoundingBoxExtension(const BoundingBox 
 	return meshBoundingBox;
 }
 
-void MeshLineCalculator::determineMeshLinesOneDirection(double min, double max, double step, std::vector<double>& coords)
-{
-	double numberSteps = (max - min) / step;
-	size_t meshSteps = (size_t)numberSteps;
-	if (numberSteps > meshSteps + 1e-3) meshSteps++;
-
-	coords.clear();
-	coords.resize(meshSteps + 1);
-
-	for (size_t step = 0; step <= meshSteps; step++)
-	{
-		coords[step] = min + step * (max - min) / meshSteps;
-	}
-}
-
-std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlanes(int direction, double vx, double vy, double vz)
+std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlanes(int direction, double vx, double vy, double vz, double min, double max)
 {
 	// First, we iterate over all triangles and determine the ones for which the normal is aligned with the given vector (parallel and antiparallel)
 	// For each of these triangles, the area is calculated and stored in the fix plane list together with the averaged triangle coordinate in the vector
 	// direction.
 
 	std::list<MeshLineCalculatorWeightedPoint> weightedFixpointList;
+
+	// Add the min and the max coordinates with maximum Priority
+	MeshLineCalculatorWeightedPoint point;
+	point.area = 1.0;
+	point.coord = min;
+	point.priority = DBL_MAX;
+	weightedFixpointList.push_back(point);
+
+	point.coord = max;
+	weightedFixpointList.push_back(point);
 	
 	for (auto meshEntity : meshEntities)
 	{
@@ -390,6 +387,7 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::mergeValuesAndAve
 			weightedCoordSum = coord * weight;
 			weightSum = weight;
 			groupCenter = coord;
+			weightPriority = priority;
 		}
 	}
 
@@ -615,3 +613,212 @@ void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& rang
 		}
 	}
 }
+
+double MeshLineCalculator::getStepAt(double x, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	constexpr double EPS = 1e-12;
+
+	double step = std::numeric_limits<double>::max();
+
+	for (const auto& r : ranges)
+	{
+		if (x >= r.min - EPS && x < r.max - EPS)
+		{
+			step = std::min(step, r.step);
+		}
+	}
+
+	return step;
+}
+
+double MeshLineCalculator::getNextRangeBoundary(double x, double xEnd, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	constexpr double EPS = 1e-12;
+
+	double next = xEnd;
+
+	for (const auto& r : ranges)
+	{
+		if (r.min > x + EPS && r.min < next)
+			next = r.min;
+
+		if (r.max > x + EPS && r.max < next)
+			next = r.max;
+	}
+
+	return next;
+}
+
+std::vector<double> MeshLineCalculator::refineGridMarching(std::vector<double> baseGrid, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	constexpr double EPS = 1e-12;
+
+	std::sort(baseGrid.begin(), baseGrid.end());
+
+	std::vector<double> result;
+
+	for (size_t i = 0; i + 1 < baseGrid.size(); ++i)
+	{
+		double x = baseGrid[i];
+		double xEnd = baseGrid[i + 1];
+
+		if (result.empty())
+			result.push_back(x);
+
+		while (x < xEnd - EPS)
+		{
+			double step = getStepAt(x, ranges);
+
+			if (step == std::numeric_limits<double>::max() || step <= 0.0)
+			{
+				// No step restriction found: jump directly to next fixed grid line
+				x = xEnd;
+				break;
+			}
+
+			double nextBoundary = getNextRangeBoundary(x, xEnd, ranges);
+
+			double target = x + step;
+
+			if (target >= xEnd - EPS)
+			{
+				x = xEnd;
+			}
+			else if (target > nextBoundary + EPS)
+			{
+				// Do not insert the range boundary.
+				// Instead continue from the boundary internally.
+				x = nextBoundary;
+			}
+			else
+			{
+				result.push_back(target);
+				x = target;
+			}
+		}
+
+		if (result.empty() || std::abs(result.back() - xEnd) > EPS)
+			result.push_back(xEnd);
+	}
+
+	return result;
+}
+
+std::vector<double> MeshLineCalculator::determineMeshLines(const std::list<MeshLineCalculatorWeightedPoint>& fixPlanes, const std::vector<MeshLineCalculatorStepRange>& densityRanges)
+{
+	// First, we store the fix plane positions as initial mesh lines in a vector
+	std::vector<double> baseMeshLines;
+	baseMeshLines.reserve(fixPlanes.size());
+
+	for (auto &point : fixPlanes)
+	{
+		baseMeshLines.push_back(point.coord);
+	}
+
+	// Now run the iterative line insertion
+	std::vector<double> meshLines = refineGridMarching(baseMeshLines, densityRanges);
+
+	return meshLines;
+}
+
+
+
+std::vector<double> MeshLineCalculator::splitGrowing(double length, double neighborStep, double ratio)
+{
+	constexpr double EPS = 1e-12;
+
+	double firstMax = neighborStep * ratio;
+
+	int n = 1;
+	double maxSum = firstMax;
+
+	while (maxSum < length - EPS)
+	{
+		++n;
+		maxSum += firstMax * std::pow(ratio, n - 1);
+	}
+
+	std::vector<double> steps(n);
+
+	double scale = length / maxSum;
+
+	for (int i = 0; i < n; ++i)
+		steps[i] = scale * firstMax * std::pow(ratio, i);
+
+	return steps;
+}
+
+std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio)
+{
+	if (meshLines.size() < 3)
+		return meshLines;
+
+	std::sort(meshLines.begin(), meshLines.end());
+
+	bool changed = true;
+
+	constexpr double EPS = 1e-12;
+
+	while (changed)
+	{
+		changed = false;
+
+		for (size_t i = 0; i + 2 < meshLines.size(); ++i)
+		{
+			double x0 = meshLines[i];
+			double x1 = meshLines[i + 1];
+			double x2 = meshLines[i + 2];
+
+			double h0 = x1 - x0;
+			double h1 = x2 - x1;
+
+			if (h1 > maximumMeshRatio * h0 + EPS)
+			{
+				auto steps = splitGrowing(h1, h0, maximumMeshRatio);
+
+				std::vector<double> newPoints;
+				double x = x1;
+
+				for (size_t k = 0; k + 1 < steps.size(); ++k)
+				{
+					x += steps[k];
+					newPoints.push_back(x);
+				}
+
+				meshLines.insert(meshLines.begin() + i + 2,
+					newPoints.begin(),
+					newPoints.end());
+
+				changed = true;
+				break;
+			}
+
+			if (h0 > maximumMeshRatio * h1 + EPS)
+			{
+				auto steps = splitGrowing(h0, h1, maximumMeshRatio);
+
+				std::vector<double> newPoints;
+				double x = x1;
+
+				for (size_t k = 0; k + 1 < steps.size(); ++k)
+				{
+					x -= steps[k];
+					newPoints.push_back(x);
+				}
+
+				std::reverse(newPoints.begin(), newPoints.end());
+
+				meshLines.insert(meshLines.begin() + i + 1,
+					newPoints.begin(),
+					newPoints.end());
+
+				changed = true;
+				break;
+			}
+		}
+	}
+
+	return meshLines;
+}
+
+

@@ -59,8 +59,7 @@ private:
 	BoundingBox calculateBoundingBox();
 	BoundingBox determineBoundingBoxExtension(const BoundingBox &geometryBoundingBox);
 	EntityMeshCartesian* getEntityMesh() { assert(meshEntity != nullptr); return meshEntity; }
-	void determineMeshLinesOneDirection(double min, double max, double step, std::vector<double>& coords);  // potentially obsolete later on
-	std::list<MeshLineCalculatorWeightedPoint> determineFixPlanes(int direction, double vx, double vy, double vz);
+	std::list<MeshLineCalculatorWeightedPoint> determineFixPlanes(int direction, double vx, double vy, double vz, double min, double max);
 	void calculateTriangleNormal(Geometry::Node& n1, Geometry::Node& n2, Geometry::Node& n3, double& nx, double& ny, double& nz);
 	bool isParallelOrAntiparallel(double nx, double ny, double nz, double vx, double vy, double vz, double deltaAngleDeg);
 	double calculateTriangleArea(Geometry::Node& n1, Geometry::Node& n2, Geometry::Node& n3);
@@ -69,6 +68,12 @@ private:
 	std::vector<MeshLineCalculatorStepRange> determineDensityRanges(int direction, double boundingBoxMin, double boundingBoxMax, double baseStepWidth);
 	void addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep);
 	double getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth);
+	double getStepAt(double x, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	double getNextRangeBoundary(double x, double xEnd, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	std::vector<double> refineGridMarching(std::vector<double> baseGrid, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	std::vector<double> determineMeshLines(const std::list<MeshLineCalculatorWeightedPoint>& fixPlanes, const std::vector<MeshLineCalculatorStepRange>& densityRanges);
+	std::vector<double> equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio);
+	std::vector<double> splitGrowing(double length, double neighborStep, double ratio);
 
 	// Data
 	EntityMeshCartesian* meshEntity;
