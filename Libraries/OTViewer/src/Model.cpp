@@ -2062,8 +2062,13 @@ void Model::executeAction(ot::UID _buttonID) {
 	case ViewerToolBar::Reset3DViewButton: resetAllViews3D(); break;
 	case ViewerToolBar::ShowGeometryButton: showGeometrySceneNodesAction(); break;
 	case ViewerToolBar::ShowMeshButton: showMeshSceneNodesAction(); break;
+
+	case ViewerToolBar::PlotShowSelected:
 	case ViewerToolBar::ShowSelectedButton: showSelectedSceneNodesAction(); break;
+
+	case ViewerToolBar::PlotHideSelected:
 	case ViewerToolBar::HideSelectedButton: hideSelectedSceneNodesAction(); break;
+
 	case ViewerToolBar::HideUnselectedButton: hideUnselectedSceneNodesAction(); break;
 	case ViewerToolBar::WireframeButton: toggleWireframeView(); break;
 	case ViewerToolBar::WorkingPlaneButton: toggleWorkingPlane(); break;

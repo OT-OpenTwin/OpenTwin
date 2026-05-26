@@ -55,6 +55,8 @@ public:
 		TableRemoveColumn,
 
 		PlotExportImage,
+		PlotShowSelected,
+		PlotHideSelected,
 
 		NoButton
 	};
@@ -119,4 +121,6 @@ private:
 	ot::UID m_tableRemoveColumnID;
 
 	ot::UID m_plotExportImage;
+	ot::UID m_plotShowSelected;
+	ot::UID m_plotHideSelected;
 };

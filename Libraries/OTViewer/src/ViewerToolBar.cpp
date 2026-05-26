@@ -58,6 +58,8 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 	else if (_uid == m_tableRemoveColumnID) return ButtonType::TableRemoveColumn;
 
 	else if (_uid == m_plotExportImage) return ButtonType::PlotExportImage;
+	else if (_uid == m_plotShowSelected) return ButtonType::PlotShowSelected;
+	else if (_uid == m_plotHideSelected) return ButtonType::PlotHideSelected;
 
 	else return ButtonType::NoButton;
 }
@@ -188,12 +190,17 @@ void ViewerToolBar::setupUIControlsPlot()
 
 	// Plot modal menu
 	ot::UID pageID = FrontendAPI::instance()->addMenuPage("Plot");
-	ot::UID plotGroupID = FrontendAPI::instance()->addMenuGroup(pageID, "Plot");
+	ot::UID visibilityID = FrontendAPI::instance()->addMenuGroup(pageID, "Curve Visibility");
+	ot::UID exportID = FrontendAPI::instance()->addMenuGroup(pageID, "Export");
 
 	m_removeItemIDList.push_front(pageID);
-	m_removeItemIDList.push_front(plotGroupID);
+	m_removeItemIDList.push_front(visibilityID);
+	m_removeItemIDList.push_front(exportID);
 
-	m_removeItemIDList.push_front(m_plotExportImage = FrontendAPI::instance()->addMenuPushButton(plotGroupID, "Export Image", "ImageSave"));
+	m_removeItemIDList.push_front(m_plotShowSelected = FrontendAPI::instance()->addMenuPushButton(visibilityID, "Show Selected", "ShowSelected"));
+	m_removeItemIDList.push_front(m_plotHideSelected = FrontendAPI::instance()->addMenuPushButton(visibilityID, "Hide Selected", "HideSelected"));
+
+	m_removeItemIDList.push_front(m_plotExportImage = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Image", "ImageSave"));
 
 	FrontendAPI::instance()->setCurrentMenuPage("Plot");
 }
@@ -333,6 +340,8 @@ void ViewerToolBar::resetControlsData() {
 	m_tableRemoveRowID = 0;
 	
 	m_plotExportImage = 0;
+	m_plotShowSelected = 0;
+	m_plotHideSelected = 0;
 }
 
 ViewerToolBar::ViewerToolBar() {
