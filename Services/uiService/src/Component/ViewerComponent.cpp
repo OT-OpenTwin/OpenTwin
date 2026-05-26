@@ -427,6 +427,16 @@ void ViewerComponent::setCurveDimmed(const std::string& _plotName, ot::UID _enti
 	}
 }
 
+void ViewerComponent::setCurveVisible(const std::string& _plotName, ot::UID _entityID, bool _setVisible, bool _queue)
+{
+	if (_queue) {
+		QMetaObject::invokeMethod(this, &ViewerComponent::slotSetCurveVisible, Qt::QueuedConnection, _plotName, _entityID, _setVisible);
+	}
+	else {
+		slotSetCurveVisible(_plotName, _entityID, _setVisible);
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Views
@@ -1181,6 +1191,25 @@ void ViewerComponent::slotSetCurveDimmed(const std::string& _plotName, ot::UID _
 
 	for (auto curve : allCurves) {
 		curve->setDimmed(_setDimmed, true);
+	}
+
+	plot->replot();
+}
+
+void ViewerComponent::slotSetCurveVisible(const std::string& _plotName, ot::UID _entityID, bool _setVisible)
+{
+	const ot::PlotView* plotView = AppBase::instance()->findPlot(_plotName, {});
+	if (!plotView)
+	{
+		OT_LOG_E("Plot not found \"" + _plotName + "\"");
+		return;
+	}
+	ot::Plot* plot = plotView->getPlot();
+	auto allCurves = plot->findDatasets(_entityID);
+
+	for (auto curve : allCurves)
+	{
+		curve->setCurveIsVisibile(_setVisible, true);
 	}
 
 	plot->replot();

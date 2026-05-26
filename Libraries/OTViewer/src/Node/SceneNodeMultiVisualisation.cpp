@@ -28,3 +28,16 @@ SceneNodeMultiVisualisation::~SceneNodeMultiVisualisation()
 {
 
 }
+
+void SceneNodeMultiVisualisation::setVisible(bool _visible)
+{
+	SceneNodeBase::setVisible(_visible);
+
+	for (auto vis : getVisualiser())
+	{
+		if (vis->getViewIsOpen())
+		{
+			vis->nodeVisibilityChanged(_visible);
+		}
+	}
+}

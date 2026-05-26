@@ -63,6 +63,8 @@ void ot::PlotLegendItem::updateVisibility()
 	OTAssertNullptr(m_dataset);
 	bool selected = m_dataset->isSelected();
 
+	bool curveVisible = m_dataset->getCurveIsVisible();
+
 	OTAssertNullptr(m_selectedWidget);
 	bool isVis = m_selectedWidget->getQWidget()->isVisible();
 	if (selected == isVis)
@@ -75,10 +77,10 @@ void ot::PlotLegendItem::updateVisibility()
 	}
 	
 
-	m_selectedWidget->getQWidget()->setVisible(selected);
+	m_selectedWidget->getQWidget()->setVisible(selected && curveVisible);
 
 	OTAssertNullptr(m_dimmedWidget);
-	m_dimmedWidget->getQWidget()->setVisible(!selected);
+	m_dimmedWidget->getQWidget()->setVisible(!selected && curveVisible);
 }
 
 void ot::PlotLegendItem::setLabel(const QString& _text)

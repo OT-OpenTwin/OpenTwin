@@ -108,7 +108,19 @@ void CurveVisualiser::setViewIsOpen(bool _viewIsOpen) {
 	// Initialize dimmed state
 	if (_viewIsOpen) {
 		FrontendAPI::instance()->setCurveDimmed(plot->getName(), m_node->getModelEntityID(), !getSceneNode()->isSelected(), true);
+		FrontendAPI::instance()->setCurveVisible(plot->getName(), m_node->getModelEntityID(), getSceneNode()->isVisible(), true);
 	}
+}
+
+void CurveVisualiser::nodeVisibilityChanged(bool _visible)
+{
+	auto plotNode = findPlotNode(getSceneNode());
+	if (!plotNode) {
+		OT_LOG_E("Plot node not found for curve visualiser");
+		return;
+	}
+
+	FrontendAPI::instance()->setCurveVisible(plotNode->getName(), m_node->getModelEntityID(), _visible, false);
 }
 
 SceneNodeBase* CurveVisualiser::findPlotNode(SceneNodeBase* _childNode) const {

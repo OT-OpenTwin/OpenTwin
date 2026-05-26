@@ -123,6 +123,7 @@ public:
 	// Plot
 
 	virtual void setCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed, bool _queue) override;
+	virtual void setCurveVisible(const std::string& _plotName, ot::UID _entityID, bool _setVisible, bool _queue) override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -240,6 +241,7 @@ public:
 
 private Q_SLOTS:
 	void slotSetCurveDimmed(const std::string& _plotName, ot::UID _entityID, bool _setDimmed);
+	void slotSetCurveVisible(const std::string& _plotName, ot::UID _entityID, bool _setVisible);
 
 private:
 	std::vector<ViewerUIDtype>		m_viewers;

@@ -79,6 +79,9 @@ public:
 	//! @brief Switch to turn a visualisation type off
 	void setMayVisualise(bool _visible) { m_mayVisualise = _visible;}
 
+	//! @brief Is called when the SceneNode visibility changes.
+	virtual void nodeVisibilityChanged(bool _visible) {};
+
 	//! @brief Switch for deciding if a data pull is necessary or if a lookup is necessary, if the displayed data may still be up-to date
 	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; };
 	bool getViewIsOpen() const { return m_viewIsOpen; };

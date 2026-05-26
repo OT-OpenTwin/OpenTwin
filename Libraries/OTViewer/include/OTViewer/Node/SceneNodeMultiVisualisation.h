@@ -30,6 +30,7 @@ namespace osg
 
 #include <string>
 #include <map>
+
 class Model;
 
 class SceneNodeMultiVisualisation : public SceneNodeBase
@@ -39,6 +40,8 @@ public:
 	virtual ~SceneNodeMultiVisualisation();
 
 	virtual bool isItem3D(void) const override { return false; };
+
+	virtual void setVisible(bool _visible) override;
 
 private:	
 };

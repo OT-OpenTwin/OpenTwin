@@ -33,7 +33,9 @@ public:
 
 	virtual std::string getViewEntityName() const override;
 
-	void setViewIsOpen(bool _viewIsOpen) override;
+	virtual void setViewIsOpen(bool _viewIsOpen) override;
+
+	virtual void nodeVisibilityChanged(bool _visible) override;
 
 	SceneNodeBase* findPlotNode(SceneNodeBase* _childNode) const;
 protected:
