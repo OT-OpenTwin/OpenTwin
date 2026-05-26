@@ -66,6 +66,9 @@ SelectProjectDialog::SelectProjectDialog(const ot::DialogCfg& _config, QWidget* 
 	ot::PushButton* cancelButton = new ot::PushButton("Cancel", this);
 	bottomLayout->addWidget(cancelButton);
 
+	setMinimumSize(800, 600);
+	resize(1024, 600);
+
 	connect(m_confirmButton, &QPushButton::clicked, this, &SelectProjectDialog::slotConfirm);
 	connect(cancelButton, &QPushButton::clicked, this, &SelectProjectDialog::closeCancel);
 	connect(m_overview, &ot::ProjectOverviewWidget::selectionChanged, this, &SelectProjectDialog::slotSelectionChanged);

@@ -123,7 +123,7 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 	this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix);
 	this->setWindowIcon(IconManager::getApplicationIcon());
 	this->setMinimumSize(QSize(800, 600));
-	this->resize(QSize(1024, 768));
+	this->resize(QSize(1024, 600));
 }
 
 ot::CreateProjectDialog::~CreateProjectDialog() {
