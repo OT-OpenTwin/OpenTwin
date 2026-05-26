@@ -27,6 +27,7 @@
 #include "OTWidgets/Widgets/PushButton.h"
 
 // Qt header
+#include <QtGui/qevent.h>
 #include <QtGui/qpainter.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qsplitter.h>
@@ -106,6 +107,7 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 
 	m_name = new LineEdit(this);
 	nameAndButtonLayout->addWidget(m_name, 1);
+	m_name->installEventFilter(this);
 	this->connect(m_name, &LineEdit::textChanged, this, &CreateProjectDialog::slotCheckCreateEnabledState);
 
 	m_createButton = new PushButton("Create", this);
@@ -121,10 +123,42 @@ ot::CreateProjectDialog::CreateProjectDialog(QWidget* _parentWidget)
 	this->setWindowTitle(OT_CREATEPROJECTDIALOG_TitlePrefix);
 	this->setWindowIcon(IconManager::getApplicationIcon());
 	this->setMinimumSize(QSize(800, 600));
+	this->resize(QSize(1024, 768));
 }
 
 ot::CreateProjectDialog::~CreateProjectDialog() {
 	
+}
+
+bool ot::CreateProjectDialog::eventFilter(QObject* _watched, QEvent* _event)
+{
+	if (_watched != m_name)
+	{
+		return Dialog::eventFilter(_watched, _event);
+	}
+
+	if (_event->type() == QEvent::KeyPress)
+	{
+		QKeyEvent* keyEvent = dynamic_cast<QKeyEvent*>(_event);
+		if (!keyEvent)
+		{
+			OT_LOG_E("Event cast failed");
+			return true;
+		}
+
+		if (keyEvent->key() == Qt::Key_Up)
+		{
+			this->moveProjectTypeSelection(false);
+			return true;
+		}
+		else if (keyEvent->key() == Qt::Key_Down)
+		{
+			this->moveProjectTypeSelection(true);
+			return true;
+		}
+	}
+
+	return Dialog::eventFilter(_watched, _event);
 }
 
 void ot::CreateProjectDialog::setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates) {
@@ -337,4 +371,78 @@ void ot::CreateProjectDialog::clear(void) {
 void ot::CreateProjectDialog::addListEntry(const ProjectTemplateInformation& _info) {
 	CreateProjectDialogEntry* newEntry = new CreateProjectDialogEntry(_info, this);
 	m_list->addItem(newEntry);
+}
+
+std::vector<ot::CreateProjectDialogEntry*> ot::CreateProjectDialog::getAllEntries() const
+{
+	std::vector<CreateProjectDialogEntry*> result;
+	auto items = m_list->findItems("*", Qt::MatchFlag::MatchWildcard);
+	result.reserve(items.size());
+
+	for (QListWidgetItem* item : items) {
+		CreateProjectDialogEntry* entry = dynamic_cast<CreateProjectDialogEntry*>(item);
+		if (entry) {
+			result.push_back(entry);
+		}
+		else {
+			OT_LOG_E("Item cast failed");
+		}
+	}
+
+	return result;
+}
+
+void ot::CreateProjectDialog::moveProjectTypeSelection(bool _down)
+{
+	std::vector<CreateProjectDialogEntry*> entries = this->getAllEntries();
+	if (entries.empty())
+	{
+		return;
+	}
+
+	size_t currentIndex = std::numeric_limits<size_t>::max();
+
+	for (size_t i = 0; i < entries.size(); i++)
+	{
+		if (entries[i]->isSelected())
+		{
+			entries[i]->setSelected(false);
+			currentIndex = i;
+			break;
+		}
+	}
+
+	if (currentIndex == std::numeric_limits<size_t>::max())
+	{
+		currentIndex = 0;
+	}
+	else if (_down)
+	{
+		if (currentIndex == entries.size() - 1)
+		{
+			currentIndex = 0;
+		}
+		else
+		{
+			currentIndex++;
+		}
+	}
+	else
+	{
+		if (currentIndex == 0)
+		{
+			currentIndex = entries.size() - 1;
+		}
+		else
+		{
+			currentIndex--;
+		}
+	}
+
+	if (currentIndex != std::numeric_limits<size_t>::max())
+	{
+		entries[currentIndex]->setSelected(true);
+		m_list->scrollToItem(entries[currentIndex], QAbstractItemView::PositionAtCenter);
+		this->slotShowInfo();
+	}
 }

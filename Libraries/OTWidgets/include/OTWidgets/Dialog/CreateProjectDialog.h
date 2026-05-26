@@ -66,6 +66,8 @@ namespace ot {
 		explicit CreateProjectDialog(QWidget* _parentWidget);
 		virtual ~CreateProjectDialog();
 
+		virtual bool eventFilter(QObject* _watched, QEvent* _event) override;
+
 		void setProjectTemplates(const std::list<ProjectTemplateInformation>& _templates);
 		void setCurrentProjectName(const QString& _name);
 
@@ -92,7 +94,9 @@ namespace ot {
 		bool isDataValid(void) const;
 		void clear(void);
 		void addListEntry(const ProjectTemplateInformation& _info);
-
+		std::vector<CreateProjectDialogEntry*> getAllEntries() const;
+		void moveProjectTypeSelection(bool _down);
+		
 		QListWidget* m_list;
 		Label* m_info;
 
