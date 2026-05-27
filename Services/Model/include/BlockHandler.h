@@ -116,7 +116,7 @@ private:
 	//! @param _originBlock The block from which the connection originates.
 	//! @param _connectionNaming The naming convention for the requested connection.
 	//! @return void 
-	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection, const ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Modifies the connection information for a given entity.
 	//! @param _connectionID Connection ID of the connection to be modified.

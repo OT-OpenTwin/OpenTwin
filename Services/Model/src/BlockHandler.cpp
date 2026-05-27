@@ -956,7 +956,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	return blockEnt;
 }
 
-std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, const ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo) {
+std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
@@ -981,8 +981,8 @@ std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGra
 			connectionName = _scene->getName() + "/" + m_connectionsFolder + "/Connection" + std::to_string(counter);
 			counter++;
 		} while (std::find(connectionItems.begin(), connectionItems.end(), connectionName) != connectionItems.end());
-
 		connectionEntity->setName(connectionName);
+		_namingBehavior.startNumber = counter;
 	}
 	else {
 		// Determine unique name
