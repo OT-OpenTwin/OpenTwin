@@ -134,13 +134,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	const std::string pageName = "Data Processing";
 	const std::string groupName = "Pipeline Handling";
 	const std::string groupName2 = "Creation";
-	const std::string subGroupName = "Library Element Creation";
 	ot::LockTypes modelWrite(ot::LockType::ModelWrite);
 
 	_ui->addMenuPage(pageName);
 	_ui->addMenuGroup(pageName, groupName);
 	_ui->addMenuGroup(pageName, groupName2);
-	_ui->addMenuSubGroup(pageName, groupName2, subGroupName);
 
 	m_buttonGraphicsScene = ot::ToolBarButtonCfg(pageName, groupName, "Create Pipeline", "Default/Add");
 	_ui->addMenuButton(m_buttonGraphicsScene.setButtonLockFlags(modelWrite));
@@ -151,20 +149,20 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonRunPipeline = ot::ToolBarButtonCfg(pageName, groupName, "Run", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonRunPipeline.setButtonLockFlags(modelWrite));
 
-	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName, "Create Manifest", "Default/AddMaterial");
+	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName2, "Create Manifest", "Default/AddMaterial");
 	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));
 
 	std::string devEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 
 	if (!devEnv.empty()) {
-		m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Manifest Meta", "Default/Add");
+		m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2,"Create Manifest Meta", "Default/Add");
 		_ui->addMenuButton(m_buttonCreateManifestMeta.setButtonLockFlags(modelWrite));
 
-		m_buttonCreatePythonMeta = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Text File", "Default/Add");
+		m_buttonCreatePythonMeta = ot::ToolBarButtonCfg(pageName, groupName2, "Create Text File", "Default/Add");
 		_ui->addMenuButton(m_buttonCreatePythonMeta.setButtonLockFlags(modelWrite));
 	}
 	
-	m_buttonCreatePythonScript = ot::ToolBarButtonCfg(pageName, groupName2, subGroupName, "Create Python Script", "Default/Add");
+	m_buttonCreatePythonScript = ot::ToolBarButtonCfg(pageName, groupName2, "Create Python Script", "Default/python");
 	_ui->addMenuButton(m_buttonCreatePythonScript.setButtonLockFlags(modelWrite));
 
 	_blockEntityHandler.setUIComponent(_ui);
