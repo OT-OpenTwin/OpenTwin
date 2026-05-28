@@ -25,6 +25,7 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
+#include "OTModelEntities/EntityUnits.h"
 
 // Open twin header
 #include "OTCommunication/ActionTypes.h"
@@ -224,6 +225,18 @@ void Application::updateMesh(void)
 		return;
 	}
 
+	// Read the units information
+	ot::EntityInformation unitsInfo;
+	ot::ModelServiceAPI::getEntityInformation("Units", unitsInfo);
+
+	EntityUnits* entityUnits = dynamic_cast<EntityUnits*>(ot::EntityAPI::readEntityFromEntityIDandVersion(unitsInfo.getEntityID(), unitsInfo.getEntityVersion()));
+	if (entityUnits == nullptr)
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Units cannot be read.\n");
+		return;
+	}
+
 	// Now we retrieve information about the mesh items
 	std::list<ot::EntityInformation> mesherInfo;
 	ot::ModelServiceAPI::getEntityInformation(mesherRunList, mesherInfo);
@@ -247,22 +260,22 @@ void Application::updateMesh(void)
 	}
 
 	// Finally start the worker thread to run the solvers
-	std::thread workerThread(&Application::mesherThread, this, mesherInfo, mesherMap);
+	std::thread workerThread(&Application::mesherThread, this, mesherInfo, mesherMap, entityUnits);
 	workerThread.detach();
 }
 
-void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityBase *> mesherMap) 
+void Application::mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityBase *> mesherMap, EntityUnits *entityUnits)
 {
 	for (auto mesher : mesherInfo)
 	{
-		runSingleMesher(mesher, mesherMap[mesher.getEntityName()]);
+		runSingleMesher(mesher, mesherMap[mesher.getEntityName()], entityUnits);
 	}
 }
 
-void Application::runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity)
+void Application::runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity, EntityUnits* entityUnits)
 {
 	CartesianMeshCreation cartesianMesher;
-	cartesianMesher.updateMesh(this, meshEntity);
+	cartesianMesher.updateMesh(this, meshEntity, entityUnits);
 }
 
 void Application::handleUpdateSingleMesh(ot::JsonDocument& _doc)
@@ -290,6 +303,18 @@ void Application::handleUpdateSingleMesh(ot::JsonDocument& _doc)
 		return;
 	}
 
+	// Read the units information
+	ot::EntityInformation unitsInfo;
+	ot::ModelServiceAPI::getEntityInformation("Units", unitsInfo);
+
+	EntityUnits* entityUnits = dynamic_cast<EntityUnits*>(ot::EntityAPI::readEntityFromEntityIDandVersion(unitsInfo.getEntityID(), unitsInfo.getEntityVersion()));
+	if (entityUnits == nullptr)
+	{
+		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
+		this->getUiComponent()->displayMessage("\nERROR: Units cannot be read.\n");
+		return;
+	}
+
 	// Now we run the mesher in the main thread, so we will return only once the mesh generation if finished.
-	runSingleMesher(mesherInfo, meshEntity);
+	runSingleMesher(mesherInfo, meshEntity, entityUnits);
 }

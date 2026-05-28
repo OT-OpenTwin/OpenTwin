@@ -29,6 +29,7 @@
 #include <string>
 
 class EntityBase;
+class EntityUnits;
 
 // Forward declaration
 namespace ot {
@@ -66,8 +67,8 @@ public:
 	void createMesh(void);
 	void updateMesh(void);
 
-	void mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityBase *> mesherMap);
-	void runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity);
+	void mesherThread(std::list<ot::EntityInformation> mesherInfo, std::map<std::string, EntityBase *> mesherMap, EntityUnits* entityUnits);
+	void runSingleMesher(ot::EntityInformation &mesher, EntityBase *meshEntity, EntityUnits* entityUnits);
 
 private:
 	static std::string materialsFolder;

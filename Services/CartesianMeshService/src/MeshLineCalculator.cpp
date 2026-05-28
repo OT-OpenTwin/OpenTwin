@@ -19,6 +19,7 @@
 
 #include "MeshLineCalculator.h"
 #include "CartesianMeshMaterial.h"
+#include "ProblemType.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 
@@ -33,6 +34,11 @@ void MeshLineCalculator::updateMeshLines()
 	double geometryToleranceAbsolute = geometryTolerance * geometryBoundingBox.getDiagonal();
 	double smallestMeshStep = smallestCellRatio * baseStepWidth;
 	double maximumMeshRatio = 2.0;
+
+	if (problemType != nullptr)
+	{
+		baseStepWidth = std::min(baseStepWidth, problemType->getBaseStepWidth());
+	}
 
 	std::list<MeshLineCalculatorWeightedPoint> fixPlanesX = determineFixPlanes(0, 1.0, 0.0, 0.0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax());
 	std::list<MeshLineCalculatorWeightedPoint> fixPlanesY = determineFixPlanes(1, 0.0, 1.0, 0.0, meshBoundingBox.getYmin(), meshBoundingBox.getYmax());
@@ -531,6 +537,19 @@ double MeshLineCalculator::getVolumeMeshStepWidth(EntityBase* entity, double bas
 		if (meshStepWidth->getValue() > 0.0)
 		{
 			shapeMeshStepWidth = meshStepWidth->getValue();
+		}
+	}
+
+	if (problemType != nullptr)
+	{
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(entity);
+		if (geometryEntity != nullptr)
+		{
+			CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial*>(geometryEntity->getData());
+			if (material != nullptr)
+			{
+				shapeMeshStepWidth = std::min(shapeMeshStepWidth, problemType->getMaterialBaseStepWidth(material));
+			}
 		}
 	}
 

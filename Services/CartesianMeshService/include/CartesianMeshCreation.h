@@ -31,6 +31,8 @@ class EntityFacetData;
 class EntityMeshCartesianNodes;
 class EntityCartesianVector;
 class EntityMaterial;
+class EntityUnits;
+class ProblemType;
 
 #include "OTModelEntities/Geometry.h"
 #include "OTModelEntities/EntityResultBase.h"
@@ -271,7 +273,7 @@ public:
 	CartesianMeshCreation();
 	virtual ~CartesianMeshCreation();
 
-	void updateMesh(Application *app, EntityBase *meshEntity);
+	void updateMesh(Application *app, EntityBase *meshEntity, EntityUnits* entityUnits);
 
 private:
 	Application *getApplication(void) { return application; }
@@ -281,7 +283,7 @@ private:
 	void deleteMesh(void);
 	void reportTime(const std::string &message, std::time_t &timer);
 	std::list<ot::UID> getAllGeometryEntitiesForMeshing(void);
-	EntityMeshCartesianData *determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty);
+	EntityMeshCartesianData *determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty, ProblemType* problemType);
 	EntityGeometry *addBackgroundCubeTopology(void);
 	void addBackgroundCubeGeometry(EntityGeometry *backgroundCube, EntityMeshCartesianData *meshData, double stepWidth);
 	void determineVolumeFill(std::list<EntityGeometry *> &geometryEntities, EntityMeshCartesianData *meshData, bool conformalMeshing);

@@ -26,6 +26,8 @@
 #include "OTModelEntities/EntityMeshCartesian.h"
 #include "OTModelEntities/Geometry.h"
 
+class ProblemType;
+
 struct MeshLineCalculatorWeightedPoint
 {
 	double coord;
@@ -50,6 +52,7 @@ public:
 	void setMeshEntities(const std::list<EntityBase*>& entities) { meshEntities = entities; }
 	void setMaximumEdgeLength(double value) { maximumEdgeLength = value; }
 	void setStepsAlongDiagonal(double value) { stepsAlongDiagonal = value; }
+	void setProblemType(ProblemType* _problemType) { problemType = _problemType; }
 
 	void updateMeshLines();
 
@@ -85,6 +88,7 @@ private:
 	double geometryTolerance = 1e-5;
 
 	std::list<EntityBase*> meshEntities;
+	ProblemType* problemType;
 
 	std::vector<double> meshCoords[3];
 };

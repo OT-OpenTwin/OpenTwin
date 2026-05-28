@@ -192,6 +192,7 @@
     <ClCompile Include="src\MeshLineCalculator.cpp" />
     <ClCompile Include="src\MeshSlicer.cpp" />
     <ClCompile Include="src\ModelNotifier.cpp" />
+    <ClCompile Include="src\ProblemTypeElectromagneticHF.cpp" />
     <ClCompile Include="src\UiNotifier.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -202,6 +203,8 @@
     <ClInclude Include="include\MeshLineCalculator.h" />
     <ClInclude Include="include\MeshSlicer.h" />
     <ClInclude Include="include\ModelNotifier.h" />
+    <ClInclude Include="include\ProblemType.h" />
+    <ClInclude Include="include\ProblemTypeElectromagneticHF.h" />
     <ClInclude Include="include\UiNotifier.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

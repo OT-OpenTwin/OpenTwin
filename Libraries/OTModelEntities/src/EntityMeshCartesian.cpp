@@ -61,6 +61,10 @@ bool EntityMeshCartesian::updateFromProperties(void)
 
 void EntityMeshCartesian::createProperties(const std::string materialsFolder, ot::UID materialsFolderID)
 {
+	// General mesh type
+	EntityPropertiesSelection::createProperty("General", "Problem type", { "Electromagnetics (HF)" }, "Electromagnetics (HF)", "Cartesian Meshing", getProperties());
+	EntityPropertiesDouble::createProperty("General", "Maximum frequency", 0, "Cartesian Meshing", getProperties());
+
 	// Background properties
 	EntityPropertiesSelection::createProperty( "Background", "Background mode", {"Field free", "Extend relative", "Extend absolute"}, "Field free", "Cartesian Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty(   "Background", "Extend in all directions", true, "Cartesian Meshing", getProperties());
@@ -81,18 +85,17 @@ void EntityMeshCartesian::createProperties(const std::string materialsFolder, ot
 	EntityPropertiesEntityList::createProperty("Background", "Background material", materialsFolder, materialsFolderID, "", -1, "Cartesian Meshing", getProperties());
 
 	// Base step width
-	EntityPropertiesDouble::createProperty("Base step width", "Maximum edge length",			1e22, "Cartesian Meshing", getProperties());
+	EntityPropertiesDouble::createProperty("Base step width", "Steps per wavelength", 15.0, "Cartesian Meshing", getProperties());
+	EntityPropertiesDouble::createProperty("Base step width", "Maximum edge length", 1e22, "Cartesian Meshing", getProperties());
 	EntityPropertiesDouble::createProperty("Base step width", "Number of steps along diagonal", 10.0, "Cartesian Meshing", getProperties());
+
+	// Mesh line distribution
+	EntityPropertiesDouble::createProperty("Mesh lines", "Smallest mesh step ratio", 10.0, "Cartesian Meshing", getProperties());
+	EntityPropertiesDouble::createProperty("Mesh lines", "Mesh equilibration ratio", 2.0, "Cartesian Meshing", getProperties());
 
 	// Algorithm
 	EntityPropertiesBoolean::createProperty("Algorithm", "Conformal meshing", false, "Cartesian Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Algorithm", "Visualize matrices", false, "Cartesian Meshing", getProperties());
-
-	// Curvature refinement
-	//EntityPropertiesBoolean::createProperty("Curvature refinement", "Curvature refinement",					true, "Cartesian Meshing", getProperties());
-	//EntityPropertiesDouble::createProperty( "Curvature refinement", "Maximum deviation of mesh from shape",  0.0, "Cartesian Meshing", getProperties());
-	//EntityPropertiesInteger::createProperty("Curvature refinement", "Number of steps per circle",			   6, "Cartesian Meshing", getProperties());
-	//EntityPropertiesDouble::createProperty( "Curvature refinement", "Minimum curvature refinement radius",   0.0, "Cartesian Meshing", getProperties());
 
 	updatePropertyVisibilities();
 
@@ -120,6 +123,9 @@ bool EntityMeshCartesian::updatePropertyVisibilities(void)
 	EntityPropertiesDouble *boundaryDistanceRelYmax = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary distance at ymax (rel)"));
 	EntityPropertiesDouble *boundaryDistanceRelZmin = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary distance at zmin (rel)"));
 	EntityPropertiesDouble *boundaryDistanceRelZmax = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Boundary distance at zmax (rel)"));
+	EntityPropertiesSelection *problemType          = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type")); 
+	EntityPropertiesDouble *maximumFrequency        = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum frequency"));
+	EntityPropertiesDouble *stepsPerWavelength      = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Steps per wavelength"));
 
 	if (backgroundMode != nullptr && extendFlag != nullptr && backgroundMaterial != nullptr && boundaryDistanceAllAbs != nullptr && boundaryDistanceAllRel != nullptr
 		&& boundaryDistanceAbsXmin != nullptr && boundaryDistanceAbsXmax != nullptr && boundaryDistanceAbsYmin != nullptr && boundaryDistanceAbsYmax != nullptr 
@@ -211,59 +217,37 @@ bool EntityMeshCartesian::updatePropertyVisibilities(void)
 			boundaryDistanceRelZmax->setVisible(showBoundaryDistanceDirectionRel);
 			updatePropertiesGrid = true;
 		}
-	}
 
-	/*
-	EntityPropertiesInteger *numStepsPerCircle = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Number of steps per circle"));
-	EntityPropertiesDouble *minCurvRefinementRadius = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Minimum curvature refinement radius"));
-	EntityPropertiesDouble *maximumDeviation = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum deviation of mesh from shape"));
+		bool showMaximumFrequency = false;
+		bool showStepsPerWavelength = false;
 
-	bool showNumStepsPerCircle = true;
-	bool showMinCurvRefinementRadius = true;
-	bool showMaximumDeviation = true;
-
-	if (curvatureRefinment != nullptr)
-	{
-		if (!curvatureRefinment->getValue())
+		if (problemType != nullptr)
 		{
-			// We do not use local curvature refinement 
-			showNumStepsPerCircle = false;
-			showMinCurvRefinementRadius = false;
-			showMaximumDeviation = false;
+			if (problemType->getValue() == "Electromagnetics (HF)")
+			{
+				showMaximumFrequency   = true;
+				showStepsPerWavelength = true;
+			}
+		}
+
+		if (maximumFrequency != nullptr)
+		{
+			if (maximumFrequency->getVisible() != showMaximumFrequency)
+			{
+				maximumFrequency->setVisible(showMaximumFrequency);
+				updatePropertiesGrid = true;
+			}
+		}
+
+		if (stepsPerWavelength != nullptr)
+		{
+			if (stepsPerWavelength->getVisible() != showStepsPerWavelength)
+			{
+				stepsPerWavelength->setVisible(showStepsPerWavelength);
+				updatePropertiesGrid = true;
+			}
 		}
 	}
-
-	if (numStepsPerCircle != nullptr)
-	{
-		if (numStepsPerCircle->getVisible() != showNumStepsPerCircle)
-		{
-			numStepsPerCircle->setVisible(showNumStepsPerCircle);
-			updatePropertiesGrid = true;
-		}
-	}
-
-	if (minCurvRefinementRadius != nullptr)
-	{
-		if (minCurvRefinementRadius->getVisible() != showMinCurvRefinementRadius)
-		{
-			minCurvRefinementRadius->setVisible(showMinCurvRefinementRadius);
-			updatePropertiesGrid = true;
-		}
-	}
-
-	if (maximumDeviation != nullptr)
-	{
-		if (maximumDeviation->getVisible() != showMaximumDeviation)
-		{
-			maximumDeviation->setVisible(showMaximumDeviation);
-			updatePropertiesGrid = true;
-		}
-	}
-
-	if (numStepsPerCircle != nullptr) numStepsPerCircle->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
-	if (minCurvRefinementRadius != nullptr) minCurvRefinementRadius->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
-	if (maximumDeviation != nullptr) maximumDeviation->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
-	*/
 
 	return updatePropertiesGrid;
 }

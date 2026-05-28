@@ -22,6 +22,8 @@
 #include "Application.h"
 #include "CartesianMeshTree.h"
 #include "MeshLineCalculator.h"
+#include "ProblemType.h"
+#include "ProblemTypeElectromagneticHF.h"
 
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -36,6 +38,7 @@
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityVisCartesianFaceScalar.h"
+#include "OTModelEntities/EntityUnits.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -103,7 +106,7 @@ std::string CartesianMeshCreation::getLargeNumberString(size_t number)
 	return ss.str();
 }
 
-void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
+void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity, EntityUnits* entityUnits)
 {
 	assert(app != nullptr);
 	setApplication(app);
@@ -121,6 +124,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 	try
 	{
 		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(meshEntity->getEntityID(), meshEntity->getEntityStorageVersion()));  // Add ourselves to the dependency list (because of the properties)
+		inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(entityUnits->getEntityID(), entityUnits->getEntityStorageVersion()));  // Add the units to the dependency list
 
 		newTopologyEntities.clear();
 		newDataEntities.clear();
@@ -133,6 +137,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		// -----------------------------------------------------------------------------------------
 
 		// Read the setting from the mesh entity
+		EntityPropertiesSelection* problemTypeProperty = dynamic_cast<EntityPropertiesSelection*>(getEntityMesh()->getProperties().getProperty("Problem type"));
+
 		EntityPropertiesDouble *maximumEdgeLengthProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Maximum edge length"));
 		assert(maximumEdgeLengthProperty != nullptr);
 
@@ -141,6 +147,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 
 		EntityPropertiesBoolean *conformalMeshProperty = dynamic_cast<EntityPropertiesBoolean*>(getEntityMesh()->getProperties().getProperty("Conformal meshing"));
 		EntityPropertiesBoolean *visualizeMatricesProperty = dynamic_cast<EntityPropertiesBoolean*>(getEntityMesh()->getProperties().getProperty("Visualize matrices"));
+		EntityPropertiesDouble* maximumFrequencyProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Maximum frequency"));
+		EntityPropertiesDouble* stepsPerWavelengthProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Steps per wavelength"));
 
 		double maximumEdgeLength = maximumEdgeLengthProperty->getValue();
 		double stepsAlongDiagonal = stepsAlongDiagonalProperty->getValue();
@@ -148,6 +156,27 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		if (conformalMeshProperty != nullptr) conformalMeshing = conformalMeshProperty->getValue();
 		bool visualizeMatrices = false;
 		if (visualizeMatricesProperty != nullptr) visualizeMatrices = visualizeMatricesProperty->getValue();
+
+		ProblemType* problemType = nullptr;
+
+		if (problemTypeProperty != nullptr)
+		{
+			if (problemTypeProperty->getValue() == "Electromagnetics (HF)")
+			{
+				assert(maximumFrequencyProperty != nullptr);
+				assert(stepsPerWavelengthProperty != nullptr);
+
+				double maximumFrequencySI = maximumFrequencyProperty->getValue() * entityUnits->getScaleToSIFrequency();
+				double stepsPerWavelength = stepsPerWavelengthProperty->getValue();
+				double geomScaleFactor    = entityUnits->getScaleToSIDimension();
+
+				problemType = new ProblemTypeElectromagneticHF(maximumFrequencySI, stepsPerWavelength, geomScaleFactor);
+			}
+			else
+			{
+				assert(0); // Unknown problem type
+			}
+		}
 
 		// Get all geometry entities which need to be considered for meshing
 		std::list<ot::UID> geometryEntitiesID = getAllGeometryEntitiesForMeshing();
@@ -249,7 +278,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity)
 		// In a first step, we need to determine the mesh line distribution. 
 		setProgressInformation("Determine mesh line distribution", true);
 
-		EntityMeshCartesianData *meshData = determineMeshLines(allEntities, maximumEdgeLength, stepsAlongDiagonal);
+		EntityMeshCartesianData *meshData = determineMeshLines(allEntities, maximumEdgeLength, stepsAlongDiagonal, problemType);
 		newTopologyEntities.push_back(meshData);
 
 		meshData->setName(getEntityMesh()->getName() + "/Mesh");
@@ -713,7 +742,7 @@ std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 	return ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
 }
 
-EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty)
+EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty, ProblemType *problemType)
 {
 	EntityMeshCartesianData *data = new EntityMeshCartesianData(0, nullptr, nullptr, nullptr);
 
@@ -722,6 +751,7 @@ EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::li
 	lineCalculator.setMeshEntities(meshEntities);
 	lineCalculator.setMaximumEdgeLength(maximumEdgeLength);
 	lineCalculator.setStepsAlongDiagonal(stepsAlongDiagonalProperty);
+	lineCalculator.setProblemType(problemType);
 
 	lineCalculator.updateMeshLines();
 
