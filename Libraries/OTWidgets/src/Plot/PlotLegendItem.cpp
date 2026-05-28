@@ -67,16 +67,11 @@ void ot::PlotLegendItem::updateVisibility()
 
 	OTAssertNullptr(m_selectedWidget);
 	bool isVis = m_selectedWidget->getQWidget()->isVisible();
-	if (selected == isVis)
-	{
-		return;
-	}
 	
 	if (selected && !plot->getQWidget()->isVisible()) {
 		return;
 	}
 	
-
 	m_selectedWidget->getQWidget()->setVisible(selected && curveVisible);
 
 	OTAssertNullptr(m_dimmedWidget);
