@@ -181,6 +181,9 @@ namespace ot {
 
 		void setDisplayTitle(const QString& _title);
 
+		void setXAxisUnit(const std::string& _unit) { m_xAxisUnit = _unit; };
+		const std::string& getXAxisUnit() const { return m_xAxisUnit; };
+
 		QString getSecondaryDependencyInfoString(size_t _index, const QString& _linePrefix = QString()) const;
 		QString getDependencyInfoString(const DatasetDependencyInfos& _dependencyInfo, const QString& _linePrefix = QString()) const;
 
@@ -208,6 +211,7 @@ namespace ot {
 
 		// Config
 		Plot1DCurveCfg m_config;
+		std::string m_xAxisUnit;
 		BasicEntityInformation m_storageEntityInfo;
 
 		PlotLegendItem* m_legendItem;

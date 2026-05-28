@@ -594,8 +594,13 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	// Update data info
 	std::string dataY;
 	std::string unitY;
+	std::string unitX;
 	bool isComplexData = false;
 	
+	bool unitYSet = false;
+	bool titleYSet = false;
+	bool unitXSet = false;
+
 	for (const PlotDataset* dataset : getAllDatasets())
 	{
 		if (dataset->dataIsComplex()) {
@@ -608,24 +613,35 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 			if (dataY.empty())
 			{
 				dataY = quantity->getValue();
+				titleYSet = true;
 			}
-			else if (dataY != quantity->getValue())
+			else if (titleYSet && dataY != quantity->getValue())
 			{
 				dataY = "";
-				break;
 			}
 
 			if (unitY.empty())
 			{
 				unitY = quantity->getUnit();
+				unitYSet = true;
 			}
-			else if (unitY != quantity->getUnit())
+			else if (unitYSet && unitY != quantity->getUnit())
 			{
 				unitY = "";
-				break;
 			}
 		}
+
+		if (unitX.empty())
+		{
+			unitX = dataset->getXAxisUnit();
+			unitXSet = true;
+		}
+		else if (unitXSet && unitX != dataset->getXAxisUnit())
+		{
+			unitX = "";
+		}
 	}
+
 	if (!dataY.empty())
 	{
 		m_config.setDataLabelY(dataY);
@@ -634,6 +650,11 @@ void ot::PlotBase::updateAxisTitles(bool _replot)
 	if (!unitY.empty())
 	{
 		m_config.setUnitLabelY(unitY);
+	}
+
+	if (!unitX.empty())
+	{
+		m_config.setUnitLabelX(unitX);
 	}
 
 	// Create title based on axis config and data info

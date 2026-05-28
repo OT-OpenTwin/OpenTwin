@@ -78,22 +78,13 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 		return {};
 	}
 	
-	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments);
-	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _curveCfg);
+	std::string xAxisUnit;
+	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments, xAxisUnit);
+	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _curveCfg, xAxisUnit);
 	return dataSets;
 }
 
-std::string CurveDatasetFactory::createUnitLabel(const std::string& _unit) {
-	std::string result = ot::String::removePrefixSuffix(_unit, " \t\n\r");
-	if (!result.empty())
-	{
-		result.insert(result.begin(), '(');
-		result.push_back(')');
-	}
-	return result;
-}
-
-CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments)
+CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments, std::string& _xAxisUnit)
 {
 	const uint32_t numberOfDocuments = _allMongoDBDocuments.Size();
 	const int numberOfQuantities = 1;
@@ -109,6 +100,21 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	const ot::DataLakeAccessCfg& dataLakeAccessCfg = _curveCfg.getDataAccessConfig();
 	
 	std::map<std::string, ot::DataPointDecoder*> additionalParameterDecoders = dataLakeAccessCfg.getAllFieldDecoderParameterByLabel();
+
+	const auto parameterDecoderIt = additionalParameterDecoders.find(displayParameterLabel);
+	if (parameterDecoderIt != additionalParameterDecoders.end())
+	{
+		const auto& unitsList = parameterDecoderIt->second->getTupleInstance().getTupleUnits();
+		if (!unitsList.empty())
+		{
+			_xAxisUnit = unitsList.front();
+		}
+		else
+		{
+			OT_LOG_D("No units found for the x-axis parameter");
+		}
+	}
+
 	additionalParameterDecoders.erase(displayParameterLabel);
 
 	// ! Careful. This is a code duplication. The same logic is being used in the ResultCollectionAccess lib in the QuantityContainer class.
@@ -262,7 +268,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	return familyOfCurves;
 }
 
-std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg)
+std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisUnit)
 {
 	std::list<ot::PlotDataset*> dataSets;
 
@@ -298,6 +304,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 		}
 
 		ot::PlotDataset* dataset = new ot::PlotDataset(nullptr, _curveCfg, std::move(datasetData));
+		dataset->setXAxisUnit(_xAxisUnit);
 		dataset->setDependencyInfos(dependencies);
 		dataset->setSecondaryDependencyInfos(curve.second.secondaryDependencies);
 		//OT_LOG_T("Curve created { \"Title\": \"" + curveTitle + "\", \"EntityName\": \"" + dataset->getEntityName() + "\", \"DatasetTitle\": \"" + dataset->getConfig().getTitle() + "\" }");

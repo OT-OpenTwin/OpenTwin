@@ -67,10 +67,8 @@ private:
 	std::list<std::string> m_skippedValueComparisons;
 	DataStorageAPI::DataLakeAPI m_dataAccess;
 
-	std::string createUnitLabel(const std::string& _unit);
-
-	DependencyInfoList createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments);
-	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg);
+	DependencyInfoList createCurves(const ot::Plot1DCfg& _plotCfg, const ot::Plot1DCurveCfg& _curveCfg, ot::ConstJsonArray& _allMongoDBDocuments, std::string& _xAxisUnit);
+	std::list<ot::PlotDataset*> createPlotDatasets(const ot::Plot1DCfg& _plotCfg, DependencyInfoList&& _curveData, const ot::Plot1DCurveCfg& _curveCfg, const std::string& _xAxisUnit);
 
 	double jsonToDouble(const std::string& _memberName, ot::ConstJsonObject& _jesonEntry, const std::string& _dataType);
 	double jsonToDouble(const rapidjson::Value& _jesonEntry, const std::string& _dataType);
