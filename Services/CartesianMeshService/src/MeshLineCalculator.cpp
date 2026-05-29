@@ -558,6 +558,8 @@ double MeshLineCalculator::getVolumeMeshStepWidth(EntityBase* entity, double bas
 
 void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep)
 {
+	newStep *= 1.001; // Add some tolerance for the mesh density requirement
+
 	if (ranges.empty())
 	{
 		MeshLineCalculatorStepRange newRange;
@@ -569,8 +571,6 @@ void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& rang
 
 		return;
 	}
-
-	constexpr double EPS = 1e-12;
 
 	if (newMax <= newMin)
 		return;
@@ -621,8 +621,8 @@ void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& rang
 	for (const auto& r : result)
 	{
 		if (!ranges.empty() &&
-			std::abs(ranges.back().step - r.step) < EPS
-			&& std::abs(ranges.back().max - r.min) < EPS)
+			std::abs(ranges.back().step - r.step) < geometryTolerance
+			&& std::abs(ranges.back().max - r.min) < geometryTolerance)
 		{
 			ranges.back().max = r.max;
 		}
@@ -633,94 +633,143 @@ void MeshLineCalculator::addRange(std::vector<MeshLineCalculatorStepRange>& rang
 	}
 }
 
-double MeshLineCalculator::getStepAt(double x, const std::vector<MeshLineCalculatorStepRange>& ranges)
+double MeshLineCalculator::densityIntegral(double a, double b, const std::vector<MeshLineCalculatorStepRange>& ranges)
 {
-	constexpr double EPS = 1e-12;
-
-	double step = std::numeric_limits<double>::max();
+	double sum = 0.0;
 
 	for (const auto& r : ranges)
 	{
-		if (x >= r.min - EPS && x < r.max - EPS)
+		double x0 = std::max(a, r.min);
+		double x1 = std::min(b, r.max);
+
+		if (x1 > x0 + geometryTolerance && r.step > 0.0)
+			sum += (x1 - x0) / r.step;  
+	}
+
+	return sum;
+}
+
+double MeshLineCalculator::findPositionForDensity(double a, double b, double targetDensity, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	double accumulated = 0.0;
+	double last = a;
+
+	std::vector<MeshLineCalculatorStepRange> localRanges;
+
+	for (const auto& r : ranges)
+	{
+		double x0 = std::max(a, r.min);
+		double x1 = std::min(b, r.max);
+
+		if (x1 > x0 + geometryTolerance && r.step > 0.0)
+			localRanges.push_back({ x0, x1, r.step });
+	}
+
+	std::sort(localRanges.begin(), localRanges.end(),
+		[](const MeshLineCalculatorStepRange& a, const MeshLineCalculatorStepRange& b)
 		{
-			step = std::min(step, r.step);
-		}
-	}
+			return a.min < b.min;
+		});
 
-	return step;
-}
-
-double MeshLineCalculator::getNextRangeBoundary(double x, double xEnd, const std::vector<MeshLineCalculatorStepRange>& ranges)
-{
-	constexpr double EPS = 1e-12;
-
-	double next = xEnd;
-
-	for (const auto& r : ranges)
+	for (const auto& r : localRanges)
 	{
-		if (r.min > x + EPS && r.min < next)
-			next = r.min;
+		double segmentDensity = (r.max - r.min) / r.step;
 
-		if (r.max > x + EPS && r.max < next)
-			next = r.max;
+		if (accumulated + segmentDensity >= targetDensity - geometryTolerance)
+		{
+			double remaining = targetDensity - accumulated;
+			return r.min + remaining * r.step;
+		}
+
+		accumulated += segmentDensity;
+		last = r.max;
 	}
 
-	return next;
+	return b;
 }
 
-std::vector<double> MeshLineCalculator::refineGridMarching(std::vector<double> baseGrid, const std::vector<MeshLineCalculatorStepRange>& ranges)
+std::vector<double> MeshLineCalculator::createDensityBasedGrid(std::vector<double> fixedLines, const std::vector<MeshLineCalculatorStepRange>& ranges)
 {
-	constexpr double EPS = 1e-12;
-
-	std::sort(baseGrid.begin(), baseGrid.end());
+	std::sort(fixedLines.begin(), fixedLines.end());
 
 	std::vector<double> result;
 
-	for (size_t i = 0; i + 1 < baseGrid.size(); ++i)
+	for (size_t i = 0; i + 1 < fixedLines.size(); ++i)
 	{
-		double x = baseGrid[i];
-		double xEnd = baseGrid[i + 1];
+		double x0 = fixedLines[i];
+		double x1 = fixedLines[i + 1];
 
 		if (result.empty())
-			result.push_back(x);
+			result.push_back(x0);
 
-		while (x < xEnd - EPS)
+		double totalDensity = densityIntegral(x0, x1, ranges);
+
+		int n = static_cast<int>(std::ceil(totalDensity));
+
+		if (n < 1)
+			n = 1;
+
+		for (int k = 1; k < n; ++k)
 		{
-			double step = getStepAt(x, ranges);
+			double targetDensity =
+				totalDensity * static_cast<double>(k) / static_cast<double>(n);
 
-			if (step == std::numeric_limits<double>::max() || step <= 0.0)
-			{
-				// No step restriction found: jump directly to next fixed grid line
-				x = xEnd;
-				break;
-			}
+			double x = findPositionForDensity(x0, x1, targetDensity, ranges);
 
-			double nextBoundary = getNextRangeBoundary(x, xEnd, ranges);
-
-			double target = x + step;
-
-			if (target >= xEnd - EPS)
-			{
-				x = xEnd;
-			}
-			else if (target > nextBoundary + EPS)
-			{
-				// Do not insert the range boundary.
-				// Instead continue from the boundary internally.
-				x = nextBoundary;
-			}
-			else
-			{
-				result.push_back(target);
-				x = target;
-			}
+			if (x > x0 + geometryTolerance && x < x1 - geometryTolerance)
+				result.push_back(x);
 		}
 
-		if (result.empty() || std::abs(result.back() - xEnd) > EPS)
-			result.push_back(xEnd);
+		result.push_back(x1);
 	}
 
 	return result;
+}
+
+bool MeshLineCalculator::intervalViolatesStep(double x0, double x1, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	for (const auto& r : ranges)
+	{
+		double a = std::max(x0, r.min);
+		double b = std::min(x1, r.max);
+
+		if (b > a + geometryTolerance)
+		{
+			if (x1 - x0 > r.step + geometryTolerance)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+void MeshLineCalculator::refineUntilValid(std::vector<double>& grid, const std::vector<MeshLineCalculatorStepRange>& ranges)
+{
+	bool changed = true;
+
+	while (changed)
+	{
+		changed = false;
+
+		std::vector<double> refined;
+		refined.push_back(grid.front());
+
+		for (size_t i = 0; i + 1 < grid.size(); ++i)
+		{
+			double x0 = grid[i];
+			double x1 = grid[i + 1];
+
+			if (intervalViolatesStep(x0, x1, ranges))
+			{
+				refined.push_back(0.5 * (x0 + x1));
+				changed = true;
+			}
+
+			refined.push_back(x1);
+		}
+
+		grid = std::move(refined);
+	}
 }
 
 std::vector<double> MeshLineCalculator::determineMeshLines(const std::list<MeshLineCalculatorWeightedPoint>& fixPlanes, const std::vector<MeshLineCalculatorStepRange>& densityRanges)
@@ -735,36 +784,33 @@ std::vector<double> MeshLineCalculator::determineMeshLines(const std::list<MeshL
 	}
 
 	// Now run the iterative line insertion
-	std::vector<double> meshLines = refineGridMarching(baseMeshLines, densityRanges);
+	std::vector<double> meshLines = createDensityBasedGrid(baseMeshLines, densityRanges);
+	//refineUntilValid(meshLines, densityRanges);
 
 	return meshLines;
 }
 
-
-
 std::vector<double> MeshLineCalculator::splitGrowing(double length, double neighborStep, double ratio)
 {
-	constexpr double EPS = 1e-12;
-
 	double firstMax = neighborStep * ratio;
 
 	int n = 1;
 	double maxSum = firstMax;
 
-	while (maxSum < length - EPS)
+	while (maxSum < length - geometryTolerance)
 	{
 		++n;
 		maxSum += firstMax * std::pow(ratio, n - 1);
 	}
 
-	std::vector<double> steps(n);
+	std::vector<double> stgeometryTolerance(n);
 
 	double scale = length / maxSum;
 
 	for (int i = 0; i < n; ++i)
-		steps[i] = scale * firstMax * std::pow(ratio, i);
+		stgeometryTolerance[i] = scale * firstMax * std::pow(ratio, i);
 
-	return steps;
+	return stgeometryTolerance;
 }
 
 std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio)
@@ -775,8 +821,6 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 	std::sort(meshLines.begin(), meshLines.end());
 
 	bool changed = true;
-
-	constexpr double EPS = 1e-12;
 
 	while (changed)
 	{
@@ -791,16 +835,16 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 			double h0 = x1 - x0;
 			double h1 = x2 - x1;
 
-			if (h1 > maximumMeshRatio * h0 + EPS)
+			if (h1 > maximumMeshRatio * h0 + geometryTolerance)
 			{
-				auto steps = splitGrowing(h1, h0, maximumMeshRatio);
+				auto stgeometryTolerance = splitGrowing(h1, h0, maximumMeshRatio);
 
 				std::vector<double> newPoints;
 				double x = x1;
 
-				for (size_t k = 0; k + 1 < steps.size(); ++k)
+				for (size_t k = 0; k + 1 < stgeometryTolerance.size(); ++k)
 				{
-					x += steps[k];
+					x += stgeometryTolerance[k];
 					newPoints.push_back(x);
 				}
 
@@ -812,16 +856,16 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 				break;
 			}
 
-			if (h0 > maximumMeshRatio * h1 + EPS)
+			if (h0 > maximumMeshRatio * h1 + geometryTolerance)
 			{
-				auto steps = splitGrowing(h0, h1, maximumMeshRatio);
+				auto stgeometryTolerance = splitGrowing(h0, h1, maximumMeshRatio);
 
 				std::vector<double> newPoints;
 				double x = x1;
 
-				for (size_t k = 0; k + 1 < steps.size(); ++k)
+				for (size_t k = 0; k + 1 < stgeometryTolerance.size(); ++k)
 				{
-					x -= steps[k];
+					x -= stgeometryTolerance[k];
 					newPoints.push_back(x);
 				}
 

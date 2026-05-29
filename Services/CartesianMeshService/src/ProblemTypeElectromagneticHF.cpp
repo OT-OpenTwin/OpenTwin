@@ -33,5 +33,10 @@ double ProblemTypeElectromagneticHF::getMaterialBaseStepWidth(CartesianMeshMater
 {
 	double baseStep = getBaseStepWidth();
 
+	if (material->getIsPEC())
+	{
+		return baseStep;
+	}
+
 	return baseStep / std::sqrt(material->getEpsilon() * material->getMu());
 }

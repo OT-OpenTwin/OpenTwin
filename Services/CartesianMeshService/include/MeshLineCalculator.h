@@ -71,10 +71,12 @@ private:
 	std::vector<MeshLineCalculatorStepRange> determineDensityRanges(int direction, double boundingBoxMin, double boundingBoxMax, double baseStepWidth);
 	void addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep);
 	double getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth);
-	double getStepAt(double x, const std::vector<MeshLineCalculatorStepRange>& ranges);
-	double getNextRangeBoundary(double x, double xEnd, const std::vector<MeshLineCalculatorStepRange>& ranges);
-	std::vector<double> refineGridMarching(std::vector<double> baseGrid, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	std::vector<double> createDensityBasedGrid(std::vector<double> fixedLines, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	double findPositionForDensity(double a, double b, double targetDensity, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	double densityIntegral(double a, double b, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	std::vector<double> determineMeshLines(const std::list<MeshLineCalculatorWeightedPoint>& fixPlanes, const std::vector<MeshLineCalculatorStepRange>& densityRanges);
+	bool intervalViolatesStep(double x0, double x1, const std::vector<MeshLineCalculatorStepRange>& ranges);
+	void refineUntilValid(std::vector<double>& grid, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	std::vector<double> equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio);
 	std::vector<double> splitGrowing(double length, double neighborStep, double ratio);
 
