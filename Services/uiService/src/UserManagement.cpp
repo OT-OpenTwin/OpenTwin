@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: UserManagement.cpp
 // 
 // License:
@@ -296,7 +296,7 @@ bool UserManagement::sendSingleSignOnRequest() {
 	// Here we check whether a user exists by getting its data from the authorization service
 	ot::SingleSignOn_Client singleSignOnClient;
 	std::string token;
-	token = singleSignOnClient.generateToken(token);
+	token = singleSignOnClient.generateFirstToken();
 	std::string encodedToken = ot::String::toBase64Url(token);
 
 	ot::JsonDocument doc;

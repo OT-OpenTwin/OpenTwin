@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: LogInDialog.cpp
 // 
 // License:
@@ -1141,11 +1141,43 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	return WorkerError::NoError;
 }
 
+#include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
+
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
 	std::wstring ssoUsername = determineSSOUsername();
 	
 	// Jan, hier den Login via SSO implementieren
-	
+	try
+	{
+		ot::SingleSignOn_Client client;
+		const std::string firstToken =	client.generateFirstToken();
+
+		ot::JsonDocument firstTokenMessage;
+		firstTokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, firstTokenMessage.GetAllocator()), firstTokenMessage.GetAllocator());
+		firstTokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(firstToken, firstTokenMessage.GetAllocator()), firstTokenMessage.GetAllocator());
+
+		const std::string authorisationURL = _userManager.getAuthorisationServerURL();
+		std::string response;
+		if (ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, firstTokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		{
+			ot::JsonDocument secondTokenMessage;
+			secondTokenMessage.fromJson(response);
+			std::string secondToken = ot::json::getString(secondTokenMessage, OT_PARAM_AUTH_Token);
+
+			const std::string thirdToken = client.generateThirdToken(secondToken);
+			ot::JsonDocument thirdTokenMessage;
+			thirdTokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, thirdTokenMessage.GetAllocator()), thirdTokenMessage.GetAllocator());
+			thirdTokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(thirdToken, thirdTokenMessage.GetAllocator()), thirdTokenMessage.GetAllocator());
+			if (!ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, thirdTokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+			{
+			}
+		}
+
+	}
+	catch (std::exception& _e)
+	{
+
+	}
 	// ! keine exception hier raus werfen <-- paralleler thread
 
 	// Falls du einen neuen Fehlercode (Output message) brauchst, einfach das enum WorkerError,

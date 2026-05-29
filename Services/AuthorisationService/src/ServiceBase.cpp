@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ServiceBase.cpp
 // 
 // License:
@@ -225,17 +225,50 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 	return json.toJson();
 }
 
-std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) {
-	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
-	std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
-	bool encryptedPassword = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
 
-	if (encryptedPassword)
+#include "OTSystem/SingleSignOn/SingleSignOn_Server.h"
+
+bool first = true;
+ot::SingleSignOn_Server server;
+std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) 
+{
+	bool usePSW = ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+	bool successful = false;
+	std::string username, password;
+	if (usePSW)
 	{
-		password = ot::UserCredentials::decryptString(password);
+		username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+		bool encryptedPassword = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
+		
+		if (encryptedPassword)
+		{
+			password = ot::UserCredentials::decryptString(password);
+		}
+
+		 successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
+	}
+	else
+	{
+		if (first)
+		{
+			std::string firstToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+			const std::string secondToken = server.processToken(firstToken);
+			successful = true;
+			first = false;
+			ot::JsonDocument json;
+			json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
+			json.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(secondToken, json.GetAllocator()), json.GetAllocator());
+			return json.toJson();
+		}
+		else
+		{
+			std::string thirdToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+			server.processToken(thirdToken);
+			server.processLoggedInUserInfo();
+		}
 	}
 
-	bool successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());

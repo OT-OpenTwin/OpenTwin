@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: UserManagement.h
 // 
 // License:
@@ -62,6 +62,7 @@ public:
 
 	std::string getUserSettingsCollection(void);
 
+	const std::string& getAuthorisationServerURL() const { return m_authServerURL; }
 private:
 	bool hasError(const std::string& _response) const;
 	bool hasSuccessful(const std::string& _response) const;

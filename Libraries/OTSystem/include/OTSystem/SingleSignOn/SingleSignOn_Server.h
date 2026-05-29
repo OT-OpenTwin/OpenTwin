@@ -2,15 +2,15 @@
 #include "OTSystem/SingleSignOn/SingleSignOn_State.h"
 
 namespace ot {
-    class OT_SYS_API_EXPORT SingleSignOn_Client
+    class OT_SYS_API_EXPORT SingleSignOn_Server
     {
     public:
-        SingleSignOn_Client(const std::wstring& _servicePrincipleName = L"");
-        static std::wstring getActiveUserName();
+        SingleSignOn_Server(const std::wstring& _servicePrincipleName = L"");
 
         // Potential improvement: General function to create a token and check the current state which may be completed or need to continue. The general approach would work with both kerberos and NTLM.
-        std::string generateFirstToken();
-		std::string generateThirdToken(std::string& _receivedToken);
+        std::string processToken(std::string& _receivedEncodedToken);
+		void processLoggedInUserInfo();
+
     private:
         SingleSignOn_State m_state;
     };

@@ -841,6 +841,8 @@
 #define OT_ACTION_SETTINGS_COLLECTION_NAME "settingsCollectionName"
 
 // todo: ot param auth username exists twice: USERNAME and USER_NAME
+#define OT_PARAM_AUTH_SSO_USE "UseSSO"
+#define OT_PARAM_AUTH_SSO_TOKEN "UseSSO"
 #define OT_PARAM_AUTH_USERNAME "Username"
 #define OT_PARAM_USERNAME_TO_DELETE "UsernameToDelete"
 #define OT_PARAM_AUTH_LOGGED_IN_USERNAME "LoggedInUsername"
