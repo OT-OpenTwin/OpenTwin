@@ -70,12 +70,6 @@ void MeshLineCalculator::updateMeshLines()
 	meshCoords[0] = equilibrateMeshLines(meshLinesX, maximumMeshRatio);
 	meshCoords[1] = equilibrateMeshLines(meshLinesY, maximumMeshRatio);
 	meshCoords[2] = equilibrateMeshLines(meshLinesZ, maximumMeshRatio);
-	
-
-	// Naechste Schritte:
-	// 7. Parameter der Gittergenerierung einstellbar machen.
-	// 8. Anzeige der Gitterlinien in der Schnittebene
-
 }
 
 BoundingBox MeshLineCalculator::calculateBoundingBox()

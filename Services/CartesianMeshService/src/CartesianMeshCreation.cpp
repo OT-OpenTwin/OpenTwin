@@ -865,10 +865,13 @@ void CartesianMeshCreation::determineVolumeFill(std::list<EntityGeometry *> &geo
 
 	for (auto shape : geometryEntities)
 	{
+		CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial *>(shape->getData());
 		EntityPropertiesDouble *meshPriorityProperty = dynamic_cast<EntityPropertiesDouble*>(shape->getProperties().getProperty("Mesh priority"));
+
 		double meshPriority = 0.0;
 		if (meshPriorityProperty != nullptr) meshPriority = meshPriorityProperty->getValue();
-
+		if (material != nullptr) meshPriority += material->getPriority(); 
+		
 		shapePriorities[shape] = meshPriority;
 	}
 
