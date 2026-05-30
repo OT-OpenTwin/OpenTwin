@@ -1,0 +1,28 @@
+cmake_minimum_required(VERSION 3.20)
+project(GlobalSessionService LANGUAGES CXX)
+
+include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
+
+ot_initialize_lib(GlobalSessionService OT_GLOBAL_SESSION_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
+
+ot_add_dependency(GlobalSessionService
+    OTSystem
+    OTCore
+    OTGui
+    OTCommunication
+    OTGuiAPI
+    OTServiceFoundation
+    OTModelEntities
+    OTDataStorage
+    OTModelAPI
+    RJSON
+    CURL
+    MONGO_C
+    MONGO_CXX
+    BOOST
+    BASE64
+    ZLIB
+)
+
+ot_finalize_lib(GlobalSessionService)
+ot_add_test(GlobalSessionService)
