@@ -30,6 +30,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Building Project
 
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LoggerService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LoggerService\build"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LoggerService\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\LoggerService\packages"
 
