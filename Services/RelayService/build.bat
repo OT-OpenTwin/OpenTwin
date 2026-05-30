@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OPENTWIN_DEV_ROOT%\Services\RelayService\RelayService.sln" %1 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CMakeBuildSingleProject.bat" "%OT_RELAY_SERVICE_ROOT%" %1 %2
 
 GOTO END
 
@@ -20,4 +20,3 @@ pause
 GOTO END
 
 :END
-
