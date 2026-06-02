@@ -133,7 +133,7 @@ void UserManagement::initializeNewSession(void)
 	m_userSettingsCollection.clear();
 }
 
-bool UserManagement::addUser(const std::string &userName, const std::string &password) const {
+bool UserManagement::addUser(const std::string &userName, const std::string &password, bool _isSSO) const {
 	assert(!m_authServerURL.empty());
 
 	// Here we register a new user by sending a message to the authorization service
@@ -142,7 +142,10 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REGISTER, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
+	if (!_isSSO)
+	{
+		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -288,43 +291,6 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	}
 	
 	return false; // Login attempt unsuccessful
-}
-
-bool UserManagement::sendSingleSignOnRequest() {
-	assert(!m_authServerURL.empty());
-
-	// Here we check whether a user exists by getting its data from the authorization service
-	ot::SingleSignOn_Client singleSignOnClient;
-	std::string token;
-	token = singleSignOnClient.generateFirstToken();
-	std::string encodedToken = ot::String::toBase64Url(token);
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(encodedToken, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
-	}
-
-	if (!hasSuccessful(response)) {
-		return false;
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	// Login attempt successful -> get encrypted and unencrypted passwords
-	std::string sessionUser = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
-	std::string sessionPassword = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
-	std::string validPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
-	std::string validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
-
-	return true;
 }
 
 bool UserManagement::hasError(const std::string &response) const {

@@ -2,13 +2,14 @@
 #include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 #include <windows.h>
 #include <cassert>
+#include <secext.h>   // GetUserNameExW
 
 using namespace ot;
 
 SingleSignOn_Client::SingleSignOn_Client(const std::wstring& _servicePrincipleName)
     : m_state(SECPKG_CRED_OUTBOUND, _servicePrincipleName)
 {
-    if (!m_state.initializationSuccessful())
+    if (!m_state.stateOK())
     {
         throw std::exception("AcquireCredentialsHandle failed");
     }
@@ -18,36 +19,39 @@ SingleSignOn_Client::SingleSignOn_Client(const std::wstring& _servicePrincipleNa
 
 std::wstring SingleSignOn_Client::getActiveUserName()
 {
-    TCHAR username[UNLEN + 1];
-    DWORD size = UNLEN + 1;
+    // NameSamCompatible → "DOMAIN\username"
+    // NameUserPrincipal → "username@domain.com"  (Kerberos UPN)
+    // NameDisplay       → "John Smith"           (friendly display name)
 
-    if (GetUserName(username, &size))
+    DWORD size = 0;
+    GetUserNameExW(NameSamCompatible, nullptr, &size); // first call gets required size
+
+    std::wstring result(size, L'\0');
+    if (GetUserNameExW(NameSamCompatible, result.data(), &size)) {
+        result.resize(size); // trim the null terminator
+        return result;
+    }
+    std::string error = "GetUserNameExW failed: " + std::to_string(GetLastError());
+    throw std::exception(error.c_str());
+}
+
+std::string ot::SingleSignOn_Client::generateToken(const std::string& _receivedToken)
+{
+    std::vector<unsigned char> receivedToken;
+    if (!_receivedToken.empty())
     {
-        std::wstring out (username, size);
-        return out;
+	    receivedToken = SingleSignOn_State::decode(_receivedToken);
+    }
+    std::optional<std::vector<unsigned char>> token = m_state.generateToken(receivedToken);
+    if (token.has_value())
+    {
+        const std::string encryptedToken = SingleSignOn_State::encode(token.value());
+        std::vector<unsigned char> decryptedToken = SingleSignOn_State::decode(encryptedToken);
+        assert(token == decryptedToken);
+        return encryptedToken;
     }
     else
     {
-        throw std::exception("Failed to get the active user name.");
+        return "";
     }
-}
-
-std::string ot::SingleSignOn_Client::generateFirstToken()
-{
-    std::vector<unsigned char> temp;
-    std::vector<unsigned char> token = m_state.generateToken(temp);
-    const std::string encryptedToken = SingleSignOn_State::encode(token);
-    std::vector<unsigned char> decryptedToken = SingleSignOn_State::decode(encryptedToken);
-    assert(token == decryptedToken);
-    return encryptedToken;
-}
-
-std::string ot::SingleSignOn_Client::generateThirdToken(std::string& _receivedToken)
-{
-	std::vector<unsigned char> receivedToken = SingleSignOn_State::decode(_receivedToken);
-    std::vector<unsigned char> token = m_state.generateToken(receivedToken);
-    const std::string encryptedToken = SingleSignOn_State::encode(token);
-    std::vector<unsigned char> decryptedToken = SingleSignOn_State::decode(encryptedToken);
-    assert(token == decryptedToken);
-    return encryptedToken;
 }

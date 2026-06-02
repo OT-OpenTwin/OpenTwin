@@ -4,14 +4,14 @@
 ot::SingleSignOn_Server::SingleSignOn_Server(const std::wstring& _servicePrincipleName)
     : m_state(SECPKG_CRED_INBOUND, _servicePrincipleName)
 {
-    if (!m_state.initializationSuccessful())
+    if (!m_state.stateOK())
     {
         throw std::exception("AcquireCredentialsHandle inbound failed");
     }
     m_state.setFirstCall(false);
 }
 
-std::string ot::SingleSignOn_Server::processToken(std::string& _receivedEncodedToken)
+std::string ot::SingleSignOn_Server::processToken(const std::string& _receivedEncodedToken)
 {
     
     std::vector<unsigned char> receivedEncodedToken = SingleSignOn_State::decode(_receivedEncodedToken);
@@ -26,10 +26,12 @@ std::string ot::SingleSignOn_Server::processToken(std::string& _receivedEncodedT
     return std::string();
 }
 
-void ot::SingleSignOn_Server::processLoggedInUserInfo()
+ot::LogInInfos ot::SingleSignOn_Server::processLoggedInUserInfo()
 {
-    m_state.readUserName();
-    m_state.readUserGroups();
-	m_state.readPackageInfo();
+    ot::LogInInfos logiInfos;
+    m_state.readUserName(logiInfos);
+    m_state.readUserGroups(logiInfos);
+	m_state.readPackageInfo(logiInfos);
+    return logiInfos;
 }
 

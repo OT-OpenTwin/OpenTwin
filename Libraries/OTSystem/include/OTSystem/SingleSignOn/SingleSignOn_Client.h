@@ -8,9 +8,11 @@ namespace ot {
         SingleSignOn_Client(const std::wstring& _servicePrincipleName = L"");
         static std::wstring getActiveUserName();
 
-        // Potential improvement: General function to create a token and check the current state which may be completed or need to continue. The general approach would work with both kerberos and NTLM.
-        std::string generateFirstToken();
-		std::string generateThirdToken(std::string& _receivedToken);
+        // If the token is an empty string, we generate the initial token.
+		std::string generateToken(const std::string& _receivedToken);
+        std::string getStateString() const { return m_state.getStateString(); }
+        bool stateOK() const { return m_state.stateOK(); }
+        bool stateContinueNeeded() const { return m_state.stateContinueNeeded(); }
     private:
         SingleSignOn_State m_state;
     };

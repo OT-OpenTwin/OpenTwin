@@ -213,6 +213,14 @@ LogInDialog::LogInDialog()
 	connect(m_gss, &ComboBox::currentTextChanged, this, &LogInDialog::slotGSSChanged);
 	connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
 	connect(this, &LogInDialog::configChanged, this, &LogInDialog::applyConfig);
+
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+		setControlsForSSO();
+	}
+	else {
+		setControlsForUsernamePassword();
+	}
+
 }
 
 LogInDialog::~LogInDialog() {
@@ -373,24 +381,27 @@ void LogInDialog::slotRegister() {
 		return;
 	}
 
-	if (m_username->text().isEmpty()) {
-		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
-		return;
-	}
+	if (!m_isSSOLogin)
+	{
+		if (m_username->text().isEmpty()) {
+			QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
+			return;
+		}
 
-	if (m_password->text().isEmpty()) {
-		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
-		return;
-	}
+		if (m_password->text().isEmpty()) {
+			QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
+			return;
+		}
 
-	if (m_password->text().length() < 4) {
-		QToolTip::showText(this->mapToGlobal(m_password->pos()), "Password is too short", m_password, QRect(), 3000);
-		return;
-	}
+		if (m_password->text().length() < 4) {
+			QToolTip::showText(this->mapToGlobal(m_password->pos()), "Password is too short", m_password, QRect(), 3000);
+			return;
+		}
 
-	if (m_password->text() != m_passwordConfirm->text()) {
-		QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the password", m_passwordConfirm, QRect(), 3000);
-		return;
+		if (m_password->text() != m_passwordConfirm->text()) {
+			QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the password", m_passwordConfirm, QRect(), 3000);
+			return;
+		}
 	}
 
 	// Run worker
@@ -493,7 +504,7 @@ void LogInDialog::slotGSSChanged() {
 			break;
 
 		case ot::LoginType::SSO:
-			setControlsForSSO();
+			setControlsForSSO(true);
 			break;
 
 		default:
@@ -546,9 +557,16 @@ void LogInDialog::slotLogInSuccess() {
 
 void LogInDialog::slotRegisterSuccess() {
 	m_state.remove(LogInStateFlag::WorkerRunning);
-
-	QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was created successfully.", QMessageBox::Ok);
-	msgBox.exec();
+	if (m_isSSOLogin)
+	{
+		QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was successfully registered. Contact your local administrator to unlock your account.", QMessageBox::Ok);
+		msgBox.exec();
+	}
+	else
+	{
+		QMessageBox msgBox(QMessageBox::Information, "Registration", "The account was created successfully.", QMessageBox::Ok);
+		msgBox.exec();
+	}
 
 	m_passwordConfirm->setText(QString());
 
@@ -836,6 +854,7 @@ std::wstring LogInDialog::determineSSOUsername() const {
 }
 
 void LogInDialog::setControlsForUsernamePassword() {
+	m_isSSOLogin = false;
 	m_logInButton->setHidden(false);
 	m_registerButton->setHidden(true);
 	m_savePassword->setHidden(false);
@@ -883,17 +902,22 @@ void LogInDialog::setControlsForChangePassword() {
 	OT_LOG_W("Not implemented yet");
 }
 
-void LogInDialog::setControlsForSSO() {
+void LogInDialog::setControlsForSSO(bool _resize) {
+	m_isSSOLogin = true;
 	m_logInButton->setHidden(false);
-	m_registerButton->setHidden(true);
-	m_savePassword->setHidden(true);
+	m_registerButton->setHidden(false);
 
+	m_savePassword->setHidden(true);
 	if (!m_state.has(LogInStateFlag::SSOMode)) {
 		m_userNameTmp = m_username->text();
 		m_logInButton->setText("SSO Login");
-		setMinimumHeight(m_maxSSOHeight);
-		resize(width(), m_maxSSOHeight);
 		m_state.set(LogInStateFlag::SSOMode);
+		setMinimumHeight(m_maxSSOHeight);
+	}
+	if (_resize)
+	{
+		auto currentWidgetWidth = width();
+		resize(currentWidgetWidth, m_maxSSOHeight);
 	}
 	m_username->setReadOnly(true);
 	m_username->setText(QString::fromStdWString(determineSSOUsername()));
@@ -1146,40 +1170,48 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
 	std::wstring ssoUsername = determineSSOUsername();
 	
-	// Jan, hier den Login via SSO implementieren
 	try
 	{
 		ot::SingleSignOn_Client client;
-		const std::string firstToken =	client.generateFirstToken();
-
-		ot::JsonDocument firstTokenMessage;
-		firstTokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, firstTokenMessage.GetAllocator()), firstTokenMessage.GetAllocator());
-		firstTokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(firstToken, firstTokenMessage.GetAllocator()), firstTokenMessage.GetAllocator());
-
 		const std::string authorisationURL = _userManager.getAuthorisationServerURL();
-		std::string response;
-		if (ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, firstTokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		std::string receivedToken = "";
+		std::string errorMessage;
+		bool continueProcess = true;
+		do
 		{
-			ot::JsonDocument secondTokenMessage;
-			secondTokenMessage.fromJson(response);
-			std::string secondToken = ot::json::getString(secondTokenMessage, OT_PARAM_AUTH_Token);
-
-			const std::string thirdToken = client.generateThirdToken(secondToken);
-			ot::JsonDocument thirdTokenMessage;
-			thirdTokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, thirdTokenMessage.GetAllocator()), thirdTokenMessage.GetAllocator());
-			thirdTokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(thirdToken, thirdTokenMessage.GetAllocator()), thirdTokenMessage.GetAllocator());
-			if (!ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, thirdTokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+			std::string token =	client.generateToken(receivedToken);
+			
+			ot::JsonDocument tokenMessage;
+			tokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			tokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(token, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			tokenMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(ot::String::toString(ssoUsername), tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			std::string response;
+			if (ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, tokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
 			{
+				ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
+				if (message.isOk())
+				{
+					receivedToken = message.getWhat();
+					continueProcess = !receivedToken.empty();
+				}
+				else
+				{
+					errorMessage = message.getWhat();
+					continueProcess = false;
+				}
 			}
-		}
+			else
+			{
+				errorMessage = "Failed to connect to authorisation service";
+				continueProcess = false;
+			}
+		} while (continueProcess);
 
 	}
 	catch (std::exception& _e)
 	{
-
+		
 	}
-	// ! keine exception hier raus werfen <-- paralleler thread
-
 	// Falls du einen neuen Fehlercode (Output message) brauchst, einfach das enum WorkerError,
 	// sowie das switch in slotWorkerError() erweitern
 
@@ -1188,7 +1220,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 }
 
 LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {
-	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
+	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString(),m_isSSOLogin))
 	{
 		return WorkerError::FailedToRegister;
 	}

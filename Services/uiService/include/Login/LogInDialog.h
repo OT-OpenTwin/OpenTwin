@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: LogInDialog.h
 // 
 // License:
@@ -66,7 +66,7 @@ public:
 	void setConfigFlag(ConfigFlag _flag, bool _enabled = true);
 	void setConfig(const Config& _cfg);
 	const Config& getConfig() const { return m_config; };
-
+	bool isSSOLogin() const { return m_isSSOLogin; };
 Q_SIGNALS:
 	void dialogShown();
 	void configChanged(const Config& _newConfig);
@@ -131,6 +131,7 @@ private:
 
 	std::string m_databaseUrl;
 	std::string m_authorizationServiceUrl;
+	bool m_isSSOLogin = false;
 
 	std::vector<LogInGSSEntry> m_gssData;
 
@@ -176,7 +177,7 @@ private:
 	void setControlsForUsernamePassword();
 	void setControlsForRegister();
 	void setControlsForChangePassword();
-	void setControlsForSSO();
+	void setControlsForSSO(bool _resize = false);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
