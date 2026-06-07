@@ -29,7 +29,8 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\PHREECService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\PHREECService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\PHREECService\build"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\PHREECService\packages"
 

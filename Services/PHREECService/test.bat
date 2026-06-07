@@ -53,23 +53,13 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PHREECService\PHREECService.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64\Debug\PHREECServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceDebugReport.xml" "PHREECService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\PHREECServiceDebugReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_PHREEC_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PHREECService\PHREECService.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64\Release\PHREECServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceReleaseReport.xml" "PHREECService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\PHREECServiceReleaseReport.xml"
-) 
-  
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_PHREEC_SERVICE_ROOT%" RELEASE
+)
+
 GOTO END
 
 :PAUSE_END
