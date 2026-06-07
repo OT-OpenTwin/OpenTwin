@@ -29,9 +29,10 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\.vs"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\x64"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\packages"
+RMDIR /S /Q "%OT_TET_MESH_SERVICE_ROOT%\.vs"
+RMDIR /S /Q "%OT_TET_MESH_SERVICE_ROOT%\build"
+RMDIR /S /Q "%OT_TET_MESH_SERVICE_ROOT%\x64"
+RMDIR /S /Q "%OT_TET_MESH_SERVICE_ROOT%\packages"
 
 GOTO END
 

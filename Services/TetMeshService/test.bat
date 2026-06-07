@@ -53,23 +53,13 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\TetMeshService.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\TetMeshService\x64\Debug\TetMeshServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\TetMeshServiceDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\TetMeshServiceDebugReport.xml" "TetMeshService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\TetMeshServiceDebugReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_TET_MESH_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\TetMeshService\TetMeshService.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\TetMeshService\x64\Release\TetMeshServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\TetMeshServiceReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\TetMeshServiceReleaseReport.xml" "TetMeshService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\TetMeshServiceReleaseReport.xml"
-) 
-  
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_TET_MESH_SERVICE_ROOT%" RELEASE
+)
+
 GOTO END
 
 :PAUSE_END
