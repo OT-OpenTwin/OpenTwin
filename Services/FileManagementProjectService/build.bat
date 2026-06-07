@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%\FileManagementProjectService.sln" %1 %2 
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CMakeBuildSingleProject.bat" "%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%" %1 %2
 
 GOTO END
 
