@@ -27,10 +27,38 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Launching development enviroment
+ECHO Testing Project : KrigingService
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_KRIGING_SERVICE_ROOT%"
+
+SET RELEASE=1
+SET DEBUG=1
+
+IF "%1"=="RELEASE" (
+  SET RELEASE=1
+  SET DEBUG=0
+)
+
+IF "%1"=="DEBUG" (
+  SET RELEASE=0
+  SET DEBUG=1
+)
+
+SET TYPE=/Rebuild
+SET TYPE_NAME=REBUILD
+
+IF "%2"=="BUILD" (
+	SET TYPE=/Build
+	SET TYPE_NAME=BUILD
+)
+
+IF %DEBUG%==1 (
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_KRIGING_SERVICE_ROOT%" DEBUG
+)
+
+IF %RELEASE%==1 (
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_KRIGING_SERVICE_ROOT%" RELEASE
+)
 
 GOTO END
 
@@ -39,5 +67,3 @@ pause
 GOTO END
 
 :END
-
-exit /b

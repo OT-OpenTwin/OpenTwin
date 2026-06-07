@@ -57,3 +57,6 @@ bld/
 __pycache__/
 
 
+
+# CMake build directory
+build/
