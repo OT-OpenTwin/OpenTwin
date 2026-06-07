@@ -53,22 +53,12 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\StudioSuiteService\StudioSuiteService.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\StudioSuiteService\x64\Debug\StudioSuiteServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\StudioSuiteServiceDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\StudioSuiteServiceDebugReport.xml" "StudioSuiteService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\StudioSuiteServiceDebugReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_STUDIOSUITE_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\StudioSuiteService\StudioSuiteService.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\StudioSuiteService\x64\Release\StudioSuiteServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\StudioSuiteServiceReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\StudioSuiteServiceReleaseReport.xml" "StudioSuiteService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\StudioSuiteServiceReleaseReport.xml"
-) 
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_STUDIOSUITE_SERVICE_ROOT%" RELEASE
+)
 
 GOTO END
 
