@@ -66,7 +66,7 @@ echo +++ COMPILE TIME +++
 
 	REM First we build and copy the c++ executable
 	CALL "%UPGRADER_EXE%build.bat" BOTH REBUILD
-	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe\MongoDBUpgradeManager.exe
+	copy %UPGRADER_EXE%\build\windows-release\Release\MongoDBUpgradeManager.exe %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe\MongoDBUpgradeManager.exe
 	
 	REM Now copying all required dlls to the deployment dir
 	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_86_0\lib64-msvc-14.3\boost_filesystem-vc143-mt-x64-1_86.dll %OT_INSTALLUPGRADER_DIR%\Upgrader_Exe\boost_filesystem-vc143-mt-x64-1_86.dll
