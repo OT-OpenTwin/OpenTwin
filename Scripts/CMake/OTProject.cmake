@@ -181,6 +181,17 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
         return()
     endif()
 
+    # The generic guess would strip the leading "OT" and produce OT_OOLKIT_ROOT.
+    if(DEP_TOKEN STREQUAL "OToolkitAPI")
+        set(${OUT_VAR} "OT_OTOOLKITAPI_ROOT" PARENT_SCOPE)
+        return()
+    endif()
+
+    if(DEP_TOKEN STREQUAL "OToolkit")
+        set(${OUT_VAR} "OT_OTOOLKIT_ROOT" PARENT_SCOPE)
+        return()
+    endif()
+
     if(DEP_TOKEN STREQUAL "OTFMC")
         if(DEFINED ENV{OT_FILE_MANAGER_CONNECTOR_ROOT} AND NOT "$ENV{OT_FILE_MANAGER_CONNECTOR_ROOT}" STREQUAL "")
             set(${OUT_VAR} "OT_FILE_MANAGER_CONNECTOR_ROOT" PARENT_SCOPE)
@@ -357,10 +368,15 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
         CXX_EXTENSIONS NO
     )
 
-    target_compile_definitions(${_core} PRIVATE
-        $<${_OT_CFG_DEBUG}:_DEBUG>
-        $<${_OT_CFG_RELEASE}:NDEBUG>
-    )
+    if("${ARGV2}" STREQUAL "PYTHON")
+        target_compile_definitions(${_core} PRIVATE NDEBUG)
+        set_property(TARGET ${_core} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+    else()
+        target_compile_definitions(${_core} PRIVATE
+            $<${_OT_CFG_DEBUG}:_DEBUG>
+            $<${_OT_CFG_RELEASE}:NDEBUG>
+        )
+    endif()
 
     target_include_directories(${_core} PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include"
@@ -424,6 +440,18 @@ endfunction()
 
 function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
     _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR})
+    _ot_target_core_name(_core ${TARGET_NAME})
+    set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
+
+    if(NOT "${ARGV2}" STREQUAL "")
+        _ot_apply_export_macro(${TARGET_NAME} "${ARGV2}")
+    endif()
+endfunction()
+
+# Python apps link the release CPython (python311.lib) in every config, because the
+# debug build (python311_d.lib) is not shipped. The PYTHON mode forces /MD and NDEBUG.
+function(ot_initialize_bin_python TARGET_NAME ROOT_PATH_VAR)
+    _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR} PYTHON)
     _ot_target_core_name(_core ${TARGET_NAME})
     set_property(TARGET ${_core} PROPERTY OT_IS_APP TRUE)
 
@@ -510,6 +538,44 @@ function(ot_add_compile_definitions TARGET_NAME)
     endforeach()
 endfunction()
 
+# Use the static CRT (/MT) in release and the default /MDd in debug. Matches the
+# standalone tools that ship as self-contained executables.
+function(ot_set_runtime_static_release TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_set_runtime_static_release: target '${_core}' not found.")
+    endif()
+    set_property(TARGET ${_core} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:DebugDLL>")
+endfunction()
+
+function(ot_add_qt_resources TARGET_NAME)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_add_qt_resources: target '${_core}' not found.")
+    endif()
+    file(GLOB_RECURSE _qrc CONFIGURE_DEPENDS
+        "${CMAKE_CURRENT_SOURCE_DIR}/*.qrc"
+    )
+    if(_qrc)
+        set_property(TARGET ${_core} PROPERTY AUTORCC ON)
+        target_sources(${_core} PRIVATE ${_qrc})
+    endif()
+endfunction()
+
+function(ot_set_subsystem TARGET_NAME SUBSYSTEM)
+    _ot_target_core_name(_core ${TARGET_NAME})
+    if(NOT TARGET ${_core})
+        message(FATAL_ERROR "ot_set_subsystem: target '${_core}' not found.")
+    endif()
+
+    string(TOUPPER "${SUBSYSTEM}" _subsystem)
+    if(NOT (_subsystem STREQUAL "WINDOWS" OR _subsystem STREQUAL "CONSOLE"))
+        message(FATAL_ERROR "ot_set_subsystem(${TARGET_NAME} ...): unsupported subsystem '${SUBSYSTEM}'. Use WINDOWS or CONSOLE.")
+    endif()
+
+    set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM "${_subsystem}")
+endfunction()
+
 function(ot_set_subsystem_for_config TARGET_NAME CONFIG_NAME SUBSYSTEM)
     _ot_target_core_name(_core ${TARGET_NAME})
     if(NOT TARGET ${_core})
@@ -589,16 +655,20 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
-    _ot_get_ot_root_envvar(_rootVar "${DEP}")
-    if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
-        _ot_get_ot_inc_suffix(_incSuffix)
-        file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
-        target_include_directories("${CORE_TARGET}" PRIVATE "${_root}/${_incSuffix}")
+    # Skip PYTHON tokens here. Their guessed root OT_PYTHON_ROOT is a real env var and
+    # would be mistaken for an OT library. They are resolved by the branches below.
+    if(NOT (DEP STREQUAL "PYTHON" OR DEP STREQUAL "PYTHON_LEGACY"))
+        _ot_get_ot_root_envvar(_rootVar "${DEP}")
+        if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
+            _ot_get_ot_inc_suffix(_incSuffix)
+            file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${_root}/${_incSuffix}")
 
-        if(DEP STREQUAL "OTRubberbandOSG")
-            _ot_apply_dep_to_core("${CORE_TARGET}" "OSG")
+            if(DEP STREQUAL "OTRubberbandOSG")
+                _ot_apply_dep_to_core("${CORE_TARGET}" "OSG")
+            endif()
+            return()
         endif()
-        return()
     endif()
 
     # Qt tokens: create imported Qt targets AND link them to the core object library
@@ -758,6 +828,52 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "GMSH")
+        if(GMSH_INC_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${GMSH_INC_PATH}")
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "NGSPICE")
+        if(NGSPICE_ROOT_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${NGSPICE_ROOT_PATH}/src/include")
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "VTK")
+        if(VTK_INC_LIST)
+            target_include_directories("${CORE_TARGET}" PRIVATE ${VTK_INC_LIST})
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "PYTHON")
+        if(OT_PYTHON_INC_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_PATH}")
+        endif()
+        if(OT_PYTHON_NUMPY_INC_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_NUMPY_INC_PATH}")
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "PYTHON_LEGACY")
+        if(OT_PYTHON_INC_LEGACY_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_LEGACY_PATH}")
+        endif()
+        if(OT_PYTHON_ROOT_LEGACY_PATH)
+            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_ROOT_LEGACY_PATH}/Lib/site-packages/numpy/core/include")
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "BOOST_FILESYSTEM")
+        _ot_apply_tp_to_core("${CORE_TARGET}" "BOOST")
+        return()
+    endif()
+
     _ot_env_get_path(_inc  "${DEP}_INC")
     _ot_env_get_path(_incd "${DEP}_INCD")
     _ot_env_get_path(_incr "${DEP}_INCR")
@@ -800,14 +916,17 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
-    _ot_get_ot_root_envvar(_rootVar "${DEP}")
+    # Skip PYTHON tokens here. Their guessed root OT_PYTHON_ROOT is a real env var and
+    # would be mistaken for an OT library. They are resolved by the branches below.
+    if(NOT (DEP STREQUAL "PYTHON" OR DEP STREQUAL "PYTHON_LEGACY"))
+        _ot_get_ot_root_envvar(_rootVar "${DEP}")
+        if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
+            target_link_libraries("${FINAL_TARGET}" PRIVATE ${DEP})
 
-    if(DEFINED ENV{${_rootVar}} AND NOT "$ENV{${_rootVar}}" STREQUAL "")
-        target_link_libraries("${FINAL_TARGET}" PRIVATE ${DEP})
-
-        file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
-        _ot_add_ot_dep_link_dirs("${FINAL_TARGET}" "${_root}")
-        return()
+            file(TO_CMAKE_PATH "$ENV{${_rootVar}}" _root)
+            _ot_add_ot_dep_link_dirs("${FINAL_TARGET}" "${_root}")
+            return()
+        endif()
     endif()
 
     # Qt tokens
@@ -987,6 +1106,90 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
+    if(DEP STREQUAL "EMBREE")
+        if(EMBREE_LIBPATHD_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${EMBREE_LIBPATHD_PATH}>)
+        endif()
+        if(EMBREE_LIBPATHR_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${EMBREE_LIBPATHR_PATH}>)
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE embree3.lib)
+        return()
+    endif()
+
+    if(DEP STREQUAL "GMP")
+        if(GMP_LIBPATHD_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${GMP_LIBPATHD_PATH}>)
+        endif()
+        if(GMP_LIBPATHR_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${GMP_LIBPATHR_PATH}>)
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE libgmp-10.lib)
+        return()
+    endif()
+
+    if(DEP STREQUAL "CGAL")
+        return()
+    endif()
+
+    if(DEP STREQUAL "GMSH")
+        if(GMSH_LIBPATH_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE "${GMSH_LIBPATH_PATH}")
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE gmsh.lib)
+        return()
+    endif()
+
+    if(DEP STREQUAL "NGSPICE")
+        if(NGSPICE_LIBPATHD_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${NGSPICE_LIBPATHD_PATH}>)
+        endif()
+        if(NGSPICE_LIBPATHR_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${NGSPICE_LIBPATHR_PATH}>)
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE ngspice.lib)
+        return()
+    endif()
+
+    if(DEP STREQUAL "VTK")
+        if(VTK_LIB_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE "${VTK_LIB_PATH}")
+        endif()
+        if(VTK_LIBLIST_DEBUG_LIST)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${VTK_LIBLIST_DEBUG_LIST}>)
+        endif()
+        if(VTK_LIBLIST_RELEASE_LIST)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${VTK_LIBLIST_RELEASE_LIST}>)
+        endif()
+        return()
+    endif()
+
+    if(DEP STREQUAL "PYTHON")
+        if(OT_PYTHON_LIBPATH_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE "${OT_PYTHON_LIBPATH_PATH}/Release")
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE python311.lib)
+        return()
+    endif()
+
+    if(DEP STREQUAL "PYTHON_LEGACY")
+        return()
+    endif()
+
+    if(DEP STREQUAL "BOOST_FILESYSTEM")
+        if(BOOST_LIBPATHD_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${BOOST_LIBPATHD_PATH}>)
+        endif()
+        if(BOOST_LIBPATHR_PATH)
+            target_link_directories("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${BOOST_LIBPATHR_PATH}>)
+        endif()
+        target_link_libraries("${FINAL_TARGET}" PRIVATE
+            $<${_OT_CFG_DEBUG}:boost_filesystem-vc143-mt-gd-x64-1_86.lib>
+            $<${_OT_CFG_RELEASE}:boost_filesystem-vc143-mt-x64-1_86.lib>
+        )
+        return()
+    endif()
+
     _ot_env_get_path(_libpathd "${DEP}_LIBPATHD")
     _ot_env_get_path(_libpathr "${DEP}_LIBPATHR")
     if(NOT ("${_libpathd}" STREQUAL "" AND "${_libpathr}" STREQUAL ""))
@@ -1100,7 +1303,12 @@ function(ot_finalize_bin TARGET_NAME)
     add_executable(${TARGET_NAME} $<TARGET_OBJECTS:${_core}>)
 
     if(WIN32)
-        set_property(TARGET ${TARGET_NAME} PROPERTY WIN32_EXECUTABLE "${_OT_CFG_RELEASE}")
+        get_property(_subsystem TARGET ${_core} PROPERTY OT_SUBSYSTEM)
+        if("${_subsystem}" STREQUAL "CONSOLE")
+            set_property(TARGET ${TARGET_NAME} PROPERTY WIN32_EXECUTABLE OFF)
+        else()
+            set_property(TARGET ${TARGET_NAME} PROPERTY WIN32_EXECUTABLE "${_OT_CFG_RELEASE}")
+        endif()
     endif()
 
     if(NOT "${_output_name}" STREQUAL "")
@@ -1156,6 +1364,12 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
             _ot_apply_all_deps(${TEST_TARGET_NAME} ${_coreName} "${_main_deps}")
         endif()
 
+        # Match the core runtime so test and core objects agree on /MD vs /MDd.
+        get_target_property(_core_runtime ${_coreName} MSVC_RUNTIME_LIBRARY)
+        if(_core_runtime)
+            set_property(TARGET ${TEST_TARGET_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "${_core_runtime}")
+        endif()
+
     elseif(TARGET ${MAIN_TARGET_NAME})
         target_link_libraries(${TEST_TARGET_NAME} PRIVATE ${MAIN_TARGET_NAME})
     else()
@@ -1184,11 +1398,22 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
     if(DEFINED ENV{GOOGLE_TEST_LIB} AND NOT "$ENV{GOOGLE_TEST_LIB}" STREQUAL "")
         target_link_libraries(${TEST_TARGET_NAME} PRIVATE $ENV{GOOGLE_TEST_LIB})
     endif()
-    if(DEFINED ENV{GOOGLE_TEST_LIBPATHD} AND NOT "$ENV{GOOGLE_TEST_LIBPATHD}" STREQUAL "")
+    # A Python core runs the release runtime in every config, so its test links the
+    # release gtest even in debug to avoid a /MD vs /MDd clash.
+    set(_test_release_gtest FALSE)
+    if(DEFINED _core_runtime AND "${_core_runtime}" STREQUAL "MultiThreadedDLL")
+        set(_test_release_gtest TRUE)
+    endif()
+
+    if(DEFINED ENV{GOOGLE_TEST_LIBPATHD} AND NOT "$ENV{GOOGLE_TEST_LIBPATHD}" STREQUAL "" AND NOT _test_release_gtest)
         target_link_directories(${TEST_TARGET_NAME} PRIVATE $<${_OT_CFG_DEBUG}:$ENV{GOOGLE_TEST_LIBPATHD}>)
     endif()
     if(DEFINED ENV{GOOGLE_TEST_LIBPATHR} AND NOT "$ENV{GOOGLE_TEST_LIBPATHR}" STREQUAL "")
-        target_link_directories(${TEST_TARGET_NAME} PRIVATE $<${_OT_CFG_RELEASE}:$ENV{GOOGLE_TEST_LIBPATHR}>)
+        if(_test_release_gtest)
+            target_link_directories(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_LIBPATHR}")
+        else()
+            target_link_directories(${TEST_TARGET_NAME} PRIVATE $<${_OT_CFG_RELEASE}:$ENV{GOOGLE_TEST_LIBPATHR}>)
+        endif()
     endif()
 
     add_test(NAME ${TEST_TARGET_NAME} COMMAND ${TEST_TARGET_NAME})

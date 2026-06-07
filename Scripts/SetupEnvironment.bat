@@ -118,6 +118,16 @@ REM OpenTwin tools root paths
 SET OT_OTOOLKITAPI_ROOT=%OPENTWIN_DEV_ROOT%\Tools\OToolkitAPI
 SET OT_OTOOLKIT_ROOT=%OPENTWIN_DEV_ROOT%\Tools\OToolkit
 SET OT_FILEHEADERUPDATER_ROOT=%OPENTWIN_DEV_ROOT%\Tools\FileHeaderUpdater
+SET OT_CONFIGMONGODBNOAUTH_ROOT=%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth
+SET OT_CONFIGMONGODBWITHAUTH_ROOT=%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth
+SET OT_ENDPOINTDOCPARSER_ROOT=%OPENTWIN_DEV_ROOT%\Tools\EndpointDocParser
+SET OT_GITLINECOUNTER_ROOT=%OPENTWIN_DEV_ROOT%\Tools\GitLineCounter
+SET OT_KEYGENERATOR_ROOT=%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator
+SET OT_OTSYSTEMINFORMATIONTOOL_ROOT=%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool
+SET OT_PASSWORDENCRYPTION_ROOT=%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption
+SET OT_SETPERMISSIONS_ROOT=%OPENTWIN_DEV_ROOT%\Tools\SetPermissions
+SET OT_WINDOWSSSO_ROOT=%OPENTWIN_DEV_ROOT%\Tools\WindowsSSO
+SET OT_MONGODBUPGRADEMANAGER_ROOT=%OPENTWIN_DEV_ROOT%\Tools\MongoDBUpgrader\Upgrader_Exe
 
 REM #########################################################################################################################################################################################################################################################################################################################################################################################
 

@@ -208,6 +208,7 @@ ot_get_env_path(OT_DEBUGSERVICE_ROOT_PATH                  OT_DEBUGSERVICE_ROOT)
 ot_get_env_path(OT_LIBRARY_MANAGEMENT_SERVICE_ROOT_PATH    OT_LIBRARY_MANAGEMENT_SERVICE_ROOT)
 ot_get_env_path(OT_HIERARCHICAL_PROJECT_SERVICE_ROOT_PATH  OT_HIERARCHICAL_PROJECT_SERVICE_ROOT)
 ot_get_env_path(OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT_PATH OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT)
+ot_get_env_path(OT_OPENEMS_SERVICE_ROOT_PATH              OT_OPENEMS_SERVICE_ROOT)
 
 # ============================================================
 # OpenTwin library roots from SetupEnvironment.bat
@@ -253,6 +254,16 @@ ot_get_env_path(OT_DOCUMENTATION_ROOT_PATH  OT_DOCUMENTATION_ROOT)
 ot_get_env_path(OT_OTOOLKITAPI_ROOT_PATH    OT_OTOOLKITAPI_ROOT)
 ot_get_env_path(OT_OTOOLKIT_ROOT_PATH       OT_OTOOLKIT_ROOT)
 ot_get_env_path(OT_FILEHEADERUPDATER_ROOT_PATH OT_FILEHEADERUPDATER_ROOT)
+ot_get_env_path(OT_CONFIGMONGODBNOAUTH_ROOT_PATH    OT_CONFIGMONGODBNOAUTH_ROOT)
+ot_get_env_path(OT_CONFIGMONGODBWITHAUTH_ROOT_PATH  OT_CONFIGMONGODBWITHAUTH_ROOT)
+ot_get_env_path(OT_ENDPOINTDOCPARSER_ROOT_PATH      OT_ENDPOINTDOCPARSER_ROOT)
+ot_get_env_path(OT_GITLINECOUNTER_ROOT_PATH         OT_GITLINECOUNTER_ROOT)
+ot_get_env_path(OT_KEYGENERATOR_ROOT_PATH           OT_KEYGENERATOR_ROOT)
+ot_get_env_path(OT_OTSYSTEMINFORMATIONTOOL_ROOT_PATH OT_OTSYSTEMINFORMATIONTOOL_ROOT)
+ot_get_env_path(OT_PASSWORDENCRYPTION_ROOT_PATH     OT_PASSWORDENCRYPTION_ROOT)
+ot_get_env_path(OT_SETPERMISSIONS_ROOT_PATH         OT_SETPERMISSIONS_ROOT)
+ot_get_env_path(OT_WINDOWSSSO_ROOT_PATH             OT_WINDOWSSSO_ROOT)
+ot_get_env_path(OT_MONGODBUPGRADEMANAGER_ROOT_PATH  OT_MONGODBUPGRADEMANAGER_ROOT)
 ot_get_env_path(OT_ENCRYPTIONKEY_ROOT_PATH  OT_ENCRYPTIONKEY_ROOT)
 ot_get_env_path(THIRDPARTY_ROOT_PATH        OPENTWIN_THIRDPARTY_ROOT)
 ot_get_env_path(BASE64_ROOT_PATH            BASE64_ROOT)
@@ -376,6 +387,44 @@ ot_get_env_path(OVR_DLLR_PATH                     OVR_DLLR)
 
 ot_get_env_path(JEM_ROOT_PATH                     JEM_ROOT)
 ot_get_env_path(JEM_DLLR_PATH                     JEM_DLLR)
+
+ot_get_env_path(EMBREE_INCD_PATH                  EMBREE_INCD)
+ot_get_env_path(EMBREE_INCR_PATH                  EMBREE_INCR)
+ot_get_env_path(EMBREE_LIBPATHD_PATH              EMBREE_LIBPATHD)
+ot_get_env_path(EMBREE_LIBPATHR_PATH              EMBREE_LIBPATHR)
+
+ot_get_env_path(GMSH_INC_PATH                     GMSH_ROOT_INC)
+ot_get_env_path(GMSH_LIBPATH_PATH                 GMSH_ROOT_BIN)
+
+ot_get_env_path(NGSPICE_ROOT_PATH                 NGSPICE_ROOT)
+ot_get_env_path(NGSPICE_LIBPATHD_PATH             NGSPICE_LIBPATHD)
+ot_get_env_path(NGSPICE_LIBPATHR_PATH             NGSPICE_LIBPATHR)
+
+ot_get_env_path(VTK_ROOT_PATH                     VTK_ROOT)
+ot_get_env_path(VTK_LIB_PATH                      VTK_LIB)
+ot_get_env_string(VTK_INC_RAW                     VTK_INC)
+ot_get_env_list(VTK_LIBLIST_DEBUG_LIST            VTK_LIBLIST_DEBUG)
+ot_get_env_list(VTK_LIBLIST_RELEASE_LIST          VTK_LIBLIST_RELEASE)
+
+# VTK_INC uses MSBuild-style $(VTK_ROOT) placeholders; expand them to the real
+# path and normalize each entry to a CMake include list.
+set(VTK_INC_LIST "")
+if(NOT "${VTK_INC_RAW}" STREQUAL "" AND NOT "${VTK_ROOT_PATH}" STREQUAL "")
+    string(REPLACE "$(VTK_ROOT)" "${VTK_ROOT_PATH}" _vtk_inc_expanded "${VTK_INC_RAW}")
+    foreach(_vtk_p IN LISTS _vtk_inc_expanded)
+        if(NOT "${_vtk_p}" STREQUAL "")
+            file(TO_CMAKE_PATH "${_vtk_p}" _vtk_p)
+            list(APPEND VTK_INC_LIST "${_vtk_p}")
+        endif()
+    endforeach()
+endif()
+
+ot_get_env_path(OT_PYTHON_INC_PATH                OT_PYTHON_INC)
+ot_get_env_path(OT_PYTHON_LIBPATH_PATH            OT_PYTHON_LIBPATH)
+ot_get_env_path(OT_PYTHON_NUMPY_INC_PATH          OT_PYTHON_NUMPY_INC)
+ot_get_env_path(OT_PYTHON_ROOT_LEGACY_PATH        OT_PYTHON_ROOT_LEGACY)
+ot_get_env_path(OT_PYTHON_INC_LEGACY_PATH         OT_PYTHON_INC_LEGACY)
+ot_get_env_path(OT_PYTHON_LIBPATH_LEGACY_PATH     OT_PYTHON_LIBPATH_LEGACY)
 
 # ============================================================
 # derived OT library directories
