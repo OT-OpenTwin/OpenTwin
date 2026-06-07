@@ -21,7 +21,6 @@ IF "%DEVENV_ROOT_2022%" == "" (
 
 REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\OpenTwin_set_up_services.bat"
 
 REM Ensure that the script finished successfully
 IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
@@ -31,7 +30,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKIT_ROOT%\OToolkit.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_OTOOLKIT_ROOT%"
 
 GOTO END
 
