@@ -30,7 +30,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_ELMERFEM_SERVICE_ROOT%\ElmerFEMService.vcxproj"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_ELMERFEM_SERVICE_ROOT%"
 
 GOTO END
 

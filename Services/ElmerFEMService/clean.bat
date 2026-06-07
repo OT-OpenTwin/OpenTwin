@@ -29,7 +29,8 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\build"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\packages"
 

@@ -53,22 +53,12 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\ElmerFEMService.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\x64\Debug\ElmerFEMServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ElmerFEMServiceDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ElmerFEMServiceDebugReport.xml" "ElmerFEMService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ElmerFEMServiceDebugReport.xml"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_ELMERFEM_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\ElmerFEMService.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\ElmerFEMService\x64\Release\ElmerFEMServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\ElmerFEMServiceReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\ElmerFEMServiceReleaseReport.xml" "ElmerFEMService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\ElmerFEMServiceReleaseReport.xml"
-) 
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_ELMERFEM_SERVICE_ROOT%" RELEASE
+)
 
 GOTO END
 
