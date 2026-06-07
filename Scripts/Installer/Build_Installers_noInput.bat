@@ -90,10 +90,10 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	cd !HELPER_PATH!
 	mkdir Configuration
 	
-	copy %OPENTWIN_DEV_ROOT%\Tools\SetPermissions\x64\Release\SetPermissions.exe .\Configuration
-	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth\x64\Release\ConfigMongoDBNoAuth.exe .\Configuration
-	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\x64\Release\ConfigMongoDBWithAuth.exe .\Configuration
-	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\x64\Release\OTSystem.dll .\Configuration
+	copy %OPENTWIN_DEV_ROOT%\Tools\SetPermissions\build\windows-release\Release\SetPermissions.exe .\Configuration
+	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth\build\windows-release\Release\ConfigMongoDBNoAuth.exe .\Configuration
+	copy %OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\build\windows-release\Release\ConfigMongoDBWithAuth.exe .\Configuration
+	copy %OPENTWIN_DEV_ROOT%\Libraries\OTSystem\build\windows-release\Release\OTSystem.dll .\Configuration
 	
 	REM Now all tools, necessary for MongoDB installation/upgrade
 	Set UPGRADER_EXE="%UPGRADER_PATH%\Upgrader_Exe\"
@@ -104,7 +104,7 @@ REM	"!SEVENZIP_REG_DATA!\7z.exe" x !PLUGIN_ZIPFILE! -o!NSIS_REG_VALUE! -y -aos
 	MKDIR "Upgrader_Exe"
 	
 	CALL "%UPGRADER_EXE%\build.bat" BOTH REBUILD
-	copy %UPGRADER_EXE%\x64\Release\MongoDBUpgradeManager.exe .\Upgrader_Exe\MongoDBUpgradeManager.exe
+	copy %UPGRADER_EXE%\build\windows-release\Release\MongoDBUpgradeManager.exe .\Upgrader_Exe\MongoDBUpgradeManager.exe
 	
 	REM Now copying all required dlls to the deployment dir
 	copy %OPENTWIN_THIRDPARTY_ROOT%\boost\boost_1_86_0\lib64-msvc-14.3\boost_filesystem-vc143-mt-x64-1_86.dll .\Upgrader_Exe\boost_filesystem-vc143-mt-x64-1_86.dll

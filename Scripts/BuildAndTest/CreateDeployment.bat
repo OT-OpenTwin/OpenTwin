@@ -245,7 +245,7 @@ REM Launcher scripts
 XCOPY /S "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\*.*" "%OT_DEPLOYMENT_DIR%"
 
 REM Copy the Password Encryption Tool
-XCOPY /S "%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption\x64\Release\PasswordEncryption.exe" "%OT_DEPLOYMENT_DIR%"
+XCOPY /S "%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption\%OT_CDLLR%\PasswordEncryption.exe" "%OT_DEPLOYMENT_DIR%"
 
 REM Copy the certificate creation tools
 XCOPY /S "%OPENTWIN_THIRDPARTY_ROOT%\CertificateCreation\*.*" "%OT_DEPLOYMENT_DIR%\Certificates"

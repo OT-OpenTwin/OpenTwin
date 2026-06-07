@@ -112,16 +112,16 @@ IF NOT EXIST "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h" (
 	ECHO Updating header file "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
 	
 	REM Remove libraries
-	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTSystem.dll"
-	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTCore.dll"
-	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\OTRandom.dll"
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%\OTSystem.dll"
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%\OTCore.dll"
+	DEL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%\OTRandom.dll"
 	
 	REM Copy libraries
-	COPY "%OT_SYSTEM_ROOT%\%OT_CDLLR%\OTSystem.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
-	COPY "%OT_CORE_ROOT%\%OT_CDLLR%\OTCore.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
-	COPY "%OT_RANDOM_ROOT%\%OT_CDLLR%\OTRandom.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release"
+	COPY "%OT_SYSTEM_ROOT%\%OT_CDLLR%\OTSystem.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%"
+	COPY "%OT_CORE_ROOT%\%OT_CDLLR%\OTCore.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%"
+	COPY "%OT_RANDOM_ROOT%\%OT_CDLLR%\OTRandom.dll" "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%"
 
-	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\x64\Release\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
+	CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\%OT_CDLLR%\KeyGenerator.exe" 2048 "%OT_ENCRYPTIONKEY_ROOT%\OTEncryptionKey.h"
 )
 
 REM ====================================================================

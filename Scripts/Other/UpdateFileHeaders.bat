@@ -41,7 +41,7 @@ if not "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 )
 
 rem rem Enabled:
-call "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --out "%OT_FILEHEADERUPDATER_ROOT%\FHU_Log.txt" --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json" %1 %2 %3 %4 %5 %6 %7 %8 %9
+call "%OT_FILEHEADERUPDATER_ROOT%\%OT_CDLLR%\FileHeaderUpdater.exe" --out "%OT_FILEHEADERUPDATER_ROOT%\FHU_Log.txt" --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json" %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 if "%1"=="--pause" (
 	goto PAUSE_END
