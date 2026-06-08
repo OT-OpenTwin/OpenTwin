@@ -980,9 +980,14 @@ void LogInDialog::loginWorkerStart() {
 		return;
 	}
 
-	if (!m_loginData.isValid()) {
+	if (!m_isSSOLogin && !m_loginData.isValid()) {
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
+		return;
+	}
+	else if (m_isSSOLogin)
+	{
+		this->stopWorkerWithError(WorkerError::NoError);
 		return;
 	}
 
