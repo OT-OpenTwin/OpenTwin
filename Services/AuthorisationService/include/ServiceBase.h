@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ServiceBase.h
 // 
 // License:
@@ -42,6 +42,8 @@
 #include "Group.h"
 #include "Project.h"
 #include "User.h"
+
+#include "SSOBuffer.h"
 
 class ServiceBase
 {
@@ -214,8 +216,9 @@ private:
 	std::string m_dbUsername;
 	std::string m_dbPassword;
 	std::mutex m_mutex;
-
 	const int m_dataBaseVersion = 1;
+
+	SSOBuffer m_ssoBuffer;
 
 	ServiceBase() = default;
 };

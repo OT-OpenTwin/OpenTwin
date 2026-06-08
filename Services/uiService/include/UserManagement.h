@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: UserManagement.h
 // 
 // License:
@@ -44,13 +44,12 @@ public:
 	bool checkConnectionDataBase(const std::string &userName, const std::string &password) const;
 	void initializeNewSession(void);
 
-	bool addUser(const std::string &userName, const std::string &password) const;
+	bool addUser(const std::string &userName, const std::string &password, bool _isSSO) const;
 	bool deleteUser(const std::string &userName) const;
 	//bool changePassword(const std::string &oldPassword, const std::string &newPassword);
 
 	bool checkUserName(const std::string &userName) const;
 	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const;
-	bool sendSingleSignOnRequest();
 
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);
@@ -62,6 +61,7 @@ public:
 
 	std::string getUserSettingsCollection(void);
 
+	const std::string& getAuthorisationServerURL() const { return m_authServerURL; }
 private:
 	bool hasError(const std::string& _response) const;
 	bool hasSuccessful(const std::string& _response) const;
