@@ -469,7 +469,9 @@ void LogInDialog::slotToggleLogInAndRegisterMode() {
 		}
 	}
 	else {
-		setControlsForRegister();
+		if (findCurrentGssEntry().getLoginType() != ot::LoginType::SSO) {
+			setControlsForRegister();
+		}
 	}
 
 	this->update();
