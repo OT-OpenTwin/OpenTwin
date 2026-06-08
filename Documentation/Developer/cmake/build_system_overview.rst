@@ -149,7 +149,3 @@ Configurations come from ``OTPresets.json`` through each project's
 generated ``.vcxproj`` contains ``Debug``, ``Release``, ``RelWithDebInfo`` and
 ``MinSizeRel``. Day to day you mostly use ``windows-debug`` and
 ``windows-release``.
-
-Debugging works out of the box in Debug. The generated projects compile with
-``/Zi``, link with debug information enabled and optimization disabled, and
-produce PDBs for every library, service and tool.

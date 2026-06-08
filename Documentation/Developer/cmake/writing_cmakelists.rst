@@ -135,9 +135,9 @@ differ from the target name:
 A Python subprocess
 -------------------
 
-A binary that embeds CPython uses ``ot_initialize_bin_python``. It keeps the
-release runtime in every configuration so it can link the shipped
-``python311.lib`` (see :ref:`Runtime library<target CMake Runtime Library>`):
+A binary that embeds Python uses ``ot_initialize_bin_python``. It keeps the
+release runtime in every configuration so it can link the shipped Python
+(see :ref:`Runtime library<target CMake Runtime Library>`):
 
 .. code-block:: cmake
 
@@ -163,10 +163,8 @@ release runtime in every configuration so it can link the shipped
    ot_add_test(PythonExecution)
 
 .. warning::
-   Only a target that actually includes ``<Python.h>`` needs
-   ``ot_initialize_bin_python`` and the ``PYTHON`` token. A service that just
-   talks to the Python subprocess over the service interface is an ordinary
-   library and uses ``ot_initialize_lib``.
+   A service that just talks to the Python subprocess over the service interface 
+   is an ordinary library and uses ``ot_initialize_lib``.
 
 Unit tests
 ----------
