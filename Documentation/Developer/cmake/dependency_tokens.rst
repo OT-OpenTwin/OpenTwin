@@ -145,7 +145,7 @@ both include and link information.
      - Boost
      - lib
    * - ``BOOST_FILESYSTEM``
-     - Boost.Filesystem (versioned ``.lib``)
+     - Boost.Filesystem
      - lib
    * - ``ADS``
      - Qt Advanced Docking System
@@ -163,19 +163,19 @@ both include and link information.
      - VTK
      - lib
    * - ``EMBREE``
-     - Embree (``embree3.lib``)
+     - Embree
      - lib
    * - ``GMP``
-     - GMP (``libgmp-10.lib``)
+     - GMP
      - lib
    * - ``GMSH``
-     - Gmsh (``gmsh.lib``)
+     - Gmsh
      - lib
    * - ``NGSPICE``
-     - ngspice (``ngspice.lib``)
+     - ngspice
      - lib
    * - ``PYTHON``
-     - CPython 3.11, links ``python311.lib``
+     - CPython 3.11
      - lib
    * - ``PYTHON_LEGACY``
      - Legacy CPython include and numpy paths

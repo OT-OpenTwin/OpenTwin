@@ -86,7 +86,7 @@ Sources are found with ``file(GLOB_RECURSE ... CONFIGURE_DEPENDS)``, so adding o
 removing a file under ``src/`` or ``include/`` is picked up on the next build.
 You do not list files by hand.
 
-What you get for free
+What you get
 ---------------------
 
 Just including ``OTProject.cmake`` applies the OpenTwin standard MSVC setup to
