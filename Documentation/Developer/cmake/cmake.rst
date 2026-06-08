@@ -3,15 +3,14 @@
 CMake Build System
 ==================
 
-OpenTwin builds with CMake. Every library, service and tool is described by a
-small ``CMakeLists.txt`` that hands almost all of the work to a shared meta build
+OpenTwin builds with CMake. Every library, service and tool is build by a
+``CMakeLists.txt`` that handes almost all of the work to a shared meta build
 system in ``Scripts/CMake``.
 
-The idea is that each project file stays short and declarative. You say what the
+The idea is that each project file stays short and declarative. You declare what the
 target is (a library, an executable, a Python subprocess), which dependencies it
-needs as short tokens, and the meta system works out the include paths, link
-directories, runtime library, export macro, Qt integration and the debug/release
-setup for you.
+needs as tokens, and the system works out the include paths, link
+directories, runtime library, export macro, Qt integration and the debug/release setup.
 
 .. toctree::
    :maxdepth: 2

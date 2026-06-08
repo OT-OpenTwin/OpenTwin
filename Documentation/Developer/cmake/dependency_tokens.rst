@@ -3,11 +3,10 @@
 Dependency Tokens
 =================
 
-``ot_add_dependency(<Target> <TOKEN> ...)`` is where you list what a project
-needs to build. Each token is a short name that the build system turns into the
+``ot_add_dependency(<Target> <TOKEN> ...)`` is where you list the project
+dependencies to build. Each token is a short name that the build system turns into the
 right include directories (on the ``_core`` object library) and the right link
-directories and link libraries (on the final target). You never write include or
-library paths by hand.
+directories and link libraries (on the final target).
 
 .. code-block:: cmake
 
@@ -18,8 +17,8 @@ library paths by hand.
        OSLibs                      # OS system libraries
    )
 
-Order does not matter, and you can call ``ot_add_dependency`` more than once;
-the tokens just accumulate. A token that is not recognised produces a warning at
+Order does not matter.
+A token that is not recognised produces a warning at
 configure time, so typos are easy to spot.
 
 OpenTwin library tokens
@@ -65,6 +64,9 @@ If you add a new OpenTwin library whose root variable does not match the
 ``OT_FOO_BAR_ROOT`` pattern, add a mapping in the ``_ot_get_ot_root_envvar``
 function in ``OTProject.cmake``.
 
+.. note::
+This will be revised in the upcoming Environment setup changes via Python in the future.
+
 Qt tokens
 ---------
 
@@ -96,8 +98,7 @@ as one ``Qt*`` token is present, ``AUTOMOC`` is turned on for you at finalize.
      - Core, Gui, Widgets, Network, Svg, Xml, OpenGLWidgets, SvgWidgets, Qml,
        WebSockets
 
-A console executable uses ``main()``, so it does not need ``QtEntryPoint`` even
-when it uses Qt. Qt resource (``.qrc``) files are handled by
+Qt resource (``.qrc``) files are handled by
 ``ot_add_qt_resources(T)``, which turns on ``AUTORCC``.
 
 Third party tokens

@@ -45,19 +45,14 @@ The two target model: ``_core`` plus the final target
 
 Every project builds as two CMake targets.
 
-One is the core object library ``<TARGET>_core``, created with
-``add_library(... OBJECT ...)``. It compiles everything under ``src/`` and
+One is the core object library ``<TARGET>_core``.
+It compiles everything under ``src/`` and
 ``include/`` and carries the compile flags, preprocessor definitions, include
 directories, the runtime library and the export macro.
 
 The other is the final target. ``ot_finalize_lib`` builds the DLL from those core
 objects, while ``ot_finalize_bin`` builds an executable. Either one picks up the
 link directories and link libraries.
-
-The split exists mainly for unit tests. A test executable links the same compiled
-core objects directly, so the code under test is compiled once and the test never
-re-links a DLL. This replaces the old ``DebugTest`` and ``ReleaseTest`` static
-library configurations from the Visual Studio days.
 
 .. code-block:: text
 
@@ -104,6 +99,10 @@ every target. The main pieces are:
 * ``_DEBUG`` in Debug and ``NDEBUG`` in Release on the core (Python targets
   differ, see below).
 
+.. note::
+   The overal compiler settings will be adjusted in the future.
+   E.g. ``/W3`` (Warning level 3) will be added globally.
+
 .. _target CMake Runtime Library:
 
 Runtime library and the Debug/Release mapping
@@ -136,8 +135,8 @@ Self contained command line tools that ship as a single executable use
 ``ot_set_runtime_static_release``, so Release links the static CRT while Debug
 stays on ``/MDd`` for normal debugging.
 
-Python only ships a release build, so a binary that embeds CPython always uses
-the release runtime, even in Debug. ``ot_initialize_bin_python`` handles that:
+Python only ships a release build with debug information, so a binary that embeds Python always uses
+the release runtime, even in Debug. ``ot_initialize_bin_python`` handles that distinction:
 it keeps ``/MD`` in every configuration and, in Debug, defines ``_RELEASEDEBUG``
 instead of ``_DEBUG`` so the service's debug code paths are still active.
 

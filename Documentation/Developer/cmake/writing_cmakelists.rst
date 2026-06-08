@@ -97,8 +97,6 @@ An executable (command line tool)
 ---------------------------------
 
 Tools live in ``Tools/`` and use ``ot_initialize_bin`` and ``ot_finalize_bin``.
-A console tool should declare the console subsystem so it keeps a ``main()``
-entry point and a console window for output and debugging:
 
 .. code-block:: cmake
 
@@ -186,6 +184,10 @@ project's ``tests/`` directory when it exists and ``BUILD_TESTING`` is on. The
 runtime library of the target under test, and registers the test with CTest. The
 first argument is the test executable name; the second is the main target whose
 core objects and dependencies it reuses.
+
+.. warning::
+   If ``ot_add_test()`` is defined in the core target CMakeLists, and no tests subdir is present,
+   the configuration step will throw a ``BUILD_TESTING`` not configured warning.
 
 Modifiers (between initialize and finalize)
 -------------------------------------------
