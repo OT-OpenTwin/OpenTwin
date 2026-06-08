@@ -369,7 +369,10 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     )
 
     if("${ARGV2}" STREQUAL "PYTHON")
-        target_compile_definitions(${_core} PRIVATE NDEBUG)
+        target_compile_definitions(${_core} PRIVATE
+            $<${_OT_CFG_DEBUG}:_RELEASEDEBUG>
+            $<${_OT_CFG_RELEASE}:NDEBUG>
+        )
         set_property(TARGET ${_core} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
     else()
         target_compile_definitions(${_core} PRIVATE
@@ -448,8 +451,6 @@ function(ot_initialize_bin TARGET_NAME ROOT_PATH_VAR)
     endif()
 endfunction()
 
-# Python apps link the release CPython (python311.lib) in every config, because the
-# debug build (python311_d.lib) is not shipped. The PYTHON mode forces /MD and NDEBUG.
 function(ot_initialize_bin_python TARGET_NAME ROOT_PATH_VAR)
     _ot_initialize_target(${TARGET_NAME} ${ROOT_PATH_VAR} PYTHON)
     _ot_target_core_name(_core ${TARGET_NAME})
