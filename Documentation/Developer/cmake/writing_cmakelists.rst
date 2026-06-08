@@ -56,10 +56,9 @@ Libraries live in ``Libraries/`` and build as shared libraries. Use
    ot_finalize_lib(OTExample)
    ot_add_test(OTExample)
 
-The export macro controls the ``__declspec(dllexport/dllimport)`` switch. If you
-do not pass one, the default is ``OPENTWIN<NAME>_EXPORTS`` (for ``OTExample``
-that is ``OPENTWINEXAMPLE_EXPORTS``). To use your own, pass it as the third
-argument:
+The export macro controls the ``__declspec(dllexport/dllimport)`` switch. Leave it
+out and you get ``OPENTWIN<NAME>_EXPORTS`` by default, so ``OTExample`` ends up
+with ``OPENTWINEXAMPLE_EXPORTS``. To set your own, pass it as the third argument:
 
 .. code-block:: cmake
 

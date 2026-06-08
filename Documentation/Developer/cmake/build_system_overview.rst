@@ -45,14 +45,14 @@ The two target model: ``_core`` plus the final target
 
 Every project builds as two CMake targets.
 
-The first is the core object library ``<TARGET>_core``, an
-``add_library(... OBJECT ...)`` that compiles everything under ``src/`` and
-``include/``. This is where compile flags, preprocessor definitions, include
-directories, the runtime library and the export macro are applied.
+One is the core object library ``<TARGET>_core``, created with
+``add_library(... OBJECT ...)``. It compiles everything under ``src/`` and
+``include/`` and carries the compile flags, preprocessor definitions, include
+directories, the runtime library and the export macro.
 
-The second is the final target, created by ``ot_finalize_lib`` (a ``SHARED``
-library, i.e. a DLL) or ``ot_finalize_bin`` (an executable). It is assembled from
-the compiled core objects and receives the link directories and link libraries.
+The other is the final target. ``ot_finalize_lib`` builds the DLL from those core
+objects, while ``ot_finalize_bin`` builds an executable. Either one picks up the
+link directories and link libraries.
 
 The split exists mainly for unit tests. A test executable links the same compiled
 core objects directly, so the code under test is compiled once and the test never
@@ -96,8 +96,8 @@ every target. The main pieces are:
 * Conformance and warning flags such as ``/permissive-``,
   ``/Zc:__cplusplus``, ``/Zc:preprocessor``, ``/EHsc``, ``/MP`` for parallel
   compilation, and external header warning suppression.
-* A default runtime library of ``/MD`` in Release and ``/MDd`` in Debug (the
-  dynamic CRT). A target only overrides this when it has to.
+* The dynamic CRT by default: ``/MD`` in Release, ``/MDd`` in Debug. A target
+  overrides this only when it has to.
 * Common definitions everywhere (``WIN32``, ``_WIN32``, ``_WINDOWS``,
   ``UNICODE``, ``_UNICODE``), plus a few Debug only ones.
 * ``/OPT:REF`` and ``/OPT:ICF`` for Release linking.
