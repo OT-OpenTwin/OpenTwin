@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : LibraryManagementService
+ECHO Testing Project : LocalDirectoryService
 
 REM Open project
 
@@ -53,13 +53,23 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%" DEBUG
+	ECHO %TYPE% DEBUGTEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService\LibraryManagementService.vcxproj" %TYPE% "DebugTest|x64"  
+	ECHO %TYPE% DEBUG
+	"%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService\x64\Debug\LibraryManagementServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\LibraryManagementServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\LibraryManagementServiceDebugReport.xml" "LibraryManagementService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\LibraryManagementServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LIBRARY_MANAGEMENT_SERVICE_ROOT%" RELEASE
-)
-
+	ECHO %TYPE% RELEASETEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService\LibraryManagementService.vcxproj" %TYPE% "ReleaseTest|x64"
+	ECHO %TYPE% RELEASE
+	"%OPENTWIN_DEV_ROOT%\Services\LibraryManagementService\x64\Release\LibraryManagementServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\LibraryManagementServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\LibraryManagementServiceReleaseReport.xml" "LibraryManagementService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\LibraryManagementServiceReleaseReport.xml"
+) 
+  
 GOTO END
 
 :PAUSE_END

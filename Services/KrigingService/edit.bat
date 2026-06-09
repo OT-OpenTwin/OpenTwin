@@ -27,10 +27,13 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+REM Setup Python dev env from third party Services
+CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+
 ECHO Launching development enviroment
 
 REM Open project
-START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_KRIGING_SERVICE_ROOT%"
+START "" "%DEVENV_ROOT_2022%\devenv.exe" "%OT_KRIGING_SERVICE_ROOT%\KrigingService.vcxproj"
 
 GOTO END
 

@@ -53,13 +53,23 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_GLOBAL_DIRECTORY_SERVICE_ROOT%" DEBUG
+	ECHO %TYPE% DEBUGTEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\GlobalDirectoryService.vcxproj" %TYPE% "DebugTest|x64"
+	ECHO %TYPE% DEBUG
+	"%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\x64\Debug\GlobalDirectoryServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalDirectoryServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalDirectoryServiceDebugReport.xml" "GlobalDirectoryService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\GlobalDirectoryServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_GLOBAL_DIRECTORY_SERVICE_ROOT%" RELEASE
-)
-
+	ECHO %TYPE% RELEASETEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\GlobalDirectoryService.vcxproj" %TYPE% "ReleaseTest|x64"
+	ECHO %TYPE% RELEASE
+	"%OPENTWIN_DEV_ROOT%\Services\GlobalDirectoryService\x64\Release\GlobalDirectoryServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalDirectoryServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\GlobalDirectoryServiceReleaseReport.xml" "GlobalDirectoryService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\GlobalDirectoryServiceReleaseReport.xml"
+) 
+  
 GOTO END
 
 :PAUSE_END

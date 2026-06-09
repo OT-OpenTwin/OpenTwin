@@ -43,6 +43,14 @@ packages
 # VS internal build directory
 /**/.vs
 
+# Log files
+*.log
+*.csv
+
+# Step files
+*.stp
+*.step
+
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
@@ -56,6 +64,3 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-
-# CMake build directory
-build/

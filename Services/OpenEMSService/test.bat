@@ -27,7 +27,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : OpenEMSService
+ECHO Testing Project : ServiceTemplate
 
 REM Open project
 
@@ -52,14 +52,26 @@ IF "%2"=="BUILD" (
 	SET TYPE_NAME=BUILD
 )
 
+
+
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_OPENEMS_SERVICE_ROOT%" DEBUG
+	ECHO %TYPE% DEBUGTEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "DebugTest|x64"  
+	ECHO %TYPE% DEBUG
+	"%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\x64\Debug\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateDebugReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\ServiceTemplateDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_OPENEMS_SERVICE_ROOT%" RELEASE
-)
-
+	ECHO %TYPE% RELEASETEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\ServiceTemplate.vcxproj" %TYPE% "ReleaseTest|x64"
+	ECHO %TYPE% RELEASE
+	"%OPENTWIN_DEV_ROOT%\Templates\ServiceTemplate\x64\Release\ServiceTemplateTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\TestReports\ServiceTemplateReleaseReport.xml" "ServiceTemplate" "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\EditReports\ServiceTemplateReleaseReport.xml"
+) 
+  
 GOTO END
 
 :PAUSE_END

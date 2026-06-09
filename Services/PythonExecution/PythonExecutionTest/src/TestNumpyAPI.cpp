@@ -1,0 +1,65 @@
+// @otlicense
+// File: TestNumpyAPI.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#include "FixtureNumpyAPI.h"
+#include "OTCore/Variable/Variable.h"
+
+#define PY_ARRAY_UNIQUE_SYMBOL FixtureNumpyAPI_ARRAY_API
+#define NO_IMPORT_ARRAY
+#define NPY_NO_DEPRECATED_API NPY_1_7_API_VERSION
+#include "numpy/ndarrayobject.h"
+TEST_F(FixtureNumpyAPI, Array_1D_Access)
+{
+
+	// Create an array of float values
+	double expected = 3.;
+	npy_float64 data[] = { 1.0, 2.0, expected, 4.0, 5.5 };
+	npy_intp dims[] = { 5 };  // Number of elements in the array
+
+	// Create a NumPy array from the existing data
+	PyObject* numpy_array = PyArray_SimpleNewFromData(1, dims, NPY_FLOAT64, data);
+
+	// Access an element from the array (e.g., the third element)
+	double third_element = *(double*)PyArray_GETPTR1((PyArrayObject*)numpy_array, 2);
+
+	ASSERT_DOUBLE_EQ(third_element,expected);
+	// Print the entire array and the third element
+	
+	// Clean up
+	Py_DECREF(numpy_array);
+}
+
+TEST_F(FixtureNumpyAPI, Array_2D_Access)
+{
+	double expected = 7.7;
+	npy_float64 data[] = { 1.0, 2.0, 3., 4.0, 5.5, 6., expected,8.8,9.9 };
+	npy_intp dims[] = { 3,3,3 };
+
+	// Create a NumPy array from the existing data
+	PyObject* numpy_array = PyArray_SimpleNewFromData(3, dims, NPY_FLOAT64, data);
+
+	// Access an element from the array (e.g., the third element)
+	double third_element = *(double*)PyArray_GETPTR2((PyArrayObject*)numpy_array, 0,2);
+
+	ASSERT_DOUBLE_EQ(third_element, expected);
+	// Print the entire array and the third element
+
+	// Clean up
+	Py_DECREF(numpy_array);
+}

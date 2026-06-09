@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="DebugTest|x64">
+      <Configuration>DebugTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="ReleaseTest|x64">
+      <Configuration>ReleaseTest</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\AppBase.cpp" />
+    <ClCompile Include="src\BackendInfo.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="src\ColorStyleEditor.cpp" />
+    <ClCompile Include="src\ConnectToLoggerDialog.cpp" />
+    <ClCompile Include="src\DiagramGenerator.cpp" />
+    <ClCompile Include="src\dllmain.cpp" />
+    <ClCompile Include="src\ExportableGraphicsView.cpp" />
+    <ClCompile Include="src\ExternalLibrary.cpp" />
+    <ClCompile Include="src\ExternalLibraryManager.cpp" />
+    <ClCompile Include="src\FAR.cpp" />
+    <ClCompile Include="src\FileLogImporterDialog.cpp" />
+    <ClCompile Include="src\GraphicsItemDesigner.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerDrawHandler.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerExportConfig.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerExportDialog.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerImageExportConfig.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerImageExportDialog.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerInfoOverlay.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerItemBase.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerNavigation.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerNavigationRoot.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerPreview.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerPropertyHandler.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerScene.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerToolBar.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerView.cpp" />
+    <ClCompile Include="src\GraphicsItemDesignerViewStatusOverlay.cpp" />
+    <ClCompile Include="src\ImageEditor.cpp" />
+    <ClCompile Include="src\JSONEditor.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
+    <ClCompile Include="src\LoggingFilterView.cpp" />
+    <ClCompile Include="src\LogModeSetter.cpp" />
+    <ClCompile Include="src\LogServiceDebugInfo.cpp" />
+    <ClCompile Include="src\LogServiceDebugInfoDialog.cpp" />
+    <ClCompile Include="src\LogVisualizationItemViewDialog.cpp" />
+    <ClCompile Include="src\LogVisualizerColumnWidthSaveDialog.cpp" />
+    <ClCompile Include="src\MenuManager.cpp" />
+    <ClCompile Include="src\NetworkTools.cpp" />
+    <ClCompile Include="src\PortBlockerServer.cpp" />
+    <ClCompile Include="src\ProjectHelper.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelper.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelperCustomItem.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelperItem.cpp" />
+    <ClCompile Include="src\ProjectHelperBatchHelperProjectItem.cpp" />
+    <ClCompile Include="src\QuickLogExport.cpp" />
+    <ClCompile Include="src\Randomizer.cpp" />
+    <ClCompile Include="src\ScriptRunner.cpp" />
+    <ClCompile Include="src\SDSLSSEntry.cpp" />
+    <ClCompile Include="src\SDSServiceEntry.cpp" />
+    <ClCompile Include="src\ServiceDebugSwitch.cpp" />
+    <ClCompile Include="src\SettingsManager.cpp" />
+    <ClCompile Include="src\StatusManager.cpp" />
+    <ClCompile Include="src\SVGBrowser.cpp" />
+    <ClCompile Include="src\Terminal.cpp" />
+    <ClCompile Include="src\ToolBarManager.cpp" />
+    <ClCompile Include="src\ToolManager.cpp" />
+    <ClCompile Include="src\ToolMenuManager.cpp" />
+    <ClCompile Include="src\ToolRuntimeHandler.cpp" />
+    <ClCompile Include="src\ToolViewManager.cpp" />
+    <ClCompile Include="src\TypeHelper.cpp" />
+    <ClCompile Include="src\WidgetTest.cpp">
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">%(Filename).moc</QtMocFileName>
+      <DynamicSource Condition="'$(Configuration)|$(Platform)'=='Release|x64'">input</DynamicSource>
+      <QtMocFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(Filename).moc</QtMocFileName>
+    </ClCompile>
+    <ClCompile Include="src\WrappedArcItem.cpp" />
+    <ClCompile Include="src\WrappedCircleItem.cpp" />
+    <ClCompile Include="src\WrappedEllipseItem.cpp" />
+    <ClCompile Include="src\WrappedItemFactory.cpp" />
+    <ClCompile Include="src\WrappedLineItem.cpp" />
+    <ClCompile Include="src\WrappedPolygonItem.cpp" />
+    <ClCompile Include="src\WrappedRectItem.cpp" />
+    <ClCompile Include="src\WrappedSquareItem.cpp" />
+    <ClCompile Include="src\WrappedTextItem.cpp" />
+    <ClCompile Include="src\WrappedTriangleItem.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtMoc Include="include\SettingsManager.h" />
+    <QtMoc Include="include\BackendInfo.h" />
+    <QtMoc Include="include\DiagramGenerator.h" />
+    <QtMoc Include="include\ExportableGraphicsView.h" />
+    <ClInclude Include="include\ExternalLibrary.h" />
+    <ClInclude Include="include\ExternalLibraryManager.h" />
+    <QtMoc Include="include\FileLogImporterDialog.h" />
+    <ClInclude Include="include\GraphicsItemDesignerPreview.h" />
+    <QtMoc Include="include\NetworkTools.h" />
+    <QtMoc Include="include\PortBlockerServer.h" />
+    <QtMoc Include="include\Logging.h" />
+    <QtMoc Include="include\LogVisualizationItemViewDialog.h" />
+    <QtMoc Include="include\LoggingFilterView.h" />
+    <QtMoc Include="include\LogModeSetter.h" />
+    <QtMoc Include="include\QuickLogExport.h" />
+    <QtMoc Include="include\SVGBrowser.h" />
+    <QtMoc Include="include\LogServiceDebugInfo.h" />
+    <ClInclude Include="include\LogServiceDebugInfoDialog.h" />
+    <QtMoc Include="include\LogVisualizerColumnWidthSaveDialog.h" />
+    <QtMoc Include="include\TypeHelper.h" />
+    <QtMoc Include="include\ProjectHelper.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelper.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperProjectItem.h" />
+    <QtMoc Include="include\ScriptRunner.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperCustomItem.h" />
+    <QtMoc Include="include\ServiceDebugSwitch.h" />
+    <QtMoc Include="include\SDSLSSEntry.h" />
+    <QtMoc Include="include\SDSServiceEntry.h" />
+    <QtMoc Include="include\ProjectHelperBatchHelperItem.h" />
+    <ClInclude Include="include\WrappedArcItem.h" />
+    <ClInclude Include="include\WrappedItemFactory.h" />
+    <ClInclude Include="include\WrappedPolygonItem.h" />
+    <ClInclude Include="include\WrappedTextItem.h" />
+    <ClInclude Include="include\WrappedTriangleItem.h" />
+    <QtMoc Include="include\ToolViewManager.h" />
+    <QtMoc Include="include\GraphicsItemDesignerImageExportDialog.h" />
+    <ClInclude Include="include\GraphicsItemDesignerExportConfig.h" />
+    <QtMoc Include="include\GraphicsItemDesignerExportDialog.h" />
+    <ClInclude Include="include\GraphicsItemDesignerImageExportConfig.h" />
+    <ClInclude Include="include\WrappedCircleItem.h" />
+    <ClInclude Include="include\WrappedEllipseItem.h" />
+    <ClInclude Include="include\WrappedRectItem.h" />
+    <ClInclude Include="include\WrappedSquareItem.h" />
+    <QtMoc Include="include\GraphicsItemDesignerPropertyHandler.h" />
+    <ClInclude Include="include\GraphicsItemDesignerNavigationRoot.h" />
+    <ClInclude Include="include\WrappedLineItem.h" />
+    <QtMoc Include="include\GraphicsItemDesigner.h" />
+    <QtMoc Include="include\GraphicsItemDesignerToolBar.h" />
+    <QtMoc Include="include\GraphicsItemDesignerDrawHandler.h" />
+    <ClInclude Include="include\GraphicsItemDesignerInfoOverlay.h" />
+    <QtMoc Include="include\GraphicsItemDesignerView.h" />
+    <ClInclude Include="include\GraphicsItemDesignerItemBase.h" />
+    <QtMoc Include="include\GraphicsItemDesignerNavigation.h" />
+    <ClInclude Include="include\GraphicsItemDesignerScene.h" />
+    <ClInclude Include="include\GraphicsItemDesignerViewStatusOverlay.h" />
+    <QtMoc Include="include\WidgetTest.h" />
+    <QtMoc Include="include\ColorStyleEditor.h" />
+    <QtMoc Include="include\ToolMenuManager.h" />
+    <QtMoc Include="include\FAR.h" />
+    <QtMoc Include="include\Randomizer.h" />
+    <QtMoc Include="include\ImageEditor.h" />
+    <ClInclude Include="include\ToolBarManager.h" />
+    <ClInclude Include="include\ToolRuntimeHandler.h" />
+    <QtMoc Include="include\MenuManager.h" />
+    <QtMoc Include="include\ToolManager.h" />
+    <QtMoc Include="include\ConnectToLoggerDialog.h" />
+    <QtMoc Include="include\Terminal.h" />
+    <QtMoc Include="include\StatusManager.h" />
+    <QtMoc Include="include\AppBase.h" />
+    <ClInclude Include="include\JSONEditor.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <QtRcc Include="Resource.qrc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{D080674E-86ED-4CA4-AA4F-3D1D199D4D65}</ProjectGuid>
+    <Keyword>QtVS_v303</Keyword>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">10.0.17763.0</WindowsTargetPlatformVersion>
+    <QtMsBuild Condition="'$(QtMsBuild)'=='' OR !Exists('$(QtMsBuild)\qt.targets')">$(MSBuildProjectDirectory)\QtMsBuild</QtMsBuild>
+    <ProjectName>OToolkit</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <Target Name="QtMsBuildNotFound" BeforeTargets="CustomBuild;ClCompile" Condition="!Exists('$(QtMsBuild)\qt.targets') or !Exists('$(QtMsBuild)\qt.props')">
+    <Message Importance="High" Text="QtMsBuild: could not locate qt.targets, qt.props; project may not build correctly." />
+  </Target>
+  <ImportGroup Label="ExtensionSettings" />
+  <ImportGroup Label="Shared" />
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt_defaults.props')">
+    <Import Project="$(QtMsBuild)\qt_defaults.props" />
+  </ImportGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetExt>.lib</TargetExt>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetExt>.dll</TargetExt>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <IncludePath>$(ProjectDir)include;$(VC_IncludePath);$(WindowsSDK_IncludePath);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\include;$(BASE64_ROOT);$(ZLIB_ROOT)</IncludePath>
+    <CustomBuildAfterTargets>ClCompile</CustomBuildAfterTargets>
+    <CustomBuildBeforeTargets>Link</CustomBuildBeforeTargets>
+    <TargetExt>.lib</TargetExt>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(ProjectDir)include;$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);$(R_JSON_INCD);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild />
+      <PreprocessorDefinitions>_WINDLL;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHD);$(OT_GUI_ROOT)\$(OT_CLIBD);$(OT_WIDGETS_ROOT)\$(OT_CLIBD);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBD);$(QT_ADS_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBD);OTGui.lib;OTWidgets.lib;OToolkitAPI.lib;qtadvanceddockingd.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCD);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>
+      </MinimalRebuild>
+      <PreprocessorDefinitions>_DEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Debug;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Debug;%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Debug\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Debug\OTViewer.lib;$(Qt_LIBS_);%SIM_PLAT_ROOT%\Libraries\Model\x64\Debug\Model.lib;%CURL_LIB%\libCurl.lib;OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlibd.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(OT_GUI_ROOT)\$(OT_INC);$(OT_WIDGETS_ROOT)\$(OT_INC);$(OT_OTOOLKITAPI_ROOT)\$(OT_INC);$(ProjectDir)include;$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);$(R_JSON_INCR);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild />
+      <PreprocessorDefinitions>NDEBUG;_WINDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(OT_DEFAULT_SERVICE_LIBPATHR);$(OT_GUI_ROOT)\$(OT_CLIBR);$(OT_WIDGETS_ROOT)\$(OT_CLIBR);$(OT_OTOOLKITAPI_ROOT)\$(OT_LIBR);$(QT_ADS_ROOT)\lib;$(Qt_LIBPATH_);%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>$(OT_DEFAULT_SERVICE_LIBR);OTGui.lib;OTWidgets.lib;OToolkitAPI.lib;qtadvanceddocking.lib;$(Qt_LIBS_);%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'">
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(OT_DEFAULT_SERVICE_INCR);$(QT_ADS_ROOT)\include;$(Qt_INCLUDEPATH_);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MinimalRebuild>
+      </MinimalRebuild>
+      <PreprocessorDefinitions>NDEBUG;_UNICODE;UNICODE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>$(SIM_PLAT_ROOT)\Libraries\OpenTwinCommunication\x64\$(Configuration);%UICORE_LIB_ROOT%\x64\Release;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Release;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release;%CURL_LIB%;$(Qt_LIBPATH_);$(SIM_PLAT_ROOT)\Libraries\OTDataStorage\x64\$(Configuration);$(MONGO_C_ROOT)\$(Configuration)\lib;$(MONGO_CXX_ROOT)\$(Configuration)\lib;$(ZLIB_LIB)\$(Configuration)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>%UICORE_LIB_ROOT%\x64\Release\uiCore.lib;%SIM_PLAT_ROOT%\Libraries\OTViewer\x64\Release\OTViewer.lib;%SIM_PLAT_ROOT%\Libraries\Model\x64\Release\Model.lib;%CURL_LIB%\libCurl.lib;$(Qt_LIBS_);OpenTwinCommunication.lib;OTDataStorage.lib;mongocxx.lib;bsoncxx.lib;mongoc-1.0.lib;bson-1.0.lib;zlib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuildStep>
+      <Command>copy "$(MSBuildProjectDirectory)\qt.conf" "$(OutputPath)"</Command>
+      <Outputs>$(OutputPath)\qt.conf</Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
+    <QtBuildConfig>debug</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="QtSettings">
+    <QtInstall>$(QTDIR)</QtInstall>
+    <QtModules>core;gui;network;widgets;websockets</QtModules>
+    <QtBuildConfig>release</QtBuildConfig>
+  </PropertyGroup>
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.props')">
+    <Import Project="$(QtMsBuild)\qt.props" />
+  </ImportGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='DebugTest|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='ReleaseTest|x64'" Label="Configuration">
+    <ClCompile>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <DebugInformationFormat>None</DebugInformationFormat>
+      <Optimization>MaxSpeed</Optimization>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>false</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Condition="Exists('$(QtMsBuild)\qt.targets')">
+    <Import Project="$(QtMsBuild)\qt.targets" />
+  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

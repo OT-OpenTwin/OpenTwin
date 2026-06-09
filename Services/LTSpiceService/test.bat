@@ -53,12 +53,22 @@ IF "%2"=="BUILD" (
 )
 
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LTSPICE_SERVICE_ROOT%" DEBUG
+	ECHO %TYPE% DEBUGTEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LTSpiceService\LTSpiceService.vcxproj" %TYPE% "DebugTest|x64"  
+	ECHO %TYPE% DEBUG
+	"%OPENTWIN_DEV_ROOT%\Services\LTSpiceService\x64\Debug\LTSpiceServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\LTSpiceServiceDebugReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\LTSpiceServiceDebugReport.xml" "LTSpiceService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\LTSpiceServiceDebugReport.xml"
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_LTSPICE_SERVICE_ROOT%" RELEASE
-)
+	ECHO %TYPE% RELEASETEST
+	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\LTSpiceService\LTSpiceService.vcxproj" %TYPE% "ReleaseTest|x64"
+	ECHO %TYPE% RELEASE
+	"%OPENTWIN_DEV_ROOT%\Services\LTSpiceService\x64\Release\LTSpiceServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\LTSpiceServiceReleaseReport.xml"
+	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
+	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\LTSpiceServiceReleaseReport.xml" "LTSpiceService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\LTSpiceServiceReleaseReport.xml"
+) 
 
 GOTO END
 

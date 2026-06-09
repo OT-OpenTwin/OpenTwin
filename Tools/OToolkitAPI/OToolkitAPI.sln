@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33516.290
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OToolkitAPI", "OToolkitAPI.vcxproj", "{11272C84-AF8E-4865-B95C-82DE5B5F391D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11272C84-AF8E-4865-B95C-82DE5B5F391D}.Debug|x64.ActiveCfg = Debug|x64
+		{11272C84-AF8E-4865-B95C-82DE5B5F391D}.Debug|x64.Build.0 = Debug|x64
+		{11272C84-AF8E-4865-B95C-82DE5B5F391D}.Release|x64.ActiveCfg = Release|x64
+		{11272C84-AF8E-4865-B95C-82DE5B5F391D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5A33018E-0E7C-4D6D-A9DC-45FCF5FDBC11}
+	EndGlobalSection
+EndGlobal

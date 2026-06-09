@@ -57,6 +57,3 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
-
-# CMake build directory
-build/

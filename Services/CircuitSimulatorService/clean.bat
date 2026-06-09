@@ -29,10 +29,9 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\.vs"
-RMDIR /S /Q "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\build"
-RMDIR /S /Q "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\x64"
-RMDIR /S /Q "%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\packages"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\.vs"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\x64"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\CircuitSimulatorService\packages"
 
 GOTO END
 

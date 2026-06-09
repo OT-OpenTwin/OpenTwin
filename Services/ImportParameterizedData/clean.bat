@@ -29,8 +29,7 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 
 ECHO Building Project
 
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\.vs"
-RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\build"
+RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\.vs"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\x64"
 RMDIR /S /Q "%OPENTWIN_DEV_ROOT%\Services\ImportParameterizedData\packages"
 

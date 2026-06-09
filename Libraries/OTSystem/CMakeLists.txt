@@ -8,7 +8,7 @@ ot_add_compile_options(OTSystem /W3 /sdl 4996)
 
 ot_add_dependency(OTSystem
     OSLibs
-    WINLIB:Crypt32
+    "WINLIB:Crypt32.lib"
 )
 
 ot_finalize_lib(OTSystem)

@@ -1,0 +1,465 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\MicroServiceInterface">
+      <UniqueIdentifier>{f944d2ac-6414-4cc2-a045-50bf1e6bf975}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MicroServiceInterface">
+      <UniqueIdentifier>{0d715eb1-1974-4670-8c5a-9b1bc2e6b364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Grid">
+      <UniqueIdentifier>{8916ef11-7717-4a1d-833d-e6166d6cdf47}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Grid">
+      <UniqueIdentifier>{6cb75348-ad42-4580-a3d1-fd0ec806f5d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CurlCoefficients">
+      <UniqueIdentifier>{118fabcb-dac3-497a-991e-8820fc5ebcdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Ports">
+      <UniqueIdentifier>{3810cd47-54ec-447b-8c25-0a314014c493}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Simulation">
+      <UniqueIdentifier>{f2a77b5b-fe6f-473a-b1ea-f7196e37679d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Solver">
+      <UniqueIdentifier>{69ef707a-1c8d-4d60-aa9f-abde4ad1e5c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SolverSettings">
+      <UniqueIdentifier>{ae17205f-079e-4be2-bd62-19982648f075}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\SystemDependencies">
+      <UniqueIdentifier>{d35789c1-459a-4060-8a10-4b0222a86f5a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\CurlCoefficients">
+      <UniqueIdentifier>{261c8d2a-e25f-46d4-ba5c-b19485c3073d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Simulation">
+      <UniqueIdentifier>{921e9947-ff7e-4254-bc1f-3944c45957ef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Solver">
+      <UniqueIdentifier>{3b2fbb39-d07d-4d36-8fa7-240d49edddc7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SolverSettings">
+      <UniqueIdentifier>{b15d7310-0324-478a-9588-dbcb50fc0436}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\SystemDependencies">
+      <UniqueIdentifier>{dd07cf99-c788-478e-9707-412e21f0fbed}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ResultFilter">
+      <UniqueIdentifier>{0d00065e-e945-4f8f-a888-5a9dcd625dfd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ResultPipeline">
+      <UniqueIdentifier>{36f367bc-e17c-44b7-b7c6-8a043fb8ddd2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling">
+      <UniqueIdentifier>{6825f5f6-9155-40e5-9c26-5a6222897b82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ResultPostprocessor">
+      <UniqueIdentifier>{b88285d1-d8ce-461b-b410-d50410114c3f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Ports">
+      <UniqueIdentifier>{eeda50ba-bdf7-4b34-9773-2ab1b5a38225}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultFilter">
+      <UniqueIdentifier>{d41dab57-f655-43a9-9a6c-ebba66ae3482}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultContainer">
+      <UniqueIdentifier>{f5181f6a-7c3a-40ed-96b1-c0fb072b461d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultSource">
+      <UniqueIdentifier>{b0f5ba3a-32f3-4859-a9ea-77672bd76576}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultSink">
+      <UniqueIdentifier>{b9996429-86fa-4e0f-ad87-f5bcabac7d77}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultPipeline">
+      <UniqueIdentifier>{be8d9baf-2102-412f-9c6c-4e8918aaa23b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ResultPostProcessors">
+      <UniqueIdentifier>{de06c915-1394-47ef-af62-552bcbfd5398}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ResultHandling\ExecutionBarriers">
+      <UniqueIdentifier>{c5742e45-c3a7-48c6-bc46-744923c895e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ResultHandling">
+      <UniqueIdentifier>{5e83978b-e0f4-4e9e-9339-219e209842ff}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ModelNotifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\UiNotifier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MicroServiceSolver.cpp">
+      <Filter>Source Files\MicroServiceInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MicroServiceInterfaceFITTDSolver.cpp">
+      <Filter>Source Files\MicroServiceInterface</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid\EdgeDiscretization.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid\IntrinsicMasks.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid\SurfaceDiscretization.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CurlCoefficients\Coefficient3DFactory.cpp">
+      <Filter>Source Files\CurlCoefficients</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SystemDependencies\SystemProperties.cpp">
+      <Filter>Source Files\SystemDependencies</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SolverSettings\PortSettings.cpp">
+      <Filter>Source Files\SolverSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Solver\Solver.cpp">
+      <Filter>Source Files\Solver</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Simulation\FITTD3DBuilder.cpp">
+      <Filter>Source Files\Simulation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultPipelineProgressUpdater.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultFilter.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultPipeline\ResultPipeline.cpp">
+      <Filter>Source Files\ResultPipeline</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid\IGridIteratorVolume.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Grid\GridIteratorSubvolume.cpp">
+      <Filter>Source Files\Grid</Filter>
+    </ClCompile>
+    <ClCompile Include="include\ResultFilter\ResultFilterSinkVector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultContainerVector3DComplex.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultContainerScalar.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSource.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSinkScalarAccumalating.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultFilterDFT.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSinkVector3DComplexSum.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSinkScalarComplexSum.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultFilterEdgeToNode.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultPostProcessors\ResultPostprocessingComplexNormalization.cpp">
+      <Filter>Source Files\ResultPostprocessor</Filter>
+    </ClCompile>
+    <ClCompile Include="src\FolderNames.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ports\Signal.cpp">
+      <Filter>Source Files\Ports</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Ports\PortFactory.cpp">
+      <Filter>Source Files\Ports</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerformanceTracker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SolverSettings\MonitorSettings.cpp">
+      <Filter>Source Files\SolverSettings</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSinkVector3DAccumalating.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultHandling\ExecutionBarrierFixedTimesteps.cpp">
+      <Filter>Source Files\ResultHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultHandling\ExecutionBarrierFrequencyAndLast.cpp">
+      <Filter>Source Files\ResultHandling</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResultFilter\ResultSinkFilePrinter.cpp">
+      <Filter>Source Files\ResultFilter</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ModelNotifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\UiNotifier.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MicroServiceSolver.h">
+      <Filter>Header Files\MicroServiceInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\MicroServiceInterfaceFITTDSolver.h">
+      <Filter>Header Files\MicroServiceInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\DimensionPadding.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\DimensionPadding.hpp">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\EdgeDiscretization.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\Grid.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\IntrinsicMasks.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\MaterialProperties.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\MeshDiscretization.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\SurfaceDiscretization.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurlCoefficients\Coefficient3DFactory.h">
+      <Filter>Header Files\CurlCoefficients</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients.h">
+      <Filter>Header Files\CurlCoefficients</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients3D.h">
+      <Filter>Header Files\CurlCoefficients</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CurlCoefficients\CurlCoefficients3D.hpp">
+      <Filter>Header Files\CurlCoefficients</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SystemDependencies\Allignments.h">
+      <Filter>Header Files\SystemDependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SystemDependencies\InstructionSet.h">
+      <Filter>Header Files\SystemDependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SystemDependencies\SystemDependentDefines.h">
+      <Filter>Header Files\SystemDependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SystemDependencies\SystemProperties.h">
+      <Filter>Header Files\SystemDependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolverSettings\PortSettings.h">
+      <Filter>Header Files\SolverSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolverSettings\SolverVersion.h">
+      <Filter>Header Files\SolverSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Solver\Solver.h">
+      <Filter>Header Files\Solver</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\DegreesOfFreedom3DLoopCPU.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DBuilder.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoop.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX2.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX2.hpp">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX512Sp.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopAVX512Sp.hpp">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopNoVectorization.h">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Simulation\FITTD3DLoopNoVectorization.hpp">
+      <Filter>Header Files\Simulation</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultPipeline\ResultPipeline.h">
+      <Filter>Header Files\ResultHandling\ResultPipeline</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\Port.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\SourceTarget.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolverSettings\ResultPipelineSettings.h">
+      <Filter>Header Files\SystemDependencies</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\PortGaussian.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\PortGaussian.hpp">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\PortSinusGaussian.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\PortSinusGaussian.hpp">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\GridIteratorVolume.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\GridIteratorComponent.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\GridIteratorComponentSubspace.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\IGridIteratorVolume.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\GridIteratorSubvolume.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultPostProcessors\ResultPostprocessors.h">
+      <Filter>Header Files\ResultHandling\ResultPostProcessors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultPostProcessors\ResultPostProcessingComplexNormalization.h">
+      <Filter>Header Files\ResultHandling\ResultPostProcessors</Filter>
+    </ClInclude>
+    <ClInclude Include="include\FolderNames.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\Signal.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolverSettings\MonitorSettings.h">
+      <Filter>Header Files\SolverSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Ports\PortFactory.h">
+      <Filter>Header Files\Ports</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Grid\Point.h">
+      <Filter>Header Files\Grid</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PerformanceTracker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SolverSettings\SolverSettings.h">
+      <Filter>Header Files\SolverSettings</Filter>
+    </ClInclude>
+    <ClInclude Include="include\PhysicalQuantities.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\IResultFilterEdge.h">
+      <Filter>Header Files\ResultHandling\ResultFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultContainer.h">
+      <Filter>Header Files\ResultHandling\ResultContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultContainerScalar.h">
+      <Filter>Header Files\ResultHandling\ResultContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultContainerScalarComplex.h">
+      <Filter>Header Files\ResultHandling\ResultContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultContainerVector3DComplex.h">
+      <Filter>Header Files\ResultHandling\ResultContainer</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultFilter.h">
+      <Filter>Header Files\ResultHandling\ResultFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultFilterDFT.h">
+      <Filter>Header Files\ResultHandling\ResultFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultFilterEdgeToNode.h">
+      <Filter>Header Files\ResultHandling\ResultFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultPipelineProgressUpdater.h">
+      <Filter>Header Files\ResultHandling\ResultFilter</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSink.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSinkScalarAccumalating.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSinkScalarComplexSum.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSinkVector3DComplexSum.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceScalar.h">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceScalar.hpp">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceScalarComplex.h">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceScalarComplex.hpp">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceVector3DComplex.h">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSourceVector3DComplex.hpp">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSource.h">
+      <Filter>Header Files\ResultHandling\ResultSource</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultFilter\ResultSinkVector3DAccumalating.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultHandling\ExecutionBarrier.h">
+      <Filter>Header Files\ResultHandling\ExecutionBarriers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultHandling\ExecutionBarrierFixedTimesteps.h">
+      <Filter>Header Files\ResultHandling\ExecutionBarriers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultHandling\ExecutionBarrierFrequencyAndLast.h">
+      <Filter>Header Files\ResultHandling\ExecutionBarriers</Filter>
+    </ClInclude>
+    <ClInclude Include="include\ResultHandling\ResultSinkFilePrinter.h">
+      <Filter>Header Files\ResultHandling\ResultSink</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

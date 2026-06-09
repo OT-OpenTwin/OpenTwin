@@ -11,7 +11,7 @@ REM Setup eviroment
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
 
 REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CMakeBuildSingleProject.bat" "%OT_LOCAL_SESSION_SERVICE_ROOT%" %1 %2
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\BuildSingleProject.bat" "%OPENTWIN_DEV_ROOT%\Services\LocalSessionService\LocalSessionService.sln" %1 %2 
 
 GOTO END
 
@@ -20,3 +20,4 @@ pause
 GOTO END
 
 :END
+
