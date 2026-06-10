@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -410,16 +410,14 @@ void Application::handleImportSTEP(ot::JsonDocument& _document) {
 		ot::GridFSFileInfo gridInfo(ot::json::getObject(_document, OT_ACTION_PARAM_FILE_Content));
 
 		DataStorageAPI::DocumentAPI api;
-		uint8_t* dataBuffer = nullptr;
-		size_t length = 0;
 
 		bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+		std::vector<uint8_t> dataBuffer = api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName());
 		api.DeleteGridFSData(id, gridInfo.getCollectionName());
 
-		std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+		std::string stringData(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 
 		// Create a tmp file from uncompressing the data
 		std::string tmpFileName = CreateTmpFileFromCompressedData(stringData, gridInfo.getUncompressedSize());

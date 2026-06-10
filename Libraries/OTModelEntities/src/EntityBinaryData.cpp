@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBinaryData.cpp
 // 
 // License:
@@ -92,16 +92,13 @@ void EntityBinaryData::readSpecificDataFromDataBase(const bsoncxx::document::vie
 	{
 		// The storage is separate in GridFS
 		DataStorageAPI::DocumentAPI doc;
-		uint8_t* buffer = nullptr;
-		size_t length = 0;
-
+		
 		std::string file = doc_view["file"].get_utf8().value.data();
 		bsoncxx::oid oid_obj{ file };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		doc.GetDocumentUsingGridFs(id, buffer, length, DataBase::instance().getCollectionName());
-
-		data.insert(data.end(), buffer, buffer + length);
+		std::vector<uint8_t> buffer = doc.GetDocumentUsingGridFs(id, DataBase::instance().getCollectionName());
+		data.insert(data.end(), buffer.begin(), buffer.end());
 	}
 	else
 	{

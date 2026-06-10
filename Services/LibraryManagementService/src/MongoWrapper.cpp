@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MongoWrapper.cpp
 // 
 // License:
@@ -784,7 +784,7 @@ std::string MongoWrapper::loadGridFSData(const bsoncxx::oid& _oid, const std::st
 
         std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
         delete[] dataBuffer;
-
+        dataBuffer = nullptr;
         return stringData;
     }
     catch (const std::exception& e) {

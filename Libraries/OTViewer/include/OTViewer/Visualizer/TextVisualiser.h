@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TextVisualiser.h
 // 
 // License:
@@ -52,6 +52,8 @@ protected:
 	virtual std::string getVisualiserTypeString() const override { return "Text"; };
 
 private Q_SLOTS:
+	//! @brief 
+	//! @param _text Takes over ownership
 	void slotRequestRemainingDataCompleted(uint8_t* _text, size_t _textLength);
 
 private:
