@@ -762,6 +762,13 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 					exportFile.write((const char *)&length, sizeof(size_t));
 					exportFile.write((const char *)data, length);
 
+					if(data != nullptr)
+					{
+						delete[] data;
+						data = nullptr;
+						length = 0;
+					}
+
 					// afterward we store the item
 					const uint8_t *buffer = reinterpret_cast<const uint8_t *>(doc.data());
 					size_t size = doc.length();
@@ -778,15 +785,15 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 					// Now we store the grid fs data first
 					auto fileId = doc["FileId"].get_value();
 
-					std::uint8_t *data = nullptr;
-					size_t length = 0;
+
 
 					DataStorageAPI::DocumentAPI fsDoc;
-					fsDoc.GetDocumentUsingGridFs(fileId, data, length, collectionName);
+					std::vector<uint8_t> data = fsDoc.GetDocumentUsingGridFs(fileId, collectionName);
+					size_t length = data.size();
 
 					// Now store the length and the data in the export file
 					exportFile.write((const char *)&length, sizeof(size_t));
-					exportFile.write((const char *)data, length);
+					exportFile.write((const char *)data.data(), length);
 
 					// afterward we store the item
 					const uint8_t *buffer = reinterpret_cast<const uint8_t *>(doc.data());
