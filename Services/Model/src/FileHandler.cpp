@@ -510,7 +510,7 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 
 	assert(fileInfos.size() == fileNames.size());
 	{
-		QueuingDatabaseWritingRAII queueDatabase;
+		//QueuingDatabaseWritingRAII queueDatabase;
 		auto info = fileInfos.begin();
 		
 		ProgressUpdater updater(uiComponent, "Importing files");
@@ -525,24 +525,21 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 		for (std::string& fileName : fileNames)
 		{
 			counter++;
+			std::string compressedData;
+			{
+				DataStorageAPI::DocumentAPI api;
+				bsoncxx::oid oid_obj{ info->getDocumentId() };
+				bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+				std::vector<uint8_t> dataBuffer  = api.GetDocumentUsingGridFs(id, info->getCollectionName());
+				api.DeleteGridFSData(id, info->getCollectionName());
+				compressedData = std::string(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
+			}
+			
 			uint64_t dataLen = static_cast<uint64_t>(info->getUncompressedSize());
-
-			DataStorageAPI::DocumentAPI api;
-			uint8_t* dataBuffer = nullptr;
-			size_t length = 0;
-
-			bsoncxx::oid oid_obj{ info->getDocumentId() };
-			bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
-
-			api.GetDocumentUsingGridFs(id, dataBuffer, length, info->getCollectionName());
-			api.DeleteGridFSData(id, info->getCollectionName());
-
-			std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
-
-			std::unique_ptr<uint8_t> data(ot::String::decompressBase64(stringData.c_str(), dataLen));
+			std::unique_ptr<uint8_t[]> data(ot::String::decompressBase64(compressedData.c_str(), dataLen));
+			info++;
 		
 			storeFileInDataBase(std::string(reinterpret_cast<const char*>(data.get()), dataLen), fileName, folderContent, _folderName, fileFilter);
-			info++;
 			updater.triggerUpdate(counter);
 		}
 		auto end = std::chrono::system_clock::now();
