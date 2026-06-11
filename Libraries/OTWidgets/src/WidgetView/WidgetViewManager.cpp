@@ -42,22 +42,16 @@
 
 ot::WidgetViewManager::WidgetViewManager() :
 	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState),
-	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_autoCloseTimer(this), m_hasQueuedDelayedFocusUpdate(false)
+	m_dockComponentsFactory(nullptr), m_initialStateVersion(0), m_hasQueuedDelayedFocusUpdate(false)
 {
 	m_focusInfo.last = nullptr;
 	m_focusInfo.lastSide = nullptr;
 	m_focusInfo.lastTool = nullptr;
 	m_focusInfo.lastCentral = nullptr;
-
-	m_autoCloseTimer.setInterval(0);
-	m_autoCloseTimer.setSingleShot(true);
-	this->connect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
 }
 
 ot::WidgetViewManager::~WidgetViewManager() {
-	this->disconnect(&m_autoCloseTimer, &QTimer::timeout, this, &WidgetViewManager::slotCloseUnpinnedViews);
-
-	this->deleteLater();
+	
 }
 
 void ot::WidgetViewManager::initialize(WidgetViewDockManager* _dockManager) {
@@ -236,13 +230,58 @@ void ot::WidgetViewManager::closeViews() {
 }
 
 void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::ViewFlags& _flags, const SelectionInformation& _activeSelection, bool _ignoreCurrent) {
-	m_autoCloseTimer.stop();
-
 	m_autoCloseInfo.flags = _flags;
 	m_autoCloseInfo.activeSelection = _activeSelection;
 	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
 
-	m_autoCloseTimer.start();
+	// Iterate trough all views
+	for (const ViewEntry& view : m_views) {
+		const WidgetViewDock* dock = view.second->getViewDockWidget();
+		OTAssertNullptr(dock);
+
+		// Check if the view matches the auto close flags and is not pinned
+		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
+			bool concider = true;
+
+			// If ignore current is set, do not close the last focused view
+			if (m_autoCloseInfo.ignoreCurrent) {
+				concider = !(view.second == m_focusInfo.last ||
+					view.second == m_focusInfo.lastCentral ||
+					view.second == m_focusInfo.lastSide ||
+					view.second == m_focusInfo.lastTool);
+			}
+
+			// If the active selection is set, do not close views that are selected in the active selection
+			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
+
+			if (concider) {
+				if (activeSel.empty()) {
+					// No active selection, ensure view is allowed to close on empty selection
+					if (!(view.second->getViewData().getViewFlags() & WidgetViewBase::ViewCloseOnEmptySelection)) {
+						concider = false;
+					}
+				}
+				else {
+					// Check if the view is selected in the active selection
+					if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
+						concider = false;
+					}
+				}
+			}
+
+			// If the view matches all criteria, add it to the list of views to close
+			if (concider) {
+				m_autoCloseInfo.viewsToClose.push_back(view.second);
+			}
+		}
+	}
+
+	// Request to close all matching views
+	while (!m_autoCloseInfo.viewsToClose.empty()) {
+		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
+		m_autoCloseInfo.viewsToClose.pop_front();
+		this->handleViewCloseRequest(view);
+	}
 }
 
 void ot::WidgetViewManager::forgetView(WidgetView* _view) {
@@ -759,57 +798,6 @@ void ot::WidgetViewManager::slotViewDataModifiedChanged() {
 	}
 
 	Q_EMIT viewDataModifiedChanged(view);
-}
-
-void ot::WidgetViewManager::slotCloseUnpinnedViews() {
-	// Iterate trough all views
-	for (const ViewEntry& view : m_views) {
-		const WidgetViewDock* dock = view.second->getViewDockWidget();
-		OTAssertNullptr(dock);
-
-		// Check if the view matches the auto close flags and is not pinned
-		if ((view.second->getViewData().getViewFlags() & m_autoCloseInfo.flags) == m_autoCloseInfo.flags && !dock->getIsPinned()) {
-			bool concider = true;
-
-			// If ignore current is set, do not close the last focused view
-			if (m_autoCloseInfo.ignoreCurrent) {
-				concider = !(view.second == m_focusInfo.last ||
-					view.second == m_focusInfo.lastCentral ||
-					view.second == m_focusInfo.lastSide ||
-					view.second == m_focusInfo.lastTool);
-			}
-
-			// If the active selection is set, do not close views that are selected in the active selection
-			const UIDList& activeSel = m_autoCloseInfo.activeSelection.getSelectedNavigationItems();
-
-			if (concider) {
-				if (activeSel.empty()) {
-					// No active selection, ensure view is allowed to close on empty selection
-					if (!(view.second->getViewData().getViewFlags() & WidgetViewBase::ViewCloseOnEmptySelection)) {
-						concider = false;
-					}
-				}
-				else {
-					// Check if the view is selected in the active selection
-					if (ContainerHelper::hasIntersection(activeSel, view.second->getVisualizingItems().getSelectedNavigationItems())) {
-						concider = false;
-					}
-				}
-			}
-
-			// If the view matches all criteria, add it to the list of views to close
-			if (concider) {
-				m_autoCloseInfo.viewsToClose.push_back(view.second);
-			}
-		}
-	}
-
-	// Request to close all matching views
-	while (!m_autoCloseInfo.viewsToClose.empty()) {
-		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
-		m_autoCloseInfo.viewsToClose.pop_front();
-		this->handleViewCloseRequest(view);
-	}
 }
 
 void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned) {
