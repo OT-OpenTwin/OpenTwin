@@ -234,6 +234,14 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 	m_autoCloseInfo.activeSelection = _activeSelection;
 	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
 
+	/*OT_LOG_TS("Auto close upinned views called with: { \"Flags\": " << (int)_flags << ", \"ActiveSelection\": " << &_activeSelection
+		<< ", \"IgnoreCurrent\": " << _ignoreCurrent << ", \"LastFocusedInfo\": { \"Last\": \"" << (m_focusInfo.last ? m_focusInfo.last->getViewData().getEntityName() : std::string("< null >"))
+		<< "\", \"LastCentral\": \"" << (m_focusInfo.lastCentral ? m_focusInfo.lastCentral->getViewData().getEntityName() : std::string("< null >"))
+		<< "\", \"LastSide\": \"" << (m_focusInfo.lastSide ? m_focusInfo.lastSide->getViewData().getEntityName() : std::string("< null >"))
+		<< "\", \"LastTool\": \"" << (m_focusInfo.lastTool ? m_focusInfo.lastTool->getViewData().getEntityName() : std::string("< null >"))
+		<< "\" }"
+		<< " }"); */
+	
 	// Iterate trough all views
 	for (const ViewEntry& view : m_views) {
 		const WidgetViewDock* dock = view.second->getViewDockWidget();
@@ -280,6 +288,8 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 	while (!m_autoCloseInfo.viewsToClose.empty()) {
 		WidgetView* view = m_autoCloseInfo.viewsToClose.front();
 		m_autoCloseInfo.viewsToClose.pop_front();
+
+		//OT_LOG_TS("Requesting view auto close: { \"View\": " << view << ", \"EntityName\": " << view->getViewData().getEntityName() << ", \"ViewType\": \"" << WidgetViewBase::toString(view->getViewData().getViewType()) << "\" }");
 		this->handleViewCloseRequest(view);
 	}
 }

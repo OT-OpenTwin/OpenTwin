@@ -5,6 +5,12 @@
 // OpenTwin header
 #include "OTCore/Logging/LogMessageStream.h"
 
+template<class T, std::enable_if_t<!std::is_base_of<ot::Serializable, std::remove_cv_t<T>>::value, int>>
+inline ot::LogMessageStream& ot::LogMessageStream::operator<<(T* _ptr)
+{
+    return *this << Pointer(static_cast<const void*>(_ptr));
+}
+
 template <typename T, typename>
 inline ot::LogMessageStream& ot::LogMessageStream::operator<<(const std::set<T>& _set)
 {

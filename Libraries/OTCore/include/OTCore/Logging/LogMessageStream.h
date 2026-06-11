@@ -56,6 +56,10 @@ namespace ot {
 
 		LogMessageStream& operator << (const Serializable* const _serializableObject);
 		LogMessageStream& operator << (const Pointer& _pointer);
+		LogMessageStream& operator << (std::nullptr_t) { return *this << Pointer(nullptr); };
+
+		template <class T, std::enable_if_t<!std::is_base_of<ot::Serializable, std::remove_cv_t<T>>::value, int> = 0>
+		LogMessageStream& operator<<(T* _ptr);
 
 		template <typename T, typename = std::enable_if_t<is_log_streamable<T>::value>>
 		LogMessageStream& operator<<(const std::set<T>& _set);
