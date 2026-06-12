@@ -233,3 +233,12 @@ bool ot::Dialog::mayCloseDialogWindow(void) {
 
 	return continueClose;
 }
+
+void ot::Dialog::fillDialogConfig(DialogCfg& _config) const
+{
+	_config.setFlags(m_flags);
+	_config.setName(m_dialogName);
+	_config.setTitle(this->windowTitle().toStdString());
+	_config.setMinSize(this->minimumWidth(), this->minimumHeight());
+	_config.setMaxSize(this->maximumWidth(), this->maximumHeight());
+}

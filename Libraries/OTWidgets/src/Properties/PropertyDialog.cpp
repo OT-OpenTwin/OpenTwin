@@ -199,6 +199,16 @@ void ot::PropertyDialog::setConfirmButtonEnabled(bool _enabled) {
 	m_confirmButton->setEnabled(_enabled);
 }
 
+ot::PropertyDialogCfg ot::PropertyDialog::createConfiguration() const
+{
+	PropertyDialogCfg cfg;
+	this->fillDialogConfig(cfg);
+
+	cfg.setGridConfig(m_grid->createGridConfig());
+
+	return cfg;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private slots

@@ -4735,6 +4735,8 @@ void ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document
 	m_actionProfiler.ignoreCurrent();
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	std::string callbackService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
@@ -4742,9 +4744,27 @@ void ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document
 	ot::PropertyDialog dia(pckg, nullptr);
 	dia.showDialog();
 
-	if (dia.dialogResult() == ot::Dialog::Ok)
+	if (dia.dialogResult() != ot::Dialog::Ok)
 	{
+		return;
+	}
 
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(callbackFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	
+	const auto responseCfg = dia.createConfiguration();
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(responseCfg, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	std::string responseStr;
+	if (!sendRelayedRequest(EXECUTE, callbackService, responseDoc.toJson(), responseStr))
+	{
+		OT_LOG_E("Failed to send message to callback service at \"" + callbackService + "\"");
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) 
+	{
+		OT_LOG_E("Callback service returned error: " + response.getWhat());
 	}
 }
 
