@@ -328,7 +328,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	// Setup axis
 
+	// X Axis Cartesian = Azimuth Axis Polar
 	ot::Plot1DAxisCfg xAxisCfg = config.getXAxis();
+
+	// Y Axis Cartesian = Radius Axis Polar
 	ot::Plot1DAxisCfg yAxisCfg = config.getYAxis();
 
 	if (config.getPlotType() == ot::Plot1DCfg::Cartesian)
@@ -344,17 +347,17 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
 	{
-		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
-		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
+		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), xAxisCfg);
+		setAxisFromProperties(getRadiusAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
 		if (!phaseAxisComponent.empty()) 
 		{
-			yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
+			xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
 		}
 		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
 		if (!radiusAxisComponent.empty()) 
 		{
-			xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
+			yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
 		}
 	}
 	else

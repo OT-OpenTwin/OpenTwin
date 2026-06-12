@@ -64,7 +64,7 @@ double ot::AbstractPlotAxis::getMax(void) const {
 	return m_config.getMax();
 }
 
-QwtPlot::Axis ot::AbstractPlotAxis::getCartesianAxisID(void) const {
+QwtPlot::Axis ot::AbstractPlotAxis::getCartesianAxisID() const {
 	switch (m_id) {
 	case AbstractPlotAxis::yLeft: return QwtPlot::yLeft;
 	case AbstractPlotAxis::yRight: return QwtPlot::yRight;
@@ -76,12 +76,13 @@ QwtPlot::Axis ot::AbstractPlotAxis::getCartesianAxisID(void) const {
 	}
 }
 
-QwtPolar::Axis ot::AbstractPlotAxis::getPolarAxisID(void) const {
-	switch (m_id) {
-	case AbstractPlotAxis::yLeft: return QwtPolar::AxisLeft;
+QwtPolar::Axis ot::AbstractPlotAxis::getPolarAxisID() const {
+	switch (m_id)
+	{
+	case AbstractPlotAxis::yLeft: return QwtPolar::AxisAzimuth;
 	case AbstractPlotAxis::yRight: return QwtPolar::AxisRight;
-	case AbstractPlotAxis::xBottom: return QwtPolar::AxisBottom;
-	case AbstractPlotAxis::xTop: return QwtPolar::AxisTop;
+	case AbstractPlotAxis::xBottom: return QwtPolar::AxisLeft;
+	case AbstractPlotAxis::xTop: return QwtPolar::AxisRight;
 	default:
 		assert(0);	// Not implemented axis
 		return QwtPolar::AxisBottom;
