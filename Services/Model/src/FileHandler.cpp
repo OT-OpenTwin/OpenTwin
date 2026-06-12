@@ -51,6 +51,9 @@
 #include "OTModelEntities/IEventHandler.h"
 #include "OTModelEntities/EntityPythonManifest.h"
 
+#include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTGui/Properties/PropertyGroup.h"
+#include "OTGui/Properties/PropertyStringList.h"
 // std header
 #include <assert.h>
 #include <filesystem>
@@ -109,137 +112,183 @@ void FileHandler::handleImportPythonScriptButton() {
 
 void FileHandler::handleExportFilesToLibrary() {
 
-	ot::UIDList selectedEntities = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
-	if (selectedEntities.empty()) {
-		Application::instance()->getNotifier()->reportError("Please select at least one entity and one meta file to export to the library.");
-		return;
-	}
+	Model* model = Application::instance()->getModel();
 
-	// Collect the entities to export
-	EntityFileText* pythonScript = nullptr;
-	EntityPythonManifest* pythonManifest = nullptr;
-	EntityFileText* pythonMetaFile = nullptr;
-	EntityFileText* manifestMetaFile = nullptr;
-	EntityFileText* circuitModel = nullptr;
-	EntityFileText* circuitMetaFile = nullptr;
+	// Get Entities from respective folders
+	std::string pythonScriptFolder = ot::FolderNames::PythonScriptFolder;
+	std::string manifestFolder = ot::FolderNames::PythonManifestFolder;
+	std::string metaFileFolder = ot::FolderNames::FilesFolder;
 
-	for (auto entityID : selectedEntities) {
-		EntityBase* entity = Application::instance()->getModel()->getEntityByID(entityID);
-		if (entity == nullptr) continue;
+	auto pythonScripts = model->getListOfFolderItems(pythonScriptFolder,true);
+	auto manifestFiles = model->getListOfFolderItems(manifestFolder,true);
+	auto metaFiles = model->getListOfFolderItems(metaFileFolder,true);
 
-		// Check if it's a PythonScript or metadata file
-		EntityFileText* fileEntity = dynamic_cast<EntityFileText*>(entity);
-		if (fileEntity != nullptr) {
-			EntityPropertiesBase* exportTypeProperty = entity->getProperties().getProperty("ExportType");
-			if (exportTypeProperty != nullptr) {
-				EntityPropertiesString* selectionProperty = dynamic_cast<EntityPropertiesString*>(exportTypeProperty);
-				if (selectionProperty != nullptr) {
-					std::string exportType = selectionProperty->getValue();
-					if (exportType == "PythonScript") {
-						pythonScript = fileEntity;
-					}
-					else if (exportType == "PythonMeta") {
-						pythonMetaFile = fileEntity;
-					}
-					else if (exportType == "ManifestMeta") {
-						manifestMetaFile = fileEntity;
-					}
-					else if (exportType == "CircuitModel") {
-						circuitModel = fileEntity;
-					}
-					else if (exportType == "CircuitMeta") {
-						circuitMetaFile = fileEntity;
-					}
-				}
-			}
-			else {
+	ot::PropertyDialogCfg dialogConfig;
+	dialogConfig.setTitle("Export to Library");
+	dialogConfig.setName("ExportToLibraryDialog");
 
-				EntityPropertiesBase* fileType = fileEntity->getProperties().getProperty("FileType");
-				if (!fileType) {
-					Application::instance()->getNotifier()->reportError(
-						"Selected file entity " + entity->getName() + " does not have a valid ExportType or FileType property. Please ensure that the file entities have the correct properties set for export."
-					);
-					return;
-				}
-				EntityPropertiesString* fileTypeSelection = dynamic_cast<EntityPropertiesString*>(fileType);
-				if (fileTypeSelection) {
-					std::string fileTypeValue = fileTypeSelection->getValue();
-					if (fileTypeValue == "py") {
-						pythonScript = fileEntity;
-					}
-					else {
-						Application::instance()->getNotifier()->reportError(
-							"Selected file entity " + entity->getName() + " has an unsupported file type for export. Please ensure that the file entities have the correct properties set for export."
-						);
-						return;
-					}
-				}		
-			}
-		}
+	ot::PropertyGridCfg gridConfig;
+	ot::PropertyGroup* rootGroup = new ot::PropertyGroup("Export Selection");
 
-		// Check if it's a PythonManifest
-		EntityPythonManifest* manifestEntity = dynamic_cast<EntityPythonManifest*>(entity);
-		if (manifestEntity != nullptr) {
-			pythonManifest = manifestEntity;
-		}
-	}
+	// Create properties using ot::PropertyStringList instead of EntityPropertiesSelection
+	ot::PropertyStringList* pythonScriptProp = new ot::PropertyStringList("Python Script", "", pythonScripts);
+	ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
+	ot::PropertyStringList* pythonMetaProp = new ot::PropertyStringList("Python Metadata File", "", metaFiles);
+	ot::PropertyStringList* manifestMetaProp = new ot::PropertyStringList("Manifest Metadata File", "", metaFiles);
 
-	// Check for Circuit export (both files required)
-	bool hasCircuitExport = (circuitModel != nullptr && circuitMetaFile != nullptr);
+	rootGroup->addProperty(pythonScriptProp);
+	rootGroup->addProperty(pythonManifestProp);
+	rootGroup->addProperty(pythonMetaProp);
+	rootGroup->addProperty(manifestMetaProp);
 
-	if (hasCircuitExport) {
-		Application::instance()->getNotifier()->reportError(
-			"Circuit export is currently not supported. Please select Python files for export."
-		);
-		return;
-	}
 
-	// Determine Python export scenario
-	bool hasMinimalPythonExport = (pythonScript != nullptr && pythonMetaFile != nullptr && 
-	                                pythonManifest == nullptr && manifestMetaFile == nullptr);
-	bool hasFullPythonExport = (pythonScript != nullptr && pythonManifest != nullptr && 
-	                             pythonMetaFile != nullptr && manifestMetaFile != nullptr);
+	gridConfig.addRootGroup(rootGroup);
+	dialogConfig.setGridConfig(gridConfig);
 
-	if (!hasMinimalPythonExport && !hasFullPythonExport) {
-		Application::instance()->getNotifier()->reportError(
-			"For Python export: Please select either:\n"
-			"- A Python script with its metadata file (.py + .otmeta.json), or\n"
-			"- All four files: PythonScript, PythonManifest, PythonMeta, and ManifestMeta."
-		);
-		return;
-	}
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PropertyDialog, doc.GetAllocator()), doc.GetAllocator());
+	ot::JsonObject jConfig;
+	dialogConfig.addToJsonObject(jConfig, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, jConfig, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(OT_ACTION_CMD_ExportFilesToLibrary, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(Application::instance()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 
-	// Validate Python export
-	if (!validateMetaDataFile(pythonMetaFile)) {
-		return;
-	}
+	std::string response;
+	Application::instance()->getUiComponent()->sendMessage(true, doc, response);
 
-	if (hasFullPythonExport && !validateMetaDataFile(manifestMetaFile)) {
-		return;
-	}
 
-	// Case 1: Minimal export (script + metadata only)
-	if (hasMinimalPythonExport) {
-		std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
-			pythonScript->getEntityID(),
-			ot::invalidUID,  // No manifest
-			pythonMetaFile->getEntityID(),
-			ot::invalidUID,  // No manifest meta
-			ot::invalidUID                // No environment ID needed
-		);
-		worker.detach();
-	}
-	// Case 2: Full export (all four files)
-	else if (hasFullPythonExport) {
-		std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
-			pythonScript->getEntityID(),
-			pythonManifest->getEntityID(),
-			pythonMetaFile->getEntityID(),
-			manifestMetaFile->getEntityID(),
-			pythonManifest->getManifestID()
-		);
-		worker.detach();
-	}
+	// This part goes to the callback of the property dialog when the user clicks "OK"
+	//ot::UIDList selectedEntities = Application::instance()->getSelectionHandler().getSelectedEntityIDs();
+	//if (selectedEntities.empty()) {
+	//	Application::instance()->getNotifier()->reportError("Please select at least one entity and one meta file to export to the library.");
+	//	return;
+	//}
+
+	//// Collect the entities to export
+	//EntityFileText* pythonScript = nullptr;
+	//EntityPythonManifest* pythonManifest = nullptr;
+	//EntityFileText* pythonMetaFile = nullptr;
+	//EntityFileText* manifestMetaFile = nullptr;
+	//EntityFileText* circuitModel = nullptr;
+	//EntityFileText* circuitMetaFile = nullptr;
+
+	//for (auto entityID : selectedEntities) {
+	//	EntityBase* entity = Application::instance()->getModel()->getEntityByID(entityID);
+	//	if (entity == nullptr) continue;
+
+	//	// Check if it's a PythonScript or metadata file
+	//	EntityFileText* fileEntity = dynamic_cast<EntityFileText*>(entity);
+	//	if (fileEntity != nullptr) {
+	//		EntityPropertiesBase* exportTypeProperty = entity->getProperties().getProperty("ExportType");
+	//		if (exportTypeProperty != nullptr) {
+	//			EntityPropertiesString* selectionProperty = dynamic_cast<EntityPropertiesString*>(exportTypeProperty);
+	//			if (selectionProperty != nullptr) {
+	//				std::string exportType = selectionProperty->getValue();
+	//				if (exportType == "PythonScript") {
+	//					pythonScript = fileEntity;
+	//				}
+	//				else if (exportType == "PythonMeta") {
+	//					pythonMetaFile = fileEntity;
+	//				}
+	//				else if (exportType == "ManifestMeta") {
+	//					manifestMetaFile = fileEntity;
+	//				}
+	//				else if (exportType == "CircuitModel") {
+	//					circuitModel = fileEntity;
+	//				}
+	//				else if (exportType == "CircuitMeta") {
+	//					circuitMetaFile = fileEntity;
+	//				}
+	//			}
+	//		}
+	//		else {
+
+	//			EntityPropertiesBase* fileType = fileEntity->getProperties().getProperty("FileType");
+	//			if (!fileType) {
+	//				Application::instance()->getNotifier()->reportError(
+	//					"Selected file entity " + entity->getName() + " does not have a valid ExportType or FileType property. Please ensure that the file entities have the correct properties set for export."
+	//				);
+	//				return;
+	//			}
+	//			EntityPropertiesString* fileTypeSelection = dynamic_cast<EntityPropertiesString*>(fileType);
+	//			if (fileTypeSelection) {
+	//				std::string fileTypeValue = fileTypeSelection->getValue();
+	//				if (fileTypeValue == "py") {
+	//					pythonScript = fileEntity;
+	//				}
+	//				else {
+	//					Application::instance()->getNotifier()->reportError(
+	//						"Selected file entity " + entity->getName() + " has an unsupported file type for export. Please ensure that the file entities have the correct properties set for export."
+	//					);
+	//					return;
+	//				}
+	//			}		
+	//		}
+	//	}
+
+	//	// Check if it's a PythonManifest
+	//	EntityPythonManifest* manifestEntity = dynamic_cast<EntityPythonManifest*>(entity);
+	//	if (manifestEntity != nullptr) {
+	//		pythonManifest = manifestEntity;
+	//	}
+	//}
+
+	//// Check for Circuit export (both files required)
+	//bool hasCircuitExport = (circuitModel != nullptr && circuitMetaFile != nullptr);
+
+	//if (hasCircuitExport) {
+	//	Application::instance()->getNotifier()->reportError(
+	//		"Circuit export is currently not supported. Please select Python files for export."
+	//	);
+	//	return;
+	//}
+
+	//// Determine Python export scenario
+	//bool hasMinimalPythonExport = (pythonScript != nullptr && pythonMetaFile != nullptr && 
+	//                                pythonManifest == nullptr && manifestMetaFile == nullptr);
+	//bool hasFullPythonExport = (pythonScript != nullptr && pythonManifest != nullptr && 
+	//                             pythonMetaFile != nullptr && manifestMetaFile != nullptr);
+
+	//if (!hasMinimalPythonExport && !hasFullPythonExport) {
+	//	Application::instance()->getNotifier()->reportError(
+	//		"For Python export: Please select either:\n"
+	//		"- A Python script with its metadata file (.py + .otmeta.json), or\n"
+	//		"- All four files: PythonScript, PythonManifest, PythonMeta, and ManifestMeta."
+	//	);
+	//	return;
+	//}
+
+	//// Validate Python export
+	//if (!validateMetaDataFile(pythonMetaFile)) {
+	//	return;
+	//}
+
+	//if (hasFullPythonExport && !validateMetaDataFile(manifestMetaFile)) {
+	//	return;
+	//}
+
+	//// Case 1: Minimal export (script + metadata only)
+	//if (hasMinimalPythonExport) {
+	//	std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
+	//		pythonScript->getEntityID(),
+	//		ot::invalidUID,  // No manifest
+	//		pythonMetaFile->getEntityID(),
+	//		ot::invalidUID,  // No manifest meta
+	//		ot::invalidUID                // No environment ID needed
+	//	);
+	//	worker.detach();
+	//}
+	//// Case 2: Full export (all four files)
+	//else if (hasFullPythonExport) {
+	//	std::thread worker(&FileHandler::exportFilesToLibraryAsync, this,
+	//		pythonScript->getEntityID(),
+	//		pythonManifest->getEntityID(),
+	//		pythonMetaFile->getEntityID(),
+	//		manifestMetaFile->getEntityID(),
+	//		pythonManifest->getManifestID()
+	//	);
+	//	worker.detach();
+	//}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
