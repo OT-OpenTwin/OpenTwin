@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: RandomNumberGeneratorCryptoSecure.cpp
 // 
 // License:
@@ -111,12 +111,12 @@ unsigned __int64 RandomNumberGeneratorCryptoSecure::GetPositiveRandomInt64(unsig
 				randomNumber += partialRandomNumber << (i * 8);
 			}
 			randomNumber %= maxValue + 1;
-			delete randomNumberBuffer;
+			delete[] randomNumberBuffer;
 			return randomNumber;
 		}
 		else
 		{
-			delete randomNumberBuffer;
+			delete[] randomNumberBuffer;
 			throw ("Creating random number for shuffled index vector (solver matrix encryption) failed due to error code: " + status);
 		}
 	}
