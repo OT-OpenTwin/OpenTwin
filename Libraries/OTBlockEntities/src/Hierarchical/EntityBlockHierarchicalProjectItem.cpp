@@ -50,18 +50,16 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalProjectItem::createBlockCfg() {
 	ot::GraphicsHierarchicalItemBuilder builder;
 	
 	// Mandatory settings
-	builder.setName(this->getName());
-	builder.setTitle(project.getProjectName());
-	builder.setProjectType(project.getProjectType());
-	builder.setLeftTitleCornerImagePath("ProjectTemplates/" + project.getProjectType());
-	builder.setTitleBackgroundGradientColor(ot::Blue);
+	builder.setEntityName(this->getName());
+	builder.setTopText(project.getProjectName());
 
 	// Optional settings
 	if (!getUseLatestVersion()) {
-		builder.setProjectVersion(getCustomVersion());
+		builder.setBottomText("Project Version: " + getCustomVersion());
 	}
-	if (m_previewData != nullptr) {
-		builder.setPreviewImageData(m_previewData->getData(), m_previewFormat);
+	if (m_previewData != nullptr)
+	{
+		builder.setCenterImageData(m_previewData->getData(), m_previewFormat);
 	}
 
 	// Create the item

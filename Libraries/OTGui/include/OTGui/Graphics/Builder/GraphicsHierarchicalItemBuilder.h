@@ -21,7 +21,10 @@
 
 // OpenTwin header
 #include "OTCore/Color.h"
+#include "OTGui/Style/Font.h"
+#include "OTGui/Style/PenCfg.h"
 #include "OTGui/Style/Margins.h"
+#include "OTGui/Painter/Painter2DContainer.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 
 // std header
@@ -31,16 +34,12 @@
 namespace ot {
 
 	class Painter2D;
+	class GraphicsLayoutItemCfg;
 
 	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalItemBuilder {
 		OT_DECL_NOCOPY(GraphicsHierarchicalItemBuilder)
 		OT_DECL_NOMOVE(GraphicsHierarchicalItemBuilder)
 	public:
-		enum BackgroundImageInsertMode {
-			OnLayout,
-			OnStack
-		};
-
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
 		ot::GraphicsItemCfg* createGraphicsItem() const;
@@ -48,72 +47,67 @@ namespace ot {
 		GraphicsHierarchicalItemBuilder();
 		virtual ~GraphicsHierarchicalItemBuilder();
 
-		//! @brief Sets the name for the root item.
-		//! The item name will be used as a prefix for the created child items (layouts and stacks).
-		void setName(const std::string& _name) { m_name = _name; };
-		const std::string& getName() const { return m_name; };
+		//! @brief Set the entity name of the item.
+		void setEntityName(const std::string& _name) { m_entityName = _name; };
 
-		//! @brief Sets the title that will be displayed to the user.
-		void setTitle(const std::string& _title) { m_title = _title; };
-		const std::string& getTitle() const { return m_title; };
+		void setTopText(const std::string& _text) { m_topText.text = _text; };
+		void setTopTextFont(const Font& _font) { m_topText.font = _font; };
+		void setTopTextMargins(const MarginsD& _margins) { m_topText.margins = _margins; };
+		void setTopTextPen(const PenFCfg& _pen) { m_topText.pen = _pen; };
+		//! @brief Replace the current top text pen painter.
+		//! @param _painter The pen takes ownership of the painter.
+		void setTopTextPainter(Painter2D* _painter) { m_topText.pen.setPainter(_painter); };
+		void setTopTextColor(const Color& _color) { m_topText.pen.setColor(_color); };
+		void setTopTextAlignment(Alignment _alignment) { m_topText.alignment = _alignment; };
 
-		//! @brief Sets the project type that will be displayed to the user.
-		//! @param _type The type string.
-		void setProjectType(const std::string& _type) { m_type = _type; };
-		const std::string& getProjectType() const { return m_type; };
+		//! @brief Sets the image path.
+		//! The path is only used if no image data is set.
+		//! @param _path The relative image path.
+		void setCenterImagePath(const std::string& _path) { m_centerImage.path = _path; };
 
-		void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
-		const std::string& getProjectVersion() const { return m_projectVersion; };
+		//! @brief Set the image data.
+		//! The data is used instead of the image path if available.
+		//! @param _data The image data.
+		//! @param _format The image file format.
+		void setCenterImageData(const std::vector<char>& _data, ImageFileFormat _format) { m_centerImage.data = _data; m_centerImage.format = _format; };
+		void setCenterImageMargins(const ot::MarginsD& _margins) { m_centerImage.margins = _margins; };
+		void setCenterImageAlignment(Alignment _alignment) { m_centerImage.alignment = _alignment; };
+		void setCenterImageMaintainAspectRatio(bool _maintain) { m_centerImage.maintainAspectRatio = _maintain; };
+		void setCenterImageMinimumSize(const Size2DD& _size) { m_centerImage.minimumSize = _size; };
+		void setCenterImageMaximumSize(const Size2DD& _size) { m_centerImage.maximumSize = _size; };
+		void setCenterImageFixedSize(const Size2DD& _size) { m_centerImage.minimumSize = _size; m_centerImage.maximumSize = _size; };
+
+		void setBottomText(const std::string& _text) { m_bottomText.text = _text; };
+		void setBottomTextFont(const Font& _font) { m_bottomText.font = _font; };
+		void setBottomTextMargins(const MarginsD& _margins) { m_bottomText.margins = _margins; };
+		void setBottomTextPen(const PenFCfg& _pen) { m_bottomText.pen = _pen; };
+		//! @brief Replace the current bottom text pen painter.
+		//! @param _painter The item takes ownership of the painter.
+		void setBottomTextPainter(Painter2D* _painter) { m_bottomText.pen.setPainter(_painter); };
+		void setBottomTextColor(const Color& _color) { m_bottomText.pen.setColor(_color); };
+		void setBottomTextAlignment(Alignment _alignment) { m_bottomText.alignment = _alignment; };
 
 		//! @brief Set the item tool tip.
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
 
-		//! @brief Set the item tool tip.
-		const std::string& getToolTip() const { return m_toolTip; };
+		//! @brief Replace the current background painter.
+		//! @param _painter The item takes ownership of the painter.
+		void setBackgroundPainter(Painter2D* _painter) { m_backgroundPainter.setPainter(_painter); };
+		void setBackgroundColor(const Color& _color);
+		inline void setBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setBackgroundColor(Color(_r, _g, _b, _a)); };
 
-		//! @brief Replace the current title background painter.
-		//! The item takes ownership.
-		void setTitleBackgroundPainter(ot::Painter2D* _painter);
+		void setOutline(const PenFCfg& _outline) { m_outline = _outline; };
 
-		//! @brief Sets the title background color.
-		//! Creates a FillPainter2D and replace the current title background painter.
-		void setTitleBackgroundColor(const ot::Color& _color);
+		//! @brief Replace the current outline painter.
+		//! @param _painter The item takes ownership of the painter.
+		void setOutlinePainter(Painter2D* _painter) { m_outline.setPainter(_painter); };
+		void setOutlineColor(const Color& _color) { m_outline.setColor(_color); };
+		inline void setOutlineColor(int _r, int _g, int _b, int _a = 255) { m_outline.setColor(Color(_r, _g, _b, _a)); };
 
-		//! @brief Sets the title background painter.
-		//! Creates a LinearGradientPainter2D and replace the current title background painter.
-		void setTitleBackgroundGradientColor(const ot::Color& _color);
+		void setOutlineWidth(double _width) { m_outline.setWidth(_width); };
 
-		//! @brief Sets the title background color.
-		//! Will create a FillPainter2D and replace the current title background painter.
-		inline void setTitleBackgroundColor(int _r, int _g, int _b, int _a = 255) { this->setTitleBackgroundColor(ot::Color(_r, _g, _b, _a)); };
-
-		//! @brief Replace the current title foreground painter.
-		//! The item takes ownership.
-		void setTitleForegroundPainter(ot::Painter2D* _painter);
-
-		//! @brief Sets the title foreground painter.
-		//! Create a FillPainter2D and replace the current title foreground painter.
-		void setTitleForegroundColor(const ot::Color& _color);
-
-		//! @brief Sets the title foreground painter.
-		//! Create a LinearGradientPainter2D and replace the current title foreground painter.
-		//! @param _color The primary text color, other colors are calculated by 255-color.
-		void setDefaultTitleForegroundGradient();
-
-		void setLeftTitleCornerImagePath(const std::string& _path) { m_leftTitleImagePath = _path; };
-
-		//! @brief Sets the preview image path.
-		//! The path is only used if no image data is set.
-		//! @param _path The relative image path.
-		void setPreviewImagePath(const std::string& _path) { m_previewImagePath = _path; };
-
-		//! @brief Set the preview image data.
-		//! The data is used instead of the image path if available.
-		//! @param _data The image data.
-		//! @param _format The image file format.
-		void setPreviewImageData(const std::vector<char>& _data, ImageFileFormat _format) { m_previewImage = _data; m_previewImageFormat = _format; };
-		void setPreviewImageMargins(const ot::MarginsD& _margins) { m_previewImageMargins = _margins; };
-		
+		void setConnectorWidth(double _width) { m_connectorWidth = _width; };
+		void setConnectorHeight(double _height) { m_connectorHeight = _height; };
 		void setConnectorSize(double _width, double _height) { m_connectorWidth = _width; m_connectorHeight = _height; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
@@ -121,28 +115,49 @@ namespace ot {
 		// Private: Helper
 
 	private:
-		double m_connectorWidth;
-		double m_connectorHeight;
+		struct TextInfo {
+			std::string text;
+			Font font;
+			MarginsD margins;
+			PenFCfg pen;
+			Alignment alignment;
+		};
 
-		ot::GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
-		ot::GraphicsItemCfg* createTitle() const;
+		struct ImageInfo
+		{
+			std::string path;
+			std::vector<char> data;
+			ImageFileFormat format;
+			MarginsD margins;
+			Alignment alignment;
+			bool maintainAspectRatio;
+			Size2DD minimumSize;
+			Size2DD maximumSize;
+		};
 
-		std::string m_name;
-		std::string m_type;
-		std::string m_title;
+		void initializeTextInfo(TextInfo& _info);
+		void initializeImageInfo(ImageInfo& _info);
+
+		GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
+		GraphicsItemCfg* createShapeItem() const;
+
+		void createText(GraphicsLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const;
+		void createImage(GraphicsLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
+
+		std::string m_entityName;
+
+		TextInfo m_topText;
+		ImageInfo m_centerImage;
+		TextInfo m_bottomText;
+
 		std::string m_toolTip;
 
-		std::string m_projectVersion;
+		Painter2DContainer m_backgroundPainter;
+		PenFCfg m_outline;
+		int m_cornerRadius;
 
-		ot::Painter2D* m_titleBackgroundPainter;
-		ot::Painter2D* m_titleForegroundPainter;
-
-		std::string m_leftTitleImagePath;
-
-		std::string m_previewImagePath;
-		std::vector<char> m_previewImage;
-		ImageFileFormat m_previewImageFormat;
-		ot::MarginsD m_previewImageMargins;
+		double m_connectorWidth;
+		double m_connectorHeight;
 	};
 
 }

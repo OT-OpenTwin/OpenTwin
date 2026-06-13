@@ -46,11 +46,9 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalDocumentItem::createBlockCfg() {
 	ot::GraphicsHierarchicalItemBuilder builder;
 
 	// Mandatory settings
-	builder.setName(this->getName());
-	builder.setTitle(this->createBlockHeadline());
-	builder.setLeftTitleCornerImagePath("Hierarchical/Document");
-	builder.setTitleBackgroundGradientColor(ot::Red);
-	builder.setPreviewImagePath("Hierarchical/DocumentBackground");
+	builder.setEntityName(this->getName());
+	builder.setTopText(this->createBlockHeadline());
+	builder.setCenterImagePath("Hierarchical/DocumentBackground");
 
 	// Create the item
 	return builder.createGraphicsItem();

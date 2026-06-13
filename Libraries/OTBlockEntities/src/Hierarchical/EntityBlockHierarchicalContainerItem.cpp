@@ -42,11 +42,9 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalContainerItem::createBlockCfg() 
 	ot::GraphicsHierarchicalItemBuilder builder;
 
 	// Mandatory settings
-	builder.setName(this->getName());
-	builder.setTitle(this->createBlockHeadline());
-	builder.setLeftTitleCornerImagePath("Hierarchical/Container.png");
-	builder.setTitleBackgroundGradientColor(ot::Green);
-	builder.setPreviewImagePath("Hierarchical/ContainerBackground.png");
+	builder.setEntityName(this->getName());
+	builder.setTopText(this->createBlockHeadline());
+	builder.setCenterImagePath("Hierarchical/ContainerBackground.png");
 
 	// Create the item
 	return builder.createGraphicsItem();
