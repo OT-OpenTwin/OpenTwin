@@ -28,8 +28,7 @@
 static EntityFactoryRegistrar<ot::EntityBlockHierarchicalProjectItem> registrar(ot::EntityBlockHierarchicalProjectItem::className());
 
 ot::EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBlockHierarchicalBase(_ID, _parent, _obs, _ms), m_previewUID(ot::invalidUID), m_previewVersion(ot::invalidUID), m_previewData(nullptr),
-	m_previewFormat(ot::ImageFileFormat::PNG)
+	: EntityBlockHierarchicalBase(_ID, _parent, _obs, _ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon("ProjectTemplates/DefaultIcon");
@@ -41,29 +40,6 @@ ot::EntityBlockHierarchicalProjectItem::EntityBlockHierarchicalProjectItem(ot::U
 	setBlockTitle("Hierarchical Project Item");
 
 	resetModified();
-}
-
-ot::GraphicsItemCfg* ot::EntityBlockHierarchicalProjectItem::createBlockCfg() {
-	ensurePreviewLoaded();
-
-	ot::ProjectInformation project = this->getProjectInformation();
-	ot::GraphicsHierarchicalItemBuilder builder;
-	
-	// Mandatory settings
-	builder.setEntityName(this->getName());
-	builder.setTopText(project.getProjectName());
-
-	// Optional settings
-	if (!getUseLatestVersion()) {
-		builder.setBottomText("Project Version: " + getCustomVersion());
-	}
-	if (m_previewData != nullptr)
-	{
-		builder.setCenterImageData(m_previewData->getData(), m_previewFormat);
-	}
-
-	// Create the item
-	return builder.createGraphicsItem();
 }
 
 bool ot::EntityBlockHierarchicalProjectItem::updateFromProperties() {
@@ -96,34 +72,6 @@ void ot::EntityBlockHierarchicalProjectItem::createProperties() {
 	prop = EntityPropertiesString::createProperty("Project", "Custom version", "1", "", getProperties());
 	prop->setToolTip("Specify a custom version to be used when opening the project.");
 	prop->setVisible(false);
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Data accessors
-
-void ot::EntityBlockHierarchicalProjectItem::setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format) {
-	m_previewUID = _entityID;
-	m_previewVersion = _entityVersion;
-	m_previewFormat = _format;
-	m_previewData.reset();
-	m_previewData = nullptr;
-
-	setModified();
-}
-
-void ot::EntityBlockHierarchicalProjectItem::removePreviewFile() {
-	m_previewUID = ot::invalidUID;
-	m_previewVersion = ot::invalidUID;
-	m_previewData.reset();
-	m_previewData = nullptr;
-
-	setModified();
-}
-
-std::shared_ptr<EntityBinaryData> ot::EntityBlockHierarchicalProjectItem::getPreviewFileData() {
-	ensurePreviewLoaded();
-	return m_previewData;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -185,10 +133,7 @@ void ot::EntityBlockHierarchicalProjectItem::addStorageData(bsoncxx::builder::ba
 	_storage.append(
 		bsoncxx::builder::basic::kvp("ProjectName", m_projectName),
 		bsoncxx::builder::basic::kvp("ProjectType", m_projectType),
-		bsoncxx::builder::basic::kvp("CollectionName", m_collectionName),
-		bsoncxx::builder::basic::kvp("PreviewImageID", static_cast<int64_t>(m_previewUID)),
-		bsoncxx::builder::basic::kvp("PreviewImageVersion", static_cast<int64_t>(m_previewVersion)),
-		bsoncxx::builder::basic::kvp("PreviewImageType", ot::toString(m_previewFormat))
+		bsoncxx::builder::basic::kvp("CollectionName", m_collectionName)
 	);
 }
 
@@ -198,19 +143,4 @@ void ot::EntityBlockHierarchicalProjectItem::readSpecificDataFromDataBase(const 
 	m_projectName = _docView["ProjectName"].get_string().value.data();
 	m_projectType = _docView["ProjectType"].get_string().value.data();
 	m_collectionName = _docView["CollectionName"].get_string().value.data();
-	m_previewUID = static_cast<ot::UID>(_docView["PreviewImageID"].get_int64());
-	m_previewVersion = static_cast<ot::UID>(_docView["PreviewImageVersion"].get_int64());
-	m_previewFormat = ot::stringToImageFileFormat(_docView["PreviewImageType"].get_string().value.data());
-}
-
-void ot::EntityBlockHierarchicalProjectItem::ensurePreviewLoaded() {
-	if (m_previewUID == ot::invalidUID) {
-		return;
-	}
-	if (m_previewData != nullptr) {
-		return;
-	}
-
-	std::map<ot::UID, EntityBase*> entityMap;
-	m_previewData.reset(dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, m_previewUID, m_previewVersion, entityMap)));
 }

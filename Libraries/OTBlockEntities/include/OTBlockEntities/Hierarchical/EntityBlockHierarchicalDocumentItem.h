@@ -39,7 +39,6 @@ namespace ot {
 
 		virtual std::string getBlockFolderName() const override { return "Documents"; };
 
-		virtual ot::GraphicsItemCfg* createBlockCfg() override;
 		virtual bool updateFromProperties() override;
 
 		virtual void createProperties() override;

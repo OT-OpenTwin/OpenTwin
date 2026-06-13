@@ -34,8 +34,6 @@ namespace ot {
 		virtual std::string getClassName(void) const override { return EntityBlockHierarchicalContainerItem::className(); };
 		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-		virtual ot::GraphicsItemCfg* createBlockCfg() override;
-
 		virtual std::string getBlockFolderName() const override { return "Containers"; };
 	};
 

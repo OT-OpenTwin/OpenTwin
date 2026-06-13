@@ -18,7 +18,6 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalContainerItem.h"
@@ -36,16 +35,4 @@ ot::EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(o
 	setBlockTitle("Container");
 
 	resetModified();
-}
-
-ot::GraphicsItemCfg* ot::EntityBlockHierarchicalContainerItem::createBlockCfg() {
-	ot::GraphicsHierarchicalItemBuilder builder;
-
-	// Mandatory settings
-	builder.setEntityName(this->getName());
-	builder.setTopText(this->createBlockHeadline());
-	builder.setCenterImagePath("Hierarchical/ContainerBackground.png");
-
-	// Create the item
-	return builder.createGraphicsItem();
 }

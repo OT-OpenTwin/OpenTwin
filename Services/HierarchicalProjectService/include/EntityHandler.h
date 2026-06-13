@@ -54,12 +54,15 @@ public:
 	void addLabel();
 
 private:
-	void updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
+	void updateProjectBlockCenterImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
 public:
-	void updateProjectImages(const std::list<ot::EntityInformation>& _projects);
+	void updateProjectBlockCenterImages(const std::list<ot::EntityInformation>& _projects);
 
-	bool addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
-	bool removeImageFromProjects(const std::list<ot::EntityInformation>& _projects);
+private:
+	bool addCenterImageToBlock(const std::string& _entityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
+public:
+	bool addCenterImageToBlocks(const std::list<std::string>& _entityNames, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
+	bool removeCenterImageFromBlocks(const std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>>& _blocks);
 
 	void addContainer();
 

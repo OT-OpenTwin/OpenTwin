@@ -46,10 +46,39 @@ namespace ot {
 		//! @param _menuCfg Context menu config to fill.
 		virtual void fillContextMenu(const MenuRequestData* _requestData, MenuCfg& _menu) override;
 
+		virtual ot::GraphicsItemCfg* createBlockCfg() override;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Data accessors
+
+		void setCenterImage(const EntityBase& _entity, ot::ImageFileFormat _format) { setCenterImage(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
+		void setCenterImage(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
+		void removeCenterImage();
+		bool hasCenterImage() const { return m_centerImageUID != ot::invalidUID; };
+		ot::UID getCenterImageID() const { return m_centerImageUID; };
+		ot::UID getCenterImageVersion() const { return m_centerImageVersion; };
+		ot::ImageFileFormat getCenterImageFormat() const { return m_centerImageFormat; };
+		std::shared_ptr<EntityBinaryData> getCenterImageData();
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Protected
+
 	protected:
 		virtual void createNavigationTreeEntry() override;
 		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
+		virtual std::string getBlockBottomText() const;
+
+		void ensureCenterImageLoaded();
+
+	private:
+		ot::UID m_centerImageUID;
+		ot::UID m_centerImageVersion;
+		ot::ImageFileFormat m_centerImageFormat;
+		std::shared_ptr<EntityBinaryData> m_centerImageData;
 
 	};
 

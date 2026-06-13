@@ -117,7 +117,7 @@ void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _
 		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
 		previewImageDataEntity.setData(std::move(previewImageData));
 		previewImageDataEntity.storeToDataBase();
-		blockEntity.setPreviewFile(previewImageDataEntity, previewImageFormat);
+		blockEntity.setCenterImage(previewImageDataEntity, previewImageFormat);
 		newEntities.addDataEntity(blockCoordinates.getEntityID(), previewImageDataEntity);
 	}
 
@@ -435,7 +435,7 @@ void EntityHandler::addLabel() {
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added label", true, true);
 }
 
-void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
+void EntityHandler::updateProjectBlockCenterImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
 	// Load project entity
 	std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(_projectInfo.getEntityID(), _projectInfo.getEntityVersion()));
 	ot::EntityBlockHierarchicalProjectItem* projectEntity = dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity.get());
@@ -450,40 +450,40 @@ void EntityHandler::updateProjectImage(const ot::EntityInformation& _projectInfo
 		return;
 	}
 
-	// Remove existing preview image if existing
-	if (projectEntity->hasPreviewFile()) {
-		ot::UID previewFileID = projectEntity->getPreviewFileID();
-		projectEntity->removePreviewFile();
-		_removalEntities.push_back(previewFileID);
+	// Remove existing center image if existing
+	if (projectEntity->hasCenterImage()) {
+		ot::UID centerImageID = projectEntity->getCenterImageID();
+		projectEntity->removeCenterImage();
+		_removalEntities.push_back(centerImageID);
 	}
 
-	// Read preview image if existing
-	std::vector<char> previewImageData;
-	ot::ImageFileFormat previewImageFormat = ot::ImageFileFormat::PNG;
-	if (ModelState::readProjectPreviewImage(projectEntity->getProjectInformation().getCollectionName(), previewImageData, previewImageFormat)) {
+	// Read center image if existing
+	std::vector<char> centerImageData;
+	ot::ImageFileFormat centerImageFormat = ot::ImageFileFormat::PNG;
+	if (ModelState::readProjectPreviewImage(projectEntity->getProjectInformation().getCollectionName(), centerImageData, centerImageFormat)) {
 		const std::string serviceName = Application::instance().getServiceName();
-		// Create data entity for preview image
-		EntityBinaryData previewImageDataEntity;
-		previewImageDataEntity.setEntityID(_modelComponent->createEntityUID());
-		previewImageDataEntity.setData(std::move(previewImageData));
-		previewImageDataEntity.storeToDataBase();
+		// Create data entity for center image
+		EntityBinaryData centerImageDataEntity;
+		centerImageDataEntity.setEntityID(_modelComponent->createEntityUID());
+		centerImageDataEntity.setData(std::move(centerImageData));
+		centerImageDataEntity.storeToDataBase();
 
-		projectEntity->setPreviewFile(previewImageDataEntity, previewImageFormat);
+		projectEntity->setCenterImage(centerImageDataEntity, centerImageFormat);
 		projectEntity->storeToDataBase();
 
-		_newEntities.addDataEntity(projectEntity->getEntityID(), previewImageDataEntity);
+		_newEntities.addDataEntity(projectEntity->getEntityID(), centerImageDataEntity);
 	}
 
 	_updateEntities.addTopologyEntity(*projectEntity);
 }
 
-void EntityHandler::updateProjectImages(const std::list<ot::EntityInformation>& _projects) {
+void EntityHandler::updateProjectBlockCenterImages(const std::list<ot::EntityInformation>& _projects) {
 	std::list<ot::UID> removalUIDs;
 	ot::NewModelStateInfo newEntities;
 	ot::NewModelStateInfo updateEntities;
 	
 	for (const ot::EntityInformation& proj : _projects) {
-		updateProjectImage(proj, newEntities, updateEntities, removalUIDs);
+		updateProjectBlockCenterImage(proj, newEntities, updateEntities, removalUIDs);
 	}
 	if (newEntities.hasEntities()) {
 		ot::ModelServiceAPI::deleteEntitiesFromModel(removalUIDs, false);
@@ -492,7 +492,7 @@ void EntityHandler::updateProjectImages(const std::list<ot::EntityInformation>& 
 	}
 }
 
-bool EntityHandler::addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter) {
+bool EntityHandler::addCenterImageToBlock(const std::string& _entityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities) {
 	// Unpack data
 	uint64_t uncompressedLength = static_cast<uint64_t>(_uncompressedDataLength);
 	std::unique_ptr<uint8_t> unpackedData(ot::String::decompressBase64(_fileContent.c_str(), uncompressedLength));
@@ -508,36 +508,34 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 
 	// Get selected project
 	ot::EntityInformation projectInfo;
-	if (!ot::ModelServiceAPI::getEntityInformation(_projectEntityName, projectInfo)) {
-		OT_LOG_E("Could not determine entity information for project entity: \"" + _projectEntityName + "\"");
+	if (!ot::ModelServiceAPI::getEntityInformation(_entityName, projectInfo)) {
+		OT_LOG_E("Could not determine entity information for entity: \"" + _entityName + "\"");
 		return false;
 	}
 
 	// Load project entity
 	EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(projectInfo.getEntityID(), projectInfo.getEntityVersion());
 	if (!entity) {
-		OT_LOG_E("Could not read entity from database for project entity: \"" + _projectEntityName + "\"");
+		OT_LOG_E("Could not read entity from database for entity: \"" + _entityName + "\"");
 		return false;
 	}
-	std::unique_ptr<ot::EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity));
-	if (!projectEntity) {
-		OT_LOG_E("Entity is not of expected type for project entity { \"Entity\": \"" + _projectEntityName + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
+	std::unique_ptr<ot::EntityBlockHierarchicalBase> blockEntity(dynamic_cast<ot::EntityBlockHierarchicalBase*>(entity));
+	if (!blockEntity) {
+		OT_LOG_E("Entity is not of expected type { \"Entity\": \"" + _entityName + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
 		delete entity;
 		return false;
 	}
 
 	// Read position
 	ot::Point2DD pos;
-	if (!getCoordinate(projectEntity.get(), pos)) {
+	if (!getCoordinate(blockEntity.get(), pos)) {
 		return false;
 	}
 
-	if (projectEntity->hasPreviewFile()) {
-		ot::NewModelStateInfo update;
-
-		auto dataEntity = projectEntity->getPreviewFileData();
+	if (blockEntity->hasCenterImage()) {
+		auto dataEntity = blockEntity->getCenterImageData();
 		if (!dataEntity) {
-			OT_LOG_E("Could not load existing preview file data entity { \"ProjectEntity\": \"" + _projectEntityName + "\" }");
+			OT_LOG_E("Could not load existing preview file data entity { \"Entity\": \"" + _entityName + "\" }");
 			return false;
 		}
 
@@ -545,16 +543,13 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		dataEntity->setData(std::move(fileData));
 		dataEntity->storeToDataBase();
 
-		projectEntity->setPreviewFile(*dataEntity, format);
-		projectEntity->storeToDataBase();
+		blockEntity->setCenterImage(*dataEntity, format);
+		blockEntity->storeToDataBase();
 
-		update.addTopologyEntity(*projectEntity);
-		ot::ModelServiceAPI::updateTopologyEntities(update, "Changed image of project item");
+		_updateEntities.addTopologyEntity(*blockEntity);
 	}
 	else {
 		const std::string serviceName = Application::instance().getServiceName();
-		ot::NewModelStateInfo newData;
-		ot::NewModelStateInfo existingTopo;
 
 		// No previous image existing, create new one
 
@@ -564,54 +559,54 @@ bool EntityHandler::addImageToProject(const std::string& _projectEntityName, con
 		imageDataEntity.setData(reinterpret_cast<const char*>(unpackedData.get()), uncompressedLength);
 		imageDataEntity.storeToDataBase();
 
-		newData.addDataEntity(*projectEntity, imageDataEntity);
+		_newEntities.addDataEntity(*blockEntity, imageDataEntity);
 
 		// Set preview file in project entity
-		projectEntity->setPreviewFile(imageDataEntity, format);
-		projectEntity->storeToDataBase();
-		existingTopo.addTopologyEntity(*projectEntity);
-
-		ot::ModelServiceAPI::addEntitiesToModel(newData, "Added image to project item", true, false);
-		ot::ModelServiceAPI::updateTopologyEntities(existingTopo, "Set preview image for project item");
+		blockEntity->setCenterImage(imageDataEntity, format);
+		blockEntity->storeToDataBase();
+		_updateEntities.addTopologyEntity(*blockEntity);
 	}
 
 	return true;
 }
 
-bool EntityHandler::removeImageFromProjects(const std::list<ot::EntityInformation>& _projects) {
+bool EntityHandler::addCenterImageToBlocks(const std::list<std::string>& _entityNames, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter)
+{
+	std::list<ot::UID> removalUIDs;
+	ot::NewModelStateInfo newEntities;
+	ot::NewModelStateInfo updateEntities;
+
+	for (const std::string& block : _entityNames)
+	{
+		addCenterImageToBlock(block, _fileName, _fileContent, _uncompressedDataLength, _fileFilter, newEntities, updateEntities, removalUIDs);
+	}
+	if (updateEntities.hasEntities())
+	{
+		ot::ModelServiceAPI::deleteEntitiesFromModel(removalUIDs, false);
+		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated project images", false, false);
+		ot::ModelServiceAPI::updateTopologyEntities(updateEntities, "Updated project images");
+	}
+
+	return true;
+}
+
+bool EntityHandler::removeCenterImageFromBlocks(const std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>>& _blocks) {
 	ot::UIDList entitiesToDelete;
 	ot::NewModelStateInfo update;
 
-	for (const ot::EntityInformation& proj : _projects) {
-		auto entity = ot::EntityAPI::readEntityFromEntityIDandVersion(proj.getEntityID(), proj.getEntityVersion());
-		if (!entity) {
-			OT_LOG_W("Could not read project entity from database { \"EntityName: \"" + proj.getEntityName() + "\" }");
+	for (const std::unique_ptr<ot::EntityBlockHierarchicalBase>& block : _blocks) {
+		if (!block->hasCenterImage()) {
 			continue;
 		}
 
-		std::unique_ptr<ot::EntityBlockHierarchicalProjectItem> projectEntity(dynamic_cast<ot::EntityBlockHierarchicalProjectItem*>(entity));
-		if (!projectEntity) {
-			OT_LOG_W("Project entity is not of expected type { \"EntityName: \"" + proj.getEntityName() + "\", \"EntityType\": \"" + entity->getClassName() + "\" }");
-			continue;
-		}
+		OTAssert(block->getCenterImageID() != ot::invalidUID, "Entity has center image, but no center image ID set");
 
-		if (!projectEntity->hasPreviewFile()) {
-			continue;
-		}
+		entitiesToDelete.push_back(block->getCenterImageID());
 
-		ot::Point2DD pos;
-		if (!getCoordinate(projectEntity.get(), pos)) {
-			continue;
-		}
-
-		OTAssert(projectEntity->getPreviewFileID() != ot::invalidUID, "Project entity has preview file, but no preview file ID set");
-
-		entitiesToDelete.push_back(projectEntity->getPreviewFileID());
-		
-		projectEntity->removePreviewFile();
-		projectEntity->storeToDataBase();
-		update.addTopologyEntity(*projectEntity);
-	}	
+		block->removeCenterImage();
+		block->storeToDataBase();
+		update.addTopologyEntity(*block);
+	}
 
 	if (entitiesToDelete.empty()) {
 		OTAssert(update.getTopologyEntityIDs().empty(), "No entities to delete, but update contains topology entities");
@@ -643,6 +638,14 @@ void EntityHandler::addContainer() {
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
 	newContainer.setTreeItemSelectChildren(false);
 	newContainer.setCoordinateEntityID(coord.getEntityID());
+
+	newContainer.registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataHandle,
+		serviceName
+	);
+
 	newContainer.storeToDataBase();
 
 	newEntities.addDataEntity(newContainer.getEntityID(), coord);
