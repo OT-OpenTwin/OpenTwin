@@ -36,3 +36,13 @@ ot::EntityBlockHierarchicalContainerItem::EntityBlockHierarchicalContainerItem(o
 
 	resetModified();
 }
+
+bool ot::EntityBlockHierarchicalContainerItem::updateFromProperties()
+{
+	return EntityBlockHierarchicalBase::updateFromProperties();
+}
+
+void ot::EntityBlockHierarchicalContainerItem::createProperties()
+{
+	EntityBlockHierarchicalBase::createProperties();
+}

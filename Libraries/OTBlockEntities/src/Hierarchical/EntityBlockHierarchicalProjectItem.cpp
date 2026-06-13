@@ -49,29 +49,25 @@ bool ot::EntityBlockHierarchicalProjectItem::updateFromProperties() {
 	EntityPropertiesString* customVersionProp = PropertyHelper::getStringProperty(this, "Custom version");
 	OTAssertNullptr(customVersionProp);
 
-	updateGrid = (useLatestVersionProp == customVersionProp->getVisible());
+	updateGrid |= (useLatestVersionProp == customVersionProp->getVisible());
 	customVersionProp->setVisible(!useLatestVersionProp);
 
 	if (customVersionProp->getValue().empty()) {
 		customVersionProp->setValue("1");
 	}
 
-	getProperties().forceResetUpdateForAllProperties();
-
-	createBlockItem();
-
-	return updateGrid;
+	return updateGrid || EntityBlockHierarchicalBase::updateFromProperties();
 }
 
 void ot::EntityBlockHierarchicalProjectItem::createProperties() {
-	EntityBlockHierarchicalBase::createProperties();
-
 	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Project", "Use current version", true, "", getProperties());
 	prop->setToolTip("If enabled, the last active version will be used (same as opening the project regulary).");
 
 	prop = EntityPropertiesString::createProperty("Project", "Custom version", "1", "", getProperties());
 	prop->setToolTip("Specify a custom version to be used when opening the project.");
 	prop->setVisible(false);
+
+	EntityBlockHierarchicalBase::createProperties();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

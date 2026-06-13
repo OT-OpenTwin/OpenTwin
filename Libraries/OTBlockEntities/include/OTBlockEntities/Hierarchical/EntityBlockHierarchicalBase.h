@@ -35,6 +35,9 @@ namespace ot {
 
 		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
+		//! @brief Will be called whenever a property of the entity has changed.
+		//! Will reset the update flag for all properties and request the recreation of the block item.
+		//! Call this method at the end of the updateFromProperties() method of the derived class to ensure that the block item is updated with the new property values.
 		virtual bool updateFromProperties() override;
 		virtual void createProperties() override;
 
@@ -63,14 +66,42 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Property accessors
+
+		constexpr static std::string_view generalPropertyGroupName = "General";
+		constexpr static std::string_view titlePropertyGroupName = "Title";
+		constexpr static std::string_view centerImagePropertyGroupName = "Image";
+		constexpr static std::string_view footerPropertyGroupName = "Footer";
+
+		bool getUseCustomSize() const;
+		int getCustomWidth() const;
+		int getCustomHeight() const;
+		Size2DD getCustomSize() const;
+
+		std::string getCustomTitle() const;
+		Font getTitleFont() const;
+		const Painter2D* getTitlePainter() const;
+		Alignment getTitleAlignment() const;
+
+		bool getMaintainCenterImageAspectRatio() const;
+		Alignment getCenterImageAlignment() const;
+		int getCenterImageWidth() const;
+		int getCenterImageHeight() const;
+		Size2DD getCenterImageSize() const;
+
+		std::string getFooterText() const;
+		Font getFooterFont() const;
+		const Painter2D* getFooterPainter() const;
+		Alignment getFooterAlignment() const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		// Protected
 
 	protected:
 		virtual void createNavigationTreeEntry() override;
 		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
-
-		virtual std::string getBlockBottomText() const;
 
 		void ensureCenterImageLoaded();
 
@@ -79,6 +110,9 @@ namespace ot {
 		ot::UID m_centerImageVersion;
 		ot::ImageFileFormat m_centerImageFormat;
 		std::shared_ptr<EntityBinaryData> m_centerImageData;
+
+		void createTextProperties(const std::string& _group, bool _isTopText);
+		void createImageProperties(const std::string& _group, bool _isCenter);
 
 	};
 

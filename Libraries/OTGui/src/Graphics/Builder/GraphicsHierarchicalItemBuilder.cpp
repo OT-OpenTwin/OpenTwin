@@ -91,7 +91,8 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	// Main layout
 	GraphicsVBoxLayoutItemCfg* mLay = new GraphicsVBoxLayoutItemCfg;
 	mLay->setName(m_entityName + "_mLay");
-	mLay->setMinimumSize(Size2DD(50., 80.));
+	mLay->setMinimumSize(m_minimumSize);
+	mLay->setMaximumSize(m_maximumSize);
 	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
 	cStack->addItemTop(mLay, true, false);
 
@@ -104,7 +105,8 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 }
 
 ot::GraphicsHierarchicalItemBuilder::GraphicsHierarchicalItemBuilder()
-	: m_cornerRadius(5), m_connectorWidth(7.), m_connectorHeight(5.)
+	: m_cornerRadius(5), m_connectorWidth(7.), m_connectorHeight(5.),
+	  m_minimumSize(Size2DD(10., 10.)), m_maximumSize(Size2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()))
 {
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
 	this->setOutlinePainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
@@ -245,7 +247,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() cons
 	return shape;
 }
 
-void ot::GraphicsHierarchicalItemBuilder::createText(GraphicsLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const
+void ot::GraphicsHierarchicalItemBuilder::createText(GraphicsVBoxLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const
 {
 	if (_info.text.empty())
 	{
@@ -262,7 +264,7 @@ void ot::GraphicsHierarchicalItemBuilder::createText(GraphicsLayoutItemCfg* _lay
 	_layout->addChildItem(itm);
 }
 
-void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const
+void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const
 {
 	if (_info.data.empty() && _info.path.empty())
 	{
@@ -284,5 +286,5 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsLayoutItemCfg* _la
 	itm->setMinimumSize(_info.minimumSize);
 	itm->setMaximumSize(_info.maximumSize);
 
-	_layout->addChildItem(itm);
+	_layout->addChildItem(itm, 1);
 }

@@ -35,6 +35,9 @@ namespace ot {
 		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
 		virtual std::string getBlockFolderName() const override { return "Containers"; };
+
+		virtual bool updateFromProperties() override;
+		virtual void createProperties() override;
 	};
 
 }

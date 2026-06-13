@@ -34,7 +34,7 @@
 namespace ot {
 
 	class Painter2D;
-	class GraphicsLayoutItemCfg;
+	class GraphicsVBoxLayoutItemCfg;
 
 	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalItemBuilder {
 		OT_DECL_NOCOPY(GraphicsHierarchicalItemBuilder)
@@ -49,6 +49,10 @@ namespace ot {
 
 		//! @brief Set the entity name of the item.
 		void setEntityName(const std::string& _name) { m_entityName = _name; };
+
+		void setMinimumSize(const Size2DD& _size) { m_minimumSize = _size; };
+		void setMaximumSize(const Size2DD& _size) { m_maximumSize = _size; };
+		void setFixedSize(const Size2DD& _size) { m_minimumSize = _size; m_maximumSize = _size; };
 
 		void setTopText(const std::string& _text) { m_topText.text = _text; };
 		void setTopTextFont(const Font& _font) { m_topText.font = _font; };
@@ -141,10 +145,13 @@ namespace ot {
 		GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
 		GraphicsItemCfg* createShapeItem() const;
 
-		void createText(GraphicsLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const;
-		void createImage(GraphicsLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
+		void createText(GraphicsVBoxLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const;
+		void createImage(GraphicsVBoxLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
 
 		std::string m_entityName;
+
+		Size2DD m_minimumSize;
+		Size2DD m_maximumSize;
 
 		TextInfo m_topText;
 		ImageInfo m_centerImage;
