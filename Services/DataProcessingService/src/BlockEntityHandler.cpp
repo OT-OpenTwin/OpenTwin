@@ -84,7 +84,7 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 	return graphicsPicker;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName)
+std::map<ot::UID, std::shared_ptr<ot::EntityBlock>> BlockEntityHandler::findAllBlockEntitiesByBlockID(const std::string& _folderName)
 {
 	const std::string fullBlockFolderFile = _folderName + "/" + m_blockFolder;
 	std::list<std::string> blockItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullBlockFolderFile);
@@ -93,13 +93,13 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	ot::ModelServiceAPI::getEntityInformation(blockItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 	
-	std::map<ot::UID, std::shared_ptr<EntityBlock>> blockEntitiesByBlockID;
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>> blockEntitiesByBlockID;
 	for (auto& entityInfo : entityInfos)
 	{
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr)
 		{
-			std::shared_ptr<EntityBlock> blockEntity(dynamic_cast<EntityBlock*>(baseEntity));
+			std::shared_ptr<ot::EntityBlock> blockEntity(dynamic_cast<ot::EntityBlock*>(baseEntity));
 			if (blockEntity != nullptr)
 			{
 				blockEntitiesByBlockID[blockEntity->getEntityID()] = blockEntity;
@@ -109,19 +109,19 @@ std::map<ot::UID, std::shared_ptr<EntityBlock>> BlockEntityHandler::findAllBlock
 	return blockEntitiesByBlockID;
 }
 
-std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections(const std::string& _folderName) {
+std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> BlockEntityHandler::findAllEntityBlockConnections(const std::string& _folderName) {
 	const std::string fullFolderName = _folderName + "/" + m_connectionsFolder;
 	std::list<std::string> connectionItemNames = ot::ModelServiceAPI::getListOfFolderItems(fullFolderName);
 	std::list<ot::EntityInformation> entityInfos;
 	ot::ModelServiceAPI::getEntityInformation(connectionItemNames, entityInfos);
 	Application::instance()->prefetchDocumentsFromStorage(entityInfos);
 
-	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> entityBlockConnectionsByBlockID;
-	EntityBlockConnection temp;
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> entityBlockConnectionsByBlockID;
+	ot::EntityBlockConnection temp;
 	for (auto& entityInfo : entityInfos) {
 		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 		if (baseEntity != nullptr && baseEntity->getClassName() == temp.getClassName()) {
-			std::shared_ptr<EntityBlockConnection> blockEntityConnection(dynamic_cast<EntityBlockConnection*>(baseEntity));
+			std::shared_ptr<ot::EntityBlockConnection> blockEntityConnection(dynamic_cast<ot::EntityBlockConnection*>(baseEntity));
 			if (blockEntityConnection != nullptr)
 			{
 				entityBlockConnectionsByBlockID[blockEntityConnection->getEntityID()] = blockEntityConnection;

@@ -135,7 +135,7 @@ std::vector<std::string> NGSpice::convertToCircByLine(const std::string& lines) 
 	return circLines;
 }
 
-void NGSpice::connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	counter++;
 
@@ -242,7 +242,7 @@ void NGSpice::connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& 
 	return;
 }
 
-void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	counter++;
 
@@ -347,7 +347,7 @@ void NGSpice::connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDL
 
 }
 
-void NGSpice::handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	auto appInstance = Application::instance();
 	auto circuitMap = appInstance->getNGSpice().getMapOfCircuits();
@@ -494,7 +494,7 @@ bool NGSpice::checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElemen
 	
 }
 
-Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,ot::UID connection)
+Connection NGSpice::createConnection(std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities,ot::UID connection)
 {
 	auto it = allConnectionEntities.find(connection);
 	if (it != allConnectionEntities.end()) {
@@ -546,7 +546,7 @@ bool NGSpice::checkIfConnectionIsConnectedToVoltageMeter(std::string blockTitle)
 	
 }
 
-void NGSpice::setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
+void NGSpice::setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements)
 {
 	// First get all informations that needed
 	auto circuitMap = Application::instance()->getNGSpice().getMapOfCircuits();
@@ -592,7 +592,7 @@ void NGSpice::setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _con
 
 
 
-void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 
 
@@ -609,7 +609,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 
 	for (auto& blockEntityByID : allEntitiesByBlockID)
 	{
-		std::shared_ptr<EntityBlock> blockEntity = blockEntityByID.second;
+		std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByID.second;
 		it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 		it->second.addBlockEntity(blockEntity->getClassName(), blockEntity);
 		
@@ -884,7 +884,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 
 
 
-std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	
 	
@@ -1365,7 +1365,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	return _netlist;
 }
 
-std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
 {
 	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
 	
@@ -1389,7 +1389,7 @@ std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::
 	return simulationLine;
 }
 
-std::string NGSpice::generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+std::string NGSpice::generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
 {
 	EntityPropertiesSelection* variation = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Variation"));
 	EntityPropertiesString* np = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Number of Points"));
@@ -1404,7 +1404,7 @@ std::string NGSpice::generateNetlistACSimulation(EntityBase* solverEntity, std::
 	return simulationLine;
 }
 
-std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<EntityBlock>>&, std::string editorname)
+std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
 {
 	EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
 	EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
@@ -1417,7 +1417,7 @@ std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std
 	return simulationLine;
 }
 
-std::list<std::string> NGSpice::ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<EntityBlock>>& allEntitiesByBlockID,std::string editorname)
+std::list<std::string> NGSpice::ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {
 	
 	updateBufferClasses(_connectionBlockMap ,allConnectionEntities, allEntitiesByBlockID, editorname);
@@ -1477,7 +1477,7 @@ std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
 	}
 }
 
-std::shared_ptr<EntityBlock> NGSpice::getEntityBlock(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const {
+std::shared_ptr<ot::EntityBlock> NGSpice::getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const {
 	auto it = _allEntitiesByBlockID.find(_uid);
 	if (it != _allEntitiesByBlockID.end()) {
 		return it->second;

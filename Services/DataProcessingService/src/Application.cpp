@@ -103,7 +103,7 @@ void Application::runPipeline()
 				}
 				auto allBlockEntities = _blockEntityHandler.findAllBlockEntitiesByBlockID(folderName);
 				auto allConnectionEntities = _blockEntityHandler.findAllEntityBlockConnections(folderName);
-				std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntities, allBlockEntities);
+				std::map<ot::UID, ot::UIDList> connectionBlockMap = ot::BlockHelper::buildMap(allConnectionEntities, allBlockEntities);
 				const bool isValid = _graphHandler.blockDiagramIsValid(allConnectionEntities, allBlockEntities, connectionBlockMap);
 
 				if (isValid)

@@ -22,13 +22,13 @@
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Deco/EntityBlockDecoration.h"
 
-EntityBlockDecoration::EntityBlockDecoration(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+ot::EntityBlockDecoration::EntityBlockDecoration(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlock(_ID, _parent, _obs, _ms)
 {
 
 }
 
-bool EntityBlockDecoration::updateFromProperties() {
+bool ot::EntityBlockDecoration::updateFromProperties() {
 	bool updateGrid = false;
 
 	getProperties().forceResetUpdateForAllProperties();
@@ -38,7 +38,7 @@ bool EntityBlockDecoration::updateFromProperties() {
 	return updateGrid;
 }
 
-void EntityBlockDecoration::createProperties() {
+void ot::EntityBlockDecoration::createProperties() {
 	EntityBlock::createProperties();
 
 	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Block", "Lock Movement", false, "", getProperties());
@@ -59,43 +59,43 @@ void EntityBlockDecoration::createProperties() {
 
 // Property accessors
 
-void EntityBlockDecoration::setLockMovement(bool _lock) {
+void ot::EntityBlockDecoration::setLockMovement(bool _lock) {
 	PropertyHelper::setBoolPropertyValue(_lock, this, "Lock Movement", "Block");
 }
 
-bool EntityBlockDecoration::getLockMovement() const {
+bool ot::EntityBlockDecoration::getLockMovement() const {
 	return PropertyHelper::getBoolPropertyValue(this, "Lock Movement", "Block");
 }
 
-void EntityBlockDecoration::setZValue(int _zValue) {
+void ot::EntityBlockDecoration::setZValue(int _zValue) {
 	PropertyHelper::setIntegerPropertyValue(_zValue, this, "Z Value", "Block");
 }
 
-int EntityBlockDecoration::getZValue() const {
+int ot::EntityBlockDecoration::getZValue() const {
 	return PropertyHelper::getIntegerPropertyValue(this, "Z Value", "Block");
 }
 
-void EntityBlockDecoration::setRotation(double _rotation) {
+void ot::EntityBlockDecoration::setRotation(double _rotation) {
 	PropertyHelper::setDoublePropertyValue(_rotation, this, "Rotation", "Block");
 }
 
-double EntityBlockDecoration::getRotation() const {
+double ot::EntityBlockDecoration::getRotation() const {
 	return PropertyHelper::getDoublePropertyValue(this, "Rotation", "Block");
 }
 
-void EntityBlockDecoration::setFlipHorizontal(bool _flip) {
+void ot::EntityBlockDecoration::setFlipHorizontal(bool _flip) {
 	PropertyHelper::setBoolPropertyValue(_flip, this, "Flip Horizontal", "Block");
 }
 
-bool EntityBlockDecoration::getFlipHorizontal() const {
+bool ot::EntityBlockDecoration::getFlipHorizontal() const {
 	return PropertyHelper::getBoolPropertyValue(this, "Flip Horizontal", "Block");
 }
 
-void EntityBlockDecoration::setFlipVertical(bool _flip) {
+void ot::EntityBlockDecoration::setFlipVertical(bool _flip) {
 	PropertyHelper::setBoolPropertyValue(_flip, this, "Flip Vertical", "Block");
 }
 
-bool EntityBlockDecoration::getFlipVertical() const {
+bool ot::EntityBlockDecoration::getFlipVertical() const {
 	return PropertyHelper::getBoolPropertyValue(this, "Flip Vertical", "Block");
 }
 
@@ -103,15 +103,15 @@ bool EntityBlockDecoration::getFlipVertical() const {
 
 // Protected
 
-void EntityBlockDecoration::addStorageData(bsoncxx::builder::basic::document& _storage) {
+void ot::EntityBlockDecoration::addStorageData(bsoncxx::builder::basic::document& _storage) {
 	EntityBlock::addStorageData(_storage);
 }
 
-void EntityBlockDecoration::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void ot::EntityBlockDecoration::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 }
 
-void EntityBlockDecoration::applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const {
+void ot::EntityBlockDecoration::applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const {
 	_cfg->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemIsMoveable, !getLockMovement());
 	_cfg->setZValue(getZValue());
 

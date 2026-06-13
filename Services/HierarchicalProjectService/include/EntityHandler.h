@@ -66,7 +66,7 @@ public:
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
-	bool getCoordinate(const EntityBlock* _block, ot::Point2DD& _pos);
+	bool getCoordinate(const ot::EntityBlock* _block, ot::Point2DD& _pos);
 
 	const std::string c_rootFolderPath;
 	const std::string c_projectsFolder;

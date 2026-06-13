@@ -23,55 +23,59 @@
 #include "OTGui/Style/Font.h"
 #include "OTBlockEntities/Deco/EntityBlockDecoration.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoLabel : public EntityBlockDecoration {
-public:
-	EntityBlockDecoLabel() : EntityBlockDecoLabel(0, nullptr, nullptr, nullptr) {};
-	EntityBlockDecoLabel(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
+namespace ot {
 
-	static std::string className() { return "EntityBlockDecoLabel"; }
-	virtual std::string getClassName(void) const override { return EntityBlockDecoLabel::className(); };
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoLabel : public EntityBlockDecoration {
+	public:
+		EntityBlockDecoLabel() : EntityBlockDecoLabel(0, nullptr, nullptr, nullptr) {};
+		EntityBlockDecoLabel(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
-	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
-	virtual ot::GraphicsItemCfg* createBlockCfg() override;
-	virtual bool updateFromProperties() override;
+		static std::string className() { return "EntityBlockDecoLabel"; }
+		virtual std::string getClassName(void) const override { return EntityBlockDecoLabel::className(); };
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	virtual void createProperties() override;
+		virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
+		virtual ot::GraphicsItemCfg* createBlockCfg() override;
+		virtual bool updateFromProperties() override;
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		virtual void createProperties() override;
 
-	// Data accessors
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setText(const std::string& _text);
-	std::string getText() const;
+		// Data accessors
 
-	void setTextPainter(const ot::Painter2D* _painter);
-	const ot::Painter2D* getTextPainter() const;
+		void setText(const std::string& _text);
+		std::string getText() const;
 
-	void setFontFamily(ot::FontFamily _fontFamily);
-	void setFontFamily(const std::string& _fontFamily);
-	std::string getFontFamily() const;
+		void setTextPainter(const ot::Painter2D* _painter);
+		const ot::Painter2D* getTextPainter() const;
 
-	void setFontSize(int _fontSize);
-	int getFontSize() const;
+		void setFontFamily(ot::FontFamily _fontFamily);
+		void setFontFamily(const std::string& _fontFamily);
+		std::string getFontFamily() const;
 
-	void setBold(bool _bold);
-	bool getBold() const;
+		void setFontSize(int _fontSize);
+		int getFontSize() const;
 
-	void setItalic(bool _italic);
-	bool getItalic() const;
+		void setBold(bool _bold);
+		bool getBold() const;
 
-	void setFont(const ot::Font& _font);
-	ot::Font getFont() const;
+		void setItalic(bool _italic);
+		bool getItalic() const;
 
-	void setAlignment(ot::Alignment _alignment);
-	ot::Alignment getAlignment() const;
+		void setFont(const ot::Font& _font);
+		ot::Font getFont() const;
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		void setAlignment(ot::Alignment _alignment);
+		ot::Alignment getAlignment() const;
 
-	// Property accessors
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-protected:
-	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
-};
+		// Property accessors
+
+	protected:
+		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+	};
+
+}

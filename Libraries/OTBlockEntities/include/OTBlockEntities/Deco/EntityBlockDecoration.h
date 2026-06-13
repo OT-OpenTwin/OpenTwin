@@ -22,44 +22,48 @@
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoration : public EntityBlock {
-public:
-	EntityBlockDecoration() : EntityBlockDecoration(0, nullptr, nullptr, nullptr) {};
-	EntityBlockDecoration(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
+namespace ot {
 
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockDecoration : public EntityBlock {
+	public:
+		EntityBlockDecoration() : EntityBlockDecoration(0, nullptr, nullptr, nullptr) {};
+		EntityBlockDecoration(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms);
 
-	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
-	virtual bool updateFromProperties() override;
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
 
-	virtual void createProperties() override;
+		virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine; };
+		virtual bool updateFromProperties() override;
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		virtual void createProperties() override;
 
-	// Property accessors
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-	void setLockMovement(bool _lock);
-	bool getLockMovement() const;
+		// Property accessors
 
-	void setZValue(int _zValue);
-	int getZValue() const;
+		void setLockMovement(bool _lock);
+		bool getLockMovement() const;
 
-	void setRotation(double _rotation);
-	double getRotation() const;
+		void setZValue(int _zValue);
+		int getZValue() const;
 
-	void setFlipHorizontal(bool _flip);
-	bool getFlipHorizontal() const;
+		void setRotation(double _rotation);
+		double getRotation() const;
 
-	void setFlipVertical(bool _flip);
-	bool getFlipVertical() const;
+		void setFlipHorizontal(bool _flip);
+		bool getFlipHorizontal() const;
 
-	// ###########################################################################################################################################################################################################################################################################################################################
+		void setFlipVertical(bool _flip);
+		bool getFlipVertical() const;
 
-	// Protected
+		// ###########################################################################################################################################################################################################################################################################################################################
 
-protected:
-	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+		// Protected
 
-	void applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const;
-};
+	protected:
+		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
+		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+
+		void applyDecorationPropertiesToCfg(ot::GraphicsItemCfg* _cfg) const;
+	};
+
+}

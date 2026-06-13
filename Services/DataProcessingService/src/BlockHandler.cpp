@@ -20,7 +20,8 @@
 #include "BlockHandler.h"
 #include "OTCore/TimeFormatter.h"
 #include "SolverReport.h"
-BlockHandler::BlockHandler(EntityBlock* blockEntity, const HandlerMap& allHandler)
+
+BlockHandler::BlockHandler(ot::EntityBlock* blockEntity, const HandlerMap& allHandler)
 	:m_allHandler(allHandler)
 {
 	m_blockName = blockEntity->getName();

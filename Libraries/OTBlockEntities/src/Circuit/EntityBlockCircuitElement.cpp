@@ -26,7 +26,7 @@
 #include "OTModelEntities/EntityFileText.h"
 
 EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms) 
-	:EntityBlock(ID, parent, obs, ms)
+	: ot::EntityBlock(ID, parent, obs, ms)
 {
 	
 }

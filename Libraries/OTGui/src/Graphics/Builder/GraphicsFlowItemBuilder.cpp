@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
-#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/Builder/GraphicsFlowItemBuilder.h"
 
 #include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
 #include "OTGui/Graphics/GraphicsImageItemCfg.h"

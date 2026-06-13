@@ -149,7 +149,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 
 	// Ensure origin and destination entites are both blocks
 	for (const ot::EntityInformation& info : itemInfos) {
-		if (info.getEntityType() == EntityBlockConnection::className()) {
+		if (info.getEntityType() == ot::EntityBlockConnection::className()) {
 			OT_LOG_D("Connections between connection entities are not allowed");
 			return true;
 		}
@@ -172,7 +172,7 @@ bool EntityHandler::addConnection(const ot::GraphicsConnectionCfg& _connection) 
 	std::string newConnectionName = createNewUniqueTopologyName(c_connectionsFolder, connectionFromName + " >> " + connectionToName);
 
 	// Create connection entity
-	EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	ot::EntityBlockConnection connectionEntity(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	connectionEntity.createProperties();
 	connectionEntity.setName(newConnectionName);
 
@@ -340,7 +340,7 @@ void EntityHandler::addImage(const std::string& _fileName, const std::string& _f
 	coord.storeToDataBase();
 
 	// Create background image block entity
-	EntityBlockImage backgroundImageEntity;
+	ot::EntityBlockImage backgroundImageEntity;
 	backgroundImageEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	backgroundImageEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -411,7 +411,7 @@ void EntityHandler::addLabel() {
 	coord.storeToDataBase();
 
 	// Create background image block entity
-	EntityBlockDecoLabel labelEntity;
+	ot::EntityBlockDecoLabel labelEntity;
 	labelEntity.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	labelEntity.registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
@@ -697,7 +697,7 @@ bool EntityHandler::getImageFileFormat(const std::string& _filePath, std::string
 	}
 }
 
-bool EntityHandler::getCoordinate(const EntityBlock* _block, ot::Point2DD& _pos) {
+bool EntityHandler::getCoordinate(const ot::EntityBlock* _block, ot::Point2DD& _pos) {
 	ot::EntityInformation coordinateInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(_block->getCoordinateEntityID(), coordinateInfo)) {
 		OT_LOG_E("Could not determine entity information for project coordinate entity { \"Entity\": \"" + _block->getName() + "\", \"CoordinateID\": " + std::to_string(_block->getCoordinateEntityID()) + "\" }");

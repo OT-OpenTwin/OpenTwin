@@ -271,14 +271,14 @@ void ViewVisualisationHandler::setupGraphicsScene(EntityBase* _container)
 		std::list<EntityBase*> children = container->getChildrenList();
 		for (EntityBase* child : children)
 		{
-			EntityBlock* childBlock = dynamic_cast<EntityBlock*>(child);
+			ot::EntityBlock* childBlock = dynamic_cast<ot::EntityBlock*>(child);
 			if (childBlock != nullptr)
 			{
 				childBlock->createBlockItem();
 			}
 			else
 			{
-				EntityBlockConnection* connection = dynamic_cast<EntityBlockConnection*>(child);
+				ot::EntityBlockConnection* connection = dynamic_cast<ot::EntityBlockConnection*>(child);
 				if (connection != nullptr)
 				{
 					connection->createConnectionItem();

@@ -1,5 +1,5 @@
 // @otlicense
-// File: GraphicsHierarchicalProjectItemBuilder.h
+// File: GraphicsHierarchicalItemBuilder.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -32,9 +32,9 @@ namespace ot {
 
 	class Painter2D;
 
-	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalProjectItemBuilder {
-		OT_DECL_NOCOPY(GraphicsHierarchicalProjectItemBuilder)
-		OT_DECL_NOMOVE(GraphicsHierarchicalProjectItemBuilder)
+	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalItemBuilder {
+		OT_DECL_NOCOPY(GraphicsHierarchicalItemBuilder)
+		OT_DECL_NOMOVE(GraphicsHierarchicalItemBuilder)
 	public:
 		enum BackgroundImageInsertMode {
 			OnLayout,
@@ -45,8 +45,8 @@ namespace ot {
 		//! The callee takes ownership of the item.
 		ot::GraphicsItemCfg* createGraphicsItem() const;
 
-		GraphicsHierarchicalProjectItemBuilder();
-		virtual ~GraphicsHierarchicalProjectItemBuilder();
+		GraphicsHierarchicalItemBuilder();
+		virtual ~GraphicsHierarchicalItemBuilder();
 
 		//! @brief Sets the name for the root item.
 		//! The item name will be used as a prefix for the created child items (layouts and stacks).

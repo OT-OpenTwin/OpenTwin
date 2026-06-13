@@ -20,11 +20,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/QueryDescription/ValueComparisonDescription.h"
-#include "OTBlockEntities/EntityBlock.h"
-#include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
-class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public EntityBlock
+#include "OTCore/QueryDescription/ValueComparisonDescription.h"
+#include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
+
+class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public ot::EntityBlockPipelineBase
 {
 public:
 	EntityBlockDatabaseAccess() : EntityBlockDatabaseAccess(0, nullptr, nullptr, nullptr) {};

@@ -22,57 +22,60 @@
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockConnection : public EntityBase
-{
-public:
-	EntityBlockConnection() : EntityBlockConnection(0, nullptr, nullptr, nullptr) {};
-	EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
-	virtual ~EntityBlockConnection();
+namespace ot {
 
-	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockConnection : public EntityBase
+	{
+	public:
+		EntityBlockConnection() : EntityBlockConnection(0, nullptr, nullptr, nullptr) {};
+		EntityBlockConnection(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+		virtual ~EntityBlockConnection();
 
-	static std::string className() { return "EntityBlockConnection"; }
-	virtual std::string getClassName(void) const override { return EntityBlockConnection::className(); };
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+		virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
 
-	void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
-	ot::GraphicsConnectionCfg getConnectionCfg() const;
-	
-	void setGraphicsPickerKey(const std::string& _key);
-	const std::string& getGraphicsPickerKey() const { return m_pickerKey; };
+		static std::string className() { return "EntityBlockConnection"; }
+		virtual std::string getClassName(void) const override { return EntityBlockConnection::className(); };
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 
-	void setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape);
-	ot::GraphicsConnectionCfg::ConnectionShape getLineShape() const;
+		void setConnectionCfg(const ot::GraphicsConnectionCfg& connectionCfg);
+		ot::GraphicsConnectionCfg getConnectionCfg() const;
 
-	//! @brief The name of the container below the graphics editor. This name need not be editable. 
-	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
-	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
+		void setGraphicsPickerKey(const std::string& _key);
+		const std::string& getGraphicsPickerKey() const { return m_pickerKey; };
 
-	//! @brief Create the connection in the graphics scene.
-	//! @note Requires that an observer is set that is able to send messages to the viewer.
-	void createConnectionItem() const;
+		void setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape);
+		ot::GraphicsConnectionCfg::ConnectionShape getLineShape() const;
 
-	ot::JsonDocument createGraphicsRequestDocument() const;
+		//! @brief The name of the container below the graphics editor. This name need not be editable. 
+		//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
+		void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 
-	void createProperties();
-	virtual bool updateFromProperties() override;
-	virtual void addVisualizationNodes(void) override;
-	virtual int getSchemaVersion(void) override { return 1; };
+		//! @brief Create the connection in the graphics scene.
+		//! @note Requires that an observer is set that is able to send messages to the viewer.
+		void createConnectionItem() const;
 
-private:
-	ot::PenFCfg m_lineStyle;
+		ot::JsonDocument createGraphicsRequestDocument() const;
 
-	std::string m_pickerKey;
-	std::string	m_graphicsScenePackageChildName = "";
-	ot::UID m_blockIDOrigin;
-	ot::UID m_blockIDDestination;
-	std::string m_connectorNameOrigin;
-	std::string m_connectorNameDestination;
-	ot::Point2DD m_originPos;
-	ot::Point2DD m_destPos;
+		void createProperties();
+		virtual bool updateFromProperties() override;
+		virtual void addVisualizationNodes(void) override;
+		virtual int getSchemaVersion(void) override { return 1; };
 
-	void createNavigationTreeEntry();
-	void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
-};
+	private:
+		ot::PenFCfg m_lineStyle;
 
+		std::string m_pickerKey;
+		std::string	m_graphicsScenePackageChildName = "";
+		ot::UID m_blockIDOrigin;
+		ot::UID m_blockIDDestination;
+		std::string m_connectorNameOrigin;
+		std::string m_connectorNameDestination;
+		ot::Point2DD m_originPos;
+		ot::Point2DD m_destPos;
+
+		void createNavigationTreeEntry();
+		void addStorageData(bsoncxx::builder::basic::document& storage) override;
+		void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	};
+
+}

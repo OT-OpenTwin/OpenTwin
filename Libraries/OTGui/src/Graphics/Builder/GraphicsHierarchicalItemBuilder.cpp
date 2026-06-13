@@ -1,5 +1,5 @@
 // @otlicense
-// File: GraphicsHierarchicalProjectItemBuilder.cpp
+// File: GraphicsHierarchicalItemBuilder.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -19,13 +19,12 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
-#include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
+#include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 
 #include "OTGui/Graphics/GraphicsTextItemCfg.h"
 #include "OTGui/Graphics/GraphicsStackItemCfg.h"
 #include "OTGui/Graphics/GraphicsImageItemCfg.h"
 #include "OTGui/Graphics/GraphicsEllipseItemCfg.h"
-#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 #include "OTGui/Graphics/GraphicsTriangleItemCfg.h"
 #include "OTGui/Graphics/GraphicsRectangularItemCfg.h"
 
@@ -41,7 +40,7 @@
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Painter/RadialGradientPainter2D.h"
 
-ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsItem() const {
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() const {
 	OTAssert(!m_name.empty(), "No name provided");
 
 	// --- Create items ------------------------------------------------
@@ -164,7 +163,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createGraphicsI
 	return root;
 }
 
-ot::GraphicsHierarchicalProjectItemBuilder::GraphicsHierarchicalProjectItemBuilder()
+ot::GraphicsHierarchicalItemBuilder::GraphicsHierarchicalItemBuilder()
 	: m_titleBackgroundPainter(nullptr), m_titleForegroundPainter(nullptr), m_previewImageFormat(ot::ImageFileFormat::PNG),
 	m_previewImageMargins(10., 10., 10., 10.), m_connectorWidth(7.), m_connectorHeight(5.)
 {
@@ -172,15 +171,15 @@ ot::GraphicsHierarchicalProjectItemBuilder::GraphicsHierarchicalProjectItemBuild
 	this->setDefaultTitleForegroundGradient();
 }
 
-ot::GraphicsHierarchicalProjectItemBuilder::~GraphicsHierarchicalProjectItemBuilder() {}
+ot::GraphicsHierarchicalItemBuilder::~GraphicsHierarchicalItemBuilder() {}
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setTitleBackgroundPainter(ot::Painter2D* _painter) {
+void ot::GraphicsHierarchicalItemBuilder::setTitleBackgroundPainter(ot::Painter2D* _painter) {
 	if (m_titleBackgroundPainter == _painter) return;
 	if (m_titleBackgroundPainter) delete m_titleBackgroundPainter;
 	m_titleBackgroundPainter = _painter;
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setTitleBackgroundGradientColor(const ot::Color& _color) {
+void ot::GraphicsHierarchicalItemBuilder::setTitleBackgroundGradientColor(const ot::Color& _color) {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
@@ -195,21 +194,21 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setTitleBackgroundGradientColor
 	this->setTitleBackgroundPainter(painter);
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setTitleBackgroundColor(const ot::Color& _color) {
+void ot::GraphicsHierarchicalItemBuilder::setTitleBackgroundColor(const ot::Color& _color) {
 	this->setTitleBackgroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setTitleForegroundPainter(ot::Painter2D* _painter) {
+void ot::GraphicsHierarchicalItemBuilder::setTitleForegroundPainter(ot::Painter2D* _painter) {
 	if (m_titleForegroundPainter == _painter) return;
 	if (m_titleForegroundPainter) delete m_titleForegroundPainter;
 	m_titleForegroundPainter = _painter;
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setTitleForegroundColor(const ot::Color& _color) {
+void ot::GraphicsHierarchicalItemBuilder::setTitleForegroundColor(const ot::Color& _color) {
 	this->setTitleForegroundPainter(new ot::FillPainter2D(_color));
 }
 
-void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradient() {
+void ot::GraphicsHierarchicalItemBuilder::setDefaultTitleForegroundGradient() {
 	ot::RadialGradientPainter2D* painter = new ot::RadialGradientPainter2D;
 	painter->setCenterPoint(ot::Point2DD(0., 2.));
 	painter->setCenterRadius(2.5);
@@ -228,7 +227,7 @@ void ot::GraphicsHierarchicalProjectItemBuilder::setDefaultTitleForegroundGradie
 
 // Private: Helper
 
-ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnectorItem(Alignment _alignment) const {
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Alignment _alignment) const {
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
 	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
@@ -310,7 +309,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createConnector
 	return con;
 }
 
-ot::GraphicsItemCfg* ot::GraphicsHierarchicalProjectItemBuilder::createTitle() const {
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createTitle() const {
 	OTAssertNullptr(m_titleBackgroundPainter);
 	OTAssertNullptr(m_titleForegroundPainter);
 

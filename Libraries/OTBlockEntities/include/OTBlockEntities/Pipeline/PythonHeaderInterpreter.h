@@ -19,11 +19,14 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OTCore/JSON/JSON.h"
+#include "OTCore/Python/PythonHeaderAnalyser.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTBlockEntities/Connector.h"
+
+// std header
 #include <vector>
-#include "OTCore/Python/PythonHeaderAnalyser.h"
 
 class OT_BLOCKENTITIES_API_EXPORT PythonHeaderInterpreter
 {

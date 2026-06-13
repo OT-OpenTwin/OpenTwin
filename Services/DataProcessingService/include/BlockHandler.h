@@ -30,7 +30,7 @@ class BlockHandler : public BusinessLogicHandler
 public:
 	using HandlerMap = std::map<std::shared_ptr<GraphNode>, std::shared_ptr<BlockHandler>>;
 
-	BlockHandler(EntityBlock* _blockEntity, const HandlerMap& _allHandler);
+	BlockHandler(ot::EntityBlock* _blockEntity, const HandlerMap& _allHandler);
 	virtual ~BlockHandler() = default;
 	void executeOwnNode(std::shared_ptr<GraphNode> _ownNode);
 	virtual void setData(PipelineData* _data, const std::string& _targetPort);

@@ -25,7 +25,7 @@
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTBlockEntities/BlockConfigurationHelper.h"
 
-EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+ot::EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBase(ID, parent, obs, ms)
 {
 	ot::VisualisationTypes visTypes = getVisualizationTypes();
@@ -33,7 +33,7 @@ EntityBlock::EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, Mo
 	setDefaultVisualizationTypes(visTypes);
 }
 
-EntityBlock::~EntityBlock()
+ot::EntityBlock::~EntityBlock()
 {
 	if (m_coordinateEntity != nullptr)
 	{
@@ -42,13 +42,13 @@ EntityBlock::~EntityBlock()
 	}
 }
 
-void EntityBlock::addVisualizationNodes(void)
+void ot::EntityBlock::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
 	createBlockItem();
 }
 
-void EntityBlock::addConnector(const ot::Connector& connector)
+void ot::EntityBlock::addConnector(const ot::Connector& connector)
 {
 	if (m_connectorsByName.find(connector.getConnectorName()) == m_connectorsByName.end())
 	{
@@ -61,7 +61,7 @@ void EntityBlock::addConnector(const ot::Connector& connector)
 	}
 }
 
-void EntityBlock::addConnector(ot::Connector&& connector) {
+void ot::EntityBlock::addConnector(ot::Connector&& connector) {
 	if (m_connectorsByName.find(connector.getConnectorName()) == m_connectorsByName.end())
 	{
 		m_connectorsByName[connector.getConnectorName()] = std::move(connector);
@@ -73,7 +73,7 @@ void EntityBlock::addConnector(ot::Connector&& connector) {
 	}
 }
 
-void EntityBlock::removeConnector(const ot::Connector& connector)
+void ot::EntityBlock::removeConnector(const ot::Connector& connector)
 {
 	if (m_connectorsByName.find(connector.getConnectorName()) != m_connectorsByName.end())
 	{
@@ -86,12 +86,12 @@ void EntityBlock::removeConnector(const ot::Connector& connector)
 	}
 }
 
-void EntityBlock::clearConnectors() {
+void ot::EntityBlock::clearConnectors() {
 	m_connectorsByName.clear();
 	setModified();
 }
 
-ot::Connector EntityBlock::getConnectorByName(const std::string& _connectorName) const {
+ot::Connector ot::EntityBlock::getConnectorByName(const std::string& _connectorName) const {
 	auto it = m_connectorsByName.find(_connectorName);
 	if (it != m_connectorsByName.end()) {
 		return it->second;
@@ -102,22 +102,22 @@ ot::Connector EntityBlock::getConnectorByName(const std::string& _connectorName)
 	}
 }
 
-void EntityBlock::setGraphicsPickerKey(const std::string& _key) {
+void ot::EntityBlock::setGraphicsPickerKey(const std::string& _key) {
 	if (_key != m_graphicsPickerKey) {
 		m_graphicsPickerKey = _key;
 		setModified();
 	}
 }
 
-void EntityBlock::createProperties() {
+void ot::EntityBlock::createProperties() {
 
 }
 
-ot::GraphicsConnectionCfg::ConnectionShape EntityBlock::getDefaultConnectionShape() const {
+ot::GraphicsConnectionCfg::ConnectionShape ot::EntityBlock::getDefaultConnectionShape() const {
 	return ot::GraphicsConnectionCfg::ConnectionShape::DirectLine;
 }
 
-std::string EntityBlock::createBlockHeadline() const
+std::string ot::EntityBlock::createBlockHeadline() const
 {
 	const std::string nameWithoutRootDirectory = getName().substr(getName().find_last_of("/") + 1, getName().size());
 	//const std::string blockTitel = m_blockTitle + ": " + nameWithoutRootDirectory;
@@ -125,7 +125,7 @@ std::string EntityBlock::createBlockHeadline() const
 	else return nameWithoutRootDirectory;
 }
 
-std::string EntityBlock::serialiseAsJSON()
+std::string ot::EntityBlock::serialiseAsJSON()
 {
 	auto docBlock = EntityBase::serialiseAsMongoDocument();
 	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
@@ -143,7 +143,7 @@ std::string EntityBlock::serialiseAsJSON()
 	return entireDoc.toJson();
 }
 
-bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+bool ot::EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
 {
 	try
 	{
@@ -173,7 +173,7 @@ bool EntityBlock::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation,
 	}
 }
 
-void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
+void ot::EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBase::addStorageData(storage);
 	
@@ -192,7 +192,7 @@ void EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(bsoncxx::builder::basic::kvp("Connectors", connectorsArray));
 }
 
-void EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void ot::EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBase::readSpecificDataFromDataBase(doc_view, entityMap);
 	
@@ -226,7 +226,7 @@ void EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view& do
 	}
 }
 
-void EntityBlock::createNavigationTreeEntry()
+void ot::EntityBlock::createNavigationTreeEntry()
 {
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_AddContainerNode, doc.GetAllocator()), doc.GetAllocator());
@@ -237,14 +237,14 @@ void EntityBlock::createNavigationTreeEntry()
 		getObserver()->sendMessageToViewer(doc);
 }
 
-void EntityBlock::createBlockItem()
+void ot::EntityBlock::createBlockItem()
 {
 	OTAssertNullptr(getObserver());
 	ot::JsonDocument doc = createGraphicsRequestDocument();
 	getObserver()->sendMessageToViewer(doc);
 }
 
-ot::JsonDocument EntityBlock::createGraphicsRequestDocument() {
+ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument() {
 	OTAssertNullptr(getModelState());
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
@@ -261,7 +261,7 @@ ot::JsonDocument EntityBlock::createGraphicsRequestDocument() {
 	return createGraphicsRequestDocument(entCoordinate->getCoordinates());
 }
 
-ot::JsonDocument EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& _position) {
+ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& _position) {
 	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
 
 	if (!blockCfg) {
@@ -291,30 +291,4 @@ ot::JsonDocument EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& 
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
 
 	return reqDoc;
-}
-
-void EntityBlock::addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) const
-{
-	for (const auto& connectorByName : m_connectorsByName)
-	{
-		const ot::Connector& connector = connectorByName.second;
-		ot::ConnectorType connectorType = connector.getConnectorType();
-		if (connectorType == ot::ConnectorType::UNKNOWN) {
-			OT_LOG_E("Unknown connector type");
-		}
-		const std::string connectorName = connector.getConnectorName();
-		const std::string connectorTitle = connector.getConnectorTitle();
-		if (connectorType == ot::ConnectorType::In)
-		{
-			_flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
-		}
-		else if (connectorType == ot::ConnectorType::InOptional)
-		{
-			_flowBlockBuilder.addLeft(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::Circle);
-		}
-		else if (connectorType == ot::ConnectorType::Out)
-		{
-			_flowBlockBuilder.addRight(connectorName, connectorTitle, ot::GraphicsFlowItemConnector::TriangleRight);
-		}
-	}
 }

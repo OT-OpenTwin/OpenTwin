@@ -1652,7 +1652,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 
-	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity);
+	ot::EntityBlock* blockEntity = dynamic_cast<ot::EntityBlock*>(entity);
 	if (blockEntity != nullptr)
 	{
 		blockEntity->createBlockItem();
@@ -2297,7 +2297,7 @@ std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& 
 
 	for (auto entity : allEntitiesForDeletion)
 	{
-		const bool entityIsABlockEntity = dynamic_cast<EntityBlock*>(entity) != nullptr;
+		const bool entityIsABlockEntity = dynamic_cast<ot::EntityBlock*>(entity) != nullptr;
 		if (entityIsABlockEntity)
 		{
 			// Now check whether a parent of the item is part of the list as well and if this parent is also a block entity.
@@ -2310,7 +2310,7 @@ std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& 
 			{
 				if (entityMap.find(currentEntity) != entityMap.end())
 				{
-					const bool parentIsABlockEntity = dynamic_cast<EntityBlock*>(currentEntity) != nullptr;
+					const bool parentIsABlockEntity = dynamic_cast<ot::EntityBlock*>(currentEntity) != nullptr;
 					if (parentIsABlockEntity)
 					{
 						parentFoundAndIsBlock = true;

@@ -54,7 +54,7 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 		return;
 	}
 
-	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
+	ot::EntityBlock* entBlock = dynamic_cast<ot::EntityBlock*>(_entBase);
 	if (entBlock) {
 		EntityGraphicsScene* editor = findGraphicsScene(entBlock->getName());
 		if (!editor) {
@@ -65,7 +65,7 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 		return;
 	}
 
-	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
+	ot::EntityBlockConnection* entBlockConnection = dynamic_cast<ot::EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
 		EntityGraphicsScene* editor = findGraphicsScene(entBlockConnection->getName());
 		if (!editor) {
@@ -77,7 +77,7 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 	}
 }
 
-void BlockHandler::addConnection(ot::UID _editorId, const EntityBlockConnection& _toBeAddedConnection) {
+void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
 	ot::UID originUid = _toBeAddedConnection.getConnectionCfg().getOriginUid();
 	ot::UID destUid = _toBeAddedConnection.getConnectionCfg().getDestinationUid();
 	ot::UID connectionId = _toBeAddedConnection.getEntityID();
@@ -97,7 +97,7 @@ void BlockHandler::addConnection(ot::UID _editorId, const EntityBlockConnection&
 	}
 }
 
-void BlockHandler::addBlock(ot::UID _editorId, const EntityBlock* _block) {
+void BlockHandler::addBlock(ot::UID _editorId, const ot::EntityBlock* _block) {
 	auto& blocksMap = getOrCreateBlockMap(_editorId);
 	blocksMap.emplace(_block->getEntityID(), ot::UIDList{});
 }
@@ -126,7 +126,7 @@ void BlockHandler::removeFromMap(EntityBase* _entBase) {
 	}
 
 	// Check if block with id exists - if yes remove the block with its connections
-	EntityBlock* entBlock = dynamic_cast<EntityBlock*>(_entBase);
+	ot::EntityBlock* entBlock = dynamic_cast<ot::EntityBlock*>(_entBase);
 	if (entBlock) {
 		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end();) {
 			auto& blocks = itEditor->second;
@@ -143,7 +143,7 @@ void BlockHandler::removeFromMap(EntityBase* _entBase) {
 	}
 
 	// Check if connection with id exists - if yes remove the connection
-	EntityBlockConnection* entBlockConnection = dynamic_cast<EntityBlockConnection*>(_entBase);
+	ot::EntityBlockConnection* entBlockConnection = dynamic_cast<ot::EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
 		for (auto& [editorId, blocks] : m_viewBlockConnectionsMap) {
 			for (auto& [blockId, connections] : blocks) {
@@ -168,7 +168,7 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 		return;
 	}
 
-	EntityBlock* blockToRemove = dynamic_cast<EntityBlock*>(_entityToRemove);
+	ot::EntityBlock* blockToRemove = dynamic_cast<ot::EntityBlock*>(_entityToRemove);
 	if (blockToRemove) {
 		// Go through all editors
 		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); itEditor++) {
@@ -194,7 +194,7 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 	}
 }
 
-void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection) {
+void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, ot::EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection) {
 
 	ot::UID origin = _changedConnection.getOriginUid();
 	ot::UID destination = _changedConnection.getDestinationUid();
@@ -328,7 +328,7 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	ot::NewModelStateInfo modelStateInfo;
 
-	std::shared_ptr<EntityBlock> createdBlock = createBlockEntity(editor, _eventData.getScenePos(), _eventData.getItemName(), modelStateInfo);
+	std::shared_ptr<ot::EntityBlock> createdBlock = createBlockEntity(editor, _eventData.getScenePos(), _eventData.getItemName(), modelStateInfo);
 	if (createdBlock == nullptr) {
 		OT_LOG_E("Could not create block entity { \"BlockName\": \"" + _eventData.getItemName() + "\" }");
 		return ot::ReturnMessage::Failed;
@@ -360,7 +360,7 @@ ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoub
 
 	const ot::JsonDocument fwdDoc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(fwdEvent);
 
-	EntityBlock* block = dynamic_cast<EntityBlock*>(model->getEntityByID(_eventData.getItemUid()));
+	ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(model->getEntityByID(_eventData.getItemUid()));
 	if (!block) {
 		OT_LOG_E("Could not find block entity { \"UID\": " + std::to_string(_eventData.getItemUid()) + ", \"Name\": \"" + _eventData.getItemName() + "\" }");
 		return ot::ReturnMessage::Failed;
@@ -428,17 +428,17 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 	}
 
 	// Check connection type
-	EntityBlockConnection* originConnection = dynamic_cast<EntityBlockConnection*>(originEntityBase);
+	ot::EntityBlockConnection* originConnection = dynamic_cast<ot::EntityBlockConnection*>(originEntityBase);
 	if (originConnection)
 	{
-		EntityBlockConnection* destinationConnection = dynamic_cast<EntityBlockConnection*>(destinationEntityBase);
+		ot::EntityBlockConnection* destinationConnection = dynamic_cast<ot::EntityBlockConnection*>(destinationEntityBase);
 		if (destinationConnection) {
 			// Conenction to connection
 			OT_LOG_W("Connection to connection not supported yet");
 		}
 		else {
 			// Block to connection (reversed)
-			EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+			ot::EntityBlock* destinationBlock = dynamic_cast<ot::EntityBlock*>(destinationEntityBase);
 			if (!destinationBlock) {
 				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
 				return ot::ReturnMessage::Failed;
@@ -450,13 +450,13 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 		}
 	}
 	else {
-		EntityBlock* originBlock = dynamic_cast<EntityBlock*>(originEntityBase);
+		ot::EntityBlock* originBlock = dynamic_cast<ot::EntityBlock*>(originEntityBase);
 		if (!originBlock) {
 			OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(originEntityBase->getEntityID()) + "\" }");
 			return ot::ReturnMessage::Failed;
 		}
 
-		EntityBlockConnection* destinationConnection = dynamic_cast<EntityBlockConnection*>(destinationEntityBase);
+		ot::EntityBlockConnection* destinationConnection = dynamic_cast<ot::EntityBlockConnection*>(destinationEntityBase);
 		if (destinationConnection) {
 			// Block to connection
 			if (!createBlockToConnectionConnection(editor, originBlock, destinationConnection, _eventData, false)) {
@@ -466,7 +466,7 @@ ot::ReturnMessage BlockHandler::graphicsConnectionRequested(const ot::GraphicsCo
 		}
 		else {
 			// Block to block
-			EntityBlock* destinationBlock = dynamic_cast<EntityBlock*>(destinationEntityBase);
+			ot::EntityBlock* destinationBlock = dynamic_cast<ot::EntityBlock*>(destinationEntityBase);
 			if (!destinationBlock) {
 				OT_LOG_E("Could not cast to EntityBlock { \"EntityUID\": " + std::to_string(destinationEntityBase->getEntityID()) + "\" }");
 				return ot::ReturnMessage::Failed;
@@ -545,7 +545,7 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 	const std::list<ot::GraphicsChangeEvent::SnapInfo>& snapInfos = _changeEvent.getSnapInfos();
 	if(!snapInfos.empty()) {
 		ot::NewModelStateInfo modelStateInfo;
-		std::set<EntityBlockConnection*> processedConnections;
+		std::set<ot::EntityBlockConnection*> processedConnections;
 		ot::GraphicsConnectionCfg connectionCfg;
 		for (const ot::GraphicsChangeEvent::SnapInfo& snapInfo : snapInfos) {
 			if (!snapConnection(editor, snapInfo, connectionCfg, processedConnections)) {
@@ -554,7 +554,7 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 			}
 		}
 
-		for (EntityBlockConnection* conn : processedConnections) {
+		for (ot::EntityBlockConnection* conn : processedConnections) {
 			conn->storeToDataBase();
 			modelStateInfo.addTopologyEntity(*conn);
 		}
@@ -584,7 +584,7 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 
 // Private: Helper
 
-bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData) {
+bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, ot::EntityBlock* _originBlock, ot::EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
@@ -594,8 +594,8 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	// Get connectionCfg
 	ot::GraphicsConnectionCfg connection = _eventData.getConnectionCfg();
 	
-	if (_originBlock->getClassName() == EntityBlockCircuitConnector::className() ||
-		_destinationBlock->getClassName() == EntityBlockCircuitConnector::className()) {
+	if (_originBlock->getClassName() == ot::EntityBlockCircuitConnector::className() ||
+		_destinationBlock->getClassName() == ot::EntityBlockCircuitConnector::className()) {
 
 		// Find connectors
 		auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
@@ -624,7 +624,7 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	
 	ot::EntityName::NamingBehavior connectionNaming;
 	connection.setUid(model->createEntityUID());
-	std::unique_ptr<EntityBlockConnection> createdConnection = createConnection(_scene, _originBlock, connection, connectionNaming, false, modelStateInfo);
+	std::unique_ptr<ot::EntityBlockConnection> createdConnection = createConnection(_scene, _originBlock, connection, connectionNaming, false, modelStateInfo);
 	
 	if (createdConnection) {
 		// Add the created connection to the model
@@ -637,7 +637,7 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, Ent
 	}
 }
 
-bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed) {
+bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene, ot::EntityBlock* _originBlock, ot::EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
@@ -647,12 +647,12 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	}
 
 	// Here I want to get all block/connection entities
-	std::map<ot::UID, EntityBlock*> blockEntities;
-	std::map<ot::UID, EntityBlockConnection*> connectionEntities;
+	std::map<ot::UID, ot::EntityBlock*> blockEntities;
+	std::map<ot::UID, ot::EntityBlockConnection*> connectionEntities;
 	std::list<std::string> entitiesToDelete;
 	std::list<ot::GraphicsConnectionCfg> newConnections;
 
-	std::queue<std::pair<std::string, EntityBlock*>> connectedElements;
+	std::queue<std::pair<std::string, ot::EntityBlock*>> connectedElements;
 	auto blocks = model->getListOfFolderItems(_scene->getName(), true);
 	auto connections = model->getListOfFolderItems(_scene->getName() + "/" + m_connectionsFolder, true);
 
@@ -662,7 +662,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 			OT_LOG_E("Could not find block entity { \"Name\": \"" + block + "\" }");
 			return false;
 		}
-		EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(baseEntity);
+		ot::EntityBlock* blockEntity = dynamic_cast<ot::EntityBlock*>(baseEntity);
 		if (!blockEntity) {
 			//OT_LOG_E("Could not cast to EntityBlock { \"Name\": \"" + block + "\" }");
 			continue;
@@ -676,7 +676,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 			OT_LOG_E("Could not find connection entity { \"Name\": \"" + connection + "\" }");
 			return false;
 		}
-		EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(baseEntity);
+		ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(baseEntity);
 		if (!connectionEntity) {
 			//OT_LOG_E("Could not cast to EntityBlockConnection { \"Name\": \"" + connection + "\" }");
 			continue;
@@ -695,16 +695,16 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	ot::GraphicsConnectionCfg connectionCfg = _destinationConnection->getConnectionCfg();
 
 	// First get the connection which needs to be deleted by the new connection
-	std::unique_ptr<EntityBlock> connector = nullptr;
+	std::unique_ptr<ot::EntityBlock> connector = nullptr;
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
-		connector = createBlockEntity(_scene, requestedConnection.getDestPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
+		connector = createBlockEntity(_scene, requestedConnection.getDestPos(), ot::EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 	else {
 		// Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
-		connector = createBlockEntity(_scene, requestedConnection.getOriginPos(), EntityBlockCircuitConnector::className(), _modelStateInfo);
+		connector = createBlockEntity(_scene, requestedConnection.getOriginPos(), ot::EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 
 	if (!connector) {
@@ -759,7 +759,7 @@ bool BlockHandler::updateBlock(const ot::GraphicsItemCfg* _changedBlock, const o
 
 	// Get EntityBlock
 	auto entBase = model->getEntityByID(blockID);
-	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(entBase);
+	ot::EntityBlock* blockEnt = dynamic_cast<ot::EntityBlock*>(entBase);
 	if (!blockEnt) {
 		OT_LOG_E("BlockEntity not found { \"EntityID\": " + std::to_string(blockID) + " }");
 		return false;
@@ -846,7 +846,7 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 
 	// Get connection entity
 	auto entBase = model->getEntityByID(connectionID);
-	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
+	ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
 		OT_LOG_E("BlockEntity not found { \"EntityID\": " + std::to_string(connectionID) + " }");
 		return false;
@@ -877,7 +877,7 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	return true;
 }
 
-std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName, ot::NewModelStateInfo& _newModelStateInfo) {
+std::unique_ptr<ot::EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 	
@@ -888,7 +888,7 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 		return nullptr;
 	}
 
-	std::unique_ptr<EntityBlock> blockEnt(dynamic_cast<EntityBlock*>(entBase));
+	std::unique_ptr<ot::EntityBlock> blockEnt(dynamic_cast<ot::EntityBlock*>(entBase));
 	if (blockEnt == nullptr) {
 		OT_LOG_E("Could not cast to EntityBlock { \"EntityID\": " + std::to_string(entBase->getEntityID()) + " }");
 		return nullptr;
@@ -956,12 +956,12 @@ std::unique_ptr<EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsScene
 	return blockEnt;
 }
 
-std::unique_ptr<EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo) {
+std::unique_ptr<ot::EntityBlockConnection> BlockHandler::createConnection( EntityGraphicsScene* _scene, ot::EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _connectionCfg, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
 	// Create connection entity
-	std::unique_ptr<EntityBlockConnection> connectionEntity(new EntityBlockConnection(_connectionCfg.getUid(), nullptr, nullptr, nullptr));
+	std::unique_ptr<ot::EntityBlockConnection> connectionEntity(new ot::EntityBlockConnection(_connectionCfg.getUid(), nullptr, nullptr, nullptr));
 	connectionEntity->createProperties();
 	connectionEntity->setCallbackData(_scene->getCallbackData());
 	connectionEntity->setGraphicsPickerKey(_scene->getGraphicsPickerKey());
@@ -1011,13 +1011,13 @@ void BlockHandler::modifyConnection(const ot::UID& _connectionID, EntityBase* _c
 		OT_LOG_E("Entity not found { \"ConnectionID\": " + std::to_string(_connectionID) + " }");
 		return;
 	}
-	EntityBlockConnection* connectionEntity = dynamic_cast<EntityBlockConnection*>(entBase);
+	ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(entBase);
 	if (!connectionEntity) {
 		OT_LOG_E("EntityBlockConnection cast failed { \"ConnectionID\": " + std::to_string(_connectionID) + " }");
 		return;
 	}
 
-	EntityBlock* blockEnt = dynamic_cast<EntityBlock*>(_connectedBlockEntity);
+	ot::EntityBlock* blockEnt = dynamic_cast<ot::EntityBlock*>(_connectedBlockEntity);
 	if (!blockEnt) {
 		OT_LOG_E("EntityBlock cast failed { \"EntityID\": " + std::to_string(_connectedBlockEntity->getEntityID()) + " }");
 		return;
@@ -1048,7 +1048,7 @@ void BlockHandler::modifyConnection(const ot::UID& _connectionID, EntityBase* _c
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 }
 
-bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg, std::set<EntityBlockConnection*>& _processedConnections) {
+bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg, std::set<ot::EntityBlockConnection*>& _processedConnections) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);
 
@@ -1060,7 +1060,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	}
 
 	//Cast to EntityBlockConnection
-	EntityBlockConnection* connectionEnt = dynamic_cast<EntityBlockConnection*>(baseEnt);
+	ot::EntityBlockConnection* connectionEnt = dynamic_cast<ot::EntityBlockConnection*>(baseEnt);
 	if (!connectionEnt) {
 		OT_LOG_E("Could not cast to EntityBlockConnection { \"EntityID\": " + std::to_string(_snapInfo.connectionCfg.getUid()) + " }");
 		return false;
@@ -1094,7 +1094,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 		return false;
 	}
 
-	EntityBlock* snapBlock = dynamic_cast<EntityBlock*>(snapEntity);
+	ot::EntityBlock* snapBlock = dynamic_cast<ot::EntityBlock*>(snapEntity);
 	if (!snapBlock) {
 		OT_LOG_E("BlockEntity cast failed { \"EntityID\": " + std::to_string(snapEntity->getEntityID()) + " }");
 		return false;
@@ -1102,7 +1102,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 
 	// Check if the other entity exists
 	bool bothItemsExist = true;
-	EntityBlock* otherBlock = nullptr;
+	ot::EntityBlock* otherBlock = nullptr;
 	if (!blockExists(_scene->getEntityID(), otherUid)) {
 		if (isOrigin) {
 			connectionCfg.setDestUid(ot::invalidUID);
@@ -1120,7 +1120,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 			OT_LOG_E((isOrigin ? "Destination" : "Origin") + std::string(" entity not found { \"EntityID\": ") + std::to_string(otherUid) + " }");
 			return false;
 		}
-		otherBlock = dynamic_cast<EntityBlock*>(otherEntity);
+		otherBlock = dynamic_cast<ot::EntityBlock*>(otherEntity);
 		if (!otherBlock) {
 			OT_LOG_E("BlockEntity cast failed { \"EntityID\": " + std::to_string(otherEntity->getEntityID()) + " }");
 			return false;
@@ -1130,8 +1130,8 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	// Validate connector types if both items exist and neither is a circuit connector
 	if (bothItemsExist && snapBlock->getClassName() != "EntityBlockCircuitConnector" && otherBlock->getClassName() != "EntityBlockCircuitConnector") {
 		// Determine which block is origin and which is destination
-		EntityBlock* originBlock = isOrigin ? snapBlock : otherBlock;
-		EntityBlock* destBlock = isOrigin ? otherBlock : snapBlock;
+		ot::EntityBlock* originBlock = isOrigin ? snapBlock : otherBlock;
+		ot::EntityBlock* destBlock = isOrigin ? otherBlock : snapBlock;
 		const std::string& originConnectorName = isOrigin ? snapConnectable : otherConnectable;
 		const std::string& destConnectorName = isOrigin ? otherConnectable : snapConnectable;
 
