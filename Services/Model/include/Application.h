@@ -170,7 +170,8 @@ public:
 
 	void handleImportTableFile(ot::JsonDocument& _document);
 
-	void handleExportFilesToLibraryCallback(ot::JsonDocument& _document);
+	void handleExportDialog(ot::JsonDocument& _document);
+
 
 	// ##################################################################################################################################################################################################################
 
