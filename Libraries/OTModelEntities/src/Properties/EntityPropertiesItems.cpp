@@ -693,6 +693,7 @@ EntityPropertiesString* EntityPropertiesString::createProperty(const std::string
 	// Finally create the new property
 	EntityPropertiesString* newProperty = new EntityPropertiesString(name, value);
 	newProperty->setIsMultiline(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultBool(defaultCategory, name + "_Multiline", false));
+	newProperty->setPlaceholderText(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name + "_Placeholder", ""));
 	properties.createProperty(newProperty, group);
 	return newProperty;
 }
@@ -722,6 +723,7 @@ EntityPropertiesString::EntityPropertiesString(const EntityPropertiesString& oth
 {
 	m_value = other.m_value;
 	m_isMultiline = other.m_isMultiline;
+	m_placeholderText = other.m_placeholderText;
 }
 
 void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
@@ -729,6 +731,7 @@ void EntityPropertiesString::addToConfiguration(ot::PropertyGridCfg& _configurat
 	ot::PropertyString* newProp = new ot::PropertyString(this->getName(), m_value);
 	this->setupPropertyData(_configuration, newProp);
 	newProp->setMultiline(m_isMultiline);
+	newProp->setPlaceholderText(m_placeholderText);
 }
 
 void EntityPropertiesString::setFromConfiguration(const ot::Property* _property, EntityBase* _root)
@@ -743,6 +746,7 @@ void EntityPropertiesString::setFromConfiguration(const ot::Property* _property,
 
 	setValue(actualProperty->getValue());
 	setIsMultiline(actualProperty->isMultiline());
+	setPlaceholderText(actualProperty->getPlaceholderText());
 }
 
 void EntityPropertiesString::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
@@ -750,6 +754,7 @@ void EntityPropertiesString::addToJsonObject(ot::JsonObject& _jsonObject, ot::Js
 	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
 	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
 	_jsonObject.AddMember("IsMultiline", m_isMultiline, _allocator);
+	_jsonObject.AddMember("PlaceholderText", ot::JsonString(m_placeholderText, _allocator), _allocator);
 }
 
 void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
@@ -760,6 +765,11 @@ void EntityPropertiesString::readFromJsonObject(const ot::ConstJsonObject& _obje
 	{
 		this->setIsMultiline(ot::json::getBool(_object, "IsMultiline", false));
 	}
+	if (_object.HasMember("PlaceholderText"))
+	{
+		this->setPlaceholderText(ot::json::getString(_object, "PlaceholderText"));
+	}
+
 }
 
 void EntityPropertiesString::copySettings(EntityPropertiesBase* other, EntityBase* root)
@@ -773,6 +783,7 @@ void EntityPropertiesString::copySettings(EntityPropertiesBase* other, EntityBas
 	{
 		setValue(entity->getValue());
 		setIsMultiline(entity->getIsMultiline());
+		setPlaceholderText(entity->getPlaceholderText());
 	}
 }
 

@@ -140,9 +140,11 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	cStack->addItemTop(mLay, true, false);
 
 	// Content
+	//mLay->addStrech(1);
 	createText(mLay, m_topText, "_ttxt");
 	createImage(mLay, m_centerImage, "_cimg");
 	createText(mLay, m_bottomText, "_btxt");
+	//mLay->addStrech(1);
 
 	return root;
 }
@@ -346,5 +348,5 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg*
 	itm->setMaintainAspectRatio(_info.maintainAspectRatio);
 	itm->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
-	_layout->addChildItem(itm, 1);
+	_layout->addChildItem(itm);
 }

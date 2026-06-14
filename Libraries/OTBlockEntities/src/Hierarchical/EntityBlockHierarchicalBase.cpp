@@ -362,6 +362,8 @@ void ot::EntityBlockHierarchicalBase::createTextProperties(const std::string& _g
 	{
 		sprop->setToolTip("Text to display. If empty the short entity name will be displayed instead.");
 	}
+	sprop->setIsMultiline(true);
+	sprop->setPlaceholderText("Enter text...");
 	sprop->setVisible(_isTopText);
 	
 	prop = EntityPropertiesSelection::createProperty(_group, "Font Family", getAllFontFamilyStringList(), toString(FontFamily::Consolas), "", getProperties());
