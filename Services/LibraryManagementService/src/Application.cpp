@@ -255,7 +255,7 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 	}
 
 	// Collections to update - can be extended if needed
-	std::list<std::string> collections = { "PythonEnvironments", "PythonScripts" };
+	std::list<std::string> collections = { "PythonEnvironments", "PythonScripts", "CircuitData"};
 
 	// Resolve DB address and decrypted admin password once
 	const std::string dbAddress = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS");
