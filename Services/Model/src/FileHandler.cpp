@@ -1261,9 +1261,33 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 	const PendingFileOverwrite& pending = it->second;
 
 	if (_overwrite) {
+		// Parse the metadata JSON to increment the version
+		std::string metaContent = pending.metaNewContent;
+		ot::JsonDocument metaDoc;
+		try {
+			metaDoc.fromJson(metaContent);
+
+			// Increment the version
+			int currentVersion = 1;
+			if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version")) {
+				currentVersion = ot::json::getInt(metaDoc, "Version");
+			}
+
+			// Remove and update with incremented version
+			metaDoc.RemoveMember("Version");
+			metaDoc.AddMember("Version", ot::JsonValue(currentVersion + 1), metaDoc.GetAllocator());
+
+			// Update metaContent with the new version
+			metaContent = ot::json::toJson(metaDoc);
+		}
+		catch (const std::exception& _e) {
+			OT_LOG_W("Failed to increment version in metadata: " + std::string(_e.what()));
+			// Continue with original metadata if version increment fails
+		}
+
 		writeFileToPath(pending.contentFilePath, pending.contentNewContent);
-		writeFileToPath(pending.metaFilePath, pending.metaNewContent);
-		OT_LOG_D("Files overwritten: \"" + pending.contentFilePath + "\" and \"" + pending.metaFilePath + "\"");
+		writeFileToPath(pending.metaFilePath, metaContent);
+		OT_LOG_D("Files overwritten with incremented version: \"" + pending.contentFilePath + "\" and \"" + pending.metaFilePath + "\"");
 	}
 	else {
 		// Don't overwrite - add counter to both filenames
@@ -1307,53 +1331,57 @@ void FileHandler::handleExportDialog(const ot::PropertyDialogCfg& _dialogCfg) {
 	std::string pythonMetaPath = pythonMetaProperty->getCurrent();
 	std::string manifestMetaPath = manifestMetaProperty->getCurrent();
 
+	if (!pythonScriptPath.empty()) {
+		EntityBase* pythonScriptEntity = model->findEntityFromName(pythonScriptPath);
+		if (pythonScriptEntity == nullptr) {
+			OT_LOG_E("Python script entity not found for path: " + pythonScriptPath);
+			return;
+		}
+		pythonScript = dynamic_cast<EntityFileText*>(pythonScriptEntity);
+		if (!pythonScript) {
+			OT_LOG_E("Entity found for Python script path is not of type EntityFileText: " + pythonScriptPath);
+			return;
+		}
+	}
+
+	if(!pythonManifestPath.empty())
+	{
+		EntityBase* pythonManifestEntity = model->findEntityFromName(pythonManifestPath);
+		if (pythonManifestEntity == nullptr) {
+			OT_LOG_E("Python manifest entity not found for path: " + pythonManifestPath);
+			return;
+		}
+		pythonManifest = dynamic_cast<EntityPythonManifest*>(pythonManifestEntity);
+		if (!pythonManifest) {
+			OT_LOG_E("Entity found for Python manifest path is not of type EntityPythonManifest: " + pythonManifestPath);
+			return;
+		}
+	}
 	
-	EntityBase* pythonScriptEntity = model->findEntityFromName(pythonScriptPath);
-	if (pythonScriptEntity == nullptr) {
-		OT_LOG_E("Python script entity not found for path: " + pythonScriptPath);
-		return;
-	}
-	pythonScript = dynamic_cast<EntityFileText*>(pythonScriptEntity);
-	if(!pythonScript)
-	{
-		OT_LOG_E("Entity found for Python script path is not of type EntityFileText: " + pythonScriptPath);
-		return;
-	}
-
-	EntityBase* pythonManifestEntity = model->findEntityFromName(pythonManifestPath);
-	if (pythonManifestEntity == nullptr) {
-		OT_LOG_E("Python manifest entity not found for path: " + pythonManifestPath);
-		return;
-	}
-	pythonManifest = dynamic_cast<EntityPythonManifest*>(pythonManifestEntity);
-	if(!pythonManifest)
-	{
-		OT_LOG_E("Entity found for Python manifest path is not of type EntityPythonManifest: " + pythonManifestPath);
-		return;
+	if (!pythonMetaPath.empty()) {
+		EntityBase* pythonMetaEntity = model->findEntityFromName(pythonMetaPath);
+		if (pythonMetaEntity == nullptr) {
+			OT_LOG_E("Python metadata entity not found for path: " + pythonMetaPath);
+			return;
+		}
+		pythonMetaFile = dynamic_cast<EntityFileText*>(pythonMetaEntity);
+		if (!pythonMetaFile) {
+			OT_LOG_E("Entity found for Python metadata path is not of type EntityFileText: " + pythonMetaPath);
+			return;
+		}
 	}
 
-	EntityBase* pythonMetaEntity = model->findEntityFromName(pythonMetaPath);
-	if (pythonMetaEntity == nullptr) {
-		OT_LOG_E("Python metadata entity not found for path: " + pythonMetaPath);
-		return;
-	}
-	pythonMetaFile = dynamic_cast<EntityFileText*>(pythonMetaEntity);
-	if(!pythonMetaFile)
-	{
-		OT_LOG_E("Entity found for Python metadata path is not of type EntityFileText: " + pythonMetaPath);
-		return;
-	}
-
-	EntityBase* manifestMetaEntity = model->findEntityFromName(manifestMetaPath);
-	if (manifestMetaEntity == nullptr) {
-		OT_LOG_E("Manifest metadata entity not found for path: " + manifestMetaPath);
-		return;
-	}
-	manifestMetaFile = dynamic_cast<EntityFileText*>(manifestMetaEntity);
-	if(!manifestMetaFile)
-	{
-		OT_LOG_E("Entity found for Manifest metadata path is not of type EntityFileText: " + manifestMetaPath);
-		return;
+	if (!manifestMetaPath.empty()) {
+		EntityBase* manifestMetaEntity = model->findEntityFromName(manifestMetaPath);
+		if (manifestMetaEntity == nullptr) {
+			OT_LOG_E("Manifest metadata entity not found for path: " + manifestMetaPath);
+			return;
+		}
+		manifestMetaFile = dynamic_cast<EntityFileText*>(manifestMetaEntity);
+		if (!manifestMetaFile) {
+			OT_LOG_E("Entity found for Manifest metadata path is not of type EntityFileText: " + manifestMetaPath);
+			return;
+		}
 	}
 
 	// Check for Circuit export (both files required)
