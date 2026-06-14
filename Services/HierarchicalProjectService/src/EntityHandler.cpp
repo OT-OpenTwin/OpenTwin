@@ -630,12 +630,12 @@ void EntityHandler::addContainer() {
 	coord.storeToDataBase();
 
 	ot::EntityBlockHierarchicalContainerItem newContainer;
-
 	newContainer.setTreeItemEditable(true);
 	newContainer.setEntityID(_modelComponent->createEntityUID());
 	newContainer.setName(createNewUniqueTopologyName(c_containerFolder, "Container"));
 	newContainer.setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_HierarchicalProjectService);
 	newContainer.setGraphicsScenePackageChildName(c_containerFolderName);
+	newContainer.createProperties();
 	newContainer.setTreeItemSelectChildren(false);
 	newContainer.setCoordinateEntityID(coord.getEntityID());
 

@@ -40,6 +40,49 @@
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Painter/RadialGradientPainter2D.h"
 
+std::string ot::GraphicsHierarchicalItemBuilder::backgroundShapeToString(BackgroundShape _shape)
+{
+	switch (_shape)
+	{
+	case BackgroundShape::None: return "None";
+	case BackgroundShape::Rectangle: return "Rectangle";
+	case BackgroundShape::Ellipse: return "Ellipse";
+	default:
+		OT_LOG_E("Unknown background shape: " + std::to_string(static_cast<int>(_shape)));
+		return "Rectangle";
+	}
+}
+
+ot::GraphicsHierarchicalItemBuilder::BackgroundShape ot::GraphicsHierarchicalItemBuilder::stringToBackgroundShape(const std::string& _shapeStr)
+{
+	if (_shapeStr == backgroundShapeToString(BackgroundShape::None))
+	{
+		return BackgroundShape::None;
+	}
+	else if (_shapeStr == backgroundShapeToString(BackgroundShape::Rectangle))
+	{
+		return BackgroundShape::Rectangle;
+	}
+	else if (_shapeStr == backgroundShapeToString(BackgroundShape::Ellipse))
+	{
+		return BackgroundShape::Ellipse;
+	}
+	else
+	{
+		OT_LOG_E("Unknown background shape string: " + _shapeStr);
+		return BackgroundShape::Rectangle;
+	}
+}
+
+std::list<std::string> ot::GraphicsHierarchicalItemBuilder::getBackgroundShapeSelectionValues()
+{
+	return std::list<std::string>({
+		backgroundShapeToString(BackgroundShape::None),
+		backgroundShapeToString(BackgroundShape::Rectangle),
+		backgroundShapeToString(BackgroundShape::Ellipse)
+		});
+}
+
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() const
 {
 	OTAssert(!m_entityName.empty(), "No entity name provided");
@@ -105,7 +148,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 }
 
 ot::GraphicsHierarchicalItemBuilder::GraphicsHierarchicalItemBuilder()
-	: m_cornerRadius(5), m_connectorWidth(7.), m_connectorHeight(5.),
+	: m_cornerRadius(5), m_connectorWidth(7.), m_connectorHeight(5.), m_backgroundShape(BackgroundShape::Rectangle),
 	  m_minimumSize(Size2DD(10., 10.)), m_maximumSize(Size2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()))
 {
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
@@ -147,8 +190,6 @@ void ot::GraphicsHierarchicalItemBuilder::initializeImageInfo(ImageInfo& _info)
 	_info.margins = MarginsD(10., 10., 10., 10.);
 	_info.alignment = Alignment::Center;
 	_info.maintainAspectRatio = true;
-	_info.minimumSize = Size2DD(0., 0.);
-	_info.maximumSize = Size2DD(150., 150.);
 }
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Alignment _alignment) const
@@ -237,9 +278,33 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() const
 {
+	switch (m_backgroundShape)
+	{
+	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::None: return nullptr;
+	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Rectangle: return createRectangleShapeItem();
+	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse: return createEllipseShapeItem();
+	default:
+		OT_LOG_E("Unknown background shape: " + std::to_string(static_cast<int>(m_backgroundShape)));
+		return nullptr;
+	}
+}
+
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeItem() const
+{
 	GraphicsRectangularItemCfg* shape = new GraphicsRectangularItemCfg(m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
 	shape->setCornerRadius(m_cornerRadius);
+	shape->setName(m_entityName + "_shape");
+	shape->setSizePolicy(SizePolicy::Dynamic);
+	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+
+	return shape;
+}
+
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createEllipseShapeItem() const
+{
+	GraphicsEllipseItemCfg* shape = new GraphicsEllipseItemCfg(5., 5., m_backgroundPainter->createCopy());
+	shape->setOutline(m_outline);
 	shape->setName(m_entityName + "_shape");
 	shape->setSizePolicy(SizePolicy::Dynamic);
 	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
@@ -271,20 +336,15 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg*
 		return;
 	}
 
-	OTAssert(_info.minimumSize.getWidth() <= _info.maximumSize.getWidth(), "Minimum width must be smaller or equal to maximum width");
-	OTAssert(_info.minimumSize.getHeight() <= _info.maximumSize.getHeight(), "Minimum height must be smaller or equal to maximum height");
-
 	GraphicsImageItemCfg* itm = new GraphicsImageItemCfg;
+	itm->setName(m_entityName + _nameSuffix);
 	itm->setImagePath(_info.path);
 	itm->setImageData(_info.data, _info.format);
-	itm->setName(m_entityName + _nameSuffix);
 	itm->setMargins(_info.margins);
 	itm->setSizePolicy(SizePolicy::Dynamic);
 	itm->setAlignment(_info.alignment);
 	itm->setMaintainAspectRatio(_info.maintainAspectRatio);
 	itm->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
-	itm->setMinimumSize(_info.minimumSize);
-	itm->setMaximumSize(_info.maximumSize);
 
 	_layout->addChildItem(itm, 1);
 }

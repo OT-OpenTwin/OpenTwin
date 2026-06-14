@@ -40,6 +40,16 @@ namespace ot {
 		OT_DECL_NOCOPY(GraphicsHierarchicalItemBuilder)
 		OT_DECL_NOMOVE(GraphicsHierarchicalItemBuilder)
 	public:
+		enum class BackgroundShape : int32_t
+		{
+			None,
+			Rectangle,
+			Ellipse
+		};
+		static std::string backgroundShapeToString(BackgroundShape _shape);
+		static BackgroundShape stringToBackgroundShape(const std::string& _shapeStr);
+		static std::list<std::string> getBackgroundShapeSelectionValues();
+
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
 		ot::GraphicsItemCfg* createGraphicsItem() const;
@@ -77,9 +87,6 @@ namespace ot {
 		void setCenterImageMargins(const ot::MarginsD& _margins) { m_centerImage.margins = _margins; };
 		void setCenterImageAlignment(Alignment _alignment) { m_centerImage.alignment = _alignment; };
 		void setCenterImageMaintainAspectRatio(bool _maintain) { m_centerImage.maintainAspectRatio = _maintain; };
-		void setCenterImageMinimumSize(const Size2DD& _size) { m_centerImage.minimumSize = _size; };
-		void setCenterImageMaximumSize(const Size2DD& _size) { m_centerImage.maximumSize = _size; };
-		void setCenterImageFixedSize(const Size2DD& _size) { m_centerImage.minimumSize = _size; m_centerImage.maximumSize = _size; };
 
 		void setBottomText(const std::string& _text) { m_bottomText.text = _text; };
 		void setBottomTextFont(const Font& _font) { m_bottomText.font = _font; };
@@ -93,6 +100,8 @@ namespace ot {
 
 		//! @brief Set the item tool tip.
 		void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+
+		void setBackgroundShape(BackgroundShape _shape) { m_backgroundShape = _shape; };
 
 		//! @brief Replace the current background painter.
 		//! @param _painter The item takes ownership of the painter.
@@ -135,8 +144,6 @@ namespace ot {
 			MarginsD margins;
 			Alignment alignment;
 			bool maintainAspectRatio;
-			Size2DD minimumSize;
-			Size2DD maximumSize;
 		};
 
 		void initializeTextInfo(TextInfo& _info);
@@ -144,6 +151,8 @@ namespace ot {
 
 		GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
 		GraphicsItemCfg* createShapeItem() const;
+		GraphicsItemCfg* createRectangleShapeItem() const;
+		GraphicsItemCfg* createEllipseShapeItem() const;
 
 		void createText(GraphicsVBoxLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const;
 		void createImage(GraphicsVBoxLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
@@ -159,6 +168,7 @@ namespace ot {
 
 		std::string m_toolTip;
 
+		BackgroundShape m_backgroundShape;
 		Painter2DContainer m_backgroundPainter;
 		PenFCfg m_outline;
 		int m_cornerRadius;

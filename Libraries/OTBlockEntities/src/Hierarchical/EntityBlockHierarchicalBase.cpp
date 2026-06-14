@@ -18,7 +18,6 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/Properties/PropertyHelper.h"
@@ -43,6 +42,19 @@ bool ot::EntityBlockHierarchicalBase::updateFromProperties() {
 		needsUpdate = true;
 	}
 
+	const bool shapeVisible = getBackgroundShape() != GraphicsHierarchicalItemBuilder::BackgroundShape::None;
+	EntityPropertiesBase* backgroundProp = PropertyHelper::getPropertyBase(this, "Background", std::string(generalPropertyGroupName));
+	if (shapeVisible != backgroundProp->getVisible())
+	{
+		backgroundProp->setVisible(shapeVisible);
+		PropertyHelper::getPropertyBase(this, "Border Color", std::string(generalPropertyGroupName))->setVisible(shapeVisible);
+		PropertyHelper::getPropertyBase(this, "Border Width", std::string(generalPropertyGroupName))->setVisible(shapeVisible);
+		needsUpdate = true;
+	}
+	
+	needsUpdate |= updateTextProperties(std::string(titlePropertyGroupName), "Show Title");
+	needsUpdate |= updateTextProperties(std::string(footerPropertyGroupName), "Show Footer");
+
 	getProperties().forceResetUpdateForAllProperties();
 
 	createBlockItem();
@@ -59,20 +71,26 @@ void ot::EntityBlockHierarchicalBase::createProperties()
 	const std::string centerImageGroup = std::string(this->centerImagePropertyGroupName);
 	const std::string footerGroup = std::string(this->footerPropertyGroupName);
 
-	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty(generalGroup, "Custom Size", false, "", getProperties());
+	EntityPropertiesBase* prop = EntityPropertiesSelection::createProperty(generalGroup, "Background Shape", GraphicsHierarchicalItemBuilder::getBackgroundShapeSelectionValues(), GraphicsHierarchicalItemBuilder::backgroundShapeToString(GraphicsHierarchicalItemBuilder::BackgroundShape::Rectangle), "", getProperties());
 
-	EntityPropertiesInteger* intProp = EntityPropertiesInteger::createProperty(generalGroup, "Width", 100, 1, 10000, "", getProperties());
+	prop = EntityPropertiesGuiPainter::createProperty(generalGroup, "Background", new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground), "", getProperties());
+	prop = EntityPropertiesGuiPainter::createProperty(generalGroup, "Border Color", new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder), "", getProperties());
+	EntityPropertiesInteger* intProp = EntityPropertiesInteger::createProperty(generalGroup, "Border Width", 1, 0, 100, "", getProperties());
+	intProp->setAllowCustomValues(false);
+
+	prop = EntityPropertiesBoolean::createProperty(generalGroup, "Custom Size", false, "", getProperties());
+
+	intProp = EntityPropertiesInteger::createProperty(generalGroup, "Width", 150, 1, 10000, "", getProperties());
 	intProp->setAllowCustomValues(false);
 	intProp->setVisible(false);
 
-	intProp = EntityPropertiesInteger::createProperty(generalGroup, "Height", 100, 1, 10000, "", getProperties());
+	intProp = EntityPropertiesInteger::createProperty(generalGroup, "Height", 150, 1, 10000, "", getProperties());
 	intProp->setAllowCustomValues(false);
 	intProp->setVisible(false);
 
-	createTextProperties(titleGroup, true);
+	createTextProperties(titleGroup, true, "Show Title");
 	createImageProperties(centerImageGroup, true);
-	createTextProperties(footerGroup, false);
-
+	createTextProperties(footerGroup, false, "Show Footer");
 }
 
 void ot::EntityBlockHierarchicalBase::fillContextMenu(const MenuRequestData* _requestData, MenuCfg& _menu)
@@ -97,17 +115,25 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 
 	builder.setEntityName(this->getName());
 
-	// Title
-	std::string titleText = this->getCustomTitle();
-	if (titleText.empty())
-	{
-		titleText = this->createBlockHeadline();
-	}
+	builder.setBackgroundShape(getBackgroundShape());
+	builder.setBackgroundPainter(this->getBackgroundPainter()->createCopy());
+	builder.setOutlinePainter(this->getBorderPainter()->createCopy());
+	builder.setOutlineWidth(getBorderWidth());
 
-	builder.setTopText(titleText);
-	builder.setTopTextFont(this->getTitleFont());
-	builder.setTopTextPainter(this->getTitlePainter()->createCopy());
-	builder.setTopTextAlignment(this->getTitleAlignment());
+	// Title
+	if (getShowTitle())
+	{
+		std::string titleText = this->getCustomTitle();
+		if (titleText.empty())
+		{
+			titleText = this->createBlockHeadline();
+		}
+
+		builder.setTopText(titleText);
+		builder.setTopTextFont(this->getTitleFont());
+		builder.setTopTextPainter(this->getTitlePainter()->createCopy());
+		builder.setTopTextAlignment(this->getTitleAlignment());
+	}
 
 	// Image
 	if (hasCenterImage())
@@ -115,14 +141,16 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 		builder.setCenterImageData(m_centerImageData->getData(), m_centerImageFormat);
 		builder.setCenterImageAlignment(getCenterImageAlignment());
 		builder.setCenterImageMaintainAspectRatio(getMaintainCenterImageAspectRatio());
-		builder.setCenterImageFixedSize(getCenterImageSize());
 	}
 
 	// Footer
-	builder.setBottomText(getFooterText());
-	builder.setBottomTextFont(this->getFooterFont());
-	builder.setBottomTextPainter(this->getFooterPainter()->createCopy());
-	builder.setBottomTextAlignment(getFooterAlignment());
+	if (getShowFooter())
+	{
+		builder.setBottomText(getFooterText());
+		builder.setBottomTextFont(this->getFooterFont());
+		builder.setBottomTextPainter(this->getFooterPainter()->createCopy());
+		builder.setBottomTextAlignment(getFooterAlignment());
+	}
 
 	// Create the item
 	return builder.createGraphicsItem();
@@ -163,6 +191,26 @@ std::shared_ptr<EntityBinaryData> ot::EntityBlockHierarchicalBase::getCenterImag
 
 // Property accessors
 
+ot::GraphicsHierarchicalItemBuilder::BackgroundShape ot::EntityBlockHierarchicalBase::getBackgroundShape() const
+{
+	return GraphicsHierarchicalItemBuilder::stringToBackgroundShape(PropertyHelper::getSelectionPropertyValue(this, "Background Shape", std::string(generalPropertyGroupName)));
+}
+
+const ot::Painter2D* ot::EntityBlockHierarchicalBase::getBackgroundPainter() const
+{
+	return PropertyHelper::getPainterPropertyValue(this, "Background", std::string(generalPropertyGroupName));
+}
+
+const ot::Painter2D* ot::EntityBlockHierarchicalBase::getBorderPainter() const
+{
+	return PropertyHelper::getPainterPropertyValue(this, "Border Color", std::string(generalPropertyGroupName));
+}
+
+int ot::EntityBlockHierarchicalBase::getBorderWidth() const
+{
+	return PropertyHelper::getIntegerPropertyValue(this, "Border Width", std::string(generalPropertyGroupName));
+}
+
 bool ot::EntityBlockHierarchicalBase::getUseCustomSize() const
 {
 	return PropertyHelper::getBoolPropertyValue(this, "Custom Size", std::string(generalPropertyGroupName));
@@ -181,6 +229,11 @@ int ot::EntityBlockHierarchicalBase::getCustomHeight() const
 ot::Size2DD ot::EntityBlockHierarchicalBase::getCustomSize() const
 {
 	return Size2DD(static_cast<double>(getCustomWidth()), static_cast<double>(getCustomHeight()));
+}
+
+bool ot::EntityBlockHierarchicalBase::getShowTitle() const
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Show Title", std::string(titlePropertyGroupName));
 }
 
 std::string ot::EntityBlockHierarchicalBase::getCustomTitle() const
@@ -220,19 +273,9 @@ ot::Alignment ot::EntityBlockHierarchicalBase::getCenterImageAlignment() const
 	return stringToAlignment(PropertyHelper::getSelectionPropertyValue(this, "Alignment", std::string(centerImagePropertyGroupName)));
 }
 
-int ot::EntityBlockHierarchicalBase::getCenterImageWidth() const
+bool ot::EntityBlockHierarchicalBase::getShowFooter() const
 {
-	return PropertyHelper::getIntegerPropertyValue(this, "Width", std::string(centerImagePropertyGroupName));
-}
-
-int ot::EntityBlockHierarchicalBase::getCenterImageHeight() const
-{
-	return PropertyHelper::getIntegerPropertyValue(this, "Height", std::string(centerImagePropertyGroupName));
-}
-
-ot::Size2DD ot::EntityBlockHierarchicalBase::getCenterImageSize() const
-{
-	return Size2DD(static_cast<double>(getCenterImageWidth()), static_cast<double>(getCenterImageHeight()));
+	return PropertyHelper::getBoolPropertyValue(this, "Show Footer", std::string(footerPropertyGroupName));
 }
 
 std::string ot::EntityBlockHierarchicalBase::getFooterText() const
@@ -310,33 +353,60 @@ void ot::EntityBlockHierarchicalBase::ensureCenterImageLoaded()
 	m_centerImageData.reset(dynamic_cast<EntityBinaryData*>(readEntityFromEntityIDAndVersion(this, m_centerImageUID, m_centerImageVersion, entityMap)));
 }
 
-void ot::EntityBlockHierarchicalBase::createTextProperties(const std::string& _group, bool _isTopText)
+void ot::EntityBlockHierarchicalBase::createTextProperties(const std::string& _group, bool _isTopText, const std::string& _showTextPropertyName)
 {
+	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty(_group, _showTextPropertyName, _isTopText, "", getProperties());
+
 	EntityPropertiesString* sprop = EntityPropertiesString::createProperty(_group, "Text", "", "", getProperties());
 	if (_isTopText)
 	{
 		sprop->setToolTip("Text to display. If empty the short entity name will be displayed instead.");
 	}
+	sprop->setVisible(_isTopText);
 	
-	EntityPropertiesBase* prop = EntityPropertiesSelection::createProperty(_group, "Font Family", getAllFontFamilyStringList(), toString(FontFamily::Consolas), "", getProperties());
+	prop = EntityPropertiesSelection::createProperty(_group, "Font Family", getAllFontFamilyStringList(), toString(FontFamily::Consolas), "", getProperties());
+	prop->setVisible(_isTopText);
 
 	EntityPropertiesInteger* fontSizeProp = EntityPropertiesInteger::createProperty(_group, "Font Size", 12, 1, 1000, "", getProperties());
 	fontSizeProp->setAllowCustomValues(false);
+	fontSizeProp->setVisible(_isTopText);
 
 	prop = EntityPropertiesBoolean::createProperty(_group, "Bold", false, "", getProperties());
+	prop->setVisible(_isTopText);
+
 	prop = EntityPropertiesBoolean::createProperty(_group, "Italic", false, "", getProperties());
+	prop->setVisible(_isTopText);
+
 	prop = EntityPropertiesGuiPainter::createProperty(_group, "Text Color", new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground), "", getProperties());
+	prop->setVisible(_isTopText);
+
 	prop = EntityPropertiesSelection::createProperty(_group, "Alignment", getAllAlignmentStringList(), toString(Alignment::Center), "", getProperties());
+	prop->setVisible(_isTopText);
+
 }
 
 void ot::EntityBlockHierarchicalBase::createImageProperties(const std::string& _group, bool _isCenter)
 {
 	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty(_group, "Maintain Aspect Ratio", true, "", getProperties());
 	prop = EntityPropertiesSelection::createProperty(_group, "Alignment", getAllAlignmentStringList(), toString(Alignment::Center), "", getProperties());
+}
 
-	EntityPropertiesInteger* intProp = EntityPropertiesInteger::createProperty(_group, "Width", 150, 1, 10000, "", getProperties());
-	intProp->setAllowCustomValues(false);
-
-	intProp = EntityPropertiesInteger::createProperty(_group, "Height", 150, 1, 10000, "", getProperties());
-	intProp->setAllowCustomValues(false);
+bool ot::EntityBlockHierarchicalBase::updateTextProperties(const std::string& _group, const std::string& _showTextPropertyName)
+{
+	bool showText = PropertyHelper::getBoolPropertyValue(this, _showTextPropertyName, _group);
+	if (showText != PropertyHelper::getPropertyBase(this, "Text", _group)->getVisible())
+	{
+		PropertyHelper::getPropertyBase(this, "Text", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Font Family", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Font Size", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Bold", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Italic", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Text Color", _group)->setVisible(showText);
+		PropertyHelper::getPropertyBase(this, "Alignment", _group)->setVisible(showText);
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }

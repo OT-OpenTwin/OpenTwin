@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
+#include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "OTBlockEntities/EntityBlock.h"
 
 class EntityBinaryData;
@@ -73,11 +74,17 @@ namespace ot {
 		constexpr static std::string_view centerImagePropertyGroupName = "Image";
 		constexpr static std::string_view footerPropertyGroupName = "Footer";
 
+		GraphicsHierarchicalItemBuilder::BackgroundShape getBackgroundShape() const;
+		const Painter2D* getBackgroundPainter() const;
+		const Painter2D* getBorderPainter() const;
+		int getBorderWidth() const;
+
 		bool getUseCustomSize() const;
 		int getCustomWidth() const;
 		int getCustomHeight() const;
 		Size2DD getCustomSize() const;
 
+		bool getShowTitle() const;
 		std::string getCustomTitle() const;
 		Font getTitleFont() const;
 		const Painter2D* getTitlePainter() const;
@@ -85,10 +92,8 @@ namespace ot {
 
 		bool getMaintainCenterImageAspectRatio() const;
 		Alignment getCenterImageAlignment() const;
-		int getCenterImageWidth() const;
-		int getCenterImageHeight() const;
-		Size2DD getCenterImageSize() const;
 
+		bool getShowFooter() const;
 		std::string getFooterText() const;
 		Font getFooterFont() const;
 		const Painter2D* getFooterPainter() const;
@@ -111,9 +116,10 @@ namespace ot {
 		ot::ImageFileFormat m_centerImageFormat;
 		std::shared_ptr<EntityBinaryData> m_centerImageData;
 
-		void createTextProperties(const std::string& _group, bool _isTopText);
+		void createTextProperties(const std::string& _group, bool _isTopText, const std::string& _showTextPropertyName);
 		void createImageProperties(const std::string& _group, bool _isCenter);
 
+		bool updateTextProperties(const std::string& _group, const std::string& _showTextPropertyName);
 	};
 
 }
