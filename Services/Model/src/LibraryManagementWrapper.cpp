@@ -40,7 +40,7 @@
 #include "OTModelEntities/EntityFactory.h"
 #include "OTModelEntities/Lms/LibraryEntityInterface.h"
 #include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
-
+#include "OTCore/String.h"
 
 std::list<std::string> LibraryManagementWrapper::getCircuitModels() {
 
@@ -318,6 +318,23 @@ EntityBase* LibraryManagementWrapper::createAndInitializeEntity(const ot::Librar
 	// First setLibraryElement to ensure that in case of python script the environment requested in this function is being handled too
 	libInterface->setLibraryElement(_importCfg, _createdEntities);
 	libInterface->setLibraryElementID(_importCfg.getLibraryElementID(),entity.get());
+
+	// Add additional infos as properties if importing a CircuitModel
+	if (_importCfg.getNewEntityFolder().find("Circuit Models") != std::string::npos) {
+		for (const auto& additionalInfos : _importCfg.getAdditionalInfos()) {
+			EntityPropertiesString* additionalInfoProp = EntityPropertiesString::createProperty(
+				"Metadata",
+				additionalInfos.first,
+				additionalInfos.second,
+				"Default",
+				entity->getProperties()
+			);
+			if (additionalInfoProp) {
+				additionalInfoProp->setReadOnly(true);
+			}
+		}
+	}
+
 
 	// Check if entity with the same name already exists and if the content of the entities matches
 	EntityBase* existingEntity = checkAndHandleIfEntityExists(fullPath, _importCfg, _model);
