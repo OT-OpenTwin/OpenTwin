@@ -207,6 +207,7 @@
     <ClCompile Include="src\Application.cpp" />
     <ClCompile Include="src\BatchedCategorisationHandler.cpp" />
     <ClCompile Include="src\BusinessLogicHandler.cpp" />
+    <ClCompile Include="src\CSVSchemaImporter.cpp" />
     <ClCompile Include="src\DataCategorizationConsistencyChecker.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerFormat.cpp" />
     <ClCompile Include="src\OptionsParameterHandlerFrequency.cpp" />
@@ -240,6 +241,7 @@
     <ClInclude Include="include\BranchSynchronizer.h" />
     <ClInclude Include="include\BusinessLogicHandler.h" />
     <ClInclude Include="include\CategorisationFolderNames.h" />
+    <ClInclude Include="include\CSVSchemaImporter.h" />
     <ClInclude Include="include\DataCategorizationConsistencyChecker.h" />
     <ClInclude Include="include\MetadataExtender.h" />
     <ClInclude Include="include\RangeSelectionVisualisationHandler.h" />

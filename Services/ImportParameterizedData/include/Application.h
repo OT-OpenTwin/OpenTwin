@@ -26,7 +26,6 @@
 #include "OTServiceFoundation/ApplicationBase.h"		// Base class
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "MetadataExtender.h"
-
 // C++ header
 #include <list>
 #include <mutex>
@@ -39,6 +38,7 @@
 #include "RangeSelectionVisualisationHandler.h"
 #include "BatchedCategorisationHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "CSVSchemaImporter.h"
 
 // Forward declaration
 namespace ot {
@@ -100,6 +100,9 @@ private:
 	ot::ToolBarButtonCfg m_buttonLockCharacterisation;
 	ot::ToolBarButtonCfg m_buttonUnLockCharacterisation;
 	ot::ToolBarButtonCfg m_buttonAddJsonMetadataToSeries;
+	ot::ToolBarButtonCfg m_buttonAddCSVSchemaImporter;
+	ot::ToolBarButtonCfg m_buttonRunCSVSchemaImporter;
+
 
 	ot::ToolBarButtonCfg m_buttonAutomaticCreationMSMD;
 	ot::ToolBarButtonCfg m_buttonAddBatchCreator;
@@ -124,6 +127,7 @@ private:
 	DataCategorizationHandler* m_parametrizedDataHandler = nullptr;
 	TabledataToResultdataHandler* _tabledataToResultdataHandler = nullptr;
 	TouchstoneToResultdata* _touchstoneToResultdata = nullptr;
+	CSVSchemaImporter * m_csvSchemaImporterCSVSchemaImporter = nullptr;
 
 	MetadataExtender m_metadataExtender;
 

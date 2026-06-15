@@ -44,10 +44,10 @@
 #include "OTModelEntities/EntityMetadataSeries.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
 #include "MetadataExtender.h"
-
+#include "OTModelEntities/EntityDatasetImporterCSV.h"
 #include <rapidjson/rapidjson.h>
 #include <rapidjson/document.h>
-
+#include "OTCore/EntityName.h"
 #include <string>
 
 Application * g_instance{ nullptr };
@@ -71,7 +71,7 @@ Application::Application()
 	m_parametrizedDataHandler = new DataCategorizationHandler( _tableFolder, _previewTableNAme);
 	_tabledataToResultdataHandler = new TabledataToResultdataHandler(_datasetFolder, _tableFolder);
 	_touchstoneToResultdata = new TouchstoneToResultdata();
-
+	m_csvSchemaImporterCSVSchemaImporter = new CSVSchemaImporter();
 	m_selectionWorker = new std::thread(&Application::HandleSelectionChanged, this);
 }
 
@@ -115,7 +115,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_tabledataToResultdataHandler->setUIComponent(_ui);
 	_touchstoneToResultdata->setUIComponent(_ui);
 	m_batchedCategorisationHandler.setUIComponent(_ui);
-
+	
 	_ui->addMenuPage(pageName);
 
 	const std::string groupNameImport = "Data Import";
@@ -161,6 +161,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonAddJsonMetadataToSeries = ot::ToolBarButtonCfg(pageName, groupNameImport, "Metadata Import", "Default/TextVisible");
 	_ui->addMenuButton(m_buttonAddJsonMetadataToSeries.setButtonLockFlags(modelWrite));
 	
+	m_buttonAddCSVSchemaImporter = ot::ToolBarButtonCfg(pageName, groupNameImport, "Add CSV Refinement Engine", "Default/BatchProcessing");
+	_ui->addMenuButton(m_buttonAddCSVSchemaImporter.setButtonLockFlags(modelWrite));
+	
+	m_buttonRunCSVSchemaImporter = ot::ToolBarButtonCfg(pageName, groupNameImport, "Run CSV Refinement Engine", "Default/BatchProcessing");
+	_ui->addMenuButton(m_buttonRunCSVSchemaImporter.setButtonLockFlags(modelWrite));
+
 	std::list<std::string> enabled;
 	std::list<std::string> disabled{ m_buttonAutomaticCreationMSMD .getFullPath(), m_buttonLockCharacterisation.getFullPath(), m_buttonUnLockCharacterisation.getFullPath()};
 
@@ -294,7 +300,32 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_metadataExtender.extendWithJsonFile();
 			}
-			
+			else if (action == m_buttonAddCSVSchemaImporter.getFullPath())
+			{
+
+			}
+			else if (action == m_buttonRunCSVSchemaImporter.getFullPath())
+			{
+
+				std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataCategorisationFolder);
+				
+				ot::UIDList rmdCategorisation = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(ot::FolderNames::DataCategorisationFolder, EntityParameterizedDataCategorization::className(), false);
+				assert(rmdCategorisation.size() == 1);
+				std::list<ot::EntityInformation> entityInfos;
+				ot::ModelServiceAPI::getEntityInformation(rmdCategorisation, entityInfos);
+				auto rmdChategorisationEntityInfos = 	entityInfos.front();
+				EntityDatasetImporterCSV importer;
+				importer.setEntityID(getModelComponent()->createEntityUID());
+
+				std::string entityName =	ot::EntityName::createUniqueEntityName(ot::FolderNames::DataCategorisationFolder, folderContent, "Import by Schema");
+				importer.setName(entityName);
+				importer.createProperties(rmdChategorisationEntityInfos.getEntityName(),rmdChategorisationEntityInfos.getEntityID());
+				importer.storeToDataBase();
+				ot::NewModelStateInfo info;
+				info.addTopologyEntity(importer);
+				ot::ModelServiceAPI::addEntitiesToModel(info,"Added new csv data converter.");
+			}
+
 			else if (action == m_buttonAutomaticCreationMSMD.getFullPath())
 			{				
 				std::thread worker( &BatchedCategorisationHandler::createNewScriptDescribedMSMD, std::ref(m_batchedCategorisationHandler), _selectedEntities);

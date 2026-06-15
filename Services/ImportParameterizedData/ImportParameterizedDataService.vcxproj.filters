@@ -88,6 +88,9 @@
     <ClCompile Include="include\MetadataExtender.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="src\CSVSchemaImporter.cpp">
+      <Filter>src\DataSources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -203,6 +206,9 @@
     </ClInclude>
     <ClInclude Include="include\MetadataExtender.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CSVSchemaImporter.h">
+      <Filter>include\DataSources</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
