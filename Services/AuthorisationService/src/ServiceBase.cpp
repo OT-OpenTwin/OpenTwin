@@ -179,40 +179,40 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	}
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
-	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USERS) { return handleGetAllUsers(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USER_COUNT) { return handleGetAllUsersCount(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_CHANGE_USER_USERNAME) { return handleChangeUserNameByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_USER_PASSWORD) { return handleChangeUserPasswordByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_DELETE_USER) { return handleDeleteUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
+	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_USERS) { return handleGetAllUsers(_actionDocument.GetObject()); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_USER_COUNT) { return handleGetAllUsersCount(_actionDocument.GetObject()); } // Not used
+	else if (_action == OT_ACTION_CHANGE_USER_USERNAME) { return handleChangeUserNameByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CHANGE_USER_PASSWORD) { return handleChangeUserPasswordByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used (commented in UI)
+	else if (_action == OT_ACTION_DELETE_USER) { return handleDeleteUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Only UI
+	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // OT Service foundation and central services. But they have own handlers that do not require euthentication
 	//------------ Group FUNCTIONS ------------
-	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USER_GROUPS) { return handleGetAllUserGroups(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUPS) { return handleGetAllGroups(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUP_COUNT) { return handleGetAllGroupsCount(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_GROUP_NAME) { return handleChangeGroupName(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_GROUP_OWNER) { return handleChangeGroupOwner(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_ADD_USER_TO_GROUP) { return handleAddUserToGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_USER_FROM_GROUP) { return handleRemoveUserFromGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_USER_GROUPS) { return handleGetAllUserGroups(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_GROUPS) { return handleGetAllGroups(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_GROUP_COUNT) { return handleGetAllGroupsCount(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_CHANGE_GROUP_NAME) { return handleChangeGroupName(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CHANGE_GROUP_OWNER) { return handleChangeGroupOwner(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_ADD_USER_TO_GROUP) { return handleAddUserToGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_USER_FROM_GROUP) { return handleRemoveUserFromGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	//------------ Project FUNCTIONS ------------
-	else if (_action == OT_ACTION_CMD_GetFilter) { return handleGetFilterOptions(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_CMD_GetFilter) { return handleGetFilterOptions(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); } // Only UI 
+	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); } // UI, Hierarchisches (opens a new instance and for that the loginData is json serialised)
+	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); } // UI only
 	//                                                       v-- CAN BE PERFORMED BY THE UI CLIENT --v
-	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_USER_PROJECTS) { return handleGetAllUserProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECTS) { return handleGetAllProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECT_COUNT) { return handleGetAllProjectsCount(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUP_PROJECTS) { return handleGetAllGroupProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_PROJECT_NAME) { return handleChangeProjectName(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_PROJECT_OWNER) { return handleChangeProjectOwner(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); } // UI and OTResultDataAccess. The latter needs it for mapping project names to collection names. Used in Modelservice
+	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_USER_PROJECTS) { return handleGetAllUserProjects(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_PROJECTS) { return handleGetAllProjects(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_PROJECT_COUNT) { return handleGetAllProjectsCount(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_GROUP_PROJECTS) { return handleGetAllGroupProjects(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_CHANGE_PROJECT_NAME) { return handleChangeProjectName(_actionDocument.GetObject(), loggedInUser); } // Only UI 
+	else if (_action == OT_ACTION_CHANGE_PROJECT_OWNER) { return handleChangeProjectOwner(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); }
 	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); }
@@ -262,6 +262,12 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	if (usePSW)
 	{
 		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+		if (password.empty())
+		{
+			ot::JsonDocument json;
+			json.AddMember(OT_ACTION_AUTH_SUCCESS, false, json.GetAllocator());
+			return json.toJson();
+		}
 		bool encryptedPassword = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
 		
 		if (encryptedPassword)
