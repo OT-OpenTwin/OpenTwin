@@ -13,6 +13,9 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B9A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\SSO">
+      <UniqueIdentifier>{4be883bb-1345-47f6-96d1-f8825d8750c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\dllmain.cpp">
@@ -51,6 +54,12 @@
     <ClCompile Include="src\SSOBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\SessionToken.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SSOUser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ServiceBase.h">
@@ -87,7 +96,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="include\SSOBuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\SSO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SessionToken.h">
+      <Filter>Header Files\SSO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SSOUser.h">
+      <Filter>Header Files\SSO</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

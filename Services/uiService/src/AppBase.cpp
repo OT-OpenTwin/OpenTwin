@@ -1384,7 +1384,6 @@ ViewerUIDtype AppBase::createView(ModelUIDtype _modelUID, const std::string& _pr
 	assert(success);
 
 
-
 	return viewID;
 }
 

@@ -980,14 +980,9 @@ void LogInDialog::loginWorkerStart() {
 		return;
 	}
 
-	if (!m_isSSOLogin && !m_loginData.isValid()) {
+	if (!m_loginData.isValid()) {
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
-		return;
-	}
-	else if (m_isSSOLogin)
-	{
-		this->stopWorkerWithError(WorkerError::NoError);
 		return;
 	}
 
@@ -1175,7 +1170,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 #include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
-	std::wstring ssoUsername = determineSSOUsername();
+	std::string ssoUsername = ot::String::toString(determineSSOUsername());
 	
 	try
 	{
@@ -1184,6 +1179,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 		std::string receivedToken = "";
 		std::string errorMessage;
 		bool continueProcess = true;
+		bool firstMessage = true;
 		do
 		{
 			std::string token =	client.generateToken(receivedToken);
@@ -1191,20 +1187,47 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 			ot::JsonDocument tokenMessage;
 			tokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
 			tokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(token, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
-			tokenMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(ot::String::toString(ssoUsername), tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			tokenMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(ssoUsername, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			tokenMessage.AddMember(OT_PARAM_AUTH_SSO_Initial, firstMessage , tokenMessage.GetAllocator());
+			firstMessage = false;
 			std::string response;
 			if (ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, tokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
 			{
-				ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
-				if (message.isOk())
+				ot::JsonDocument responseDoc;
+				responseDoc.fromJson(response);
+				if (ot::json::exists(responseDoc, OT_ACTION_AUTH_SUCCESS))
 				{
-					receivedToken = message.getWhat();
-					continueProcess = !receivedToken.empty();
+					// If the response is a regular json doc, the authentication succeeded
+					continueProcess = false;
+					std::string sessionUser = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
+					std::string sessionPassword = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
+					std::string sessionToken = ot::json::getString(responseDoc, OT_PARAM_AUTH_Token);
+
+
+					m_loginData.setUserName(ssoUsername);
+					m_loginData.setSSOSessionToken(sessionToken);
+					m_loginData.setSessionUser(sessionUser);
+					m_loginData.setSessionPassword(sessionPassword);
+					return WorkerError::NoError;
+
 				}
 				else
 				{
-					errorMessage = message.getWhat();
-					continueProcess = false;
+					ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
+					if (message.isOk())
+					{
+						receivedToken = message.getWhat();
+						continueProcess = !receivedToken.empty();
+						if (receivedToken.empty())
+						{
+							errorMessage = "Received empty authentication token.";
+						}
+					}
+					else
+					{
+						errorMessage = message.getWhat();
+						continueProcess = false;
+					}
 				}
 			}
 			else
@@ -1214,16 +1237,14 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 			}
 		} while (continueProcess);
 
+		OT_LOG_E(errorMessage);
+		return WorkerError::InvalidCreadentials;
 	}
 	catch (std::exception& _e)
 	{
-		
+		OT_LOG_E(_e.what());
+		return WorkerError::InvalidCreadentials;
 	}
-	// Falls du einen neuen Fehlercode (Output message) brauchst, einfach das enum WorkerError,
-	// sowie das switch in slotWorkerError() erweitern
-
-
-	return WorkerError::NoError;
 }
 
 LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {

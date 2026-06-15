@@ -64,7 +64,8 @@ public:
 	std::string performActionOneWayTLS(const char * _json, const char * _senderIP);
 
 	std::string dispatchAction(const char * _json, ot::MessageType _messageType);
-
+	mongocxx::client& getAdminClient() { return m_adminClient; }
+	std::string& getDatabaseURL() { return m_databaseURL; }
 private:
 	
 	std::string dispatchAction(const std::string& _action, const ot::JsonDocument& _actionDocument, ot::MessageType _messageType);

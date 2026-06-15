@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: LoginData.cpp
 // 
 // License:
@@ -41,15 +41,29 @@ void LoginData::clear(void) {
 	m_encryptedUserPassword.clear();
 	m_sessionUser.clear();
 	m_sessionPassword.clear();
+	m_sessionToken.clear();
 }
 
 bool LoginData::isValid(void) const {
-	return m_gss.isValid() &&
+	bool valid = m_gss.isValid() &&
 		!m_databaseUrl.empty() &&
 		!m_authorizationUrl.empty() &&
 		!m_username.empty() &&
-		!m_userPassword.empty() &&
-		!m_encryptedUserPassword.empty() &&
 		!m_sessionUser.empty() &&
 		!m_sessionPassword.empty();
+	if (loggedInViaSSO())
+	{
+		valid &= !m_sessionToken.empty();
+	}
+	else
+	{
+		valid &= !m_userPassword.empty() &&
+			!m_encryptedUserPassword.empty();
+	}
+	return valid;
+}
+
+bool LoginData::loggedInViaSSO() const
+{
+	return !m_sessionToken.empty();
 }
