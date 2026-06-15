@@ -31,6 +31,8 @@ include_guard(GLOBAL)
 #
 #   ot_add_dependency(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
 #
+#   ot_service_debug_launch(<LIB_NAME> ARGS <ARG_1> <ARG_2> ...)   # optional, core services only
+#
 #   ot_finalize_lib(<LIB_NAME>)
 #   ot_add_test(<LIB_NAME>)
 #
@@ -1286,6 +1288,10 @@ function(ot_finalize_lib TARGET_NAME)
     _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
 
     _ot_set_automoc_if_qt(${_core} "${_deps}")
+
+    if(CMAKE_CURRENT_SOURCE_DIR MATCHES "/Services/")
+        _ot_apply_service_debugger(${TARGET_NAME})
+    endif()
 endfunction()
 
 function(ot_finalize_bin TARGET_NAME)
@@ -1323,6 +1329,70 @@ function(ot_finalize_bin TARGET_NAME)
     _ot_apply_all_deps(${TARGET_NAME} ${_core} "${_deps}")
 
     _ot_set_automoc_if_qt(${_core} "${_deps}")
+endfunction()
+
+function(ot_service_debug_launch TARGET_NAME)
+    cmake_parse_arguments(PARSE_ARGV 1 _OTL "" "" "ARGS")
+    set_property(GLOBAL PROPERTY OT_DEBUG_LAUNCH_ARGS_${TARGET_NAME} "${_OTL_ARGS}")
+endfunction()
+
+function(_ot_service_launch_args_json OUT_VAR TARGET_NAME)
+    get_property(_args GLOBAL PROPERTY OT_DEBUG_LAUNCH_ARGS_${TARGET_NAME})
+    set(_s "")
+    foreach(_arg IN LISTS _args)
+        string(REPLACE "\\" "\\\\" _arg "${_arg}")
+        string(REPLACE "\"" "\\\"" _arg "${_arg}")
+        string(REGEX REPLACE "@([A-Za-z_][A-Za-z0-9_]*)@" "\${env.\\1}" _arg "${_arg}")
+        string(APPEND _s ", \"${_arg}\"")
+    endforeach()
+    set(${OUT_VAR} "${_s}" PARENT_SCOPE)
+endfunction()
+
+function(_ot_apply_service_debugger TARGET_NAME)
+    if(NOT MSVC)
+        return()
+    endif()
+
+    _ot_service_launch_args_json(_svc_args ${TARGET_NAME})
+
+    set(_content "{\n")
+    string(APPEND _content "  \"version\": \"0.2.1\",\n")
+    string(APPEND _content "  \"defaults\": {},\n")
+    string(APPEND _content "  \"configurations\": [\n")
+
+    set(_first TRUE)
+    foreach(_cfg IN ITEMS Debug Release)
+        # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited
+        # PATH, which includes Deployment), so the loaded service resolves the same
+        # DLLs it always did.
+        if(_cfg STREQUAL "Debug")
+            set(_sub "debug")
+            set(_path "\${env.OT_ALL_DLLD};\${env.PATH}")
+        else()
+            set(_sub "release")
+            set(_path "\${env.OT_ALL_DLLR};\${env.PATH}")
+        endif()
+
+        if(NOT _first)
+            string(APPEND _content ",\n")
+        endif()
+        set(_first FALSE)
+
+        string(APPEND _content
+            "    {\n"
+            "      \"type\": \"dll\",\n"
+            "      \"project\": \"CMakeLists.txt\",\n"
+            "      \"projectTarget\": \"${TARGET_NAME}.dll (${_cfg}\\\\${TARGET_NAME}.dll)\",\n"
+            "      \"name\": \"${TARGET_NAME}.dll (${_cfg}\\\\${TARGET_NAME}.dll)\",\n"
+            "      \"exe\": \"\${env.OPENTWIN_DEV_ROOT}\\\\Framework\\\\OpenTwin\\\\target\\\\${_sub}\\\\open_twin.exe\",\n"
+            "      \"args\": [ \"\${debugInfo.fullTargetPath}\"${_svc_args} ],\n"
+            "      \"env\": { \"PATH\": \"${_path}\" }\n"
+            "    }")
+    endforeach()
+
+    string(APPEND _content "\n  ]\n}\n")
+
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vs/launch.vs.json" "${_content}")
 endfunction()
 
 # ------------------------------------------------------------
