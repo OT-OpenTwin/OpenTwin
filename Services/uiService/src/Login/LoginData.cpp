@@ -24,12 +24,15 @@ void LoginData::addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAlloca
 	_jsonObject.AddMember("UserName", ot::JsonString(m_username, _allocator), _allocator);
 	_jsonObject.AddMember("UserPassword", ot::JsonString(m_encryptedUserPassword, _allocator), _allocator);
 	_jsonObject.AddMember("GSS", ot::JsonString(m_gss.getUrl().toStdString(), _allocator), _allocator);
+	_jsonObject.AddMember("SessionToken", ot::JsonString(m_sessionToken, _allocator), _allocator);
 }
 
 void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) {
 	m_username = ot::json::getString(_jsonObject, "UserName");
 	m_encryptedUserPassword = ot::json::getString(_jsonObject, "UserPassword");
+	m_sessionToken = ot::json::getString(_jsonObject, "SessionToken");
 	m_gss.setUrl(QString::fromStdString(ot::json::getString(_jsonObject, "GSS")));
+
 }
 
 void LoginData::clear(void) {
