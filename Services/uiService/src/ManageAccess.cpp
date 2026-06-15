@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ManageAccess.cpp
 // 
 // License:
@@ -285,9 +285,17 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 	}
 
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
+
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -336,8 +344,16 @@ void ManageAccess::fillGroupsList(void)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_projectName, doc.GetAllocator()), doc.GetAllocator());
+
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -436,7 +452,15 @@ void ManageAccess::readGroupsList(void)
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {

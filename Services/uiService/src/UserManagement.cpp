@@ -178,7 +178,15 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_DELETE_USER, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -242,7 +250,15 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -465,7 +481,15 @@ std::string UserManagement::getUserSettingsCollection(void)
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	
+	if (app->getCurrentLoginData().loggedInViaSSO())
+	{
+		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+	}
+	else
+	{
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	}
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {

@@ -134,7 +134,33 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 
 	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
 	std::string loggedInUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USERNAME);
-	std::string loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	bool passWordAuthentication = ot::json::exists(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	std::string loggedInUserPassword;
+	if (passWordAuthentication)
+	{
+		loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	}
+	else
+	{
+		std::string sessionToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+		std::optional<std::string> usersSessionToken =	m_ssoBuffer.getToken(loggedInUsername);
+		if (!usersSessionToken.has_value())
+		{
+			// Token is not valid anymore. Need to redo the SSO login.
+		}
+		else
+		{
+			if(usersSessionToken.value() != sessionToken)
+			{
+				assert(0);
+				throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
+			}
+			else
+			{
+				loggedInUserPassword = "";
+			}
+		}
+	}
 
 	User loggedInUser;
 	loggedInUser.username = loggedInUsername;
