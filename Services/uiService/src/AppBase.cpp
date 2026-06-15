@@ -2620,7 +2620,6 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 
 		ot::GraphicsDoubleClickEvent eventData;
 		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
-		eventData.setItemName(_itemConfig->getName());
 		eventData.setItemUid(_itemConfig->getUid());
 		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(eventData);
 

@@ -333,6 +333,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent "UI.GraphicsEditor.ChangeEvent"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemClicked "UI.GraphicsEditor.ItemClicked"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked "UI.GraphicsEditor.ItemDoubleClicked"
 #define OT_ACTION_CMD_SelectedEntitiesSerialise "SerialiseSelectedEntities"
 #define OT_ACTION_CMD_PasteEntities "PasteEntities"

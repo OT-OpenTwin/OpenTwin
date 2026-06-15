@@ -1,5 +1,5 @@
 // @otlicense
-// File: GraphicsDoubleClickEvent.h
+// File: GraphicsClickEvent.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -25,14 +25,14 @@
 namespace ot
 {
 
-	class OT_GUI_API_EXPORT GraphicsDoubleClickEvent : public GuiEvent
+	class OT_GUI_API_EXPORT GraphicsClickEvent : public GuiEvent
 	{
-		OT_DECL_DEFCOPY(GraphicsDoubleClickEvent)
-		OT_DECL_DEFMOVE(GraphicsDoubleClickEvent)
+		OT_DECL_DEFCOPY(GraphicsClickEvent)
+		OT_DECL_DEFMOVE(GraphicsClickEvent)
 	public:
-		GraphicsDoubleClickEvent();
-		GraphicsDoubleClickEvent(const ConstJsonObject& _jsonObject);
-		virtual ~GraphicsDoubleClickEvent() = default;
+		GraphicsClickEvent();
+		GraphicsClickEvent(const ConstJsonObject& _jsonObject);
+		virtual ~GraphicsClickEvent() = default;
 
 		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
@@ -40,19 +40,19 @@ namespace ot
 		void setEditorName(const std::string& _name) { m_editorName = _name; };
 		void setEditorName(std::string&& _name) { m_editorName = std::move(_name); };
 
-		//! @brief Returns the name of the editor where the double-clicked item is located.
+		//! @brief Returns the name of the editor where the clicked item is located.
 		const std::string& getEditorName() const { return m_editorName; };
 
 		void setElementName(const std::string& _name) { m_elementName = _name; };
 		void setElementName(std::string&& _name) { m_elementName = std::move(_name); };
 
-		//! @brief Returns the name of the double-clicked element.
-		//! The double-clicked element may be nested.
+		//! @brief Returns the name of the clicked element.
+		//! The clicked element may be nested.
 		const std::string& getElementName() const { return m_elementName; };
 
 		void setItemUid(const UID& _uid) { m_itemUid = _uid; };
 
-		//! @brief Returns the UID of the double-clicked item root.
+		//! @brief Returns the UID of the clicked item root.
 		const UID& getItemUid() const { return m_itemUid; };
 
 	private:

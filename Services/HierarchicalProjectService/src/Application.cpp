@@ -204,8 +204,8 @@ ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropE
 ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	// Get entity information
 	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemName(), info)) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + _eventData.getItemName());
+	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemUid(), info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity { \"EntityID\": " + std::to_string(_eventData.getItemUid()) + " }");
 		OT_LOG_E(ret.getWhat());
 		return ret;
 	}

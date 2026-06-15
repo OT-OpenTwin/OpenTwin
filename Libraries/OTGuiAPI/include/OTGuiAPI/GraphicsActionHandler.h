@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTGui/Event/GuiEvent.h"
+#include "OTGui/Event/GraphicsClickEvent.h"
 #include "OTGui/Event/GraphicsChangeEvent.h"
 #include "OTGui/Event/GraphicsItemDropEvent.h"
 #include "OTGui/Event/GraphicsDoubleClickEvent.h"
@@ -42,6 +43,8 @@ namespace ot {
 
 		static JsonDocument createItemRequestedDocument(const GraphicsItemDropEvent& _eventData);
 
+		static JsonDocument createItemClickedDocument(const GraphicsClickEvent& _eventData);
+
 		static JsonDocument createItemDoubleClickedDocument(const GraphicsDoubleClickEvent& _eventData);
 
 		static JsonDocument createConnectionRequestedDocument(const GraphicsConnectionDropEvent& _eventData);
@@ -60,6 +63,10 @@ namespace ot {
 		//! @brief Is called when the addition of a new graphics item is requested.
 		//! @param _eventData Contains all information about the item request.
 		virtual ot::ReturnMessage graphicsItemRequested(const GraphicsItemDropEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
+
+		//! @brief Is called when a item was clicked.
+		//! @param _eventData Contains all information about the click event.
+		virtual ot::ReturnMessage graphicsItemClicked(const GraphicsClickEvent& _eventData) { return ReturnMessage(ReturnMessage::Ok, "Request ignored"); };
 
 		//! @brief Is caled when a item was double clicked.
 		//! @param _eventData Contains all information about the double click event.
@@ -81,6 +88,7 @@ namespace ot {
 		ActionHandler m_actionHandler;
 
 		ReturnMessage handleGraphicsItemRequested(JsonDocument& _document);
+		ReturnMessage handleGraphicsItemClicked(JsonDocument& _document);
 		ReturnMessage handleGraphicsItemDoubleClicked(JsonDocument& _document);
 
 		ReturnMessage handleGraphicsConnectionRequested(JsonDocument& _document);

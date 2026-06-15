@@ -1,5 +1,5 @@
 // @otlicense
-// File: GraphicsDoubleClickEvent.cpp
+// File: GraphicsClickEvent.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -18,19 +18,20 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Event/GraphicsDoubleClickEvent.h"
+#include "OTGui/Event/GraphicsClickEvent.h"
 
-ot::GraphicsDoubleClickEvent::GraphicsDoubleClickEvent()
+ot::GraphicsClickEvent::GraphicsClickEvent()
 	: m_itemUid(invalidUID)
 {}
 
-ot::GraphicsDoubleClickEvent::GraphicsDoubleClickEvent(const ConstJsonObject& _jsonObject)
-	: GraphicsDoubleClickEvent()
+ot::GraphicsClickEvent::GraphicsClickEvent(const ConstJsonObject& _jsonObject)
+	: GraphicsClickEvent()
 {
 	setFromJsonObject(_jsonObject);
 }
 
-void ot::GraphicsDoubleClickEvent::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
+void ot::GraphicsClickEvent::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const
+{
 	GuiEvent::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("EditorName", JsonString(m_editorName, _allocator), _allocator);
@@ -38,7 +39,8 @@ void ot::GraphicsDoubleClickEvent::addToJsonObject(JsonValue& _object, JsonAlloc
 	_object.AddMember("ElementName", JsonString(m_elementName, _allocator), _allocator);
 }
 
-void ot::GraphicsDoubleClickEvent::setFromJsonObject(const ConstJsonObject& _object) {
+void ot::GraphicsClickEvent::setFromJsonObject(const ConstJsonObject& _object)
+{
 	GuiEvent::setFromJsonObject(_object);
 
 	m_editorName = json::getString(_object, "EditorName");

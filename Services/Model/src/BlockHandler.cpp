@@ -362,7 +362,7 @@ ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoub
 
 	ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(model->getEntityByID(_eventData.getItemUid()));
 	if (!block) {
-		OT_LOG_E("Could not find block entity { \"UID\": " + std::to_string(_eventData.getItemUid()) + ", \"Name\": \"" + _eventData.getItemName() + "\" }");
+		OT_LOG_E("Could not find block entity { \"UID\": " + std::to_string(_eventData.getItemUid()) + " }");
 		return ot::ReturnMessage::Failed;
 	}
 
