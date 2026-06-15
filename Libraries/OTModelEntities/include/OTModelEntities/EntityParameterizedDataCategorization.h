@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityParameterizedDataCategorization.h
 // 
 // License:
@@ -30,7 +30,8 @@ public:
 	EntityParameterizedDataCategorization() : EntityParameterizedDataCategorization(0, nullptr, nullptr, nullptr) {};
 	EntityParameterizedDataCategorization(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 
-	virtual std::string getClassName(void) const override { return "EntityParameterizedDataCategorization"; };
+	static std::string className() { return "EntityParameterizedDataCategorization"; };
+	virtual std::string getClassName(void) const override { return className(); };
 	virtual void addVisualizationNodes() override;
 	
 	virtual bool considerForPropertyFilter(void) const override { return true; };
