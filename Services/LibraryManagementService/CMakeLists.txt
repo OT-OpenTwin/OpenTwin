@@ -26,5 +26,12 @@ ot_add_dependency(LibraryManagementService
     QtWidgets
 )
 
+ot_service_debug_launch(LibraryManagementService
+    ARGS "@OPEN_TWIN_LOGGING_URL@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LMS_PORT@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
+         "@OPEN_TWIN_MONGODB_PWD@"
+)
+
 ot_finalize_lib(LibraryManagementService)
 ot_add_test(LibraryManagementService)

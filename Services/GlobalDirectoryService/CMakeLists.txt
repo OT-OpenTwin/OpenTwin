@@ -24,5 +24,12 @@ ot_add_dependency(GlobalDirectoryService
     BOOST
 )
 
+ot_service_debug_launch(GlobalDirectoryService
+    ARGS "@OPEN_TWIN_LOGGING_URL@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GDS_PORT@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
+         "unused"
+)
+
 ot_finalize_lib(GlobalDirectoryService)
 ot_add_test(GlobalDirectoryService)

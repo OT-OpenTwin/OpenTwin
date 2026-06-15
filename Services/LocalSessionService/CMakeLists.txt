@@ -22,5 +22,12 @@ ot_add_dependency(LocalSessionService
     BOOST
 )
 
+ot_service_debug_launch(LocalSessionService
+    ARGS "@OPEN_TWIN_LOGGING_URL@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LSS_PORT@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
+         "@OPEN_TWIN_AUTH_PORT@"
+)
+
 ot_finalize_lib(LocalSessionService)
 ot_add_test(LocalSessionService)

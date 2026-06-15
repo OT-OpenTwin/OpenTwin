@@ -24,5 +24,12 @@ ot_add_dependency(LocalDirectoryService
     BOOST
 )
 
+ot_service_debug_launch(LocalDirectoryService
+    ARGS "@OPEN_TWIN_LOGGING_URL@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LDS_PORT@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GDS_PORT@"
+         "@OPEN_TWIN_AUTH_PORT@"
+)
+
 ot_finalize_lib(LocalDirectoryService)
 ot_add_test(LocalDirectoryService)

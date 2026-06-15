@@ -23,5 +23,12 @@ ot_add_dependency(AuthorisationService
     BOOST
 )
 
+ot_service_debug_launch(AuthorisationService
+    ARGS "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_AUTH_PORT@"
+         "@OPEN_TWIN_MONGODB_ADDRESS@"
+         "@OPEN_TWIN_MONGODB_PWD@"
+         "@OPEN_TWIN_LOGGING_URL@"
+)
+
 ot_finalize_lib(AuthorisationService)
 ot_add_test(AuthorisationService)

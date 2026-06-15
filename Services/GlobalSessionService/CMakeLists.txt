@@ -24,5 +24,13 @@ ot_add_dependency(GlobalSessionService
     ZLIB
 )
 
+ot_service_debug_launch(GlobalSessionService
+    ARGS "@OPEN_TWIN_LOGGING_URL@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
+         "@OPEN_TWIN_MONGODB_ADDRESS@"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_AUTH_PORT@"
+         "@OPEN_TWIN_DOWNLOAD_PORT@"
+)
+
 ot_finalize_lib(GlobalSessionService)
 ot_add_test(GlobalSessionService)

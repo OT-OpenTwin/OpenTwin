@@ -22,5 +22,12 @@ ot_add_dependency(LoggerService
     BOOST
 )
 
+ot_service_debug_launch(LoggerService
+    ARGS "unused"
+         "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LOG_PORT@"
+         "unused"
+         "unused"
+)
+
 ot_finalize_lib(LoggerService)
 ot_add_test(LoggerService)
