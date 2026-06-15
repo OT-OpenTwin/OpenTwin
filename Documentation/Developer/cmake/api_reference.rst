@@ -111,6 +111,16 @@ Resources and deployment
 ``ot_deploy_app_configuration(<Target>)``
     Adds a post-build step copying ``qt.conf`` (if present) next to the binary.
 
+Debug launch (Visual Studio F5)
+-------------------------------
+
+``ot_service_debug_launch(<Target> ARGS <arg> ...)``
+    Declares the arguments Visual Studio passes to the service loader (after the
+    service DLL path) when the service is launched with F5. ``@NAME@`` tokens are
+    emitted as ``${env.NAME}`` and resolved by Visual Studio at debug time. Most
+    services do not need this; see
+    :ref:`Debugging services in Visual Studio<target Debugging services>`.
+
 Internal helpers
 ----------------
 

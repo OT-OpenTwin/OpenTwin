@@ -219,7 +219,39 @@ These act on the core target. Call them after ``ot_initialize_*`` and before
      - Globs ``*.rc`` and ``*.ico`` into the target.
    * - ``ot_deploy_app_configuration(T)``
      - Copies ``qt.conf`` next to the binary after build.
+   * - ``ot_service_debug_launch(T ...)``
+     - Declares the Visual Studio F5 launch contract for a service (see below).
 
 See the :ref:`API reference<target CMake API Reference>` for full signatures and
 :ref:`Dependency tokens<target CMake Dependency Tokens>` for everything you can
 pass to ``ot_add_dependency``.
+
+.. _target Debugging services:
+
+Debugging services in Visual Studio
+-----------------------------------
+
+``ot_finalize_lib`` generates a ``.vs/launch.vs.json`` for every ``Services/`` target,
+so **F5** launches the service under the loader. Most services need nothing more: in a
+Debug build they read their configuration from a ``.cfg`` written by the Local
+Directory Service, so the launch arguments are ignored.
+
+Only the **backbone services** that run stand-alone and parse their own arguments
+(logger, authorisation, session and directory services) call ``ot_service_debug_launch``
+(between initialize and finalize) to declare them with ``ARGS``, using ``@NAME@`` tokens
+for environment values:
+
+.. code-block:: cmake
+
+   ot_service_debug_launch(LocalSessionService
+       ARGS "@OPEN_TWIN_LOGGING_URL@"
+            "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LSS_PORT@"
+            "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
+            "@OPEN_TWIN_AUTH_PORT@")
+
+.. note::
+   Third-party runtime DLLs (Python, ngspice, ...) live in ``Deployment``, which is on
+   ``PATH``, so services that link them load without extra configuration. The execution
+   subprocesses (``PythonExecution``, ``CircuitExecution``) are plain executables that
+   Visual Studio launches directly and resolve their DLLs the same way, so they need no
+   launch declaration either.
