@@ -153,9 +153,8 @@ namespace DataStorageAPI
 		}
 	}
 
-	std::vector<uint8_t> DocumentAPI::GetDocumentUsingGridFs(value id, const std::string& fileName, const std::string& dataBase)
+	void DocumentAPI::GetDocumentUsingGridFs(value id, const std::string& fileName, std::vector<uint8_t>& _buffer, const std::string& dataBase)
 	{
-		std::vector<uint8_t> buffer;
 		try
 		{
 			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase(dataBase);
@@ -166,8 +165,8 @@ namespace DataStorageAPI
 			auto downloader = bucket.open_download_stream(id);
 			int64_t length = downloader.file_length();
 
-			buffer.resize(length);
-			downloader.read(buffer.data(), length);
+			_buffer.resize(length);
+			downloader.read(_buffer.data(), length);
 			downloader.close();
 
 		}
@@ -175,7 +174,6 @@ namespace DataStorageAPI
 		{
 			std::cout << e.what();
 		}
-		return buffer;
 	}
 
 	value DocumentAPI::InsertDocumentUsingGridFs(bsoncxx::document::view docView, const std::string &fileName, Document &metaDoc)

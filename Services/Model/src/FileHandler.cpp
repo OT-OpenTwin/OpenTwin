@@ -451,7 +451,8 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 				DataStorageAPI::DocumentAPI api;
 				bsoncxx::oid oid_obj{ info->getDocumentId() };
 				bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
-				std::vector<uint8_t> dataBuffer  = api.GetDocumentUsingGridFs(id, info->getCollectionName());
+				std::vector<uint8_t> dataBuffer;
+				api.GetDocumentUsingGridFs(id, info->getCollectionName(), dataBuffer);
 				api.DeleteGridFSData(id, info->getCollectionName());
 				compressedData = std::string(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 			}

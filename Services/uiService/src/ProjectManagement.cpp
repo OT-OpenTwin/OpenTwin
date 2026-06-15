@@ -868,7 +868,8 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 
 
 					DataStorageAPI::DocumentAPI fsDoc;
-					std::vector<uint8_t> data = fsDoc.GetDocumentUsingGridFs(fileId, collectionName);
+					std::vector<uint8_t> data;
+					fsDoc.GetDocumentUsingGridFs(fileId, collectionName,data);
 					size_t length = data.size();
 
 					// Now store the length and the data in the export file

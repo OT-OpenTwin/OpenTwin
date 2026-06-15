@@ -339,7 +339,8 @@ void Application::handleImportMesh(ot::JsonDocument& _doc) {
 	bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
 	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-	std::vector<uint8_t> dataBuffer = api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName());
+	std::vector<uint8_t> dataBuffer;
+	api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName(), dataBuffer);
 	api.DeleteGridFSData(id, gridInfo.getCollectionName());
 
 	std::string stringData(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());

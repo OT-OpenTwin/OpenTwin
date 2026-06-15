@@ -97,7 +97,8 @@ void EntityBinaryData::readSpecificDataFromDataBase(const bsoncxx::document::vie
 		bsoncxx::oid oid_obj{ file };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		std::vector<uint8_t> buffer = doc.GetDocumentUsingGridFs(id, DataBase::instance().getCollectionName());
+		std::vector<uint8_t> buffer;
+		doc.GetDocumentUsingGridFs(id, DataBase::instance().getCollectionName(),buffer);
 		data.insert(data.end(), buffer.begin(), buffer.end());
 	}
 	else
