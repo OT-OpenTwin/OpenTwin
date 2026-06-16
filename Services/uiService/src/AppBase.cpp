@@ -1879,6 +1879,7 @@ ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entit
 	connect(graphics, &ot::GraphicsView::pasteRequested, this, &AppBase::slotPasteRequested);
 	connect(graphics, &ot::GraphicsView::itemRequested, this, &AppBase::slotGraphicsItemRequested);
 	connect(graphics, &ot::GraphicsView::elementsChanged, this, &AppBase::slotGraphicsElementsChanged);
+	connect(graphics, &ot::GraphicsView::itemClicked, this, &AppBase::slotGraphicsItemClicked);
 	connect(graphics, &ot::GraphicsView::itemDoubleClicked, this, &AppBase::slotGraphicsItemDoubleClicked);
 	connect(graphics, &ot::GraphicsView::connectionRequested, this, &AppBase::slotGraphicsConnectionRequested);
 	connect(graphics, &ot::GraphicsView::connectionToConnectionRequested, this, &AppBase::slotGraphicsConnectionToConnectionRequested);
@@ -2602,7 +2603,57 @@ void AppBase::slotGraphicsElementsChanged(const ot::GraphicsChangeEvent& _event)
 	}
 }
 
-void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig) {
+void AppBase::slotGraphicsItemClicked(ot::GraphicsItem* _item)
+{
+	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
+	if (graphicsView == nullptr)
+	{
+		OT_LOG_E("GraphicsView cast failed");
+		return;
+	}
+
+	ot::GraphicsViewView* view = dynamic_cast<ot::GraphicsViewView*>(ot::GlobalWidgetViewManager::instance().findViewFromWidget(graphicsView));
+	if (!view)
+	{
+		OT_LOG_E("View not found");
+		return;
+	}
+
+	try
+	{
+		ot::BasicServiceInformation info = ot::GlobalWidgetViewManager::instance().getOwnerFromView(view);
+
+		ot::GraphicsClickEvent eventData;
+		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
+		eventData.setElementName(_item->getGraphicsItemName());
+		eventData.setItemUid(_item->getRootItem()->getGraphicsItemUid());
+		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemClickedDocument(eventData);
+
+		std::string response;
+		if (!m_ExternalServicesComponent->sendRelayedRequest(ExternalServicesComponent::EXECUTE, info, doc, response))
+		{
+			OT_LOG_E("Failed to send http request");
+			return;
+		}
+
+		ot::ReturnMessage responseObj = ot::ReturnMessage::fromJson(response);
+		if (responseObj != ot::ReturnMessage::Ok)
+		{
+			OT_LOG_E("Request failed: " + responseObj.getWhat());
+			return;
+		}
+	}
+	catch (const std::exception& _e)
+	{
+		OT_LOG_E(_e.what());
+	}
+	catch (...)
+	{
+		OT_LOG_E("[FATAL] Unknown error");
+	}
+}
+
+void AppBase::slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item) {
 	ot::GraphicsView* graphicsView = dynamic_cast<ot::GraphicsView*>(sender());
 	if (graphicsView == nullptr) {
 		OT_LOG_E("GraphicsView cast failed");
@@ -2620,7 +2671,8 @@ void AppBase::slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConf
 
 		ot::GraphicsDoubleClickEvent eventData;
 		eventData.setEditorName(view->getGraphicsView()->getGraphicsViewName());
-		eventData.setItemUid(_itemConfig->getUid());
+		eventData.setElementName(_item->getGraphicsItemName());
+		eventData.setItemUid(_item->getRootItem()->getGraphicsItemUid());
 		ot::JsonDocument doc = ot::GraphicsActionHandler::createItemDoubleClickedDocument(eventData);
 
 		std::string response;

@@ -37,8 +37,8 @@
 
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view) :
 	m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
+	m_connectionPreviewShape(GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
+	m_maxTriggerDistance(0.), m_multiselectionEnabled(true), m_pressedItem(nullptr)
 {
 	OTAssertNullptr(m_view);
 
@@ -49,7 +49,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view) :
 
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
-	m_connectionPreviewShape(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
+	m_connectionPreviewShape(GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
 	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
 {
 	OTAssertNullptr(m_view);
@@ -62,7 +62,7 @@ ot::GraphicsScene::~GraphicsScene() {}
 
 // Connection handling
 
-bool ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos) {
+bool ot::GraphicsScene::startConnectionToConnection(GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos) {
 	OTAssertNullptr(m_view);
 	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) {
 		return false;
@@ -82,7 +82,7 @@ bool ot::GraphicsScene::startConnectionToConnection(ot::GraphicsConnectionItem* 
 	return true;
 }
 
-bool ot::GraphicsScene::startConnection(ot::GraphicsItem* _item) {
+bool ot::GraphicsScene::startConnection(GraphicsItem* _item) {
 	OTAssertNullptr(m_view);
 	if (m_view->getGraphicsViewFlags() & GraphicsView::IgnoreConnectionByUser) {
 		return false;
@@ -313,7 +313,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 
 	// Check if a base item was found next to the click position.
 	if (targetedElement) {
-		GraphicsItem* graphicsItem = dynamic_cast<ot::GraphicsItem*>(targetedElement);
+		GraphicsItem* graphicsItem = dynamic_cast<GraphicsItem*>(targetedElement);
 		GraphicsConnectionItem* connectionItem = dynamic_cast<GraphicsConnectionItem*>(targetedElement);
 
 		if (graphicsItem) {
@@ -330,29 +330,7 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 
 	this->stopConnection();
 
-	QList<QGraphicsItem*> itms = this->items(_event->scenePos());
-
-	ot::GraphicsItem* itemUnder = nullptr;
-	double minDistance(std::numeric_limits<double>::max());
-	double maxZValue = std::numeric_limits<int>::lowest();
-
-	for (QGraphicsItem* itm : itms) {
-		ot::GraphicsItem* actualItem = dynamic_cast<ot::GraphicsItem*>(itm);
-		if (actualItem && !actualItem->isInternalItem()) {
-			if (!actualItem->getParentGraphicsItem()) {
-				double dist = Math::euclideanDistance(clickPos, QtFactory::toPoint2D(actualItem->getQGraphicsItem()->mapToScene(actualItem->getQGraphicsItem()->boundingRect().center())));
-				const double zValue = actualItem->getQGraphicsItem()->zValue();
-
-				if (!itemUnder ||
-					(zValue > maxZValue) ||
-					(zValue == maxZValue && dist < minDistance)) {
-					itemUnder = actualItem;
-					minDistance = dist;
-					maxZValue = zValue;
-				}
-			}
-		}
-	}
+	GraphicsItem* itemUnder = findItemWithFlagAt(_event->scenePos(), GraphicsItemCfg::ItemIsDoubleClickable);
 
 	if (itemUnder) {
 		Q_EMIT graphicsItemDoubleClicked(itemUnder);
@@ -430,6 +408,7 @@ void ot::GraphicsScene::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
 	if (_event->button() == Qt::LeftButton) {
 		m_lastSelection = this->selectedItems();
 		m_mouseIsPressed = true;
+		m_pressedItem = findItemWithFlagAt(_event->scenePos(), GraphicsItemCfg::ItemIsClickable);
 	}
 	QGraphicsScene::mousePressEvent(_event);
 }
@@ -440,6 +419,12 @@ void ot::GraphicsScene::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
 	if (_event->button() == Qt::LeftButton) {
 		m_mouseIsPressed = false;
 		this->handleSelectionChanged();
+
+		GraphicsItem* clickedItem = findItemWithFlagAt(_event->scenePos(), GraphicsItemCfg::ItemIsClickable);
+		if (clickedItem && clickedItem == m_pressedItem) {
+			Q_EMIT graphicsItemClicked(clickedItem);
+		}
+		m_pressedItem = nullptr;
 	}
 }
 
@@ -616,9 +601,9 @@ ot::GraphicsElement* ot::GraphicsScene::findClosestConnectableElement(const QPoi
 	GraphicsElement* targetedElement = nullptr;
 	bool targetedIsItem = false;
 	for (auto itm : lst) {
-		ot::GraphicsElement* actualBase = dynamic_cast<ot::GraphicsElement*>(itm);
+		GraphicsElement* actualBase = dynamic_cast<GraphicsElement*>(itm);
 		/*if (actualItm) {
-			if (actualItm->getGraphicsItemFlags() & ot::GraphicsItemCfg::ItemIsConnectable) {
+			if (actualItm->getGraphicsItemFlags() & GraphicsItemCfg::ItemIsConnectable) {
 				this->startConnection(actualItm);
 				//QGraphicsScene::mouseDoubleClickEvent(_event);
 				return;
@@ -626,7 +611,7 @@ ot::GraphicsElement* ot::GraphicsScene::findClosestConnectableElement(const QPoi
 		}
 		*/
 		if (actualBase) {
-			ot::GraphicsItem* actualItm = dynamic_cast<ot::GraphicsItem*>(itm);
+			GraphicsItem* actualItm = dynamic_cast<GraphicsItem*>(itm);
 
 			qreal dist = actualBase->calculateShortestDistanceToPoint(_pos);
 
@@ -749,4 +734,42 @@ void ot::GraphicsScene::handleSingleSelectionChanged() {
 	this->blockSignals(blocked);
 
 	Q_EMIT selectionChangeFinished();
+}
+
+ot::GraphicsItem* ot::GraphicsScene::findItemWithFlagAt(const QPointF& _pos, GraphicsItemCfg::GraphicsItemFlag _flag) const
+{
+	QList<QGraphicsItem*> itms = this->items(_pos);
+
+	GraphicsItem* itemUnder = nullptr;
+	double minDistance(std::numeric_limits<double>::max());
+	double maxZValue = std::numeric_limits<int>::lowest();
+
+	for (QGraphicsItem* itm : itms)
+	{
+		GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(itm);
+		if (actualItem && !actualItem->isInternalItem())
+		{
+			// Determine double clickable item
+			while (actualItem && !actualItem->getGraphicsItemFlags().has(_flag))
+			{
+				actualItem = actualItem->getParentGraphicsItem();
+			}
+
+			if (actualItem)
+			{
+				const Point2DD otPos = QtFactory::toPoint2D(_pos);
+				double dist = Math::euclideanDistance(otPos, QtFactory::toPoint2D(actualItem->getQGraphicsItem()->mapToScene(actualItem->getQGraphicsItem()->boundingRect().center())));
+				const double zValue = actualItem->getQGraphicsItem()->zValue();
+
+				if (!itemUnder || (zValue > maxZValue) || (zValue == maxZValue && dist < minDistance))
+				{
+					itemUnder = actualItem;
+					minDistance = dist;
+					maxZValue = zValue;
+				}
+			}
+		}
+	}
+
+	return itemUnder;
 }

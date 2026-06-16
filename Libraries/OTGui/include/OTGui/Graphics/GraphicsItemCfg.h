@@ -87,6 +87,7 @@ namespace ot {
 			ItemSilencesNotifcations   = 1 << 10, //! @brief Item will not send notifications to the scene when it is changed.
 
 			ItemIsClickable            = 1 << 11, //! @brief Item can be clicked by the user. If the item has a parent, the item may be clicked inside of the parent item.
+			ItemIsDoubleClickable      = 1 << 12, //! @brief Item can be double-clicked by the user. If the item has a parent, the item may be double-clicked inside of the parent item.
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 

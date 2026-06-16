@@ -93,7 +93,13 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	GraphicsStackItemCfg* root = new GraphicsStackItemCfg;
 	root->setName(m_entityName);
 	root->setToolTip(m_toolTip);
-	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGridTopLeft | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
+	root->setGraphicsItemFlags(
+		GraphicsItemCfg::ItemIsMoveable
+		| GraphicsItemCfg::ItemSnapsToGridTopLeft
+		| GraphicsItemCfg::ItemForwardsState
+		| GraphicsItemCfg::ItemIsSelectable
+		| GraphicsItemCfg::ItemIsDoubleClickable
+	);
 
 	// Central Stack
 	GraphicsStackItemCfg* cStack = new GraphicsStackItemCfg;

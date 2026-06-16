@@ -46,7 +46,8 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene, QWidget* _parent) :
 	QGraphicsView(_parent), m_scene(_scene), m_wheelEnabled(true), m_dropEnabled(false),
 	m_viewFlags(NoViewFlags), m_viewStateFlags(DefaultState), m_sceneMargins(5., 5., 5., 5.)
 {
-	if (!m_scene) {
+	if (!m_scene)
+	{
 		m_scene = new GraphicsScene(this);
 	}
 
@@ -58,6 +59,7 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene, QWidget* _parent) :
 
 	this->setUpdatesEnabled(true);
 
+	this->connect(m_scene, &GraphicsScene::graphicsItemClicked, this, &GraphicsView::slotGraphicsItemClicked);
 	this->connect(m_scene, &GraphicsScene::graphicsItemDoubleClicked, this, &GraphicsView::slotGraphicsItemDoubleClicked);
 
 	QShortcut* copyShortcut = new QShortcut(this);
@@ -71,33 +73,40 @@ ot::GraphicsView::GraphicsView(GraphicsScene* _scene, QWidget* _parent) :
 	this->connect(pasteShortcut, &QShortcut::activated, this, &GraphicsView::slotPaste);
 }
 
-ot::GraphicsView::~GraphicsView() {
-	
+ot::GraphicsView::~GraphicsView()
+{
+
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Setter / Getter
 
-void ot::GraphicsView::setGraphicsViewName(const std::string& _name) {
+void ot::GraphicsView::setGraphicsViewName(const std::string& _name)
+{
 	m_viewName = _name;
 
 	// Reparent items
-	for (auto& it : m_items) {
-		if (EntityName::isChildOf(it.second->getGraphicsItemName(), m_viewName)) {
+	for (auto& it : m_items)
+	{
+		if (EntityName::isChildOf(it.second->getGraphicsItemName(), m_viewName))
+		{
 			it.second->setGraphicsItemName(EntityName::changeParentPath(it.second->getGraphicsItemName(), m_viewName));
 		}
 	}
 }
 
-void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene) {
+void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene)
+{
 	OTAssertNullptr(_scene);
 
-	if (_scene == m_scene) {
+	if (_scene == m_scene)
+	{
 		return;
 	}
 
-	if (m_scene) {
+	if (m_scene)
+	{
 		delete m_scene;
 	}
 
@@ -110,10 +119,12 @@ void ot::GraphicsView::setGraphicsScene(GraphicsScene* _scene) {
 
 // View handling
 
-void ot::GraphicsView::resetView() {
+void ot::GraphicsView::resetView()
+{
 	OTAssertNullptr(m_scene);
 	QRectF boundingRect = m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins);
-	if (m_viewFlags & ViewManagesSceneRect) {
+	if (m_viewFlags & ViewManagesSceneRect)
+	{
 		this->setSceneRect(boundingRect.marginsAdded(m_sceneMargins));
 	}
 
@@ -121,17 +132,20 @@ void ot::GraphicsView::resetView() {
 	this->centerOn(boundingRect.center());
 }
 
-void ot::GraphicsView::ensureViewInBounds() {
+void ot::GraphicsView::ensureViewInBounds()
+{
 	OTAssertNullptr(m_scene);
 	QRect itemsRect = this->mapFromScene(m_scene->itemsBoundingRect().marginsAdded(m_sceneMargins)).boundingRect();
 	QRect viewPortRect = this->viewport()->rect();
 
-	if (itemsRect.width() < viewPortRect.width() && itemsRect.height() < viewPortRect.height()) {
+	if (itemsRect.width() < viewPortRect.width() && itemsRect.height() < viewPortRect.height())
+	{
 		this->resetView();
 	}
 }
 
-QRectF ot::GraphicsView::getVisibleSceneRect() const {
+QRectF ot::GraphicsView::getVisibleSceneRect() const
+{
 	return this->mapToScene(this->viewport()->rect()).boundingRect();
 }
 
@@ -139,30 +153,39 @@ QRectF ot::GraphicsView::getVisibleSceneRect() const {
 
 // Item handling
 
-ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID&  _itemUid) {
+ot::GraphicsItem* ot::GraphicsView::getItem(const ot::UID& _itemUid)
+{
 	auto it = m_items.find(_itemUid);
-	if (it == m_items.end()) {
+	if (it == m_items.end())
+	{
 		return nullptr;
 	}
-	else {
+	else
+	{
 		return it->second;
 	}
 }
 
-ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _connectionUid) {
+ot::GraphicsConnectionItem* ot::GraphicsView::getConnection(const ot::UID& _connectionUid)
+{
 	auto it = m_connections.find(_connectionUid);
-	if (it == m_connections.end()) {
-		OT_LOG_W("Connection with the UID \"" + std::to_string(_connectionUid)+ "\" does not exist");
+	if (it == m_connections.end())
+	{
+		OT_LOG_W("Connection with the UID \"" + std::to_string(_connectionUid) + "\" does not exist");
 		return nullptr;
 	}
-	else {
+	else
+	{
 		return it->second;
 	}
 }
 
-void ot::GraphicsView::renameItem(const std::string& _oldEntityName, const std::string& _newEntityName) {
-	for (auto& it : m_items) {
-		if (it.second->getGraphicsItemName() == _oldEntityName) {
+void ot::GraphicsView::renameItem(const std::string& _oldEntityName, const std::string& _newEntityName)
+{
+	for (auto& it : m_items)
+	{
+		if (it.second->getGraphicsItemName() == _oldEntityName)
+		{
 			it.second->setGraphicsItemName(_newEntityName);
 		}
 	}
@@ -182,9 +205,11 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 	return alreadyExisting;
 }
 
-void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
+void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
+{
 	auto it = m_items.find(_item->getGraphicsItemUid());
-	if (it != m_items.end()) {
+	if (it != m_items.end())
+	{
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
 		this->removeItem(_item->getGraphicsItemUid());
 	}
@@ -196,7 +221,8 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	_item->setGraphicsScene(m_scene);
 
 	QPointF pt = m_scene->snapToGrid(_item);
-	if (pt != _item->getQGraphicsItem()->pos()) {
+	if (pt != _item->getQGraphicsItem()->pos())
+	{
 		_item->setGraphicsItemPos(pt);
 	}
 
@@ -208,35 +234,43 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item) {
 	OT_LOG_D("Item added { \"UID\": " + std::to_string(_item->getGraphicsItemUid()) + " }");
 
 	// Check if any connection in the buffer can be created now
-	for (auto& connection : m_connections) {
-		if (connection.second->getConfiguration().getOriginUid() == _item->getGraphicsItemUid()) {
+	for (auto& connection : m_connections)
+	{
+		if (connection.second->getConfiguration().getOriginUid() == _item->getGraphicsItemUid())
+		{
 			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getOriginConnectable());
-			if (connector) {
+			if (connector)
+			{
 				connection.second->setOriginItem(connector);
 			}
 		}
-		else if (connection.second->getConfiguration().getDestinationUid() == _item->getGraphicsItemUid()) {
+		else if (connection.second->getConfiguration().getDestinationUid() == _item->getGraphicsItemUid())
+		{
 			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getDestConnectable());
-			if (connector) {
+			if (connector)
+			{
 				connection.second->setDestItem(connector);
 			}
 		}
 	}
 }
 
-void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
+void ot::GraphicsView::removeItem(const ot::UID& _itemUid)
+{
 	auto graphicsItemByUID = m_items.find(_itemUid);
-	if (graphicsItemByUID == m_items.end()) {
+	if (graphicsItemByUID == m_items.end())
+	{
 		return;
 	}
-	
+
 	QSignalBlocker viewBlocker(this);
 	QSignalBlocker sceneBlocker(m_scene);
 
-	ot::GraphicsItem* graphicsItem =  graphicsItemByUID->second;
+	ot::GraphicsItem* graphicsItem = graphicsItemByUID->second;
 	OTAssertNullptr(graphicsItem);
 
-	for (GraphicsConnectionItem* connection : graphicsItem->getAllConnections()) {
+	for (GraphicsConnectionItem* connection : graphicsItem->getAllConnections())
+	{
 		// Removing an item may occur during undo/redo operations, therefore we don't want to update the config
 		connection->disconnectItem(graphicsItem, false);
 	}
@@ -249,29 +283,35 @@ void ot::GraphicsView::removeItem(const ot::UID& _itemUid) {
 	delete graphicsItem;
 	graphicsItem = nullptr;
 	m_items.erase(_itemUid);
-	
+
 	OT_LOG_D("Item removed { \"UID\": " + std::to_string(_itemUid) + " }");
 }
 
-void ot::GraphicsView::setSelectedElements(const ot::UIDList& _uids) {
+void ot::GraphicsView::setSelectedElements(const ot::UIDList& _uids)
+{
 	QSignalBlocker blocker(this);
 	QSignalBlocker blocker2(m_scene);
 
-	for (auto& item : m_items) {
+	for (auto& item : m_items)
+	{
 		item.second->getQGraphicsItem()->setSelected(std::find(_uids.begin(), _uids.end(), item.second->getGraphicsItemUid()) != _uids.end());
 	}
 
-	for (auto& conn : m_connections) {
+	for (auto& conn : m_connections)
+	{
 		conn.second->getQGraphicsItem()->setSelected(std::find(_uids.begin(), _uids.end(), conn.second->getConfiguration().getUid()) != _uids.end());
 	}
 }
 
-std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const {
+std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const
+{
 	std::list<ot::UID> sel; // Selected items
-	for (auto s : m_scene->selectedItems()) {
+	for (auto s : m_scene->selectedItems())
+	{
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
 
-		if (itm && !itm->isInternalItem()) {
+		if (itm && !itm->isInternalItem())
+		{
 			// Item selected
 			sel.push_back(itm->getGraphicsItemUid());
 		}
@@ -279,12 +319,15 @@ std::list<ot::UID> ot::GraphicsView::getSelectedItemUIDs() const {
 	return sel;
 }
 
-std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems() const {
+std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems() const
+{
 	std::list<GraphicsItem*> sel; // Selected items
-	for (auto s : m_scene->selectedItems()) {
+	for (auto s : m_scene->selectedItems())
+	{
 		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(s);
 
-		if (itm) {
+		if (itm)
+		{
 			// Item selected
 			sel.push_back(itm);
 		}
@@ -292,7 +335,8 @@ std::list<ot::GraphicsItem*> ot::GraphicsView::getSelectedGraphicsItems() const 
 	return sel;
 }
 
-void ot::GraphicsView::setGraphicsSceneRect(const QRectF& _rect) {
+void ot::GraphicsView::setGraphicsSceneRect(const QRectF& _rect)
+{
 	this->setSceneRect(_rect);
 	QRectF rec = _rect.marginsAdded(m_sceneMargins);
 	this->fitInView(rec, Qt::KeepAspectRatio);
@@ -305,12 +349,13 @@ void ot::GraphicsView::setGraphicsSceneRect(const QRectF& _rect) {
 
 // Connection handling
 
-void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
+void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config)
+{
 	this->removeConnection(_config.getUid());
 
 	ot::GraphicsItem* src = this->getItem(_config.getOriginUid());
 	ot::GraphicsItem* dest = this->getItem(_config.getDestinationUid());
-	
+
 	ot::GraphicsItem* srcConn = nullptr;
 	ot::GraphicsItem* destConn = nullptr;
 
@@ -320,30 +365,38 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	newConnection->setGraphicsScene(m_scene);
 
 	newConnection->setConfiguration(_config);
-	
-	if (src) {
+
+	if (src)
+	{
 		srcConn = src->findItem(_config.getOriginConnectable());
-		if (!srcConn) {
+		if (!srcConn)
+		{
 			OT_LOG_E("Origin connector not found { \"ItemUID\": " + std::to_string(_config.getOriginUid()) + ", \"Connector\": \"" + _config.getOriginConnectable() + "\" }");
 		}
 	}
-	if (dest) {
+	if (dest)
+	{
 		destConn = dest->findItem(_config.getDestConnectable());
-		if (!destConn) {
+		if (!destConn)
+		{
 			OT_LOG_E("Destination connector not found { \"ItemUID\": " + std::to_string(_config.getDestinationUid()) + ", \"Connector\": \"" + _config.getDestConnectable() + "\" }");
 		}
 	}
 
-	if (srcConn) {
+	if (srcConn)
+	{
 		newConnection->setOriginItem(srcConn);
 	}
-	else {
+	else
+	{
 		newConnection->setOriginPos(_config.getOriginPos());
 	}
-	if (destConn) {
+	if (destConn)
+	{
 		newConnection->setDestItem(destConn);
 	}
-	else {
+	else
+	{
 		newConnection->setDestPos(_config.getDestPos());
 	}
 
@@ -352,14 +405,17 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config) {
 	OT_LOG_D("New connection added { \"UID\": " + std::to_string(_config.getUid()) + " }");
 }
 
-void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation) {
+void ot::GraphicsView::removeConnection(const GraphicsConnectionCfg& _connectionInformation)
+{
 	this->removeConnection(_connectionInformation.getUid());
 }
 
-void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
+void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID)
+{
 	// Ensure connection exists
 	auto connectionByUID = m_connections.find(_connectionUID);
-	if (connectionByUID == m_connections.end()) {
+	if (connectionByUID == m_connections.end())
+	{
 		return;
 	}
 
@@ -380,25 +436,30 @@ void ot::GraphicsView::removeConnection(const ot::UID& _connectionUID) {
 
 	// Erase connection from map
 	m_connections.erase(_connectionUID);
-	
+
 	OT_LOG_D("Connection removed { \"UID\": " + std::to_string(_connectionUID) + " }");
 
 	m_scene->blockSignals(false);
 	this->blockSignals(false);
 }
 
-ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs() const {
+ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs() const
+{
 	UIDList sel; // Selected items
-	for (auto s : m_scene->selectedItems()) {
+	for (auto s : m_scene->selectedItems())
+	{
 		GraphicsConnectionItem* citm = dynamic_cast<GraphicsConnectionItem*>(s);
 
-		if (citm) {
+		if (citm)
+		{
 			// Connection selected
 			sel.push_back(citm->getConfiguration().getUid());
 		}
-		else {
+		else
+		{
 			GraphicsConnectionConnectorItem* conItm = dynamic_cast<GraphicsConnectionConnectorItem*>(s);
-			if (conItm && conItm->getConnection()) {
+			if (conItm && conItm->getConnection())
+			{
 				sel.push_back(conItm->getConnection()->getConfiguration().getUid());
 			}
 		}
@@ -408,19 +469,24 @@ ot::UIDList ot::GraphicsView::getSelectedConnectionUIDs() const {
 	return sel;
 }
 
-std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionItems() const {
+std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionItems() const
+{
 	std::list<GraphicsConnectionItem*> sel; // Selected items
-	for (auto s : m_scene->selectedItems()) {
+	for (auto s : m_scene->selectedItems())
+	{
 		ot::GraphicsConnectionItem* citm = dynamic_cast<ot::GraphicsConnectionItem*>(s);
 
-		if (citm) {
+		if (citm)
+		{
 			// Connection selected
 			sel.push_back(citm);
 		}
-		else {
+		else
+		{
 			// Connection selected trough connector
 			GraphicsConnectionConnectorItem* conItm = dynamic_cast<GraphicsConnectionConnectorItem*>(s);
-			if (conItm && conItm->getConnection()) {
+			if (conItm && conItm->getConnection())
+			{
 				sel.push_back(conItm->getConnection());
 			}
 		}
@@ -430,15 +496,18 @@ std::list<ot::GraphicsConnectionItem*> ot::GraphicsView::getSelectedConnectionIt
 	return sel;
 }
 
-void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector) {
-	if (this->connectionAlreadyExists(ot::GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector))) {
+void ot::GraphicsView::requestConnection(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector)
+{
+	if (this->connectionAlreadyExists(ot::GraphicsConnectionCfg(_fromUid, _fromConnector, _toUid, _toConnector)))
+	{
 		OT_LOG_W("Connection already exists { \"Origin.UID\": \"" + std::to_string(_fromUid) + "\", \"Origin.Conn\"" + _fromConnector + "\", \"Dest.UID\": \"" + std::to_string(_toUid) + "\", \"Dest.Conn\": \"" + _toConnector + "\" }");
 		return;
 	}
 	Q_EMIT connectionRequested(_fromUid, _fromConnector, _toUid, _toConnector);
 }
 
-void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint) {
+void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint)
+{
 	Q_EMIT connectionToConnectionRequested(_fromItemUid, _fromItemConnector, _toConnectionUid, _newControlPoint);
 }
 
@@ -446,23 +515,28 @@ void ot::GraphicsView::requestConnectionToConnection(const ot::UID& _fromItemUid
 
 // Callback handling
 
-void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _item) {
+void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _item)
+{
 	// Avoid notification of child items
-	if (_item != _item->getRootItem()) {
+	if (_item != _item->getRootItem())
+	{
 		return;
 	}
 
-	if (m_viewStateFlags & ItemMoveInProgress) {
+	if (m_viewStateFlags & ItemMoveInProgress)
+	{
 		return;
 	}
 
 	// Ensure item is not a connector
-	if (!_item->isInternalItem()) {
+	if (!_item->isInternalItem())
+	{
 		GraphicsChangeEvent evt;
 		evt.setEditorName(m_viewName);
 		evt.addChangedItem(_item->getConfiguration()->createCopy());
 
-		for (const GraphicsConnectionItem* connection : _item->getAllConnections()) {
+		for (const GraphicsConnectionItem* connection : _item->getAllConnections())
+		{
 			evt.addChangedConnection(connection->getConfiguration());
 		}
 
@@ -470,7 +544,8 @@ void ot::GraphicsView::notifyItemConfigurationChanged(const ot::GraphicsItem* _i
 	}
 }
 
-void ot::GraphicsView::notifyConnectionConfigurationChanged(const ot::GraphicsConnectionItem* _connection) {
+void ot::GraphicsView::notifyConnectionConfigurationChanged(const ot::GraphicsConnectionItem* _connection)
+{
 	GraphicsChangeEvent evt;
 	evt.setEditorName(m_viewName);
 	evt.addChangedConnection(_connection->getConfiguration());
@@ -481,59 +556,70 @@ void ot::GraphicsView::notifyConnectionConfigurationChanged(const ot::GraphicsCo
 
 // Protected: Events
 
-void ot::GraphicsView::wheelEvent(QWheelEvent* _event) {
+void ot::GraphicsView::wheelEvent(QWheelEvent* _event)
+{
 	if ((m_viewStateFlags & MiddleMousePressedState) || !m_wheelEnabled) return;
 	const ViewportAnchor anchor = transformationAnchor();
 	setTransformationAnchor(QGraphicsView::AnchorUnderMouse);
 	int angle = _event->angleDelta().y();
 	qreal factor;
-	if (angle > 0) {
+	if (angle > 0)
+	{
 		factor = 1.1;
 	}
-	else {
+	else
+	{
 		factor = 0.9;
 	}
 	this->scale(factor, factor);
-			
+
 	this->setTransformationAnchor(anchor);
 
 	this->ensureViewInBounds();
 }
 
-void ot::GraphicsView::mousePressEvent(QMouseEvent* _event) {
+void ot::GraphicsView::mousePressEvent(QMouseEvent* _event)
+{
 	QGraphicsView::mousePressEvent(_event);
 
-	if (_event->button() == Qt::MiddleButton) {
+	if (_event->button() == Qt::MiddleButton)
+	{
 		this->viewport()->setCursor(Qt::ClosedHandCursor);
 		m_lastPanPos = _event->pos();
 		m_viewStateFlags |= MiddleMousePressedState;
 	}
-	else if (_event->button() == Qt::LeftButton) {
+	else if (_event->button() == Qt::LeftButton)
+	{
 		this->beginItemMove();
 	}
 }
 
-void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event) {
+void ot::GraphicsView::mouseReleaseEvent(QMouseEvent* _event)
+{
 	QGraphicsView::mouseReleaseEvent(_event);
 
-	if (_event->button() == Qt::MiddleButton) {
+	if (_event->button() == Qt::MiddleButton)
+	{
 		m_viewStateFlags &= (~MiddleMousePressedState);
 		this->viewport()->setCursor(Qt::CrossCursor);
 	}
-	else if (_event->button() == Qt::LeftButton) {
+	else if (_event->button() == Qt::LeftButton)
+	{
 		this->endItemMove();
 	}
 }
 
 void ot::GraphicsView::mouseMoveEvent(QMouseEvent* _event)
 {
-	if (m_viewStateFlags & MiddleMousePressedState) {
+	if (m_viewStateFlags & MiddleMousePressedState)
+	{
 		this->horizontalScrollBar()->setValue(horizontalScrollBar()->value() - (_event->position().x() - m_lastPanPos.x()));
 		this->verticalScrollBar()->setValue(verticalScrollBar()->value() - (_event->position().y() - m_lastPanPos.y()));
 		m_lastPanPos = _event->pos();
 		_event->accept();
 	}
-	else {
+	else
+	{
 		QGraphicsView::mouseMoveEvent(_event);
 	}
 }
@@ -545,76 +631,101 @@ void ot::GraphicsView::keyPressEvent(QKeyEvent* _event)
 		// Reset the view
 		this->resetView();
 	}
-	else if (_event->key() == Qt::Key_Delete) {
+	else if (_event->key() == Qt::Key_Delete)
+	{
 		ot::UIDList itm = this->getSelectedItemUIDs();
 		ot::UIDList con = this->getSelectedConnectionUIDs();
 		if (itm.empty() && con.empty()) return;
 		Q_EMIT removeItemsRequested(itm, con);
 	}
-	else if (_event->key() == Qt::Key_Left) {
-		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+	else if (_event->key() == Qt::Key_Left)
+	{
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))
+		{
 			m_scene->flipAllSelectedItems(Qt::Horizontal);
 		}
-		else {
+		else
+		{
 			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(-m_scene->getGrid().getGridStep().getX(), 0.));
 		}
 	}
-	else if (_event->key() == Qt::Key_Right) {
-		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+	else if (_event->key() == Qt::Key_Right)
+	{
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))
+		{
 			m_scene->flipAllSelectedItems(Qt::Horizontal);
 		}
-		else {
+		else
+		{
 			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(m_scene->getGrid().getGridStep().getX(), 0.));
 		}
 	}
-	else if (_event->key() == Qt::Key_Up) {
-		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+	else if (_event->key() == Qt::Key_Up)
+	{
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))
+		{
 			m_scene->flipAllSelectedItems(Qt::Vertical);
 		}
-		else {
+		else
+		{
 			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(0., -m_scene->getGrid().getGridStep().getY()));
 		}
 	}
-	else if (_event->key() == Qt::Key_Down) {
-		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)) {
+	else if (_event->key() == Qt::Key_Down)
+	{
+		if (_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))
+		{
 			m_scene->flipAllSelectedItems(Qt::Vertical);
 		}
-		else {
+		else
+		{
 			this->beginItemMove();
 			m_scene->moveAllSelectedItems(Point2DD(0., m_scene->getGrid().getGridStep().getY()));
 		}
 	}
-	else if (_event->key() == Qt::Key_R) {
-		if (_event->modifiers() & Qt::ControlModifier) {
+	else if (_event->key() == Qt::Key_R)
+	{
+		if (_event->modifiers() & Qt::ControlModifier)
+		{
 			m_scene->rotateAllSelectedItems(-90.);
 		}
-		else {
+		else
+		{
 			m_scene->rotateAllSelectedItems(90.);
 		}
 	}
 }
 
-void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event) {
-	if (_event->key() == Qt::Key_Left && !_event->isAutoRepeat()) {
-		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+void ot::GraphicsView::keyReleaseEvent(QKeyEvent* _event)
+{
+	if (_event->key() == Qt::Key_Left && !_event->isAutoRepeat())
+	{
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)))
+		{
 			this->endItemMove();
 		}
 	}
-	else if (_event->key() == Qt::Key_Right && !_event->isAutoRepeat()) {
-		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+	else if (_event->key() == Qt::Key_Right && !_event->isAutoRepeat())
+	{
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)))
+		{
 			this->endItemMove();
 		}
 	}
-	else if (_event->key() == Qt::Key_Up && !_event->isAutoRepeat()) {
-		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+	else if (_event->key() == Qt::Key_Up && !_event->isAutoRepeat())
+	{
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)))
+		{
 			this->endItemMove();
 		}
 	}
-	else if (_event->key() == Qt::Key_Down && !_event->isAutoRepeat()) {
-		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier))) {
+	else if (_event->key() == Qt::Key_Down && !_event->isAutoRepeat())
+	{
+		if (!(_event->modifiers() & (Qt::ControlModifier | Qt::AltModifier)))
+		{
 			this->endItemMove();
 		}
 	}
@@ -627,28 +738,33 @@ void ot::GraphicsView::resizeEvent(QResizeEvent* _event)
 	this->ensureViewInBounds();
 }
 
-void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
-	if (!m_dropEnabled) {
+void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event)
+{
+	if (!m_dropEnabled)
+	{
 		_event->ignore();
 		//QGraphicsView::dragEnterEvent(_event);
 		return;
 	}
 
 	// Check item name provided
-	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty()) {
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty())
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Check owner provided
 	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
-	if (pickerKey.empty()) {
+	if (pickerKey.empty())
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Check owner equals
-	if (pickerKey != m_pickerKey) {
+	if (pickerKey != m_pickerKey)
+	{
 		_event->ignore();
 		return;
 	}
@@ -656,15 +772,18 @@ void ot::GraphicsView::dragEnterEvent(QDragEnterEvent* _event) {
 	_event->acceptProposedAction();
 }
 
-void ot::GraphicsView::dropEvent(QDropEvent* _event) {
+void ot::GraphicsView::dropEvent(QDropEvent* _event)
+{
 	OTAssertNullptr(m_scene);
 
-	if (!m_dropEnabled) {
+	if (!m_dropEnabled)
+	{
 		_event->ignore();
 		return;
 	}
 	QString itemName = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName);
-	if (itemName.isEmpty()) {
+	if (itemName.isEmpty())
+	{
 		OT_LOG_W("Drop event reqected: MimeData not matching");
 		_event->ignore();
 		return;
@@ -672,47 +791,54 @@ void ot::GraphicsView::dropEvent(QDropEvent* _event) {
 
 	// Check owner provided
 	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
-	if (pickerKey.empty()) {
+	if (pickerKey.empty())
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Check owner equals
-	if (pickerKey != m_pickerKey) {
+	if (pickerKey != m_pickerKey)
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Snap position to grid
 	QPointF gridPos = m_scene->snapToGrid(this->mapToScene(_event->position().toPoint()));
-	
+
 	// Emit event
 	Q_EMIT itemRequested(itemName, gridPos);
 	_event->acceptProposedAction();
 }
 
-void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
-	if (!m_dropEnabled) {
+void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event)
+{
+	if (!m_dropEnabled)
+	{
 		_event->ignore();
 		//QGraphicsView::dragEnterEvent(_event);
 		return;
 	}
 
 	// Check item name provided
-	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty()) {
+	if (_event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_ItemName).isEmpty())
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Check owner provided
 	std::string pickerKey = _event->mimeData()->data(OT_GRAPHICSITEMPREVIEWDRAG_MIMETYPE_PickerKey).toStdString();
-	if (pickerKey.empty()) {
+	if (pickerKey.empty())
+	{
 		_event->ignore();
 		return;
 	}
 
 	// Check owner equals
-	if (pickerKey != m_pickerKey) {
+	if (pickerKey != m_pickerKey)
+	{
 		_event->ignore();
 		return;
 	}
@@ -724,23 +850,28 @@ void ot::GraphicsView::dragMoveEvent(QDragMoveEvent* _event) {
 
 // Private: Slots
 
-void ot::GraphicsView::slotCopy() {
+void ot::GraphicsView::slotCopy()
+{
 	CopyInformation info;
-	if (this->getParentWidgetView()) {
+	if (this->getParentWidgetView())
+	{
 		info.setOriginViewInfo(this->getParentWidgetView()->getViewData());
 	}
 	Q_EMIT copyRequested(info);
 }
 
-void ot::GraphicsView::slotPaste() {
+void ot::GraphicsView::slotPaste()
+{
 	CopyInformation info;
 
-	if (this->getParentWidgetView()) {
+	if (this->getParentWidgetView())
+	{
 		info.setDestinationViewInfo(this->getParentWidgetView()->getViewData());
 	}
 
 	QPoint mousePos = this->mapFromGlobal(QCursor::pos());
-	if (this->rect().contains(mousePos)) {
+	if (this->rect().contains(mousePos))
+	{
 		// If mouse is over the view paste at cursor
 		QPointF mouseScenePos = m_scene->snapToGrid(this->mapToScene(mousePos));
 		info.setDestinationScenePos(QtFactory::toPoint2D(mouseScenePos));
@@ -749,31 +880,43 @@ void ot::GraphicsView::slotPaste() {
 	Q_EMIT pasteRequested(info);
 }
 
-void ot::GraphicsView::slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item) {
-	Q_EMIT itemDoubleClicked(_item->getConfiguration());
+void ot::GraphicsView::slotGraphicsItemClicked(ot::GraphicsItem* _item)
+{
+	Q_EMIT itemClicked(_item);
+}
+
+void ot::GraphicsView::slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item)
+{
+	Q_EMIT itemDoubleClicked(_item);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
 
-void ot::GraphicsView::beginItemMove() {
-	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState)) {
+void ot::GraphicsView::beginItemMove()
+{
+	if (m_viewStateFlags & (ItemMoveInProgress | ReadOnlyState))
+	{
 		return;
 	}
 
 	m_viewStateFlags.set(ItemMoveInProgress, true);
 
-	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
+	for (QGraphicsItem* qItm : m_scene->selectedItems())
+	{
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
-		if (otItem) {
+		if (otItem)
+		{
 			otItem->setCurrentPosAsMoveStart();
 		}
 	}
 }
 
-void ot::GraphicsView::endItemMove() {
-	if (!(m_viewStateFlags & ItemMoveInProgress) || (m_viewStateFlags & ReadOnlyState)) {
+void ot::GraphicsView::endItemMove()
+{
+	if (!(m_viewStateFlags & ItemMoveInProgress) || (m_viewStateFlags & ReadOnlyState))
+	{
 		return;
 	}
 
@@ -785,37 +928,47 @@ void ot::GraphicsView::endItemMove() {
 
 	GraphicsSnapInfo snapInfo;
 
-	for (QGraphicsItem* qItm : m_scene->selectedItems()) {
+	for (QGraphicsItem* qItm : m_scene->selectedItems())
+	{
 		GraphicsItem* otItem = dynamic_cast<GraphicsItem*>(qItm);
-		if (otItem) {
-			if (otItem->getParentGraphicsItem() != nullptr) {
+		if (otItem)
+		{
+			if (otItem->getParentGraphicsItem() != nullptr)
+			{
 				// Ignore child items
 				continue;
 			}
-			if (otItem->isInternalItem()) {
+			if (otItem->isInternalItem())
+			{
 				// Item is internal item
 
-				if (otItem->hasMoved()) {
+				if (otItem->hasMoved())
+				{
 					otItem->notifyConnectionsMove(changeEvent);
 
 					// Check items around for snapping
 					GraphicsConnectionConnectorItem* connectorItem = dynamic_cast<GraphicsConnectionConnectorItem*>(otItem);
-					if (connectorItem) {
+					if (connectorItem)
+					{
 						QGraphicsItem* gItem = connectorItem->getQGraphicsItem();
 						const QRectF connectorRect = gItem->mapToScene(gItem->boundingRect()).boundingRect();
-						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance())))) {
+						for (QGraphicsItem* qSnapItm : m_scene->items(connectorRect.marginsAdded(QMarginsF(m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance(), m_scene->getMaxTriggerDistance()))))
+						{
 							GraphicsItem* otSnapItem = dynamic_cast<GraphicsItem*>(qSnapItm);
-							if (otSnapItem && (otSnapItem != otItem) && !otSnapItem->isInternalItem() && otSnapItem->getParentGraphicsItem() == nullptr) {
+							if (otSnapItem && (otSnapItem != otItem) && !otSnapItem->isInternalItem() && otSnapItem->getParentGraphicsItem() == nullptr)
+							{
 								otSnapItem->checkConnectionSnapRequest(connectorRect, connectorItem->getConnection(), snapInfo);
 							}
 						}
 					}
 				}
 			}
-			else {
+			else
+			{
 				// Item is public item
 
-				if (otItem->notifyMoveIfRequired(changeEvent)) {
+				if (otItem->notifyMoveIfRequired(changeEvent))
+				{
 					otItem->checkConnectionSnapRequest(snapInfo);
 				}
 			}
@@ -824,7 +977,8 @@ void ot::GraphicsView::endItemMove() {
 
 	snapInfo.fillEvent(changeEvent);
 
-	if (!changeEvent.isEmpty()) {
+	if (!changeEvent.isEmpty())
+	{
 		Q_EMIT elementsChanged(changeEvent);
 	}
 }

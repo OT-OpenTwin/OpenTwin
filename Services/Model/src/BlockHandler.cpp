@@ -351,6 +351,45 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage BlockHandler::graphicsItemClicked(const ot::GraphicsClickEvent& _eventData)
+{
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	ot::GraphicsClickEvent fwdEvent(_eventData);
+	fwdEvent.setForwarding();
+
+	const ot::JsonDocument fwdDoc = ot::GraphicsActionHandler::createItemClickedDocument(fwdEvent);
+
+	ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(model->getEntityByID(_eventData.getItemUid()));
+	if (!block)
+	{
+		OT_LOG_E("Could not find block entity { \"UID\": " + std::to_string(_eventData.getItemUid()) + " }");
+		return ot::ReturnMessage::Failed;
+	}
+
+	if (!_eventData.isEventFlagSet(ot::GuiEvent::ForceHandle))
+	{
+		std::list<std::string> handlingServices = block->getServicesForCallback(EntityBase::Callback::DataHandle);
+		if (!handlingServices.empty())
+		{
+			Application::instance()->sendMessageAsync(true, handlingServices, fwdDoc);
+			return ot::ReturnMessage::Ok;
+		}
+	}
+
+	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify))
+	{
+		std::list<std::string> notifyServices = block->getServicesForCallback(EntityBase::Callback::DataNotify);
+		if (!notifyServices.empty())
+		{
+			Application::instance()->sendMessageAsync(false, notifyServices, fwdDoc);
+		}
+	}
+
+	return ot::ReturnMessage::Ok;
+}
+
 ot::ReturnMessage BlockHandler::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	Model* model = Application::instance()->getModel();
 	OTAssertNullptr(model);

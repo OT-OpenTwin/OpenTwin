@@ -201,6 +201,15 @@ ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropE
 	return ot::ReturnMessage::Failed;
 }
 
+ot::ReturnMessage Application::graphicsItemClicked(const ot::GraphicsClickEvent& _eventData)
+{
+	OT_LOG_TS("Click event received { \"EditorName\": \"" << _eventData.getEditorName() 
+		<< "\", \"ItemUid\": " << _eventData.getItemUid()
+		<< ", \"ElementName\": \"" << _eventData.getElementName() << "\" }");
+
+	return ot::ReturnMessage::Ok;
+}
+
 ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	// Get entity information
 	ot::EntityInformation info;
