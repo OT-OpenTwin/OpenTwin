@@ -41,6 +41,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+#include "Login/Authentication.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -1167,7 +1168,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	return WorkerError::NoError;
 }
 
-#include "Login/Authentication.h"
+
 
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
 	std::string ssoUsername = ot::String::toString(determineSSOUsername());

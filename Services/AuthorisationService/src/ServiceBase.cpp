@@ -126,6 +126,8 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	//------------ USER FUNCTIONS THAT DO NOT NEED AUTHENTICATION ------------------------
 	if (_action == OT_ACTION_LOGIN_ADMIN) { return handleAdminLogIn(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_LOGIN) { return handleLogIn(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_SSO_Token_Refresh) { return handleSSOTokenRefresh(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_SSO_Token_Validate) { return handleSSOTokenValidate(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
@@ -213,10 +215,10 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_GET_ALL_GROUP_PROJECTS) { return handleGetAllGroupProjects(_actionDocument.GetObject(), loggedInUser); } // Not used
 	else if (_action == OT_ACTION_CHANGE_PROJECT_NAME) { return handleChangeProjectName(_actionDocument.GetObject(), loggedInUser); } // Only UI 
 	else if (_action == OT_ACTION_CHANGE_PROJECT_OWNER) { return handleChangeProjectOwner(_actionDocument.GetObject(), loggedInUser); } // Only UI
-	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument.GetObject(), loggedInUser); } // UI but the macro is also used in GSS
+	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument.GetObject(), loggedInUser); } // Not used
 	else
 	{
 		// This action is unknown
@@ -323,6 +325,28 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 	return returnDoc.toJson();
 
+}
+
+std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument)
+{
+	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+	bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
+	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+	
+	ot::JsonDocument returnDoc;
+	// Resets the buffered user. In this cause it also creates a new session token.
+	m_ssoBuffer.handleRequest(username, token, initialToken, returnDoc);
+	return returnDoc.toJson();
+}
+
+std::string ServiceBase::handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument)
+{
+	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+	bool tokenIsValid = m_ssoBuffer.validate(username, token);
+	ot::JsonDocument returnDoc;
+	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, tokenIsValid, returnDoc.GetAllocator());
+	return returnDoc.toJson();
 }
 
 std::string ServiceBase::handleRegister(const ot::ConstJsonObject& _actionDocument) 

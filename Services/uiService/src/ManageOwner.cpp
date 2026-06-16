@@ -31,6 +31,7 @@
 #include "OTWidgets/Widgets/PushButton.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
+#include "Login/Authentication.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -294,48 +295,47 @@ void ManageOwner::readUserList(void)
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	
-	if (app->getCurrentLoginData().loggedInViaSSO())
+	bool tokenValid = ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData());
+	if (tokenValid)
 	{
-		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		const rapidjson::Value& groupArray = responseDoc["users"];
+		assert(groupArray.IsArray());
+
+		for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
+		{
+			const rapidjson::Value& user = *itr;
+			std::string userData = user.GetString();
+
+			ot::JsonDocument userDoc;
+			userDoc.fromJson(userData);
+
+			std::string userName = ot::json::getString(userDoc, OT_PARAM_AUTH_USER_NAME);
+
+			m_userList.push_back(userName);
+		}
+
+		m_userList.sort();
 	}
 	else
 	{
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	}
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		OT_LOG_E("Failed to validate/refresh sso token");
 		exit(ot::AppExitCode::SendFailed);
-		return;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	const rapidjson::Value& groupArray = responseDoc[ "users" ];
-	assert(groupArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
-	{
-		const rapidjson::Value& user = *itr;
-		std::string userData = user.GetString();
-
-		ot::JsonDocument userDoc;
-		userDoc.fromJson(userData);
-
-		std::string userName = ot::json::getString(userDoc, OT_PARAM_AUTH_USER_NAME);
-
-		m_userList.push_back(userName);
-	}
-
-	m_userList.sort();
 }
 
 
@@ -433,38 +433,39 @@ void ManageGroupOwner::slotGroupCheckBoxChanged(bool state, int row)
 	}
 
 	AppBase * app{ AppBase::instance() };
-	
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_OWNER, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_OWNER_NEW_USER_USERNAME, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
-
-	if (app->getCurrentLoginData().loggedInViaSSO())
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_OWNER, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_GROUP_OWNER_NEW_USER_USERNAME, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		if (hasSuccessful(response)) {
+			m_assetOwner = newOwner;
+		}
+		else {
+			AppBase::instance()->slotShowErrorPrompt("Change Owner", "The owner could not be changed.", "");
+		}
+
+		fillOwnerList();
 	}
 	else
 	{
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	}
-	
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
 		exit(ot::AppExitCode::SendFailed);
-		return;
 	}
 
-	if (hasSuccessful(response)) {
-		m_assetOwner = newOwner;
-	}
-	else {
-		AppBase::instance()->slotShowErrorPrompt("Change Owner", "The owner could not be changed.", "");
-	}
-
-	fillOwnerList();
 }
 
 void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
@@ -494,41 +495,42 @@ void ManageProjectOwner::slotGroupCheckBoxChanged(bool state, int row)
 	}
 
 	AppBase * app{ AppBase::instance() };
-	
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_OWNER, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_OWNER, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
-
-	if (app->getCurrentLoginData().loggedInViaSSO())
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_OWNER, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(m_assetName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_OWNER, ot::JsonString(newOwner, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
+
+		if (!ret.isOk())
+		{
+			AppBase::instance()->slotShowErrorPrompt("Change Owner", "The owner could not be changed.", ret.getWhat());
+		}
+		else
+		{
+			m_assetOwner = newOwner;
+		}
+
+		fillOwnerList();
 	}
 	else
 	{
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	}
-	
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
 		exit(ot::AppExitCode::SendFailed);
-		return;
 	}
 
-	ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
-
-	if (!ret.isOk())
-	{
-		AppBase::instance()->slotShowErrorPrompt("Change Owner", "The owner could not be changed.", ret.getWhat());
-	}
-	else
-	{
-		m_assetOwner = newOwner;
-	}
-
-	fillOwnerList();
 }
 

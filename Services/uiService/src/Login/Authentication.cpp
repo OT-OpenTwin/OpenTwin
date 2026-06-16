@@ -82,7 +82,7 @@ std::optional<std::string> ot::Authentication::refreshToken(LoginData& _loginDat
 			std::string sessionToken = ot::json::getString(_resultDoc, OT_PARAM_AUTH_Token);
 			_loginData.setSSOSessionToken(sessionToken);
 		};
-	std::optional<std::string> errorMessage = ssoSequence(_loginData, resetToken, OT_PARAM_AUTH_SSO_Token_Refresh);
+	std::optional<std::string> errorMessage = ssoSequence(_loginData, resetToken, OT_ACTION_SSO_Token_Refresh);
 	return errorMessage;
 }
 
@@ -103,12 +103,12 @@ std::optional<std::string> ot::Authentication::loginSSO(LoginData& _loginData)
 	return errorMessage;
 }
 
-bool ot::Authentication::validateToken(LoginData& _loginData)
+bool ot::Authentication::validateAndRefreshToken(LoginData& _loginData)
 {
 	ot::JsonDocument validateMessage;
-	validateMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_PARAM_AUTH_SSO_Token_Validate, validateMessage.GetAllocator()), validateMessage.GetAllocator());
+	validateMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_SSO_Token_Validate, validateMessage.GetAllocator()), validateMessage.GetAllocator());
 	validateMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), validateMessage.GetAllocator()), validateMessage.GetAllocator());
-	
+	validateMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_loginData.getUserName(), validateMessage.GetAllocator()), validateMessage.GetAllocator());
 	std::string response;
 	bool success = false;
 	if (ot::msg::send("", _loginData.getAuthorizationUrl(), ot::EXECUTE_ONE_WAY_TLS, validateMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
@@ -134,6 +134,14 @@ bool ot::Authentication::validateToken(LoginData& _loginData)
 
 void ot::Authentication::addAuthenticationData(const LoginData& _loginData, ot::JsonDocument& _doc)
 {
-
+	_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(_loginData.getUserName(), _doc.GetAllocator()), _doc.GetAllocator());
+	if (_loginData.loggedInViaSSO())
+	{
+		_doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), _doc.GetAllocator()), _doc.GetAllocator());
+	}
+	else
+	{
+		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
+	}
 }
 

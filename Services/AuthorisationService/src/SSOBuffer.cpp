@@ -82,3 +82,25 @@ void SSOBuffer::clearUser(const std::string& _username)
 	m_serverSignOnByUsername.erase(_username);
 	m_loggedInSSOUsersByUsername.erase(_username);
 }
+
+bool SSOBuffer::validate(const std::string& _username, const std::string& _token) 
+{
+	auto loggedInSSOUserByUsername = m_loggedInSSOUsersByUsername.find(_username);
+	bool isValid = false;
+	if (loggedInSSOUserByUsername == m_loggedInSSOUsersByUsername.end())
+	{
+		assert(false); // This spot should only be accessed by the UI after the login
+	}
+	else
+	{
+		SSOUser& user = loggedInSSOUserByUsername->second;
+		bool isValid = user.getSessionToken().tokenIsValid();
+		if (isValid)
+		{
+			std::optional<std::string> token = user.getSessionToken().getToken();
+			assert(token.has_value()); // if tokenIsValid = true -> token.has_value
+			isValid = token.value() == _token;
+		}
+	}
+	return isValid;
+}

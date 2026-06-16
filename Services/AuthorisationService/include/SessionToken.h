@@ -16,10 +16,12 @@ namespace ot
 		std::string generateToken();
 		std::optional<std::string> getToken();
 
+		bool tokenIsValid() const;
 	private:
 		std::string m_token;
 		std::chrono::steady_clock::time_point m_creationTime;
 		std::chrono::minutes m_tokenValidityDurationAbsolute{ 30 }; 
+		std::chrono::seconds m_tokenValidityDelta{ 5 }; 
 		// std::chrono::minutes m_tokenValidityDurationIdle{ 30 }; Does not make sense since the authentication requests happen rarely
 	};
 }

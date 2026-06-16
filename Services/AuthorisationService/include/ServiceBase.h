@@ -96,6 +96,11 @@ private:
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 
+
+	std::string handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument);
+
+	std::string handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument);
+
 	//api @action OT_ACTION_REGISTER
 	//api @brief Registers a user. 
 	//api Throws a std::runtime_error if the user name already exists as an admin user name in the database. 

@@ -827,6 +827,8 @@
 #define OT_ACTION_PING "Ping"
 // User Functionalities
 #define OT_ACTION_LOGIN "Login"
+#define OT_ACTION_SSO_Token_Refresh "SSO.Token.Refresh"
+#define OT_ACTION_SSO_Token_Validate "SSO.Token.Validate"
 #define OT_ACTION_LOGIN_ADMIN "LoginAdmin"
 #define OT_ACTION_REGISTER "Register"
 #define OT_ACTION_REFRESH_SESSION "RefreshSession"
@@ -844,8 +846,7 @@
 
 // todo: ot param auth username exists twice: USERNAME and USER_NAME
 #define OT_PARAM_AUTH_SSO_Initial "SSO.Start"
-#define OT_PARAM_AUTH_SSO_Token_Validate "SSO.Token.Validate"
-#define OT_PARAM_AUTH_SSO_Token_Refresh "SSO.Token.Refresh"
+
 #define OT_PARAM_AUTH_SSO_Token_Continue "SSO.Token.Continue"
 #define OT_PARAM_AUTH_USERNAME "Username"
 #define OT_PARAM_USERNAME_TO_DELETE "UsernameToDelete"

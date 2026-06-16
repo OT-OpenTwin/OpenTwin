@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: AppBase.h
 // 
 // License:
@@ -178,7 +178,7 @@ public:
 	bool getCurrentProjectIsModified() const;
 
 	//! @brief Will return the current username
-	const LoginData& getCurrentLoginData() const { return m_loginData; };
+	LoginData& getCurrentLoginData() { return m_loginData; };
 
 	//! @brief Will return the current username
 	std::string getCurrentUserCollection() const { return m_currentUserCollection; };

@@ -118,7 +118,7 @@
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/DataBase.h"
-
+#include "Login/Authentication.h"
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
@@ -482,30 +482,39 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 std::list<ot::ProjectInformation> ExternalServicesComponent::GetAllUserProjects()
 {
 	std::string authorizationURL = AppBase::instance()->getCurrentLoginData().getAuthorizationUrl();
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
-	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	if (ot::Authentication::validateAndRefreshToken(AppBase::instance()->getCurrentLoginData()))
 	{
-		throw std::exception("Could not get the projectlist of the authorization service.");
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(AppBase::instance()->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		{
+			throw std::exception("Could not get the projectlist of the authorization service.");
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		std::list<ot::ProjectInformation> projectList;
+
+		for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+		{
+			ot::ProjectInformation newInfo(projObj);
+			projectList.push_back(std::move(newInfo));
+		}
+
+		return projectList;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::list<ot::ProjectInformation> projectList;
-
-	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+	else
 	{
-		ot::ProjectInformation newInfo(projObj);
-		projectList.push_back(std::move(newInfo));
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		exit(ot::AppExitCode::SendFailed);
 	}
-
-	return projectList;
 }
 
 void ExternalServicesComponent::prefetchDocumentsFromStorage(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>>& prefetchIDs)
