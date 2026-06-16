@@ -303,7 +303,7 @@ void ManageAccess::slotGroupCheckBoxChanged(bool state, int row)
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -434,7 +434,7 @@ void ManageAccess::fillGroupsList(void)
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 
@@ -495,7 +495,7 @@ void ManageAccess::readGroupsList(void)
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}

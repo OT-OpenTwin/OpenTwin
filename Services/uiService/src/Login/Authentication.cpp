@@ -105,6 +105,10 @@ std::optional<std::string> ot::Authentication::loginSSO(LoginData& _loginData)
 
 bool ot::Authentication::validateAndRefreshToken(LoginData& _loginData)
 {
+	if (!_loginData.loggedInViaSSO())
+	{
+		return true; // Token validation only necessary if the login happened through sso
+	}
 	ot::JsonDocument validateMessage;
 	validateMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_SSO_Token_Validate, validateMessage.GetAllocator()), validateMessage.GetAllocator());
 	validateMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), validateMessage.GetAllocator()), validateMessage.GetAllocator());

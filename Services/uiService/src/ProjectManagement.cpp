@@ -119,7 +119,7 @@ ot::ProjectFilterData ProjectManagement::getProjectFilterData() const {
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token","");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -160,7 +160,7 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -191,7 +191,7 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token","");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -218,7 +218,7 @@ void ProjectManagement::notifyProjectOpened(const std::string& _projectName) {
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -251,7 +251,7 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -305,7 +305,7 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 }
@@ -369,7 +369,7 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}	
 }
@@ -410,7 +410,7 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -440,7 +440,7 @@ bool ProjectManagement::updateAdditionalInformation(const ot::ProjectInformation
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -500,7 +500,7 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 	
@@ -558,7 +558,7 @@ bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 }

@@ -512,7 +512,7 @@ std::list<ot::ProjectInformation> ExternalServicesComponent::GetAllUserProjects(
 	else
 	{
 		OT_LOG_E("Failed to validate/refresh sso token");
-		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 	}
 }
