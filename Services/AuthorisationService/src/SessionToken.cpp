@@ -42,6 +42,6 @@ bool ot::SessionToken::tokenIsValid() const
 	auto now = std::chrono::steady_clock::now();
 	std::chrono::minutes passedTime = std::chrono::duration_cast<std::chrono::minutes>(now - m_creationTime);
 	// The UI may first request the validity of a token and afterwards send a request alongside the token. Between these two requests, the token may become invalid if there is not a delta between the actual validation timeout and the request for validation
-	bool valid = passedTime > (m_tokenValidityDurationAbsolute - m_tokenValidityDelta); 
+	bool valid = passedTime < (m_tokenValidityDurationAbsolute - m_tokenValidityDelta); 
 	return valid;
 }

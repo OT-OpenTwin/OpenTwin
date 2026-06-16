@@ -94,7 +94,7 @@ bool SSOBuffer::validate(const std::string& _username, const std::string& _token
 	else
 	{
 		SSOUser& user = loggedInSSOUserByUsername->second;
-		bool isValid = user.getSessionToken().tokenIsValid();
+		isValid = user.getSessionToken().tokenIsValid();
 		if (isValid)
 		{
 			std::optional<std::string> token = user.getSessionToken().getToken();

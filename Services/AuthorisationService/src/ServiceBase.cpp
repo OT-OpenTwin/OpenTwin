@@ -148,7 +148,9 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 		std::optional<std::string> usersSessionToken =	m_ssoBuffer.getToken(loggedInUsername);
 		if (!usersSessionToken.has_value())
 		{
-			// Token is not valid anymore. Need to redo the SSO login.
+			// Token is not valid anymore. Need to redo the SSO login. Should have been tested by the UI before attempting this action that need authentication.
+			assert(0);
+			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
 		}
 		else
 		{
@@ -181,7 +183,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	}
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
-	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); } // Only UI
+	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); } // Only UI, d
 	else if (_action == OT_ACTION_GET_ALL_USERS) { return handleGetAllUsers(_actionDocument.GetObject()); } // Only UI
 	else if (_action == OT_ACTION_GET_ALL_USER_COUNT) { return handleGetAllUsersCount(_actionDocument.GetObject()); } // Not used
 	else if (_action == OT_ACTION_CHANGE_USER_USERNAME) { return handleChangeUserNameByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
