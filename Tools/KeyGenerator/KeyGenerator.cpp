@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: KeyGenerator.cpp
 // 
 // License:
@@ -20,7 +20,7 @@
 // KeyGenerator.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 // OpenTwin header
-#include "OTRandom/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
 
 // std header
 #include <iostream>
@@ -58,7 +58,7 @@ int main(int argc, char **argv)
 	keyFile << "\tconst int EncryptionKey[] = {";
 	RandomNumberGeneratorCryptoSecure randomNumberGenerator; 
 	for (int i = 0; i < keyLength; i++) {
-		unsigned __int64 randomNumber = randomNumberGenerator.GetPositiveRandomInt64(255);
+		unsigned __int64 randomNumber = randomNumberGenerator.createPositiveRandomInt64(255);
 		if (i < keyLength-1) {
 			keyFile << randomNumber << ", ";
 		} else {

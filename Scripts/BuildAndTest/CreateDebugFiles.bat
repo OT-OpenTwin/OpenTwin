@@ -57,7 +57,6 @@ mkdir %OPENTWIN_DEBUG_FILES% 2>nul
 DEL "%OPENTWIN_DEBUG_FILES%\BlockEditorService.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OTSystem.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OTCore.dll" 2>NUL
-DEL "%OPENTWIN_DEBUG_FILES%\OTRandom.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OTCommunication.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OTServiceFoundation.dll" 2>NUL
 DEL "%OPENTWIN_DEBUG_FILES%\OTModelEntities.dll" 2>NUL
@@ -110,7 +109,6 @@ REM ====================================================================
 ECHO Copy libraries
 
 COPY "%OT_CORE_ROOT%\%OT_DLLR%\OTCore.dll" "%OPENTWIN_DEBUG_FILES%"
-COPY "%OT_RANDOM_ROOT%\%OT_DLLR%\OTRandom.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_SYSTEM_ROOT%\%OT_DLLR%\OTSystem.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_COMMUNICATION_ROOT%\%OT_DLLR%\OTCommunication.dll" "%OPENTWIN_DEBUG_FILES%"
 COPY "%OT_FOUNDATION_ROOT%\%OT_DLLR%\OTServiceFoundation.dll" "%OPENTWIN_DEBUG_FILES%"
