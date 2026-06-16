@@ -300,11 +300,11 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			{
 				m_metadataExtender.extendWithJsonFile();
 			}
-			else if (action == m_buttonAddCSVSchemaImporter.getFullPath())
+			else if (action == m_buttonRunCSVSchemaImporter.getFullPath())
 			{
 
 			}
-			else if (action == m_buttonRunCSVSchemaImporter.getFullPath())
+			else if (action == m_buttonAddCSVSchemaImporter.getFullPath())
 			{
 
 				std::list<std::string> folderContent = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DataCategorisationFolder);

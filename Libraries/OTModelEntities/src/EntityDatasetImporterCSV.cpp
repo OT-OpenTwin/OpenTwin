@@ -7,13 +7,12 @@ static EntityFactoryRegistrar<EntityDatasetImporterCSV> registrar(EntityDatasetI
 std::map<std::string, EntityDatasetImporterCSV::MetadataSelectionFormat> EntityDatasetImporterCSV::m_metadataIdentificationsByName =
 {
 	{"None",EntityDatasetImporterCSV::MetadataSelectionFormat::None},
-	{"Same name",EntityDatasetImporterCSV::MetadataSelectionFormat::SameName},
-	{"Regex",EntityDatasetImporterCSV::MetadataSelectionFormat::Regex}
+	{"Same name as table",EntityDatasetImporterCSV::MetadataSelectionFormat::SameName},
 };
 
 std::map<std::string, EntityDatasetImporterCSV::CSVSelectionFormat> EntityDatasetImporterCSV::m_consideredCSVByName =
 {
-	{"None",EntityDatasetImporterCSV::CSVSelectionFormat::All},
+	{"All",EntityDatasetImporterCSV::CSVSelectionFormat::All},
 	{"Regex",EntityDatasetImporterCSV::CSVSelectionFormat::Regex}
 };
 
@@ -80,6 +79,7 @@ bool EntityDatasetImporterCSV::updateFromProperties(void)
 		}
 		updateGrid = true;
 	}
+
 	if (namingFormat->needsUpdate())
 	{
 		const std::string format = namingFormat->getValue();
@@ -92,6 +92,7 @@ bool EntityDatasetImporterCSV::updateFromProperties(void)
 		{
 			PropertyHelper::getStringProperty(this, "Name base")->setVisible(false);
 		}
+		updateGrid = true;
 	}
 	return updateGrid;
 }
@@ -134,7 +135,7 @@ void EntityDatasetImporterCSV::createProperties(const std::string& _rmdClassific
 		allNamingFormats.push_back(entry.first);
 
 	}
-	EntityPropertiesSelection::createProperty("Settings", "Naming format", allNamingFormats, allNamingFormats.front(), "default", getProperties());
+	EntityPropertiesSelection::createProperty("Settings", "Naming format", allNamingFormats, allNamingFormats.back(), "default", getProperties());
 	EntityPropertiesString* namingBase = EntityPropertiesString::createProperty("Settings", "Name base", "", "default", getProperties());
 	namingBase->setVisible(false);
 }
