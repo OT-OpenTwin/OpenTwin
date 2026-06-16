@@ -844,6 +844,9 @@
 
 // todo: ot param auth username exists twice: USERNAME and USER_NAME
 #define OT_PARAM_AUTH_SSO_Initial "SSO.Start"
+#define OT_PARAM_AUTH_SSO_Token_Validate "SSO.Token.Validate"
+#define OT_PARAM_AUTH_SSO_Token_Refresh "SSO.Token.Refresh"
+#define OT_PARAM_AUTH_SSO_Token_Continue "SSO.Token.Continue"
 #define OT_PARAM_AUTH_USERNAME "Username"
 #define OT_PARAM_USERNAME_TO_DELETE "UsernameToDelete"
 #define OT_PARAM_AUTH_LOGGED_IN_USERNAME "LoggedInUsername"

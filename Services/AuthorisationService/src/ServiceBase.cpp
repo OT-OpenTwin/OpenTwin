@@ -259,6 +259,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	bool usePSW = ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD);
 	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string password;
+	ot::JsonDocument returnDoc;
+
 	if (usePSW)
 	{
 		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
@@ -279,12 +281,12 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		bool initialToken = ot::json::getBool(_actionDocument ,OT_PARAM_AUTH_SSO_Initial); 
 		std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-		std::string returnMessage;
-		bool authenticated = m_ssoBuffer.handleRequest(username, token, initialToken,returnMessage);
+		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons
+		bool authenticated = m_ssoBuffer.handleRequest(username, token, initialToken, returnDoc);
 		if (!authenticated)
 		{
 			// Here we return if the sequnce is not done yet or it may have failed
-			return returnMessage;
+			return returnDoc.toJson();
 		}
 		else
 		{
@@ -294,8 +296,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 	bool successful = false;
 	successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
-	ot::JsonDocument json;
-	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
+	
+	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successful, returnDoc.GetAllocator());
 
 	if (successful)
 	{
@@ -304,22 +306,22 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
 
-		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, json);
+		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, returnDoc);
 
 		if (usePSW)
 		{
-			json.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, json.GetAllocator()), json.GetAllocator());
-			json.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
+			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, returnDoc.GetAllocator()), returnDoc.GetAllocator());
+			returnDoc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
-		else
-		{
-			std::optional<std::string>token =m_ssoBuffer.getToken(username);
-			assert(token.has_value()); // Token was just created in the cause of the login
-			json.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(token.value(), json.GetAllocator()), json.GetAllocator());
-		}
+		// else is allready set in the handling method
+	}
+	else
+	{
+		m_ssoBuffer.clearUser(username);
+		returnDoc.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed MongoDB authentication", returnDoc.GetAllocator()), returnDoc.GetAllocator());
 	}
 
-	return json.toJson();
+	return returnDoc.toJson();
 
 }
 
