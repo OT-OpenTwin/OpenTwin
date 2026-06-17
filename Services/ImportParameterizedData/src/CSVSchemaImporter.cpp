@@ -13,9 +13,11 @@
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "TabledataToResultdataHandler.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
+#include "OTCore/TimeFormatter.h"
 
 void CSVSchemaImporter::execute()
 {
+	auto startPreprocessing = std::chrono::high_resolution_clock::now();
 	// First we check the settings for the importer
 	auto csvDatasetImporter = loadSelectedCSVImporter();
 	if (csvDatasetImporter == nullptr)
@@ -112,7 +114,10 @@ void CSVSchemaImporter::execute()
 		OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(0, allReferencedTableNames.size() - 2));
 	}
 
-	
+	auto endPreprocessing = std::chrono::high_resolution_clock::now();
+	auto durationPreprocessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endPreprocessing - startPreprocessing);
+	const std::string durationPreprocessingFormatted = TimeFormatter::formatDuration(durationPreprocessing);
+	OT_USER_LOG_I("Preprocessing took: " + durationPreprocessingFormatted);
 	// Now we start the creation of the datasets
 	std::list<std::string> existingDatasetNames = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder);
 	ResultCollectionExtender resultCollectionExtender(Application::instance());
@@ -122,6 +127,7 @@ void CSVSchemaImporter::execute()
 	updater.setTotalNumberOfSteps(static_cast<uint32_t>(csvFiles.size()));
 
 	OT_USER_LOG_I("Refining data from csv file(s)");
+	auto startProcessing = std::chrono::high_resolution_clock::now();
 	ot::NewModelStateInfo newEntityInfos;
 	for (auto& csvFile : csvFiles)
 	{
@@ -171,12 +177,16 @@ void CSVSchemaImporter::execute()
 		updater.triggerUpdate(counter);
 		counter++;
 	}
+	
 	// Now we store the changes on the campaign and the model state
 	resultCollectionExtender.setSaveModel(false);
 	resultCollectionExtender.storeCampaignChanges();
 	ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
 	OT_USER_LOG_I("Refinement finished.");
-
+	auto endProcessing = std::chrono::high_resolution_clock::now();
+	auto durationProcessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endProcessing - startProcessing);
+	const std::string durationProcessingFormatted = TimeFormatter::formatDuration(durationProcessing);
+	OT_USER_LOG_I("Processing took: " + durationProcessingFormatted);
 }
 
 void CSVSchemaImporter::loadCSVFiles(std::list<std::unique_ptr<EntityFileCSV>>& _csvFiles, EntityDatasetImporterCSV& _csvImporter)
