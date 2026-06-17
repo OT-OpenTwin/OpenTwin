@@ -22,6 +22,9 @@ namespace ot
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 
+		void setUid(const UID& _uid) { m_uid = _uid; };
+		const UID& getUid() const { return m_uid; };
+
 		//! @brief Returns true if the origin UID is valid.
 		bool hasOrigin() const { return m_originUID != ot::invalidUID; };
 
@@ -47,6 +50,8 @@ namespace ot
 		std::string createConnectionKeyReverse() const;
 
 	private:
+		UID m_uid = ot::invalidUID;
+
 		ot::UID m_originUID = ot::invalidUID;
 		std::string m_originConnectable;
 

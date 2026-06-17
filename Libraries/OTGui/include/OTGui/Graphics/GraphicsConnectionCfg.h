@@ -53,8 +53,6 @@ namespace ot {
 		GraphicsConnectionCfg(const UID& _originUid, const std::string& _originConnectableName, const UID& _destinationUid, const std::string& _destinationName);
 		virtual ~GraphicsConnectionCfg();
 
-		bool operator==(const GraphicsConnectionCfg& _other) const;
-
 		//! @brief Add the object contents to the provided JSON object
 		//! @param _document The JSON document (used to get the allocator)
 		//! @param _object The JSON object to add the contents to
@@ -75,9 +73,6 @@ namespace ot {
 		void setDestinationPos(double _x, double _y) { m_destPos.set(_x, _y); };
 		void setDestinationPos(const Point2DD& _pos) { m_destPos = _pos; };
 		const Point2DD& getDestinationPos() const { return m_destPos; };
-
-		void setUid(const UID& _uid) { m_uid = _uid; };
-		const UID& getUid() const { return m_uid; };
 
 		void setLineShape(ConnectionShape _shape) { m_lineShape = _shape; };
 		ConnectionShape getLineShape() const { return m_lineShape; };
@@ -105,8 +100,6 @@ namespace ot {
 	private:
 		Point2DD m_originPos;
 		Point2DD m_destPos;
-
-		UID m_uid;
 
 		ConnectionShape m_lineShape;
 		PenFCfg m_lineStyle;

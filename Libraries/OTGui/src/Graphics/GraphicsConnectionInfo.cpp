@@ -15,16 +15,22 @@ ot::GraphicsConnectionInfo::GraphicsConnectionInfo(const ConstJsonObject & _json
 
 void ot::GraphicsConnectionInfo::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const
 {
+	_jsonObject.AddMember("UID", m_uid, _allocator);
+
 	_jsonObject.AddMember("OriginUID", m_originUID, _allocator);
 	_jsonObject.AddMember("OriginConnectable", JsonString(m_originConnectable, _allocator), _allocator);
+
 	_jsonObject.AddMember("DestUID", m_destUID, _allocator);
 	_jsonObject.AddMember("DestConnectable", JsonString(m_destConnectable, _allocator), _allocator);
 }
 
 void ot::GraphicsConnectionInfo::setFromJsonObject(const ConstJsonObject& _jsonObject)
 {
+	m_uid = json::getUInt64(_jsonObject, "UID");
+
 	m_originUID = json::getUInt64(_jsonObject, "OriginUID");
 	m_originConnectable = json::getString(_jsonObject, "OriginConnectable");
+
 	m_destUID = json::getUInt64(_jsonObject, "DestUID");
 	m_destConnectable = json::getString(_jsonObject, "DestConnectable");
 }

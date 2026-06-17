@@ -30,6 +30,7 @@
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
+#include "OTCore/ContainerHelper.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
@@ -78,32 +79,20 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 }
 
 void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
-	ot::UID originUid = _toBeAddedConnection.getConnectionCfg().getOriginUid();
-	ot::UID destUid = _toBeAddedConnection.getConnectionCfg().getDestinationUid();
-	ot::UID connectionId = _toBeAddedConnection.getEntityID();
+	auto& itemMap = getGraphicsItemMap(_editorId);
 
-	if (originUid != ot::invalidUID) {
-		auto& connectionList = getOrCreateConnectionList(_editorId, originUid);
-		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
-			connectionList.push_back(connectionId);
-		}
-	}
-
-	if (destUid != ot::invalidUID) {
-		auto& connectionList = getOrCreateConnectionList(_editorId, destUid);
-		if (std::find(connectionList.begin(), connectionList.end(), connectionId) == connectionList.end()) {
-			connectionList.push_back(connectionId);
-		}
-	}
+	itemMap.addConnection(_toBeAddedConnection.getConnectionCfg());
 }
 
 void BlockHandler::addBlock(ot::UID _editorId, const ot::EntityBlock* _block) {
-	auto& blocksMap = getOrCreateBlockMap(_editorId);
-	blocksMap.emplace(_block->getEntityID(), ot::UIDList{});
+	auto& itemMap = getGraphicsItemMap(_editorId);
+
+	const auto& connectorMap = _block->getAllConnectorsByName();
+	itemMap.addItem(_block->getEntityID(), ot::ContainerHelper::getKeys(connectorMap));
 }
 
 void BlockHandler::addEditor(const EntityGraphicsScene* _editor) {
-	getOrCreateBlockMap(_editor->getEntityID());
+	getGraphicsItemMap(_editor->getEntityID());
 }
 
 void BlockHandler::removeFromMap(EntityBase* _entBase) {
@@ -118,26 +107,16 @@ void BlockHandler::removeFromMap(EntityBase* _entBase) {
 	// Check if editor with id exists - if yes remove the whole entry
 	EntityGraphicsScene* entGraphicsScene = dynamic_cast<EntityGraphicsScene*>(_entBase);
 	if (entGraphicsScene) {
-		auto itEditor = m_viewBlockConnectionsMap.find(_entBase->getEntityID());
-		if (itEditor != m_viewBlockConnectionsMap.end()) {
-			m_viewBlockConnectionsMap.erase(itEditor);
-		}
+		m_sceneMap.erase(entGraphicsScene->getEntityID());
 		return;
 	}
 
 	// Check if block with id exists - if yes remove the block with its connections
 	ot::EntityBlock* entBlock = dynamic_cast<ot::EntityBlock*>(_entBase);
 	if (entBlock) {
-		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end();) {
-			auto& blocks = itEditor->second;
-			auto itBlock = blocks.find(_entBase->getEntityID());
-			if (itBlock != blocks.end()) {
-				blocks.erase(itBlock);
-				break;
-			}
-			else {
-				++itEditor;
-			}
+		for (auto& it : m_sceneMap)
+		{
+			it.second.removeItem(entBlock->getEntityID());
 		}
 		return;
 	}
@@ -145,15 +124,9 @@ void BlockHandler::removeFromMap(EntityBase* _entBase) {
 	// Check if connection with id exists - if yes remove the connection
 	ot::EntityBlockConnection* entBlockConnection = dynamic_cast<ot::EntityBlockConnection*>(_entBase);
 	if (entBlockConnection) {
-		for (auto& [editorId, blocks] : m_viewBlockConnectionsMap) {
-			for (auto& [blockId, connections] : blocks) {
-				// Looks for connection id in block
-				auto itConn = std::find(connections.begin(), connections.end(), entBlockConnection->getEntityID());
-				if (itConn != connections.end()) {
-				// Erase the connection from the map (only one connection with same UID can be related to the same block
-					connections.erase(itConn);
-				}
-			}
+		for (auto& it : m_sceneMap)
+		{
+			it.second.removeConnection(entBlockConnection->getEntityID());
 		}
 		return;
 	}
@@ -171,100 +144,71 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 	ot::EntityBlock* blockToRemove = dynamic_cast<ot::EntityBlock*>(_entityToRemove);
 	if (blockToRemove) {
 		// Go through all editors
-		for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); itEditor++) {
-			// Check if block exists in editor
-			auto itBlock = itEditor->second.find(blockToRemove->getEntityID());
-			if (itBlock != itEditor->second.end()) {
-				// Go through all connections of the block
-				for (const ot::UID& connection : itBlock->second) {
-					EntityBase* connectionEntity = model->getEntityByID(connection);
-					if (!connectionEntity) {
-						OT_LOG_E("EditorBlockConnections map is not correct sychronized with entity map { \"SceneID\": " + std::to_string(itEditor->first) + ", \"ConnectionID\": " + std::to_string(connection) + " }");
-						return;
-					}
+		for (auto& it : m_sceneMap)
+		{
+			auto connections = it.second.getItemConnections(blockToRemove->getEntityID());
+			for (const auto& connection : connections) {
+				EntityBase* connectionEntity = model->getEntityByID(connection.getUid());
+				if (!connectionEntity) {
+					OT_LOG_E("EditorBlockConnections map is not sychronized with entity map { \"SceneID\": " + std::to_string(it.first) + ", \"ConnectionID\": " + std::to_string(connection.getUid()) + " }");
+					continue;
+				}
 
-					// Only modify connection if the connection entity is not also removed
-					if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), model->getEntityByID(connection)) == _otherEntitiesToRemove.end()) {
-						modifyConnection(connectionEntity->getEntityID(), _entityToRemove);
-					}
+				// Only modify connection if the connection entity is not also removed
+				if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), connectionEntity) == _otherEntitiesToRemove.end()) {
+					modifyConnection(connectionEntity->getEntityID(), _entityToRemove);
 				}
 			}
 		}
-		return;
 	}
 }
 
 void BlockHandler::removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, ot::EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection) {
+	const ot::GraphicsConnectionCfg currentCfg = _connectionEntity->getConnectionCfg();
+	const ot::UID origin = _changedConnection.getOriginUid();
+	const ot::UID destination = _changedConnection.getDestinationUid();
 
-	ot::UID origin = _changedConnection.getOriginUid();
-	ot::UID destination = _changedConnection.getDestinationUid();
-
-	for (auto itEditor = m_viewBlockConnectionsMap.begin(); itEditor != m_viewBlockConnectionsMap.end(); ++itEditor) {
-		if (itEditor->first != _editor->getEntityID()) {
+	for (auto& sceneIt : m_sceneMap)
+	{
+		if (sceneIt.first != _editor->getEntityID()) {
 			continue;
 		}
-		
-		if (origin == ot::invalidUID) {
-			auto& blocks = itEditor->second;
-			for(auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
-				if(itBlock->first != _connectionEntity->getConnectionCfg().getOriginUid()) {
-					continue;
-				}
-				auto& connections = itBlock->second;
-				auto itConn = std::find(connections.begin(), connections.end(), _connectionEntity->getEntityID());
-				if (itConn != connections.end()) {
-					connections.erase(itConn);
-					return;
-				}
-			}
+
+		if (origin == ot::invalidUID)
+		{
+			sceneIt.second.removeConnectionFromItem(currentCfg.getOriginUid(), currentCfg.getOriginConnectable(), _connectionEntity->getEntityID());
 		}
-		
-		if (destination == ot::invalidUID) {
-			auto& blocks = itEditor->second;
-			for (auto itBlock = blocks.begin(); itBlock != blocks.end(); ++itBlock) {
-				if (itBlock->first != _connectionEntity->getConnectionCfg().getDestinationUid()) {
-					continue;
-				}
-				auto& connections = itBlock->second;
-				auto itConn = std::find(connections.begin(), connections.end(), _connectionEntity->getEntityID());
-				if (itConn != connections.end()) {
-					connections.erase(itConn);
-					return;
-				}
-			}
+
+		if (destination == ot::invalidUID)
+		{
+			sceneIt.second.removeConnectionFromItem(currentCfg.getDestinationUid(), currentCfg.getDestinationConnectable(), _connectionEntity->getEntityID());
 		}
 	}
 }
 
 void BlockHandler::clearMap() {
-	this->m_viewBlockConnectionsMap.clear();
+	m_sceneMap.clear();
 }
 
 bool BlockHandler::blockExists(ot::UID _blockID) {
-	Model* model = Application::instance()->getModel();
-	OTAssertNullptr(model);
-
-	std::map<ot::UID, EntityBase*>& entityMap = model->getAllEntitiesByUID();
-	if (entityMap.find(_blockID) != entityMap.end()) {
-		return true;
+	for (const auto& it : m_sceneMap)
+	{
+		if (it.second.hasItem(_blockID)) {
+			return true;
+		}
 	}
+
 	return false;
 }
 
 bool BlockHandler::blockExists(ot::UID _editorID, ot::UID _blockID) {
-	auto itEditor = m_viewBlockConnectionsMap.find(_editorID);
-	if (itEditor == m_viewBlockConnectionsMap.end()) {
+	auto sceneIt = m_sceneMap.find(_editorID);
+	if (sceneIt == m_sceneMap.end()) {
 		OT_LOG_E("Editor not found { \"EntityID\": " + std::to_string(_editorID) + " }");
 		return false;
 	}
 
-	const auto& blocksMap = itEditor->second;
-	auto itBlock = blocksMap.find(_blockID);
-	if (itBlock == blocksMap.end()) {
-		return false;
-	}
-
-	return true;
+	return sceneIt->second.hasItem(_blockID);
 }
 
 EntityGraphicsScene* BlockHandler::findGraphicsScene(const std::string& _graphicsElementName) {
@@ -283,25 +227,16 @@ EntityGraphicsScene* BlockHandler::findGraphicsScene(const std::string& _graphic
 
 void BlockHandler::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
 	using namespace ot;
-	JsonArray viewMapArr;
-	for (const auto& it : m_viewBlockConnectionsMap) {
+	JsonArray sceneArr;
+	for (const auto& it : m_sceneMap) {
 		JsonObject viewObj;
 		viewObj.AddMember("ViewID", it.first, _allocator);
-		JsonArray blocksArr;
-		for (const auto& blockIt : it.second) {
-			JsonObject blockObj;
-			blockObj.AddMember("BlockID", blockIt.first, _allocator);
-			JsonArray connectionsArr;
-			for (const auto& connId : blockIt.second) {
-				connectionsArr.PushBack(connId, _allocator);
-			}
-			blockObj.AddMember("Connections", connectionsArr, _allocator);
-			blocksArr.PushBack(blockObj, _allocator);
-		}
-		viewObj.AddMember("Blocks", blocksArr, _allocator);
-		viewMapArr.PushBack(viewObj, _allocator);
+		JsonObject mapObj;
+		it.second.addToJsonObject(mapObj, _allocator);
+		viewObj.AddMember("Map", mapObj, _allocator);
+		sceneArr.PushBack(viewObj, _allocator);
 	}
-	_object.AddMember("ViewBlockConnectionsMap", viewMapArr, _allocator);
+	_object.AddMember("SceneMap", sceneArr, _allocator);
 }
 
 ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) {
@@ -1215,26 +1150,13 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	return true;
 }
 
-std::map<ot::UID, ot::UIDList>& BlockHandler::getOrCreateBlockMap(ot::UID _editorId) {
-	auto it = m_viewBlockConnectionsMap.find(_editorId);
-	if (it == m_viewBlockConnectionsMap.end()) {
-		return m_viewBlockConnectionsMap.insert_or_assign(_editorId, std::map<ot::UID, ot::UIDList>()).first->second;
+ot::GraphicsItemMap& BlockHandler::getGraphicsItemMap(ot::UID _sceneID)
+{
+	auto it = m_sceneMap.find(_sceneID);
+	if (it == m_sceneMap.end()) {
+		return m_sceneMap.insert_or_assign(_sceneID, ot::GraphicsItemMap()).first->second;
 	}
 	else {
 		return it->second;
 	}
 }
-
-ot::UIDList& BlockHandler::getOrCreateConnectionList(ot::UID& _editorId, ot::UID& _blockId) {
-	std::map<ot::UID, ot::UIDList>& blockMap = getOrCreateBlockMap(_editorId);
-	auto it = blockMap.find(_blockId);
-	if (it == blockMap.end()) {
-		return blockMap.insert_or_assign(_blockId, ot::UIDList()).first->second;
-	}
-	else {
-		return it->second;
-	}
-}
-
-
-

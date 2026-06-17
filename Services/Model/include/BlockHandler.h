@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/EntityName.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -144,11 +145,11 @@ private:
 	//! @return True if the snapping was handled successfully, false otherwise.
 	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<ot::EntityBlockConnection*>& _processedConnections);
 
-	std::map<ot::UID, ot::UIDList>& getOrCreateBlockMap(ot::UID _editorId);
-	ot::UIDList& getOrCreateConnectionList(ot::UID& _editorId, ot::UID& _blockId);
+	ot::GraphicsItemMap& getGraphicsItemMap(ot::UID _sceneID);
 
-	//! @brief Maps scenes to a map of blocks and their connections.
-	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
+	//! @brief Maps scenes to the corresponding item map.
+	std::map<ot::UID, ot::GraphicsItemMap> m_sceneMap;
+
 	const std::string m_connectionsFolder = "Connections";
 
 };

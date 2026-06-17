@@ -48,7 +48,7 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToSh
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_lineShape(ConnectionShape::DirectLine), m_uid(ot::invalidUID), m_handlesState(true)
+	: m_lineShape(ConnectionShape::DirectLine), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -58,7 +58,7 @@ ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ConstJsonObject& _jsonObj
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName)
-	: GraphicsConnectionInfo(_originUid, _originConnectableName, _destinationUid, _destinationName), m_lineShape(ConnectionShape::DirectLine), m_uid(ot::invalidUID), m_handlesState(true)
+	: GraphicsConnectionInfo(_originUid, _originConnectableName, _destinationUid, _destinationName), m_lineShape(ConnectionShape::DirectLine), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -67,15 +67,9 @@ ot::GraphicsConnectionCfg::~GraphicsConnectionCfg() {
 
 }
 
-bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other) const
-{
-	return m_uid == _other.m_uid;
-}
-
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
 	GraphicsConnectionInfo::addToJsonObject(_object, _allocator);
 
-	_object.AddMember("UID", m_uid, _allocator);
 	_object.AddMember("HandleState", m_handlesState, _allocator);
 	
 	_object.AddMember("OriginPos", JsonObject(m_originPos, _allocator), _allocator);
@@ -88,7 +82,6 @@ void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	GraphicsConnectionInfo::setFromJsonObject(_object);
 
-	m_uid = json::getUInt64(_object, "UID");
 	m_handlesState = json::getBool(_object, "HandleState");
 
 	m_originPos.setFromJsonObject(json::getObject(_object, "OriginPos"));
