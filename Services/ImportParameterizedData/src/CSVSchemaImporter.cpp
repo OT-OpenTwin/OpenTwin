@@ -109,7 +109,7 @@ void CSVSchemaImporter::execute()
 		{
 			allReferencedTableNames += referencedTableName + ", ";
 		}
-		OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(allReferencedTableNames.size() - 2));
+		OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(0, allReferencedTableNames.size() - 2));
 	}
 
 	
@@ -175,6 +175,7 @@ void CSVSchemaImporter::execute()
 	resultCollectionExtender.setSaveModel(false);
 	resultCollectionExtender.storeCampaignChanges();
 	ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+	OT_USER_LOG_I("Refinement finished.");
 
 }
 
