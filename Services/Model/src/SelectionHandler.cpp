@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: SelectionHandler.cpp
 // 
 // License:
@@ -147,13 +147,14 @@ void SelectionHandler::toggleButtonEnabledState()
 	std::list<std::string> enabled;
 	std::list<std::string> disabled;
 
+	auto& deleteButton = Application::instance()->getModel()->getDeleteButton();
 	if (m_selectedEntityIDs.size() > 0)
 	{
-		enabled.push_back("Model:Edit:Delete");
+		enabled.push_back(deleteButton.getFullPath());
 	}
 	else
 	{
-		disabled.push_back("Model:Edit:Delete");
+		disabled.push_back(deleteButton.getFullPath());
 	}
 
 	Model* model = Application::instance()->getModel();

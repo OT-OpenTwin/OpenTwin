@@ -242,6 +242,8 @@ public:
 
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator);
 
+	ot::ToolBarButtonCfg& getDeleteButton() { return m_deleteButton; }
+
 private:
 	// Methods
 	void clearAll();
