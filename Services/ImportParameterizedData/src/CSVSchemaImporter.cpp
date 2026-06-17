@@ -16,21 +16,28 @@
 
 void CSVSchemaImporter::execute()
 {
-	
+	// First we check the settings for the importer
 	auto csvDatasetImporter = loadSelectedCSVImporter();
 	if (csvDatasetImporter == nullptr)
 	{
 		OT_USER_LOG_E("Running the csv dataset import requires the selection of a single importer.");
 		return;
 	}
-	
+
+	std::string importerRunSettings = "Performing a data refinement of csv files. Selected settings:\n"
+	"Metadata files added to the datasets by the chosen format of: " + csvDatasetImporter->getMetadataSelectionFormatString() + "\n"
+	"CSV files are selected by the criteria: " +	csvDatasetImporter->getCSVSelectionFormatString(); + "\n"
+	"New datasets are named by the format of: " + csvDatasetImporter->getNamingFormatString();
+	OT_USER_LOG_I(importerRunSettings);
+
 	std::list<std::unique_ptr<EntityFileCSV>> csvFiles;
 	loadCSVFiles(csvFiles, *csvDatasetImporter.get());
 	if (csvFiles.size() == 0)
 	{
-		OT_USER_LOG_E("No csv files found that match the selected format.");
+		OT_USER_LOG_E("No csv files found that are considered for refinement and match the selected format.");
 		return;
 	}
+	OT_USER_LOG_I("Number of considered csv files: " + std::to_string(csvFiles.size()));
 
 	std::string seriesClassificationName = csvDatasetImporter->getSelectedSeriesClassification();
 	if (seriesClassificationName.empty())
@@ -38,6 +45,7 @@ void CSVSchemaImporter::execute()
 		OT_USER_LOG_E("No series classification selected.");
 		return;
 	}
+	OT_USER_LOG_I("Using classification: " + seriesClassificationName);
 
 	std::map<std::string, std::unique_ptr<EntityFileText>> metadataFiles;
 	loadJsonFiles(metadataFiles, csvFiles, *csvDatasetImporter.get());
@@ -51,23 +59,36 @@ void CSVSchemaImporter::execute()
 		}
 	}
 	
+	// Now we load and check the table selection ranges
 	MetadataAssemblyData seriesMetadataAssemblyData(extractMetadataAssembly(seriesClassificationName));
 	MetadataAssemblyData* parameter =  seriesMetadataAssemblyData.m_next;
 	MetadataAssemblyData* quantity =  parameter->m_next;
-	if (quantity->m_allSelectionRanges.size() == 0 || parameter->m_allSelectionRanges.size() == 0)
+	bool quantMissing = quantity->m_allSelectionRanges.size() == 0;
+	bool paramMissing = parameter->m_allSelectionRanges.size() == 0;
+	if (quantMissing || paramMissing)
 	{
-		OT_USER_LOG_E("Classification is missing table ranges: " + seriesClassificationName);
+		std::string missingComponent =  paramMissing && quantMissing ? "Parameter and quantity" : paramMissing  ? "Parameter" : "Quantity";
+		OT_USER_LOG_E(missingComponent + " classification(s) without table ranges in : " + seriesClassificationName);
 		return;
 	}
 
 	std::set<std::string> referencedTableNames;
+	std::set<std::string> referencesWithoutEntireColumnOrRow;
 	for (auto& selectionRange : parameter->m_allSelectionRanges)
 	{
 		referencedTableNames.insert(selectionRange->getTableName());		
+		if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+		{
+			referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+		}
 	}
 	for (auto& selectionRange : quantity->m_allSelectionRanges)
 	{
 		referencedTableNames.insert(selectionRange->getTableName());
+		if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+		{
+			referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+		}
 	}
 
 	if (referencedTableNames.size() != 1)
@@ -77,20 +98,34 @@ void CSVSchemaImporter::execute()
 		{
 			allReferencedTableNames += referencedTableName + ", ";
 		}
-		OT_USER_LOG_E("Table ranges reference different tables: " + allReferencedTableNames.substr(allReferencedTableNames.size() -2));
+		OT_USER_LOG_E("Table ranges reference different tables: " + allReferencedTableNames.substr(0,allReferencedTableNames.size() -2));
 		return;
 	}
 	
+	if (referencesWithoutEntireColumnOrRow.size() != 0)
+	{
+		std::string allReferencedTableNames;
+		for (const std::string& referencedTableName : referencesWithoutEntireColumnOrRow)
+		{
+			allReferencedTableNames += referencedTableName + ", ";
+		}
+		OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(allReferencedTableNames.size() - 2));
+	}
+
 	
+	// Now we start the creation of the datasets
 	std::list<std::string> existingDatasetNames = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder);
 	ResultCollectionExtender resultCollectionExtender(Application::instance());
 
 	ProgressUpdater updater(Application::instance()->getUiComponent(), "Importing data from csv files");
-	uint32_t counter(0);
+	uint32_t counter(1);
 	updater.setTotalNumberOfSteps(static_cast<uint32_t>(csvFiles.size()));
 
+	OT_USER_LOG_I("Refining data from csv file(s)");
+	ot::NewModelStateInfo newEntityInfos;
 	for (auto& csvFile : csvFiles)
 	{
+		// First we assemble the information for the newly created series
 		std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, csvFile.get());
 		std::string seriesName = createSeriesName(csvFile->getName(), existingDatasetNames, *csvDatasetImporter.get());
 		std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *csvFile.get());
@@ -111,13 +146,17 @@ void CSVSchemaImporter::execute()
 			seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, extractedMetadata.value());
 		}
 
-		
+		// Then we store the data points
 		try
 		{
 			for (DatasetDescription& dataset : datasetDescriptions)
 			{
 				resultCollectionExtender.processDataPoints(&dataset, seriesUID);
 			}
+			// Since the import was successfull, we need to set the flag in the csv file, so it is not being imported again
+			csvFile->setConsiderForRefinement(false);
+			csvFile->storeToDataBase();
+			newEntityInfos.addTopologyEntity(*csvFile.get());
 		}
 		catch (std::exception& e)
 		{
@@ -128,10 +167,14 @@ void CSVSchemaImporter::execute()
 			bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
 			assert(seriesRemoved); //Otherwise panic!
 		}
+		
 		updater.triggerUpdate(counter);
 		counter++;
 	}
+	// Now we store the changes on the campaign and the model state
+	resultCollectionExtender.setSaveModel(false);
 	resultCollectionExtender.storeCampaignChanges();
+	ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
 
 }
 
@@ -146,7 +189,12 @@ void CSVSchemaImporter::loadCSVFiles(std::list<std::unique_ptr<EntityFileCSV>>& 
 		{
 			ot::UID version = Application::instance()->getPrefetchedEntityVersion(uid);
 			EntityBase* baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(uid, version);
-			_csvFiles.push_back(std::unique_ptr<EntityFileCSV>(dynamic_cast<EntityFileCSV*>(baseEntity)));
+			std::unique_ptr<EntityFileCSV>csvEntity(dynamic_cast<EntityFileCSV*>(baseEntity));
+			bool considerForRefinement = csvEntity->getConsiderForRefinement();
+			if (considerForRefinement)
+			{
+				_csvFiles.push_back(std::move(csvEntity));
+			}
 		}
 	}
 	else if (_csvImporter.getCSVSelectionFormat() == EntityDatasetImporterCSV::CSVSelectionFormat::Regex)

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityFileCSV.h
 // 
 // License:
@@ -49,7 +49,9 @@ public:
 
 	virtual void setActiveFilters(const std::list<ot::ValueComparisonDescription>& _filters) override;
 	virtual std::list<ot::ValueComparisonDescription> getActiveFilters() const override { return m_activeFilters; };
-
+	
+	bool getConsiderForRefinement();
+	void setConsiderForRefinement(bool _considerForRefinement);
 private:
 	void setSpecializedProperties() override;
 	void addStorageData(bsoncxx::builder::basic::document& storage) override;

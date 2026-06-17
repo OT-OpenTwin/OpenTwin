@@ -35,9 +35,12 @@ public:
 	virtual std::string getClassName(void) const override { return EntityDatasetImporterCSV::className(); };
 
 	CSVSelectionFormat getCSVSelectionFormat();
+	std::string getCSVSelectionFormatString();
 	std::string getCSVSelectionRegex();
 	MetadataSelectionFormat getMetadataSelectionFormat();
+	std::string getMetadataSelectionFormatString();
 	NamingFormat getNamingFormat();
+	std::string getNamingFormatString();
 	std::string getNamingBase();
 	bool interruptAtWarnings();
 	std::string getSelectedSeriesClassification();

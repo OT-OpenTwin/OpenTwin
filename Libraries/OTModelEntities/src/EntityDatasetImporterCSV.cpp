@@ -82,11 +82,17 @@ bool EntityDatasetImporterCSV::updateFromProperties(void)
 }
 EntityDatasetImporterCSV::CSVSelectionFormat EntityDatasetImporterCSV::getCSVSelectionFormat()
 {
-	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "CSV file selection", "Settings");
+	const std::string selectedFormat = getCSVSelectionFormatString();
 	auto csvSelectionFormat = m_consideredCSVByName.find(selectedFormat);
 	assert(csvSelectionFormat != m_consideredCSVByName.end());
 
 	return csvSelectionFormat->second;
+}
+
+std::string EntityDatasetImporterCSV::getCSVSelectionFormatString()
+{
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "CSV file selection", "Settings");
+	return selectedFormat;
 }
 
 std::string EntityDatasetImporterCSV::getCSVSelectionRegex()
@@ -97,19 +103,31 @@ std::string EntityDatasetImporterCSV::getCSVSelectionRegex()
 
 EntityDatasetImporterCSV::MetadataSelectionFormat EntityDatasetImporterCSV::getMetadataSelectionFormat()
 {
-	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Metadata selection", "Settings");
+	const std::string selectedFormat = getMetadataSelectionFormatString();
 	auto metadataSelectionFormat = m_metadataIdentificationsByName.find(selectedFormat);
 	assert(metadataSelectionFormat != m_metadataIdentificationsByName.end());
 
 	return metadataSelectionFormat->second;
 }
 
+std::string EntityDatasetImporterCSV::getMetadataSelectionFormatString()
+{
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Metadata selection", "Settings");
+	return selectedFormat;
+}
+
 EntityDatasetImporterCSV::NamingFormat EntityDatasetImporterCSV::getNamingFormat()
 {
-	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Naming format", "Settings");
+	std::string selectedFormat = getNamingFormatString();
 	auto namingFormat =	m_namingFormatByName.find(selectedFormat);
 	assert(namingFormat != m_namingFormatByName.end()); 
 	return namingFormat->second;
+}
+
+std::string EntityDatasetImporterCSV::getNamingFormatString()
+{
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Naming format", "Settings");
+	return selectedFormat;
 }
 
 std::string EntityDatasetImporterCSV::getNamingBase()
