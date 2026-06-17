@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: CategorisationFolderNames.h
 // 
 // License:
@@ -19,7 +19,7 @@
 
 #pragma once
 #include <string>
-
+#include "OTCore/FolderNames.h"
 
 namespace CategorisationFolderNames
 {
@@ -37,6 +37,6 @@ namespace CategorisationFolderNames
 	}
 	static std::string getRootFolderName()
 	{
-		return "Data Categorization";
+		return ot::FolderNames::DataCategorisationFolder;
 	}
 }
