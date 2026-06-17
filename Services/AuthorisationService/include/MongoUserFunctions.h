@@ -81,6 +81,6 @@ namespace MongoUserFunctions
 
 	bool doesUserExist(const std::string &userName, mongocxx::client& adminClient);
 
-	void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, mongocxx::client& adminClient, ot::JsonDocument &json);
+	void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument &json);
 	void removeTmpUser(std::string userName, mongocxx::client& adminClient);
 }

@@ -38,7 +38,7 @@
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
-int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const char * _databasePWD)
+int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const char* _databasePWD) 
 {
 	m_serviceURL  = _ownIP;
 	m_databaseURL = _databaseIP;
@@ -318,8 +318,9 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		std::string sessionPWD = createRandomPassword();
 
 		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
+
 		// Fills in the fields about the session user in the mongodb document
-		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, returnDoc);
+		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
 
 		if (usePSW)
 		{
@@ -907,7 +908,7 @@ std::string ServiceBase::handleCheckIfCollectionExists(const ot::ConstJsonObject
 
 void ServiceBase::initializeDatabase() {
 	// NEEDED AND MUST BE EXECUTED ONCE
-	mongocxx::instance inst{};
+	//mongocxx::instance inst{};
 
 	// Initializing the Admin Client at the time of starting the service.
 

@@ -47,6 +47,29 @@ std::set<std::string> authenticatedUserTokens;
 
 namespace MongoUserFunctions
 {
+	bool checkMongodbLogin(const std::string& username, const std::string& password, const std::string &databaseUrl)
+	{
+		try {
+			const std::string uriStr = getMongoURL(databaseUrl, username, password);
+
+			mongocxx::uri uri{ uriStr };
+			mongocxx::client client{ uri };
+
+			bsoncxx::builder::basic::document cmd;
+			cmd.append(bsoncxx::builder::basic::kvp("ping", 1));
+
+			bsoncxx::document::value result =
+				client["admin"].run_command(cmd.view());
+
+			auto ok = result.view()["ok"];
+			return ok && ok.type() == bsoncxx::type::k_double
+				&& ok.get_double().value == 1.0;
+		}
+		catch (const std::exception) {
+			return false;
+		}
+	}
+
 	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient)
 	{
 		// This authentication may take some time. Therefore, we want to cache the credentials to speed up subsequent checks
@@ -63,6 +86,15 @@ namespace MongoUserFunctions
 
 		if (!userDocument)
 		{
+			// The user was not found. It may be a local session user. Therefore, we need to query the database
+			if (checkMongodbLogin(username, password, databaseUrl))
+			{
+				// The login worked, so we have a temporary session user.
+				authenticatedUserTokens.insert(token);
+	
+				return true;
+			}
+
 			return false; // User not found
 		}
 
@@ -526,7 +558,7 @@ namespace MongoUserFunctions
 		return json.toJson();
 	}
 
-	void createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, mongocxx::client& adminClient, ot::JsonDocument &json)
+	void createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument &json)
 	{
 		value new_user_command = document{}
 			<< "createUser" << userName
@@ -555,6 +587,9 @@ namespace MongoUserFunctions
 			json.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(userName, json.GetAllocator()), json.GetAllocator());
 			json.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(userPWD, json.GetAllocator()), json.GetAllocator());
 		}
+
+		std::string token = userName + "\n" + userPWD + "\n" + databaseUrl;
+		authenticatedUserTokens.insert(token);
 	}
 
 	void removeTmpUser(std::string userName, mongocxx::client & adminClient)
@@ -574,6 +609,8 @@ namespace MongoUserFunctions
 		{
 			assert(0);
 		}
+
+		authenticatedUserTokens.clear();
 	}
 }
 

@@ -218,6 +218,7 @@ private:
 	std::string m_serviceURL;
 	std::string m_databaseURL;
 	std::string m_databasePWD;
+	mongocxx::instance m_mongoInstance;
 	mongocxx::client m_adminClient;
 	std::string m_dbUsername;
 	std::string m_dbPassword;
