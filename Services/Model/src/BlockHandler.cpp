@@ -638,7 +638,7 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, ot:
 
 		// Find connectors
 		auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
-		auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestConnectable());
+		auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestinationConnectable());
 
 		if (originConnectorIt == _originBlock->getAllConnectorsByName().end() || destinationConnectorIt == _destinationBlock->getAllConnectorsByName().end()) {
 			OT_LOG_E("Could not find origin or destination connector for connection");
@@ -738,11 +738,11 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	if (!_connectionReversed) {
 		//Saving connected Element and connector
 		connectedElements.push(std::make_pair(requestedConnection.getOriginConnectable(), blockEntities[requestedConnection.getOriginUid()]));
-		connector = createBlockEntity(_scene, requestedConnection.getDestPos(), ot::EntityBlockCircuitConnector::className(), _modelStateInfo);
+		connector = createBlockEntity(_scene, requestedConnection.getDestinationPos(), ot::EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 	else {
 		// Saving connected Element and connector
-		connectedElements.push(std::make_pair(requestedConnection.getDestConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
+		connectedElements.push(std::make_pair(requestedConnection.getDestinationConnectable(), blockEntities[requestedConnection.getDestinationUid()]));
 		connector = createBlockEntity(_scene, requestedConnection.getOriginPos(), ot::EntityBlockCircuitConnector::className(), _modelStateInfo);
 	}
 
@@ -759,7 +759,7 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	}
 
 	// Saving connected Elements and connectors
-	connectedElements.push(std::make_pair(connectionCfg.getDestConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
+	connectedElements.push(std::make_pair(connectionCfg.getDestinationConnectable(), blockEntities[connectionCfg.getDestinationUid()]));
 	connectedElements.push(std::make_pair(connectionCfg.getOriginConnectable(), blockEntities[connectionCfg.getOriginUid()]));
 
 	entitiesToDelete.push_back(_destinationConnection->getName());
@@ -769,8 +769,8 @@ bool BlockHandler::createBlockToConnectionConnection(EntityGraphicsScene* _scene
 	// Create a GraphicsConnectionCfg for all elements
 	while (!connectedElements.empty()) {
 		ot::GraphicsConnectionCfg temp(_eventData.getConnectionCfg());
-		temp.setDestUid(connector->getEntityID());
-		temp.setDestConnectable(connector->getName());
+		temp.setDestinationUid(connector->getEntityID());
+		temp.setDestinationConnectable(connector->getName());
 		temp.setOriginUid(connectedElements.front().second->getEntityID());
 		temp.setOriginConnectable(connectedElements.front().first);
 		temp.setLineShape(_originBlock->getDefaultConnectionShape());
@@ -901,14 +901,14 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	}
 
 	if(_changedConnection.getDestinationUid() == ot::invalidUID || blockExists(_changedConnection.getDestinationUid())) {
-		connectionCfg.setDestUid(_changedConnection.getDestinationUid());
-		connectionCfg.setDestConnectable(_changedConnection.getDestConnectable());
+		connectionCfg.setDestinationUid(_changedConnection.getDestinationUid());
+		connectionCfg.setDestinationConnectable(_changedConnection.getDestinationConnectable());
 	}
 
 	removeConnectionIfUnsnapped(editor, connectionEntity, _changedConnection);
 
 	connectionCfg.setOriginPos(_changedConnection.getOriginPos());
-	connectionCfg.setDestPos(_changedConnection.getDestPos());
+	connectionCfg.setDestinationPos(_changedConnection.getDestinationPos());
 	connectionEntity->setConnectionCfg(connectionCfg);
 	connectionEntity->storeToDataBase();
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
@@ -1068,8 +1068,8 @@ void BlockHandler::modifyConnection(const ot::UID& _connectionID, EntityBase* _c
 		oldConnectionCfg.setOriginConnectable("");
 	}
 	else if (oldConnectionCfg.getDestinationUid() == _connectedBlockEntity->getEntityID()) {
-		oldConnectionCfg.setDestUid(ot::invalidUID);
-		oldConnectionCfg.setDestConnectable("");
+		oldConnectionCfg.setDestinationUid(ot::invalidUID);
+		oldConnectionCfg.setDestinationConnectable("");
 	}
 	else {
 		OT_LOG_E("Origin and destination differ for existing connection, can not modify "
@@ -1123,8 +1123,8 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	// Determine UIDs and connector names based on isOrigin once
 	const ot::UID snapUid = isOrigin ? connectionCfg.getOriginUid() : connectionCfg.getDestinationUid();
 	const ot::UID otherUid = isOrigin ? connectionCfg.getDestinationUid() : connectionCfg.getOriginUid();
-	const std::string& snapConnectable = isOrigin ? connectionCfg.getOriginConnectable() : connectionCfg.getDestConnectable();
-	const std::string& otherConnectable = isOrigin ? connectionCfg.getDestConnectable() : connectionCfg.getOriginConnectable();
+	const std::string& snapConnectable = isOrigin ? connectionCfg.getOriginConnectable() : connectionCfg.getDestinationConnectable();
+	const std::string& otherConnectable = isOrigin ? connectionCfg.getDestinationConnectable() : connectionCfg.getOriginConnectable();
 
 	// Get the snapped entity
 	EntityBase* snapEntity = model->getEntityByID(snapUid);
@@ -1144,8 +1144,8 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	ot::EntityBlock* otherBlock = nullptr;
 	if (!blockExists(_scene->getEntityID(), otherUid)) {
 		if (isOrigin) {
-			connectionCfg.setDestUid(ot::invalidUID);
-			connectionCfg.setDestConnectable("");
+			connectionCfg.setDestinationUid(ot::invalidUID);
+			connectionCfg.setDestinationConnectable("");
 		}
 		else {
 			connectionCfg.setOriginUid(ot::invalidUID);
@@ -1205,8 +1205,8 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 		newConnectionCfg.setOriginUid(connectionCfg.getOriginUid());
 	}
 	else {
-		newConnectionCfg.setDestConnectable(connectionCfg.getDestConnectable());
-		newConnectionCfg.setDestUid(connectionCfg.getDestinationUid());
+		newConnectionCfg.setDestinationConnectable(connectionCfg.getDestinationConnectable());
+		newConnectionCfg.setDestinationUid(connectionCfg.getDestinationUid());
 	}
 
 	connectionEnt->setConnectionCfg(newConnectionCfg);

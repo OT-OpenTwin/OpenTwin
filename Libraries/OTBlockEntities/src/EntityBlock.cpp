@@ -180,7 +180,8 @@ void ot::EntityBlock::addStorageData(bsoncxx::builder::basic::document& storage)
 	storage.append(
 		bsoncxx::builder::basic::kvp("CoordinatesEntityID", static_cast<int64_t>(m_coordinate2DEntityID)),
 		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
-		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey)
+		bsoncxx::builder::basic::kvp("GraphicsPickerKey", m_graphicsPickerKey),
+		bsoncxx::builder::basic::kvp("IsHidden", m_hidden)
 	);
 
 	auto connectorsArray = bsoncxx::builder::basic::array();
@@ -208,10 +209,10 @@ void ot::EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view
 		m_connectorsByName[connector.getConnectorName()]=(connector);
 	}
 
-	auto pickerIt = doc_view.find("GraphicsPickerKey");
-	if (pickerIt != doc_view.end())
+	auto docIt = doc_view.find("GraphicsPickerKey");
+	if (docIt != doc_view.end())
 	{
-		m_graphicsPickerKey = pickerIt->get_string().value.data();
+		m_graphicsPickerKey = docIt->get_string().value.data();
 	}
 	else {
 		// Legacy support
@@ -223,6 +224,12 @@ void ot::EntityBlock::readSpecificDataFromDataBase(const bsoncxx::document::view
 			OT_LOG_W("Block entity has no GraphicsPickerKey and no callback service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
 			m_graphicsPickerKey = OT_INFO_SERVICE_TYPE_MODEL;
 		}
+	}
+
+	docIt = doc_view.find("IsHidden");
+	if (docIt != doc_view.end())
+	{
+		m_hidden = docIt->get_bool().value;
 	}
 }
 
@@ -240,6 +247,11 @@ void ot::EntityBlock::createNavigationTreeEntry()
 void ot::EntityBlock::createBlockItem()
 {
 	OTAssertNullptr(getObserver());
+	if (m_hidden)
+	{
+		return;
+	}
+
 	ot::JsonDocument doc = createGraphicsRequestDocument();
 	getObserver()->sendMessageToViewer(doc);
 }

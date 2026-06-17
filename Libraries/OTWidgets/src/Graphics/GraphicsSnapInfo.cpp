@@ -41,8 +41,8 @@ void ot::GraphicsSnapInfo::fillEvent(GraphicsChangeEvent& _event) const {
 	}
 	for (const auto& snap : m_destSnaps) {
 		GraphicsConnectionCfg cfg = snap.connection->getConfiguration();
-		cfg.setDestUid(snap.item->getGraphicsItemUid());
-		cfg.setDestConnectable(snap.connector->getGraphicsItemName());
+		cfg.setDestinationUid(snap.item->getGraphicsItemUid());
+		cfg.setDestinationConnectable(snap.connector->getGraphicsItemName());
 		_event.addSnapInfo(cfg, false);
 	}
 }

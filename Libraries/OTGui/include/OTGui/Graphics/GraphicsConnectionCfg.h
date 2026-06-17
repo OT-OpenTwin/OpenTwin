@@ -22,10 +22,8 @@
 // OpenTwin header
 #include "OTCore/Color.h"
 #include "OTCore/Geometry/Point2D.h"
-#include "OTCore/CoreTypes.h"
-#include "OTCore/Serializable.h"
-#include "OTGui/OTGuiAPIExport.h"
 #include "OTGui/Style/PenCfg.h"
+#include "OTGui/Graphics/GraphicsConnectionInfo.h"
 
 // std header
 #include <string>
@@ -34,7 +32,8 @@
 
 namespace ot {
 
-	class OT_GUI_API_EXPORT GraphicsConnectionCfg : public ot::Serializable {
+	class OT_GUI_API_EXPORT GraphicsConnectionCfg : public GraphicsConnectionInfo
+	{
 		OT_DECL_DEFCOPY(GraphicsConnectionCfg)
 		OT_DECL_DEFMOVE(GraphicsConnectionCfg)
 	public:
@@ -51,7 +50,7 @@ namespace ot {
 
 		GraphicsConnectionCfg();
 		GraphicsConnectionCfg(const ConstJsonObject& _jsonObject);
-		GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName);
+		GraphicsConnectionCfg(const UID& _originUid, const std::string& _originConnectableName, const UID& _destinationUid, const std::string& _destinationName);
 		virtual ~GraphicsConnectionCfg();
 
 		bool operator==(const GraphicsConnectionCfg& _other) const;
@@ -66,37 +65,19 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		//! @brief Create a copy of this connection but the origin an destination are swapped
-		GraphicsConnectionCfg getReversedConnection() const;
-
-		//! @brief Returns true if the origin UID is valid.
-		bool hasOrigin() const { return m_originUID != ot::invalidUID; };
-
-		void setOriginUid(const ot::UID& _uid) { m_originUID = _uid; };
-		const ot::UID& getOriginUid() const { return m_originUID; };
-
-		void setOriginConnectable(const std::string& _name) { m_originConnectable = _name; };
-		const std::string& getOriginConnectable() const { return m_originConnectable; };
+		//! @brief Create a copy of this connection configuration with reversed origin and destination.
+		GraphicsConnectionCfg getReversedConnectionCfg() const;
 
 		void setOriginPos(double _x, double _y) { m_originPos.set(_x, _y); };
-		void setOriginPos(const ot::Point2DD& _pos) { m_originPos = _pos; };
-		const ot::Point2DD& getOriginPos() const { return m_originPos; };
+		void setOriginPos(const Point2DD& _pos) { m_originPos = _pos; };
+		const Point2DD& getOriginPos() const { return m_originPos; };
 
-		//! @brief Returns true if the destination UID is valid.
-		bool hasDestination() const { return m_destUID != ot::invalidUID; };
+		void setDestinationPos(double _x, double _y) { m_destPos.set(_x, _y); };
+		void setDestinationPos(const Point2DD& _pos) { m_destPos = _pos; };
+		const Point2DD& getDestinationPos() const { return m_destPos; };
 
-		void setDestUid(const ot::UID& _uid) { m_destUID = _uid; };
-		const ot::UID& getDestinationUid() const { return m_destUID; };
-
-		void setDestConnectable(const std::string& _name) { m_destConnectable = _name; };
-		const std::string& getDestConnectable() const { return m_destConnectable; };
-
-		void setDestPos(double _x, double _y) { m_destPos.set(_x, _y); };
-		void setDestPos(const ot::Point2DD& _pos) { m_destPos = _pos; };
-		const ot::Point2DD& getDestPos() const { return m_destPos; };
-
-		void setUid(const ot::UID& _uid) { m_uid = _uid; };
-		const ot::UID& getUid() const { return m_uid; };
+		void setUid(const UID& _uid) { m_uid = _uid; };
+		const UID& getUid() const { return m_uid; };
 
 		void setLineShape(ConnectionShape _shape) { m_lineShape = _shape; };
 		ConnectionShape getLineShape() const { return m_lineShape; };
@@ -104,36 +85,28 @@ namespace ot {
 		void setLineWidth(double _width) { m_lineStyle.setWidth(_width); };
 		double getLineWidth() const { return m_lineStyle.getWidth(); };
 
-		void setLineColor(const ot::Color& _color) { m_lineStyle.setColor(_color); };
+		void setLineColor(const Color& _color) { m_lineStyle.setColor(_color); };
 
 		//! @brief Set the line painter.
 		//! The item takes ownership of the painter.
-		void setLinePainter(ot::Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
+		void setLinePainter(Painter2D* _painter) { m_lineStyle.setPainter(_painter); };
 
 		//! @brief Returns the current painter.
 		//! The item keeps ownership of the painter.
-		const ot::Painter2D* getLinePainter() const { return m_lineStyle.getPainter(); };
+		const Painter2D* getLinePainter() const { return m_lineStyle.getPainter(); };
 
 		void setLineStyle(LineStyle _style) { m_lineStyle.setStyle(_style); };
 		void setLineStyle(const PenFCfg& _style) { m_lineStyle = _style; };
 		const PenFCfg& getLineStyle() const { return m_lineStyle; };
 
-		std::string createConnectionKey() const;
-		std::string createConnectionKeyReverse() const;
-
 		void setHandlesState(bool _handleState) { m_handlesState = _handleState; };
 		bool getHandlesState() const { return m_handlesState; };
 
 	private:
-		ot::UID m_originUID;
-		std::string m_originConnectable;
-		ot::Point2DD m_originPos;
+		Point2DD m_originPos;
+		Point2DD m_destPos;
 
-		ot::UID m_destUID;
-		std::string m_destConnectable;
-		ot::Point2DD m_destPos;
-
-		ot::UID m_uid;
+		UID m_uid;
 
 		ConnectionShape m_lineShape;
 		PenFCfg m_lineStyle;

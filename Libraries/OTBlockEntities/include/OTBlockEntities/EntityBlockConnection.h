@@ -61,6 +61,9 @@ namespace ot {
 		virtual void addVisualizationNodes(void) override;
 		virtual int getSchemaVersion(void) override { return 1; };
 
+		void setHidden(bool _hidden) { if (m_hidden != _hidden) { m_hidden = _hidden; setModified(); } };
+		bool getHidden() const { return m_hidden; };
+
 	private:
 		ot::PenFCfg m_lineStyle;
 
@@ -72,6 +75,7 @@ namespace ot {
 		std::string m_connectorNameDestination;
 		ot::Point2DD m_originPos;
 		ot::Point2DD m_destPos;
+		bool m_hidden = false;
 
 		void createNavigationTreeEntry();
 		void addStorageData(bsoncxx::builder::basic::document& storage) override;

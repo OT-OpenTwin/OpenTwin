@@ -75,6 +75,9 @@ namespace ot {
 		virtual std::string serialiseAsJSON() override;
 		virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
+		void setHidden(bool _hidden) { if (m_hidden != _hidden) { m_hidden = _hidden; setModified(); } };
+		bool getHidden() const { return m_hidden; };
+
 		//! @brief Creates a block item in the graphics scene.
 		//! @note This method requires the observer and model state to be set.
 		virtual void createBlockItem();
@@ -115,6 +118,8 @@ namespace ot {
 		std::string m_graphicsPickerKey;
 
 		std::map<std::string, ot::Connector> m_connectorsByName;
+
+		bool m_hidden = false;
 	};
 
 }

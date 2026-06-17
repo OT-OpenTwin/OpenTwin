@@ -108,7 +108,7 @@ void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<
 		{
 			auto connectorsByName =	destinationBlockByName->second->getAllConnectorsByName();
 			//In case of dynamic blocks it may be that the block with the corresponding IDs still exists, but the connectors/connectables have changed.
-			if (connectorsByName.find(connectionCfg.getDestConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
+			if (connectorsByName.find(connectionCfg.getDestinationConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
 			{
 				toBeErased.push_back(connectionEntByID.first);
 				connectionNames += connectionEnt->getName() + ", ";
@@ -126,7 +126,7 @@ void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<
 		{
 			auto connectorsByName = originBlockByName->second->getAllConnectorsByName();
 			//In case of dynamic blocks it may be that the block with the corresponding IDs still exists, but the connectors/connectables have changed.
-			if (connectorsByName.find(connectionCfg.getDestConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
+			if (connectorsByName.find(connectionCfg.getDestinationConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
 			{
 				toBeErased.push_back(connectionEntByID.first);
 				connectionNames += connectionEnt->getName() + ", ";
@@ -211,7 +211,7 @@ bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDLis
 					auto connection =  connectionByID->second;
 					ot::GraphicsConnectionCfg connectionCfg = connection->getConnectionCfg();
 					const std::string& originConnectableName =	connectionCfg.getOriginConnectable();
-					const std::string& destConnectableName =	connectionCfg.getDestConnectable();
+					const std::string& destConnectableName =	connectionCfg.getDestinationConnectable();
 					if (connector.getConnectorName() == originConnectableName || connector.getConnectorName() == destConnectableName)
 					{
 						connectionIsSet = true;
@@ -291,7 +291,7 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<ot::EntityBlock
 				
 		ot::UID destinationUID = connectionCfg.getDestinationUid();
 		ot::UID originUID = connectionCfg.getOriginUid();
-		const std::string& destinationConnectableName = connectionCfg.getDestConnectable();
+		const std::string& destinationConnectableName = connectionCfg.getDestinationConnectable();
 		const std::string& originConnectableName = connectionCfg.getOriginConnectable();
 
 		//First we determine the direction which is determined by the connectable types: out -> in/optIn

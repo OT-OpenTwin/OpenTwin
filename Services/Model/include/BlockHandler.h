@@ -42,21 +42,31 @@ public:
 	BlockHandler() = default;
 	~BlockHandler() = default;
 
-	//Fill map function
+	// Fill map functions
+
 	void processEntity(EntityBase* entBase);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Setter
+
 	void addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection);
 	void addBlock(ot::UID _editorId, const ot::EntityBlock* _block);
 	void addEditor(const EntityGraphicsScene* _editor);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Remover
+
 	void removeFromMap(EntityBase* entBase);
 	void entityRemoved(EntityBase* _entity, const std::list<EntityBase*>& _otherEntitiesToRemove);
 	void removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, ot::EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection);
 	void clearMap();
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Finder
+
 	bool blockExists(ot::UID _blockID);
 	bool blockExists(ot::UID _editorID, ot::UID _blockID);
 	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);

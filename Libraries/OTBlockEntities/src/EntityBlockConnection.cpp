@@ -55,7 +55,7 @@ ot::GraphicsConnectionCfg ot::EntityBlockConnection::getConnectionCfg() const
 
 	const EntityPropertiesGuiPainter* painterProperty = dynamic_cast<const EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
 	outlineCfg.setPainter(painterProperty->getValue()->createCopy());
-	
+
 	const EntityPropertiesDouble* lineWidthProperty = dynamic_cast<const EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
 	outlineCfg.setWidth(lineWidthProperty->getValue());
 
@@ -67,9 +67,9 @@ ot::GraphicsConnectionCfg ot::EntityBlockConnection::getConnectionCfg() const
 	const EntityPropertiesSelection* lineShapeProperty = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	cfg.setLineShape(ot::GraphicsConnectionCfg::stringToShape(lineShapeProperty->getValue()));
 
-	cfg.setDestPos(m_destPos);
+	cfg.setDestinationPos(m_destPos);
 	cfg.setOriginPos(m_originPos);
-	
+
 	cfg.setUid(getEntityID());
 	return cfg;
 }
@@ -87,48 +87,57 @@ void ot::EntityBlockConnection::setConnectionCfg(const ot::GraphicsConnectionCfg
 	EntityPropertiesSelection* lineStyle = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
 	OTAssertNullptr(lineStyle);
 	lineStyle->setValue(ot::toString(connectionCfg.getLineStyle().getStyle()));
-	
+
 	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	OTAssertNullptr(lineShape);
 	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(connectionCfg.getLineShape()));
 
 	m_blockIDOrigin = connectionCfg.getOriginUid();
 	m_blockIDDestination = connectionCfg.getDestinationUid();
-	m_connectorNameDestination = connectionCfg.getDestConnectable();
+	m_connectorNameDestination = connectionCfg.getDestinationConnectable();
 	m_connectorNameOrigin = connectionCfg.getOriginConnectable();
 	m_originPos = connectionCfg.getOriginPos();
-	m_destPos = connectionCfg.getDestPos();
+	m_destPos = connectionCfg.getDestinationPos();
 
 	setModified();
 }
 
-void ot::EntityBlockConnection::setGraphicsPickerKey(const std::string& _key) {
-	if (_key != m_pickerKey) {
+void ot::EntityBlockConnection::setGraphicsPickerKey(const std::string& _key)
+{
+	if (_key != m_pickerKey)
+	{
 		m_pickerKey = _key;
 		setModified();
 	}
 }
 
-void ot::EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape) {
+void ot::EntityBlockConnection::setLineShape(ot::GraphicsConnectionCfg::ConnectionShape _shape)
+{
 	EntityPropertiesSelection* lineShape = dynamic_cast<EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	OTAssertNullptr(lineShape);
 	lineShape->setValue(ot::GraphicsConnectionCfg::shapeToString(_shape));
 }
 
-ot::GraphicsConnectionCfg::ConnectionShape ot::EntityBlockConnection::getLineShape() const {
+ot::GraphicsConnectionCfg::ConnectionShape ot::EntityBlockConnection::getLineShape() const
+{
 	const EntityPropertiesSelection* lineShape = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
 	OTAssertNullptr(lineShape);
 	return ot::GraphicsConnectionCfg::stringToShape(lineShape->getValue());
 }
 
-void ot::EntityBlockConnection::createConnectionItem() const {
+void ot::EntityBlockConnection::createConnectionItem() const
+{
 	OTAssertNullptr(getObserver());
-	
+	if (m_hidden)
+	{
+		return;
+	}
 	ot::JsonDocument reqDoc = createGraphicsRequestDocument();
 	getObserver()->sendMessageToViewer(reqDoc);
 }
 
-ot::JsonDocument ot::EntityBlockConnection::createGraphicsRequestDocument() const {
+ot::JsonDocument ot::EntityBlockConnection::createGraphicsRequestDocument() const
+{
 	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
 
 	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
@@ -158,7 +167,7 @@ void ot::EntityBlockConnection::createProperties()
 	EntityPropertiesGuiPainter::createProperty("Settings", "Line Painter", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemBorder), "default", getProperties());
 	EntityPropertiesDouble::createProperty("Settings", "Line Width", 2., "default", getProperties());
 	EntityPropertiesSelection::createProperty("Settings", "Line Style", { ot::toString(ot::LineStyle::NoLine), ot::toString(ot::LineStyle::SolidLine), ot::toString(ot::LineStyle::DotLine), ot::toString(ot::LineStyle::DashLine), ot::toString(ot::LineStyle::DashDotLine), ot::toString(ot::LineStyle::DashDotDotLine) }, ot::toString(ot::LineStyle::SolidLine), "default", getProperties());
-	EntityPropertiesSelection::createProperty("Settings", "Line Shape", { 
+	EntityPropertiesSelection::createProperty("Settings", "Line Shape", {
 		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::DirectLine),
 		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::SmoothLine),
 		ot::GraphicsConnectionCfg::shapeToString(ot::GraphicsConnectionCfg::ConnectionShape::XYLine),
@@ -180,7 +189,8 @@ void ot::EntityBlockConnection::addVisualizationNodes(void)
 	createConnectionItem();
 }
 
-void ot::EntityBlockConnection::createNavigationTreeEntry() {
+void ot::EntityBlockConnection::createNavigationTreeEntry()
+{
 	OTAssertNullptr(getObserver());
 
 	ot::JsonDocument doc;
@@ -198,7 +208,7 @@ void ot::EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document
 
 	// Store the ConnectionCfg
 
-	
+
 	storage.append(
 
 		bsoncxx::builder::basic::kvp("GraphicPackageChildName", m_graphicsScenePackageChildName),
@@ -211,7 +221,8 @@ void ot::EntityBlockConnection::addStorageData(bsoncxx::builder::basic::document
 		bsoncxx::builder::basic::kvp("OriginPosX", m_originPos.getX()),
 		bsoncxx::builder::basic::kvp("OriginPosY", m_originPos.getY()),
 		bsoncxx::builder::basic::kvp("DestinationPosX", m_destPos.getX()),
-		bsoncxx::builder::basic::kvp("DestinationPosY", m_destPos.getY())
+		bsoncxx::builder::basic::kvp("DestinationPosY", m_destPos.getY()),
+		bsoncxx::builder::basic::kvp("IsHidden", m_hidden)
 	);
 }
 
@@ -221,7 +232,7 @@ void ot::EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::docu
 
 	//Now we read the information about the ConnectionCfg
 	m_graphicsScenePackageChildName = std::string(doc_view["GraphicPackageChildName"].get_string().value.data());
-	
+
 	m_connectorNameOrigin = std::string(doc_view["FromConnectable"].get_string().value.data());
 	m_connectorNameDestination = std::string(doc_view["ToConnectable"].get_string().value.data());
 	m_blockIDOrigin = static_cast<ot::UID>(doc_view["FromUID"].get_int64());
@@ -233,22 +244,26 @@ void ot::EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::docu
 	double destY = 0.0;
 
 	auto itOriginPosX = doc_view.find("OriginPosX");
-	if (itOriginPosX != doc_view.end()) {
+	if (itOriginPosX != doc_view.end())
+	{
 		originX = itOriginPosX->get_double();
 	}
 
 	auto itOriginPosY = doc_view.find("OriginPosY");
-	if (itOriginPosY != doc_view.end()) {
+	if (itOriginPosY != doc_view.end())
+	{
 		originY = itOriginPosY->get_double();
 	}
 
 	auto itDestPosX = doc_view.find("DestinationPosX");
-	if (itDestPosX != doc_view.end()) {
+	if (itDestPosX != doc_view.end())
+	{
 		destX = itDestPosX->get_double();
 	}
 
 	auto itDestPosY = doc_view.find("DestinationPosY");
-	if (itDestPosY != doc_view.end()) {
+	if (itDestPosY != doc_view.end())
+	{
 		destY = itDestPosY->get_double();
 	}
 
@@ -257,20 +272,29 @@ void ot::EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::docu
 	m_destPos.setX(destX);
 	m_destPos.setY(destY);
 
-	auto pickerIt = doc_view.find("GraphicsPickerKey");
-	if (pickerIt != doc_view.end())
+	auto docIt = doc_view.find("GraphicsPickerKey");
+	if (docIt != doc_view.end())
 	{
-		m_pickerKey = pickerIt->get_string().value.data();
+		m_pickerKey = docIt->get_string().value.data();
 	}
-	else {
+	else
+	{
 		// Legacy support
 		auto lst = getServicesForCallback(Callback::DataNotify);
-		if (!lst.empty()) {
+		if (!lst.empty())
+		{
 			m_pickerKey = lst.front();
 		}
-		else {
+		else
+		{
 			OT_LOG_W("Block connection entity has no GraphicsPickerKey and no callback service set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
 			m_pickerKey = OT_INFO_SERVICE_TYPE_MODEL;
 		}
+	}
+
+	docIt = doc_view.find("IsHidden");
+	if (docIt != doc_view.end())
+	{
+		m_hidden = docIt->get_bool();
 	}
 }

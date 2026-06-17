@@ -246,7 +246,7 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
 		}
 		else if (connection.second->getConfiguration().getDestinationUid() == _item->getGraphicsItemUid())
 		{
-			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getDestConnectable());
+			GraphicsItem* connector = _item->findItem(connection.second->getConfiguration().getDestinationConnectable());
 			if (connector)
 			{
 				connection.second->setDestItem(connector);
@@ -376,10 +376,10 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config)
 	}
 	if (dest)
 	{
-		destConn = dest->findItem(_config.getDestConnectable());
+		destConn = dest->findItem(_config.getDestinationConnectable());
 		if (!destConn)
 		{
-			OT_LOG_E("Destination connector not found { \"ItemUID\": " + std::to_string(_config.getDestinationUid()) + ", \"Connector\": \"" + _config.getDestConnectable() + "\" }");
+			OT_LOG_E("Destination connector not found { \"ItemUID\": " + std::to_string(_config.getDestinationUid()) + ", \"Connector\": \"" + _config.getDestinationConnectable() + "\" }");
 		}
 	}
 
@@ -397,7 +397,7 @@ void ot::GraphicsView::addConnection(const GraphicsConnectionCfg& _config)
 	}
 	else
 	{
-		newConnection->setDestPos(_config.getDestPos());
+		newConnection->setDestPos(_config.getDestinationPos());
 	}
 
 	m_connections.insert_or_assign(_config.getUid(), newConnection);
