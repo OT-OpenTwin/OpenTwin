@@ -93,9 +93,12 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	const size_t numberOfDocuments = _numberOfParameterValues;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 
+	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+	const size_t constCount = currentParameterValues.size();
+
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
-		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
@@ -150,9 +153,12 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 
+	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+	const size_t constCount = currentParameterValues.size();
+
 	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
 	{
-		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
@@ -203,9 +209,11 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 
 	const size_t numberOfDocuments = _numberOfParameterValues * 2;
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
+	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+	const size_t constCount = currentParameterValues.size();
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
 	{
-		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
@@ -239,9 +247,13 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	}
 	
 	std::vector<ot::GenericDataStructMatrix> quantityValueMatrices = _quantityDescription->getValues();
+	
+	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+	const size_t constCount = currentParameterValues.size();
+
 	for (size_t i = 0; i < _numberOfParameterValues; i++)
 	{
-		std::list<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
+		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
@@ -306,7 +318,7 @@ void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std
 	}
 }
 
-void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue)
+void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::vector<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const ot::Variable& _quantityValue)
 {
 	if (m_quantityContainer.size() == 0)
 	{
@@ -336,6 +348,35 @@ void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std
 }
 
 void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const std::list<ot::Variable>& _quantityValues)
+{
+	if (m_quantityContainer.size() == 0)
+	{
+		QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
+		newContainer.addValue(_quantityValues);
+		m_quantityContainer.push_back(std::move(newContainer));
+	}
+	else
+	{
+		QuantityContainer* lastAddedQuantityContainer = &m_quantityContainer.back();
+		const uint64_t lastAddedQuantityContainerStoredValues = lastAddedQuantityContainer->getValueArraySize();
+		if (lastAddedQuantityContainerStoredValues == m_bucketSize)
+		{
+			if (m_quantityContainer.size() == m_bufferSize)
+			{
+				flushQuantityContainer();
+			}
+			QuantityContainer newContainer(_seriesIndex, _parameterIDs, _parameterValues, _quantityIndex);
+			newContainer.addValue(_quantityValues);
+			m_quantityContainer.push_back(std::move(newContainer));
+		}
+		else
+		{
+			lastAddedQuantityContainer->addValue(_quantityValues);
+		}
+	}
+}
+
+void QuantityContainerSerialiser::addQuantityContainer(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::vector<ot::Variable>& _parameterValues, uint64_t _quantityIndex, const std::list<ot::Variable>& _quantityValues)
 {
 	if (m_quantityContainer.size() == 0)
 	{

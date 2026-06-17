@@ -50,6 +50,19 @@ QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _
 
 }
 
+QuantityContainer::QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterAbbreviations, std::vector<ot::Variable>& _parameterValues, int64_t _quantityIndex)
+{
+	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataSeries::getFieldName(), _seriesIndex));
+	m_mongoDocument.append(bsoncxx::builder::basic::kvp(MetadataQuantity::getFieldName(), _quantityIndex));
+
+	VariableToBSONConverter converter;
+	auto parameterValue = _parameterValues.begin();
+	for (const auto& parameterAbbreviation : _parameterAbbreviations)
+	{
+		converter(m_mongoDocument, *parameterValue++, std::to_string(parameterAbbreviation));
+	}
+}
+
 QuantityContainer::QuantityContainer(QuantityContainer&& other) noexcept
 : m_values(std::move(other.m_values)), m_mongoDocument (std::move(other.m_mongoDocument))
 {

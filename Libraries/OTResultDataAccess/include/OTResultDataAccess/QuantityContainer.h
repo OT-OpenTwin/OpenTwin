@@ -40,6 +40,7 @@ class OT_RESULTDATAACCESS_API_EXPORT QuantityContainer
 public:
 	QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>&& _parameterValues, int64_t _quantityIndex);
 	QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _parameterValues, int64_t _quantityIndex);
+	QuantityContainer(int64_t _seriesIndex, std::list<ot::UID>& _parameterIDs, std::vector<ot::Variable>& _parameterValues, int64_t _quantityIndex);
 	QuantityContainer(QuantityContainer&& _other) noexcept;
 	QuantityContainer(const QuantityContainer& _other) = delete;
 	QuantityContainer& operator=(const QuantityContainer& _other) = delete;
