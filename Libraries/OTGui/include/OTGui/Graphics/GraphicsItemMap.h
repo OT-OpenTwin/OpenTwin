@@ -29,7 +29,8 @@ namespace ot
 			std::list<GraphicsConnectionInfo> connections; //! @brief List of connections associated with this connectable item.
 		};
 
-		GraphicsItemMap() = default;
+		explicit GraphicsItemMap() = default;
+		explicit GraphicsItemMap(const ConstJsonObject& _jsonObject);
 		virtual ~GraphicsItemMap() = default;
 
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
@@ -38,6 +39,8 @@ namespace ot
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Item management
+
+		void clear() { m_itemToConnectorsMap.clear(); };
 
 		void addItem(UID _itemId, const std::list<std::string>& _connectors);
 		void removeItem(UID _itemId);

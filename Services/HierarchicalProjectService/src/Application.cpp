@@ -203,9 +203,28 @@ ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropE
 
 ot::ReturnMessage Application::graphicsItemClicked(const ot::GraphicsClickEvent& _eventData)
 {
-	OT_LOG_TS("Click event received { \"EditorName\": \"" << _eventData.getEditorName() 
-		<< "\", \"ItemUid\": " << _eventData.getItemUid()
-		<< ", \"ElementName\": \"" << _eventData.getElementName() << "\" }");
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetGraphicsItemMap, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_eventData.getEditorName(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	if (!sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc, responseStr)) {
+		OT_LOG_E("Failed to send message to model for graphics item click event");
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk())
+	{
+		OT_LOG_ES("Model returned error for graphics item click event: " << response.getWhat());
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::JsonDocument itemMapDoc;
+	itemMapDoc.Parse(response.getWhat().c_str());
+
+	ot::GraphicsItemMap itemMap(itemMapDoc.getConstObject());
+	m_entityHandler.expandCollapseSubtree(_eventData, itemMap);
 
 	return ot::ReturnMessage::Ok;
 }

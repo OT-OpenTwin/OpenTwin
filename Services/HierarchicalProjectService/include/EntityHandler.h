@@ -24,7 +24,9 @@
 #include "OTCore/FolderNames.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectInformation.h"
+#include "OTGui/Event/GraphicsClickEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -65,6 +67,8 @@ public:
 	bool removeCenterImageFromBlocks(const std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>>& _blocks);
 
 	void addContainer();
+
+	void expandCollapseSubtree(const ot::GraphicsClickEvent& _event, const ot::GraphicsItemMap& _itemMap);
 
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;

@@ -654,6 +654,11 @@ void EntityHandler::addContainer() {
 	ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Added hierarchical container", true, true);
 }
 
+void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, const ot::GraphicsItemMap& _itemMap)
+{
+
+}
+
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {
 	std::string tmp;
 	std::list<std::string> path = ot::String::split(ot::String::replace(_filePath, '\\', '/'), '/', true);

@@ -3,11 +3,66 @@
 // OpenTwin header
 #include "OTGui/Graphics/GraphicsItemMap.h"
 
+ot::GraphicsItemMap::GraphicsItemMap(const ConstJsonObject& _jsonObject)
+	: GraphicsItemMap()
+{
+	setFromJsonObject(_jsonObject);
+}
+
 void ot::GraphicsItemMap::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const
-{}
+{
+	JsonArray itemMapArr;
+	for (const auto& itemIt : m_itemToConnectorsMap)
+	{
+		JsonObject itemObj;
+		itemObj.AddMember("ItemID", itemIt.first, _allocator);
+
+		JsonArray connectorsArr;
+		for (const auto& connectorIt : itemIt.second)
+		{
+			JsonObject connectorObj;
+			connectorObj.AddMember("ConnectorName", JsonString(connectorIt.first, _allocator), _allocator);
+
+			JsonArray connectionsArr;
+			for (const auto& connection : connectorIt.second.connections)
+			{
+				JsonObject connectionObj;
+				connection.addToJsonObject(connectionObj, _allocator);
+				connectionsArr.PushBack(connectionObj, _allocator);
+			}
+			connectorObj.AddMember("Connections", connectionsArr, _allocator);
+			connectorsArr.PushBack(connectorObj, _allocator);
+		}
+		itemObj.AddMember("Connectors", connectorsArr, _allocator);
+		itemMapArr.PushBack(itemObj, _allocator);
+	}
+	_jsonObject.AddMember("ItemMap", itemMapArr, _allocator);
+}
 
 void ot::GraphicsItemMap::setFromJsonObject(const ConstJsonObject& _jsonObject)
-{}
+{
+	this->clear();
+
+	for (const ConstJsonObject& itemObj : json::getObjectList(_jsonObject, "ItemMap"))
+	{
+		UID itemId = json::getUInt64(itemObj, "ItemID");
+		std::map<std::string, ItemConnectorInfo> connectorsMap;
+
+		for (const ConstJsonObject& connectorObj : json::getObjectList(itemObj, "Connectors"))
+		{
+			std::string connectorName = json::getString(connectorObj, "ConnectorName");
+			ItemConnectorInfo connectorInfo(connectorName);
+			for (const ConstJsonObject& connectionObj : json::getObjectList(connectorObj, "Connections"))
+			{
+				GraphicsConnectionInfo connection(connectionObj);
+				connectorInfo.connections.push_back(connection);
+			}
+			connectorsMap.emplace(connectorName, connectorInfo);
+		}
+
+		m_itemToConnectorsMap.emplace(itemId, connectorsMap);
+	}
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

@@ -40,7 +40,7 @@ class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandl
 	OT_DECL_NOCOPY(BlockHandler)
 	OT_DECL_NOMOVE(BlockHandler)
 public:
-	BlockHandler() = default;
+	BlockHandler();
 	~BlockHandler() = default;
 
 	// Fill map functions
@@ -70,11 +70,15 @@ public:
 
 	bool blockExists(ot::UID _blockID);
 	bool blockExists(ot::UID _editorID, ot::UID _blockID);
-	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);
-
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Callbacks
+
 protected:
+	virtual ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
+
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemClicked(const ot::GraphicsClickEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
@@ -88,6 +92,9 @@ protected:
 	// Private: Helper
 
 private:
+
+	EntityGraphicsScene* findElementGraphicsScene(const std::string& _graphicsElementName);
+
 	//! @brief Handles the connection of one block to another block.
 	//! @param _scene The graphics scene in which the connection is being made.
 	//! @param _originBlock The block from which the connection originates.
@@ -146,6 +153,8 @@ private:
 	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<ot::EntityBlockConnection*>& _processedConnections);
 
 	ot::GraphicsItemMap& getGraphicsItemMap(ot::UID _sceneID);
+
+	ot::ActionHandler m_actionHandler;
 
 	//! @brief Maps scenes to the corresponding item map.
 	std::map<ot::UID, ot::GraphicsItemMap> m_sceneMap;

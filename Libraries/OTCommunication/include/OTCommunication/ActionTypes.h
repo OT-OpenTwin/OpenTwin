@@ -154,6 +154,7 @@
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 #define OT_ACTION_CMD_MODEL_ModelDialogConfirmed "Model.ModelDialog.Confirmed"
 #define OT_ACTION_CMD_MODEL_ModelDialogCanceled "Model.ModelDialog.Canceled"
+#define OT_ACTION_CMD_MODEL_GetGraphicsItemMap "Model.GetGraphicsItemMap"
 
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
