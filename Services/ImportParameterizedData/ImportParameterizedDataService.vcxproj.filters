@@ -92,6 +92,9 @@
       <Filter>src\DataSources</Filter>
     </ClCompile>
     <ClCompile Include="include\MetadataAssemblyData.cpp" />
+    <ClCompile Include="src\EntityLazyIterator.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">
@@ -210,6 +213,9 @@
     </ClInclude>
     <ClInclude Include="include\CSVSchemaImporter.h">
       <Filter>include\DataSources</Filter>
+    </ClInclude>
+    <ClInclude Include="include\EntityLazyIterator.h">
+      <Filter>include</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
