@@ -62,16 +62,16 @@ std::string TimeFormatter::formatDuration(const std::chrono::nanoseconds& _durat
 		oss << h << "."
 			<< std::setw(2) << m << "."
 			<< std::setw(2) << s << "."
-			<< std::setw(3) << ms;
+			<< std::setw(3) << ms << " h";
 	}
 	else if (m > 0) {
 		oss << m << "."
 			<< std::setw(2) << s << "."
-			<< std::setw(3) << ms;
+			<< std::setw(3) << ms << " min";
 	}
 	else {
 		oss << s << "."
-			<< std::setw(3) << ms;
+			<< std::setw(3) << ms << " s";
 	}
 
 	return oss.str();
