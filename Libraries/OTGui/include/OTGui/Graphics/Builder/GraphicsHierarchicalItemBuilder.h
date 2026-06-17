@@ -26,6 +26,7 @@
 #include "OTGui/Style/Margins.h"
 #include "OTGui/Painter/Painter2DContainer.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsTriangleItemCfg.h"
 
 // std header
 #include <vector>
@@ -35,6 +36,7 @@ namespace ot {
 
 	class Painter2D;
 	class GraphicsVBoxLayoutItemCfg;
+	class GraphicsGridLayoutItemCfg;
 
 	class OT_GUI_API_EXPORTONLY GraphicsHierarchicalItemBuilder {
 		OT_DECL_NOCOPY(GraphicsHierarchicalItemBuilder)
@@ -46,9 +48,20 @@ namespace ot {
 			Rectangle,
 			Ellipse
 		};
+
+		enum class ExpanderState : int32_t
+		{
+			None,
+			Expanded,
+			Collapsed
+		};
+
 		static std::string backgroundShapeToString(BackgroundShape _shape);
 		static BackgroundShape stringToBackgroundShape(const std::string& _shapeStr);
 		static std::list<std::string> getBackgroundShapeSelectionValues();
+
+		static std::string createExpanderItemName(const std::string& _entityName, Alignment _expanderAlignment);
+		static Alignment expanderAlignmentFromItemName(const std::string& _itemName);
 
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
@@ -123,6 +136,11 @@ namespace ot {
 		void setConnectorHeight(double _height) { m_connectorHeight = _height; };
 		void setConnectorSize(double _width, double _height) { m_connectorWidth = _width; m_connectorHeight = _height; };
 
+		void setTopExpanderState(ExpanderState _state) { m_topExpanderState = _state; };
+		void setBottomExpanderState(ExpanderState _state) { m_bottomExpanderState = _state; };
+		void setLeftExpanderState(ExpanderState _state) { m_leftExpanderState = _state; };
+		void setRightExpanderState(ExpanderState _state) { m_rightExpanderState = _state; };
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
@@ -150,12 +168,16 @@ namespace ot {
 		void initializeImageInfo(ImageInfo& _info);
 
 		GraphicsItemCfg* createConnectorItem(ot::Alignment _alignment) const;
+		GraphicsItemCfg* createExpanderItem(ot::Alignment _alignment) const;
 		GraphicsItemCfg* createShapeItem() const;
 		GraphicsItemCfg* createRectangleShapeItem() const;
 		GraphicsItemCfg* createEllipseShapeItem() const;
 
 		void createText(GraphicsVBoxLayoutItemCfg* _layout, const TextInfo& _info, const std::string& _nameSuffix) const;
 		void createImage(GraphicsVBoxLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
+
+		bool isExpanderVisible(Alignment _alignment) const;
+		GraphicsTriangleItemCfg::TriangleDirection expanderDiectionFromAlignment(Alignment _alignment) const;
 
 		std::string m_entityName;
 
@@ -175,6 +197,11 @@ namespace ot {
 
 		double m_connectorWidth;
 		double m_connectorHeight;
+
+		ExpanderState m_topExpanderState;
+		ExpanderState m_bottomExpanderState;
+		ExpanderState m_leftExpanderState;
+		ExpanderState m_rightExpanderState;
 	};
 
 }

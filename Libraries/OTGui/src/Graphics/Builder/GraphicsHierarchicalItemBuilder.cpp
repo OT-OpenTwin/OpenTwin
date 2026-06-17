@@ -83,6 +83,23 @@ std::list<std::string> ot::GraphicsHierarchicalItemBuilder::getBackgroundShapeSe
 		});
 }
 
+std::string ot::GraphicsHierarchicalItemBuilder::createExpanderItemName(const std::string& _entityName, Alignment _expanderAlignment)
+{
+	return _entityName + "_expander_" + ot::toString(_expanderAlignment);
+}
+
+ot::Alignment ot::GraphicsHierarchicalItemBuilder::expanderAlignmentFromItemName(const std::string& _itemName)
+{
+	size_t pos = _itemName.rfind("_expander_");
+	if (pos == std::string::npos)
+	{
+		OT_LOG_E("Invalid expander item name: " + _itemName);
+		return Alignment::Center;
+	}
+	std::string alignmentStr = _itemName.substr(pos + std::string("_expander_").length());
+	return stringToAlignment(alignmentStr);
+}
+
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() const
 {
 	OTAssert(!m_entityName.empty(), "No entity name provided");
@@ -121,14 +138,10 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	root->addItemBottom(conGrid, false, true);
 
 	// Connectors
-	//conGrid->addChildItem(0, 0, createConnectorItem(Alignment::TopLeft));
 	conGrid->addChildItem(0, 2, createConnectorItem(Alignment::Top));
-	//conGrid->addChildItem(0, 4, createConnectorItem(Alignment::TopRight));
 	conGrid->addChildItem(2, 0, createConnectorItem(Alignment::Left));
 	conGrid->addChildItem(2, 4, createConnectorItem(Alignment::Right));
-	//conGrid->addChildItem(4, 0, createConnectorItem(Alignment::BottomLeft));
 	conGrid->addChildItem(4, 2, createConnectorItem(Alignment::Bottom));
-	//conGrid->addChildItem(4, 4, createConnectorItem(Alignment::BottomRight));
 
 	// Shape
 	GraphicsItemCfg* shapeItm = createShapeItem();
@@ -138,26 +151,39 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	}
 
 	// Main layout
-	GraphicsVBoxLayoutItemCfg* mLay = new GraphicsVBoxLayoutItemCfg;
+	GraphicsGridLayoutItemCfg* mLay = new GraphicsGridLayoutItemCfg(3, 3);
 	mLay->setName(m_entityName + "_mLay");
-	mLay->setMinimumSize(m_minimumSize);
-	mLay->setMaximumSize(m_maximumSize);
 	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	mLay->setColumnStretch(1, 1);
+	mLay->setRowStretch(1, 1);
 	cStack->addItemTop(mLay, true, false);
 
+	// Expander buttons
+	mLay->addChildItem(0, 1, createExpanderItem(Alignment::Top));
+	mLay->addChildItem(1, 0, createExpanderItem(Alignment::Left));
+	mLay->addChildItem(1, 2, createExpanderItem(Alignment::Right));
+	mLay->addChildItem(2, 1, createExpanderItem(Alignment::Bottom));
+
+	// Content layout
+	GraphicsVBoxLayoutItemCfg* cLay = new GraphicsVBoxLayoutItemCfg;
+	cLay->setName(m_entityName + "_cLay");
+	cLay->setMinimumSize(m_minimumSize);
+	cLay->setMaximumSize(m_maximumSize);
+	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	mLay->addChildItem(1, 1, cLay);
+
 	// Content
-	//mLay->addStrech(1);
-	createText(mLay, m_topText, "_ttxt");
-	createImage(mLay, m_centerImage, "_cimg");
-	createText(mLay, m_bottomText, "_btxt");
-	//mLay->addStrech(1);
+	createText(cLay, m_topText, "_ttxt");
+	createImage(cLay, m_centerImage, "_cimg");
+	createText(cLay, m_bottomText, "_btxt");
 
 	return root;
 }
 
 ot::GraphicsHierarchicalItemBuilder::GraphicsHierarchicalItemBuilder()
 	: m_cornerRadius(5), m_connectorWidth(7.), m_connectorHeight(5.), m_backgroundShape(BackgroundShape::Rectangle),
-	  m_minimumSize(Size2DD(10., 10.)), m_maximumSize(Size2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max()))
+	  m_minimumSize(Size2DD(10., 10.)), m_maximumSize(Size2DD(std::numeric_limits<double>::max(), std::numeric_limits<double>::max())),
+	m_topExpanderState(ExpanderState::Expanded), m_bottomExpanderState(ExpanderState::Expanded), m_leftExpanderState(ExpanderState::Expanded), m_rightExpanderState(ExpanderState::Expanded)
 {
 	this->setBackgroundPainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
 	this->setOutlinePainter(new ot::StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
@@ -284,6 +310,48 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 	return con;
 }
 
+ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot::Alignment _alignment) const
+{
+	ot::GraphicsBoxLayoutItemCfg* root = nullptr;
+	if (_alignment == Alignment::Top || _alignment == Alignment::Bottom)
+	{
+		root = new GraphicsHBoxLayoutItemCfg;
+	}
+	else if (_alignment == Alignment::Left || _alignment == Alignment::Right)
+	{
+		root = new GraphicsVBoxLayoutItemCfg;
+	}
+	else
+	{
+		OT_LOG_E("Invalid expander item alignment: " + std::to_string((int)_alignment));
+		return nullptr;
+	}
+
+	root->addStrech(1);
+
+	GraphicsTriangleItemCfg* buttonItm = new GraphicsTriangleItemCfg;
+	buttonItm->setName(createExpanderItemName(m_entityName, _alignment));
+	buttonItm->setSizePolicy(SizePolicy::Preferred);
+	buttonItm->setFixedSize(10., 10.);
+	root->addChildItem(buttonItm);
+	
+	if (isExpanderVisible(_alignment))
+	{
+		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemHandlesState);
+		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground)));
+		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
+	}
+	else
+	{
+		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
+		buttonItm->setOutline(PenFCfg(0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
+	}
+
+	root->addStrech(1);
+	return root;
+}
+
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() const
 {
 	switch (m_backgroundShape)
@@ -355,4 +423,32 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg*
 	itm->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	_layout->addChildItem(itm);
+}
+
+bool ot::GraphicsHierarchicalItemBuilder::isExpanderVisible(Alignment _alignment) const
+{
+	switch (_alignment)
+	{
+	case Alignment::Top: return m_topExpanderState != ExpanderState::None;
+	case Alignment::Bottom: return m_bottomExpanderState != ExpanderState::None;
+	case Alignment::Left: return m_leftExpanderState != ExpanderState::None;
+	case Alignment::Right: return m_rightExpanderState != ExpanderState::None;
+	default:
+		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
+		return false;
+	}
+}
+
+ot::GraphicsTriangleItemCfg::TriangleDirection ot::GraphicsHierarchicalItemBuilder::expanderDiectionFromAlignment(Alignment _alignment) const
+{
+	switch (_alignment)
+	{
+	case Alignment::Top: return (m_topExpanderState == ExpanderState::Expanded ? GraphicsTriangleItemCfg::GraphicsTriangleItemCfg::TriangleDirection::Down : GraphicsTriangleItemCfg::TriangleDirection::Up);
+	case Alignment::Bottom: return (m_bottomExpanderState == ExpanderState::Expanded ? GraphicsTriangleItemCfg::TriangleDirection::Up : GraphicsTriangleItemCfg::TriangleDirection::Down);
+	case Alignment::Left: return (m_leftExpanderState == ExpanderState::Expanded ? GraphicsTriangleItemCfg::TriangleDirection::Right : GraphicsTriangleItemCfg::TriangleDirection::Left);
+	case Alignment::Right: return (m_rightExpanderState == ExpanderState::Expanded ? GraphicsTriangleItemCfg::TriangleDirection::Left : GraphicsTriangleItemCfg::TriangleDirection::Right);
+	default:
+		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
+		return GraphicsTriangleItemCfg::TriangleDirection::Down;
+	}
 }
