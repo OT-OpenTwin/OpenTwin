@@ -91,6 +91,7 @@
     <ClCompile Include="src\CSVSchemaImporter.cpp">
       <Filter>src\DataSources</Filter>
     </ClCompile>
+    <ClCompile Include="include\MetadataAssemblyData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Application.h">

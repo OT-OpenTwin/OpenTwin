@@ -45,8 +45,8 @@ void EntityDatasetImporterCSV::addVisualizationNodes(void)
 bool EntityDatasetImporterCSV::updateFromProperties(void)
 {
 	auto considerCSVProperty = PropertyHelper::getSelectionProperty(this, "CSV file selection");
-	auto metadataSelectionProperty = PropertyHelper::getSelectionProperty(this, "Metadata selection");
 	auto namingFormat = PropertyHelper::getSelectionProperty(this, "Naming format");
+
 	bool updateGrid = false;
 	if (considerCSVProperty->needsUpdate())
 	{
@@ -60,22 +60,6 @@ bool EntityDatasetImporterCSV::updateFromProperties(void)
 		else
 		{
 			PropertyHelper::getStringProperty(this, "CSV regex pattern")->setVisible(false);
-		}
-		updateGrid = true;
-	}
-
-	if (metadataSelectionProperty->needsUpdate())
-	{
-		const std::string format = metadataSelectionProperty->getValue();
-		auto metadataIdentificationsByName= m_metadataIdentificationsByName.find(format);
-		assert(metadataIdentificationsByName != m_metadataIdentificationsByName.end());
-		if (metadataIdentificationsByName->second == MetadataSelectionFormat::Regex)
-		{
-			PropertyHelper::getStringProperty(this, "Metadata regex pattern")->setVisible(true);
-		}
-		else
-		{
-			PropertyHelper::getStringProperty(this, "Metadata regex pattern")->setVisible(false);
 		}
 		updateGrid = true;
 	}
@@ -98,12 +82,52 @@ bool EntityDatasetImporterCSV::updateFromProperties(void)
 }
 EntityDatasetImporterCSV::CSVSelectionFormat EntityDatasetImporterCSV::getCSVSelectionFormat()
 {
-	return CSVSelectionFormat();
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "CSV file selection", "Settings");
+	auto csvSelectionFormat = m_consideredCSVByName.find(selectedFormat);
+	assert(csvSelectionFormat != m_consideredCSVByName.end());
+
+	return csvSelectionFormat->second;
+}
+
+std::string EntityDatasetImporterCSV::getCSVSelectionRegex()
+{
+	const std::string csvRegex = PropertyHelper::getStringPropertyValue(this, "CSV regex pattern", "Settings");
+	return csvRegex;
 }
 
 EntityDatasetImporterCSV::MetadataSelectionFormat EntityDatasetImporterCSV::getMetadataSelectionFormat()
 {
-	return MetadataSelectionFormat();
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Metadata selection", "Settings");
+	auto metadataSelectionFormat = m_metadataIdentificationsByName.find(selectedFormat);
+	assert(metadataSelectionFormat != m_metadataIdentificationsByName.end());
+
+	return metadataSelectionFormat->second;
+}
+
+EntityDatasetImporterCSV::NamingFormat EntityDatasetImporterCSV::getNamingFormat()
+{
+	const std::string selectedFormat = PropertyHelper::getSelectionPropertyValue(this, "Naming format", "Settings");
+	auto namingFormat =	m_namingFormatByName.find(selectedFormat);
+	assert(namingFormat != m_namingFormatByName.end()); 
+	return namingFormat->second;
+}
+
+std::string EntityDatasetImporterCSV::getNamingBase()
+{
+	const std::string namingBase = PropertyHelper::getStringPropertyValue(this, "Name base", "Settings");
+	return namingBase;
+}
+
+bool EntityDatasetImporterCSV::interruptAtWarnings()
+{
+	bool interruptAtWarnings =	PropertyHelper::getBoolPropertyValue(this, "Interrupt at warnings", "Settings");
+	return interruptAtWarnings;
+}
+
+std::string EntityDatasetImporterCSV::getSelectedSeriesClassification()
+{
+	const std::string selectedSeriesClassification = PropertyHelper::getEntityListPropertyValueName(this, "Classification schema", "Settings");
+	return selectedSeriesClassification;
 }
 
 void EntityDatasetImporterCSV::createProperties(const std::string& _rmdClassificationFolderName, ot::UID _rmdClassificationFolderUID)
@@ -126,9 +150,7 @@ void EntityDatasetImporterCSV::createProperties(const std::string& _rmdClassific
 		allMetadataIdentifications.push_back(entry.first);
 	}
 	EntityPropertiesSelection::createProperty("Settings", "Metadata selection", allMetadataIdentifications, allMetadataIdentifications.front(), "default", getProperties());
-	EntityPropertiesString* metadataRegex = EntityPropertiesString::createProperty("Settings", "Metadata regex pattern", "", "default", getProperties());
-	metadataRegex->setVisible(false);
-
+	
 	std::list<std::string> allNamingFormats;
 	for (auto& entry : m_namingFormatByName)
 	{
@@ -138,4 +160,6 @@ void EntityDatasetImporterCSV::createProperties(const std::string& _rmdClassific
 	EntityPropertiesSelection::createProperty("Settings", "Naming format", allNamingFormats, allNamingFormats.back(), "default", getProperties());
 	EntityPropertiesString* namingBase = EntityPropertiesString::createProperty("Settings", "Name base", "", "default", getProperties());
 	namingBase->setVisible(false);
+
+	EntityPropertiesBoolean::createProperty("Settings", "Interrupt at warnings", true, "default", getProperties());
 }

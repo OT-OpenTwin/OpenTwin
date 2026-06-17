@@ -12,7 +12,7 @@ public:
 
 	enum class MetadataSelectionFormat
 	{
-		None, SameName, Regex
+		None, SameName
 	};
 
 	enum class CSVSelectionFormat
@@ -35,7 +35,12 @@ public:
 	virtual std::string getClassName(void) const override { return EntityDatasetImporterCSV::className(); };
 
 	CSVSelectionFormat getCSVSelectionFormat();
+	std::string getCSVSelectionRegex();
 	MetadataSelectionFormat getMetadataSelectionFormat();
+	NamingFormat getNamingFormat();
+	std::string getNamingBase();
+	bool interruptAtWarnings();
+	std::string getSelectedSeriesClassification();
 
 private:
 	static std::map<std::string, MetadataSelectionFormat> m_metadataIdentificationsByName;

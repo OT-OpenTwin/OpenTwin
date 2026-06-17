@@ -302,7 +302,8 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			}
 			else if (action == m_buttonRunCSVSchemaImporter.getFullPath())
 			{
-
+				ot::UILockWrapper uiLock(Application::instance()->getUiComponent(), ot::LockType::ModelWrite);
+				CSVSchemaImporter::execute();
 			}
 			else if (action == m_buttonAddCSVSchemaImporter.getFullPath())
 			{
@@ -320,6 +321,13 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 				std::string entityName =	ot::EntityName::createUniqueEntityName(ot::FolderNames::DataCategorisationFolder, folderContent, "Import by Schema");
 				importer.setName(entityName);
 				importer.createProperties(rmdChategorisationEntityInfos.getEntityName(),rmdChategorisationEntityInfos.getEntityID());
+				importer.registerCallbacks(
+					ot::EntityCallbackBase::Callback::Properties |
+					ot::EntityCallbackBase::Callback::Selection |
+					ot::EntityCallbackBase::Callback::DataNotify,
+					getServiceName()
+				);
+
 				importer.storeToDataBase();
 				ot::NewModelStateInfo info;
 				info.addTopologyEntity(importer);

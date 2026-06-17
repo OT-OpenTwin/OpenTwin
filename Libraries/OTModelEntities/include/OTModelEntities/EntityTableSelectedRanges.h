@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityTableSelectedRanges.h
 // 
 // License:
@@ -31,7 +31,8 @@ public:
 	EntityTableSelectedRanges(ot::UID ID, EntityBase *parent, EntityObserver *obs, ModelState *ms);
 	~EntityTableSelectedRanges() = default;
 	virtual bool getEntityBox(double & xmin, double & xmax, double & ymin, double & ymax, double & zmin, double & zmax) override;
-	virtual std::string getClassName(void) const override { return "EntityTableSelectedRanges"; };
+	static std::string className() { return "EntityTableSelectedRanges"; }
+	virtual std::string getClassName(void) const override { return className(); };
 	virtual entityType getEntityType() const override { return TOPOLOGY; }
 	virtual void addVisualizationNodes() override;
 	virtual bool updateFromProperties(void) override;
