@@ -42,12 +42,12 @@ ProjectToCollectionConverter::ProjectToCollectionConverter(const std::string& _s
 	m_authorisationService = response.getWhat();
 }
 
-std::string ProjectToCollectionConverter::nameCorrespondingCollection(const std::string& projectName, const std::string& userName, const std::string& userPSW)
+std::string ProjectToCollectionConverter::nameCorrespondingCollection(const std::string& projectName, const std::string& databaseUserName, const std::string& databaseUserPwd)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(userPSW, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(databaseUserName, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(databaseUserPwd, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
