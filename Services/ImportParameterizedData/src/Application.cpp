@@ -119,7 +119,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	_ui->addMenuPage(pageName);
 
 	const std::string groupNameImport = "Data Import";
-	const std::string groupNameParameterizedDataCreation = "Table Selection Characterisation";
+	const std::string groupNameParameterizedDataCreation = "Table Selection Classification";
 	const std::string subgroupNameTableHandlingRow = "Row";
 	const std::string subgroupNameTableHandlingColumn = "Column";
 	const std::string subgroupNameTableHandlingState = "State";
@@ -131,13 +131,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonImportTouchstone = ot::ToolBarButtonCfg(pageName, groupNameImport, "Import Touchstone", "Default/regional-indicator-symbol-letter-s");
 	_ui->addMenuButton(m_buttonImportTouchstone.setButtonLockFlags(modelWrite));
 
-	m_buttonAutomaticCreationMSMD = ot::ToolBarButtonCfg(pageName, groupNameImport, "Auto Create Series Metadata", "Default/RunSolver");
+	m_buttonAutomaticCreationMSMD = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Execute Batch classification", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonAutomaticCreationMSMD.setButtonLockFlags(modelWrite));
 
-	m_buttonAddBatchCreator = ot::ToolBarButtonCfg(pageName, groupNameImport, "Add Batch Importer", "Default/BatchProcessing");
+	m_buttonAddBatchCreator = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Add Batch Classifier", "Default/BatchProcessing");
 	_ui->addMenuButton(m_buttonAddBatchCreator.setButtonLockFlags(modelWrite));
 
-	m_buttonCreateDataCollection = ot::ToolBarButtonCfg(pageName, groupNameImport, "Create Data Collection", "Default/database");
+	m_buttonCreateDataCollection = ot::ToolBarButtonCfg(pageName, groupNameImport, "Turn Classifications into Datasets", "Button/AddDataset");
 	_ui->addMenuButton(m_buttonCreateDataCollection.setButtonLockFlags(modelWrite));
 
 	m_buttonCreateRMDEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Campaign Metadata", "Default/SelectionRMD");
@@ -152,19 +152,19 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateQuantityEntry = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Quantity", "Default/SelectionQuantity");
 	_ui->addMenuButton(m_buttonCreateQuantityEntry.setButtonLockFlags(modelWrite));
 
-	m_buttonLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Lock Data Characterisation", "Default/Lock");
+	m_buttonLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Lock Data Classification", "Default/Lock");
 	_ui->addMenuButton(m_buttonLockCharacterisation.setButtonLockFlags(modelWrite));
 
-	m_buttonUnLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Unlock Data Characterisation", "Default/Unlock");
+	m_buttonUnLockCharacterisation = ot::ToolBarButtonCfg(pageName, groupNameParameterizedDataCreation, "Unlock Data Classification", "Default/Unlock");
 	_ui->addMenuButton(m_buttonUnLockCharacterisation.setButtonLockFlags(modelWrite));
 
-	m_buttonAddJsonMetadataToSeries = ot::ToolBarButtonCfg(pageName, groupNameImport, "Metadata Import", "Default/TextVisible");
+	m_buttonAddJsonMetadataToSeries = ot::ToolBarButtonCfg(pageName, groupNameImport, "Metadata Merge", "Default/TextVisible");
 	_ui->addMenuButton(m_buttonAddJsonMetadataToSeries.setButtonLockFlags(modelWrite));
 	
 	m_buttonAddCSVSchemaImporter = ot::ToolBarButtonCfg(pageName, groupNameImport, "Add CSV Refinement Engine", "Default/BatchProcessing");
 	_ui->addMenuButton(m_buttonAddCSVSchemaImporter.setButtonLockFlags(modelWrite));
 	
-	m_buttonRunCSVSchemaImporter = ot::ToolBarButtonCfg(pageName, groupNameImport, "Run CSV Refinement Engine", "Default/BatchProcessing");
+	m_buttonRunCSVSchemaImporter = ot::ToolBarButtonCfg(pageName, groupNameImport, "Execute CSV Refinement Engine", "Default/RunSolver");
 	_ui->addMenuButton(m_buttonRunCSVSchemaImporter.setButtonLockFlags(modelWrite));
 
 	std::list<std::string> enabled;

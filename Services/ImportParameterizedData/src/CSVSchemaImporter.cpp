@@ -26,7 +26,7 @@ void CSVSchemaImporter::execute()
 
 	std::string importerRunSettings = "Performing a data refinement of csv files. Selected settings:\n"
 	"Metadata files added to the datasets by the chosen format of: " + csvDatasetImporter->getMetadataSelectionFormatString() + "\n"
-	"CSV files are selected by the criteria: " +	csvDatasetImporter->getCSVSelectionFormatString(); + "\n"
+	"CSV files are selected by the criteria: " + csvDatasetImporter->getCSVSelectionFormatString() + "\n"
 	"New datasets are named by the format of: " + csvDatasetImporter->getNamingFormatString();
 	OT_USER_LOG_I(importerRunSettings);
 
