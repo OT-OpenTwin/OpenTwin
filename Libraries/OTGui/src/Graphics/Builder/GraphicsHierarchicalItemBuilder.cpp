@@ -83,21 +83,31 @@ std::list<std::string> ot::GraphicsHierarchicalItemBuilder::getBackgroundShapeSe
 		});
 }
 
-std::string ot::GraphicsHierarchicalItemBuilder::createExpanderItemName(const std::string& _entityName, Alignment _expanderAlignment)
+std::string ot::GraphicsHierarchicalItemBuilder::createExpanderItemName(Alignment _expanderAlignment)
 {
-	return _entityName + "_expander_" + ot::toString(_expanderAlignment);
+	return "Expander_" + ot::toString(_expanderAlignment);
 }
 
 ot::Alignment ot::GraphicsHierarchicalItemBuilder::expanderAlignmentFromItemName(const std::string& _itemName)
 {
-	size_t pos = _itemName.rfind("_expander_");
-	if (pos == std::string::npos)
+	size_t pos = _itemName.find("Expander_");
+	if (pos != 0)
 	{
 		OT_LOG_E("Invalid expander item name: " + _itemName);
 		return Alignment::Center;
 	}
-	std::string alignmentStr = _itemName.substr(pos + std::string("_expander_").length());
-	return stringToAlignment(alignmentStr);
+	std::string alignmentStr = _itemName.substr(std::string("Expander_").length());
+	return ot::stringToAlignment(alignmentStr);
+}
+
+std::string ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(Alignment _connectorAlignment)
+{
+	return "Connector_" + ot::toString(_connectorAlignment);
+}
+
+std::string ot::GraphicsHierarchicalItemBuilder::connectorNameFromExpanderName(const std::string& _expanderItemName)
+{
+	return createConnectorItemName(expanderAlignmentFromItemName(_expanderItemName));
 }
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() const
@@ -229,6 +239,7 @@ void ot::GraphicsHierarchicalItemBuilder::initializeImageInfo(ImageInfo& _info)
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Alignment _alignment) const
 {
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
+	con->setName(createConnectorItemName(_alignment));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
 	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 	con->setSizePolicy(SizePolicy::Preferred);
@@ -238,32 +249,14 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 	// Set name
 	switch (_alignment)
 	{
-	case Alignment::TopLeft:
-		con->setName("TopLeft");
-		con->setRadiusX(m_connectorWidth);
-		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ConnectionDirection::Up);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
-		break;
-
 	case Alignment::Top:
-		con->setName("Top");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
 		con->setConnectionDirection(ConnectionDirection::Up);
 		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
-	case Alignment::TopRight:
-		con->setName("TopRight");
-		con->setRadiusX(m_connectorWidth);
-		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ConnectionDirection::Up);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
-		break;
-
 	case Alignment::Left:
-		con->setName("Left");
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
 		con->setConnectionDirection(ConnectionDirection::Left);
@@ -271,33 +264,15 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 		break;
 
 	case Alignment::Right:
-		con->setName("Right");
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
 		con->setConnectionDirection(ConnectionDirection::Right);
 		con->setAdditionalTriggerDistance(0., trigDist, trigDist, trigDist);
 		break;
 
-	case Alignment::BottomLeft:
-		con->setName("BottomLeft");
-		con->setRadiusX(m_connectorWidth);
-		con->setRadiusY(m_connectorWidth);
-		con->setConnectionDirection(ConnectionDirection::Down);
-		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
-		break;
-
 	case Alignment::Bottom:
-		con->setName("Bottom");
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
-		con->setConnectionDirection(ConnectionDirection::Down);
-		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
-		break;
-
-	case Alignment::BottomRight:
-		con->setName("BottomRight");
-		con->setRadiusX(m_connectorWidth);
-		con->setRadiusY(m_connectorWidth);
 		con->setConnectionDirection(ConnectionDirection::Down);
 		con->setAdditionalTriggerDistance(trigDist, 0., trigDist, trigDist);
 		break;
@@ -330,7 +305,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	root->addStrech(1);
 
 	GraphicsTriangleItemCfg* buttonItm = new GraphicsTriangleItemCfg;
-	buttonItm->setName(createExpanderItemName(m_entityName, _alignment));
+	buttonItm->setName(createExpanderItemName(_alignment));
 	buttonItm->setSizePolicy(SizePolicy::Preferred);
 	buttonItm->setFixedSize(10., 10.);
 	root->addChildItem(buttonItm);

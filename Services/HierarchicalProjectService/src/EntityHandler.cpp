@@ -656,7 +656,24 @@ void EntityHandler::addContainer() {
 
 void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, const ot::GraphicsItemMap& _itemMap)
 {
+	const std::string& expanderName = _event.getElementName();
+	const std::string connectorName = ot::GraphicsHierarchicalItemBuilder::connectorNameFromExpanderName(expanderName);
 
+	auto subtree = _itemMap.findSubTree(_event.getItemUid(), connectorName);
+
+	OT_LOG_TS("Subtree:\n" <<
+		"EditorName: " << _event.getEditorName() << "\n" <<
+		"ItemUID: " << _event.getItemUid() << "\n" <<
+		"ExpanderName: " << expanderName << "\n" <<
+		"ConnectorName: " << connectorName << "\n" <<
+		"\n" <<
+		"ItemMap:\n" << &_itemMap << "\n" <<
+		"\n" <<
+		"Subtree:\n" <<
+		"HasCycle: " << subtree.hasCycle << "\n" <<
+		"Items: " << subtree.items << "\n" <<
+		"Connections: " << subtree.connections
+	);
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {

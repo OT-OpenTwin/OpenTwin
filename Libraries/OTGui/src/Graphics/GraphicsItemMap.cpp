@@ -3,6 +3,10 @@
 // OpenTwin header
 #include "OTGui/Graphics/GraphicsItemMap.h"
 
+// std header
+#include <queue>
+#include <unordered_set>
+
 ot::GraphicsItemMap::GraphicsItemMap(const ConstJsonObject& _jsonObject)
 	: GraphicsItemMap()
 {
@@ -281,6 +285,151 @@ std::list<ot::GraphicsConnectionInfo> ot::GraphicsItemMap::getItemConnections(UI
 	}
 
 	return {};
+}
+
+ot::GraphicsItemMap::GraphicsSubTreeResult ot::GraphicsItemMap::findSubTree(UID _startItemId, const std::string& _startConnector) const
+{
+	GraphicsSubTreeResult result;
+
+	// Safety: check if start item exists
+
+	auto itemIt = m_itemToConnectorsMap.find(_startItemId);
+	if (itemIt == m_itemToConnectorsMap.end())
+	{
+		return result;
+	}
+
+	// Visited sets (prevent infinite traversal in large graphs)
+
+	std::unordered_set<ot::UID> visitedItems;
+	std::unordered_set<ot::UID> visitedConnections;
+
+	// Helper lambda: resolve connection endpoints safely
+	// Because connection may store origin/destination in any order
+	auto getOtherSide = [](const GraphicsConnectionInfo& conn, ot::UID currentItem)
+		-> std::pair<ot::UID, std::string>
+		{
+			if (conn.getOriginUid() == currentItem)
+			{
+				return { conn.getDestinationUid(), conn.getDestinationConnectable() };
+			}
+			else
+			{
+				return { conn.getOriginUid(), conn.getOriginConnectable() };
+			}
+		};
+
+	// Helper lambda: cycle detection against origin item rules
+	auto isBackToOriginDifferentConnector =
+		[_startItemId, _startConnector](ot::UID item, const std::string& connector) -> bool
+		{
+			return (item == _startItemId && connector != _startConnector);
+		};
+
+	// Queue for BFS traversal over items
+	std::queue<ot::UID> queue;
+
+	// mark start item as visited (but NOT added to result)
+	visitedItems.insert(_startItemId);
+
+	// Seed: process all connections from starting connector only
+	auto& startConnectorMap = itemIt->second;
+
+	auto startConnIt = startConnectorMap.find(_startConnector);
+	if (startConnIt == startConnectorMap.end())
+	{
+		return result;
+	}
+
+	for (const GraphicsConnectionInfo& conn : startConnIt->second.connections)
+	{
+		if (visitedConnections.count(conn.getUid()) != 0)
+		{
+			continue;
+		}
+
+		visitedConnections.insert(conn.getUid());
+		result.connections.push_back(conn.getUid());
+
+		auto [otherItem, otherConnector] = getOtherSide(conn, _startItemId);
+
+		// Cycle detection rule:
+		// reaching origin item via different connector = ERROR
+		if (isBackToOriginDifferentConnector(otherItem, otherConnector))
+		{
+			result.hasCycle = true;
+			return result;
+		}
+
+		// ignore invalid endpoints
+		if (otherItem == ot::invalidUID)
+		{
+			continue;
+		}
+
+		if (visitedItems.insert(otherItem).second)
+		{
+			result.items.push_back(otherItem);
+			queue.push(otherItem);
+		}
+	}
+
+	// BFS traversal
+	while (!queue.empty())
+	{
+		ot::UID currentItem = queue.front();
+		queue.pop();
+
+		auto currentIt = m_itemToConnectorsMap.find(currentItem);
+		if (currentIt == m_itemToConnectorsMap.end())
+		{
+			continue;
+		}
+
+		// Traverse ALL connectors of the current item
+		for (const auto& connectorPair : currentIt->second)
+		{
+			const ItemConnectorInfo& connectorInfo = connectorPair.second;
+
+			// Traverse all connections of this connector
+			for (const GraphicsConnectionInfo& conn : connectorInfo.connections)
+			{
+				// Skip already processed connections
+				if (visitedConnections.count(conn.getUid()) != 0)
+				{
+					continue;
+				}
+
+				visitedConnections.insert(conn.getUid());
+				result.connections.push_back(conn.getUid());
+
+				auto [otherItem, otherConnector] = getOtherSide(conn, currentItem);
+
+				// Cycle detection rule:
+				// if we reach origin item via different connector -> error
+				if (isBackToOriginDifferentConnector(otherItem, otherConnector))
+				{
+					result.hasCycle = true;
+					return result;
+				}
+
+				// ignore invalid endpoints
+				if (otherItem == ot::invalidUID)
+				{
+					continue;
+				}
+
+				// Add new item
+				if (visitedItems.insert(otherItem).second)
+				{
+					result.items.push_back(otherItem);
+					queue.push(otherItem);
+				}
+			}
+		}
+	}
+
+	return result;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

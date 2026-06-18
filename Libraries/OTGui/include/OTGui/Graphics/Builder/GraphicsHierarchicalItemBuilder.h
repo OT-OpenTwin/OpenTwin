@@ -60,8 +60,11 @@ namespace ot {
 		static BackgroundShape stringToBackgroundShape(const std::string& _shapeStr);
 		static std::list<std::string> getBackgroundShapeSelectionValues();
 
-		static std::string createExpanderItemName(const std::string& _entityName, Alignment _expanderAlignment);
+		static std::string createExpanderItemName(Alignment _expanderAlignment);
 		static Alignment expanderAlignmentFromItemName(const std::string& _itemName);
+
+		static std::string createConnectorItemName(Alignment _connectorAlignment);
+		static std::string connectorNameFromExpanderName(const std::string& _expanderItemName);
 
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
