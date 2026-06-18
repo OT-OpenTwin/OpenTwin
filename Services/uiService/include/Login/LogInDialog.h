@@ -114,6 +114,7 @@ private:
 	
 	ot::ComboBox* m_gss;
 	ot::LineEdit* m_username;
+	ot::Label* m_usernameLabel;
 	ot::Label* m_passwordLabel;
 	ot::LineEdit* m_password; // LogIn, Register:1, Change:Old
 	ot::Label* m_passwordNewLabel;
@@ -173,8 +174,6 @@ private:
 	LogInGSSEntry findCurrentGssEntry() const;
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
-
-	std::wstring determineSSOUsername() const;
 
 	void setControlsForUsernamePassword();
 	void setControlsForRegister();

@@ -89,7 +89,7 @@ LogInDialog::LogInDialog()
 	m_gss->setPlaceholderText("Choose Service");
 	m_gss->setToolTip("Select the Global Session Service to connect to. Select the \"" EDIT_GSS_TEXT "\" option to add/edit available connections.");
 
-	Label* usernameLabel = new Label("Username:", this);
+	m_usernameLabel = new Label("Username:", this);
 	m_username = new LineEdit(this);
 	
 	m_passwordLabel = new Label("Password:", this);
@@ -145,7 +145,7 @@ LogInDialog::LogInDialog()
 
 	inputLayout->addWidget(gssLabel, r, 0);
 	inputLayout->addWidget(m_gss, r++, 1);
-	inputLayout->addWidget(usernameLabel, r, 0);
+	inputLayout->addWidget(m_usernameLabel, r, 0);
 	inputLayout->addWidget(m_username, r++, 1);
 	inputLayout->addWidget(m_passwordLabel, r, 0);
 	inputLayout->addWidget(m_password, r++, 1);
@@ -858,17 +858,6 @@ void LogInDialog::updateGssOptions() {
 	m_gss->addItems(options);
 }
 
-std::wstring LogInDialog::determineSSOUsername() const {
-	std::wstring ssoUsername;
-	try {
-		ssoUsername = ot::SingleSignOn_Client::getActiveUserName();
-	}
-	catch (const std::exception& ex) {
-		OT_LOG_E(std::string("Failed to determine active user: ") + ex.what());
-		ssoUsername.clear();
-	}
-	return ssoUsername;
-}
 
 void LogInDialog::setControlsForUsernamePassword() {
 	m_isSSOLogin = false;
@@ -884,7 +873,8 @@ void LogInDialog::setControlsForUsernamePassword() {
 		setMinimumHeight(m_maxDefaultHeight);
 		m_state.remove(LogInStateFlag::SSOMode);
 	}
-
+	m_username->setHidden(false);
+	m_usernameLabel->setHidden(false);
 	m_password->setHidden(false);
 	m_passwordLabel->setHidden(false);
 	m_passwordConfirmLabel->setHidden(true);
@@ -924,6 +914,7 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 	m_logInButton->setHidden(false);
 	m_registerButton->setHidden(true);
 
+	m_usernameLabel->setHidden(true);
 	m_savePassword->setHidden(true);
 	if (!m_state.has(LogInStateFlag::SSOMode)) {
 		m_userNameTmp = m_username->text();
@@ -938,7 +929,6 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 	}
 	m_username->setHidden(true);
 	
-
 	m_password->setHidden(true);
 	m_passwordLabel->setHidden(true);
 	m_passwordConfirm->setHidden(true);
