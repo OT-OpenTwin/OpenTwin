@@ -82,16 +82,6 @@ namespace ot {
 		//! @note This method requires the observer and model state to be set.
 		virtual void createBlockItem();
 
-		//! @brief Creates a block request document.
-		//! @note This method requires the observer and model state to be set.
-		//! @throws ot::GeneralException If the block configuration could not be created or the coordianate entity could not be loaded.
-		ot::JsonDocument createGraphicsRequestDocument();
-
-		//! @brief Creates a block request document with a specified position.
-		//! @param _position Block position.
-		//! @throws ot::GeneralException If the block configuration could not be created.
-		ot::JsonDocument createGraphicsRequestDocument(const ot::Point2DD& _position);
-
 	protected:
 
 		virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -110,6 +100,18 @@ namespace ot {
 		void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
 
 	private:
+		//! @brief Creates a block request document.
+		//! @note This method requires the observer and model state to be set.
+		//! @throws ot::GeneralException If the block configuration could not be created or the coordianate entity could not be loaded.
+		ot::JsonDocument createGraphicsShowRequest();
+
+		//! @brief Creates a block request document with a specified position.
+		//! @param _position Block position.
+		//! @throws ot::GeneralException If the block configuration could not be created.
+		ot::JsonDocument createGraphicsShowRequest(const ot::Point2DD& _position);
+
+		ot::JsonDocument createGraphicsHideRequest();
+
 		std::string m_blockTitle = "";
 		ot::UID m_coordinate2DEntityID = 0;
 		EntityCoordinates2D* m_coordinateEntity = nullptr;

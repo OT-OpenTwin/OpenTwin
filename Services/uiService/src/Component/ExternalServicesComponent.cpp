@@ -4065,7 +4065,15 @@ void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _docu
 	ot::BasicServiceInformation info;
 	info.setFromJsonObject(_document.getConstObject());
 
-	ot::UIDList itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+	ot::UIDList itemUids;
+	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds))
+	{
+		itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId))
+	{
+		itemUids.push_back(ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId));
+	}
 
 	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName))
 	{
@@ -4120,23 +4128,53 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 
 void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument& _document)
 {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
+	std::string editorName;
+	ot::UIDList connectionUids;
 
-	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package))
+	{
+		ot::GraphicsConnectionPackage pckg;
+		pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	if (!pckg.getName().empty())
+		editorName = pckg.getName();
+
+		for (const auto& connection : pckg.getConnections())
+		{
+			connectionUids.push_back(connection.getUid());
+		}
+	}
+	else
+	{
+		if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName))
+		{
+			editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		}
+		if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds))
+		{
+			connectionUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds);
+		}
+		else if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId))
+		{
+			connectionUids.push_back(ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId));
+		}
+		else
+		{
+			OT_LOG_E("No connection IDs provided to remove graphics connections");
+			return;
+		}
+	}
+
+	if (!editorName.empty())
 	{
 		// Specific editor
-		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
-		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(pckg.getName(), {});
+
+		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(editorName, {});
 
 		if (editor)
 		{
-			for (const auto& connection : pckg.getConnections())
+			for (ot::UID connection : connectionUids)
 			{
-				editor->getGraphicsView()->removeConnection(connection.getUid());
+				editor->getGraphicsView()->removeConnection(connection);
 			}
 		}
 	}
@@ -4147,9 +4185,9 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views)
 		{
-			for (const auto& connection : pckg.getConnections())
+			for (ot::UID connection : connectionUids)
 			{
-				view->getGraphicsView()->removeConnection(connection.getUid());
+				view->getGraphicsView()->removeConnection(connection);
 			}
 		}
 	}

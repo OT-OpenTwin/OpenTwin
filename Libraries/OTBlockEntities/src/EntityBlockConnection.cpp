@@ -130,35 +130,14 @@ void ot::EntityBlockConnection::createConnectionItem() const
 	OTAssertNullptr(getObserver());
 	if (m_hidden)
 	{
-		return;
+		ot::JsonDocument reqDoc = createGraphicsHideRequest();
+		getObserver()->sendMessageToViewer(reqDoc);
 	}
-	ot::JsonDocument reqDoc = createGraphicsRequestDocument();
-	getObserver()->sendMessageToViewer(reqDoc);
-}
-
-ot::JsonDocument ot::EntityBlockConnection::createGraphicsRequestDocument() const
-{
-	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
-
-	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
-	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
-
-	connectionPckg.setPickerKey(m_pickerKey);
-	connectionPckg.addConnection(connectionCfg);
-
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-	ot::VisualisationCfg visualisationCfg;
-	ot::JsonObject visualisationCfgJson;
-	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-	return reqDoc;
+	else
+	{
+		ot::JsonDocument reqDoc = createGraphicsShowRequest();
+		getObserver()->sendMessageToViewer(reqDoc);
+	}
 }
 
 void ot::EntityBlockConnection::createProperties()
@@ -297,4 +276,43 @@ void ot::EntityBlockConnection::readSpecificDataFromDataBase(const bsoncxx::docu
 	{
 		m_hidden = docIt->get_bool();
 	}
+}
+
+ot::JsonDocument ot::EntityBlockConnection::createGraphicsShowRequest() const
+{
+	ot::JsonDocument reqDoc;
+
+	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
+
+	ot::GraphicsConnectionPackage connectionPckg(graphicsSceneName);
+	ot::GraphicsConnectionCfg connectionCfg = this->getConnectionCfg();
+
+	connectionPckg.setPickerKey(m_pickerKey);
+	connectionPckg.addConnection(connectionCfg);
+
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
+
+	ot::JsonObject pckgObj;
+	connectionPckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+	return reqDoc;
+}
+
+ot::JsonDocument ot::EntityBlockConnection::createGraphicsHideRequest() const
+{
+	ot::JsonDocument reqDoc;
+
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId, getEntityID(), reqDoc.GetAllocator());
+
+	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(graphicsSceneName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	
+	return reqDoc;
 }

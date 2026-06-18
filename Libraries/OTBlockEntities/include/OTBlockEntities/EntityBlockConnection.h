@@ -54,8 +54,6 @@ namespace ot {
 		//! @note Requires that an observer is set that is able to send messages to the viewer.
 		void createConnectionItem() const;
 
-		ot::JsonDocument createGraphicsRequestDocument() const;
-
 		void createProperties();
 		virtual bool updateFromProperties() override;
 		virtual void addVisualizationNodes(void) override;
@@ -80,6 +78,10 @@ namespace ot {
 		void createNavigationTreeEntry();
 		void addStorageData(bsoncxx::builder::basic::document& storage) override;
 		void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+
+		ot::JsonDocument createGraphicsShowRequest() const;
+		ot::JsonDocument createGraphicsHideRequest() const;
+
 	};
 
 }

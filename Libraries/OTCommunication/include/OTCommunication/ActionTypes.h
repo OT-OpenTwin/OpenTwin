@@ -746,6 +746,7 @@
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds "GraphicsEditor.Item.IDs"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId "GraphicsEditor.Origin.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestId "GraphicsEditor.Dest.ID"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId "GraphicsEditor.Connection.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds "GraphicsEditor.Connection.IDs"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName "GraphicsEditor.Origin.ConName"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName "GraphicsEditor.Dest.ConName"

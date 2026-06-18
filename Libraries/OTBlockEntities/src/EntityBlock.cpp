@@ -249,14 +249,17 @@ void ot::EntityBlock::createBlockItem()
 	OTAssertNullptr(getObserver());
 	if (m_hidden)
 	{
-		return;
+		ot::JsonDocument doc = createGraphicsHideRequest();
+		getObserver()->sendMessageToViewer(doc);
 	}
-
-	ot::JsonDocument doc = createGraphicsRequestDocument();
-	getObserver()->sendMessageToViewer(doc);
+	else
+	{
+		ot::JsonDocument doc = createGraphicsShowRequest();
+		getObserver()->sendMessageToViewer(doc);
+	}
 }
 
-ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument() {
+ot::JsonDocument ot::EntityBlock::createGraphicsShowRequest() {
 	OTAssertNullptr(getModelState());
 	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* entBase = readEntityFromEntityID(this, m_coordinate2DEntityID, entityMap);
@@ -270,10 +273,10 @@ ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument() {
 	std::unique_ptr<EntityCoordinates2D> entCoordinate(dynamic_cast<EntityCoordinates2D*>(entBase));
 	assert(entCoordinate != nullptr);
 
-	return createGraphicsRequestDocument(entCoordinate->getCoordinates());
+	return createGraphicsShowRequest(entCoordinate->getCoordinates());
 }
 
-ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument(const ot::Point2DD& _position) {
+ot::JsonDocument ot::EntityBlock::createGraphicsShowRequest(const ot::Point2DD& _position) {
 	ot::GraphicsItemCfg* blockCfg = createBlockCfg();
 
 	if (!blockCfg) {
@@ -301,6 +304,18 @@ ot::JsonDocument ot::EntityBlock::createGraphicsRequestDocument(const ot::Point2
 	ot::JsonObject pckgObj;
 	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
 	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+	return reqDoc;
+}
+
+ot::JsonDocument ot::EntityBlock::createGraphicsHideRequest()
+{
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId, getEntityID(), reqDoc.GetAllocator());
+
+	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName, ot::JsonString(graphicsSceneName, reqDoc.GetAllocator()), reqDoc.GetAllocator());
 
 	return reqDoc;
 }
