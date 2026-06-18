@@ -19,6 +19,9 @@ namespace ot
 		GraphicsConnectionInfo(const ConstJsonObject& _jsonObject);
 		virtual ~GraphicsConnectionInfo() = default;
 
+		bool operator == (const GraphicsConnectionInfo& _other) const;
+		bool operator != (const GraphicsConnectionInfo& _other) const { return !(*this == _other); };
+
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 

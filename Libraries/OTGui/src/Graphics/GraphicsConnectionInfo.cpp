@@ -13,6 +13,15 @@ ot::GraphicsConnectionInfo::GraphicsConnectionInfo(const ConstJsonObject & _json
 	setFromJsonObject(_jsonObject);
 }
 
+bool ot::GraphicsConnectionInfo::operator==(const GraphicsConnectionInfo& _other) const
+{
+	return m_uid == _other.m_uid
+		&& m_originUID == _other.m_originUID
+		&& m_originConnectable == _other.m_originConnectable
+		&& m_destUID == _other.m_destUID
+		&& m_destConnectable == _other.m_destConnectable;
+}
+
 void ot::GraphicsConnectionInfo::addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const
 {
 	_jsonObject.AddMember("UID", m_uid, _allocator);
