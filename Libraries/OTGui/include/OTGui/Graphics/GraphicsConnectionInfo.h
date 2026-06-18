@@ -25,6 +25,10 @@ namespace ot
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 
+		//! @brief Returns true if this connection connectes the same two items and has the same UID.
+		//! Also takes the reverse connection into account.
+		bool isSameConnection(const GraphicsConnectionInfo& _other) const;
+		
 		void setUid(const UID& _uid) { m_uid = _uid; };
 		const UID& getUid() const { return m_uid; };
 

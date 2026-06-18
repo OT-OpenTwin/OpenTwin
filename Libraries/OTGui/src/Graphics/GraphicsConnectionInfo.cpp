@@ -44,6 +44,11 @@ void ot::GraphicsConnectionInfo::setFromJsonObject(const ConstJsonObject& _jsonO
 	m_destConnectable = json::getString(_jsonObject, "DestConnectable");
 }
 
+bool ot::GraphicsConnectionInfo::isSameConnection(const GraphicsConnectionInfo& _other) const
+{
+	return (*this == _other) || (*this == _other.getReversedConnectionInfo());
+}
+
 ot::GraphicsConnectionInfo ot::GraphicsConnectionInfo::getReversedConnectionInfo() const
 {
 	GraphicsConnectionInfo ret(*this);
