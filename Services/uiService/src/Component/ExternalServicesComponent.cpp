@@ -4062,9 +4062,6 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 
 void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
 	ot::UIDList itemUids;
 	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds))
 	{

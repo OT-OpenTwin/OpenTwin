@@ -661,19 +661,76 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 
 	auto subtree = _itemMap.findSubTree(_event.getItemUid(), connectorName);
 
-	OT_LOG_TS("Subtree:\n" <<
-		"EditorName: " << _event.getEditorName() << "\n" <<
-		"ItemUID: " << _event.getItemUid() << "\n" <<
-		"ExpanderName: " << expanderName << "\n" <<
-		"ConnectorName: " << connectorName << "\n" <<
-		"\n" <<
-		"ItemMap:\n" << &_itemMap << "\n" <<
-		"\n" <<
-		"Subtree:\n" <<
-		"HasCycle: " << subtree.hasCycle << "\n" <<
-		"Items: " << subtree.items << "\n" <<
-		"Connections: " << subtree.connections
-	);
+	if (subtree.connections.empty() && subtree.items.empty()) {
+		return;
+	}
+
+	// Get entity information for clicked item
+	ot::EntityInformation targedEntityInfo;
+	if (!ot::ModelServiceAPI::getEntityInformation(_event.getItemUid(), targedEntityInfo))
+	{
+		OT_LOG_E("Could not determine entity information for clicked item with UID: " + std::to_string(_event.getItemUid()));
+		return;
+	}
+	EntityBase* targetEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(targedEntityInfo.getEntityID(), targedEntityInfo.getEntityVersion());
+	if (!targetEntity)
+	{
+		OT_LOG_E("Could not read entity from database for clicked item with UID: " + std::to_string(_event.getItemUid()));
+		return;
+	}
+	std::unique_ptr<ot::EntityBlockHierarchicalBase> targetBlock(dynamic_cast<ot::EntityBlockHierarchicalBase*>(targetEntity));
+	if (!targetBlock)
+	{
+		OT_LOG_E("Clicked item entity is not of expected type { \"ItemUID\": " + std::to_string(_event.getItemUid()) + ", \"EntityType\": \"" + targetEntity->getClassName() + "\" }");
+		delete targetEntity;
+		return;
+	}
+
+	// Check if the subtree should be hidden or shown
+	bool hideSubtree = true;
+
+	// Get selected project
+	ot::UIDList subtreeEntityIDs;
+	for (ot::UID itemID : subtree.items) {
+		subtreeEntityIDs.push_back(itemID);
+	}
+	for (ot::UID connectionID : subtree.connections) {
+		subtreeEntityIDs.push_back(connectionID);
+	}
+
+	std::list<ot::EntityInformation> subtreeEntityInfos;
+	ot::ModelServiceAPI::getEntityInformation(subtreeEntityIDs, subtreeEntityInfos);
+
+	ot::NewModelStateInfo updatedEntities;
+
+	for (const ot::EntityInformation& subtreeEntityInfo : subtreeEntityInfos)
+	{
+		std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(subtreeEntityInfo.getEntityID(), subtreeEntityInfo.getEntityVersion()));
+		if (!entity)
+		{
+			OT_LOG_ES("Could not read entity from database { \"EntityID\": " << subtreeEntityInfo.getEntityID() << ", \"EntityVersion\": " << subtreeEntityInfo.getEntityVersion() << " }");
+			continue;
+		}
+
+		ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(entity.get());
+		if (block)
+		{
+			block->setHidden(hideSubtree);
+			block->storeToDataBase();
+			updatedEntities.addTopologyEntity(*block);
+		}
+
+		ot::EntityBlockConnection* connection = dynamic_cast<ot::EntityBlockConnection*>(entity.get());
+		if (connection)
+		{
+			connection->setHidden(hideSubtree);
+			connection->storeToDataBase();
+			updatedEntities.addTopologyEntity(*connection);
+		}
+	}
+
+	std::string changeDescription = hideSubtree ? "Collapsed subtree" : "Expanded subtree";
+	ot::ModelServiceAPI::updateTopologyEntities(updatedEntities, changeDescription);
 }
 
 bool EntityHandler::getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const {
