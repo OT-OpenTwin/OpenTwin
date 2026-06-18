@@ -665,6 +665,8 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 		return;
 	}
 
+	ot::NewModelStateInfo updatedEntities;
+
 	// Get entity information for clicked item
 	ot::EntityInformation targedEntityInfo;
 	if (!ot::ModelServiceAPI::getEntityInformation(_event.getItemUid(), targedEntityInfo))
@@ -688,6 +690,19 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 
 	// Check if the subtree should be hidden or shown
 	bool hideSubtree = true;
+	ot::Alignment expanderAlignment = ot::GraphicsHierarchicalItemBuilder::expanderAlignmentFromItemName(expanderName);
+	ot::GraphicsHierarchicalItemBuilder::ExpanderState expanderState = targetBlock->getConnectorState(expanderAlignment);
+	ot::GraphicsHierarchicalItemBuilder::ExpanderState newExpanderState = ot::GraphicsHierarchicalItemBuilder::ExpanderState::Collapsed;
+
+	if (expanderState == ot::GraphicsHierarchicalItemBuilder::ExpanderState::Collapsed)
+	{
+		hideSubtree = false;
+		newExpanderState = ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded;
+	}
+
+	targetBlock->setConnectorState(expanderAlignment, newExpanderState);
+	targetBlock->storeToDataBase();
+	updatedEntities.addTopologyEntity(*targetBlock);
 
 	// Get selected project
 	ot::UIDList subtreeEntityIDs;
@@ -700,8 +715,6 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 
 	std::list<ot::EntityInformation> subtreeEntityInfos;
 	ot::ModelServiceAPI::getEntityInformation(subtreeEntityIDs, subtreeEntityInfos);
-
-	ot::NewModelStateInfo updatedEntities;
 
 	for (const ot::EntityInformation& subtreeEntityInfo : subtreeEntityInfos)
 	{

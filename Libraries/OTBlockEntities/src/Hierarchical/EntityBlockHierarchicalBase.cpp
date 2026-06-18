@@ -26,7 +26,8 @@
 
 ot::EntityBlockHierarchicalBase::EntityBlockHierarchicalBase(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlock(_ID, _parent, _obs, _ms), m_centerImageUID(ot::invalidUID), m_centerImageVersion(ot::invalidUID), m_centerImageData(nullptr),
-	m_centerImageFormat(ot::ImageFileFormat::PNG)
+	m_centerImageFormat(ot::ImageFileFormat::PNG), m_topConnectorState(GraphicsHierarchicalItemBuilder::ExpanderState::Expanded), m_bottomConnectorState(GraphicsHierarchicalItemBuilder::ExpanderState::Expanded),
+	m_leftConnectorState(GraphicsHierarchicalItemBuilder::ExpanderState::Expanded), m_rightConnectorState(GraphicsHierarchicalItemBuilder::ExpanderState::Expanded)
 {}
 
 bool ot::EntityBlockHierarchicalBase::updateFromProperties() {
@@ -152,6 +153,12 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 		builder.setBottomTextAlignment(getFooterAlignment());
 	}
 
+	// Connectors
+	builder.setTopExpanderState(m_topConnectorState);
+	builder.setBottomExpanderState(m_bottomConnectorState);
+	builder.setLeftExpanderState(m_leftConnectorState);
+	builder.setRightExpanderState(m_rightConnectorState);
+
 	// Create the item
 	return builder.createGraphicsItem();
 }
@@ -185,6 +192,67 @@ std::shared_ptr<EntityBinaryData> ot::EntityBlockHierarchicalBase::getCenterImag
 {
 	ensureCenterImageLoaded();
 	return m_centerImageData;
+}
+
+void ot::EntityBlockHierarchicalBase::setConnectorState(Alignment _connectorAlignment, GraphicsHierarchicalItemBuilder::ExpanderState _state)
+{
+	switch (_connectorAlignment)
+	{
+	case ot::Alignment::Top:
+		if (m_topConnectorState != _state)
+		{
+			m_topConnectorState = _state;
+			setModified();
+		}
+		break;
+
+	case ot::Alignment::Right:
+		if (m_rightConnectorState != _state)
+		{
+			m_rightConnectorState = _state;
+			setModified();
+		}
+		break;
+
+	case ot::Alignment::Bottom:
+		if (m_bottomConnectorState != _state)
+		{
+			m_bottomConnectorState = _state;
+			setModified();
+		}
+		break;
+
+	case ot::Alignment::Left:
+		if (m_leftConnectorState != _state)
+		{
+			m_leftConnectorState = _state;
+			setModified();
+		}
+		break;
+
+	default:
+		OT_LOG_ES("Invalid connector alignment provided: " + ot::toString(_connectorAlignment));
+		break;
+	}
+}
+
+ot::GraphicsHierarchicalItemBuilder::ExpanderState ot::EntityBlockHierarchicalBase::getConnectorState(Alignment _connectorAlignment) const
+{
+	switch (_connectorAlignment)
+	{
+	case ot::Alignment::Top:
+		return m_topConnectorState;
+	case ot::Alignment::Right:
+		return m_rightConnectorState;
+	case ot::Alignment::Bottom:
+		return m_bottomConnectorState;
+	case ot::Alignment::Left:
+		return m_leftConnectorState;
+	default:
+		OT_LOG_ES("Invalid connector alignment provided: " + ot::toString(_connectorAlignment));
+		break;
+	}
+	return GraphicsHierarchicalItemBuilder::ExpanderState::None;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -321,7 +389,11 @@ void ot::EntityBlockHierarchicalBase::addStorageData(bsoncxx::builder::basic::do
 	_storage.append(
 		bsoncxx::builder::basic::kvp("CenterImageID", static_cast<int64_t>(m_centerImageUID)),
 		bsoncxx::builder::basic::kvp("CenterImageVersion", static_cast<int64_t>(m_centerImageVersion)),
-		bsoncxx::builder::basic::kvp("CenterImageType", ot::toString(m_centerImageFormat))
+		bsoncxx::builder::basic::kvp("CenterImageType", ot::toString(m_centerImageFormat)),
+		bsoncxx::builder::basic::kvp("TopConnectorState", GraphicsHierarchicalItemBuilder::expanderStateToString(m_topConnectorState)),
+		bsoncxx::builder::basic::kvp("BottomConnectorState", GraphicsHierarchicalItemBuilder::expanderStateToString(m_bottomConnectorState)),
+		bsoncxx::builder::basic::kvp("LeftConnectorState", GraphicsHierarchicalItemBuilder::expanderStateToString(m_leftConnectorState)),
+		bsoncxx::builder::basic::kvp("RightConnectorState", GraphicsHierarchicalItemBuilder::expanderStateToString(m_rightConnectorState))
 	);
 }
 
@@ -335,6 +407,10 @@ void ot::EntityBlockHierarchicalBase::readSpecificDataFromDataBase(const bsoncxx
 		m_centerImageUID = static_cast<ot::UID>(docIt->get_int64());
 		m_centerImageVersion = static_cast<ot::UID>(_docView["CenterImageVersion"].get_int64());
 		m_centerImageFormat = ot::stringToImageFileFormat(_docView["CenterImageType"].get_string().value.data());
+		m_topConnectorState = GraphicsHierarchicalItemBuilder::stringToExpanderState(_docView["TopConnectorState"].get_string().value.data());
+		m_bottomConnectorState = GraphicsHierarchicalItemBuilder::stringToExpanderState(_docView["BottomConnectorState"].get_string().value.data());
+		m_leftConnectorState = GraphicsHierarchicalItemBuilder::stringToExpanderState(_docView["LeftConnectorState"].get_string().value.data());
+		m_rightConnectorState = GraphicsHierarchicalItemBuilder::stringToExpanderState(_docView["RightConnectorState"].get_string().value.data());
 	}
 }
 

@@ -65,6 +65,9 @@ namespace ot {
 		ot::ImageFileFormat getCenterImageFormat() const { return m_centerImageFormat; };
 		std::shared_ptr<EntityBinaryData> getCenterImageData();
 
+		void setConnectorState(Alignment _connectorAlignment, GraphicsHierarchicalItemBuilder::ExpanderState _state);
+		GraphicsHierarchicalItemBuilder::ExpanderState getConnectorState(Alignment _connectorAlignment) const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Property accessors
@@ -115,6 +118,11 @@ namespace ot {
 		ot::UID m_centerImageVersion;
 		ot::ImageFileFormat m_centerImageFormat;
 		std::shared_ptr<EntityBinaryData> m_centerImageData;
+
+		ot::GraphicsHierarchicalItemBuilder::ExpanderState m_topConnectorState;
+		ot::GraphicsHierarchicalItemBuilder::ExpanderState m_bottomConnectorState;
+		ot::GraphicsHierarchicalItemBuilder::ExpanderState m_leftConnectorState;
+		ot::GraphicsHierarchicalItemBuilder::ExpanderState m_rightConnectorState;
 
 		void createTextProperties(const std::string& _group, bool _isTopText, const std::string& _showTextPropertyName);
 		void createImageProperties(const std::string& _group, bool _isCenter);

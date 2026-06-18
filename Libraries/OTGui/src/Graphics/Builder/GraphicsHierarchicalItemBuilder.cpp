@@ -110,6 +110,40 @@ std::string ot::GraphicsHierarchicalItemBuilder::connectorNameFromExpanderName(c
 	return createConnectorItemName(expanderAlignmentFromItemName(_expanderItemName));
 }
 
+std::string ot::GraphicsHierarchicalItemBuilder::expanderStateToString(ExpanderState _state)
+{
+	switch (_state)
+	{
+	case ot::GraphicsHierarchicalItemBuilder::ExpanderState::None: return "None";
+	case ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded: return "Expanded";
+	case ot::GraphicsHierarchicalItemBuilder::ExpanderState::Collapsed: return "Collapsed";
+	default:
+		OT_LOG_E("Unknown expander state: " + std::to_string(static_cast<int>(_state)));
+		return "None";
+	}
+}
+
+ot::GraphicsHierarchicalItemBuilder::ExpanderState ot::GraphicsHierarchicalItemBuilder::stringToExpanderState(const std::string& _stateStr)
+{
+	if (_stateStr == expanderStateToString(ExpanderState::None))
+	{
+		return ExpanderState::None;
+	}
+	else if (_stateStr == expanderStateToString(ExpanderState::Expanded))
+	{
+		return ExpanderState::Expanded;
+	}
+	else if (_stateStr == expanderStateToString(ExpanderState::Collapsed))
+	{
+		return ExpanderState::Collapsed;
+	}
+	else
+	{
+		OT_LOG_E("Unknown expander state string: " + _stateStr);
+		return ExpanderState::None;
+	}
+}
+
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() const
 {
 	OTAssert(!m_entityName.empty(), "No entity name provided");

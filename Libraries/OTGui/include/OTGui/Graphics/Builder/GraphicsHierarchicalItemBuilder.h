@@ -66,6 +66,9 @@ namespace ot {
 		static std::string createConnectorItemName(Alignment _connectorAlignment);
 		static std::string connectorNameFromExpanderName(const std::string& _expanderItemName);
 
+		static std::string expanderStateToString(ExpanderState _state);
+		static ExpanderState stringToExpanderState(const std::string& _stateStr);
+
 		//! @brief Creates a GraphicsItemCfg in the "OpenTwin hierarchical project item block" style that takes the current configuration into account.
 		//! The callee takes ownership of the item.
 		ot::GraphicsItemCfg* createGraphicsItem() const;
