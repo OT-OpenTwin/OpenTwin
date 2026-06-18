@@ -661,6 +661,12 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 
 	auto subtree = _itemMap.findSubTree(_event.getItemUid(), connectorName);
 
+	if (subtree.hasCycle) 
+	{
+		OT_USER_LOG_W("Cannot expand/collapse subtree, as it contains a cycle.");
+		return;
+	}
+
 	if (subtree.connections.empty() && subtree.items.empty()) {
 		return;
 	}
