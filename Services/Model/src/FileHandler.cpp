@@ -130,7 +130,8 @@ void FileHandler::handleExportFilesToLibrary() {
 	dialogConfig.setName("ExportToLibraryDialog");
 
 	ot::PropertyGridCfg gridConfig;
-	ot::PropertyGroup* rootGroup = new ot::PropertyGroup("Export Selection");
+	ot::PropertyGroup* pythonScriptGroup = new ot::PropertyGroup(m_pythonScriptDialogGroup);
+	ot::PropertyGroup* circuitModelGroup = new ot::PropertyGroup(m_circuitModelDialogGroup);
 
 	// Create properties using ot::PropertyStringList instead of EntityPropertiesSelection
 	ot::PropertyStringList* circuitModelsProp = new ot::PropertyStringList("Circuit Models", "", circuitModels);
@@ -140,15 +141,16 @@ void FileHandler::handleExportFilesToLibrary() {
 	ot::PropertyStringList* pythonMetaProp = new ot::PropertyStringList("Python Metadata File", "", metaFiles);
 	ot::PropertyStringList* manifestMetaProp = new ot::PropertyStringList("Manifest Metadata File", "", metaFiles);
 
-	rootGroup->addProperty(circuitModelsProp);
-	rootGroup->addProperty(circuitModelMetaProp);
-	rootGroup->addProperty(pythonScriptProp);
-	rootGroup->addProperty(pythonManifestProp);
-	rootGroup->addProperty(pythonMetaProp);
-	rootGroup->addProperty(manifestMetaProp);
+	circuitModelGroup->addProperty(circuitModelsProp);
+	circuitModelGroup->addProperty(circuitModelMetaProp);
+	pythonScriptGroup->addProperty(pythonScriptProp);
+	pythonScriptGroup->addProperty(pythonManifestProp);
+	pythonScriptGroup->addProperty(pythonMetaProp);
+	pythonScriptGroup->addProperty(manifestMetaProp);
 
 
-	gridConfig.addRootGroup(rootGroup);
+	gridConfig.addRootGroup(pythonScriptGroup);
+	gridConfig.addRootGroup(circuitModelGroup);
 	dialogConfig.setGridConfig(gridConfig);
 
 	ot::JsonDocument doc;
@@ -1346,186 +1348,86 @@ void FileHandler::handleExportDialog(const ot::PropertyDialogCfg& _dialogCfg) {
 	EntityFileText* manifestMetaFile = nullptr;
 
 	// Get circuit model properties
-	const ot::PropertyStringList* circuitModelProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Circuit Models"));
-	const ot::PropertyStringList* circuitModelMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Circuit Model Metadata File"));
+	const ot::PropertyStringList* circuitModelProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Models"));
+	const ot::PropertyStringList* circuitModelMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Metadata File"));
 
 	// Get Python properties
-	const ot::PropertyStringList* pythonScriptProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Python Script"));
-	const ot::PropertyStringList* pythonManifestProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Python Manifest"));
-	const ot::PropertyStringList* pythonMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Python Metadata File"));
-	const ot::PropertyStringList* manifestMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath("Export Selection/Manifest Metadata File"));
+	const ot::PropertyStringList* pythonScriptProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script"));
+	const ot::PropertyStringList* pythonManifestProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Manifest"));
+	const ot::PropertyStringList* pythonMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Metadata File"));
+	const ot::PropertyStringList* manifestMetaProperty = dynamic_cast<const ot::PropertyStringList*>(_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Metadata File"));
 
-	if (pythonScriptProperty == nullptr || pythonManifestProperty == nullptr || pythonMetaProperty == nullptr || manifestMetaProperty == nullptr ||
-		circuitModelProperty == nullptr || circuitModelMetaProperty == nullptr) {
-		OT_LOG_E("One or more required properties are missing in the export dialog configuration.");
+	// Determine export type: either circuit OR python, not both
+	bool isPythonExport = (pythonScriptProperty != nullptr && pythonMetaProperty != nullptr && manifestMetaProperty != nullptr);
+	bool isCircuitExport = (circuitModelProperty != nullptr && circuitModelMetaProperty != nullptr);
+
+	if (!isPythonExport && !isCircuitExport) {
+		OT_LOG_E("Error: Could not retrieve required properties for export.");
 		return;
 	}
 
-	// Get paths
-	std::string circuitModelPath = circuitModelProperty->getCurrent();
-	std::string circuitModelMetaPath = circuitModelMetaProperty->getCurrent();
-	std::string pythonScriptPath = pythonScriptProperty->getCurrent();
-	std::string pythonManifestPath = pythonManifestProperty->getCurrent();
-	std::string pythonMetaPath = pythonMetaProperty->getCurrent();
-	std::string manifestMetaPath = manifestMetaProperty->getCurrent();
+	// Get paths based on export type
+	std::string circuitModelPath;
+	std::string circuitModelMetaPath;
+	std::string pythonScriptPath;
+	std::string pythonManifestPath;
+	std::string pythonMetaPath;
+	std::string manifestMetaPath;
+
+	if (isCircuitExport) {
+		circuitModelPath = circuitModelProperty->getCurrent();
+		circuitModelMetaPath = circuitModelMetaProperty->getCurrent();
+	}
+
+	if (isPythonExport) {
+		pythonScriptPath = pythonScriptProperty->getCurrent();
+		pythonManifestPath = pythonManifestProperty->getCurrent();
+		pythonMetaPath = pythonMetaProperty->getCurrent();
+		manifestMetaPath = manifestMetaProperty->getCurrent();
+	}
 
 	// Load circuit model entities
-	if (!circuitModelPath.empty()) {
-		EntityBase* circuitModelEntity = model->findEntityFromName(circuitModelPath);
-		if (circuitModelEntity == nullptr) {
-			OT_LOG_E("Circuit model entity not found for path: " + circuitModelPath);
-			return;
+	if (isCircuitExport) {
+		if (!circuitModelPath.empty()) {
+			EntityBase* circuitModelEntity = model->findEntityFromName(circuitModelPath);
+			if (circuitModelEntity == nullptr) {
+				OT_LOG_E("Circuit model entity not found for path: " + circuitModelPath);
+				return;
+			}
+			circuitModel = dynamic_cast<EntityFileText*>(circuitModelEntity);
+			if (!circuitModel) {
+				OT_LOG_E("Entity found for circuit model path is not of type EntityFileText: " + circuitModelPath);
+				return;
+			}
 		}
-		circuitModel = dynamic_cast<EntityFileText*>(circuitModelEntity);
-		if (!circuitModel) {
-			OT_LOG_E("Entity found for circuit model path is not of type EntityFileText: " + circuitModelPath);
-			return;
-		}
-	}
-
-	if (!circuitModelMetaPath.empty()) {
-		EntityBase* circuitModelMetaEntity = model->findEntityFromName(circuitModelMetaPath);
-		if (circuitModelMetaEntity == nullptr) {
-			OT_LOG_E("Circuit model metadata entity not found for path: " + circuitModelMetaPath);
-			return;
-		}
-		circuitMetaFile = dynamic_cast<EntityFileText*>(circuitModelMetaEntity);
-		if (!circuitMetaFile) {
-			OT_LOG_E("Entity found for circuit model metadata path is not of type EntityFileText: " + circuitModelMetaPath);
-			return;
-		}
-	}
-
-	// Load Python script entities
-	if (!pythonScriptPath.empty()) {
-		EntityBase* pythonScriptEntity = model->findEntityFromName(pythonScriptPath);
-		if (pythonScriptEntity == nullptr) {
-			OT_LOG_E("Python script entity not found for path: " + pythonScriptPath);
-			return;
-		}
-		pythonScript = dynamic_cast<EntityFileText*>(pythonScriptEntity);
-		if (!pythonScript) {
-			OT_LOG_E("Entity found for Python script path is not of type EntityFileText: " + pythonScriptPath);
-			return;
-		}
-	}
-
-	if (!pythonManifestPath.empty()) {
-		EntityBase* pythonManifestEntity = model->findEntityFromName(pythonManifestPath);
-		if (pythonManifestEntity == nullptr) {
-			OT_LOG_E("Python manifest entity not found for path: " + pythonManifestPath);
-			return;
-		}
-		pythonManifest = dynamic_cast<EntityPythonManifest*>(pythonManifestEntity);
-		if (!pythonManifest) {
-			OT_LOG_E("Entity found for Python manifest path is not of type EntityPythonManifest: " + pythonManifestPath);
-			return;
-		}
-	}
-
-	if (!pythonMetaPath.empty()) {
-		EntityBase* pythonMetaEntity = model->findEntityFromName(pythonMetaPath);
-		if (pythonMetaEntity == nullptr) {
-			OT_LOG_E("Python metadata entity not found for path: " + pythonMetaPath);
-			return;
-		}
-		pythonMetaFile = dynamic_cast<EntityFileText*>(pythonMetaEntity);
-		if (!pythonMetaFile) {
-			OT_LOG_E("Entity found for Python metadata path is not of type EntityFileText: " + pythonMetaPath);
-			return;
-		}
-	}
-
-	if (!manifestMetaPath.empty()) {
-		EntityBase* manifestMetaEntity = model->findEntityFromName(manifestMetaPath);
-		if (manifestMetaEntity == nullptr) {
-			OT_LOG_E("Manifest metadata entity not found for path: " + manifestMetaPath);
-			return;
-		}
-		manifestMetaFile = dynamic_cast<EntityFileText*>(manifestMetaEntity);
-		if (!manifestMetaFile) {
-			OT_LOG_E("Entity found for Manifest metadata path is not of type EntityFileText: " + manifestMetaPath);
-			return;
-		}
-	}
-
-	// Check if at least one export type is selected
-	bool hasCircuitExport = (circuitModel != nullptr && circuitMetaFile != nullptr);
-	bool hasMinimalPythonExport = (pythonScript != nullptr && pythonMetaFile != nullptr &&
-		pythonManifest == nullptr && manifestMetaFile == nullptr);
-	bool hasFullPythonExport = (pythonScript != nullptr && pythonManifest != nullptr &&
-		pythonMetaFile != nullptr && manifestMetaFile != nullptr);
-	bool hasPythonExport = hasMinimalPythonExport || hasFullPythonExport;
-
-	// Validate: at least one export type must be selected
-	if (!hasCircuitExport && !hasPythonExport) {
-		Application::instance()->getNotifier()->reportError(
-			"Please select at least one file to export:\n"
-			"- For Circuit export: Select both circuit model and metadata file, or\n"
-			"- For Python export: Select a Python script with its metadata file (.py + .otmeta.json)."
-		);
-		return;
-	}
-
-	// Validate Python export if selected
-	if (hasPythonExport) {
-		if (!validateMetaDataFile(pythonMetaFile)) {
+		else {
+			OT_LOG_E("Circuit model path is empty.");
 			return;
 		}
 
-		if (hasFullPythonExport && !validateMetaDataFile(manifestMetaFile)) {
+		if (!circuitModelMetaPath.empty()) {
+			EntityBase* circuitModelMetaEntity = model->findEntityFromName(circuitModelMetaPath);
+			if (circuitModelMetaEntity == nullptr) {
+				OT_LOG_E("Circuit model metadata entity not found for path: " + circuitModelMetaPath);
+				return;
+			}
+			circuitMetaFile = dynamic_cast<EntityFileText*>(circuitModelMetaEntity);
+			if (!circuitMetaFile) {
+				OT_LOG_E("Entity found for circuit model metadata path is not of type EntityFileText: " + circuitModelMetaPath);
+				return;
+			}
+		}
+		else {
+			OT_LOG_E("Circuit model metadata path is empty.");
 			return;
 		}
-	}
 
-	// Validate Circuit export if selected
-	if (hasCircuitExport) {
+		// Validate Circuit export
 		if (!validateMetaDataFile(circuitMetaFile)) {
 			return;
 		}
-	}
 
-	// Execute exports sequentially
-	if (hasCircuitExport && hasPythonExport) {
-		// Export both: circuit first, then Python
-		std::thread worker([this, circuitModel, circuitMetaFile, pythonScript, pythonManifest, 
-			pythonMetaFile, manifestMetaFile]() {
-			try {
-				auto uiComponent = Application::instance()->getUiComponent();
-				ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
-
-				ProgressUpdater updater(uiComponent, "Exporting files to library", false);
-				updater.setTotalNumberOfSteps(2);
-
-				// Export circuit model first
-				std::string libDataPath = getLibraryDataPath();
-				if (!libDataPath.empty()) {
-					exportCircuitModel(circuitModel, circuitMetaFile, libDataPath);
-					updater.triggerUpdate(1);
-				}
-
-				// Then export Python script
-				if (!libDataPath.empty()) {
-					if (pythonManifest != nullptr && manifestMetaFile != nullptr) {
-						exportPythonManifest(pythonManifest, manifestMetaFile, libDataPath, pythonManifest->getManifestID());
-						exportPythonScript(pythonScript, pythonMetaFile, libDataPath, pythonManifest->getManifestID());
-					}
-					else {
-						exportPythonScript(pythonScript, pythonMetaFile, libDataPath, ot::invalidUID);
-					}
-					updater.triggerUpdate(2);
-				}
-
-				uiComponent->displayMessage("Files successfully exported to library.\n");
-			}
-			catch (const std::exception& _e) {
-				OT_LOG_E(std::string("Export failed: ") + _e.what());
-			}
-		});
-		worker.detach();
-	}
-	else if (hasCircuitExport) {
-		// Export only circuit model
+		// Execute circuit export
 		std::thread worker([this, circuitModel, circuitMetaFile]() {
 			try {
 				auto uiComponent = Application::instance()->getUiComponent();
@@ -1547,30 +1449,95 @@ void FileHandler::handleExportDialog(const ot::PropertyDialogCfg& _dialogCfg) {
 		});
 		worker.detach();
 	}
-	else if (hasMinimalPythonExport) {
-		// Export only Python script (minimal)
-		std::thread worker([this, pythonScript, pythonMetaFile]() {
-			exportFilesToLibraryAsync(
-				pythonScript->getEntityID(),
-				ot::invalidUID,  // No manifest
-				pythonMetaFile->getEntityID(),
-				ot::invalidUID,  // No manifest meta
-				ot::invalidUID   // No environment ID needed
-			);
-		});
-		worker.detach();
-	}
-	else if (hasFullPythonExport) {
-		// Export full Python (script + manifest)
-		std::thread worker([this, pythonScript, pythonManifest, pythonMetaFile, manifestMetaFile]() {
-			exportFilesToLibraryAsync(
-				pythonScript->getEntityID(),
-				pythonManifest->getEntityID(),
-				pythonMetaFile->getEntityID(),
-				manifestMetaFile->getEntityID(),
-				pythonManifest->getManifestID()
-			);
-		});
-		worker.detach();
+	else if (isPythonExport) {
+		// Load Python script entities
+		if (!pythonScriptPath.empty()) {
+			EntityBase* pythonScriptEntity = model->findEntityFromName(pythonScriptPath);
+			if (pythonScriptEntity == nullptr) {
+				OT_LOG_E("Python script entity not found for path: " + pythonScriptPath);
+				return;
+			}
+			pythonScript = dynamic_cast<EntityFileText*>(pythonScriptEntity);
+			if (!pythonScript) {
+				OT_LOG_E("Entity found for Python script path is not of type EntityFileText: " + pythonScriptPath);
+				return;
+			}
+		}
+		else {
+			OT_LOG_E("Python script path is empty.");
+			return;
+		}
+
+		if (!pythonMetaPath.empty()) {
+			EntityBase* pythonMetaEntity = model->findEntityFromName(pythonMetaPath);
+			if (pythonMetaEntity == nullptr) {
+				OT_LOG_E("Python metadata entity not found for path: " + pythonMetaPath);
+				return;
+			}
+			pythonMetaFile = dynamic_cast<EntityFileText*>(pythonMetaEntity);
+			if (!pythonMetaFile) {
+				OT_LOG_E("Entity found for Python metadata path is not of type EntityFileText: " + pythonMetaPath);
+				return;
+			}
+		}
+		else {
+			OT_LOG_E("Python metadata path is empty.");
+			return;
+		}
+
+		// Optional: Load manifest entities if provided
+		if (!pythonManifestPath.empty()) {
+			EntityBase* pythonManifestEntity = model->findEntityFromName(pythonManifestPath);
+			if (pythonManifestEntity != nullptr) {
+				pythonManifest = dynamic_cast<EntityPythonManifest*>(pythonManifestEntity);
+			}
+		}
+
+		if (!manifestMetaPath.empty()) {
+			EntityBase* manifestMetaEntity = model->findEntityFromName(manifestMetaPath);
+			if (manifestMetaEntity != nullptr) {
+				manifestMetaFile = dynamic_cast<EntityFileText*>(manifestMetaEntity);
+			}
+		}
+
+		// Validate Python export
+		if (!validateMetaDataFile(pythonMetaFile)) {
+			return;
+		}
+
+		if (pythonManifest != nullptr && manifestMetaFile != nullptr) {
+			if (!validateMetaDataFile(manifestMetaFile)) {
+				return;
+			}
+		}
+
+		// Determine export type: minimal (script only) or full (script + manifest)
+		bool hasFullPythonExport = (pythonManifest != nullptr && manifestMetaFile != nullptr);
+
+		// Execute Python export
+		if (hasFullPythonExport) {
+			std::thread worker([this, pythonScript, pythonManifest, pythonMetaFile, manifestMetaFile]() {
+				exportFilesToLibraryAsync(
+					pythonScript->getEntityID(),
+					pythonManifest->getEntityID(),
+					pythonMetaFile->getEntityID(),
+					manifestMetaFile->getEntityID(),
+					pythonManifest->getManifestID()
+				);
+			});
+			worker.detach();
+		}
+		else {
+			std::thread worker([this, pythonScript, pythonMetaFile]() {
+				exportFilesToLibraryAsync(
+					pythonScript->getEntityID(),
+					ot::invalidUID,
+					pythonMetaFile->getEntityID(),
+					ot::invalidUID,
+					ot::invalidUID
+				);
+			});
+			worker.detach();
+		}
 	}
 }

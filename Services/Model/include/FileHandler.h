@@ -47,6 +47,10 @@ public:
 	void addButtons(ot::components::UiComponent* _uiComponent);
 	void handleOverwriteResponse(const std::string& _filePath, bool _overwrite);
 	void handleExportDialog(const ot::PropertyDialogCfg& _dialogCfg);
+
+
+	const std::string m_pythonScriptDialogGroup = "Python Script Export";
+	const std::string m_circuitModelDialogGroup = "Circuit Model Export";
 private:
 	const std::string c_groupName = "File Imports";
 	ot::ToolBarButtonCfg m_buttonFileImport;
