@@ -44,7 +44,7 @@ public:
 	bool checkConnectionDataBase(const std::string &userName, const std::string &password) const;
 	void initializeNewSession(void);
 
-	bool addUser(const std::string &userName, const std::string &password, bool _isSSO) const;
+	bool addUser(const std::string &userName, const std::string &password) const;
 	bool deleteUser(const std::string &userName) const;
 	//bool changePassword(const std::string &oldPassword, const std::string &newPassword);
 

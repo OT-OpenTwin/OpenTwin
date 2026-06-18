@@ -15,33 +15,24 @@ std::string ot::SessionToken::generateToken()
 	return m_token;
 }
 
-std::optional<std::string> ot::SessionToken::getToken()
+const std::string& ot::SessionToken::getToken() const 
 {
-	if (!m_token.empty())
-	{
-		auto now = std::chrono::steady_clock::now();
-		std::chrono::minutes passedTime = std::chrono::duration_cast<std::chrono::minutes>(now - m_creationTime);
-		if (passedTime > m_tokenValidityDurationAbsolute)
-		{
-			m_token.clear();
-			return std::nullopt;
-		}
-		else
-		{
-			return m_token;
-		}
-	}
-	else
-	{
-		return std::nullopt;
-	}
+	return m_token;
 }
 
-bool ot::SessionToken::tokenIsValid() const
+bool ot::SessionToken::tokenIsValid(bool _useDelta) const
 {
 	auto now = std::chrono::steady_clock::now();
 	std::chrono::minutes passedTime = std::chrono::duration_cast<std::chrono::minutes>(now - m_creationTime);
 	// The UI may first request the validity of a token and afterwards send a request alongside the token. Between these two requests, the token may become invalid if there is not a delta between the actual validation timeout and the request for validation
-	bool valid = passedTime < (m_tokenValidityDurationAbsolute - m_tokenValidityDelta); 
+	bool valid;
+	if (_useDelta)
+	{
+		valid = passedTime < (m_tokenValidityDurationAbsolute - m_tokenValidityDelta); 
+	}
+	else
+	{
+		valid = passedTime < (m_tokenValidityDurationAbsolute);
+	}
 	return valid;
 }

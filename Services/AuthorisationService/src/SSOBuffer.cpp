@@ -4,21 +4,34 @@
 #include "ServiceBase.h"
 #include "OTCommunication/ActionTypes.h"
 
-bool SSOBuffer::handleRequest(const std::string& _username, const std::string& _receivedToken, bool _initialToken, ot::JsonDocument& _returnMessage)
+bool SSOBuffer::handleRequest(std::string& _determinedUsername, const std::string& _authenticationProcessID,  const std::string& _receivedToken, bool _initialToken, ot::JsonDocument& _returnMessage)
 {
+	clearExpiredProcessIDs();
 	bool authenticationSucceeded = false;
+
 	try
 	{
-		auto serverSignOnByUsername = m_serverSignOnByUsername.find(_username);
+		ot::AuthenticationProcessID* processID = nullptr;
+		std::unordered_map<ot::AuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>>::iterator serverSignOnByProcessID;
 		if (_initialToken)
 		{
-			clearUser(_username);
-			m_serverSignOnByUsername.emplace(_username, std::make_unique<ot::SingleSignOn_Server>());
-			serverSignOnByUsername = m_serverSignOnByUsername.find(_username);
+			auto entry = m_serverSignOnByProcessID.emplace(ot::AuthenticationProcessID(), std::make_unique<ot::SingleSignOn_Server>());
+			assert(entry.second);
+			serverSignOnByProcessID = entry.first;
+		}
+		else
+		{
+			serverSignOnByProcessID = m_serverSignOnByProcessID.find(_authenticationProcessID);
 		}
 
-		std::unique_ptr<ot::SingleSignOn_Server >& serverSSO = serverSignOnByUsername->second;
+		if (serverSignOnByProcessID == m_serverSignOnByProcessID.end())
+		{
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed to assigning authentication process.", _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			return false;
+		}
 		
+		std::unique_ptr<ot::SingleSignOn_Server >& serverSSO = serverSignOnByProcessID->second;
 		const std::string nextToken = serverSSO->processToken(_receivedToken);
 		if (serverSSO->stateContinueNeeded())
 		{
@@ -26,37 +39,34 @@ bool SSOBuffer::handleRequest(const std::string& _username, const std::string& _
 			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
 			_returnMessage.AddMember(OT_PARAM_AUTH_SSO_Token_Continue, true, _returnMessage.GetAllocator());
 			_returnMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(nextToken, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_ACTION_PARAM_PROCESS_ID, ot::JsonString(serverSignOnByProcessID->first.getID(), _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
 		}
 		else if(serverSSO->stateOK())
 		{
 			// Sequence concluded 
 			ot::LogInInfos infos = serverSSO->processLoggedInUserInfo();
 			// Here we can load the MongoDB user now.
-
-			if (infos.m_userName == _username)
-			{
+			_determinedUsername = infos.m_userName;
 				
-				SSOUser user(infos);
-				auto sessionToken = user.getSessionToken().getToken();
-				assert(sessionToken.has_value()); // Freshly generated
-				_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, true, _returnMessage.GetAllocator());
-				_returnMessage.AddMember(OT_PARAM_AUTH_SSO_Token_Continue, false, _returnMessage.GetAllocator());
-				_returnMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(sessionToken.value(), _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			SSOUser user(infos);
+			const std::string& sessionToken = user.getSessionToken().getToken();
+			
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, true, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_SSO_Token_Continue, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(sessionToken, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_determinedUsername, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
 
-				m_loggedInSSOUsersByUsername.insert(std::make_pair<>(_username, std::move(user)));
-				authenticationSucceeded = true;
-			}
-			else
-			{
-				_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
-				_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Given username does not match identified name.", _returnMessage.GetAllocator()), _returnMessage.GetAllocator());			
-			}
+			m_loggedInSSOUsersByToken.insert(std::make_pair<>(sessionToken, std::move(user)));
+			m_serverSignOnByProcessID.erase(serverSignOnByProcessID);
+			authenticationSucceeded = true;
+
 		}
 		else
 		{
 			const std::string stateString =	serverSSO->getStateString();
 			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
 			_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Server failed to process token. State: " + stateString, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			m_serverSignOnByProcessID.erase(serverSignOnByProcessID);
 		}
 
 		return authenticationSucceeded;
@@ -66,41 +76,58 @@ bool SSOBuffer::handleRequest(const std::string& _username, const std::string& _
 		_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
 		const std::string  message = "Internal error: " + std::string(_e.what());
 		_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString(message, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
-
+		
 		return false;
 	}
 }
 
-std::optional<std::string> SSOBuffer::getToken(const std::string& _userName)
+SSOUser* SSOBuffer::getUser(const std::string& _token)
 {
-	auto ssoUserByUserName = m_loggedInSSOUsersByUsername.find(_userName);
-	return ssoUserByUserName->second.getSessionToken().getToken();
+	auto loggedInSSOUsersByToken =	m_loggedInSSOUsersByToken.find(_token);
+	if (loggedInSSOUsersByToken == m_loggedInSSOUsersByToken.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return &loggedInSSOUsersByToken->second;
+	}
 }
 
-void SSOBuffer::clearUser(const std::string& _username)
+void SSOBuffer::removeUser(const std::string& _token)
 {
-	m_serverSignOnByUsername.erase(_username);
-	m_loggedInSSOUsersByUsername.erase(_username);
+	m_loggedInSSOUsersByToken.erase(_token);
 }
 
-bool SSOBuffer::validate(const std::string& _username, const std::string& _token) 
+
+void SSOBuffer::clearExpiredProcessIDs()
 {
-	auto loggedInSSOUserByUsername = m_loggedInSSOUsersByUsername.find(_username);
+	
+	for (auto entry = m_serverSignOnByProcessID.begin(); entry != m_serverSignOnByProcessID.end(); )
+	{
+		if (!entry->first.isIsExpired())
+		{
+			entry = m_serverSignOnByProcessID.erase(entry);
+		}
+		else
+		{
+			entry++;
+		}
+	}
+}
+
+bool SSOBuffer::validate(const std::string& _token) 
+{
+	auto loggedInSSOUserByToken= m_loggedInSSOUsersByToken.find(_token);
 	bool isValid = false;
-	if (loggedInSSOUserByUsername == m_loggedInSSOUsersByUsername.end())
+	if (loggedInSSOUserByToken == m_loggedInSSOUsersByToken.end())
 	{
 		assert(false); // This spot should only be accessed by the UI after the login
 	}
 	else
 	{
-		SSOUser& user = loggedInSSOUserByUsername->second;
+		SSOUser& user = loggedInSSOUserByToken->second;
 		isValid = user.getSessionToken().tokenIsValid();
-		if (isValid)
-		{
-			std::optional<std::string> token = user.getSessionToken().getToken();
-			assert(token.has_value()); // if tokenIsValid = true -> token.has_value
-			isValid = token.value() == _token;
-		}
 	}
 	return isValid;
 }

@@ -677,6 +677,20 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	this->setControlsEnabled(true);
 }
 
+void LogInDialog::slotWorkerCustomFeedback(const std::string& _title,const std::string& _feedback)
+{
+	m_state.remove(LogInStateFlag::WorkerRunning);
+
+	// Create error message
+	QString msg;
+	msg.append(_feedback);
+
+	// Display Feedback message and unlock controls
+	QMessageBox msgBox(QMessageBox::Information, _title.c_str(), msg, QMessageBox::Ok);
+	msgBox.exec();
+	this->setControlsEnabled(true);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private helper
@@ -908,12 +922,12 @@ void LogInDialog::setControlsForChangePassword() {
 void LogInDialog::setControlsForSSO(bool _resize) {
 	m_isSSOLogin = true;
 	m_logInButton->setHidden(false);
-	m_registerButton->setHidden(false);
+	m_registerButton->setHidden(true);
 
 	m_savePassword->setHidden(true);
 	if (!m_state.has(LogInStateFlag::SSOMode)) {
 		m_userNameTmp = m_username->text();
-		m_logInButton->setText("SSO Login");
+		m_logInButton->setText("Login with Systems Account");
 		m_state.set(LogInStateFlag::SSOMode);
 		setMinimumHeight(m_maxSSOHeight);
 	}
@@ -922,8 +936,8 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 		auto currentWidgetWidth = width();
 		resize(currentWidgetWidth, m_maxSSOHeight);
 	}
-	m_username->setReadOnly(true);
-	m_username->setText(QString::fromStdWString(determineSSOUsername()));
+	m_username->setHidden(true);
+	
 
 	m_password->setHidden(true);
 	m_passwordLabel->setHidden(true);
@@ -974,7 +988,13 @@ void LogInDialog::loginWorkerStart() {
 	}
 
 	// Attempt to log in the user
-	currentError = this->workerLogin(userManager);
+	std::string customTitle, customMsg;
+	currentError = this->workerLogin(userManager,customTitle, customMsg);
+	if (currentError == WorkerError::NoError_CustomFeedback)
+	{
+		QMetaObject::invokeMethod(this, &LogInDialog::slotWorkerCustomFeedback, Qt::QueuedConnection, customTitle, customMsg);
+		return;
+	}
 	if (currentError != WorkerError::NoError) {
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
@@ -1129,9 +1149,10 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager) {
-	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
-		return this->workerLoginSSO(_userManager);
+LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg) {
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) 
+	{
+		return this->workerLoginSSO(_userManager, _customTitle, _customMsg);
 	}
 	else {
 		return this->workerLoginUsernamePassword(_userManager);
@@ -1170,16 +1191,19 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 
 
 
-LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
-	std::string ssoUsername = ot::String::toString(determineSSOUsername());
-	m_loginData.setUserName(ssoUsername);
+LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)
+{		
 	m_loginData.setAuthorizationUrl(_userManager.getAuthorisationServerURL());
 
-	std::optional<std::string> errorMessage = ot::Authentication::loginSSO(m_loginData);
+	std::optional<std::string> errorMessage = ot::Authentication::loginSSO(m_loginData, _customTitle, _customMsg);
 	if (errorMessage.has_value())
 	{
 		// Content should be communicated. Error is already logged by authenticateSSO
 		return WorkerError::InvalidCreadentials;
+	}
+	else if (!_customTitle.empty())
+	{
+		return WorkerError::NoError_CustomFeedback;
 	}
 	else
 	{
@@ -1188,7 +1212,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 }
 
 LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {
-	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString(),m_isSSOLogin))
+	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
 	{
 		return WorkerError::FailedToRegister;
 	}

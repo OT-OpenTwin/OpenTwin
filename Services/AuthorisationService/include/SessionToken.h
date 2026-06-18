@@ -14,9 +14,9 @@ namespace ot
 		SessionToken& operator=(SessionToken&& _other) = default;
 		
 		std::string generateToken();
-		std::optional<std::string> getToken();
+		const std::string& getToken() const;
 
-		bool tokenIsValid() const;
+		bool tokenIsValid(bool _useDelta = true) const;
 	private:
 		std::string m_token;
 		std::chrono::steady_clock::time_point m_creationTime;

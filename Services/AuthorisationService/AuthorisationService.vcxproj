@@ -194,6 +194,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\AuthenticationProcessID.cpp" />
     <ClCompile Include="src\dllmain.cpp" />
     <ClCompile Include="src\Group.cpp" />
     <ClCompile Include="src\MongoGroupFunctions.cpp" />
@@ -210,6 +211,7 @@
     <ClCompile Include="src\User.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\AuthenticationProcessID.h" />
     <ClInclude Include="include\Group.h" />
     <ClInclude Include="include\MongoConstants.h" />
     <ClInclude Include="include\MongoGroupFunctions.h" />

@@ -60,6 +60,9 @@
     <ClCompile Include="src\SSOUser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\AuthenticationProcessID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\ServiceBase.h">
@@ -102,6 +105,9 @@
       <Filter>Header Files\SSO</Filter>
     </ClInclude>
     <ClInclude Include="include\SSOUser.h">
+      <Filter>Header Files\SSO</Filter>
+    </ClInclude>
+    <ClInclude Include="include\AuthenticationProcessID.h">
       <Filter>Header Files\SSO</Filter>
     </ClInclude>
   </ItemGroup>

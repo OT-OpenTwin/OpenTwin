@@ -145,19 +145,23 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else
 	{
 		std::string sessionToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-		std::optional<std::string> usersSessionToken =	m_ssoBuffer.getToken(loggedInUsername);
-		if (!usersSessionToken.has_value())
+		SSOUser* ssoUser =	m_ssoBuffer.getUser(sessionToken);
+		if (ssoUser == nullptr)
 		{
-			// Token is not valid anymore. Need to redo the SSO login. Should have been tested by the UI before attempting this action that need authentication.
+			// Most likely a hacking attempt
 			assert(0);
-			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
+			throw std::runtime_error("The provided authentication token is invalid. Please logout and attempt to log in again.");
 		}
 		else
 		{
-			if(usersSessionToken.value() != sessionToken)
+			const std::string& token =	ssoUser->getSessionToken().getToken();
+			
+			if(!ssoUser->getSessionToken().tokenIsValid(false))
 			{
+				// Token is expired. Should have been validated before this request was send.
 				assert(0);
-				throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
+				m_ssoBuffer.removeUser(token);
+				throw std::runtime_error("The provided authentication token is expired. Please logout and attempt to log in again.");
 			}
 			else
 			{
@@ -261,13 +265,15 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) 
 {
 	bool usePSW = ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD);
-	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+	std::string username;
 	std::string password;
 	ot::JsonDocument returnDoc;
-
+	bool ssoAuthenticationSuccess = false;
 	if (usePSW)
 	{
+		// In this case we have to use the provided credentials
 		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+		username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 		if (password.empty())
 		{
 			ot::JsonDocument json;
@@ -283,11 +289,13 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 	else
 	{
+		// Here we execute the sso authentication process
 		bool initialToken = ot::json::getBool(_actionDocument ,OT_PARAM_AUTH_SSO_Initial); 
 		std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons
-		bool authenticated = m_ssoBuffer.handleRequest(username, token, initialToken, returnDoc);
-		if (!authenticated)
+		std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
+		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons. It also sets the identified user name
+		ssoAuthenticationSuccess = m_ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
+		if (!ssoAuthenticationSuccess)
 		{
 			// Here we return if the sequnce is not done yet or it may have failed
 			return returnDoc.toJson();
@@ -298,31 +306,45 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		}
 	}	
 
-	bool successful = false;
-	successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
+	// Now we still need to check for a user entry in mongodb, matching the credentials
+	// ! If user permission is being added, look into the successfulMongoAuthenticate else path for sso !
+	bool successfulMongoAuthenticate = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
 	
-	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successful, returnDoc.GetAllocator());
 
-	if (successful)
+	if (successfulMongoAuthenticate)
 	{
+		// Now we are creating the session user and password. They are valid for the lifetime of a session.
 		std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
 		std::string sessionPWD = createRandomPassword();
 
 		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
-
+		// Fills in the fields about the session user in the mongodb document
 		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, returnDoc);
 
 		if (usePSW)
 		{
+			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successfulMongoAuthenticate, returnDoc.GetAllocator());
 			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, returnDoc.GetAllocator()), returnDoc.GetAllocator());
 			returnDoc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
-		// else is allready set in the handling method
+		// else is a sso login and there everything neccessary was already added by the handleRequest method
 	}
 	else
 	{
-		m_ssoBuffer.clearUser(username);
-		returnDoc.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed MongoDB authentication", returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		if (!usePSW)
+		{
+			// Here we have a sso login that was successful (otherwise the m_ssoBuffer.handleRequest would have returned earlier), but the mongoDB authentication failed.
+			// This is the case when the sso user has not been registered yet. 
+			// Only execute if successfulMongoAuthenticate is not considering the account state of being permitted (feature that comes later)
+			ot::JsonDocument registerReturnDoc;
+			const std::string temp = (handleRegister(returnDoc.getConstObject()));
+			registerReturnDoc.fromJson(temp);
+			returnDoc.AddMember(OT_ACTION_REGISTER, ot::json::getBool(registerReturnDoc, OT_ACTION_AUTH_SUCCESS), returnDoc.GetAllocator());
+		}
+		else
+		{
+			returnDoc.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed MongoDB authentication", returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		}
 	}
 
 	return returnDoc.toJson();
@@ -331,21 +353,25 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument)
 {
-	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
 	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-	
+	std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
+
 	ot::JsonDocument returnDoc;
 	// Resets the buffered user. In this cause it also creates a new session token.
-	m_ssoBuffer.handleRequest(username, token, initialToken, returnDoc);
+	std::string determinedUserName;
+	m_ssoBuffer.handleRequest(determinedUserName,authenticationProcessID, token, initialToken, returnDoc);
 	return returnDoc.toJson();
 }
 
 std::string ServiceBase::handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument)
 {
-	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
 	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-	bool tokenIsValid = m_ssoBuffer.validate(username, token);
+	bool tokenIsValid = m_ssoBuffer.validate(token);
+	if (!tokenIsValid)
+	{
+		m_ssoBuffer.removeUser(token); // Will be newly created with the TokenRefresh
+	}
 	ot::JsonDocument returnDoc;
 	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, tokenIsValid, returnDoc.GetAllocator());
 	return returnDoc.toJson();

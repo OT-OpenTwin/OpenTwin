@@ -18,14 +18,15 @@ std::optional<std::string> ssoSequence(LoginData& _loginData, const std::functio
 		std::string errorMessage;
 		bool continueProcess = true;
 		bool firstMessage = true;
+		std::string authenticationProcessID; // Set by the authorisationservice on the firstMessage
 		do
 		{
 			std::string token = client.generateToken(receivedToken);
-
+			
 			ot::JsonDocument tokenMessage;
 			tokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(_authorisationServiceEndpoint, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
 			tokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(token, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
-			tokenMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_loginData.getUserName(), tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
+			tokenMessage.AddMember(OT_ACTION_PARAM_PROCESS_ID, ot::JsonString(authenticationProcessID, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
 			tokenMessage.AddMember(OT_PARAM_AUTH_SSO_Initial, firstMessage, tokenMessage.GetAllocator());
 			firstMessage = false;
 			std::string response;
@@ -45,6 +46,7 @@ std::optional<std::string> ssoSequence(LoginData& _loginData, const std::functio
 
 					if (continueSequence)
 					{
+						authenticationProcessID = ot::json::getString(responseDoc, OT_ACTION_PARAM_PROCESS_ID);
 						receivedToken = ot::json::getString(responseDoc, OT_PARAM_AUTH_Token);
 						continueProcess = !receivedToken.empty();
 						if (receivedToken.empty())
@@ -86,17 +88,37 @@ std::optional<std::string> ot::Authentication::refreshToken(LoginData& _loginDat
 	return errorMessage;
 }
 
-std::optional<std::string> ot::Authentication::loginSSO(LoginData& _loginData)
+std::optional<std::string> ot::Authentication::loginSSO(LoginData& _loginData, std::string& _customTitle, std::string& _customMsg)
 {
-
-	auto setLoginData = [](LoginData& _loginData, ot::JsonDocument& _resultDoc)
+	auto setLoginData = [&_customMsg, &_customTitle](LoginData& _loginData, ot::JsonDocument& _resultDoc)
 		{
-			std::string sessionUser = ot::json::getString(_resultDoc, OT_PARAM_DB_USERNAME);
-			std::string sessionPassword = ot::json::getString(_resultDoc, OT_PARAM_DB_PASSWORD);
-			std::string sessionToken = ot::json::getString(_resultDoc, OT_PARAM_AUTH_Token);
-			_loginData.setSSOSessionToken(sessionToken);
-			_loginData.setSessionUser(sessionUser);
-			_loginData.setSessionPassword(sessionPassword);
+			std::string authenticatedUser = ot::json::getString(_resultDoc, OT_PARAM_AUTH_USERNAME);
+			
+			bool registrationExecuted = ot::json::exists(_resultDoc, OT_ACTION_REGISTER);
+			if (registrationExecuted)
+			{
+				bool registrationSuccess = ot::json::getBool(_resultDoc, OT_ACTION_REGISTER);
+				if (registrationSuccess)
+				{
+					_customTitle = "New System User Registered";
+					_customMsg = "The system user " + authenticatedUser + " was successfully registered. Ask your OpenTwin admin to unlock your access to OpenTwin.";
+				}
+				else
+				{
+					_customTitle = "Registration of System User failed";
+				}
+			}
+			else
+			{
+				// Needs a login feedback
+				std::string sessionUser = ot::json::getString(_resultDoc, OT_PARAM_DB_USERNAME);
+				std::string sessionPassword = ot::json::getString(_resultDoc, OT_PARAM_DB_PASSWORD);
+				std::string sessionToken = ot::json::getString(_resultDoc, OT_PARAM_AUTH_Token);
+				_loginData.setUserName(authenticatedUser);
+				_loginData.setSSOSessionToken(sessionToken);
+				_loginData.setSessionUser(sessionUser);
+				_loginData.setSessionPassword(sessionPassword);
+			}
 		};
 
 	std::optional<std::string> errorMessage = ssoSequence(_loginData, setLoginData, OT_ACTION_LOGIN);
