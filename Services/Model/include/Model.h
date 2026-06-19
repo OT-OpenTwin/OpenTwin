@@ -73,6 +73,7 @@ public:
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
+	virtual void requestVisualisationIfNeeded(ot::UID _entityID) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) override;
 	virtual const ot::ModelServiceState& getModelServiceState() const override { return m_serviceState; };

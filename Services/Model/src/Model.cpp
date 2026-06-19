@@ -4213,7 +4213,14 @@ std::string Model::requestLibraryElement(ot::LibraryElementRequest& _config) {
 
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
-	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
+	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
+	handler.handleVisualisationRequest(_entityID, _visualisationCfg);
+}
+
+void Model::requestVisualisationIfNeeded(ot::UID _entityID)
+{
+	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
+	handler.requestVisualisationIfNeeded(_entityID);
 }
 
 std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)

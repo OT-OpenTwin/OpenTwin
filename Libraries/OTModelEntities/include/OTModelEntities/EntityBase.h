@@ -65,14 +65,20 @@ public:
 	EntityObserver() {};
 	virtual ~EntityObserver() {};
 
-	virtual void entityRemoved(EntityBase *entity) {};
-	virtual void entityModified(EntityBase *entity) {};
+	virtual void entityRemoved(EntityBase* entity) {};
+	virtual void entityModified(EntityBase* entity) {};
 
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) { return ""; };
+	
+	//! @brief Sends a visualization request to the viewer.
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
+
+	//! @brief Sends a pull request to the viewer to pull the visualization for the entity if it is currently visualized.
+	virtual void requestVisualisationIfNeeded(ot::UID _entityID) {};
+
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
 	virtual const ot::ModelServiceState& getModelServiceState() const = 0;

@@ -302,6 +302,7 @@
 #define OT_ACTION_CMD_UI_VIEW_SetEntityName "UI.VIEW.Entity.Name.Set"
 #define OT_ACTION_CMD_UI_VIEW_SetEntitySelected "UI.VIEW.Entity.Selected.Set"
 #define OT_ACTION_CMD_UI_VIEW_RenameEntityName "UI.VIEW.Entity.Name.Rename"
+#define OT_ACTION_CMD_UI_VIEW_RequestVisualizationIfNeeded "UI.View.RequestVisualizationIfNeeded"
 
 #define OT_ACTION_CMD_UI_VIEW_OBJ_AddSceneNode "UI.VIEW.OBJ.SceneNode"
 #define OT_ACTION_CMD_UI_VIEW_CreateRubberband "UI.VIEW.CreateRubberband"

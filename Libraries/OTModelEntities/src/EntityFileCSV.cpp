@@ -72,12 +72,8 @@ bool EntityFileCSV::updateFromProperties(void)
 	requiresDataToBeFetched |= requiresDataUpdate();
 	if (requiresDataToBeFetched)
 	{
-
-		ot::VisualisationCfg visualisationCfg;
-		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
-		visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
-		visualisationCfg.setAsActiveView(true);
-		getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
+		OTAssertNullptr(getObserver());
+		getObserver()->requestVisualisationIfNeeded(getEntityID());
 	}
 
 	getProperties().forceResetUpdateForAllProperties();

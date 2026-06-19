@@ -2129,53 +2129,6 @@ double Viewer::snapAngle(double value)
 	return value;
 }
 
-osg::Geometry* Viewer::createFilledRect(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
-{
-	auto* geom = new osg::Geometry();
-
-	auto* verts = new osg::Vec3Array();
-	verts->push_back(bottomLeft);                                      // 0 unten links
-	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));      // 1 unten rechts
-	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));    // 2 oben rechts
-	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));     // 3 oben links
-	geom->setVertexArray(verts);
-
-	auto* cols = new osg::Vec4Array();
-	cols->push_back(color);
-	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
-
-	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
-
-	return geom;
-}
-
-std::string Viewer::formatValue(double v, int precision)
-{
-	std::ostringstream os;
-	os << std::setprecision(precision) << std::defaultfloat << v;
-	return os.str();
-}
-
-osg::Geometry* Viewer::createRectOutline(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
-{
-	auto* geom = new osg::Geometry();
-
-	auto* verts = new osg::Vec3Array();
-	verts->push_back(bottomLeft);
-	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));
-	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));
-	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));
-	geom->setVertexArray(verts);
-
-	auto* cols = new osg::Vec4Array();
-	cols->push_back(color);
-	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
-
-	geom->addPrimitiveSet(new osg::DrawArrays(GL_LINE_LOOP, 0, 4));
-
-	return geom;
-}
-
 void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 {
 	if (osgOverlayCamera == nullptr) return;
@@ -2243,7 +2196,7 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	textHeight = segmentHeight / 2.0f * tickInterval;
 	if (textHeight > maxTextHeight) textHeight = maxTextHeight;
 
-	int numberOfTicksBothSides = ((activeColorRamp->getValues().size()-1) / tickInterval + 1) / 2;
+	int numberOfTicksBothSides = ((activeColorRamp->getValues().size() - 1) / tickInterval + 1) / 2;
 
 	bool showCenterLabel = (2 * numberOfTicksBothSides * tickInterval < activeColorRamp->getValues().size());
 
@@ -2252,16 +2205,16 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	// Lower half of the label set
 	for (std::size_t i = 0; i < numberOfTicksBothSides; i++)
 	{
-		float y = origin.y() + static_cast<float>(i* tickInterval) * segmentHeight;
+		float y = origin.y() + static_cast<float>(i * tickInterval) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
-			
+
 		overlayColorRampNode->addDrawable(createText(textPos, textColor, formatValue(activeColorRamp->getValues()[i * tickInterval], precision), textHeight, osgText::TextBase::AlignmentType::RIGHT_CENTER));
 	}
 
 	// Upper half of the label set
 	for (std::size_t i = 0; i < numberOfTicksBothSides; i++)
 	{
-		int index = activeColorRamp->getValues().size() - 1 - i* tickInterval;
+		int index = activeColorRamp->getValues().size() - 1 - i * tickInterval;
 		float y = origin.y() + static_cast<float>(index) * segmentHeight;
 		osg::Vec2 textPos(origin.x() - labelOffset, y);
 
@@ -2296,3 +2249,59 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	osgOverlayCamera->addChild(overlayColorRampNode);
 }
 
+void Viewer::requestVisualizationIfNeeded(ot::UID _modelEntityID)
+{
+	OTAssertNullptr(model);
+	SceneNodeBase* node = model->getSceneNodeByEntityID(_modelEntityID);
+	if (node)
+	{
+		node->requestVisualizationIfNeeded();
+	}
+}
+
+osg::Geometry* Viewer::createFilledRect(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
+{
+	auto* geom = new osg::Geometry();
+
+	auto* verts = new osg::Vec3Array();
+	verts->push_back(bottomLeft);                                      // 0 unten links
+	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));      // 1 unten rechts
+	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));    // 2 oben rechts
+	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));     // 3 oben links
+	geom->setVertexArray(verts);
+
+	auto* cols = new osg::Vec4Array();
+	cols->push_back(color);
+	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
+
+	geom->addPrimitiveSet(new osg::DrawArrays(GL_QUADS, 0, 4));
+
+	return geom;
+}
+
+std::string Viewer::formatValue(double v, int precision)
+{
+	std::ostringstream os;
+	os << std::setprecision(precision) << std::defaultfloat << v;
+	return os.str();
+}
+
+osg::Geometry* Viewer::createRectOutline(const osg::Vec3& bottomLeft, float width, float height, const osg::Vec4& color)
+{
+	auto* geom = new osg::Geometry();
+
+	auto* verts = new osg::Vec3Array();
+	verts->push_back(bottomLeft);
+	verts->push_back(bottomLeft + osg::Vec3(width, 0.0f, 0.0f));
+	verts->push_back(bottomLeft + osg::Vec3(width, height, 0.0f));
+	verts->push_back(bottomLeft + osg::Vec3(0.0f, height, 0.0f));
+	geom->setVertexArray(verts);
+
+	auto* cols = new osg::Vec4Array();
+	cols->push_back(color);
+	geom->setColorArray(cols, osg::Array::BIND_OVERALL);
+
+	geom->addPrimitiveSet(new osg::DrawArrays(GL_LINE_LOOP, 0, 4));
+
+	return geom;
+}
