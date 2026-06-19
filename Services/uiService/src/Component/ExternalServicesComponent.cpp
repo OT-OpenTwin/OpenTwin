@@ -36,7 +36,7 @@
 #include "CurveHelper/CurveDatasetFactory.h"
 #include "Helper/ProgressUpdater.h"
 #include "Helper/StartArgumentParser.h"
-
+#include "OTCore/TimeFormatter.h"
 // OpenTwin System header
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
@@ -5328,66 +5328,90 @@ void ExternalServicesComponent::workerLoadPlotData(ot::Plot1DCfg&& _plotConfig, 
 {
 	try
 	{
-		auto startTime = ot::DateTime::msSinceEpoch();
-
+		bool somethingToPlot = !_plotConfig.getXAxisParameter().empty();
+		auto startTime = std::chrono::high_resolution_clock::now();
 		// Create curves
 		const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
 		CurveDatasetFactory curveFactory(collectionName);
 
 		std::list<ot::PlotDataset*> dataSets;
-
-		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
-		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
-
-		std::optional<ot::Plot1DCurveCfg> firstCurveCfg;
-
-		for (ot::Plot1DCurveCfg& curveCfg : _curveConfigs)
+		if (somethingToPlot)
 		{
-			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
+			bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
+			int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 
-			if (!firstCurveCfg.has_value() && !newCurveDatasets.empty())
+			std::optional<ot::Plot1DCurveCfg> firstCurveCfg;
+
+			for (ot::Plot1DCurveCfg& curveCfg : _curveConfigs)
 			{
-				firstCurveCfg = curveCfg;
-			}
-
-			dataSets.splice(dataSets.begin(), newCurveDatasets);
-
-			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
-			{
-				break;
-			}
-		}
-
-		if (_updatePlotConfig && firstCurveCfg.has_value())
-		{
-			const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
-
-			const auto& decoders = dataLakeAccessCfg.getAllFieldDecoderParameter();
-
-			std::string paramNameX = _plotConfig.getXAxisParameter();
-			auto it = decoders.find(paramNameX);
-
-			if (it != decoders.end())
-			{
-				if (!it->second.getLabel().empty())
+				bool validForPlot = curveCfg.getDataAccessConfig().getAllFieldDecoderQuantityByLabel().size() != 0 && !curveCfg.getDataAccessConfig().getCollectionName().empty();
+				somethingToPlot |= validForPlot;
+				if (validForPlot)
 				{
-					_plotConfig.setDataLabelX(it->second.getLabel());
+
+
+					std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
+
+					if (!firstCurveCfg.has_value() && !newCurveDatasets.empty())
+					{
+						firstCurveCfg = curveCfg;
+					}
+
+					dataSets.splice(dataSets.begin(), newCurveDatasets);
+
+					std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+					if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
+					{
+						break;
+					}
 				}
-				const auto& unitsX = it->second.getTupleInstance().getTupleUnits();
-				if (unitsX.size() == 1)
+				else
 				{
-					_plotConfig.setUnitLabelX(unitsX.front());
+					std::string msg = "Cannot create curve for \"" + curveCfg.getEntityName() + ". A curve needs a project and a quantity to be selected. ";
+					"Select the missing configuration(s) to proceed.\n" ;
+					ot::WindowAPI::appendOutputMessage(msg);
 				}
 			}
-			else
+
+			if (_updatePlotConfig && firstCurveCfg.has_value())
 			{
-				_plotConfig.setDataLabelX(paramNameX);
+				const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
+
+				const auto& decoders = dataLakeAccessCfg.getAllFieldDecoderParameter();
+
+				std::string paramNameX = _plotConfig.getXAxisParameter();
+				auto it = decoders.find(paramNameX);
+
+				if (it != decoders.end())
+				{
+					if (!it->second.getLabel().empty())
+					{
+						_plotConfig.setDataLabelX(it->second.getLabel());
+					}
+					const auto& unitsX = it->second.getTupleInstance().getTupleUnits();
+					if (unitsX.size() == 1)
+					{
+						_plotConfig.setUnitLabelX(unitsX.front());
+					}
+				}
+				else
+				{
+					_plotConfig.setDataLabelX(paramNameX);
+				}
 			}
 		}
-
-		auto endTime = ot::DateTime::msSinceEpoch();
-		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), _visualizationCfg, dataSets, (endTime - startTime), _updatePlotConfig);
+		else
+		{
+			std::string msg = "Cannot create plot for \"" + _plotConfig.getEntityName() + "\": "
+				"no x-axis parameter is assigned. Select an x-axis parameter in the configuration to proceed.\n";
+			ot::WindowAPI::appendOutputMessage(msg);
+		}
+		auto endTime = std::chrono::high_resolution_clock::now();
+		auto passedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+		std::string passedTimeString;
+		passedTimeString = TimeFormatter::formatDuration(passedTime);
+		
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), somethingToPlot,_visualizationCfg, dataSets, passedTimeString, _updatePlotConfig);
 	}
 	catch (const std::exception& e)
 	{
@@ -5454,7 +5478,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
-void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs, bool _updatePlotConfig)
+void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, bool _somethingToShow, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, std::string& _loadTime, bool _updatePlotConfig)
 {
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!_visualizationCfg.getSetAsActiveView())
@@ -5470,33 +5494,40 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(_plotConfig, insertFlags, _visualizationCfg.getVisualisingEntities());
 	ot::Plot* plot = plotView->getPlot();
-
 	if (_updatePlotConfig)
 	{
 		plot->setConfig(std::move(_plotConfig));
 	}
 
-	// Now we add the data sets to the plot and visualise them
-	int32_t curveCounter = 0;
-
-	for (ot::PlotDataset* dataSet : _dataSets)
+	if (!_somethingToShow)
 	{
-		if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
-		{
-			dataSet->setOwnerPlot(plot);
-			plot->addDatasetToCache(dataSet);
-			dataSet->attach();
-		}
-		else
-		{
-			delete dataSet;
-			dataSet = nullptr;
-		}
-		curveCounter++;
+		plot->clear(true);
 	}
+	else
+	{
 
-	// Refresh the X data label + unit
 
+		// Now we add the data sets to the plot and visualise them
+		int32_t curveCounter = 0;
+
+		for (ot::PlotDataset* dataSet : _dataSets)
+		{
+			if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
+			{
+				dataSet->setOwnerPlot(plot);
+				plot->addDatasetToCache(dataSet);
+				dataSet->attach();
+			}
+			else
+			{
+				delete dataSet;
+				dataSet = nullptr;
+			}
+			curveCounter++;
+		}
+
+		// Refresh the X data label + unit
+	}
 
 	// Now we refresh the plot visualisation.
 	QMetaObject::invokeMethod(plot, &ot::PlotBase::applyConfig, Qt::QueuedConnection);
@@ -5505,8 +5536,8 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 	{
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
-
-	ot::WindowAPI::appendOutputMessage("Loading plot data took " + ot::DateTime::intervalToString(_loadTimeMs) + "\n");
+	ot::WindowAPI::appendOutputMessage("Loading plot data took " + _loadTime + "\n");
+	
 
 	// Finally unlock the ui and hide the progress
 	ot::WindowAPI::lockSelectionAndModification(false);

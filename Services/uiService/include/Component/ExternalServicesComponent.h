@@ -433,7 +433,7 @@ public Q_SLOTS:
 	void keepAlive();
 	void slotProcessActionBuffer();
 	void slotImportFileWorkerCompleted(std::string _receiverUrl, std::string _message);
-	void slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs, bool _updatePlotConfig);
+	void slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, bool _somethingToShow, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, std::string& _loadTimeMs, bool _updatePlotConfig);
 	void slotPlotDataLoadingFailed(const std::string& _errorMessage);
 
 private:
