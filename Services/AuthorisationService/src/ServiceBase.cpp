@@ -175,7 +175,8 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	
 	if (!isAdminUser(loggedInUser))
 	{
-		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient);
+		std::string originalUserName;
+		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient, originalUserName);
 
 		if (!logInSuccessful)
 		{
@@ -183,7 +184,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
 		}
 
-		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(loggedInUsername, m_adminClient);
+		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(originalUserName, m_adminClient);
 	}
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
@@ -308,9 +309,9 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 	// Now we still need to check for a user entry in mongodb, matching the credentials
 	// ! If user permission is being added, look into the successfulMongoAuthenticate else path for sso !
-	bool successfulMongoAuthenticate = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
+	std::string originalUserName;
+	bool successfulMongoAuthenticate = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient, originalUserName);
 	
-
 	if (successfulMongoAuthenticate)
 	{
 		// Now we are creating the session user and password. They are valid for the lifetime of a session.

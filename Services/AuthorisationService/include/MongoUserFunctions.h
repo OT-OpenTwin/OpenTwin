@@ -51,7 +51,7 @@ using bsoncxx::document::element;
 
 namespace MongoUserFunctions
 {
-	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient);
+	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName);
 
 	bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
 
