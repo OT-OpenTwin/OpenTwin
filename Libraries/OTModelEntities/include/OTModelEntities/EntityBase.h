@@ -29,6 +29,7 @@
 #include "OTGui/Event/MenuRequestData.h"
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/ModelServiceState.h"
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
@@ -67,8 +68,8 @@ public:
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) { return ""; };
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
-	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); }
-	virtual bool projectIsOpen() { return true; }
+	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
+	virtual const ot::ModelServiceState& getModelServiceState() const = 0;
 
 };
 

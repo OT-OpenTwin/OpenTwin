@@ -131,11 +131,9 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_projectName(_projectName),
 	m_projectType(_projectType),
 	m_collectionName(_collectionName),
-	m_shutdown(false),
 	m_uiCreated(false),
 	m_versionGraphCreated(false),
-	m_stateManager(nullptr),
-	m_isProjectOpen(false)
+	m_stateManager(nullptr)
 {
 	OT_LOG_D("Created model { \"Project.Name\": \"" + _projectName + "\", \"Project.Type\": \"" +  + " }");
 	
@@ -469,6 +467,7 @@ void Model::resetToNew()
 	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
+		auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
 		createVisualizationItems();
 		enableQueuingHttpRequests(false);
 	}	
@@ -476,7 +475,7 @@ void Model::resetToNew()
 
 Model::~Model()
 {
-	m_shutdown = true;
+	m_serviceState.setIsShuttingDown(true);
 
 	// Restore the original version if needed
 	// This must be called before cleaerAll since clearAll will reset the state manager
@@ -925,8 +924,8 @@ void Model::getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, 
 
 void Model::setVisualizationModel(ot::UID visModelID)
 {
-	m_visualizationModelID = visModelID;	
-		
+	m_visualizationModelID = visModelID;
+
 	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
@@ -936,6 +935,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 			// Ensure that the root nodes have a visualization item
 			//createVisualizationItems();
 
+			auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
 			m_entityRoot->addVisualizationNodes();
 		}
 
@@ -3615,6 +3615,8 @@ EntityBase *Model::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, 
 
 void Model::projectOpen(const std::string& _customVersion)
 {
+	m_serviceState.setState(ot::ModelServiceState::OpeningProject);
+
 	// First, clear the current content of the model
 	clearAll();
 
@@ -3656,7 +3658,9 @@ void Model::projectOpen(const std::string& _customVersion)
 			enableQueuingHttpRequests(false);
 		}
 
-		m_isProjectOpen = true;
+		
+		m_serviceState.setProjectIsOpen(true);
+		m_serviceState.setState(ot::ModelServiceState::Running);
 		return;
 	}
 
@@ -3690,7 +3694,8 @@ void Model::projectOpen(const std::string& _customVersion)
 			enableQueuingHttpRequests(false);
 		}
 
-		m_isProjectOpen = true;
+		m_serviceState.setProjectIsOpen(true);
+		m_serviceState.setState(ot::ModelServiceState::Running);
 		return;
 	}
 
@@ -3757,7 +3762,8 @@ void Model::projectOpen(const std::string& _customVersion)
 	// update the undo information
 	updateUndoRedoStatus();
 
-	m_isProjectOpen = true;
+	m_serviceState.setProjectIsOpen(true);
+	m_serviceState.setState(ot::ModelServiceState::Running);
 }
 
 void Model::updateVersionGraph()
@@ -3963,7 +3969,9 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	}
 	_object.AddMember("PendingEntityUpdates", pendingEntityUpdatesArr, _allocator);
 
-	_object.AddMember("IsProjectOpen", m_isProjectOpen, _allocator);
+	JsonObject serviceStateObj;
+	m_serviceState.addToJsonObject(serviceStateObj, _allocator);
+	_object.AddMember("State", serviceStateObj, _allocator);
 	_object.AddMember("VisualizationModelID", m_visualizationModelID, _allocator);
 	_object.AddMember("IsModified", m_isModified, _allocator);
 	_object.AddMember("ProjectName", JsonString(m_projectName, _allocator), _allocator);
@@ -4005,8 +4013,6 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	else {
 		_object.AddMember("StateManager", JsonNullValue(), _allocator);
 	}
-
-	_object.AddMember("IsShutdown", m_shutdown, _allocator);
 }
 
 void Model::enableQueuingHttpRequests(bool flag)
@@ -4034,7 +4040,7 @@ void Model::setModified()
 
 	m_isModified = true;
 
-	if (sendNotification && !m_shutdown)
+	if (sendNotification && !m_serviceState.getIsShuttingDown())
 	{
 		Application::instance()->getNotifier()->isModified(m_visualizationModelID, true);
 	}
@@ -4046,7 +4052,7 @@ void Model::resetModified()
 
 	m_isModified = false;
 
-	if (sendNotification && !m_shutdown)
+	if (sendNotification && !m_serviceState.getIsShuttingDown())
 	{
 		Application::instance()->getNotifier()->isModified(m_visualizationModelID, false);
 	}
@@ -4077,6 +4083,8 @@ void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 	{
 		if (m_entityRoot != nullptr)
 		{
+			auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
+
 			m_entityRoot->addVisualizationNodes();
 		}
 
@@ -4224,13 +4232,6 @@ ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& 
 	MetadataHandler metadataHandler;
 	return metadataHandler.createConfig(_campaign, _collectionName, _queryCfg);
 }
-
-bool Model::projectIsOpen()
-{
-	return isProjectOpen();
-}
-
-
 
 EntityBase *Model::findEntityFromName(const std::string &name)
 {

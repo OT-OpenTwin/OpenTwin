@@ -45,7 +45,14 @@ ot::EntityBlock::~EntityBlock()
 void ot::EntityBlock::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
-	createBlockItem();
+	if (getObserver())
+	{
+		const auto& state = getObserver()->getModelServiceState();
+		if (state.isRunning())
+		{
+			createBlockItem();
+		}
+	}
 }
 
 void ot::EntityBlock::addConnector(const ot::Connector& connector)

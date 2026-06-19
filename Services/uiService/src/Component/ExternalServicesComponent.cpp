@@ -5132,6 +5132,8 @@ void ExternalServicesComponent::applyInitialSelection()
 		return;
 	}
 
+	OT_LOG_I("X: Applying initial selection");
+
 	InitialSelectionInfo selection = m_initialSelection.back();
 	m_initialSelection.clear();
 	AppBase::instance()->setNavigationTreeItemsSelected(selection.treeIDs, true, selection.clearSelection);

@@ -165,7 +165,14 @@ bool ot::EntityBlockConnection::updateFromProperties()
 void ot::EntityBlockConnection::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
-	createConnectionItem();
+	if (getObserver())
+	{
+		const auto& state = getObserver()->getModelServiceState();
+		if (state.isRunning())
+		{
+			createConnectionItem();
+		}
+	}
 }
 
 void ot::EntityBlockConnection::createNavigationTreeEntry()

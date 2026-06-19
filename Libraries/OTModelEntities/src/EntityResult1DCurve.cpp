@@ -592,7 +592,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 	}
 
 	// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
-	if (getObserver() != nullptr && getObserver()->projectIsOpen())
+	if (getObserver() != nullptr && getObserver()->getModelServiceState().getProjectIsOpen())
 	{
 		try
 		{

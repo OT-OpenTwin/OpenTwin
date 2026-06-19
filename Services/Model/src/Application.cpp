@@ -71,7 +71,7 @@ ot::ReturnMessage Application::handleCheckProjectOpen() {
 		return ot::ReturnMessage::False;
 	}
 	else {
-		return (m_model->isProjectOpen() ? ot::ReturnMessage::True : ot::ReturnMessage::False);
+		return (m_model->getModelServiceState().getProjectIsOpen() ? ot::ReturnMessage::True : ot::ReturnMessage::False);
 	}
 }
 

@@ -1529,6 +1529,7 @@ void AppBase::restoreSessionState() {
 		OT_LOG_W("No project type set. Ignoring");
 		return;
 	}
+	OT_LOG_I("X: Restoring session state");
 
 	UserManagement uM(m_loginData);
 
@@ -1832,6 +1833,7 @@ void AppBase::clearGraphicsPickerData() {
 }
 
 ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+	OT_LOG_I("X: Creating graphics editor for entity: " + _entityName);
 	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\" }. Skipping creation");
