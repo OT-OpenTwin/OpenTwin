@@ -20,11 +20,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
 #include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockPython : public EntityBlock, public ot::EntityBlockLibraryInterface
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockPython : public ot::EntityBlockPipelineBase, public ot::EntityBlockLibraryInterface
 {
 public:
 	EntityBlockPython() : EntityBlockPython(0, nullptr, nullptr, nullptr) {};

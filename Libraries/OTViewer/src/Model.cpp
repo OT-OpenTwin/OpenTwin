@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Model.cpp
 // 
 // License:
@@ -3856,6 +3856,7 @@ void Model::exportTextWorker(std::string _filePath, std::string _entityName) {
 			}
 
 			delete[] dataBuffer;
+			dataBuffer = nullptr;
 		}
 	}
 

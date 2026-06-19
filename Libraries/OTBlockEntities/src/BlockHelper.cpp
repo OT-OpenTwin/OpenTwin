@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTBlockEntities/BlockHelper.h"
 
-std::map<ot::UID, ot::UIDList> BlockHelper::buildMap(const std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _blockConnectionMap, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID) {
+std::map<ot::UID, ot::UIDList> ot::BlockHelper::buildMap(const std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _blockConnectionMap, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allEntitiesByBlockID) {
 
     //  Result map: block UID -> list of attached connection entity IDs
 	std::map<ot::UID, ot::UIDList> connectionBlockMap;

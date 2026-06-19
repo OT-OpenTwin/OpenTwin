@@ -1,0 +1,64 @@
+// @otlicense
+// File: GraphicsClickEvent.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTGui/Event/GuiEvent.h"
+
+namespace ot
+{
+
+	class OT_GUI_API_EXPORT GraphicsClickEvent : public GuiEvent
+	{
+		OT_DECL_DEFCOPY(GraphicsClickEvent)
+		OT_DECL_DEFMOVE(GraphicsClickEvent)
+	public:
+		GraphicsClickEvent();
+		GraphicsClickEvent(const ConstJsonObject& _jsonObject);
+		virtual ~GraphicsClickEvent() = default;
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+
+		void setEditorName(const std::string& _name) { m_editorName = _name; };
+		void setEditorName(std::string&& _name) { m_editorName = std::move(_name); };
+
+		//! @brief Returns the name of the editor where the clicked item is located.
+		const std::string& getEditorName() const { return m_editorName; };
+
+		void setElementName(const std::string& _name) { m_elementName = _name; };
+		void setElementName(std::string&& _name) { m_elementName = std::move(_name); };
+
+		//! @brief Returns the name of the clicked element.
+		//! The clicked element may be nested.
+		const std::string& getElementName() const { return m_elementName; };
+
+		void setItemUid(const UID& _uid) { m_itemUid = _uid; };
+
+		//! @brief Returns the UID of the clicked item root.
+		const UID& getItemUid() const { return m_itemUid; };
+
+	private:
+		std::string m_editorName;
+		UID m_itemUid;
+		std::string m_elementName;
+	};
+
+}

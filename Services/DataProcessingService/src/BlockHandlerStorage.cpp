@@ -108,8 +108,8 @@ bool BlockHandlerStorage::executeSpecialized()
 			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
 			std::map < std::string, MetadataParameter> occurringParametersByLabel;
 			
-			ot::JsonValue& dataEntries = dataPipeline->getData();
-			
+			ot::JsonValue& dataEntries = dataPipeline->getData()["Data"];
+			const std::string temp = ot::json::toJson(dataEntries);
 			if (dataEntries.IsArray())
 			{
 				auto dataArray = dataEntries.GetArray();

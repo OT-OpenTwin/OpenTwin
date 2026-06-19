@@ -20,9 +20,9 @@
 #pragma once
 
 // OpenTwin header
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockFileWriter : public EntityBlock
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockFileWriter : public ot::EntityBlockPipelineBase
 {
 public:
 	EntityBlockFileWriter() : EntityBlockFileWriter(0, nullptr, nullptr, nullptr) {};

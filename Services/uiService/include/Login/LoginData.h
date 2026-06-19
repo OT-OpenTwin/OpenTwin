@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: LoginData.h
 // 
 // License:
@@ -62,19 +62,27 @@ public:
 	void setSessionPassword(const std::string& _sessionPassword) { m_sessionPassword = _sessionPassword; };
 	const std::string& getSessionPassword(void) const { return m_sessionPassword; };
 
+	void setSSOSessionToken(const std::string& _token) { m_sessionToken = _token; }
+	const std::string& getSSOSessionToken() const { return m_sessionToken; }
+
 	void clear(void);
 
 	bool isValid(void) const;
 
+	bool loggedInViaSSO() const;
 private:
 	LogInGSSEntry m_gss;
 
 	std::string m_databaseUrl;
 	std::string m_authorizationUrl;
 	std::string m_username;
-	std::string m_userPassword;
-	std::string m_encryptedUserPassword;
 	std::string m_sessionUser;
 	std::string m_sessionPassword;
 
+	// For user/password login
+	std::string m_userPassword;
+	std::string m_encryptedUserPassword;
+
+	// For SSO
+	std::string m_sessionToken;
 };

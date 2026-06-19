@@ -25,7 +25,7 @@
 static EntityFactoryRegistrar<EntityBlockFileWriter> registrar(EntityBlockFileWriter::className());
 
 EntityBlockFileWriter::EntityBlockFileWriter(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
-	:EntityBlock(ID, parent, obs, ms)
+	: ot::EntityBlockPipelineBase(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
 	treeItem.setVisibleIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());

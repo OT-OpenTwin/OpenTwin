@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: LoginData.cpp
 // 
 // License:
@@ -24,12 +24,15 @@ void LoginData::addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAlloca
 	_jsonObject.AddMember("UserName", ot::JsonString(m_username, _allocator), _allocator);
 	_jsonObject.AddMember("UserPassword", ot::JsonString(m_encryptedUserPassword, _allocator), _allocator);
 	_jsonObject.AddMember("GSS", ot::JsonString(m_gss.getUrl().toStdString(), _allocator), _allocator);
+	_jsonObject.AddMember("SessionToken", ot::JsonString(m_sessionToken, _allocator), _allocator);
 }
 
 void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) {
 	m_username = ot::json::getString(_jsonObject, "UserName");
 	m_encryptedUserPassword = ot::json::getString(_jsonObject, "UserPassword");
+	m_sessionToken = ot::json::getString(_jsonObject, "SessionToken");
 	m_gss.setUrl(QString::fromStdString(ot::json::getString(_jsonObject, "GSS")));
+
 }
 
 void LoginData::clear(void) {
@@ -41,15 +44,29 @@ void LoginData::clear(void) {
 	m_encryptedUserPassword.clear();
 	m_sessionUser.clear();
 	m_sessionPassword.clear();
+	m_sessionToken.clear();
 }
 
 bool LoginData::isValid(void) const {
-	return m_gss.isValid() &&
+	bool valid = m_gss.isValid() &&
 		!m_databaseUrl.empty() &&
 		!m_authorizationUrl.empty() &&
 		!m_username.empty() &&
-		!m_userPassword.empty() &&
-		!m_encryptedUserPassword.empty() &&
 		!m_sessionUser.empty() &&
 		!m_sessionPassword.empty();
+	if (loggedInViaSSO())
+	{
+		valid &= !m_sessionToken.empty();
+	}
+	else
+	{
+		valid &= !m_userPassword.empty() &&
+			!m_encryptedUserPassword.empty();
+	}
+	return valid;
+}
+
+bool LoginData::loggedInViaSSO() const
+{
+	return !m_sessionToken.empty();
 }

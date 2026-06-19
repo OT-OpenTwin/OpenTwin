@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
 
 struct __declspec(dllexport) ParameterProperties
 {
@@ -36,7 +36,7 @@ struct __declspec(dllexport) QuantityProperties
 	std::string m_propertyUnit = "";
 };
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockStorage : public EntityBlock
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockStorage : public ot::EntityBlockPipelineBase
 {
 public:
 	EntityBlockStorage() : EntityBlockStorage(0, nullptr, nullptr, nullptr) {};

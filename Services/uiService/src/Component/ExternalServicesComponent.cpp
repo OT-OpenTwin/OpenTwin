@@ -118,7 +118,7 @@
 #include "OTDataStorage/DocumentAPI.h"
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/DataBase.h"
-
+#include "Login/Authentication.h"
 // uiCore header
 #include <akAPI/uiAPI.h>
 #include <akCore/akCore.h>
@@ -482,30 +482,39 @@ KeyboardCommandHandler* ExternalServicesComponent::addShortcut(ServiceDataUi* _s
 std::list<ot::ProjectInformation> ExternalServicesComponent::GetAllUserProjects()
 {
 	std::string authorizationURL = AppBase::instance()->getCurrentLoginData().getAuthorizationUrl();
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(AppBase::instance()->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
-	std::string response;
-	if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	if (ot::Authentication::validateAndRefreshToken(AppBase::instance()->getCurrentLoginData()))
 	{
-		throw std::exception("Could not get the projectlist of the authorization service.");
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString("", doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(AppBase::instance()->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", authorizationURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		{
+			throw std::exception("Could not get the projectlist of the authorization service.");
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		std::list<ot::ProjectInformation> projectList;
+
+		for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+		{
+			ot::ProjectInformation newInfo(projObj);
+			projectList.push_back(std::move(newInfo));
+		}
+
+		return projectList;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::list<ot::ProjectInformation> projectList;
-
-	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+	else
 	{
-		ot::ProjectInformation newInfo(projObj);
-		projectList.push_back(std::move(newInfo));
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
 	}
-
-	return projectList;
 }
 
 void ExternalServicesComponent::prefetchDocumentsFromStorage(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>>& prefetchIDs)
@@ -4053,10 +4062,15 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 
 void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _document)
 {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
-
-	ot::UIDList itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+	ot::UIDList itemUids;
+	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds))
+	{
+		itemUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds);
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId))
+	{
+		itemUids.push_back(ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ItemId));
+	}
 
 	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName))
 	{
@@ -4111,23 +4125,53 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 
 void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument& _document)
 {
-	ot::BasicServiceInformation info;
-	info.setFromJsonObject(_document.getConstObject());
+	std::string editorName;
+	ot::UIDList connectionUids;
 
-	ot::GraphicsConnectionPackage pckg;
-	pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
+	if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package))
+	{
+		ot::GraphicsConnectionPackage pckg;
+		pckg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_Package));
 
-	if (!pckg.getName().empty())
+		editorName = pckg.getName();
+
+		for (const auto& connection : pckg.getConnections())
+		{
+			connectionUids.push_back(connection.getUid());
+		}
+	}
+	else
+	{
+		if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName))
+		{
+			editorName = ot::json::getString(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_EditorName);
+		}
+		if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds))
+		{
+			connectionUids = ot::json::getUInt64List(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds);
+		}
+		else if (_document.HasMember(OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId))
+		{
+			connectionUids.push_back(ot::json::getUInt64(_document, OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId));
+		}
+		else
+		{
+			OT_LOG_E("No connection IDs provided to remove graphics connections");
+			return;
+		}
+	}
+
+	if (!editorName.empty())
 	{
 		// Specific editor
-		ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
-		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(pckg.getName(), {});
+
+		ot::GraphicsViewView* editor = AppBase::instance()->findGraphicsEditor(editorName, {});
 
 		if (editor)
 		{
-			for (const auto& connection : pckg.getConnections())
+			for (ot::UID connection : connectionUids)
 			{
-				editor->getGraphicsView()->removeConnection(connection.getUid());
+				editor->getGraphicsView()->removeConnection(connection);
 			}
 		}
 	}
@@ -4138,9 +4182,9 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 		std::list<ot::GraphicsViewView*> views = AppBase::instance()->getAllGraphicsEditors();
 		for (auto view : views)
 		{
-			for (const auto& connection : pckg.getConnections())
+			for (ot::UID connection : connectionUids)
 			{
-				view->getGraphicsView()->removeConnection(connection.getUid());
+				view->getGraphicsView()->removeConnection(connection);
 			}
 		}
 	}
@@ -4735,6 +4779,8 @@ void ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document
 	m_actionProfiler.ignoreCurrent();
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	std::string callbackService = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	std::string callbackFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
 
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
@@ -4742,9 +4788,27 @@ void ExternalServicesComponent::handlePropertyDialog(ot::JsonDocument& _document
 	ot::PropertyDialog dia(pckg, nullptr);
 	dia.showDialog();
 
-	if (dia.dialogResult() == ot::Dialog::Ok)
+	if (dia.dialogResult() != ot::Dialog::Ok)
 	{
+		return;
+	}
 
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(callbackFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	
+	const auto responseCfg = dia.createConfiguration();
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(responseCfg, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	std::string responseStr;
+	if (!sendRelayedRequest(EXECUTE, callbackService, responseDoc.toJson(), responseStr))
+	{
+		OT_LOG_E("Failed to send message to callback service at \"" + callbackService + "\"");
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk()) 
+	{
+		OT_LOG_E("Callback service returned error: " + response.getWhat());
 	}
 }
 

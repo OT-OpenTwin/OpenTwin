@@ -25,9 +25,9 @@
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTBlockEntities/Deco/EntityBlockImage.h"
 
-static EntityFactoryRegistrar<EntityBlockImage> registrar(EntityBlockImage::className());
+static EntityFactoryRegistrar<ot::EntityBlockImage> registrar(ot::EntityBlockImage::className());
 
-EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
+ot::EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBlock(_ID, _parent, _obs, _ms), m_imageUID(ot::invalidUID), m_imageVersion(ot::invalidUID),
 	m_image(nullptr), m_imageFormat(ot::ImageFileFormat::PNG)
 {
@@ -41,7 +41,7 @@ EntityBlockImage::EntityBlockImage(ot::UID _ID, EntityBase* _parent, EntityObser
 	resetModified();
 }
 
-ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
+ot::GraphicsItemCfg* ot::EntityBlockImage::createBlockCfg() {
 	ensureFileIsLoaded();
 
 	if (!m_image) {
@@ -79,7 +79,7 @@ ot::GraphicsItemCfg* EntityBlockImage::createBlockCfg() {
 	return cfg.release();
 }
 
-bool EntityBlockImage::updateFromProperties() {
+bool ot::EntityBlockImage::updateFromProperties() {
 	bool updateGrid = false;
 
 	const bool drawBorder = PropertyHelper::getBoolPropertyValue(this, "Draw border", "Image");
@@ -96,7 +96,7 @@ bool EntityBlockImage::updateFromProperties() {
 	return updateGrid;
 }
 
-void EntityBlockImage::createProperties() {
+void ot::EntityBlockImage::createProperties() {
 	EntityPropertiesBase* prop = EntityPropertiesBoolean::createProperty("Block", "Lock movement", false, "", getProperties());
 	prop->setToolTip("If enabled, the block item cannot be moved by mouse in the scene.");
 
@@ -135,7 +135,7 @@ void EntityBlockImage::createProperties() {
 
 // Data accessors
 
-void EntityBlockImage::setImageEntity(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format) {
+void ot::EntityBlockImage::setImageEntity(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format) {
 	m_imageUID = _entityID;
 	m_imageVersion = _entityVersion;
 	m_imageFormat = _format;
@@ -149,7 +149,7 @@ void EntityBlockImage::setImageEntity(ot::UID _entityID, ot::UID _entityVersion,
 
 // Property accessors
 
-void EntityBlockImage::addStorageData(bsoncxx::builder::basic::document& _storage) {
+void ot::EntityBlockImage::addStorageData(bsoncxx::builder::basic::document& _storage) {
 	EntityBlock::addStorageData(_storage);
 
 	_storage.append(
@@ -159,7 +159,7 @@ void EntityBlockImage::addStorageData(bsoncxx::builder::basic::document& _storag
 	);
 }
 
-void EntityBlockImage::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
+void ot::EntityBlockImage::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) {
 	EntityBlock::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	m_imageUID = static_cast<ot::UID>(_docView["ImageDataID"].get_int64());
@@ -167,7 +167,7 @@ void EntityBlockImage::readSpecificDataFromDataBase(const bsoncxx::document::vie
 	m_imageFormat = ot::stringToImageFileFormat(_docView["ImageFormat"].get_string().value.data());
 }
 
-void EntityBlockImage::ensureFileIsLoaded() {
+void ot::EntityBlockImage::ensureFileIsLoaded() {
 	if (m_imageUID == ot::invalidUID) {
 		OT_LOG_E("No image file has been assigned to this block image entity.");
 		return;

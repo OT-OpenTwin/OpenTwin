@@ -38,7 +38,7 @@
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
-int ServiceBase::initialize(const char * _ownIP, const char * _databaseIP, const char * _databasePWD)
+int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const char* _databasePWD) 
 {
 	m_serviceURL  = _ownIP;
 	m_databaseURL = _databaseIP;
@@ -126,6 +126,8 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	//------------ USER FUNCTIONS THAT DO NOT NEED AUTHENTICATION ------------------------
 	if (_action == OT_ACTION_LOGIN_ADMIN) { return handleAdminLogIn(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_LOGIN) { return handleLogIn(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_SSO_Token_Refresh) { return handleSSOTokenRefresh(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_SSO_Token_Validate) { return handleSSOTokenValidate(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
@@ -134,14 +136,47 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 
 	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
 	std::string loggedInUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USERNAME);
-	std::string loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	bool passWordAuthentication = ot::json::exists(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	std::string loggedInUserPassword;
+	if (passWordAuthentication)
+	{
+		loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	}
+	else
+	{
+		std::string sessionToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+		SSOUser* ssoUser =	m_ssoBuffer.getUser(sessionToken);
+		if (ssoUser == nullptr)
+		{
+			// Most likely a hacking attempt
+			assert(0);
+			throw std::runtime_error("The provided authentication token is invalid. Please logout and attempt to log in again.");
+		}
+		else
+		{
+			const std::string& token =	ssoUser->getSessionToken().getToken();
+			
+			if(!ssoUser->getSessionToken().tokenIsValid(false))
+			{
+				// Token is expired. Should have been validated before this request was send.
+				assert(0);
+				m_ssoBuffer.removeUser(token);
+				throw std::runtime_error("The provided authentication token is expired. Please logout and attempt to log in again.");
+			}
+			else
+			{
+				loggedInUserPassword = "";
+			}
+		}
+	}
 
 	User loggedInUser;
 	loggedInUser.username = loggedInUsername;
 	
 	if (!isAdminUser(loggedInUser))
 	{
-		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient);
+		std::string originalUserName;
+		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient, originalUserName);
 
 		if (!logInSuccessful)
 		{
@@ -149,48 +184,48 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
 		}
 
-		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(loggedInUsername, m_adminClient);
+		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(originalUserName, m_adminClient);
 	}
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
-	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USERS) { return handleGetAllUsers(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USER_COUNT) { return handleGetAllUsersCount(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_CHANGE_USER_USERNAME) { return handleChangeUserNameByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_USER_PASSWORD) { return handleChangeUserPasswordByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_DELETE_USER) { return handleDeleteUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
-	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); }
+	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); } // Only UI, d
+	else if (_action == OT_ACTION_GET_ALL_USERS) { return handleGetAllUsers(_actionDocument.GetObject()); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_USER_COUNT) { return handleGetAllUsersCount(_actionDocument.GetObject()); } // Not used
+	else if (_action == OT_ACTION_CHANGE_USER_USERNAME) { return handleChangeUserNameByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CHANGE_USER_PASSWORD) { return handleChangeUserPasswordByUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used (commented in UI)
+	else if (_action == OT_ACTION_DELETE_USER) { return handleDeleteUser(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Only UI
+	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
+	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // OT Service foundation and central services. But they have own handlers that do not require euthentication
 	//------------ Group FUNCTIONS ------------
-	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_USER_GROUPS) { return handleGetAllUserGroups(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUPS) { return handleGetAllGroups(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUP_COUNT) { return handleGetAllGroupsCount(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_GROUP_NAME) { return handleChangeGroupName(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_GROUP_OWNER) { return handleChangeGroupOwner(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_ADD_USER_TO_GROUP) { return handleAddUserToGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_USER_FROM_GROUP) { return handleRemoveUserFromGroup(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_USER_GROUPS) { return handleGetAllUserGroups(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_GROUPS) { return handleGetAllGroups(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_GROUP_COUNT) { return handleGetAllGroupsCount(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_CHANGE_GROUP_NAME) { return handleChangeGroupName(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CHANGE_GROUP_OWNER) { return handleChangeGroupOwner(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_ADD_USER_TO_GROUP) { return handleAddUserToGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_USER_FROM_GROUP) { return handleRemoveUserFromGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_GROUP) { return handleRemoveGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	//------------ Project FUNCTIONS ------------
-	else if (_action == OT_ACTION_CMD_GetFilter) { return handleGetFilterOptions(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_CMD_GetFilter) { return handleGetFilterOptions(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CREATE_PROJECT) { return handleCreateProject(_actionDocument.GetObject(), loggedInUser); } // Only UI 
+	else if (_action == OT_ACTION_CMD_OpenNewProject) { return handleProjectOpened(_actionDocument.GetObject(), loggedInUser); } // UI, Hierarchisches (opens a new instance and for that the loginData is json serialised)
+	else if (_action == OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO) { return handleUpdateAdditionalProjectInformation(_actionDocument.GetObject(), loggedInUser); } // UI only
 	//                                                       v-- CAN BE PERFORMED BY THE UI CLIENT --v
-	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_USER_PROJECTS) { return handleGetAllUserProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECTS) { return handleGetAllProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_PROJECT_COUNT) { return handleGetAllProjectsCount(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_GET_ALL_GROUP_PROJECTS) { return handleGetAllGroupProjects(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_PROJECT_NAME) { return handleChangeProjectName(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHANGE_PROJECT_OWNER) { return handleChangeProjectOwner(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); }
-	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument.GetObject(), loggedInUser); }
+	else if (_action == OT_ACTION_GET_PROJECT_DATA) { return handleGetProjectData(_actionDocument.GetObject()); } // UI and OTResultDataAccess. The latter needs it for mapping project names to collection names. Used in Modelservice
+	else if (_action == OT_ACTION_GET_ALL_PROJECT_INFO) { return handleGetProjectsInfo(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_USER_PROJECTS) { return handleGetAllUserProjects(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_GET_ALL_PROJECTS) { return handleGetAllProjects(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_PROJECT_COUNT) { return handleGetAllProjectsCount(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_GET_ALL_GROUP_PROJECTS) { return handleGetAllGroupProjects(_actionDocument.GetObject(), loggedInUser); } // Not used
+	else if (_action == OT_ACTION_CHANGE_PROJECT_NAME) { return handleChangeProjectName(_actionDocument.GetObject(), loggedInUser); } // Only UI 
+	else if (_action == OT_ACTION_CHANGE_PROJECT_OWNER) { return handleChangeProjectOwner(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_ADD_GROUP_TO_PROJECT) { return handleAddGroupToProject(_actionDocument.GetObject(), loggedInUser); } // UI but the macro is also used in GSS
+	else if (_action == OT_ACTION_REMOVE_GROUP_FROM_PROJECT) { return handleRemoveGroupFromProject(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_REMOVE_PROJECT) { return handleRemoveProject(_actionDocument.GetObject(), loggedInUser); } // Only UI
+	else if (_action == OT_ACTION_CHECK_FOR_COLLECTION_EXISTENCE) { return handleCheckIfCollectionExists(_actionDocument.GetObject(), loggedInUser); } // Not used
 	else
 	{
 		// This action is unknown
@@ -231,43 +266,117 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) 
 {
 	bool usePSW = ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD);
-	std::string username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+	std::string username;
+	std::string password;
+	ot::JsonDocument returnDoc;
+	bool ssoAuthenticationSuccess = false;
 	if (usePSW)
 	{
-		bool successful = false;
-		std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+		// In this case we have to use the provided credentials
+		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+		username = ot::json::getString(_actionDocument, OT_PARAM_AUTH_USERNAME);
+		if (password.empty())
+		{
+			ot::JsonDocument json;
+			json.AddMember(OT_ACTION_AUTH_SUCCESS, false, json.GetAllocator());
+			return json.toJson();
+		}
 		bool encryptedPassword = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
 		
 		if (encryptedPassword)
 		{
 			password = ot::UserCredentials::decryptString(password);
 		}
-
-		 successful = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient);
-		 ot::JsonDocument json;
-		 json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
-
-		 if (successful)
-		 {
-			 std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
-			 std::string sessionPWD = createRandomPassword();
-
-			 User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
-
-			 MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_adminClient, json);
-
-			 json.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, json.GetAllocator()), json.GetAllocator());
-			 json.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
-		 }
-
-		 return json.toJson();
 	}
 	else
 	{
+		// Here we execute the sso authentication process
+		bool initialToken = ot::json::getBool(_actionDocument ,OT_PARAM_AUTH_SSO_Initial); 
 		std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-		std::string returnMessage =	m_ssoBuffer.handleRequest(username, token);
-		return returnMessage;
+		std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
+		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons. It also sets the identified user name
+		ssoAuthenticationSuccess = m_ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
+		if (!ssoAuthenticationSuccess)
+		{
+			// Here we return if the sequnce is not done yet or it may have failed
+			return returnDoc.toJson();
+		}
+		else
+		{
+			password = "";
+		}
 	}	
+
+	// Now we still need to check for a user entry in mongodb, matching the credentials
+	// ! If user permission is being added, look into the successfulMongoAuthenticate else path for sso !
+	std::string originalUserName;
+	bool successfulMongoAuthenticate = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient, originalUserName);
+	
+	if (successfulMongoAuthenticate)
+	{
+		// Now we are creating the session user and password. They are valid for the lifetime of a session.
+		std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
+		std::string sessionPWD = createRandomPassword();
+
+		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
+
+		// Fills in the fields about the session user in the mongodb document
+		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
+
+		if (usePSW)
+		{
+			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successfulMongoAuthenticate, returnDoc.GetAllocator());
+			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, returnDoc.GetAllocator()), returnDoc.GetAllocator());
+			returnDoc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		}
+		// else is a sso login and there everything neccessary was already added by the handleRequest method
+	}
+	else
+	{
+		if (!usePSW)
+		{
+			// Here we have a sso login that was successful (otherwise the m_ssoBuffer.handleRequest would have returned earlier), but the mongoDB authentication failed.
+			// This is the case when the sso user has not been registered yet. 
+			// Only execute if successfulMongoAuthenticate is not considering the account state of being permitted (feature that comes later)
+			ot::JsonDocument registerReturnDoc;
+			const std::string temp = (handleRegister(returnDoc.getConstObject()));
+			registerReturnDoc.fromJson(temp);
+			returnDoc.AddMember(OT_ACTION_REGISTER, ot::json::getBool(registerReturnDoc, OT_ACTION_AUTH_SUCCESS), returnDoc.GetAllocator());
+		}
+		else
+		{
+			returnDoc.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed MongoDB authentication", returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		}
+	}
+
+	return returnDoc.toJson();
+
+}
+
+std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument)
+{
+	bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
+	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+	std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
+
+	ot::JsonDocument returnDoc;
+	// Resets the buffered user. In this cause it also creates a new session token.
+	std::string determinedUserName;
+	m_ssoBuffer.handleRequest(determinedUserName,authenticationProcessID, token, initialToken, returnDoc);
+	return returnDoc.toJson();
+}
+
+std::string ServiceBase::handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument)
+{
+	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+	bool tokenIsValid = m_ssoBuffer.validate(token);
+	if (!tokenIsValid)
+	{
+		m_ssoBuffer.removeUser(token); // Will be newly created with the TokenRefresh
+	}
+	ot::JsonDocument returnDoc;
+	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, tokenIsValid, returnDoc.GetAllocator());
+	return returnDoc.toJson();
 }
 
 std::string ServiceBase::handleRegister(const ot::ConstJsonObject& _actionDocument) 
@@ -800,7 +909,7 @@ std::string ServiceBase::handleCheckIfCollectionExists(const ot::ConstJsonObject
 
 void ServiceBase::initializeDatabase() {
 	// NEEDED AND MUST BE EXECUTED ONCE
-	mongocxx::instance inst{};
+	//mongocxx::instance inst{};
 
 	// Initializing the Admin Client at the time of starting the service.
 

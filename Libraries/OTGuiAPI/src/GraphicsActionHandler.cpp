@@ -21,16 +21,28 @@
 #include "OTGui/Graphics/GraphicsItemCfgFactory.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 
-ot::JsonDocument ot::GraphicsActionHandler::createItemRequestedDocument(const GraphicsItemDropEvent& _eventData) {
+ot::JsonDocument ot::GraphicsActionHandler::createItemRequestedDocument(const GraphicsItemDropEvent& _eventData)
+{
 	JsonDocument doc;
-	
+
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Event, JsonObject(_eventData, doc.GetAllocator()), doc.GetAllocator());
 
 	return doc;
 }
 
-ot::JsonDocument ot::GraphicsActionHandler::createItemDoubleClickedDocument(const GraphicsDoubleClickEvent& _eventData) {
+ot::JsonDocument ot::GraphicsActionHandler::createItemClickedDocument(const GraphicsClickEvent& _eventData)
+{
+	JsonDocument doc;
+
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemClicked, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Event, JsonObject(_eventData, doc.GetAllocator()), doc.GetAllocator());
+
+	return doc;
+}
+
+ot::JsonDocument ot::GraphicsActionHandler::createItemDoubleClickedDocument(const GraphicsDoubleClickEvent& _eventData)
+{
 	JsonDocument doc;
 
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, doc.GetAllocator()), doc.GetAllocator());
@@ -39,7 +51,8 @@ ot::JsonDocument ot::GraphicsActionHandler::createItemDoubleClickedDocument(cons
 	return doc;
 }
 
-ot::JsonDocument ot::GraphicsActionHandler::createConnectionRequestedDocument(const GraphicsConnectionDropEvent& _eventData) {
+ot::JsonDocument ot::GraphicsActionHandler::createConnectionRequestedDocument(const GraphicsConnectionDropEvent& _eventData)
+{
 	JsonDocument doc;
 
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, doc.GetAllocator()), doc.GetAllocator());
@@ -48,7 +61,8 @@ ot::JsonDocument ot::GraphicsActionHandler::createConnectionRequestedDocument(co
 	return doc;
 }
 
-ot::JsonDocument ot::GraphicsActionHandler::createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent) {
+ot::JsonDocument ot::GraphicsActionHandler::createChangeEventDocument(const ot::GraphicsChangeEvent& _changeEvent)
+{
 	JsonDocument doc;
 
 	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, doc.GetAllocator()), doc.GetAllocator());
@@ -62,11 +76,12 @@ ot::JsonDocument ot::GraphicsActionHandler::createChangeEventDocument(const ot::
 // Constructor
 
 ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatcher)
-	: m_actionHandler(_dispatcher) 
+	: m_actionHandler(_dispatcher)
 {
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, this, &GraphicsActionHandler::handleGraphicsItemRequested, ot::SECURE_MESSAGE_TYPES);
+	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemClicked, this, &GraphicsActionHandler::handleGraphicsItemClicked, ot::SECURE_MESSAGE_TYPES);
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked, this, &GraphicsActionHandler::handleGraphicsItemDoubleClicked, ot::SECURE_MESSAGE_TYPES);
-	
+
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, this, &GraphicsActionHandler::handleGraphicsConnectionRequested, ot::SECURE_MESSAGE_TYPES);
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent, this, &GraphicsActionHandler::handleGraphicsChangeEvent, ot::SECURE_MESSAGE_TYPES);
@@ -76,25 +91,32 @@ ot::GraphicsActionHandler::GraphicsActionHandler(ActionDispatcherBase* _dispatch
 
 // Private: Handlers
 
-ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemRequested(JsonDocument& _document) {
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemRequested(JsonDocument& _document)
+{
 	GraphicsItemDropEvent eventData(json::getObject(_document, OT_ACTION_PARAM_Event));
-
 	return graphicsItemRequested(eventData);
 }
 
-ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemDoubleClicked(JsonDocument& _document) {
-	GraphicsDoubleClickEvent eventData(json::getObject(_document, OT_ACTION_PARAM_Event));
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemClicked(JsonDocument& _document)
+{
+	GraphicsClickEvent eventData(json::getObject(_document, OT_ACTION_PARAM_Event));
+	return graphicsItemClicked(eventData);
+}
 
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsItemDoubleClicked(JsonDocument& _document)
+{
+	GraphicsDoubleClickEvent eventData(json::getObject(_document, OT_ACTION_PARAM_Event));
 	return graphicsItemDoubleClicked(eventData);
 }
 
-ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsConnectionRequested(JsonDocument& _document) {
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsConnectionRequested(JsonDocument& _document)
+{
 	GraphicsConnectionDropEvent eventData(json::getObject(_document, OT_ACTION_PARAM_Event));
-
 	return graphicsConnectionRequested(eventData);
 }
 
-ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsChangeEvent(JsonDocument& _document) {
+ot::ReturnMessage ot::GraphicsActionHandler::handleGraphicsChangeEvent(JsonDocument& _document)
+{
 	GraphicsChangeEvent event(json::getObject(_document, OT_ACTION_PARAM_Event));
 	return graphicsChangeEvent(event);
 }

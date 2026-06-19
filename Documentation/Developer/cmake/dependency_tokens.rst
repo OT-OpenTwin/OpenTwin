@@ -212,7 +212,7 @@ For example, ``OTSystem`` needs the Windows crypto library for single sign on:
        WINLIB:Crypt32
    )
 
-Generic fallback
+Fallbacks
 ----------------
 
 If a token is none of the above, the build system looks for a matching set of
@@ -224,5 +224,5 @@ environment variables and wires it up generically:
 
 So a simple new third party dependency can often be added just by defining those
 variables in ``SetupEnvironment.bat`` and using the token, with no change to
-``OTProject.cmake``. For anything with a less regular layout, add a branch in
+``OTProject.cmake``. For anything less regular, add a branch in
 ``_ot_apply_dep_to_core`` and ``_ot_apply_dep_to_final``.

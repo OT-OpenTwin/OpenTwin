@@ -35,7 +35,9 @@
 #include <functional>
 
 class EntityBinaryData;
-class EntityBlockHierarchicalDocumentItem;
+namespace ot {
+	class EntityBlockHierarchicalDocumentItem;
+}
 
 class Application : public ot::ApplicationBase, public ot::ActionHandler, public ot::ButtonHandler
 {

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TimeFormatter.cpp
 // 
 // License:
@@ -16,7 +16,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // @otlicense-end
-#define _CRT_SECURE_NO_WARNINGS
 #include "OTCore/TimeFormatter.h"
 
 std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)
@@ -42,6 +41,40 @@ std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_
 		return std::to_string(static_cast<uint64_t>(duration_h)) + " h";
 	}
 	
+}
+
+std::string TimeFormatter::formatDuration(const std::chrono::nanoseconds& _duration)
+{
+	using namespace std::chrono;
+
+	// hh_mm_ss splits the duration into components automatically
+	hh_mm_ss hms{duration_cast<milliseconds>(_duration) };
+
+	auto h = hms.hours().count();
+	auto m = hms.minutes().count();
+	auto s = hms.seconds().count();
+	auto ms = hms.subseconds().count();  // milliseconds remainder
+
+	std::ostringstream oss;
+	oss << std::setfill('0');
+
+	if (h > 0) {
+		oss << h << "."
+			<< std::setw(2) << m << "."
+			<< std::setw(2) << s << "."
+			<< std::setw(3) << ms << " h";
+	}
+	else if (m > 0) {
+		oss << m << "."
+			<< std::setw(2) << s << "."
+			<< std::setw(3) << ms << " min";
+	}
+	else {
+		oss << s << "."
+			<< std::setw(3) << ms << " s";
+	}
+
+	return oss.str();
 }
 
 const std::string TimeFormatter::createCurrentDateTimeString()

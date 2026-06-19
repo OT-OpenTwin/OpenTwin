@@ -44,14 +44,86 @@
 */
 
 std::set<std::string> authenticatedUserTokens;
+std::map<std::string, std::string> authenticatedUserOriginalName;
 
 namespace MongoUserFunctions
 {
-	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient)
+	std::string getOriginalUserName(const std::string& username, mongocxx::database &db)
+	{
+		auto cmd = bsoncxx::builder::stream::document{}
+			<< "usersInfo" << username
+			<< bsoncxx::builder::stream::finalize;
+
+		auto result = db.run_command(cmd.view());
+
+		auto view = result.view();
+
+		auto users = view["users"].get_array().value;
+
+		for (auto&& userElem : users)
+		{
+			auto userDoc = userElem.get_document().view();
+
+			if (auto customDataElem = userDoc["customData"])
+			{
+				auto customData = customDataElem.get_document().view();
+
+				if (auto originalUserElem = customData["originalUser"])
+				{
+					std::string originalUser = std::string(originalUserElem.get_string().value);
+					return originalUser;
+				}
+			}
+		}
+
+		return "";
+	}
+
+	bool checkMongodbLogin(const std::string& username, const std::string& password, const std::string &databaseUrl, std::string &originalUserName)
+	{
+		try {
+			const std::string uriStr = getMongoURL(databaseUrl, username, password);
+
+			mongocxx::uri uri{ uriStr };
+			mongocxx::client client{ uri };
+
+			bsoncxx::builder::basic::document cmd;
+			cmd.append(bsoncxx::builder::basic::kvp("ping", 1));
+
+			auto db = client["admin"];
+
+			bsoncxx::document::value result = db.run_command(cmd.view());
+
+			auto ok = result.view()["ok"];
+
+			if (ok && ok.type() == bsoncxx::type::k_double && ok.get_double().value == 1.0)
+			{
+				// The user credentials are valid. Now we need to get the original user name
+				originalUserName = getOriginalUserName(username, db);
+
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		catch (const std::exception) {
+			return false;
+		}
+	}
+
+	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName)
 	{
 		// This authentication may take some time. Therefore, we want to cache the credentials to speed up subsequent checks
 		std::string token = username + "\n" + password + "\n" + databaseUrl;
-		if (authenticatedUserTokens.find(token) != authenticatedUserTokens.end()) return true;
+		if (authenticatedUserTokens.find(token) != authenticatedUserTokens.end())
+		{
+			originalUserName = authenticatedUserOriginalName[username];
+			return true;
+		}
+
+		originalUserName = username;
 
 		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 
@@ -63,6 +135,16 @@ namespace MongoUserFunctions
 
 		if (!userDocument)
 		{
+			// The user was not found. It may be a local session user. Therefore, we need to query the database
+			if (checkMongodbLogin(username, password, databaseUrl, originalUserName))
+			{
+				// The login worked, so we have a temporary session user.
+				authenticatedUserTokens.insert(token);
+				authenticatedUserOriginalName[username] = originalUserName;
+	
+				return true;
+			}
+
 			return false; // User not found
 		}
 
@@ -79,7 +161,8 @@ namespace MongoUserFunctions
 		}
 
 		authenticatedUserTokens.insert(token);
-		
+		authenticatedUserOriginalName[username] = username;
+
 		return true;
 	}
 
@@ -330,6 +413,7 @@ namespace MongoUserFunctions
 		adminClient[MongoConstants::SETTINGS_DB][userToBeDeleted.settingsCollectionName].drop();
 
 		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 
 		return true;
 	}
@@ -373,6 +457,7 @@ namespace MongoUserFunctions
 		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 
 		if (!result.has_value())
 		{
@@ -412,6 +497,7 @@ namespace MongoUserFunctions
 		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 
 		if (!result.has_value())
 		{
@@ -446,6 +532,7 @@ namespace MongoUserFunctions
 		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 
 		if (!result.has_value())
 		{
@@ -486,6 +573,7 @@ namespace MongoUserFunctions
 		auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
 		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 
 		if (!result.has_value())
 		{
@@ -526,7 +614,7 @@ namespace MongoUserFunctions
 		return json.toJson();
 	}
 
-	void createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, mongocxx::client& adminClient, ot::JsonDocument &json)
+	void createTmpUser(std::string userName, std::string userPWD, User &_loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument &json)
 	{
 		value new_user_command = document{}
 			<< "createUser" << userName
@@ -534,13 +622,17 @@ namespace MongoUserFunctions
 
 			<< "roles"
 			<< open_array
-
 			<< open_document
 			<< "role" << _loggedInUser.roleName
 			<< "db" << "admin"
 			<< close_document
-
 			<< close_array
+
+			<< "customData" 
+			<< open_document
+			<< "originalUser" << _loggedInUser.username
+			<< close_document
+			
 			<< finalize;
 
 		mongocxx::database db = adminClient.database(MongoConstants::ADMIN_DB); // The admin db must be used
@@ -555,6 +647,10 @@ namespace MongoUserFunctions
 			json.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(userName, json.GetAllocator()), json.GetAllocator());
 			json.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(userPWD, json.GetAllocator()), json.GetAllocator());
 		}
+
+		std::string token = userName + "\n" + userPWD + "\n" + databaseUrl;
+		authenticatedUserTokens.insert(token);
+		authenticatedUserOriginalName[userName] = _loggedInUser.username;
 	}
 
 	void removeTmpUser(std::string userName, mongocxx::client & adminClient)
@@ -574,6 +670,9 @@ namespace MongoUserFunctions
 		{
 			assert(0);
 		}
+
+		authenticatedUserTokens.clear();
+		authenticatedUserOriginalName.clear();
 	}
 }
 

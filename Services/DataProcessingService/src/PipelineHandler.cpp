@@ -36,7 +36,7 @@
 #include "SolverReport.h"
 #include "OTCore/TimeFormatter.h"
 
-void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
+void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID)
 {
 	try
 	{
@@ -60,12 +60,12 @@ void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootN
 	}
 }
 
-void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID)
+void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID)
 {
 	
 	for (auto& blockEntityByBlockID : _allBlockEntitiesByBlockID)
 	{
-		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
+		std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByBlockID.second;
 		std::shared_ptr<GraphNode> graphNode = _graphNodesByBlockID.find(blockEntity->getEntityID())->second;
 		m_blockHandlerByGraphNode[graphNode] = createBlockHandler(blockEntity);
 		m_blockHandlerByGraphNode[graphNode]->setModelComponent(_modelComponent);
@@ -73,7 +73,7 @@ void PipelineHandler::initiate(const std::map<ot::UID, std::shared_ptr<GraphNode
 	}
 }
 
-std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_ptr<EntityBlock> _blockEntity)
+std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_ptr<ot::EntityBlock> _blockEntity)
 {
 	EntityBlockDatabaseAccess* dbAccessEntity = dynamic_cast<EntityBlockDatabaseAccess*>(_blockEntity.get());
 	if (dbAccessEntity != nullptr)

@@ -32,7 +32,6 @@
 #include <ads/DockWidget.h>
 
 // Qt header
-#include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qbytearray.h>
 
@@ -248,7 +247,6 @@ namespace ot {
 		void slotUpdateViewVisibility();
 		void slotViewTabClicked();
 		void slotViewDataModifiedChanged();
-		void slotCloseUnpinnedViews();
 		void slotViewPinnedChanged(bool _pinned);
 		void slotUpdateViewFocus();
 
@@ -303,8 +301,7 @@ namespace ot {
 
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
-		QTimer m_autoCloseTimer;
-
+		
 		ManagerStateFlags m_state;
 		ManagerConfigFlags m_config;
 		std::string m_initialState;

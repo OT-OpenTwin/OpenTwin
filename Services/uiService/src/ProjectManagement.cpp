@@ -38,6 +38,8 @@
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTDataStorage/Helper/BsonValuesHelper.h"
 #include "OTDataStorage/DataLakeHelper.h"
+#include "Login/Authentication.h"
+
 // MongoDB header
 #include <bsoncxx/json.hpp>
 #include <mongocxx/client.hpp>
@@ -88,31 +90,39 @@ ot::ProjectFilterData ProjectManagement::getProjectFilterData() const {
 	assert(!m_authServerURL.empty());
 
 	AppBase* app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFilter, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return result;
+		}
+
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (responseMessage.isOk()) {
+			ot::JsonDocument doc;
+			doc.fromJson(responseMessage.getWhat());
+			result.setFromJsonObject(doc.getConstObject());
+		}
+		else {
+			OT_LOG_E("Failed to get project filter data: " + responseMessage.getWhat());
+		}
+
 		return result;
 	}
-
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (responseMessage.isOk()) {
-		ot::JsonDocument doc;
-		doc.fromJson(responseMessage.getWhat());
-		result.setFromJsonObject(doc.getConstObject());
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token","");
+		exit(ot::AppExitCode::SendFailed);
 	}
-	else {
-		OT_LOG_E("Failed to get project filter data: " + responseMessage.getWhat());
-	}
-
-	return result;
+	
 }
 
 bool ProjectManagement::createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate)
@@ -120,32 +130,40 @@ bool ProjectManagement::createProject(const std::string &projectName, const std:
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_TYPE, ot::JsonString(projectType, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (!responseMessage.isOk()) {
+			return false;
+		}
+
+		ot::JsonDocument projDoc;
+		projDoc.fromJson(responseMessage.getWhat());
+
+		ot::ProjectInformation info(projDoc.getConstObject());
+		return createNewCollection(info.getCollectionName(), defaultSettingTemplate);
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
-		return false;
 	}
-
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (!responseMessage.isOk()) {
-		return false;
-	}
-
-	ot::JsonDocument projDoc;
-	projDoc.fromJson(responseMessage.getWhat());
-
-	ot::ProjectInformation info(projDoc.getConstObject());
-	return createNewCollection(info.getCollectionName(), defaultSettingTemplate);
+	
 }
 
 bool ProjectManagement::deleteProject(const std::string &projectName)
@@ -153,41 +171,57 @@ bool ProjectManagement::deleteProject(const std::string &projectName)
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_PROJECT, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
+		return hasSuccessful(response);
 	}
-
-	return hasSuccessful(response);
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token","");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 void ProjectManagement::notifyProjectOpened(const std::string& _projectName) {
 	assert(!m_authServerURL.empty());
 	AppBase* app{ AppBase::instance() };
-	
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_OpenNewProject, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
-	
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return;
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_OpenNewProject, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(_projectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
 	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 bool ProjectManagement::renameProject(const std::string &oldProjectName, const std::string &newProjectName)
@@ -195,24 +229,32 @@ bool ProjectManagement::renameProject(const std::string &oldProjectName, const s
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_NAME, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(oldProjectName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_NAME, ot::JsonString(newProjectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_PROJECT_NAME, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(oldProjectName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_NEW_PROJECT_NAME, ot::JsonString(newProjectName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
+		ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
+		return ret.isOk();
 	}
-
-	ot::ReturnMessage ret = ot::ReturnMessage::fromJson(response);
-	return ret.isOk();
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 bool ProjectManagement::projectExists(const std::string &projectName, bool &canBeDeleted)
@@ -221,43 +263,51 @@ bool ProjectManagement::projectExists(const std::string &projectName, bool &canB
 
 	assert(!m_authServerURL.empty());
 	AppBase * app{ AppBase::instance() };
-
-	ot::JsonDocument doc;
- 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
-	}
-		
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (!responseMessage.isOk()) {
-		return false;
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(responseMessage.getWhat());
-
-	try
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		ot::ProjectInformation info(responseDoc.getConstObject());
 
-		if (info.getUserName() == app->getCurrentLoginData().getUserName())
-		{
-			canBeDeleted = true;
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
 		}
-	}
-	catch (std::exception)
-	{
-	}
 
-	return true;
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (!responseMessage.isOk()) {
+			return false;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(responseMessage.getWhat());
+
+		try
+		{
+			ot::ProjectInformation info(responseDoc.getConstObject());
+
+			if (info.getUserName() == app->getCurrentLoginData().getUserName())
+			{
+				canBeDeleted = true;
+			}
+		}
+		catch (std::exception)
+		{
+		}
+
+		return true;
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
 }
 
 bool ProjectManagement::hasError(const std::string &response)
@@ -290,31 +340,38 @@ std::string ProjectManagement::getProjectCollection(const std::string &projectNa
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return "";
+		}
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (!responseMessage.isOk()) {
+			return "";
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(responseMessage.getWhat());
+
+		ot::ProjectInformation info(responseDoc.getConstObject());
+		return info.getCollectionName();
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
-		return "";
-	}
-
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (!responseMessage.isOk()) {
-		return "";
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(responseMessage.getWhat());
-
-	ot::ProjectInformation info(responseDoc.getConstObject());
-	return info.getCollectionName();
+	}	
 }
 
 std::string ProjectManagement::getProjectType(const std::string& projectName)
@@ -322,55 +379,71 @@ std::string ProjectManagement::getProjectType(const std::string& projectName)
 	assert(!m_authServerURL.empty());
 
 	AppBase* app{ AppBase::instance() };
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return "";
-	}
-
-	ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
-	if (!responseMessage.isOk())
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		OT_LOG_E(responseMessage.getWhat());
-		return "";
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_PROJECT_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_NAME, ot::JsonString(projectName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return "";
+		}
+
+		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
+		if (!responseMessage.isOk())
+		{
+			OT_LOG_E(responseMessage.getWhat());
+			return "";
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(responseMessage.getWhat());
+
+		ot::ProjectInformation info(responseDoc.getConstObject());
+		return info.getProjectType();
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(responseMessage.getWhat());
-
-	ot::ProjectInformation info(responseDoc.getConstObject());
-	return info.getProjectType();
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 bool ProjectManagement::updateAdditionalInformation(const ot::ProjectInformation& projectInfo) {
 	assert(!m_authServerURL.empty());
 
 	AppBase* app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projectInfo, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_UPDATE_PROJECT_ADDITIONALINFO, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projectInfo, doc.GetAllocator()), doc.GetAllocator());
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
+		return ot::ReturnMessage::fromJson(response).isOk();
 	}
-
-	return ot::ReturnMessage::fromJson(response).isOk();
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded)
@@ -389,39 +462,48 @@ bool ProjectManagement::findProjects(const std::string& _projectNameFilter, int 
 		_maxNumberOfResults--;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return false;
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		ot::ProjectInformation newInfo(projObj);
-		_projectsFound.push_back(newInfo);
-		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
-	}
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-	size_t size = _projectsFound.size();
-	while (size > _maxNumberOfResults) {
-		_maxLengthExceeded = true;
-		_projectsFound.pop_back();
-		size--;
-	}
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	return true;
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List))
+		{
+			ot::ProjectInformation newInfo(projObj);
+			_projectsFound.push_back(newInfo);
+			m_projectInfoMap[newInfo.getProjectName()] = newInfo;
+		}
+
+		size_t size = _projectsFound.size();
+		while (size > _maxNumberOfResults) {
+			_maxLengthExceeded = true;
+			_projectsFound.pop_back();
+			size--;
+		}
+
+		return true;
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+		exit(ot::AppExitCode::SendFailed);
+	}
+	
 }
 
 bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter, const std::string& _projectNameFilter, int _maxNumberOfResults, std::list<ot::ProjectInformation>& _projectsFound, bool& _maxLengthExceeded) {
@@ -438,40 +520,47 @@ bool ProjectManagement::findProjects(const ot::ProjectFilterData& _projectFilter
 	if (_maxNumberOfResults == std::numeric_limits<int>::max()) {
 		_maxNumberOfResults--;
 	}
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_projectFilter, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(_projectFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectNameFilter, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, _maxNumberOfResults + 1, doc.GetAllocator());
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List)) {
+			ot::ProjectInformation newInfo(projObj);
+			_projectsFound.push_back(newInfo);
+			m_projectInfoMap[newInfo.getProjectName()] = newInfo;
+		}
+
+		size_t size = _projectsFound.size();
+		while (size > _maxNumberOfResults) {
+			_maxLengthExceeded = true;
+			_projectsFound.pop_back();
+			size--;
+		}
+
+		return true;
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
-		return false;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	for (const ot::ConstJsonObject& projObj : ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_List)) {
-		ot::ProjectInformation newInfo(projObj);
-		_projectsFound.push_back(newInfo);
-		m_projectInfoMap[newInfo.getProjectName()] = newInfo;
-	}
-
-	size_t size = _projectsFound.size();
-	while (size > _maxNumberOfResults) {
-		_maxLengthExceeded = true;
-		_projectsFound.pop_back();
-		size--;
-	}
-
-	return true;
 }
 
 bool ProjectManagement::createNewCollection(const std::string &collectionName, const std::string &defaultSettingTemplate)
@@ -762,6 +851,13 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 					exportFile.write((const char *)&length, sizeof(size_t));
 					exportFile.write((const char *)data, length);
 
+					if(data != nullptr)
+					{
+						delete[] data;
+						data = nullptr;
+						length = 0;
+					}
+
 					// afterward we store the item
 					const uint8_t *buffer = reinterpret_cast<const uint8_t *>(doc.data());
 					size_t size = doc.length();
@@ -778,15 +874,16 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 					// Now we store the grid fs data first
 					auto fileId = doc["FileId"].get_value();
 
-					std::uint8_t *data = nullptr;
-					size_t length = 0;
+
 
 					DataStorageAPI::DocumentAPI fsDoc;
-					fsDoc.GetDocumentUsingGridFs(fileId, data, length, collectionName);
+					std::vector<uint8_t> data;
+					fsDoc.GetDocumentUsingGridFs(fileId, collectionName,data);
+					size_t length = data.size();
 
 					// Now store the length and the data in the export file
 					exportFile.write((const char *)&length, sizeof(size_t));
-					exportFile.write((const char *)data, length);
+					exportFile.write((const char *)data.data(), length);
 
 					// afterward we store the item
 					const uint8_t *buffer = reinterpret_cast<const uint8_t *>(doc.data());

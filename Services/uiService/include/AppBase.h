@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: AppBase.h
 // 
 // License:
@@ -178,7 +178,7 @@ public:
 	bool getCurrentProjectIsModified() const;
 
 	//! @brief Will return the current username
-	const LoginData& getCurrentLoginData() const { return m_loginData; };
+	LoginData& getCurrentLoginData() { return m_loginData; };
 
 	//! @brief Will return the current username
 	std::string getCurrentUserCollection() const { return m_currentUserCollection; };
@@ -548,7 +548,8 @@ public Q_SLOTS:
 	
 	void slotGraphicsItemRequested(const QString& _name, const QPointF& _pos);
 	void slotGraphicsElementsChanged(const ot::GraphicsChangeEvent& _event);
-	void slotGraphicsItemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
+	void slotGraphicsItemClicked(ot::GraphicsItem* _item);
+	void slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item);
 	void slotGraphicsConnectionRequested(const ot::UID& _fromUid, const std::string& _fromConnector, const ot::UID& _toUid, const std::string& _toConnector);
 	void slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 	void slotGraphicsSelectionChanged();

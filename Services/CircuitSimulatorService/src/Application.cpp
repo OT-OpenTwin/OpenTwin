@@ -33,7 +33,6 @@
 #include "OTCommunication/Dispatch/ActionDispatcher.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
-#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 #include "OTGui/Graphics/GraphicsStackItemCfg.h"
 #include "OTGui/Graphics/GraphicsImageItemCfg.h"
 #include "OTGui/Graphics/GraphicsHBoxLayoutItemCfg.h"
@@ -347,7 +346,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 	}
 
 	// Now we get the blockConnectionMap from helper in BlockEntities
-	std::map<ot::UID, ot::UIDList> connectionBlockMap = BlockHelper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
+	std::map<ot::UID, ot::UIDList> connectionBlockMap = ot::BlockHelper::buildMap(allConnectionEntitiesByID,allEntitiesByBlockID);
 	if (connectionBlockMap.empty()) {
 		OT_LOG_E("No valid connections found in " + name);
 		finishFailedSimulation();

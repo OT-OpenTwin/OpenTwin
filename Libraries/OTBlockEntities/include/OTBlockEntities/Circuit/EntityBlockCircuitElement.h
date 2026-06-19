@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitElement : public EntityBlock
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitElement : public ot::EntityBlock
 {
 public:
 	EntityBlockCircuitElement(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);

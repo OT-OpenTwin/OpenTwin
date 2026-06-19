@@ -23,6 +23,7 @@
 #include "OTSystem/Flags.h"
 #include "OTGui/Style/Grid.h"
 #include "OTGui/Style/Margins.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTWidgets/WidgetTypes.h"
 
@@ -57,13 +58,13 @@ namespace ot {
 
 		//! @brief A connection line according to the current configuration will be drawn with the provided item as origin
 		//! @param _item Origin item
-		OT_DECL_NODISCARD bool startConnection(ot::GraphicsItem* _item);
+		OT_DECL_NODISCARD bool startConnection(GraphicsItem* _item);
 
 		//! @brief Will request a connection from the currently set origin to the provided target connection.
 		//! The new control point is pos and should be the mouse press position.
 		//! @param _targetConnection The destination for the connection request.
 		//! @param _pos The new control point position.
-		OT_DECL_NODISCARD bool startConnectionToConnection(ot::GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos);
+		OT_DECL_NODISCARD bool startConnectionToConnection(GraphicsConnectionItem* _targetedConnection, const Point2DD& _pos);
 
 		void stopConnection();
 
@@ -135,7 +136,8 @@ namespace ot {
 
 	Q_SIGNALS:
 		void selectionChangeFinished();
-		void graphicsItemDoubleClicked(ot::GraphicsItem* _item);
+		void graphicsItemClicked(GraphicsItem* _item);
+		void graphicsItemDoubleClicked(GraphicsItem* _item);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -174,7 +176,7 @@ namespace ot {
 	private:
 		void handleMultiSelectionChanged();
 		void handleSingleSelectionChanged();
-
+		GraphicsItem* findItemWithFlagAt(const QPointF& _pos, GraphicsItemCfg::GraphicsItemFlag _flag) const;
 
 		std::list<GraphicsElement *> m_lastHoverElements;
 
@@ -185,9 +187,11 @@ namespace ot {
 		GraphicsView* m_view;
 		GraphicsItem* m_connectionOrigin;
 		GraphicsConnectionPreviewItem* m_connectionPreview;
-		ot::GraphicsConnectionCfg::ConnectionShape m_connectionPreviewShape;
+		GraphicsConnectionCfg::ConnectionShape m_connectionPreviewShape;
 		QList<QGraphicsItem*> m_lastSelection;
+		
 		bool m_mouseIsPressed;
+		GraphicsItem* m_pressedItem;
 
 		GraphicsScene() = delete;
 	};

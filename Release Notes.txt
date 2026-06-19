@@ -7,3 +7,5 @@ Features/Changes
 - Plots have now the option to select secondary parameter that are not used for partitioning the curves
 - Queries support now regex expressions
 - Added a 'datetime' type to parameterized data that auto-detects timestamps or time durations, which are then stored into the database as milliseconds.
+- Introduced a library for Python Scripts
+- Scripts can now be imported by selecting required property

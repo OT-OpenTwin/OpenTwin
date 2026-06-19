@@ -154,6 +154,7 @@
 #define OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION "Model.OtherCollection.GetEntities"
 #define OT_ACTION_CMD_MODEL_ModelDialogConfirmed "Model.ModelDialog.Confirmed"
 #define OT_ACTION_CMD_MODEL_ModelDialogCanceled "Model.ModelDialog.Canceled"
+#define OT_ACTION_CMD_MODEL_GetGraphicsItemMap "Model.GetGraphicsItemMap"
 
 #define OT_ACTION_CMD_MODEL_RequestVisualisationData "Model.Visualisation.Data"
 
@@ -324,6 +325,7 @@
 #define OT_ACTION_CMD_LMS_LibraryElementRequest "LMS.Element.Request"
 #define OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement "LMS.Element.UpdateOrCreate"
 #define OT_ACTION_CMD_LMS_AddNewLibraryElement "LMS.Element.AddNew"
+#define OT_ACTION_CMD_ExportFilesToLibrary "ExportFilesToLibrary"
 
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_FillItemPicker "UI.GraphicsPicker.Fill"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor "UI.GraphicsEditor.Create"
@@ -332,6 +334,7 @@
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ChangeEvent "UI.GraphicsEditor.ChangeEvent"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection "UI.GraphicsEditor.Connection.Add"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_RemoveConnection "UI.GraphicsEditor.Connection.Remove"
+#define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemClicked "UI.GraphicsEditor.ItemClicked"
 #define OT_ACTION_CMD_UI_GRAPHICSEDITOR_ItemDoubleClicked "UI.GraphicsEditor.ItemDoubleClicked"
 #define OT_ACTION_CMD_SelectedEntitiesSerialise "SerialiseSelectedEntities"
 #define OT_ACTION_CMD_PasteEntities "PasteEntities"
@@ -743,6 +746,7 @@
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ItemIds "GraphicsEditor.Item.IDs"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginId "GraphicsEditor.Origin.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestId "GraphicsEditor.Dest.ID"
+#define OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionId "GraphicsEditor.Connection.ID"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_ConnectionIds "GraphicsEditor.Connection.IDs"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_OriginConnetableName "GraphicsEditor.Origin.ConName"
 #define OT_ACTION_PARAM_GRAPHICSEDITOR_DestConnetableName "GraphicsEditor.Dest.ConName"
@@ -825,6 +829,8 @@
 #define OT_ACTION_PING "Ping"
 // User Functionalities
 #define OT_ACTION_LOGIN "Login"
+#define OT_ACTION_SSO_Token_Refresh "SSO.Token.Refresh"
+#define OT_ACTION_SSO_Token_Validate "SSO.Token.Validate"
 #define OT_ACTION_LOGIN_ADMIN "LoginAdmin"
 #define OT_ACTION_REGISTER "Register"
 #define OT_ACTION_REFRESH_SESSION "RefreshSession"
@@ -841,8 +847,9 @@
 #define OT_ACTION_SETTINGS_COLLECTION_NAME "settingsCollectionName"
 
 // todo: ot param auth username exists twice: USERNAME and USER_NAME
-#define OT_PARAM_AUTH_SSO_USE "UseSSO"
-#define OT_PARAM_AUTH_SSO_TOKEN "UseSSO"
+#define OT_PARAM_AUTH_SSO_Initial "SSO.Start"
+
+#define OT_PARAM_AUTH_SSO_Token_Continue "SSO.Token.Continue"
 #define OT_PARAM_AUTH_USERNAME "Username"
 #define OT_PARAM_USERNAME_TO_DELETE "UsernameToDelete"
 #define OT_PARAM_AUTH_LOGGED_IN_USERNAME "LoggedInUsername"

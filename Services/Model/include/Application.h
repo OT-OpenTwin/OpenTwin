@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.h
 // 
 // License:
@@ -47,7 +47,7 @@ public:
 
 	static Application* instance();
 	
-	static std::string getToolBarPageName() { return "Model"; };
+	static std::string getToolBarPageName() { return "Home"; };
 
 	// ##################################################################################################################################################################################################################
 
@@ -170,7 +170,8 @@ public:
 
 	void handleImportTableFile(ot::JsonDocument& _document);
 
-	void handleExportFilesToLibraryCallback(ot::JsonDocument& _document);
+	void handleExportDialog(ot::JsonDocument& _document);
+
 
 	// ##################################################################################################################################################################################################################
 

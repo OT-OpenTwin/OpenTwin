@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TimeFormatter.h
 // 
 // License:
@@ -20,10 +20,11 @@
 #pragma once
 #include <chrono>
 #include <string>
-
-class __declspec(dllexport) TimeFormatter
+#include "OTCore/CoreAPIExport.h"
+class OT_CORE_API_EXPORT TimeFormatter
 {
 public:
 	static std::string formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end);
+	static std::string formatDuration(const std::chrono::nanoseconds& _duration);
 	static const std::string createCurrentDateTimeString();
 };

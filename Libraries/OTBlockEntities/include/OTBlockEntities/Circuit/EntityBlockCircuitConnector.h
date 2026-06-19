@@ -22,21 +22,25 @@
 // OpenTwin header
 #include "OTBlockEntities/EntityBlock.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitConnector : public EntityBlock
-{
-public:
-	EntityBlockCircuitConnector() : EntityBlockCircuitConnector(0, nullptr, nullptr, nullptr) {};
-	EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
-	static std::string className() { return "EntityBlockCircuitConnector"; }
-	virtual std::string getClassName(void) const override { return EntityBlockCircuitConnector::className(); };
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
-	virtual ot::GraphicsItemCfg* createBlockCfg() override;
-	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
-	virtual std::string getBlockFolderName() const override { return ""; };
-	
-private:
-	ot::Connector m_LeftConnector;
+namespace ot {
 
-	void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
-};
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitConnector : public EntityBlock
+	{
+	public:
+		EntityBlockCircuitConnector() : EntityBlockCircuitConnector(0, nullptr, nullptr, nullptr) {};
+		EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+		static std::string className() { return "EntityBlockCircuitConnector"; }
+		virtual std::string getClassName(void) const override { return EntityBlockCircuitConnector::className(); };
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+		virtual ot::GraphicsItemCfg* createBlockCfg() override;
+		virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const override { return ot::GraphicsConnectionCfg::ConnectionShape::AutoXYLine; };
+		virtual std::string getBlockFolderName() const override { return ""; };
+
+	private:
+		ot::Connector m_LeftConnector;
+
+		void addStorageData(bsoncxx::builder::basic::document& storage) override;
+		void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	};
+
+}

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: FolderNames.h
 // 
 // License:
@@ -36,7 +36,7 @@ namespace ot
 		const std::string SolverFolder = "Solvers";
 		const std::string BlockFolder = "Blocks";
 		const std::string ResultFolder = "Results";
-		const std::string DataCategorisationFolder = "Data Categorization";
+		const std::string DataCategorisationFolder = "Table Content Classification";
 		const std::string CircuitsFolder = "Circuits";
 		const std::string CircuitModelsFolder = "Circuit Models";
 		const std::string HierarchicalProjectRoot = "Project";

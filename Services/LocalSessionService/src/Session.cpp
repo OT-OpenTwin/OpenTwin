@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Session.cpp
 // 
 // License:
@@ -103,7 +103,7 @@ std::list<std::string> Session::getToolBarTabOrder() {
 
 	tabOrder.push_back("File");
 	tabOrder.push_back("View");
-	tabOrder.push_back("Model");
+	tabOrder.push_back("Home");
 	tabOrder.push_back("Modeling");
 	tabOrder.push_back("Mesh");
 	tabOrder.push_back("FIT-TD");

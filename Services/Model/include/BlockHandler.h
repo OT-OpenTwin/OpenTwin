@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/EntityName.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -28,40 +29,58 @@
 //std header
 #include <set>
 
-class EntityBlock;
+namespace ot {
+	class EntityBlock;
+	class EntityBlockConnection;
+}
+
 class EntityGraphicsScene;
-class EntityBlockConnection;
 
 class BlockHandler : public BusinessLogicHandler, public ot::GraphicsActionHandler {
 	OT_DECL_NOCOPY(BlockHandler)
 	OT_DECL_NOMOVE(BlockHandler)
 public:
-	BlockHandler() = default;
+	BlockHandler();
 	~BlockHandler() = default;
 
-	//Fill map function
+	// Fill map functions
+
 	void processEntity(EntityBase* entBase);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Setter
-	void addConnection(ot::UID _editorId, const EntityBlockConnection& _toBeAddedConnection);
-	void addBlock(ot::UID _editorId, const EntityBlock* _block);
+
+	void addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection);
+	void addBlock(ot::UID _editorId, const ot::EntityBlock* _block);
 	void addEditor(const EntityGraphicsScene* _editor);
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Remover
+
 	void removeFromMap(EntityBase* entBase);
 	void entityRemoved(EntityBase* _entity, const std::list<EntityBase*>& _otherEntitiesToRemove);
-	void removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection);
+	void removeConnectionIfUnsnapped(EntityGraphicsScene* _editor, ot::EntityBlockConnection* _connectionEntity, const ot::GraphicsConnectionCfg& _changedConnection);
 	void clearMap();
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
 	// Finder
+
 	bool blockExists(ot::UID _blockID);
 	bool blockExists(ot::UID _editorID, ot::UID _blockID);
-	EntityGraphicsScene* findGraphicsScene(const std::string& _graphicsElementName);
-
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Callbacks
+
 protected:
+	virtual ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
+
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsItemClicked(const ot::GraphicsClickEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
 
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) override;
@@ -73,13 +92,16 @@ protected:
 	// Private: Helper
 
 private:
+
+	EntityGraphicsScene* findElementGraphicsScene(const std::string& _graphicsElementName);
+
 	//! @brief Handles the connection of one block to another block.
 	//! @param _scene The graphics scene in which the connection is being made.
 	//! @param _originBlock The block from which the connection originates.
 	//! @param _destinationBlock The block to which the connection is made.
 	//! @param _eventData The event data associated with the connection drop event.
 	//! @return True if the connection was handled successfully, false otherwise.
-	bool createBlockToBlockConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData);
+	bool createBlockToBlockConnection(EntityGraphicsScene* _scene, ot::EntityBlock* _originBlock, ot::EntityBlock* _destinationBlock, const ot::GraphicsConnectionDropEvent& _eventData);
 
 	//! @brief Handles the connection of a block to another connection.
 	//! @param _scene The graphics scene in which the connection is being made.
@@ -88,7 +110,7 @@ private:
 	//! @param _eventData The event data associated with the connection drop event.
 	//! @param _connectionReversed If true, the origin of the event data is considered the destination and vice versa.
 	//! @return True if the connection was handled successfully, false otherwise.
-	bool createBlockToConnectionConnection(EntityGraphicsScene* _scene, EntityBlock* _originBlock, EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed);
+	bool createBlockToConnectionConnection(EntityGraphicsScene* _scene, ot::EntityBlock* _originBlock, ot::EntityBlockConnection* _destinationConnection, const ot::GraphicsConnectionDropEvent& _eventData, bool _connectionReversed);
 
 	//! @brief Handles the change of a block.
 	//! @param _changedBlock The block that changed.
@@ -108,7 +130,7 @@ private:
 	//! @param _scenePos The position in the scene where the block should be created.
 	//! @param _editor The graphics scene editor.
 	//! @return A unique pointer to the created block entity.
-	std::unique_ptr<EntityBlock> createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName,  ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<ot::EntityBlock> createBlockEntity(EntityGraphicsScene* _editor, const ot::Point2DD& _scenePos, const std::string& _itemName,  ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Creates a new connection entity based on the provided parameters.
 	//! @param _newModelStateInfo Information about the new model state.
@@ -116,7 +138,7 @@ private:
 	//! @param _originBlock The block from which the connection originates.
 	//! @param _connectionNaming The naming convention for the requested connection.
 	//! @return void 
-	std::unique_ptr<EntityBlockConnection> createConnection(EntityGraphicsScene* scene, EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo);
+	std::unique_ptr<ot::EntityBlockConnection> createConnection(EntityGraphicsScene* scene, ot::EntityBlock* _originBlock, const ot::GraphicsConnectionCfg& _requestedConnection, ot::EntityName::NamingBehavior& _namingBehavior, bool _explicitNaming, ot::NewModelStateInfo& _newModelStateInfo);
 
 	//! @brief Modifies the connection information for a given entity.
 	//! @param _connectionID Connection ID of the connection to be modified.
@@ -128,13 +150,15 @@ private:
 	//! @param _scene The graphics scene where the snapping event occurred.
 	//! @param _snapEvent The snap event containing details about the snapping action.
 	//! @return True if the snapping was handled successfully, false otherwise.
-	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<EntityBlockConnection*>& _processedConnections);
+	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<ot::EntityBlockConnection*>& _processedConnections);
 
-	std::map<ot::UID, ot::UIDList>& getOrCreateBlockMap(ot::UID _editorId);
-	ot::UIDList& getOrCreateConnectionList(ot::UID& _editorId, ot::UID& _blockId);
+	ot::GraphicsItemMap& getGraphicsItemMap(ot::UID _sceneID);
 
-	//! @brief Maps scenes to a map of blocks and their connections.
-	std::map<ot::UID, std::map<ot::UID, ot::UIDList>> m_viewBlockConnectionsMap;
+	ot::ActionHandler m_actionHandler;
+
+	//! @brief Maps scenes to the corresponding item map.
+	std::map<ot::UID, ot::GraphicsItemMap> m_sceneMap;
+
 	const std::string m_connectionsFolder = "Connections";
 
 };

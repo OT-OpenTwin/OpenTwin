@@ -306,6 +306,9 @@ public:
 	void setIsMultiline(bool _flag) { if (m_isMultiline != _flag) { m_isMultiline = _flag; setNeedsUpdate(); } };
 	bool getIsMultiline() const { return m_isMultiline; };
 
+	void setPlaceholderText(const std::string& _placeholderText) { if (m_placeholderText != _placeholderText) { m_placeholderText = _placeholderText; setNeedsUpdate(); } };
+	const std::string& getPlaceholderText() const { return m_placeholderText; };
+
 	virtual bool hasSameValue(EntityPropertiesBase *other) const override;
 
 	virtual void addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase *root) override;
@@ -319,6 +322,7 @@ public:
 private:
 	std::string m_value;
 	bool m_isMultiline = false;
+	std::string m_placeholderText;
 };
 
 // ################################################################################################################################################################

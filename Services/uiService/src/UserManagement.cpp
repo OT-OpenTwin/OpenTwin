@@ -41,7 +41,7 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
-
+#include "Login/Authentication.h"
 std::string UserManagement::m_userSettingsCollection;
 
 UserManagement::UserManagement() :
@@ -133,7 +133,7 @@ void UserManagement::initializeNewSession(void)
 	m_userSettingsCollection.clear();
 }
 
-bool UserManagement::addUser(const std::string &userName, const std::string &password, bool _isSSO) const {
+bool UserManagement::addUser(const std::string &userName, const std::string &password) const {
 	assert(!m_authServerURL.empty());
 
 	// Here we register a new user by sending a message to the authorization service
@@ -142,10 +142,8 @@ bool UserManagement::addUser(const std::string &userName, const std::string &pas
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REGISTER, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	if (!_isSSO)
-	{
-		doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
-	}
+	doc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, doc.GetAllocator()), doc.GetAllocator());
+	
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
@@ -173,24 +171,30 @@ bool UserManagement::deleteUser(const std::string &userName) const {
 	// Now we try to delete the user
 
 	AppBase * app{ AppBase::instance() };
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_DELETE_USER, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
+		// Now we check the response document
+		assert(0);
+		return true;
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_DELETE_USER, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
 		exit(ot::AppExitCode::SendFailed);
 		return false;
 	}
-
-	// Now we check the response document
-	assert(0);
-	return true;
 }
 
 //bool UserManagement::changePassword(const std::string &oldPassword, const std::string &newPassword)
@@ -238,22 +242,29 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 
 	AppBase * app{ AppBase::instance() };
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
+	bool tokenValid = ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData());
+	if (tokenValid)
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return false;
+		}
+		// Now we check the response document
+		return hasSuccessful(response);
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
 		return false;
 	}
-
-	// Now we check the response document
-	return hasSuccessful(response);
 }
 
 bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const {
@@ -460,35 +471,43 @@ std::string UserManagement::getUserSettingsCollection(void)
 	// Here we check whether a user exists by getting its data from the authorization service
 
 	AppBase * app{ AppBase::instance() };
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return "ERROR: Failed to request user data from Authorization Serivce";
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::string collectionName;
-
-	try
+	bool tokenValid = ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData());
+	if (tokenValid)
 	{
-		collectionName = ot::json::getString(responseDoc, OT_ACTION_SETTINGS_COLLECTION_NAME);
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_USER_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return "ERROR: Failed to request user data from Authorization Serivce";
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		std::string collectionName;
+
+		try
+		{
+			collectionName = ot::json::getString(responseDoc, OT_ACTION_SETTINGS_COLLECTION_NAME);
+		}
+		catch (std::exception)
+		{
+		}
+
+		return collectionName;
 	}
-	catch (std::exception)
+	else
 	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		return "ERROR: Failed to validate/refresh sso token.";
 	}
 
-	return collectionName;
 }
 
 bool UserManagement::addRecentProject(const std::string &projectName)

@@ -34,16 +34,16 @@ void ot::GraphicsDoubleClickEvent::addToJsonObject(JsonValue& _object, JsonAlloc
 	GuiEvent::addToJsonObject(_object, _allocator);
 
 	_object.AddMember("EditorName", JsonString(m_editorName, _allocator), _allocator);
-	_object.AddMember("ItemName", JsonString(m_itemName, _allocator), _allocator);
 	_object.AddMember("ItemUid", m_itemUid, _allocator);
+	_object.AddMember("ElementName", JsonString(m_elementName, _allocator), _allocator);
 }
 
 void ot::GraphicsDoubleClickEvent::setFromJsonObject(const ConstJsonObject& _object) {
 	GuiEvent::setFromJsonObject(_object);
 
 	m_editorName = json::getString(_object, "EditorName");
-	m_itemName = json::getString(_object, "ItemName");
 	m_itemUid = json::getUInt64(_object, "ItemUid");
+	m_elementName = json::getString(_object, "ElementName");
 }
 
 

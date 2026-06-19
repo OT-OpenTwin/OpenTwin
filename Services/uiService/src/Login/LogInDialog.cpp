@@ -41,6 +41,7 @@
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+#include "Login/Authentication.h"
 
 // Qt header
 #include <QtCore/qjsonarray.h>
@@ -88,7 +89,7 @@ LogInDialog::LogInDialog()
 	m_gss->setPlaceholderText("Choose Service");
 	m_gss->setToolTip("Select the Global Session Service to connect to. Select the \"" EDIT_GSS_TEXT "\" option to add/edit available connections.");
 
-	Label* usernameLabel = new Label("Username:", this);
+	m_usernameLabel = new Label("Username:", this);
 	m_username = new LineEdit(this);
 	
 	m_passwordLabel = new Label("Password:", this);
@@ -144,7 +145,7 @@ LogInDialog::LogInDialog()
 
 	inputLayout->addWidget(gssLabel, r, 0);
 	inputLayout->addWidget(m_gss, r++, 1);
-	inputLayout->addWidget(usernameLabel, r, 0);
+	inputLayout->addWidget(m_usernameLabel, r, 0);
 	inputLayout->addWidget(m_username, r++, 1);
 	inputLayout->addWidget(m_passwordLabel, r, 0);
 	inputLayout->addWidget(m_password, r++, 1);
@@ -676,6 +677,20 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	this->setControlsEnabled(true);
 }
 
+void LogInDialog::slotWorkerCustomFeedback(const std::string& _title,const std::string& _feedback)
+{
+	m_state.remove(LogInStateFlag::WorkerRunning);
+
+	// Create error message
+	QString msg;
+	msg.append(_feedback);
+
+	// Display Feedback message and unlock controls
+	QMessageBox msgBox(QMessageBox::Information, _title.c_str(), msg, QMessageBox::Ok);
+	msgBox.exec();
+	this->setControlsEnabled(true);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private helper
@@ -843,17 +858,6 @@ void LogInDialog::updateGssOptions() {
 	m_gss->addItems(options);
 }
 
-std::wstring LogInDialog::determineSSOUsername() const {
-	std::wstring ssoUsername;
-	try {
-		ssoUsername = ot::SingleSignOn_Client::getActiveUserName();
-	}
-	catch (const std::exception& ex) {
-		OT_LOG_E(std::string("Failed to determine active user: ") + ex.what());
-		ssoUsername.clear();
-	}
-	return ssoUsername;
-}
 
 void LogInDialog::setControlsForUsernamePassword() {
 	m_isSSOLogin = false;
@@ -869,7 +873,8 @@ void LogInDialog::setControlsForUsernamePassword() {
 		setMinimumHeight(m_maxDefaultHeight);
 		m_state.remove(LogInStateFlag::SSOMode);
 	}
-
+	m_username->setHidden(false);
+	m_usernameLabel->setHidden(false);
 	m_password->setHidden(false);
 	m_passwordLabel->setHidden(false);
 	m_passwordConfirmLabel->setHidden(true);
@@ -907,12 +912,13 @@ void LogInDialog::setControlsForChangePassword() {
 void LogInDialog::setControlsForSSO(bool _resize) {
 	m_isSSOLogin = true;
 	m_logInButton->setHidden(false);
-	m_registerButton->setHidden(false);
+	m_registerButton->setHidden(true);
 
+	m_usernameLabel->setHidden(true);
 	m_savePassword->setHidden(true);
 	if (!m_state.has(LogInStateFlag::SSOMode)) {
 		m_userNameTmp = m_username->text();
-		m_logInButton->setText("SSO Login");
+		m_logInButton->setText("Login with Systems Account");
 		m_state.set(LogInStateFlag::SSOMode);
 		setMinimumHeight(m_maxSSOHeight);
 	}
@@ -921,9 +927,8 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 		auto currentWidgetWidth = width();
 		resize(currentWidgetWidth, m_maxSSOHeight);
 	}
-	m_username->setReadOnly(true);
-	m_username->setText(QString::fromStdWString(determineSSOUsername()));
-
+	m_username->setHidden(true);
+	
 	m_password->setHidden(true);
 	m_passwordLabel->setHidden(true);
 	m_passwordConfirm->setHidden(true);
@@ -973,21 +978,22 @@ void LogInDialog::loginWorkerStart() {
 	}
 
 	// Attempt to log in the user
-	currentError = this->workerLogin(userManager);
+	std::string customTitle, customMsg;
+	currentError = this->workerLogin(userManager,customTitle, customMsg);
+	if (currentError == WorkerError::NoError_CustomFeedback)
+	{
+		QMetaObject::invokeMethod(this, &LogInDialog::slotWorkerCustomFeedback, Qt::QueuedConnection, customTitle, customMsg);
+		return;
+	}
 	if (currentError != WorkerError::NoError) {
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
 
-	if (!m_isSSOLogin && !m_loginData.isValid()) {
+	if (!m_loginData.isValid()) {
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
-		return;
-	}
-	else if (m_isSSOLogin)
-	{
-		this->stopWorkerWithError(WorkerError::NoError);
 		return;
 	}
 
@@ -1133,9 +1139,10 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager) {
-	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
-		return this->workerLoginSSO(_userManager);
+LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg) {
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) 
+	{
+		return this->workerLoginSSO(_userManager, _customTitle, _customMsg);
 	}
 	else {
 		return this->workerLoginUsernamePassword(_userManager);
@@ -1172,62 +1179,30 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	return WorkerError::NoError;
 }
 
-#include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 
-LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager) {
-	std::wstring ssoUsername = determineSSOUsername();
-	
-	try
+
+LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)
+{		
+	m_loginData.setAuthorizationUrl(_userManager.getAuthorisationServerURL());
+
+	std::optional<std::string> errorMessage = ot::Authentication::loginSSO(m_loginData, _customTitle, _customMsg);
+	if (errorMessage.has_value())
 	{
-		ot::SingleSignOn_Client client;
-		const std::string authorisationURL = _userManager.getAuthorisationServerURL();
-		std::string receivedToken = "";
-		std::string errorMessage;
-		bool continueProcess = true;
-		do
-		{
-			std::string token =	client.generateToken(receivedToken);
-			
-			ot::JsonDocument tokenMessage;
-			tokenMessage.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
-			tokenMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(token, tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
-			tokenMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(ot::String::toString(ssoUsername), tokenMessage.GetAllocator()), tokenMessage.GetAllocator());
-			std::string response;
-			if (ot::msg::send("", authorisationURL, ot::EXECUTE_ONE_WAY_TLS, tokenMessage.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
-			{
-				ot::ReturnMessage message = ot::ReturnMessage::fromJson(response);
-				if (message.isOk())
-				{
-					receivedToken = message.getWhat();
-					continueProcess = !receivedToken.empty();
-				}
-				else
-				{
-					errorMessage = message.getWhat();
-					continueProcess = false;
-				}
-			}
-			else
-			{
-				errorMessage = "Failed to connect to authorisation service";
-				continueProcess = false;
-			}
-		} while (continueProcess);
-
+		// Content should be communicated. Error is already logged by authenticateSSO
+		return WorkerError::InvalidCreadentials;
 	}
-	catch (std::exception& _e)
+	else if (!_customTitle.empty())
 	{
-		
+		return WorkerError::NoError_CustomFeedback;
 	}
-	// Falls du einen neuen Fehlercode (Output message) brauchst, einfach das enum WorkerError,
-	// sowie das switch in slotWorkerError() erweitern
-
-
-	return WorkerError::NoError;
+	else
+	{
+		return WorkerError::NoError;
+	}
 }
 
 LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {
-	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString(),m_isSSOLogin))
+	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
 	{
 		return WorkerError::FailedToRegister;
 	}

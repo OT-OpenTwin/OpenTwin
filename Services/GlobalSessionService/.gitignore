@@ -37,11 +37,19 @@ buildLog_Release.txt
 *.out
 *.app
 
+# VS internal build directory
+/**/.vs
+
+# Log files
+*.log
+*.csv
+
 # Google test directory
 packages
 
-# VS internal build directory
-/**/.vs
+# Step files
+*.stp
+*.step
 
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -56,6 +64,3 @@ bld/
 [Oo]bj/
 [Ll]og/
 [Ll]ogs/
-
-# CMake build directory
-build/

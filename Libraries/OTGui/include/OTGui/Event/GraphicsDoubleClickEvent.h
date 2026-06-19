@@ -22,9 +22,11 @@
 // OpenTwin header
 #include "OTGui/Event/GuiEvent.h"
 
-namespace ot {
+namespace ot
+{
 
-	class OT_GUI_API_EXPORT GraphicsDoubleClickEvent : public GuiEvent {
+	class OT_GUI_API_EXPORT GraphicsDoubleClickEvent : public GuiEvent
+	{
 		OT_DECL_DEFCOPY(GraphicsDoubleClickEvent)
 		OT_DECL_DEFMOVE(GraphicsDoubleClickEvent)
 	public:
@@ -37,20 +39,26 @@ namespace ot {
 
 		void setEditorName(const std::string& _name) { m_editorName = _name; };
 		void setEditorName(std::string&& _name) { m_editorName = std::move(_name); };
+
+		//! @brief Returns the name of the editor where the double-clicked item is located.
 		const std::string& getEditorName() const { return m_editorName; };
 
-		void setItemName(const std::string& _name) { m_itemName = _name; };
-		void setItemName(std::string&& _name) { m_itemName = std::move(_name); };
-		const std::string& getItemName() const { return m_itemName; };
+		void setElementName(const std::string& _name) { m_elementName = _name; };
+		void setElementName(std::string&& _name) { m_elementName = std::move(_name); };
+
+		//! @brief Returns the name of the double-clicked element.
+		//! The double-clicked element may be nested.
+		const std::string& getElementName() const { return m_elementName; };
 
 		void setItemUid(const UID& _uid) { m_itemUid = _uid; };
+
+		//! @brief Returns the UID of the double-clicked item root.
 		const UID& getItemUid() const { return m_itemUid; };
 
 	private:
 		std::string m_editorName;
-		std::string m_itemName;
 		UID m_itemUid;
-
+		std::string m_elementName;
 	};
 
 }

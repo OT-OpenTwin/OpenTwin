@@ -23,7 +23,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 
-bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
+bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
 
 	m_rootNodes.clear();
@@ -37,7 +37,7 @@ bool GraphHandler::blockDiagramIsValid(std::map<ot::UID, std::shared_ptr<EntityB
 }
 
 
-bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<EntityBlock>>& allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
+bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
 	std::string uiErrorMessage = "";
 	bool allRequiredConnectionsSet = true;
@@ -45,7 +45,7 @@ bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<E
 	//First we check if every block has all out and the mandatory in connections set. If not the block is not used for building a graph.
 	for (auto& blockEntityByBlockID : allBlockEntitiesByBlockID)
 	{
-		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
+		std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByBlockID.second;
 		const bool entityHasAllIncommingConnectionsSet = entityHasIncommingConnectionsSet(_connectionBlockMap,blockEntity, _allConnectionsByID, uiErrorMessage);
 		allRequiredConnectionsSet &= entityHasAllIncommingConnectionsSet;
 	}
@@ -58,7 +58,7 @@ bool GraphHandler::allRequiredConnectionsSet(std::map<ot::UID, std::shared_ptr<E
 	return allRequiredConnectionsSet;
 }
 
-void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
+void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, ot::UIDList>& _connectionBlockMap)
 {
 	std::string uiInfoMessage = "";
 	std::list<ot::UID> toBeErased;
@@ -66,7 +66,7 @@ void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityB
 	//First we check if every block has all out and the mandatory in connections set. If not the block is not used for building a graph.
 	for (auto& blockEntityByBlockID : _allBlockEntitiesByBlockID)
 	{
-		std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
+		std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByBlockID.second;
 	
 		auto it = _connectionBlockMap.find(blockEntity->getEntityID());
 		if (it == _connectionBlockMap.end()) {
@@ -88,13 +88,13 @@ void GraphHandler::sortOutUnusedBlocks(std::map<ot::UID, std::shared_ptr<EntityB
 	}
 }
 
-void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID)
+void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID)
 {
 	std::string connectionNames("");
 	ot::UIDList toBeErased;
 	for (auto& connectionEntByID : _allConnectionsByID)
 	{
-		std::shared_ptr<EntityBlockConnection> connectionEnt = connectionEntByID.second;
+		std::shared_ptr<ot::EntityBlockConnection> connectionEnt = connectionEntByID.second;
 		auto connectionCfg = connectionEnt->getConnectionCfg();
 		ot::UID destinationBlockID = connectionCfg.getDestinationUid();
 
@@ -108,7 +108,7 @@ void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<
 		{
 			auto connectorsByName =	destinationBlockByName->second->getAllConnectorsByName();
 			//In case of dynamic blocks it may be that the block with the corresponding IDs still exists, but the connectors/connectables have changed.
-			if (connectorsByName.find(connectionCfg.getDestConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
+			if (connectorsByName.find(connectionCfg.getDestinationConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
 			{
 				toBeErased.push_back(connectionEntByID.first);
 				connectionNames += connectionEnt->getName() + ", ";
@@ -126,7 +126,7 @@ void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<
 		{
 			auto connectorsByName = originBlockByName->second->getAllConnectorsByName();
 			//In case of dynamic blocks it may be that the block with the corresponding IDs still exists, but the connectors/connectables have changed.
-			if (connectorsByName.find(connectionCfg.getDestConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
+			if (connectorsByName.find(connectionCfg.getDestinationConnectable()) == connectorsByName.end() && connectorsByName.find(connectionCfg.getOriginConnectable()) == connectorsByName.end())
 			{
 				toBeErased.push_back(connectionEntByID.first);
 				connectionNames += connectionEnt->getName() + ", ";
@@ -145,13 +145,13 @@ void GraphHandler::sortOutDanglingConnections(std::map<ot::UID, std::shared_ptr<
 	}
 }
 
-bool GraphHandler::allConnectionsAreValid(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID)
+bool GraphHandler::allConnectionsAreValid(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID)
 {
 	bool allConnectionsAreValid = true;
 	std::string connectionNames("");
 	for (auto& connectionEntByID : _allConnectionsByID)
 	{
-		std::shared_ptr<EntityBlockConnection> connectionEnt =	connectionEntByID.second;
+		std::shared_ptr<ot::EntityBlockConnection> connectionEnt =	connectionEntByID.second;
 		auto connectionCfg = 	connectionEnt->getConnectionCfg();
 		ot::UID destinationBlock = connectionCfg.getDestinationUid();
 		if (_allBlockEntitiesByBlockID.find(destinationBlock) == _allBlockEntitiesByBlockID.end())
@@ -182,7 +182,7 @@ const std::string GraphHandler::getNameWithoutRoot(EntityBase* _entity)
 	return nameWithoutRoot;
 }
 
-bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDList>& _connectionBlockMap ,std::shared_ptr<EntityBlock>& blockEntity, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID, std::string& uiMessage)
+bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDList>& _connectionBlockMap ,std::shared_ptr<ot::EntityBlock>& blockEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID, std::string& uiMessage)
 {
 	auto& allConnectorsByName = blockEntity->getAllConnectorsByName();
 
@@ -211,7 +211,7 @@ bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDLis
 					auto connection =  connectionByID->second;
 					ot::GraphicsConnectionCfg connectionCfg = connection->getConnectionCfg();
 					const std::string& originConnectableName =	connectionCfg.getOriginConnectable();
-					const std::string& destConnectableName =	connectionCfg.getDestConnectable();
+					const std::string& destConnectableName =	connectionCfg.getDestinationConnectable();
 					if (connector.getConnectorName() == originConnectableName || connector.getConnectorName() == destConnectableName)
 					{
 						connectionIsSet = true;
@@ -231,7 +231,7 @@ bool GraphHandler::entityHasIncommingConnectionsSet(std::map<ot::UID, ot::UIDLis
 	return allIncommingConnectionsAreSet;
 }
 
-bool GraphHandler::hasNoCycle(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID)
+bool GraphHandler::hasNoCycle(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID)
 {
 	//First we build a graph with the blocks as nodes and connections as edges
 	const Graph graph = buildGraph(_allBlockEntitiesByBlockID,_allConnectionsByID);
@@ -255,7 +255,7 @@ bool GraphHandler::hasNoCycle(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _
 
 		if (hasCycle)
 		{
-			std::shared_ptr<EntityBlock> blockEntity = m_entityByGraphNode.find(node)->second;
+			std::shared_ptr<ot::EntityBlock> blockEntity = m_entityByGraphNode.find(node)->second;
 			const std::string nameWithoutRoot = getNameWithoutRoot(blockEntity.get());
 			uiMessage += "Cycle detected starting from block \"" + nameWithoutRoot + "\"\n";
 		}
@@ -268,7 +268,7 @@ bool GraphHandler::hasNoCycle(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _
 	return !anyCycleExists;
 }
 
-Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<EntityBlockConnection>>& _allConnectionsByID)
+Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionsByID)
 {
 	Graph graph;
 	
@@ -276,7 +276,7 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 	for (auto& blockEntityByBlockID : _allBlockEntitiesByBlockID)
 	{
 		const ot::UID& blockID = blockEntityByBlockID.first;
-		const std::shared_ptr<EntityBlock> blockEntity = blockEntityByBlockID.second;
+		const std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByBlockID.second;
 
 		std::shared_ptr<GraphNode> node = graph.addNode();
 		m_graphNodeByBlockID[blockID] = node;
@@ -291,7 +291,7 @@ Graph GraphHandler::buildGraph(std::map<ot::UID, std::shared_ptr<EntityBlock>>& 
 				
 		ot::UID destinationUID = connectionCfg.getDestinationUid();
 		ot::UID originUID = connectionCfg.getOriginUid();
-		const std::string& destinationConnectableName = connectionCfg.getDestConnectable();
+		const std::string& destinationConnectableName = connectionCfg.getDestinationConnectable();
 		const std::string& originConnectableName = connectionCfg.getOriginConnectable();
 
 		//First we determine the direction which is determined by the connectable types: out -> in/optIn

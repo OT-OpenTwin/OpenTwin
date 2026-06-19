@@ -232,7 +232,8 @@ inline void BatchedCategorisationHandler::ensureEssentials()
 	if (m_rmdEntityName == "")
 	{
 		ot::EntityInformation entityInfo;
-		std::list<std::string> allItems = ot::ModelServiceAPI::getListOfFolderItems(CategorisationFolderNames::getRootFolderName());
+		ot::UIDList allItems = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), EntityParameterizedDataCategorization::className(),false);
+		assert(allItems.size() == 1);
 		ot::ModelServiceAPI::getEntityInformation(*allItems.begin(), entityInfo);
 		m_rmdEntityName = entityInfo.getEntityName();
 	}

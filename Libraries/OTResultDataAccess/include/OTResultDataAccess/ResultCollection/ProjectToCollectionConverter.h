@@ -30,7 +30,7 @@ class OT_RESULTDATAACCESS_API_EXPORT ProjectToCollectionConverter
 {
 public:
 	ProjectToCollectionConverter(const std::string& _sessionServiceURL);
-	std::string nameCorrespondingCollection(const std::string& _projectName, const std::string& _userName, const std::string& _userPSW);
+	std::string nameCorrespondingCollection(const std::string& _projectName, const std::string& databaseUserName, const std::string& databaseUserPwd);
 private:
 	std::string m_authorisationService;
 };

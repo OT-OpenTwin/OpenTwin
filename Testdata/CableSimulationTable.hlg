@@ -1,0 +1,103 @@
+--------------------------------------------------------------------------------
+Translator Name    : Spatial InterOp Connect ( Version : 2024 1.0.1 )
+System Name        : Windows_NT
+Machine Name       : DESKTOP-O6742MC
+User Name          : JWagner
+Source System      : ACIS
+Destination System : STEP
+Input File         : C:\OpenTwin\Testdata\CableSimulationTable.sat
+Output File        : C:\OpenTwin\Testdata\CableSimulationTable.stp
+Start Time         : Wed Jun 10 10:39:30 2026
+
+--------------------------------------------------------------------------------
+Message : === Translation Options ===
+Message : SaveVersion : AP242
+Message : ProgramName : CST ACIS InterOp Converter 2025
+Message : IGES.Writer.TranslateSolidSheets : true
+Message : IGES.Writer.ConvertAnalyticalSurfacesAndCurvesToSpline : false
+Message : IGES.TrimCurveWritePreference  : 3
+Message : AuthorName : JWagner
+Message : ===========================
+-------------------------Source File Header Information-------------------------
+Modification Date        : 10 Jun 2026
+File Name                : CableSimulationTable.sat
+Organization             : CST Cable Studio
+Version                  : 3400
+Units                    : MILLIMETER
+Tolerance                : 0.000001
+Document Type            : Part
+Format Type              : ACIS
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Source Document Preprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Target Document Preprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Start BRep
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BRep Source Representation Preprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BRep Target Representation Preprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BRep Source Representation Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+BRep Target Representation Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+End BRep
+------------------------Representation Conversion Summary-----------------------
+No. of Solid Bodies                       :    11
+No. of Sheet Bodies                       :    4
+No. of Wire Bodies                        :    0
+No. of Geometric Sets                     :    0
+No. of Curve Sets                         :    0
+--------------------------------------------------------------------------------
+BRep Conversion Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Start DocumentFeature
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+DocumentFeature Source Representation Preprocessing Result : No Entity to Translate
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+DocumentFeature Target Representation Preprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+DocumentFeature Source Representation Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+DocumentFeature Target Representation Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+End DocumentFeature
+------------------------Representation Conversion Summary-----------------------
+No. of Selection Sets                     :    0
+--------------------------------------------------------------------------------
+DocumentFeature Conversion Result : No Entity to Translate
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Target Document Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+Target Document Postprocessing Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+---------------------------Document Conversion Summary--------------------------
+No. of Items of BRep Representation            :    15
+No. of Items of DocumentFeature Representation :    0
+--------------------------------------------------------------------------------
+Output File "C:\OpenTwin\Testdata\CableSimulationTable.stp" is Successfully Written
+--------------------------------------------------------------------------------
+Finish Time : Wed Jun 10 10:39:30 2026
+
+--------------------------------------------------------------------------------
+Translation Result : Success
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------

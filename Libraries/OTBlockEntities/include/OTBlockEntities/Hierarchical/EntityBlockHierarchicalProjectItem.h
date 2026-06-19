@@ -39,23 +39,9 @@ namespace ot {
 
 		virtual std::string getBlockFolderName() const override { return "Projects"; };
 
-		virtual ot::GraphicsItemCfg* createBlockCfg() override;
 		virtual bool updateFromProperties() override;
 
 		virtual void createProperties() override;
-
-		// ###########################################################################################################################################################################################################################################################################################################################
-
-		// Data accessors
-
-		void setPreviewFile(const EntityBase& _entity, ot::ImageFileFormat _format) { setPreviewFile(_entity.getEntityID(), _entity.getEntityStorageVersion(), _format); };
-		void setPreviewFile(ot::UID _entityID, ot::UID _entityVersion, ot::ImageFileFormat _format);
-		void removePreviewFile();
-		bool hasPreviewFile() const { return m_previewUID != ot::invalidUID; };
-		ot::UID getPreviewFileID() const { return m_previewUID; };
-		ot::UID getPreviewFileVersion() const { return m_previewVersion; };
-		ot::ImageFileFormat getPreviewFileFormat() const { return m_previewFormat; };
-		std::shared_ptr<EntityBinaryData> getPreviewFileData();
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -76,16 +62,9 @@ namespace ot {
 		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
 
 	private:
-		void ensurePreviewLoaded();
-
 		std::string m_projectName;
 		std::string m_projectType;
 		std::string m_collectionName;
-
-		ot::UID m_previewUID;
-		ot::UID m_previewVersion;
-		ot::ImageFileFormat m_previewFormat;
-		std::shared_ptr<EntityBinaryData> m_previewData;
 	};
 
 }

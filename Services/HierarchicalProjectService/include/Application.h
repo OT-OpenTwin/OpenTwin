@@ -30,6 +30,7 @@
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTGuiAPI/TextEditorActionHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
+#include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalBase.h"
 
 // std header
 #include <list>
@@ -75,6 +76,7 @@ public:
 
 protected:
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
+	virtual ot::ReturnMessage graphicsItemClicked(const ot::GraphicsClickEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
 
 	virtual ot::ReturnMessage graphicsConnectionRequested(const ot::GraphicsConnectionDropEvent& _eventData) override;
@@ -106,15 +108,17 @@ private:
 
 	void handleOpenSelectedItems();
 
-	void handleAddImageToProject();
-	void handleRemoveImageFromProject();
-	void handleUpdateImageFromProject();
+	void handleAddCenterImageToBlock();
+	void handleRemoveCenterImageFromBlock();
+	void handleUpdateCenterImageOfProject();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Private: Helper
 
 	void updateButtonStates();
+
+	std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>> getSelectedBlocks();
 
 	std::list<ot::EntityInformation> getSelectedDocuments();
 
@@ -154,7 +158,7 @@ private:
 
 	ot::ToolBarButtonCfg m_openSelectedItems;
 
-	ot::ToolBarButtonCfg m_addImageToProjectButton;
-	ot::ToolBarButtonCfg m_removeImageFromProjectButton;
-	ot::ToolBarButtonCfg m_updateImageFromProjectButton;
+	ot::ToolBarButtonCfg m_addCenterImageToBlockButton;
+	ot::ToolBarButtonCfg m_removeCenterImageFromBlockButton;
+	ot::ToolBarButtonCfg m_updateCenterImageOfProjectButton;
 };

@@ -30,11 +30,11 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 		if (Application::instance()->getProjectName() != _projectName)
 		{
 			// We need to load another model state. List of projects is already reduced to those which the user has access to, so permission to the collection is guaranteed.
-			const std::string userName = Application::instance()->getLogInUserName();
-			const std::string pswd = Application::instance()->getLogInUserPassword();
+			const std::string databaseUserName = Application::instance()->getDataBaseUserName();
+			const std::string databaseUserPwd = Application::instance()->getDataBaseUserPassword();
 			
 			// Getting information of session service. Potential to reduce communication with buffer.
-			_collectionName = m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,userName,pswd);
+			_collectionName = m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,databaseUserName, databaseUserPwd);
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
 			auto startModelState = std::chrono::high_resolution_clock::now();
 			CrossCollectionDatabaseWrapper wrapper(_collectionName);

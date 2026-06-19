@@ -170,6 +170,8 @@ namespace ot {
 		//! @return True if the dialog may close, otherwise false.
 		virtual bool mayCloseDialogWindow();
 
+		void fillDialogConfig(DialogCfg& _config) const;
+
 	private:
 		//! @brief The current dialog state flags.
 		DialogStateFlags m_state;

@@ -39,8 +39,8 @@ class BlockEntityHandler : public BusinessLogicHandler
 {
 public:
 	void createBlockPicker();
-	std::map<ot::UID, std::shared_ptr<EntityBlock>> findAllBlockEntitiesByBlockID(const std::string& _folderName);
-	std::map<ot::UID, std::shared_ptr<EntityBlockConnection>> findAllEntityBlockConnections(const std::string& _folderName);
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>> findAllBlockEntitiesByBlockID(const std::string& _folderName);
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> findAllEntityBlockConnections(const std::string& _folderName);
 	std::shared_ptr<EntityFileText> getCircuitModel(const std::string& _folderName, std::string _modelName);
 
 	// Function for resultCurves of Simulation

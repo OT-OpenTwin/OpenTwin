@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ManageGroups.cpp
 // 
 // License:
@@ -33,6 +33,7 @@
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/CheckBox.h"
 #include "OTWidgets/Widgets/PushButton.h"
+#include "Login/Authentication.h"
 
 // Qt header
 #include <QtGui/qevent.h>
@@ -209,29 +210,39 @@ void AddGroupDialog::slotConfirm()
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_GROUP, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CREATE_GROUP, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName().toStdString(), doc.GetAllocator()), doc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization service url: \"" + m_authServerURL + "\"");
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		if (hasError(response)) {
+			app->slotShowErrorPrompt("Create New Group", "The new group can not be created (the name may already be in use)", "");
+			return;
+		}
+
+		this->closeOk();
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-	
-	if (hasError(response)) {
-		app->slotShowErrorPrompt("Create New Group", "The new group can not be created (the name may already be in use)", "");
-		return;
-	}
-
-	this->closeOk();
 }
 
 bool AddGroupDialog::hasError(const std::string &response) {
@@ -310,30 +321,39 @@ void RenameGroupDialog::slotConfirm() {
 		return;
 	}
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_NAME, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_groupToRename, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(m_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
-	
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CHANGE_GROUP_NAME, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(m_groupToRename, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_NEW_GROUP_NAME, ot::JsonString(m_input->text().toStdString(), doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		if (!hasSuccessful(response)) {
+			app->slotShowErrorPrompt("Rename Group", "The new group can not be renamed (the new name may already be in use)", "");
+			return;
+		}
+
+		this->closeOk();
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	if (!hasSuccessful(response)) {
-		app->slotShowErrorPrompt("Rename Group", "The new group can not be renamed (the new name may already be in use)", "");
-		return;
-	}
-
-	this->closeOk();
 }
 
 bool RenameGroupDialog::hasSuccessful(const std::string &response)
@@ -570,29 +590,37 @@ void ManageGroups::slotDeleteGroup(void)
 	config.setIcon(ot::MessageDialogCfg::Warning);
 	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
 
-	if (AppBase::instance()->showPrompt(config, nullptr) == ot::MessageDialogCfg::Yes) {
+	if (AppBase::instance()->showPrompt(config, nullptr) & ot::MessageDialogCfg::Yes) {
 		// Delete the group
 		assert(!m_authServerURL.empty());
 
 		AppBase * app{ AppBase::instance() };
+		if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+		{
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_GROUP, doc.GetAllocator()), doc.GetAllocator());
+			doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+			ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
 
-		ot::JsonDocument doc;
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_GROUP, doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+			std::string response;
+			if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+				OT_LOG_E("Failed to send request to authorization service");
+				AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+				exit(ot::AppExitCode::SendFailed);
+				return;
+			}
 
-		std::string response;
-		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-			OT_LOG_E("Failed to send request to authorization service");
-			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-			exit(ot::AppExitCode::SendFailed);
-			return;
+			assert(hasSuccessful(response));
+
+			slotFillGroupsList();
 		}
-
-		assert(hasSuccessful(response));
-
-		slotFillGroupsList();
+		else
+		{
+			OT_LOG_E("Failed to validate/refresh sso token");
+			AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
+			exit(ot::AppExitCode::SendFailed);
+		}
+		
 	}
 }
 
@@ -609,34 +637,42 @@ void ManageGroups::slotMemberCheckBoxChanged(bool state, int row) {
 	std::string userName = m_membersList->item(row, 1)->text().toStdString();
 
 	AppBase * app{ AppBase::instance() };
-	ot::JsonDocument doc;
-
-	if (state)
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
 	{
-		// We need to add this user to the group
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_ADD_USER_TO_GROUP, doc.GetAllocator()), doc.GetAllocator());
+		ot::JsonDocument doc;
+
+		if (state)
+		{
+			// We need to add this user to the group
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_ADD_USER_TO_GROUP, doc.GetAllocator()), doc.GetAllocator());
+		}
+		else
+		{
+			// We need to remove the user from the group
+			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_USER_FROM_GROUP, doc.GetAllocator()), doc.GetAllocator());
+		}
+
+		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		if (!hasSuccessful(response)) {
+			OT_LOG_E("Request returned error");
+		}
 	}
 	else
 	{
-		// We need to remove the user from the group
-		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_REMOVE_USER_FROM_GROUP, doc.GetAllocator()), doc.GetAllocator());
-	}
-
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(userName, doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
-		return;
-	}
-
-	if (!hasSuccessful(response)) {
-		OT_LOG_E("Request returned error");
 	}
 }
 
@@ -666,80 +702,90 @@ void ManageGroups::slotFillGroupsList(void) {
 
 	AppBase* app{ AppBase::instance() };
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_GROUPS, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		std::string filterText = ot::String::toLower(m_filterGroups->text().toStdString());
+
+		const rapidjson::Value& groupArray = responseDoc["groups"];
+		assert(groupArray.IsArray());
+
+		std::list<std::string> groupNames;
+		std::map<std::string, std::string> groupOwners;
+
+		for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr) {
+			const rapidjson::Value& group = *itr;
+			std::string groupData = group.GetString();
+
+			ot::JsonDocument groupDoc;
+			groupDoc.fromJson(groupData);
+
+			std::string groupName = groupDoc[OT_PARAM_AUTH_GROUP].GetString();
+			std::string groupOwner = groupDoc[OT_PARAM_AUTH_GROUPOWNER].GetString();
+
+			groupNames.push_back(groupName);
+			groupOwners[groupName] = groupOwner;
+		}
+
+		groupNames.sort();
+
+		for (auto groupName : groupNames) {
+			std::string groupOwner = groupOwners[groupName];
+
+			if (!filterText.empty()) {
+				if (ot::String::toLower(groupName).find(filterText) == groupName.npos) {
+					continue;
+				}
+			}
+
+			std::array<QTableWidgetItem*, 2> dataRowItems;
+
+			{
+				QTableWidgetItem* hItm = new QTableWidgetItem(groupName.c_str());
+				auto flags = hItm->flags();
+				flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
+				hItm->setFlags(flags);
+				dataRowItems[0] = hItm;
+			}
+
+			{
+				QTableWidgetItem* hItm = new QTableWidgetItem(groupOwner.c_str());
+				auto flags = hItm->flags();
+				flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
+				hItm->setFlags(flags);
+				dataRowItems[1] = hItm;
+			}
+
+			m_groupsList->addRow(dataRowItems);
+		}
+
+		// Restore selection if possible
+
+
+		slotFillMembersList();
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	std::string filterText = ot::String::toLower(m_filterGroups->text().toStdString());
-
-	const rapidjson::Value& groupArray = responseDoc["groups"];
-	assert(groupArray.IsArray());
-
-	std::list<std::string> groupNames;
-	std::map<std::string, std::string> groupOwners;
-
-	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr) {
-		const rapidjson::Value& group = *itr;
-		std::string groupData = group.GetString();
-
-		ot::JsonDocument groupDoc;
-		groupDoc.fromJson(groupData);
-
-		std::string groupName = groupDoc[OT_PARAM_AUTH_GROUP].GetString();
-		std::string groupOwner = groupDoc[OT_PARAM_AUTH_GROUPOWNER].GetString();
-
-		groupNames.push_back(groupName);
-		groupOwners[groupName] = groupOwner;
-	}
-
-	groupNames.sort();
-
-	for (auto groupName : groupNames) {
-		std::string groupOwner = groupOwners[groupName];
-
-		if (!filterText.empty()) {
-			if (ot::String::toLower(groupName).find(filterText) == groupName.npos) {
-				continue;
-			}
-		}
-
-		std::array<QTableWidgetItem*, 2> dataRowItems;
-
-		{
-			QTableWidgetItem* hItm = new QTableWidgetItem(groupName.c_str());
-			auto flags = hItm->flags();
-			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
-			hItm->setFlags(flags);
-			dataRowItems[0] = hItm;
-		}
-
-		{
-			QTableWidgetItem* hItm = new QTableWidgetItem(groupOwner.c_str());
-			auto flags = hItm->flags();
-			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
-			hItm->setFlags(flags);
-			dataRowItems[1] = hItm;
-		}
-
-		m_groupsList->addRow(dataRowItems);
-	}
-
-	// Restore selection if possible
-
-
-	slotFillMembersList();
 }
 
 void ManageGroups::slotFillMembersList(void) {
@@ -778,98 +824,118 @@ void ManageGroups::slotFillMembersList(void) {
 	// Add new content to list
 	assert(!m_authServerURL.empty());
 
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_GROUP_DATA, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
+	if (ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData()))
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_GROUP_DATA, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_PARAM_AUTH_GROUP_NAME, ot::JsonString(groupName, doc.GetAllocator()), doc.GetAllocator());
 
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		if (app->getCurrentLoginData().loggedInViaSSO())
+		{
+			doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(app->getCurrentLoginData().getSSOSessionToken(), doc.GetAllocator()), doc.GetAllocator());
+		}
+		else
+		{
+			doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+		}
+
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
+
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		// Reset in group flag for all members
+		for (auto user : m_userInGroup) {
+			m_userInGroup[user.first] = false;
+		}
+
+		// Now update the group flag according to the group membership
+		const rapidjson::Value& userArray = responseDoc["users"];
+		assert(userArray.IsArray());
+
+		for (rapidjson::Value::ConstValueIterator itr = userArray.Begin(); itr != userArray.End(); ++itr) {
+			const rapidjson::Value& user = *itr;
+			std::string userName = user.GetString();
+
+			m_userInGroup[userName] = true;
+		}
+
+		// Fill the list (considering filter and show group members only flag)
+
+		std::string filterText = ot::String::toLower(m_filterMembers->text().toStdString());
+
+		m_userList.sort();
+
+		for (auto userName : m_userList) {
+			if (!filterText.empty()) {
+				if (ot::String::toLower(userName).find(filterText) == userName.npos) {
+					continue;
+				}
+			}
+
+			if (m_showMembersOnly->isChecked() && !m_userInGroup[userName]) {
+				continue;
+			}
+
+			std::array<QTableWidgetItem*, 2> dataRowItems;
+
+			{
+				QTableWidgetItem* hItm = new QTableWidgetItem();
+				dataRowItems[0] = hItm;
+			}
+
+			{
+				QTableWidgetItem* hItm = new QTableWidgetItem(userName.c_str());
+				auto flags = hItm->flags();
+				flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
+				hItm->setFlags(flags);
+				dataRowItems[1] = hItm;
+			}
+
+			m_membersList->addRow(dataRowItems);
+
+			QWidget* pWidget = new QWidget();
+			QCheckBox* pCheckBox = new QCheckBox();
+			QHBoxLayout* pLayout = new QHBoxLayout(pWidget);
+			pLayout->addWidget(pCheckBox);
+			pLayout->setAlignment(Qt::AlignCenter);
+			pLayout->setContentsMargins(0, 0, 0, 0);
+			pWidget->setLayout(pLayout);
+			m_membersList->setCellWidget(m_membersList->rowCount() - 1, 0, pWidget);
+
+			if (m_userInGroup[userName]) {
+				pCheckBox->setChecked(true);
+			}
+
+			if (userName == groupOwner) {
+				pCheckBox->setEnabled(false);
+			}
+
+			if (app->getCurrentLoginData().getUserName() != groupOwner) {
+				pCheckBox->setEnabled(false);
+			}
+
+			connect(pCheckBox, &QCheckBox::clicked, this, [pCheckBox, this, row = m_membersList->rowCount() - 1](bool flag) {slotMemberCheckBoxChanged(flag, row); });
+		}
+
+		// Restore selection if possible
+	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+		AppBase::instance()->slotShowErrorPrompt("SSO Validation Error", "Failed to validate/refresh sso token", "");
 		exit(ot::AppExitCode::SendFailed);
 		return;
 	}
 
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	// Reset in group flag for all members
-	for (auto user : m_userInGroup) {
-		m_userInGroup[user.first] = false;
-	}
-
-	// Now update the group flag according to the group membership
-	const rapidjson::Value& userArray = responseDoc["users"];
-	assert(userArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = userArray.Begin(); itr != userArray.End(); ++itr) {
-		const rapidjson::Value& user = *itr;
-		std::string userName = user.GetString();
-
-		m_userInGroup[userName] = true;
-	}
-
-	// Fill the list (considering filter and show group members only flag)
-
-	std::string filterText = ot::String::toLower(m_filterMembers->text().toStdString());
-
-	m_userList.sort();
-
-	for (auto userName : m_userList) {
-		if (!filterText.empty()) {
-			if (ot::String::toLower(userName).find(filterText) == userName.npos) {
-				continue;
-			}
-		}
-
-		if (m_showMembersOnly->isChecked() && !m_userInGroup[userName]) {
-			continue;
-		}
-
-		std::array<QTableWidgetItem*, 2> dataRowItems;
-
-		{
-			QTableWidgetItem* hItm = new QTableWidgetItem();
-			dataRowItems[0] = hItm;
-		}
-
-		{
-			QTableWidgetItem* hItm = new QTableWidgetItem(userName.c_str());
-			auto flags = hItm->flags();
-			flags.setFlag(Qt::ItemFlag::ItemIsEditable, false);
-			hItm->setFlags(flags);
-			dataRowItems[1] = hItm;
-		}
-
-		m_membersList->addRow(dataRowItems);
-
-		QWidget* pWidget = new QWidget();
-		QCheckBox* pCheckBox = new QCheckBox();
-		QHBoxLayout* pLayout = new QHBoxLayout(pWidget);
-		pLayout->addWidget(pCheckBox);
-		pLayout->setAlignment(Qt::AlignCenter);
-		pLayout->setContentsMargins(0, 0, 0, 0);
-		pWidget->setLayout(pLayout);
-		m_membersList->setCellWidget(m_membersList->rowCount() - 1, 0, pWidget);
-
-		if (m_userInGroup[userName]) {
-			pCheckBox->setChecked(true);
-		}
-
-		if (userName == groupOwner) {
-			pCheckBox->setEnabled(false);
-		}
-
-		if (app->getCurrentLoginData().getUserName() != groupOwner) {
-			pCheckBox->setEnabled(false);
-		}
-
-		connect(pCheckBox, &QCheckBox::clicked, this, [pCheckBox, this, row = m_membersList->rowCount() - 1](bool flag) {slotMemberCheckBoxChanged(flag, row); });
-	}
-
-	// Restore selection if possible
+	
 
 
 }
@@ -882,37 +948,44 @@ void ManageGroups::readUserList(void)
 	assert(!m_authServerURL.empty());
 
 	AppBase * app{ AppBase::instance() };
-
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string response;
-	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-		OT_LOG_E("Failed to send request to authorization service");
-		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
-		exit(ot::AppExitCode::SendFailed);
-		return;
-	}
-
-	ot::JsonDocument responseDoc;
-	responseDoc.fromJson(response);
-
-	const rapidjson::Value& groupArray = responseDoc[ "users" ];
-	assert(groupArray.IsArray());
-
-	for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
+	bool tokenValid = ot::Authentication::validateAndRefreshToken(app->getCurrentLoginData());
+	if (tokenValid)
 	{
-		const rapidjson::Value& user = *itr;
-		std::string userData = user.GetString();
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USERS, doc.GetAllocator()), doc.GetAllocator());
+		ot::Authentication::addAuthenticationData(app->getCurrentLoginData(), doc);
+		
+		std::string response;
+		if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			OT_LOG_E("Failed to send request to authorization service");
+			AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+			exit(ot::AppExitCode::SendFailed);
+			return;
+		}
 
-		ot::JsonDocument userDoc;
-		userDoc.fromJson(userData);
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
 
-		std::string userName = userDoc[OT_PARAM_AUTH_USER_NAME].GetString();
+		const rapidjson::Value& groupArray = responseDoc["users"];
+		assert(groupArray.IsArray());
 
-		m_userList.push_back(userName);
-		m_userInGroup[userName] = false;
+		for (rapidjson::Value::ConstValueIterator itr = groupArray.Begin(); itr != groupArray.End(); ++itr)
+		{
+			const rapidjson::Value& user = *itr;
+			std::string userData = user.GetString();
+
+			ot::JsonDocument userDoc;
+			userDoc.fromJson(userData);
+
+			std::string userName = userDoc[OT_PARAM_AUTH_USER_NAME].GetString();
+
+			m_userList.push_back(userName);
+			m_userInGroup[userName] = false;
+		}
 	}
+	else
+	{
+		OT_LOG_E("Failed to validate/refresh sso token");
+	}
+
 }

@@ -18,7 +18,6 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTGui/Graphics/GraphicsHierarchicalProjectItemBuilder.h"
 #include "OTModelEntities/EntityFile.h"
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTBlockEntities/Hierarchical/EntityBlockHierarchicalDocumentItem.h"
@@ -40,20 +39,6 @@ ot::EntityBlockHierarchicalDocumentItem::EntityBlockHierarchicalDocumentItem(ot:
 	setBlockTitle("Hierarchical Document Item");
 
 	resetModified();
-}
-
-ot::GraphicsItemCfg* ot::EntityBlockHierarchicalDocumentItem::createBlockCfg() {
-	ot::GraphicsHierarchicalProjectItemBuilder builder;
-
-	// Mandatory settings
-	builder.setName(this->getName());
-	builder.setTitle(this->createBlockHeadline());
-	builder.setLeftTitleCornerImagePath("Hierarchical/Document");
-	builder.setTitleBackgroundGradientColor(ot::Red);
-	builder.setPreviewImagePath("Hierarchical/DocumentBackground");
-
-	// Create the item
-	return builder.createGraphicsItem();
 }
 
 bool ot::EntityBlockHierarchicalDocumentItem::updateFromProperties() {

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: DocumentAPI.cpp
 // 
 // License:
@@ -146,6 +146,29 @@ namespace DataStorageAPI
 			buffer = new std::uint8_t[length];
 			downloader.read(buffer, length);
 			downloader.close();
+		}
+		catch (std::exception& e)
+		{
+			std::cout << e.what();
+		}
+	}
+
+	void DocumentAPI::GetDocumentUsingGridFs(value id, const std::string& fileName, std::vector<uint8_t>& _buffer, const std::string& dataBase)
+	{
+		try
+		{
+			auto db = DataStorageAPI::ConnectionAPI::getInstance().getDatabase(dataBase);
+			mongocxx::options::gridfs::bucket bucketOptions = mongocxx::options::gridfs::bucket();
+			bucketOptions.bucket_name(fileName);
+			auto bucket = db.gridfs_bucket(bucketOptions);
+
+			auto downloader = bucket.open_download_stream(id);
+			int64_t length = downloader.file_length();
+
+			_buffer.resize(length);
+			downloader.read(_buffer.data(), length);
+			downloader.close();
+
 		}
 		catch (std::exception& e)
 		{

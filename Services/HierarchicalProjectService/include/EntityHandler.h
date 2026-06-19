@@ -24,7 +24,9 @@
 #include "OTCore/FolderNames.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectInformation.h"
+#include "OTGui/Event/GraphicsClickEvent.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -54,19 +56,24 @@ public:
 	void addLabel();
 
 private:
-	void updateProjectImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
+	void updateProjectBlockCenterImage(const ot::EntityInformation& _projectInfo, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
 public:
-	void updateProjectImages(const std::list<ot::EntityInformation>& _projects);
+	void updateProjectBlockCenterImages(const std::list<ot::EntityInformation>& _projects);
 
-	bool addImageToProject(const std::string& _projectEntityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
-	bool removeImageFromProjects(const std::list<ot::EntityInformation>& _projects);
+private:
+	bool addCenterImageToBlock(const std::string& _entityName, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter, ot::NewModelStateInfo& _newEntities, ot::NewModelStateInfo& _updateEntities, std::list<ot::UID>& _removalEntities);
+public:
+	bool addCenterImageToBlocks(const std::list<std::string>& _entityNames, const std::string& _fileName, const std::string& _fileContent, int64_t _uncompressedDataLength, const std::string& _fileFilter);
+	bool removeCenterImageFromBlocks(const std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>>& _blocks);
 
 	void addContainer();
+
+	void expandCollapseSubtree(const ot::GraphicsClickEvent& _event, const ot::GraphicsItemMap& _itemMap);
 
 private:
 	bool getFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extensionString, ot::FileExtension::DefaultFileExtension& _extension) const;
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
-	bool getCoordinate(const EntityBlock* _block, ot::Point2DD& _pos);
+	bool getCoordinate(const ot::EntityBlock* _block, ot::Point2DD& _pos);
 
 	const std::string c_rootFolderPath;
 	const std::string c_projectsFolder;

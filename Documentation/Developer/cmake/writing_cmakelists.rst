@@ -3,9 +3,10 @@
 Writing a CMakeLists.txt
 ========================
 
-Every project follows the same three steps: initialize the target, declare its
-dependencies, then finalize it. Any optional tweaks go between initialize and
-finalize.
+Steps:
+Initialize the target, declare its dependencies, then finalize it. 
+
+Any optional tweaks go between initialize and finalize.
 
 .. code-block:: text
 
@@ -67,8 +68,7 @@ with ``OPENTWINEXAMPLE_EXPORTS``. To set your own, pass it as the third argument
 A service (DLL)
 ---------------
 
-A service is a shared library too; it just tends to pull in more dependencies.
-The export macro is usually ``SESSIONSERVICE_EXPORTS``:
+A service is a shared library too.
 
 .. code-block:: cmake
 
@@ -93,10 +93,11 @@ The export macro is usually ``SESSIONSERVICE_EXPORTS``:
    ot_finalize_lib(LoggerService)
    ot_add_test(LoggerService)
 
-An executable (command line tool)
----------------------------------
+.. note::
+   Services can also be binaries/executables. In that case use the ``ot_initialize_bin`` and ``ot_finalize_bin``.
 
-Tools live in ``Tools/`` and use ``ot_initialize_bin`` and ``ot_finalize_bin``.
+An executable
+---------------------------------
 
 .. code-block:: cmake
 
@@ -122,7 +123,7 @@ differ from the target name:
 
 .. code-block:: cmake
 
-   ot_finalize_bin(MongoDBUpgradeManager "MongoDBUpgrade")
+   ot_finalize_bin(uiService uiFrontend)
 
 .. note::
    ``ot_set_runtime_static_release`` is only for stand alone tools that ship as a

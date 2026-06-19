@@ -330,7 +330,7 @@ void ot::GraphicsConnectionItem::setDestPos(const Point2DD& _pos) {
 	else {
 		OTAssertNullptr(m_destConnector);
 		this->prepareGeometryChange();
-		m_config.setDestPos(_pos);
+		m_config.setDestinationPos(_pos);
 		m_destConnector->setPos(QtFactory::toQPoint(_pos) - QPointF(m_destConnector->boundingRect().width() / 2., m_destConnector->boundingRect().height() / 2.));
 		this->update();
 	}
@@ -411,7 +411,7 @@ void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _di
 
 void ot::GraphicsConnectionItem::updatePositionsFromItems() {
 	m_config.setOriginPos(QtFactory::toPoint2D(this->getOriginPos()));
-	m_config.setDestPos(QtFactory::toPoint2D(this->getDestPos()));
+	m_config.setDestinationPos(QtFactory::toPoint2D(this->getDestPos()));
 }
 
 void ot::GraphicsConnectionItem::updateConnectionView() {
@@ -501,12 +501,12 @@ void ot::GraphicsConnectionItem::updateOriginConnectionInformation() {
 
 void ot::GraphicsConnectionItem::updateDestConnectionInformation() {
 	if (m_dest) {
-		m_config.setDestConnectable(m_dest->getGraphicsItemName());
-		m_config.setDestUid(m_dest->getRootItem()->getGraphicsItemUid());
+		m_config.setDestinationConnectable(m_dest->getGraphicsItemName());
+		m_config.setDestinationUid(m_dest->getRootItem()->getGraphicsItemUid());
 	}
 	else {
-		m_config.setDestConnectable("");
-		m_config.setDestUid(ot::invalidUID);
+		m_config.setDestinationConnectable("");
+		m_config.setDestinationUid(ot::invalidUID);
 	}
 }
 
@@ -591,7 +591,7 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 				m_destConnector->finalizeGraphicsItem();
 			}
 
-			m_destConnector->setPos(QtFactory::toQPoint(m_config.getDestPos()) - QPointF(m_destConnector->getRadiusX(), m_destConnector->getRadiusY()));
+			m_destConnector->setPos(QtFactory::toQPoint(m_config.getDestinationPos()) - QPointF(m_destConnector->getRadiusX(), m_destConnector->getRadiusY()));
 			m_destConnector->storeConnection(this);
 		}
 	}

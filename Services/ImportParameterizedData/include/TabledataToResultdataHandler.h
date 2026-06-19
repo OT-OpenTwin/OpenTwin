@@ -39,6 +39,7 @@ public:
 	TabledataToResultdataHandler(const std::string& _datasetFolder, const std::string& _tableFolder);
 	void createDataCollection(const std::string& _dbURL, const std::string& _projectName);
 
+	static std::string extractUnitFromName(std::string& _name);
 private:
 	
 	const std::string m_datasetFolder;
@@ -60,5 +61,4 @@ private:
 	void rangeData2Json(ot::JsonDocument& _doc, KeyValuesExtractor&& _assembyRangeData);
 
 	std::list<DatasetDescription> extractDataset(const MetadataAssemblyData& _metadataAssembly, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>> loadedTables, KeyValuesExtractor& _outSeriesMetadata);
-	std::string extractUnitFromName(std::string& _name);
 };

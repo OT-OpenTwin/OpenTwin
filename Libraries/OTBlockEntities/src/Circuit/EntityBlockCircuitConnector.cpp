@@ -23,9 +23,9 @@
 #include "OTGui/Graphics/BasicGraphicsIntersectionItem.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitConnector.h"
 
-static EntityFactoryRegistrar<EntityBlockCircuitConnector> registrar(EntityBlockCircuitConnector::className());
+static EntityFactoryRegistrar<ot::EntityBlockCircuitConnector> registrar(ot::EntityBlockCircuitConnector::className());
 
-EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
+ot::EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms)
 	:EntityBlock(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
@@ -38,7 +38,7 @@ EntityBlockCircuitConnector::EntityBlockCircuitConnector(ot::UID ID, EntityBase*
 	resetModified();
 }
 
-ot::GraphicsItemCfg* EntityBlockCircuitConnector::createBlockCfg() {
+ot::GraphicsItemCfg* ot::EntityBlockCircuitConnector::createBlockCfg() {
 	ot::BasicGraphicsIntersectionItem* newConfig = new ot::BasicGraphicsIntersectionItem;
 	newConfig->setUid(this->getEntityID());
 	newConfig->setName(this->getName());
@@ -46,12 +46,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitConnector::createBlockCfg() {
 	return newConfig;
 }
 
-void EntityBlockCircuitConnector::addStorageData(bsoncxx::builder::basic::document& storage)
+void ot::EntityBlockCircuitConnector::addStorageData(bsoncxx::builder::basic::document& storage)
 {
 	EntityBlock::addStorageData(storage);
 }
 
-void EntityBlockCircuitConnector::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+void ot::EntityBlockCircuitConnector::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	EntityBlock::readSpecificDataFromDataBase(doc_view, entityMap);
 }

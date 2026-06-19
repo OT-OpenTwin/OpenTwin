@@ -97,7 +97,7 @@ bool EntityResult1DPlot::updateFromProperties()
 	visualisationCfg.setOverrideViewerContent(requiresDataToBeFetched);
 	visualisationCfg.setAsActiveView(true);
 	getObserver()->requestVisualisation(getEntityID(), visualisationCfg);
-	
+
 	bool gridRefresh = updatePropertyVisibilities();
 	getProperties().forceResetUpdateForAllProperties();
 
@@ -125,7 +125,7 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), true);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), false);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), false);
-		
+
 		// Here we set the conditional visibilities.
 		updatePropertiesGrid |= updateAxisPropertiesVisibility(getXAxisPropertyGroupName());
 		updatePropertiesGrid |= updateAxisPropertiesVisibility(getYAxisPropertyGroupName());
@@ -136,7 +136,7 @@ bool EntityResult1DPlot::updatePropertyVisibilities()
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getYAxisPropertyGroupName(), false);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getRadiusAxisPropertyGroupName(), true);
 		updatePropertiesGrid |= setAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName(), true);
-	
+
 		// Here we set the conditional visibilities.
 		updatePropertiesGrid |= updateAxisPropertiesVisibility(getRadiusAxisPropertyGroupName());
 		updatePropertiesGrid |= updateAxisPropertiesVisibility(getAzimuthAxisPropertyGroupName());
@@ -189,7 +189,7 @@ void EntityResult1DPlot::propertiesAboutToBeShown()
 {
 	EntityContainer::propertiesAboutToBeShown();
 	updateCurveDependencies();
-	
+
 }
 
 void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const std::string& _tupleFormat, const std::vector<std::string>& _parameterOptions)
@@ -233,7 +233,7 @@ void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const s
 void EntityResult1DPlot::createProperties()
 {
 	// Query options are set in the addChild and removeChild methods
-	
+
 	std::list<std::string> allQueryOptions{ "" };
 	// General settings
 
@@ -249,20 +249,20 @@ void EntityResult1DPlot::createProperties()
 	originProp->setDecimalPlaces(3);
 
 	// Axis settings
-	EntityPropertiesInteger::createProperty(getXAxisPropertyGroupName(), m_propertyNbOfSecondaryParameter, 0,0, m_numberOfSecondaryParameterSelections, "default", getProperties());
+	EntityPropertiesInteger::createProperty(getXAxisPropertyGroupName(), m_propertyNbOfSecondaryParameter, 0, 0, m_numberOfSecondaryParameterSelections, "default", getProperties());
 	EntityPropertiesSelection::createProperty(getXAxisPropertyGroupName(), "Parameter", {}, "", "default", getProperties());
 	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
 	{
-		EntityPropertiesSelection* selection = EntityPropertiesSelection::createProperty(m_propertyGroupSecondaryParameter + " " + std::to_string(i),m_propertyNameSecondaryParameter, {}, "", "default", getProperties());
+		EntityPropertiesSelection* selection = EntityPropertiesSelection::createProperty(m_propertyGroupSecondaryParameter + " " + std::to_string(i), m_propertyNameSecondaryParameter, {}, "", "default", getProperties());
 		selection->setGroupChanges(true);
 	}
-	EntityPropertiesSelection* quYAxis =	EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	EntityPropertiesSelection* quYAxis = EntityPropertiesSelection::createProperty(getYAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
 	quYAxis->setVisible(false);
-	EntityPropertiesSelection* quRadiusAxis =EntityPropertiesSelection::createProperty(getRadiusAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	EntityPropertiesSelection* quRadiusAxis = EntityPropertiesSelection::createProperty(getRadiusAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
 	quRadiusAxis->setVisible(false);
-	EntityPropertiesSelection* quAngleAxis =EntityPropertiesSelection::createProperty(getAzimuthAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
+	EntityPropertiesSelection* quAngleAxis = EntityPropertiesSelection::createProperty(getAzimuthAxisPropertyGroupName(), "Quantity component", {}, "", "default", getProperties());
 	quAngleAxis->setVisible(false);
-			
+
 	createAxisProperties(getXAxisPropertyGroupName());
 	createAxisProperties(getYAxisPropertyGroupName());
 	createAxisProperties(getAzimuthAxisPropertyGroupName());
@@ -303,7 +303,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
 	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Parameter", getXAxisPropertyGroupName());
-	
+
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
@@ -328,7 +328,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	// Setup axis
 
+	// X Axis Cartesian = Azimuth Axis Polar
 	ot::Plot1DAxisCfg xAxisCfg = config.getXAxis();
+
+	// Y Axis Cartesian = Radius Axis Polar
 	ot::Plot1DAxisCfg yAxisCfg = config.getYAxis();
 
 	if (config.getPlotType() == ot::Plot1DCfg::Cartesian)
@@ -344,13 +347,18 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
 	{
-		setAxisFromProperties(getRadiusAxisPropertyGroupName(), xAxisCfg);
-		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), yAxisCfg);
+		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), xAxisCfg);
+		setAxisFromProperties(getRadiusAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
-		yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
+		if (!phaseAxisComponent.empty()) 
+		{
+			xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
+		}
 		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
-		xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
-
+		if (!radiusAxisComponent.empty()) 
+		{
+			yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
+		}
 	}
 	else
 	{
@@ -380,7 +388,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	secondaryParameter.sort();
 	secondaryParameter.unique();
 	config.setSecondaryParameter(secondaryParameter);
-	
+
 	return config;
 }
 
@@ -430,7 +438,7 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 
 void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot::Plot1DAxisCfg& _axis)
 {
-	
+
 	const bool logScale = PropertyHelper::getBoolPropertyValue(this, "Logscale", _axisName);
 	const bool autoScale = PropertyHelper::getBoolPropertyValue(this, "Autoscale", _axisName);
 
@@ -451,7 +459,7 @@ void EntityResult1DPlot::setAxisFromProperties(const std::string& _axisName, ot:
 
 	_axis.setIsLogScale(logScale);
 	_axis.setIsAutoScale(autoScale);
-	
+
 	_axis.setAutoDetermineAxisLabel(automaticLabel);
 	_axis.setAxisLabel(labelOverride);
 
@@ -500,7 +508,7 @@ bool EntityResult1DPlot::updateAxisPropertiesVisibility(const std::string& _axis
 	{
 		minProp->setVisible(minMaxVisible);
 		maxProp->setVisible(minMaxVisible);
-		
+
 		changed = true;
 	}
 
@@ -635,7 +643,7 @@ void EntityResult1DPlot::setStaticCurveQueryOptions(const ot::Plot1DCfg& _config
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
 	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{_config.getXAxisParameter()}, this, "Parameter", getXAxisPropertyGroupName());
-	
+
 	const std::string tupleType = _config.getTupleType();
 	const std::string tupleFormat = _config.getTupleFormat();
 	setTupleSettings(tupleType, tupleFormat, { _config.getXAxisParameter() });

@@ -27,94 +27,101 @@
 #include "OTGui/CopyInformation.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
-#include "OTGui/Graphics/GraphicsFlowItemBuilder.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityCoordinates2D.h"
 #include "OTBlockEntities/Connector.h"
 #include "OTBlockEntities/BlockEntitiesAPIExport.h"
 
-class OT_BLOCKENTITIES_API_EXPORT EntityBlock : public EntityBase
-{
-public:
-	EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
-	EntityBlock(const EntityBlock& _other) = default;
-	EntityBlock(EntityBlock&& _other) = default;
-	EntityBlock& operator=(const EntityBlock& _other) = default;
-	EntityBlock& operator=(EntityBlock&& _other) = default;
-	virtual ~EntityBlock();
+namespace ot {
 
-	virtual entityType getEntityType(void) const override { return TOPOLOGY; }
-	virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
-	virtual void addVisualizationNodes(void) override;
+	class OT_BLOCKENTITIES_API_EXPORT EntityBlock : public EntityBase
+	{
+		OT_DECL_DEFCOPY(EntityBlock)
+			OT_DECL_DEFMOVE(EntityBlock)
+	public:
+		EntityBlock(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+		virtual ~EntityBlock();
 
-	ot::UID getCoordinateEntityID() const { return m_coordinate2DEntityID; }
-	EntityCoordinates2D* getCoordinateEntity() { return m_coordinateEntity; }
-	const std::string& getBlockTitle() const { return m_blockTitle; }
-	
-	//! @brief The name of the container below the graphics editor. This name need not be editable. 
-	//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
-	void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
+		virtual entityType getEntityType(void) const override { return TOPOLOGY; }
+		virtual bool getEntityBox(double& xmin, double& xmax, double& ymin, double& ymax, double& zmin, double& zmax) override { return false; };
+		virtual void addVisualizationNodes(void) override;
 
-	void setCoordinateEntity(const EntityCoordinates2D& _coordinateEntity) { m_coordinate2DEntityID = _coordinateEntity.getEntityID(); setModified(); };
-	void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; setModified(); };
+		ot::UID getCoordinateEntityID() const { return m_coordinate2DEntityID; }
+		EntityCoordinates2D* getCoordinateEntity() { return m_coordinateEntity; }
+		const std::string& getBlockTitle() const { return m_blockTitle; }
 
-	const std::map<std::string,ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
-	const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
+		//! @brief The name of the container below the graphics editor. This name need not be editable. 
+		//! If the name is empty, it is assumed that the block exists directly below the graphics scene entity
+		void setGraphicsScenePackageChildName(const std::string& _name) { m_graphicsScenePackageChildName = _name; }
 
-	void setGraphicsPickerKey(const std::string& _key);
-	const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; };
+		void setCoordinateEntity(const EntityCoordinates2D& _coordinateEntity) { m_coordinate2DEntityID = _coordinateEntity.getEntityID(); setModified(); };
+		void setCoordinateEntityID(ot::UID coordinateEntityID) { m_coordinate2DEntityID = coordinateEntityID; setModified(); };
 
-	virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
-	virtual void createProperties();
-	virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const;
+		const std::map<std::string, ot::Connector>& getAllConnectorsByName() const { return m_connectorsByName; }
+		const bool hasConnector(const std::string& connectorName) const { return m_connectorsByName.find(connectorName) != m_connectorsByName.end(); }
 
-	virtual ot::EntityName::NamingBehavior getNamingBehavior() const { return ot::EntityName::NamingBehavior(); } ;
-	virtual std::string getBlockFolderName() const { return "Blocks"; };
+		void setGraphicsPickerKey(const std::string& _key);
+		const std::string& getGraphicsPickerKey() const { return m_graphicsPickerKey; };
 
-	std::string createBlockHeadline() const;
+		virtual ot::GraphicsItemCfg* createBlockCfg() = 0;
+		virtual void createProperties();
+		virtual ot::GraphicsConnectionCfg::ConnectionShape getDefaultConnectionShape() const;
 
-	virtual std::string serialiseAsJSON() override;
-	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
+		virtual ot::EntityName::NamingBehavior getNamingBehavior() const { return ot::EntityName::NamingBehavior(); };
+		virtual std::string getBlockFolderName() const { return "Blocks"; };
 
-	//! @brief Creates a block item in the graphics scene.
-	//! @note This method requires the observer and model state to be set.
-	virtual void createBlockItem();
+		std::string createBlockHeadline() const;
 
-	//! @brief Creates a block request document.
-	//! @note This method requires the observer and model state to be set.
-	//! @throws ot::GeneralException If the block configuration could not be created or the coordianate entity could not be loaded.
-	ot::JsonDocument createGraphicsRequestDocument();
+		virtual std::string serialiseAsJSON() override;
+		virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
-	//! @brief Creates a block request document with a specified position.
-	//! @param _position Block position.
-	//! @throws ot::GeneralException If the block configuration could not be created.
-	ot::JsonDocument createGraphicsRequestDocument(const ot::Point2DD& _position);
+		void setHidden(bool _hidden) { if (m_hidden != _hidden) { m_hidden = _hidden; setModified(); } };
+		bool getHidden() const { return m_hidden; };
 
-protected:
+		//! @brief Creates a block item in the graphics scene.
+		//! @note This method requires the observer and model state to be set.
+		virtual void createBlockItem();
 
-	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
-	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	protected:
 
-	void addConnector(const ot::Connector& connector);
-	void addConnector(ot::Connector&& connector);
-	void removeConnector(const ot::Connector& connector);
-	void clearConnectors();
-	const std::map<std::string, ot::Connector>& getAllConnectors() const { return m_connectorsByName; }
-	ot::Connector getConnectorByName(const std::string& _connectorName) const;
-	size_t getConnectorCount() const { return m_connectorsByName.size(); }
+		virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
+		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 
-	virtual void createNavigationTreeEntry();
-	void addConnectors(ot::GraphicsFlowItemBuilder& _flowBlockBuilder) const;
+		void addConnector(const ot::Connector& connector);
+		void addConnector(ot::Connector&& connector);
+		void removeConnector(const ot::Connector& connector);
+		void clearConnectors();
+		const std::map<std::string, ot::Connector>& getAllConnectors() const { return m_connectorsByName; }
+		ot::Connector getConnectorByName(const std::string& _connectorName) const;
+		size_t getConnectorCount() const { return m_connectorsByName.size(); }
 
-	void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
+		virtual void createNavigationTreeEntry();
 
-private:
-	std::string m_blockTitle = "";
-	ot::UID m_coordinate2DEntityID = 0;
-	EntityCoordinates2D* m_coordinateEntity = nullptr;
-	std::string	m_graphicsScenePackageChildName = "";
+		void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
 
-	std::string m_graphicsPickerKey;
+	private:
+		//! @brief Creates a block request document.
+		//! @note This method requires the observer and model state to be set.
+		//! @throws ot::GeneralException If the block configuration could not be created or the coordianate entity could not be loaded.
+		ot::JsonDocument createGraphicsShowRequest();
 
-	std::map<std::string, ot::Connector> m_connectorsByName;
-};
+		//! @brief Creates a block request document with a specified position.
+		//! @param _position Block position.
+		//! @throws ot::GeneralException If the block configuration could not be created.
+		ot::JsonDocument createGraphicsShowRequest(const ot::Point2DD& _position);
+
+		ot::JsonDocument createGraphicsHideRequest();
+
+		std::string m_blockTitle = "";
+		ot::UID m_coordinate2DEntityID = 0;
+		EntityCoordinates2D* m_coordinateEntity = nullptr;
+		std::string	m_graphicsScenePackageChildName = "";
+
+		std::string m_graphicsPickerKey;
+
+		std::map<std::string, ot::Connector> m_connectorsByName;
+
+		bool m_hidden = false;
+	};
+
+}

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityFileCSV.cpp
 // 
 // License:
@@ -184,6 +184,16 @@ void EntityFileCSV::setActiveFilters(const std::list<ot::ValueComparisonDescript
 	}
 }
 
+bool EntityFileCSV::getConsiderForRefinement()
+{
+	return PropertyHelper::getBoolPropertyValue(this, "Consider for refinement","CSV Properties");
+}
+
+void EntityFileCSV::setConsiderForRefinement(bool _considerForRefinement)
+{
+	PropertyHelper::setBoolPropertyValue( _considerForRefinement, this, "Consider for refinement", "CSV Properties");
+}
+
 void EntityFileCSV::setSpecializedProperties() {
 	EntityFileText::setSpecializedProperties();
 	EntityPropertiesString::createProperty("CSV Properties", "Row Delimiter", m_rowDelimiterDefault, OT_INFO_SERVICE_TYPE_ImportParameterizedDataService, getProperties());
@@ -204,6 +214,8 @@ void EntityFileCSV::setSpecializedProperties() {
 		}
 		, std::string(1, defaulDecimalSeparator),
 		"default", getProperties());
+
+	EntityPropertiesBoolean::createProperty("CSV Properties", "Consider for refinement", true, "default", getProperties());
 }
 
 void EntityFileCSV::addStorageData(bsoncxx::builder::basic::document& _storage)

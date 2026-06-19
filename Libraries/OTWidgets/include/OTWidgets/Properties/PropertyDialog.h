@@ -61,6 +61,8 @@ namespace ot {
 
 		void setConfirmButtonEnabled(bool _enabled);
 
+		PropertyDialogCfg createConfiguration() const;
+
 	Q_SIGNALS:
 		void propertyChanged(const Property* _property);
 		void propertyDeleteRequested(const Property* _property);

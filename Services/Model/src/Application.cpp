@@ -41,6 +41,7 @@
 #include "OTServiceFoundation/Encryption.h"
 #include "CrossCollectionDatabaseWrapper.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
 
 // std header
 #include <thread>
@@ -771,6 +772,16 @@ void Application::handleImportTableFile(ot::JsonDocument& _document) {
 	}
 }
 
+void Application::handleExportDialog(ot::JsonDocument& _document) {
+
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::PropertyDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	m_fileHandler.handleExportDialog(pckg);
+}
+
+
 // ##################################################################################################################################################################################################################
 
 // Action handler: Properties
@@ -1377,6 +1388,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, this, &Application::handleModelDialogConfirmed);
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogCanceled, this, &Application::handleModelDialogCanceled);
 	connectAction(OT_ACTION_CMD_ImportTableFile, this, &Application::handleImportTableFile);
+	connectAction(OT_ACTION_CMD_ExportFilesToLibrary, this, &Application::handleExportDialog);
 
 	// Properties
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityProperties, this, &Application::handleGetEntityProperties);

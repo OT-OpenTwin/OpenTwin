@@ -34,6 +34,7 @@
 #include "OTServiceFoundation/BusinessLogicHandler.h"
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/EntityPythonManifest.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
 
 class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
@@ -45,6 +46,7 @@ public:
 
 	void addButtons(ot::components::UiComponent* _uiComponent);
 	void handleOverwriteResponse(const std::string& _filePath, bool _overwrite);
+	void handleExportDialog(const ot::PropertyDialogCfg& _dialogCfg);
 private:
 	const std::string c_groupName = "File Imports";
 	ot::ToolBarButtonCfg m_buttonFileImport;

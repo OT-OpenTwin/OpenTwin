@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: KeyValuesExtractor.cpp
 // 
 // License:
@@ -96,6 +96,59 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 			Documentation::INSTANCE()->AddToDocumentation("The listed failure was detected in table: " + tableName + "\n");
 		}
 	}
+	if (!allEntriesSuccessfullyTransformed)
+	{
+		throw std::exception("Failed to transform table entries into the desired format.");
+	}
+}
+
+void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, EntityFileCSV* _table)
+{
+	const std::string& tableName = _table->getName() ;
+	ot::IVisualisationTable* tableView = dynamic_cast<ot::IVisualisationTable*>(_table);
+
+	ot::GenericDataStructMatrix tableContent = tableView->getTable();
+
+	//Sort out all ranges associated with the this table
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> relevantSelections = _assemblyData.m_allSelectionRanges;
+
+	//Extract content that is refered by the ranges
+	std::map<std::string, std::map<std::uint32_t, ot::Variable>> allFieldsSorted;
+	std::map<std::string, std::string> rangeTypesByRangeNames;
+
+	for (const auto& range : relevantSelections)
+	{
+		const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted);
+		const std::string& type = range->getSelectedType();
+
+		for (const std::string fieldKey : fieldKeys)
+		{
+			rangeTypesByRangeNames[fieldKey] = type;
+		}
+	}
+
+	//The values of all selection ranges are now sorted by their index (column or row, depending on header orientation). Now we drop the index information, since only the values are needed.
+	std::map<std::string, std::list<ot::Variable>> allFields;
+	for (auto& newField : allFieldsSorted)
+	{
+		const std::string& fieldKey = newField.first;
+		std::map<std::uint32_t, ot::Variable>& fieldValues = newField.second;
+		for (auto& fieldValue : fieldValues)
+		{
+			allFields[fieldKey].push_back(std::move(fieldValue.second));
+		}
+	}
+
+	char decimalDelimiter = _table->getDecimalDelimiter();
+	bool entriesSuccessfullyTransformed = transformSelectedDataIntoSelectedDataType(allFields, rangeTypesByRangeNames, decimalDelimiter);
+	bool allEntriesSuccessfullyTransformed = true;
+
+	if (!entriesSuccessfullyTransformed)
+	{
+		allEntriesSuccessfullyTransformed = false;
+		Documentation::INSTANCE()->AddToDocumentation("The listed failure was detected in table: " + tableName + "\n");
+	}
+	
 	if (!allEntriesSuccessfullyTransformed)
 	{
 		throw std::exception("Failed to transform table entries into the desired format.");

@@ -1,70 +1,133 @@
 ﻿#include "SSOBuffer.h"
 #include "OTCore/JSON/JSON.h"
-#include "OTCore/ReturnMessage.h"
-std::string SSOBuffer::handleRequest(const std::string& _username, const std::string& _receivedToken)
+#include "MongoUserFunctions.h"
+#include "ServiceBase.h"
+#include "OTCommunication/ActionTypes.h"
+
+bool SSOBuffer::handleRequest(std::string& _determinedUsername, const std::string& _authenticationProcessID,  const std::string& _receivedToken, bool _initialToken, ot::JsonDocument& _returnMessage)
 {
-	ot::ReturnMessage returnMessage;
+	clearExpiredProcessIDs();
+	bool authenticationSucceeded = false;
+
 	try
 	{
-		auto serverSignOnByUsername = m_serverSignOnByUsername.find(_username);
-		bool firstCall = false; // Could be removed if the state is carried in the SSO_Server class. This would make Kerberos possible as well
-		if (serverSignOnByUsername == m_serverSignOnByUsername.end())
+		ot::AuthenticationProcessID* processID = nullptr;
+		std::unordered_map<ot::AuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>>::iterator serverSignOnByProcessID;
+		if (_initialToken)
 		{
-			firstCall = true;
-			m_serverSignOnByUsername.emplace(_username, std::make_unique<ot::SingleSignOn_Server>());
-			serverSignOnByUsername = m_serverSignOnByUsername.find(_username);
-		}
-
-		std::unique_ptr<ot::SingleSignOn_Server >& serverSSO = serverSignOnByUsername->second;
-		
-		if (firstCall)
-		{
-			const std::string secondToken = serverSSO->processToken(_receivedToken);
-			if(secondToken.empty())
-			{ 
-				const std::string stateString =	serverSSO->getStateString();
-				returnMessage.setStatus(ot::ReturnMessage::Failed);
-				returnMessage.setWhat("Server failed to process token. State: " + stateString);
-			}
-			else
-			{
-				returnMessage.setStatus(ot::ReturnMessage::Ok);
-				returnMessage.setWhat(secondToken);
-			}
+			auto entry = m_serverSignOnByProcessID.emplace(ot::AuthenticationProcessID(), std::make_unique<ot::SingleSignOn_Server>());
+			assert(entry.second);
+			serverSignOnByProcessID = entry.first;
 		}
 		else
 		{
-			
-			serverSSO->processToken(_receivedToken);
-			if (serverSSO->stateOK())
-			{
-				ot::LogInInfos infos = serverSSO->processLoggedInUserInfo();
-				// Here we can load the MongoDB user now.
-
-				if (infos.m_userName == _username)
-				{
-					returnMessage.setStatus(ot::ReturnMessage::Ok);
-				}
-				else
-				{
-					returnMessage.setStatus(ot::ReturnMessage::Failed);
-					returnMessage.setWhat("User information does not match.");
-				}
-			}
-			else if (! serverSSO->stateContinueNeeded())
-			{
-				returnMessage.setStatus(ot::ReturnMessage::Failed);
-				returnMessage.setWhat("Server failed to process token. State: " + serverSSO->getStateString());
-			}
+			serverSignOnByProcessID = m_serverSignOnByProcessID.find(_authenticationProcessID);
 		}
 
-		return returnMessage.toJson();
+		if (serverSignOnByProcessID == m_serverSignOnByProcessID.end())
+		{
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Failed to assigning authentication process.", _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			return false;
+		}
+		
+		std::unique_ptr<ot::SingleSignOn_Server >& serverSSO = serverSignOnByProcessID->second;
+		const std::string nextToken = serverSSO->processToken(_receivedToken);
+		if (serverSSO->stateContinueNeeded())
+		{
+			// Sequence needs to be continued return next token to client
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_SSO_Token_Continue, true, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(nextToken, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_ACTION_PARAM_PROCESS_ID, ot::JsonString(serverSignOnByProcessID->first.getID(), _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+		}
+		else if(serverSSO->stateOK())
+		{
+			// Sequence concluded 
+			ot::LogInInfos infos = serverSSO->processLoggedInUserInfo();
+			// Here we can load the MongoDB user now.
+			_determinedUsername = infos.m_userName;
+				
+			SSOUser user(infos);
+			const std::string& sessionToken = user.getSessionToken().getToken();
+			
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, true, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_SSO_Token_Continue, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(sessionToken, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_determinedUsername, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+
+			m_loggedInSSOUsersByToken.insert(std::make_pair<>(sessionToken, std::move(user)));
+			m_serverSignOnByProcessID.erase(serverSignOnByProcessID);
+			authenticationSucceeded = true;
+
+		}
+		else
+		{
+			const std::string stateString =	serverSSO->getStateString();
+			_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
+			_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString("Server failed to process token. State: " + stateString, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+			m_serverSignOnByProcessID.erase(serverSignOnByProcessID);
+		}
+
+		return authenticationSucceeded;
 	}
 	catch (const std::exception& _e)
 	{
-		returnMessage.setStatus(ot::ReturnMessage::Failed);	
+		_returnMessage.AddMember(OT_ACTION_AUTH_SUCCESS, false, _returnMessage.GetAllocator());
 		const std::string  message = "Internal error: " + std::string(_e.what());
-		returnMessage.setWhat(message);
-		return returnMessage.toJson();
+		_returnMessage.AddMember(OT_ACTION_PARAM_LOG, ot::JsonString(message, _returnMessage.GetAllocator()), _returnMessage.GetAllocator());
+		
+		return false;
 	}
+}
+
+SSOUser* SSOBuffer::getUser(const std::string& _token)
+{
+	auto loggedInSSOUsersByToken =	m_loggedInSSOUsersByToken.find(_token);
+	if (loggedInSSOUsersByToken == m_loggedInSSOUsersByToken.end())
+	{
+		return nullptr;
+	}
+	else
+	{
+		return &loggedInSSOUsersByToken->second;
+	}
+}
+
+void SSOBuffer::removeUser(const std::string& _token)
+{
+	m_loggedInSSOUsersByToken.erase(_token);
+}
+
+
+void SSOBuffer::clearExpiredProcessIDs()
+{
+	
+	for (auto entry = m_serverSignOnByProcessID.begin(); entry != m_serverSignOnByProcessID.end(); )
+	{
+		if (!entry->first.isIsExpired())
+		{
+			entry = m_serverSignOnByProcessID.erase(entry);
+		}
+		else
+		{
+			entry++;
+		}
+	}
+}
+
+bool SSOBuffer::validate(const std::string& _token) 
+{
+	auto loggedInSSOUserByToken= m_loggedInSSOUsersByToken.find(_token);
+	bool isValid = false;
+	if (loggedInSSOUserByToken == m_loggedInSSOUsersByToken.end())
+	{
+		assert(false); // This spot should only be accessed by the UI after the login
+	}
+	else
+	{
+		SSOUser& user = loggedInSSOUserByToken->second;
+		isValid = user.getSessionToken().tokenIsValid();
+	}
+	return isValid;
 }

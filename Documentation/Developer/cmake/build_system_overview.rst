@@ -3,7 +3,7 @@
 Overview and Architecture
 =========================
 
-Where the meta system lives
+CMake system
 ---------------------------
 
 All of the shared CMake logic lives in ``Scripts/CMake``:
@@ -24,6 +24,7 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
    * - ``OTQt.cmake``
      - Finds Qt 6 and defines the imported ``Qt6::*`` targets used by the
        ``Qt*`` dependency tokens.
+	 - Instead of using ``find_package()`` we directly read set environment for our ``Qt`` packges.
    * - ``OTPresets.json``
      - The shared ``CMakePresets`` definition that every project includes, so
        the configurations (such as ``windows-debug`` and ``windows-release``)
@@ -35,10 +36,9 @@ together with the per project root variables (``OT_<NAME>_ROOT``) and the third
 party paths.
 
 .. note::
-   Run ``Scripts/SetupEnvironment.bat`` before you configure, either directly or
-   through a project's ``build.bat`` or ``edit.bat``. Without it ``OT_CMAKE_DIR``
-   and the ``OT_*_ROOT`` variables are undefined and configuration stops with a
-   clear error.
+   The System depends on the set environment variable ``OT_CMAKE_DIR``, which is defined in the
+   ``SetupEnvironment.bat`` of OpenTwin.
+   If unset, CMake wont be able to find all the CMake scripts defined in ``/Scripts/CMake`` as well as the presets.
 
 The two target model: ``_core`` plus the final target
 -----------------------------------------------------
@@ -81,14 +81,14 @@ Sources are found with ``file(GLOB_RECURSE ... CONFIGURE_DEPENDS)``, so adding o
 removing a file under ``src/`` or ``include/`` is picked up on the next build.
 You do not list files by hand.
 
-What you get
+OTProject.cmake
 ---------------------
 
-Just including ``OTProject.cmake`` applies the OpenTwin standard MSVC setup to
+Including ``OTProject.cmake`` applies the OpenTwin standard MSVC setup to
 every target. The main pieces are:
 
 * C++20 with compiler extensions disabled.
-* Conformance and warning flags such as ``/permissive-``,
+* Flags such as ``/permissive-``,
   ``/Zc:__cplusplus``, ``/Zc:preprocessor``, ``/EHsc``, ``/MP`` for parallel
   compilation, and external header warning suppression.
 * The dynamic CRT by default: ``/MD`` in Release, ``/MDd`` in Debug. A target
@@ -131,7 +131,7 @@ function, plus an optional helper:
 The default profile uses the dynamic CRT in both configurations. All libraries
 and services use it, and so do binaries that run next to the OpenTwin DLLs.
 
-Self contained command line tools that ship as a single executable use
+Command line tools that ship as a single executable use
 ``ot_set_runtime_static_release``, so Release links the static CRT while Debug
 stays on ``/MDd`` for normal debugging.
 

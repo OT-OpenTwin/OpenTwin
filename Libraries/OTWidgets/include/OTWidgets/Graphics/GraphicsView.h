@@ -211,7 +211,8 @@ namespace ot {
 		//! @param _newControlPoint New control point in scene coordinates.
 		void connectionToConnectionRequested(const ot::UID& _fromItemUid, const std::string& _fromItemConnector, const ot::UID& _toConnectionUid, const ot::Point2DD& _newControlPoint);
 
-		void itemDoubleClicked(const ot::GraphicsItemCfg* _itemConfig);
+		void itemClicked(GraphicsItem* _item);
+		void itemDoubleClicked(GraphicsItem* _item);
 
 		void removeItemsRequested(const ot::UIDList& _items, const ot::UIDList& _connections);
 
@@ -245,7 +246,8 @@ namespace ot {
 	private Q_SLOTS:
 		void slotCopy();
 		void slotPaste();
-		void slotGraphicsItemDoubleClicked(ot::GraphicsItem* _item);
+		void slotGraphicsItemClicked(GraphicsItem* _item);
+		void slotGraphicsItemDoubleClicked(GraphicsItem* _item);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

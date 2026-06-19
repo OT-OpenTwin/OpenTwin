@@ -59,6 +59,21 @@ ot::Alignment ot::stringToAlignment(const std::string& _string) {
 	}
 }
 
+std::list<std::string> ot::getAllAlignmentStringList()
+{
+	return std::list<std::string>({
+		toString(Alignment::Center),
+		toString(Alignment::Top),
+		toString(Alignment::TopRight),
+		toString(Alignment::Right),
+		toString(Alignment::BottomRight),
+		toString(Alignment::Bottom),
+		toString(Alignment::BottomLeft),
+		toString(Alignment::Left),
+		toString(Alignment::TopLeft)
+		});
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Orientation

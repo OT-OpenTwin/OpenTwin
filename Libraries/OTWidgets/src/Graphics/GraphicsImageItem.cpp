@@ -148,7 +148,7 @@ QMarginsF ot::GraphicsImageItem::getOutlineMargins() const {
 	}
 }
 
-QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize(void) const {
+QSizeF ot::GraphicsImageItem::getPreferredGraphicsItemSize() const {
 	const GraphicsImageItemCfg* config = dynamic_cast<const GraphicsImageItemCfg*>(this->getConfiguration());
 	if (!config) {
 		OT_LOG_E("Config not set");

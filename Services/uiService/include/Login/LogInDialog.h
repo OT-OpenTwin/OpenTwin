@@ -94,6 +94,7 @@ private:
 
 	enum class WorkerError {
 		NoError,
+		NoError_CustomFeedback,
 		GSSConnectionFailed,
 		IncompatibleVersions,
 		InvalidGssResponse,
@@ -113,6 +114,7 @@ private:
 	
 	ot::ComboBox* m_gss;
 	ot::LineEdit* m_username;
+	ot::Label* m_usernameLabel;
 	ot::Label* m_passwordLabel;
 	ot::LineEdit* m_password; // LogIn, Register:1, Change:Old
 	ot::Label* m_passwordNewLabel;
@@ -152,6 +154,7 @@ public Q_SLOTS:
 	void slotRegisterSuccess();
 	void slotChangePasswordSuccess();
 	void slotWorkerError(WorkerError _error);
+	void slotWorkerCustomFeedback(const std::string& _title, const std::string& _feedback);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -172,8 +175,6 @@ private:
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
 
-	std::wstring determineSSOUsername() const;
-
 	void setControlsForUsernamePassword();
 	void setControlsForRegister();
 	void setControlsForChangePassword();
@@ -190,9 +191,9 @@ private:
 	void changePasswordWorkerStart();
 	WorkerError workerCheckVersionCompatibility();
 	WorkerError workerConnectToGSS();
-	WorkerError workerLogin(const UserManagement& _userManager);
+	WorkerError workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerLoginUsernamePassword(const UserManagement& _userManager);
-	WorkerError workerLoginSSO(const UserManagement& _userManager);
+	WorkerError workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 };

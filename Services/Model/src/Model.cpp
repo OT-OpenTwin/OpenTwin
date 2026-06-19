@@ -525,8 +525,9 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults("UI Configuration");
 
 	// Add default pages, groups and buttons
-	_ui->addMenuPage("Model");
-	_ui->addMenuGroup("Model", "Edit");
+	const std::string pageName = Application::instance()->getToolBarPageName();
+	_ui->addMenuPage(pageName);
+	_ui->addMenuGroup(pageName, "Edit");
 	_ui->addMenuButton(m_undoButton);
 	_ui->addMenuButton(m_redoButton);
 	_ui->addMenuButton(m_deleteButton);
@@ -540,11 +541,11 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 		_ui->addMenuPage("View");
 
 		//_ui->addMenuGroup("Model", "Database");
-		_ui->addMenuGroup("Model", "Geometry");
-		_ui->addMenuGroup("Model", "Material");
-		_ui->addMenuGroup("Model", "Parameters");
-		_ui->addMenuGroup("Model", "Groups");
-		_ui->addMenuGroup("Model", "Plots");
+		_ui->addMenuGroup(pageName, "Geometry");
+		_ui->addMenuGroup(pageName, "Material");
+		_ui->addMenuGroup(pageName, "Parameters");
+		_ui->addMenuGroup(pageName, "Groups");
+		_ui->addMenuGroup(pageName, "Plots");
 
 		_ui->addMenuButton(m_infoButton);
 		_ui->addMenuButton(m_createParameterButton);
@@ -571,13 +572,14 @@ void Model::updateUndoRedoStatus()
 	std::string text = getStateManager()->getCurrentModelStateDescription();
 	if (text.empty()) text = "Undo";
 	text += " (Ctrl+Z)";
-	Application::instance()->getNotifier()->setToolTip("Model:Edit:Undo", text);
+	
+	Application::instance()->getNotifier()->setToolTip(m_undoButton.getFullPath(), text);
 
 	// Update the text for the redo button
 	text = getStateManager()->getRedoModelStateDescription();
 	if (text.empty()) text = "Redo";
 	text += " (Ctrl+Y)";
-	Application::instance()->getNotifier()->setToolTip("Model:Edit:Redo", text);
+	Application::instance()->getNotifier()->setToolTip(m_redoButton.getFullPath(), text);
 
 	// Update the state for undo and redo button
 	std::list<std::string> enabled;
@@ -585,20 +587,20 @@ void Model::updateUndoRedoStatus()
 
 	if (getStateManager()->canUndo())
 	{
-		enabled.push_back("Model:Edit:Undo");
+		enabled.push_back(m_undoButton.getFullPath());
 	}
 	else
 	{
-		disabled.push_back("Model:Edit:Undo");
+		disabled.push_back(m_undoButton.getFullPath());
 	}
 
 	if (getStateManager()->canRedo())
 	{
-		enabled.push_back("Model:Edit:Redo");
+		enabled.push_back(m_redoButton.getFullPath());
 	}
 	else
 	{
-		disabled.push_back("Model:Edit:Redo");
+		disabled.push_back(m_redoButton.getFullPath());
 	}
 
 	Application::instance()->getNotifier()->enableDisableControls(enabled, disabled);
@@ -1652,7 +1654,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	Application::instance()->getNotifier()->queuedHttpRequestToUI(notify, prefetchIds);
 
-	EntityBlock* blockEntity = dynamic_cast<EntityBlock*>(entity);
+	ot::EntityBlock* blockEntity = dynamic_cast<ot::EntityBlock*>(entity);
 	if (blockEntity != nullptr)
 	{
 		blockEntity->createBlockItem();
@@ -2297,7 +2299,7 @@ std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& 
 
 	for (auto entity : allEntitiesForDeletion)
 	{
-		const bool entityIsABlockEntity = dynamic_cast<EntityBlock*>(entity) != nullptr;
+		const bool entityIsABlockEntity = dynamic_cast<ot::EntityBlock*>(entity) != nullptr;
 		if (entityIsABlockEntity)
 		{
 			// Now check whether a parent of the item is part of the list as well and if this parent is also a block entity.
@@ -2310,7 +2312,7 @@ std::list<EntityBase*> Model::FindTopLevelBlockEntities(std::list<EntityBase*>& 
 			{
 				if (entityMap.find(currentEntity) != entityMap.end())
 				{
-					const bool parentIsABlockEntity = dynamic_cast<EntityBlock*>(currentEntity) != nullptr;
+					const bool parentIsABlockEntity = dynamic_cast<ot::EntityBlock*>(currentEntity) != nullptr;
 					if (parentIsABlockEntity)
 					{
 						parentFoundAndIsBlock = true;

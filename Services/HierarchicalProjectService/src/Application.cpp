@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -104,20 +104,20 @@ Application::Application() :
 	m_openSelectedItems.setButtonToolTip("Open the selected project in a new OpenTwin instance.");
 	connectToolBarButton(m_openSelectedItems, this, &Application::handleOpenSelectedItems);
 
-	m_addImageToProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
-	m_addImageToProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
-	m_addImageToProjectButton.setButtonToolTip("Add an image to the selected item.");
-	connectToolBarButton(m_addImageToProjectButton, this, &Application::handleAddImageToProject);
+	m_addCenterImageToBlockButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Add Image", "Hierarchical/AddImage");
+	m_addCenterImageToBlockButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_addCenterImageToBlockButton.setButtonToolTip("Add an image to the selected item.");
+	connectToolBarButton(m_addCenterImageToBlockButton, this, &Application::handleAddCenterImageToBlock);
 
-	m_removeImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
-	m_removeImageFromProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
-	m_removeImageFromProjectButton.setButtonToolTip("Remove the image(s) from the selected item(s).");
-	connectToolBarButton(m_removeImageFromProjectButton, this, &Application::handleRemoveImageFromProject);
+	m_removeCenterImageFromBlockButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Remove Image", "Hierarchical/RemoveImage");
+	m_removeCenterImageFromBlockButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_removeCenterImageFromBlockButton.setButtonToolTip("Remove the image(s) from the selected item(s).");
+	connectToolBarButton(m_removeCenterImageFromBlockButton, this, &Application::handleRemoveCenterImageFromBlock);
 
-	m_updateImageFromProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Update Image", "Hierarchical/UpdateImage");
-	m_updateImageFromProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
-	m_updateImageFromProjectButton.setButtonToolTip("Update the image of the selected project(s) from the current projects' preview image.");
-	connectToolBarButton(m_updateImageFromProjectButton, this, &Application::handleUpdateImageFromProject);
+	m_updateCenterImageOfProjectButton = ot::ToolBarButtonCfg(c_pageName, c_selectionGroupName, "Update Image", "Hierarchical/UpdateImage");
+	m_updateCenterImageOfProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_updateCenterImageOfProjectButton.setButtonToolTip("Update the image of the selected project(s) from the current projects' preview image.");
+	connectToolBarButton(m_updateCenterImageOfProjectButton, this, &Application::handleUpdateCenterImageOfProject);
 
 	m_addLabelButton = ot::ToolBarButtonCfg(c_pageName, c_decorationGroupName, c_decorationSub1Name, "Add Label", "Hierarchical/AddLabel");
 	m_addLabelButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
@@ -169,9 +169,9 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 
 	_ui->addMenuButton(m_openSelectedItems);
 
-	_ui->addMenuButton(m_addImageToProjectButton);
-	_ui->addMenuButton(m_removeImageFromProjectButton);
-	_ui->addMenuButton(m_updateImageFromProjectButton);
+	_ui->addMenuButton(m_addCenterImageToBlockButton);
+	_ui->addMenuButton(m_removeCenterImageFromBlockButton);
+	_ui->addMenuButton(m_updateCenterImageOfProjectButton);
 
 	_ui->addMenuGroup(c_pageName, c_decorationGroupName);
 
@@ -201,11 +201,39 @@ ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropE
 	return ot::ReturnMessage::Failed;
 }
 
+ot::ReturnMessage Application::graphicsItemClicked(const ot::GraphicsClickEvent& _eventData)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetGraphicsItemMap, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_eventData.getEditorName(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	if (!sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc, responseStr)) {
+		OT_LOG_E("Failed to send message to model for graphics item click event");
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (!response.isOk())
+	{
+		OT_LOG_ES("Model returned error for graphics item click event: " << response.getWhat());
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::JsonDocument itemMapDoc;
+	itemMapDoc.Parse(response.getWhat().c_str());
+
+	ot::GraphicsItemMap itemMap(itemMapDoc.getConstObject());
+	m_entityHandler.expandCollapseSubtree(_eventData, itemMap);
+
+	return ot::ReturnMessage::Ok;
+}
+
 ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
 	// Get entity information
 	ot::EntityInformation info;
-	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemName(), info)) {
-		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity: " + _eventData.getItemName());
+	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemUid(), info)) {
+		ot::ReturnMessage ret(ot::ReturnMessage::Failed, "Could not determine entity information for entity { \"EntityID\": " + std::to_string(_eventData.getItemUid()) + " }");
 		OT_LOG_E(ret.getWhat());
 		return ret;
 	}
@@ -273,16 +301,15 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 	for (const ot::ConstJsonObject& gridInfoObj : gridInfos) {
 		ot::GridFSFileInfo gridInfo(gridInfoObj);
 
-		uint8_t* dataBuffer = nullptr;
-		size_t length = 0;
-
+		
 		bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+		std::vector<uint8_t> dataBuffer;
+		api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName(), dataBuffer);
 		api.DeleteGridFSData(id, gridInfo.getCollectionName());
 
-		std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+		std::string stringData(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 
 		contents.push_back(std::move(stringData));
 		uncompressedDataLengths.push_back(gridInfo.getUncompressedSize());
@@ -291,8 +318,10 @@ void Application::handleDocumentSelected(ot::JsonDocument& _doc) {
 	m_entityHandler.addDocuments(fileNames, contents, uncompressedDataLengths, fileFilter);
 }
 
-void Application::handleProjectImageSelected(ot::JsonDocument& _doc) {
-	if (!isModelConnected()) {
+void Application::handleProjectImageSelected(ot::JsonDocument& _doc)
+{
+	if (!isModelConnected())
+	{
 		OT_LOG_E("No model connected");
 		return;
 	}
@@ -301,22 +330,39 @@ void Application::handleProjectImageSelected(ot::JsonDocument& _doc) {
 	ot::GridFSFileInfo gridInfo(ot::json::getObject(_doc, OT_ACTION_PARAM_FILE_Content));
 	DataStorageAPI::DocumentAPI api;
 
-	uint8_t* dataBuffer = nullptr;
-	size_t length = 0;
 
 	bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
 	bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-	api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+	std::vector<uint8_t> dataBuffer;
+	api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName(), dataBuffer);
 	api.DeleteGridFSData(id, gridInfo.getCollectionName());
 
-	std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+	std::string stringData(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 
 	std::string fileName = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_OriginalName);
 	std::string fileFilter = ot::json::getString(_doc, OT_ACTION_PARAM_FILE_Mask);
-	std::string projectEntityName = ot::json::getString(_doc, OT_ACTION_PARAM_Info);
 
-	m_entityHandler.addImageToProject(projectEntityName, fileName, stringData, gridInfo.getUncompressedSize(), fileFilter);
+	std::string entityArr = ot::json::getString(_doc, OT_ACTION_PARAM_Info);
+	ot::JsonDocument entityDoc;
+	entityDoc.Parse(entityArr.c_str());
+
+	std::list<std::string> entityNames;
+	if (entityDoc.IsArray())
+	{
+		for (ot::JsonSizeType i = 0; i < entityDoc.Size(); ++i)
+		{
+			std::string entityName = ot::json::getString(entityDoc, i);
+			entityNames.push_back(std::move(entityName));
+		}
+	}
+
+	if (entityNames.empty()) 	{
+		OT_LOG_E("No target entity provided for project image");
+		return;
+	}
+
+	m_entityHandler.addCenterImageToBlocks(entityNames, fileName, stringData, gridInfo.getUncompressedSize(), fileFilter);
 }
 
 void Application::handleImageSelected(ot::JsonDocument& _doc) {
@@ -334,16 +380,14 @@ void Application::handleImageSelected(ot::JsonDocument& _doc) {
 	for (const ot::ConstJsonObject& gridInfoObj : gridInfos) {
 		ot::GridFSFileInfo gridInfo(gridInfoObj);
 
-		uint8_t* dataBuffer = nullptr;
-		size_t length = 0;
-
 		bsoncxx::oid oid_obj{ gridInfo.getDocumentId() };
 		bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 
-		api.GetDocumentUsingGridFs(id, dataBuffer, length, gridInfo.getCollectionName());
+		std::vector<uint8_t> dataBuffer;
+		api.GetDocumentUsingGridFs(id, gridInfo.getCollectionName(), dataBuffer);
 		api.DeleteGridFSData(id, gridInfo.getCollectionName());
 
-		std::string stringData(reinterpret_cast<char*>(dataBuffer), length);
+		std::string stringData(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 
 		contents.push_back(std::move(stringData));
 		uncompressedDataLengths.push_back(gridInfo.getUncompressedSize());
@@ -433,10 +477,9 @@ void Application::handleOpenSelectedItems() {
 	this->enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
 }
 
-void Application::handleAddImageToProject() {
-	auto projects = getSelectedProjects();
-	if (projects.size() != 1) {
-		OT_LOG_E("Invalid number of selected projects to add an image to");
+void Application::handleAddCenterImageToBlock() {
+	auto selectedBlocks = getSelectedBlocks();
+	if (selectedBlocks.empty()) {
 		return;
 	}
 
@@ -445,21 +488,27 @@ void Application::handleAddImageToProject() {
 		return;
 	}
 
+	ot::JsonDocument entityDoc(rapidjson::kArrayType);
+	for (const auto& block : selectedBlocks)
+	{
+		entityDoc.PushBack(ot::JsonString(block->getName(), entityDoc.GetAllocator()), entityDoc.GetAllocator());
+	}
+
 	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
-	ot::Frontend::requestFileForReading(c_projectImageSelectedAction, "Select Project Image", filter, true, false, projects.front().getEntityName());
+	ot::Frontend::requestFileForReading(c_projectImageSelectedAction, "Select Project Image", filter, true, false, entityDoc.toJson());
 }
 
-void Application::handleRemoveImageFromProject() {
-	auto projects = getSelectedProjects();
-	if (projects.empty()) {
-		OT_LOG_E("No project selected to remove image from");
+void Application::handleRemoveCenterImageFromBlock() {
+	auto blocks = getSelectedBlocks();
+	if (blocks.empty()) {
+		OT_LOG_E("No blocks selected to remove image from");
 		return;
 	}
 
-	m_entityHandler.removeImageFromProjects(projects);
+	m_entityHandler.removeCenterImageFromBlocks(blocks);
 }
 
-void Application::handleUpdateImageFromProject() {
+void Application::handleUpdateCenterImageOfProject() {
 	auto projects = getSelectedProjects();
 	
 	if (projects.empty()) {
@@ -467,7 +516,7 @@ void Application::handleUpdateImageFromProject() {
 		return;
 	}
 
-	m_entityHandler.updateProjectImages(projects);
+	m_entityHandler.updateProjectBlockCenterImages(projects);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -491,12 +540,10 @@ void Application::updateButtonStates() {
 	const bool canOpenDocument = !documentsToOpen.empty();
 
 	if (canOpenProject) {
-		enabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
-		enabledControls.push_back(m_updateImageFromProjectButton.getFullPath());
+		enabledControls.push_back(m_updateCenterImageOfProjectButton.getFullPath());
 	}
 	else {
-		disabledControls.push_back(m_removeImageFromProjectButton.getFullPath());
-		disabledControls.push_back(m_updateImageFromProjectButton.getFullPath());
+		disabledControls.push_back(m_updateCenterImageOfProjectButton.getFullPath());
 	}
 	
 	if ((projectsToOpen.size() + documentsToOpen.size()) == 1) {
@@ -506,15 +553,37 @@ void Application::updateButtonStates() {
 		disabledControls.push_back(m_openSelectedItems.getFullPath());
 	}
 
-	if (projectsToOpen.size() == 1) {
-		enabledControls.push_back(m_addImageToProjectButton.getFullPath());
-	}
-	else {
-		disabledControls.push_back(m_addImageToProjectButton.getFullPath());
-	}
-
 	// Set control states
 	ui->setControlsEnabledState(enabledControls, disabledControls);
+}
+
+std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>> Application::getSelectedBlocks()
+{
+	std::list<std::unique_ptr<ot::EntityBlockHierarchicalBase>> ret;
+
+	const std::list<ot::EntityInformation>& selectedInfos = this->getSelectedEntityInfos();
+
+	for (const ot::EntityInformation& info : selectedInfos) {
+		EntityBase* entity = ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion());
+		if (!entity)
+		{
+			OT_LOG_E("Could not read entity from database: \"" + info.getEntityName() + "\"");
+		}
+		else
+		{
+			std::unique_ptr<ot::EntityBlockHierarchicalBase> blockEntity(dynamic_cast<ot::EntityBlockHierarchicalBase*>(entity));
+			if (!blockEntity)
+			{
+				delete entity;
+			}
+			else
+			{
+				ret.push_back(std::move(blockEntity));
+			}
+		}
+	}
+	
+	return ret;
 }
 
 std::list<ot::EntityInformation> Application::getSelectedDocuments() {

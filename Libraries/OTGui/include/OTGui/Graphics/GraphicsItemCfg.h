@@ -51,7 +51,8 @@ namespace ot {
 		static constexpr double defaultAdditionalTriggerDistance() { return 15.; };
 
 		//! @brief GraphicsItemFlag
-		enum GraphicsItemFlag {
+		enum GraphicsItemFlag : uint64_t
+		{
 			NoFlags                    = 0 << 0, //! @brief No item flags.
 			ItemIsMoveable             = 1 << 0, //! @brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item.
 			ItemIsSelectable           = 1 << 1, //! @brief The item can be selected by the user.
@@ -83,7 +84,10 @@ namespace ot {
 			//! If the root item is a container item (e.g. GraphicsGroupItem) it have this flag set in order to forward the state change to its child items.
 			ItemForwardsState          = 1 << 9,
 
-			ItemSilencesNotifcations   = 1 << 10 //! @brief Item will not send notifications to the scene when it is changed.
+			ItemSilencesNotifcations   = 1 << 10, //! @brief Item will not send notifications to the scene when it is changed.
+
+			ItemIsClickable            = 1 << 11, //! @brief Item can be clicked by the user. If the item has a parent, the item may be clicked inside of the parent item.
+			ItemIsDoubleClickable      = 1 << 12, //! @brief Item can be double-clicked by the user. If the item has a parent, the item may be double-clicked inside of the parent item.
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 

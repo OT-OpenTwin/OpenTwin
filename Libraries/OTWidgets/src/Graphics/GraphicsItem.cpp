@@ -295,7 +295,7 @@ QRectF ot::GraphicsItem::handleGetGraphicsItemBoundingRect(const QRectF& _rect) 
 	}
 
 	// Adjust size to requested size
-		newSize = newSize.expandedTo(this->removeGraphicsItemMargins(m_requestedSize));
+	newSize = newSize.expandedTo(this->removeGraphicsItemMargins(m_requestedSize));
 	
 	// Bound to maximum size
 	newSize = newSize.boundedTo(this->getGraphicsItemMaximumSize());
@@ -560,7 +560,7 @@ void ot::GraphicsItem::setGraphicsItemMinimumSize(const QSizeF& _size) {
 
 QSizeF ot::GraphicsItem::getGraphicsItemMinimumSize() const {
 	OTAssertNullptr(m_config);
-	return std::move(QtFactory::toQSize(m_config->getMinimumSize()));
+	return QtFactory::toQSize(m_config->getMinimumSize());
 }
 
 void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
@@ -573,7 +573,7 @@ void ot::GraphicsItem::setGraphicsItemMaximumSize(const QSizeF& _size) {
 
 QSizeF ot::GraphicsItem::getGraphicsItemMaximumSize() const {
 	OTAssertNullptr(m_config);
-	return std::move(QtFactory::toQSize(m_config->getMaximumSize()));
+	return QtFactory::toQSize(m_config->getMaximumSize());
 }
 
 void ot::GraphicsItem::setGraphicsItemSizePolicy(ot::SizePolicy _policy) {

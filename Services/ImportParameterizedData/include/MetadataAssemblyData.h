@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MetadataAssemblyData.h
 // 
 // License:
@@ -26,7 +26,14 @@ struct MetadataAssemblyData
 {
 public:
 	MetadataAssemblyData() = default;
-	~MetadataAssemblyData() = default;
+	~MetadataAssemblyData()
+	{
+		if (m_next != nullptr)
+		{
+			delete m_next;
+			m_next = nullptr;
+		}
+	}
 	MetadataAssemblyData& operator=(const MetadataAssemblyData& _other) = delete;
 	MetadataAssemblyData& operator=(MetadataAssemblyData&& _other) = delete;
 

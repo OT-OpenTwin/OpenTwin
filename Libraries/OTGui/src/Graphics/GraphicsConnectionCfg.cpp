@@ -21,17 +21,6 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 
-#define OT_JSON_Member_Uid "UID"
-#define OT_JSON_Member_Shape "Shape"
-#define OT_JSON_Member_Style "Style"
-#define OT_JSON_Member_SourceUid "Source.UID"
-#define OT_JSON_Member_SourcePos "Source.Pos"
-#define OT_JSON_Member_SourceName "Source.Name"
-#define OT_JSON_Member_HandleState "HandleState"
-#define OT_JSON_Member_DestinationUid "Destination.UID"
-#define OT_JSON_Member_DestinationPos "Destination.Pos"
-#define OT_JSON_Member_DestinationName "Destination.Name"
-
 std::string ot::GraphicsConnectionCfg::shapeToString(ConnectionShape _shape) {
 	switch (_shape)
 	{
@@ -59,7 +48,7 @@ ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionCfg::stringToSh
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg()
-	: m_lineShape(ConnectionShape::DirectLine), m_destUID(ot::invalidUID), m_originUID(ot::invalidUID), m_uid(ot::invalidUID), m_handlesState(true)
+	: m_lineShape(ConnectionShape::DirectLine), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -69,8 +58,7 @@ ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ConstJsonObject& _jsonObj
 }
 
 ot::GraphicsConnectionCfg::GraphicsConnectionCfg(const ot::UID& _originUid, const std::string& _originConnectableName, const ot::UID& _destinationUid, const std::string& _destinationName)
-	: m_lineShape(ConnectionShape::DirectLine), m_uid(ot::invalidUID),
-	m_originUID(_originUid), m_originConnectable(_originConnectableName), m_destUID(_destinationUid), m_destConnectable(_destinationName), m_handlesState(true)
+	: GraphicsConnectionInfo(_originUid, _originConnectableName, _destinationUid, _destinationName), m_lineShape(ConnectionShape::DirectLine), m_handlesState(true)
 {
 	m_lineStyle.setWidth(2.);
 }
@@ -79,54 +67,40 @@ ot::GraphicsConnectionCfg::~GraphicsConnectionCfg() {
 
 }
 
-bool ot::GraphicsConnectionCfg::operator==(const GraphicsConnectionCfg& _other) const
-{
-	return m_uid == _other.m_uid;
-}
-
 void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const {
-	_object.AddMember(OT_JSON_Member_Uid, m_uid, _allocator);
-	_object.AddMember(OT_JSON_Member_HandleState, m_handlesState, _allocator);
-	
-	_object.AddMember(OT_JSON_Member_SourceUid, m_originUID, _allocator);
-	_object.AddMember(OT_JSON_Member_SourcePos, JsonObject(m_originPos, _allocator), _allocator);
-	_object.AddMember(OT_JSON_Member_SourceName, JsonString(m_originConnectable, _allocator), _allocator);
-	
-	_object.AddMember(OT_JSON_Member_DestinationUid, m_destUID, _allocator);
-	_object.AddMember(OT_JSON_Member_DestinationPos, JsonObject(m_destPos, _allocator), _allocator);
-	_object.AddMember(OT_JSON_Member_DestinationName, JsonString(m_destConnectable, _allocator), _allocator);
+	GraphicsConnectionInfo::addToJsonObject(_object, _allocator);
 
-	_object.AddMember(OT_JSON_Member_Shape, JsonString(this->shapeToString(this->m_lineShape), _allocator), _allocator);
-	_object.AddMember(OT_JSON_Member_Style, JsonObject(m_lineStyle, _allocator), _allocator);
+	_object.AddMember("HandleState", m_handlesState, _allocator);
+	
+	_object.AddMember("OriginPos", JsonObject(m_originPos, _allocator), _allocator);
+	_object.AddMember("DestinationPos", JsonObject(m_destPos, _allocator), _allocator);
+
+	_object.AddMember("Shape", JsonString(this->shapeToString(this->m_lineShape), _allocator), _allocator);
+	_object.AddMember("Style", JsonObject(m_lineStyle, _allocator), _allocator);
 }
 
 void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object) {
-	m_uid = json::getUInt64(_object, OT_JSON_Member_Uid);
-	m_handlesState = json::getBool(_object, OT_JSON_Member_HandleState);
+	GraphicsConnectionInfo::setFromJsonObject(_object);
 
-	m_originUID = json::getUInt64(_object, OT_JSON_Member_SourceUid);
-	m_originPos.setFromJsonObject(json::getObject(_object, OT_JSON_Member_SourcePos));
-	m_originConnectable = json::getString(_object, OT_JSON_Member_SourceName);
-	
-	m_destUID = json::getUInt64(_object, OT_JSON_Member_DestinationUid);
-	m_destPos.setFromJsonObject(json::getObject(_object, OT_JSON_Member_DestinationPos));
-	m_destConnectable = json::getString(_object, OT_JSON_Member_DestinationName);
-	
-	m_lineShape = this->stringToShape(json::getString(_object, OT_JSON_Member_Shape));
-	m_lineStyle.setFromJsonObject(json::getObject(_object, OT_JSON_Member_Style));
+	m_handlesState = json::getBool(_object, "HandleState");
+
+	m_originPos.setFromJsonObject(json::getObject(_object, "OriginPos"));
+	m_destPos.setFromJsonObject(json::getObject(_object, "DestinationPos"));
+
+	m_lineShape = this->stringToShape(json::getString(_object, "Shape"));
+	m_lineStyle.setFromJsonObject(json::getObject(_object, "Style"));
 }
 
-ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnection(void) const {
-	GraphicsConnectionCfg ret(m_destUID, m_destConnectable, m_originUID, m_originConnectable);
+ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnectionCfg() const {
+	GraphicsConnectionCfg ret(*this);
+
+	ret.setOriginUid(this->getDestinationUid());
+	ret.setOriginConnectable(this->getDestinationConnectable());
+	ret.setOriginPos(this->getDestinationPos());
+
+	ret.setDestinationUid(this->getOriginUid());
+	ret.setDestinationConnectable(this->getOriginConnectable());
+	ret.setDestinationPos(this->getOriginPos());
+
 	return ret;
-}
-
-std::string ot::GraphicsConnectionCfg::createConnectionKey() const
-{
-	return std::to_string(m_originUID) + m_originConnectable + std::to_string(m_destUID) + m_destConnectable;
-}
-
-std::string ot::GraphicsConnectionCfg::createConnectionKeyReverse() const
-{
-	return std::to_string(m_destUID) + m_destConnectable + std::to_string(m_originUID) + m_originConnectable;
 }
