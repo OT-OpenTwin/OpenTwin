@@ -76,6 +76,7 @@ public:
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) override;
 	virtual const ot::ModelServiceState& getModelServiceState() const override { return m_serviceState; };
+	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const override;
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string& _collectionName);
 	virtual ~Model();

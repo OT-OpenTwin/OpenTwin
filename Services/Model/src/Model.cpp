@@ -4233,6 +4233,12 @@ ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& 
 	return metadataHandler.createConfig(_campaign, _collectionName, _queryCfg);
 }
 
+const ot::GraphicsItemMap* Model::getGraphicsItemMap(const std::string& _editorEntityName) const
+{
+	BlockHandler& handler = Application::instance()->getBlockHandler();
+	return handler.getGraphicsItemMap(_editorEntityName);
+}
+
 EntityBase *Model::findEntityFromName(const std::string &name)
 {
 	if (m_entityRoot == nullptr) return nullptr;

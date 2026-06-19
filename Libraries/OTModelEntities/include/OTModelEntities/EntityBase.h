@@ -22,6 +22,9 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/BasicEntityInformation.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
@@ -34,8 +37,6 @@
 #include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "OTModelEntities/Properties/EntityProperties.h"
-#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
-#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
 
 // BSON header
@@ -48,10 +49,15 @@
 #include <list>
 #include <string>
 #include <optional>
+
 #pragma warning(disable : 4251)
 
 class EntityBase;
-#include "OTCore/MetadataHandle/MetadataCampaign.h"
+
+namespace ot
+{
+	class GraphicsItemMap;
+}
 
 class OT_MODELENTITIES_API_EXPORT EntityObserver
 {
@@ -70,7 +76,7 @@ public:
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
 	virtual const ot::ModelServiceState& getModelServiceState() const = 0;
-
+	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const { return nullptr; };
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

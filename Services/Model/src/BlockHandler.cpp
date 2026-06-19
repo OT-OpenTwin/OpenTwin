@@ -84,20 +84,22 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 }
 
 void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
-	auto& itemMap = getGraphicsItemMap(_editorId);
+	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 
 	itemMap.addConnection(_toBeAddedConnection.getConnectionCfg());
 }
 
 void BlockHandler::addBlock(ot::UID _editorId, const ot::EntityBlock* _block) {
-	auto& itemMap = getGraphicsItemMap(_editorId);
+	OTAssertNullptr(_block);
+	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 
 	const auto& connectorMap = _block->getAllConnectorsByName();
 	itemMap.addItem(_block->getEntityID(), ot::ContainerHelper::getKeys(connectorMap));
 }
 
 void BlockHandler::addEditor(const EntityGraphicsScene* _editor) {
-	getGraphicsItemMap(_editor->getEntityID());
+	OTAssertNullptr(_editor);
+	getOrCreateGraphicsItemMap(_editor->getEntityID());
 }
 
 void BlockHandler::removeFromMap(EntityBase* _entBase) {
@@ -244,6 +246,29 @@ void BlockHandler::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocato
 	_object.AddMember("SceneMap", sceneArr, _allocator);
 }
 
+const ot::GraphicsItemMap* BlockHandler::getGraphicsItemMap(ot::UID _editorID)
+{
+	auto it = m_sceneMap.find(_editorID);
+	if (it != m_sceneMap.end()) {
+		return &it->second;
+	}
+	else {
+		OT_LOG_E("Editor not found { \"EntityID\": " + std::to_string(_editorID) + " }");
+		return nullptr;
+	}
+}
+
+const ot::GraphicsItemMap* BlockHandler::getGraphicsItemMap(const std::string& _editorEntityName)
+{
+	EntityBase* editorBase = Application::instance()->getModel()->findEntityFromName(_editorEntityName);
+	EntityGraphicsScene* editor = dynamic_cast<EntityGraphicsScene*>(editorBase);
+	if (!editor) {
+		OT_LOG_E("Editor not found { \"Name\": \"" + _editorEntityName + "\" }");
+		return nullptr;
+	}
+	return getGraphicsItemMap(editor->getEntityID());
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Callbacks
@@ -280,18 +305,18 @@ ot::ReturnMessage BlockHandler::handleGetGraphicsItemMap(ot::JsonDocument& _requ
 		return result;
 	}
 
-	auto it = m_sceneMap.find(editorId);
-	if (it == m_sceneMap.end()) {
+	const ot::GraphicsItemMap* itemMap = getGraphicsItemMap(editorId);
+	if (itemMap)
+	{
+		ot::JsonDocument doc;
+		itemMap->addToJsonObject(doc, doc.GetAllocator());
+		result = doc.toJson();
+		result = ot::ReturnMessage::Ok;
+	}
+	else {
 		OT_LOG_E("Editor not found { \"EntityID\": " + std::to_string(editorId) + " }");
 		result = "Could not find editor for provided ID";
 		result = ot::ReturnMessage::Failed;
-	}
-	else
-	{
-		ot::JsonDocument doc;
-		it->second.addToJsonObject(doc, doc.GetAllocator());
-		result = doc.toJson();
-		result = ot::ReturnMessage::Ok;
 	}
 
 	return result;
@@ -1208,7 +1233,7 @@ bool BlockHandler::snapConnection(EntityGraphicsScene* _scene, const ot::Graphic
 	return true;
 }
 
-ot::GraphicsItemMap& BlockHandler::getGraphicsItemMap(ot::UID _sceneID)
+ot::GraphicsItemMap& BlockHandler::getOrCreateGraphicsItemMap(ot::UID _sceneID)
 {
 	auto it = m_sceneMap.find(_sceneID);
 	if (it == m_sceneMap.end()) {
