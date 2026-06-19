@@ -50,7 +50,7 @@ ot::ModelServiceStateRAII::ModelServiceStateRAII(ModelServiceState& _modelServic
 	m_modelServiceState->setState(_stateToSet);
 }
 
-ot::ModelServiceStateRAII::ModelServiceStateRAII(ModelServiceStateRAII&& _other)
+ot::ModelServiceStateRAII::ModelServiceStateRAII(ModelServiceStateRAII&& _other) noexcept
 	: m_modelServiceState(_other.m_modelServiceState), m_previousState(_other.m_previousState)
 {
 	_other.m_modelServiceState = nullptr;

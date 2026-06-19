@@ -72,9 +72,10 @@ namespace ot
 	class OT_MODELENTITIES_API_EXPORT ModelServiceStateRAII
 	{
 		OT_DECL_NOCOPY(ModelServiceStateRAII)
+		OT_DECL_NODEFAULT(ModelServiceStateRAII)
 	public:
 		explicit ModelServiceStateRAII(ModelServiceState& _modelServiceState, ModelServiceState::State _stateToSet);
-		ModelServiceStateRAII(ModelServiceStateRAII&& _other);
+		ModelServiceStateRAII(ModelServiceStateRAII&& _other) noexcept;
 		~ModelServiceStateRAII();
 
 	private:
