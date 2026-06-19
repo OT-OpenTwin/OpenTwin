@@ -26,6 +26,7 @@
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTGui/Graphics/GraphicsConnectionCfg.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityCoordinates2D.h"
@@ -82,6 +83,8 @@ namespace ot {
 		//! @note This method requires the observer and model state to be set.
 		virtual void createBlockItem();
 
+		virtual void connectionsHaveChanged() {};
+
 	protected:
 
 		virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
@@ -98,6 +101,13 @@ namespace ot {
 		virtual void createNavigationTreeEntry();
 
 		void setBlockTitle(const std::string& title) { m_blockTitle = title; setModified(); };
+
+		//! @brief Returns the current connector information for the block entity.
+		//! @note This method requires the observer to be set and the item to be created in the graphics scene.
+		std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo> getCurrentConnectorInformation() const;
+
+		
+		bool getConnectorHasCurrentlyConnection(const std::string& connectorName) const;
 
 	private:
 		//! @brief Creates a block request document.

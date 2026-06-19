@@ -70,6 +70,8 @@ namespace ot
 		std::list<GraphicsConnectionInfo> getItemConnections(UID _itemId) const;
 		std::list<GraphicsConnectionInfo> getItemConnections(UID _itemId, const std::string& _connectorName) const;
 
+		std::map<std::string, ItemConnectorInfo> getItemConnectors(UID _itemId) const;
+
 		//! @brief Finds a connected subtree in the graphics scene starting from a given item connector.
 		//! This function performs a breadth-first traversal over the scene graph starting at the
 		//! specified item and connector. The graph is treated as undirected at the connector level,

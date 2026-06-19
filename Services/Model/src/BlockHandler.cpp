@@ -87,6 +87,23 @@ void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnect
 	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 
 	itemMap.addConnection(_toBeAddedConnection.getConnectionCfg());
+
+	std::list<EntityBase*> entitiesToNotify;
+	Model* model = Application::instance()->getModel();
+	const auto cfg = _toBeAddedConnection.getConnectionCfg();
+	if (cfg.getOriginUid() != ot::invalidUID) {
+		EntityBase* originEntity = model->getEntityByID(cfg.getOriginUid());
+		if (originEntity) {
+			entitiesToNotify.push_back(originEntity);
+		}
+	}
+	if (cfg.getDestinationUid() != ot::invalidUID) {
+		EntityBase* destinationEntity = model->getEntityByID(cfg.getDestinationUid());
+		if (destinationEntity) {
+			entitiesToNotify.push_back(destinationEntity);
+		}
+	}
+	notifyBlocksAboutConnectionChange(entitiesToNotify);
 }
 
 void BlockHandler::addBlock(ot::UID _editorId, const ot::EntityBlock* _block) {
@@ -135,6 +152,23 @@ void BlockHandler::removeFromMap(EntityBase* _entBase) {
 		{
 			it.second.removeConnection(entBlockConnection->getEntityID());
 		}
+
+		const auto cfg = entBlockConnection->getConnectionCfg();
+		std::list<EntityBase*> entitiesToNotify;
+		if (cfg.getOriginUid() != ot::invalidUID) {
+			EntityBase* originEntity = model->getEntityByID(cfg.getOriginUid());
+			if (originEntity) {
+				entitiesToNotify.push_back(originEntity);
+			}
+		}
+		if (cfg.getDestinationUid() != ot::invalidUID) {
+			EntityBase* destinationEntity = model->getEntityByID(cfg.getDestinationUid());
+			if (destinationEntity) {
+				entitiesToNotify.push_back(destinationEntity);
+			}
+		}
+
+		notifyBlocksAboutConnectionChange(entitiesToNotify);
 		return;
 	}
 }
@@ -167,6 +201,32 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 				}
 			}
 		}
+	}
+
+	ot::EntityBlockConnection* connectionToRemove = dynamic_cast<ot::EntityBlockConnection*>(_entityToRemove);
+	if (connectionToRemove)
+	{
+		// Notify blocks about the connection removal
+		std::list<EntityBase*> entitiesToNotify;
+		const auto cfg = connectionToRemove->getConnectionCfg();
+		if (cfg.getOriginUid() != ot::invalidUID) {
+			EntityBase* originEntity = model->getEntityByID(cfg.getOriginUid());
+			if (originEntity) {
+				if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), originEntity) == _otherEntitiesToRemove.end()) {
+					entitiesToNotify.push_back(originEntity);
+				}
+			}
+		}
+		if (cfg.getDestinationUid() != ot::invalidUID) {
+			EntityBase* destinationEntity = model->getEntityByID(cfg.getDestinationUid());
+			if (destinationEntity) {
+				if (std::find(_otherEntitiesToRemove.begin(), _otherEntitiesToRemove.end(), destinationEntity) == _otherEntitiesToRemove.end()) {
+					entitiesToNotify.push_back(destinationEntity);
+				}
+			}
+		}
+
+		notifyBlocksAboutConnectionChange(entitiesToNotify);
 	}
 }
 
@@ -574,7 +634,6 @@ ot::ReturnMessage BlockHandler::graphicsChangeEvent(const ot::GraphicsChangeEven
 		}
 	}
 
-
 	// Fist handle the block changed requests
 	const std::list<ot::GraphicsItemCfg*>& changedItems = _changeEvent.getChangedItems();
 	if (!changedItems.empty()) {
@@ -909,16 +968,26 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 		return false;
 	}
 
+	std::list<EntityBase*> blocksToNotify;
+
 	// Ui does not update the connectionCfg anymore means that originUid/destinationUid could exist even if the block with corresponding uid does not exits
 	// Only update the position of the connections means no need of checking if originUid or destinationUid exists
 	ot::GraphicsConnectionCfg connectionCfg = connectionEntity->getConnectionCfg();
 
 	if(_changedConnection.getOriginUid() == ot::invalidUID || blockExists(_changedConnection.getOriginUid())) {
+		if (connectionCfg.getOriginUid() != ot::invalidUID)
+		{
+			blocksToNotify.push_back(model->getEntityByID(connectionCfg.getOriginUid()));
+		}
 		connectionCfg.setOriginUid(_changedConnection.getOriginUid());
 		connectionCfg.setOriginConnectable(_changedConnection.getOriginConnectable());
 	}
 
 	if(_changedConnection.getDestinationUid() == ot::invalidUID || blockExists(_changedConnection.getDestinationUid())) {
+		if (connectionCfg.getDestinationUid() != ot::invalidUID)
+		{
+			blocksToNotify.push_back(model->getEntityByID(connectionCfg.getDestinationUid()));
+		}
 		connectionCfg.setDestinationUid(_changedConnection.getDestinationUid());
 		connectionCfg.setDestinationConnectable(_changedConnection.getDestinationConnectable());
 	}
@@ -930,6 +999,8 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	connectionEntity->setConnectionCfg(connectionCfg);
 	connectionEntity->storeToDataBase();
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
+
+	notifyBlocksAboutConnectionChange(blocksToNotify);
 
 	return true;
 }
@@ -1241,5 +1312,17 @@ ot::GraphicsItemMap& BlockHandler::getOrCreateGraphicsItemMap(ot::UID _sceneID)
 	}
 	else {
 		return it->second;
+	}
+}
+
+void BlockHandler::notifyBlocksAboutConnectionChange(const std::list<EntityBase*>& _entities)
+{
+	for (EntityBase* entity : _entities)
+	{
+		ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(entity);
+		if (block)
+		{
+			block->connectionsHaveChanged();
+		}
 	}
 }

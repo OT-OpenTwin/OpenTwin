@@ -107,7 +107,7 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 	ensureCenterImageLoaded();
 
 	ot::GraphicsHierarchicalItemBuilder builder;
-
+	
 	// General
 	if (getUseCustomSize())
 	{
@@ -135,7 +135,7 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 		builder.setTopTextPainter(this->getTitlePainter()->createCopy());
 		builder.setTopTextAlignment(this->getTitleAlignment());
 	}
-
+	
 	// Image
 	if (hasCenterImage())
 	{
@@ -152,15 +152,25 @@ ot::GraphicsItemCfg* ot::EntityBlockHierarchicalBase::createBlockCfg()
 		builder.setBottomTextPainter(this->getFooterPainter()->createCopy());
 		builder.setBottomTextAlignment(getFooterAlignment());
 	}
-
+	
 	// Connectors
-	builder.setTopExpanderState(m_topConnectorState);
-	builder.setBottomExpanderState(m_bottomConnectorState);
-	builder.setLeftExpanderState(m_leftConnectorState);
-	builder.setRightExpanderState(m_rightConnectorState);
+	builder.setTopExpanderState(determineCurrentExpanderState(Alignment::Top));
+	builder.setBottomExpanderState(determineCurrentExpanderState(Alignment::Bottom));
+	builder.setLeftExpanderState(determineCurrentExpanderState(Alignment::Left));
+	builder.setRightExpanderState(determineCurrentExpanderState(Alignment::Right));
 
 	// Create the item
 	return builder.createGraphicsItem();
+}
+
+void ot::EntityBlockHierarchicalBase::connectionsHaveChanged()
+{
+	OTAssertNullptr(getObserver());
+	const auto& modelServiceState = getObserver()->getModelServiceState();
+	if (modelServiceState.isRunning())
+	{
+		createBlockItem();
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -487,4 +497,22 @@ bool ot::EntityBlockHierarchicalBase::updateTextProperties(const std::string& _g
 	{
 		return false;
 	}
+}
+
+ot::GraphicsHierarchicalItemBuilder::ExpanderState ot::EntityBlockHierarchicalBase::determineCurrentExpanderState(Alignment _connectorAlignment)
+{
+	GraphicsHierarchicalItemBuilder::ExpanderState state = getConnectorState(_connectorAlignment);
+
+	if (getConnectorHasCurrentlyConnection(GraphicsHierarchicalItemBuilder::createConnectorItemName(_connectorAlignment)))
+	{
+		if (state == GraphicsHierarchicalItemBuilder::ExpanderState::None)
+		{
+			state = GraphicsHierarchicalItemBuilder::ExpanderState::Expanded;
+		}
+	}
+	else
+	{
+		state = GraphicsHierarchicalItemBuilder::ExpanderState::None;
+	}
+	return state;
 }

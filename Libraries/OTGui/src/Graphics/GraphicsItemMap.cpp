@@ -287,6 +287,19 @@ std::list<ot::GraphicsConnectionInfo> ot::GraphicsItemMap::getItemConnections(UI
 	return {};
 }
 
+std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo> ot::GraphicsItemMap::getItemConnectors(UID _itemId) const
+{
+	auto it = m_itemToConnectorsMap.find(_itemId);
+	if (it != m_itemToConnectorsMap.end())
+	{
+		return it->second;
+	}
+	else
+	{
+		return std::map<std::string, ItemConnectorInfo>();
+	}
+}
+
 ot::GraphicsItemMap::GraphicsSubTreeResult ot::GraphicsItemMap::findSubTree(UID _startItemId, const std::string& _startConnector) const
 {
 	GraphicsSubTreeResult result;

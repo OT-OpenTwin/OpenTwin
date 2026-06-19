@@ -157,6 +157,8 @@ private:
 
 	ot::GraphicsItemMap& getOrCreateGraphicsItemMap(ot::UID _sceneID);
 
+	void notifyBlocksAboutConnectionChange(const std::list<EntityBase*>& _entities);
+
 	ot::ActionHandler m_actionHandler;
 
 	//! @brief Maps scenes to the corresponding item map.
