@@ -10,7 +10,6 @@ ot_set_runtime_static_release(ConfigMongoDBWithAuth)
 ot_add_dependency(ConfigMongoDBWithAuth
     OTSystem
     OTCore
-    OTRandom
     WINLIB:bcrypt
 )
 

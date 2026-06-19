@@ -56,7 +56,6 @@ set OT_LOCALDIRECTORYSERVICE_CONFIGURATION={^
 		"VisualizationService",^
 		"PythonExecutionService",^
 		"GetDPService",^
-		"FDTDService",^
 		"ElmerFEMService",^
 		"DataProcessingService",^
 		"DebugService",^

@@ -10,7 +10,6 @@ ot_set_runtime_static_release(KeyGenerator)
 ot_add_dependency(KeyGenerator
     OTSystem
     OTCore
-    OTRandom
     WINLIB:bcrypt
 )
 

@@ -10,7 +10,6 @@ ot_set_runtime_static_release(SetPermissions)
 ot_add_dependency(SetPermissions
     OTSystem
     OTCore
-    OTRandom
     WINLIB:bcrypt
 )
 

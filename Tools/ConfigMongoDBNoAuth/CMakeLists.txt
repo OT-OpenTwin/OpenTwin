@@ -10,7 +10,6 @@ ot_set_runtime_static_release(ConfigMongoDBNoAuth)
 ot_add_dependency(ConfigMongoDBNoAuth
     OTSystem
     OTCore
-    OTRandom
     OTServiceFoundation
     WINLIB:bcrypt
 )

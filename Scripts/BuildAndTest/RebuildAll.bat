@@ -94,11 +94,6 @@ ECHO Build Library: OpenTwinCore
 ECHO ===============================================================
 CALL "%OT_CORE_ROOT%\build.bat" %1 %2
 
-ECHO ===============================================================
-ECHO Build Library: OTRandom
-ECHO ===============================================================
-CALL "%OT_RANDOM_ROOT%\build.bat" %1 %2
-
 REM ====================================================================
 REM Build the key generator and the encryption key, if needed
 REM ====================================================================
@@ -316,11 +311,6 @@ ECHO ===============================================================
 ECHO Build Service: GetDPService
 ECHO ===============================================================
 CALL "%OT_GETDP_SERVICE_ROOT%\build.bat" %1 %2
-
-ECHO ===============================================================
-ECHO Build Service: FDTDService
-ECHO ===============================================================
-CALL "%OT_FDTD_SERVICE_ROOT%\build.bat" %1 %2
 
 ECHO ===============================================================
 ECHO Build Service: ElmerFEMService

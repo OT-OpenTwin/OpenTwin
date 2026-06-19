@@ -5,3 +5,4 @@ buildLog_Debug.txt
 buildLog_Release.txt
 *.log
 *.exe
+/build
