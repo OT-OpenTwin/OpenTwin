@@ -772,13 +772,22 @@ void Application::handleImportTableFile(ot::JsonDocument& _document) {
 	}
 }
 
-void Application::handleExportDialog(ot::JsonDocument& _document) {
+void Application::handleExportFileToLocalLibraryDialog(ot::JsonDocument& _document) {
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportDialog(pckg);
+	m_fileHandler.handleExportFileToLocalLibraryDialog(pckg);
+}
+
+void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::PropertyDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	m_fileHandler.handleExportFileToUserLibraryDialog(pckg);
+
 }
 
 
@@ -1388,7 +1397,8 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, this, &Application::handleModelDialogConfirmed);
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogCanceled, this, &Application::handleModelDialogCanceled);
 	connectAction(OT_ACTION_CMD_ImportTableFile, this, &Application::handleImportTableFile);
-	connectAction(OT_ACTION_CMD_ExportFilesToLibrary, this, &Application::handleExportDialog);
+	connectAction(OT_ACTION_CMD_ExportFilesToLibrary, this, &Application::handleExportFileToLocalLibraryDialog);
+	connectAction(OT_ACTION_CMD_ExportFileToUserLibrary, this, &Application::handleExportFileToUserLibrary);
 
 	// Properties
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityProperties, this, &Application::handleGetEntityProperties);

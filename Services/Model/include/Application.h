@@ -170,8 +170,10 @@ public:
 
 	void handleImportTableFile(ot::JsonDocument& _document);
 
-	void handleExportDialog(ot::JsonDocument& _document);
-
+	//! @brief Handles the request to export a file to the local library.
+	void handleExportFileToLocalLibraryDialog(ot::JsonDocument& _document);
+	//! @brief Handles the request to export a file to the user library.
+	void handleExportFileToUserLibrary(ot::JsonDocument& _document);
 
 	// ##################################################################################################################################################################################################################
 

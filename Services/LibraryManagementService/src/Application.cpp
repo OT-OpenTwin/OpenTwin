@@ -30,6 +30,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
+#include "OTModelEntities/Lms/UserLibraryElement.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/FileSystem/DirectoryIterator.h"
 #include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
@@ -279,8 +280,13 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 		}
 		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
 
+		std::list<std::shared_ptr<ot::LibraryElement>> localPtrModels;
+		for (auto& model : localModels) {
+			localPtrModels.push_back(std::make_shared<ot::LibraryElement>(std::move(model)));
+		}
+
 		// Filter out models that are already up-to-date (this modifies localModels in-place)
-		updateOrCreateLibraryElement(localModels, adminUserName, adminPasswordPlain, dbAddress);
+		updateOrCreateLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
 
 		// If no models remain after the check, nothing to do
 		if (localModels.empty()) {
@@ -289,10 +295,10 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 		}
 
 		// Attach binary content from disk
-		localModels = addDataToLibraryElements(localModels, libraryDataPath);
+		addDataToLibraryElements(localPtrModels, libraryDataPath);
 
 		// Add or update remaining library elements in DB
-		addLibraryElement(localModels, adminUserName, adminPasswordPlain, dbAddress);
+		addLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
 		OT_LOG_D("Completed add/update for collection: " + collectionName);
 	}
 
@@ -304,7 +310,6 @@ std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _mo
 	try {
 
 		if (!std::filesystem::exists(_modelFolderPath)) {
-			OT_LOG_E("Model folder path does not exist: " + _modelFolderPath);
 			return {};
 		}
 
@@ -357,37 +362,44 @@ std::list<ot::LibraryElement> Application::getLocalModels(const std::string& _mo
 void Application::fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath) {
 	// Get content file to calculate hash and set it to LibraryElement
 	std::string contentFileName = _element.getFileName();
-	std::filesystem::path contentFilePath = std::filesystem::path(_modelFolderPath) / contentFileName;
-	if (std::filesystem::exists(contentFilePath)) {
-		try {
-			std::ifstream contentFile(contentFilePath, std::ios::binary);
-			if (!contentFile) {
-				OT_LOG_E("Cannot open content file: " + contentFilePath.string());
-			}
-			else {
-				std::stringstream contentBuffer;
-				contentBuffer << contentFile.rdbuf();
-				std::string fileContent = contentBuffer.str();
-				contentFile.close();
+	if (_modelFolderPath.empty()) {
+		std::string data = _element.getData();
+		QCryptographicHash hashCalculator(QCryptographicHash::Algorithm::Md5);
+		hashCalculator.addData(QByteArrayView(data.data(), data.size()));
+		std::string hashValue = hashCalculator.result().toHex().toStdString();
+		_element.setHash(hashValue);
+	}
+	else {
+		std::filesystem::path contentFilePath = std::filesystem::path(_modelFolderPath) / contentFileName;
+		if (std::filesystem::exists(contentFilePath)) {
+			try {
+				std::ifstream contentFile(contentFilePath, std::ios::binary);
+				if (!contentFile) {
+					OT_LOG_E("Cannot open content file: " + contentFilePath.string());
+				}
+				else {
+					std::stringstream contentBuffer;
+					contentBuffer << contentFile.rdbuf();
+					std::string fileContent = contentBuffer.str();
+					contentFile.close();
 
-				// Calculate hash from content file and set it to LibraryElement
-				QCryptographicHash hashCalculator(QCryptographicHash::Algorithm::Md5);
-				hashCalculator.addData(QByteArrayView(fileContent.data(), fileContent.size()));
-				std::string hashValue = hashCalculator.result().toHex().toStdString();
-				_element.setHash(hashValue);
+					// Calculate hash from content file and set it to LibraryElement
+					QCryptographicHash hashCalculator(QCryptographicHash::Algorithm::Md5);
+					hashCalculator.addData(QByteArrayView(fileContent.data(), fileContent.size()));
+					std::string hashValue = hashCalculator.result().toHex().toStdString();
+					_element.setHash(hashValue);
+				}
 			}
-		}
-		catch (const std::exception& e) {
-			OT_LOG_E("Error reading content file '" + contentFilePath.string() + "': " + std::string(e.what()));
+			catch (const std::exception& e) {
+				OT_LOG_E("Error reading content file '" + contentFilePath.string() + "': " + std::string(e.what()));
+			}
 		}
 	}
 }
 
-std::list<ot::LibraryElement> Application::addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath) {
-	std::list<ot::LibraryElement> updatedElements = _elements;
-
-	for (ot::LibraryElement& element : updatedElements) {
-		std::string contentFileName = element.getFileName();
+void Application::addDataToLibraryElements(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _modelFolderPath) {
+	for (auto& ptrModel : _elements) {
+		std::string contentFileName = ptrModel->getFileName();
 		std::filesystem::path contentFilePath = std::filesystem::path(_modelFolderPath) / contentFileName;
 		if (std::filesystem::exists(contentFilePath)) {
 			try {
@@ -401,7 +413,7 @@ std::list<ot::LibraryElement> Application::addDataToLibraryElements(const std::l
 					std::string fileContent = contentBuffer.str();
 					contentFile.close();
 					// Set the file content to the LibraryElement
-					element.setData(fileContent);
+					ptrModel->setData(fileContent);
 				}
 			}
 			catch (const std::exception& e) {
@@ -412,7 +424,6 @@ std::list<ot::LibraryElement> Application::addDataToLibraryElements(const std::l
 			OT_LOG_E("Content file does not exist: " + contentFilePath.string());
 		}
 	}
-	return updatedElements;
 }
 
 std::string Application::getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
@@ -420,17 +431,16 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	return result;
 }
 
-void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	
-	for(auto it = _elements.begin(); it != _elements.end();) {
-		// Get the collection name from the current element
-		std::string collectionName = it->getCollectionName();
-		std::string elementName = it->getName();
+void Application::updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 
+	for (auto it = _elements.begin(); it != _elements.end();) {
+		// Get the collection name from the current element
+		std::string collectionName = (*it)->getCollectionName();
+		std::string elementName = (*it)->getName();
 
 		// Check if additonal depenency exists if not then skip 
-		std::string dependencyID = it->getAdditionalInfoValue("DependencyID");
-		std::string dependencyCollection = it->getAdditionalInfoValue("DependencyCollection");
+		std::string dependencyID = (*it)->getAdditionalInfoValue("DependencyID");
+		std::string dependencyCollection = (*it)->getAdditionalInfoValue("DependencyCollection");
 
 		if (dependencyID != std::to_string(ot::invalidUID) && !dependencyID.empty() && !dependencyCollection.empty()) {
 			std::string dependencyDocJson = db.getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
@@ -446,11 +456,10 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 			}
 		}
 
-
 		// Try to fetch the existing document from database
 		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
-		if(existingDocJson == "failed") {
+		if (existingDocJson == "failed") {
 			OT_LOG_E("Failed to fetch existing document for element '" + elementName + "' in collection '" + collectionName + "'. Skipping this element.");
 			++it;
 			continue;
@@ -465,7 +474,7 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 			std::string dbHash = ot::json::getString(existingDoc, "Hash");
 
 			// Get hash from current element
-			std::string currentHash = it->getHash();
+			std::string currentHash = (*it)->getHash();
 
 			// If hashes match, remove element from list (no update needed)
 			if (dbHash == currentHash) {
@@ -476,12 +485,11 @@ void Application::updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _e
 		++it;
 	}
 }
-
-void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	// Process each received model
 	for (auto& model : _elements) {
-		std::string collectionName = model.getCollectionName();
-		std::string elementName = model.getName();
+		std::string collectionName = model->getCollectionName();
+		std::string elementName = model->getName();
 
 		// Try to fetch existing document from database
 		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
@@ -500,12 +508,12 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 		}
 
 		// Set the new version in the model
-		model.setVersion(newVersion);
+		model->setVersion(newVersion);
 
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
 			// Update existing data to GridFS and update metadata (version, hash)
-			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model.getHash(), model.getData());
+			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model->getHash(), model->getData());
 
 			if (!gridfsIdResult.empty()) {
 				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
@@ -513,10 +521,10 @@ void Application::addLibraryElement(std::list<ot::LibraryElement>& _elements, co
 			else {
 				OT_LOG_E("Failed to update document '" + elementName + "'");
 			}
-       	}
+		}
 		else {
 			// Migrate new entry data to GridFS
-			db.addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, model);
+			db.addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model);
 		}
 	}
 }
@@ -845,6 +853,56 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	responseDoc.AddMember(OT_ACTION_PARAM_Config, libraryElementObj, responseDoc.GetAllocator());
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
+}
+
+std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document) {
+
+	// Extract database credentials
+	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
+	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
+	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+
+	// Read incoming array (user library elements) and convert to LibraryElement
+	ot::ConstJsonArray elementsArray = ot::json::getArray(_document, OT_ACTION_PARAM_Config);
+
+	for (const ot::JsonValue& val : elementsArray) {
+		if (!val.IsObject()) continue;
+
+		ot::ConstJsonObject elementObj = val.GetObject();
+
+		// Deserialize as UserLibraryElement to capture Owner and future fields
+		ot::UserLibraryElement userElement;
+		userElement.setFromJsonObject(elementObj);
+
+		// Calculate hash
+		fillLibraryElementWithHash(userElement, "");
+
+		// Ensure DB/collection exists
+		if (!db.ensureDatabaseAndCollection(userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl)) {
+			OT_LOG_E("Failed to ensure database and collection '" + userElement.getCollectionName() + "'");
+			continue;
+		}
+		OT_LOG_I("Database and collection '" + userElement.getCollectionName() + "' are ready");
+
+		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
+		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(std::move(userElement)));
+
+		// Filter out models that are already up-to-date
+		updateOrCreateLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+	
+		// If element was not filtered out (hash matches), add/update it
+		if (!singleElementPtrList.empty()) {
+			OT_LOG_I("Processing element '" + singleElementPtrList.front()->getName() + "' from collection '" + singleElementPtrList.front()->getCollectionName() + "'");
+
+			// Add or update in database
+			addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+		}
+		else {
+			OT_LOG_I("Element is already up-to-date. Skipping.");
+		}
+	}
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }
 
 //std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {

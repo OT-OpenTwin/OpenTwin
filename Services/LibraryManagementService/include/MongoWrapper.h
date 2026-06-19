@@ -26,6 +26,7 @@
 #include "OTSystem/AppExitCodes.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTModelEntities/Lms/UserLibraryElement.h"
 #include "OTDataStorage/Document/DocumentAccess.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 #include "OTDataStorage/Helper/BsonValuesHelper.h"

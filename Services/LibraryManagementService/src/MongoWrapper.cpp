@@ -410,6 +410,19 @@ void MongoWrapper::addNewDocument(const std::string& _collectionName, const std:
         }
         docBuilder.append(bsoncxx::builder::basic::kvp("LibraryElementID", elementId));
 
+        // Add owner if element is ot::UserLibraryElement
+        ot::UserLibraryElement* userElement = dynamic_cast<ot::UserLibraryElement*>(&_element);
+        if (userElement != nullptr) {
+            const std::string& owner = userElement->getOwner();
+            if (!owner.empty()) {
+                docBuilder.append(bsoncxx::builder::basic::kvp("Owner", owner));
+                OT_LOG_I("Added Owner '" + owner + "' to document '" + _element.getName() + "'");
+            }
+            else {
+                OT_LOG_W("UserLibraryElement owner is empty for document '" + _element.getName() + "'");
+            }
+        }
+
         // Add additionalInfos
         auto additionalInfosBuilder = bsoncxx::builder::basic::document{};
         const auto& additionalInfos = _element.getAdditionalInfos();
