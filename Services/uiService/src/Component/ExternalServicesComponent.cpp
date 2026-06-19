@@ -5367,7 +5367,7 @@ void ExternalServicesComponent::workerLoadPlotData(ot::Plot1DCfg&& _plotConfig, 
 				}
 				else
 				{
-					std::string msg = "Cannot create curve for \"" + curveCfg.getEntityName() + ". A curve needs a project and a quantity to be selected. ";
+					std::string msg = "Cannot create curve for \"" + curveCfg.getEntityName() + ". A curve needs a project and a quantity to be selected. "
 					"Select the missing configuration(s) to proceed.\n" ;
 					ot::WindowAPI::appendOutputMessage(msg);
 				}
