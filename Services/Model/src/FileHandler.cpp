@@ -115,11 +115,11 @@ void FileHandler::handleImportPythonScriptButton() {
 }
 
 void FileHandler::handleExportFilesToLibrary() {
-	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary);
+	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary);
 }
 
 void FileHandler::handleExportToUserLibrary() {
-	showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary);
+	//showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary);
 }
 
 void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction) {
