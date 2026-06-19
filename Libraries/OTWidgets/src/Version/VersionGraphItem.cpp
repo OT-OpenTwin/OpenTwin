@@ -42,7 +42,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	this->setGraphicsItemName(m_config.getName());
 	this->setGraphicsItemToolTip(m_config.getDescription());
-	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
+	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable | GraphicsItemCfg::ItemIsDoubleClickable);
 	
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
 	centralLayout->setGraphicsItemName("CentralLayout");
