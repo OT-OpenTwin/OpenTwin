@@ -26,8 +26,9 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "OTModelEntities/Interfaces/IPropertyHandling.h"
-#include "OTBlockEntities/EntityBlock.h"
 
+#include "OTCADEntities/CADEntitiesAPI.h"
+#include "OTBlockEntities/BlockEntitiesAPI.h"
 EntityBuffer& EntityBuffer::instance() {
 	static EntityBuffer g_instance;
 	return g_instance;
@@ -277,10 +278,10 @@ void EntityBuffer::clearBuffer()
 	m_bufferedTableEntities.clear();
 }
 
-#include "OTBlockEntities/Pipeline/EntityBlockPython.h"
 
 
 EntityBuffer::EntityBuffer() {
 	// Required for the EntityFactory. Otherwise the names are not registered.
-	EntityBlockPython temp; 
+	ot::BlockEntitiesAPI::initialize();
+	ot::CADEntitiesAPI::initialize();
 }
