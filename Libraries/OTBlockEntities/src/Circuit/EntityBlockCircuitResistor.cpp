@@ -83,7 +83,7 @@ std::string EntityBlockCircuitResistor::getFolderName() {
 ot::GraphicsItemCfg* EntityBlockCircuitResistor::createBlockCfg() {
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitResistor");
-	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
 	newConfig->setFile("Circuit/Resistor.ot.json");
 	
 	std::string name = getNameOnly();

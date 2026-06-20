@@ -35,6 +35,84 @@
 //  <  ^^\\ .## < ##: \\   ^^^^^^Ov                  .                '                          .             '                      ^O^^^^^^   //.:## > ##:.//^^  3
 // <   ^^\\.:## x ##:.\\   ^^^^^^Ov                     .                    '                                      '                           ^O^^^^^^   //.:## > ##:.//^^   3
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Static helper
+
+std::string ot::GraphicsItemCfg::flagToString(GraphicsItemFlag _flag)
+{
+	switch (_flag)
+	{
+	case ot::GraphicsItemCfg::NoFlags: return "null";
+	case ot::GraphicsItemCfg::ItemIsMoveable: return "Moveable";
+	case ot::GraphicsItemCfg::ItemIsSelectable: return "Selectable";
+	case ot::GraphicsItemCfg::ItemIsConnectable: return "Connectable";
+	case ot::GraphicsItemCfg::ItemSnapsToGridTopLeft: return "SnapTL";
+	case ot::GraphicsItemCfg::ItemSnapsToGridCenter: return "SnapCenter";
+	case ot::GraphicsItemCfg::ItemForwardsTooltip: return "FwdTip";
+	case ot::GraphicsItemCfg::ItemUserTransformEnabled: return "UserTransform";
+	case ot::GraphicsItemCfg::ItemIgnoresParentTransform: return "IgnoreParentTransform";
+	case ot::GraphicsItemCfg::ItemUsesStateStyling: return "StateStyle";
+	case ot::GraphicsItemCfg::ItemParticipatesInStateHandling: return "StateHandle";
+	case ot::GraphicsItemCfg::ItemForwardsState: return "FwdState";
+	case ot::GraphicsItemCfg::ItemSilencesNotifcations: return "SilenceNoti";
+	case ot::GraphicsItemCfg::ItemIsClickable: return "Clickable";
+	case ot::GraphicsItemCfg::ItemIsDoubleClickable: return "DoubleClickable";
+	default:
+		OT_LOG_ES("Unknown GraphicsItemFlag: " + std::to_string(static_cast<uint64_t>(_flag)));
+		return "null";
+	}
+}
+
+ot::GraphicsItemCfg::GraphicsItemFlag ot::GraphicsItemCfg::stringToFlag(const std::string& _flagStr)
+{
+	if (_flagStr == "null") return ot::GraphicsItemCfg::NoFlags;
+	else if (_flagStr == "Moveable") return ot::GraphicsItemCfg::ItemIsMoveable;
+	else if (_flagStr == "Selectable") return ot::GraphicsItemCfg::ItemIsSelectable;
+	else if (_flagStr == "Connectable") return ot::GraphicsItemCfg::ItemIsConnectable;
+	else if (_flagStr == "SnapTL") return ot::GraphicsItemCfg::ItemSnapsToGridTopLeft;
+	else if (_flagStr == "SnapCenter") return ot::GraphicsItemCfg::ItemSnapsToGridCenter;
+	else if (_flagStr == "FwdTip") return ot::GraphicsItemCfg::ItemForwardsTooltip;
+	else if (_flagStr == "UserTransform") return ot::GraphicsItemCfg::ItemUserTransformEnabled;
+	else if (_flagStr == "IgnoreParentTransform") return ot::GraphicsItemCfg::ItemIgnoresParentTransform;
+	else if (_flagStr == "StateStyle") return ot::GraphicsItemCfg::ItemUsesStateStyling;
+	else if (_flagStr == "StateHandle") return ot::GraphicsItemCfg::ItemParticipatesInStateHandling;
+	else if (_flagStr == "FwdState") return ot::GraphicsItemCfg::ItemForwardsState;
+	else if (_flagStr == "SilenceNoti") return ot::GraphicsItemCfg::ItemSilencesNotifcations;
+	else if (_flagStr == "Clickable") return ot::GraphicsItemCfg::ItemIsClickable;
+	else if (_flagStr == "DoubleClickable") return ot::GraphicsItemCfg::ItemIsDoubleClickable;
+	else {
+		OT_LOG_ES("Unknown GraphicsItemFlag string: " + _flagStr);
+		return ot::GraphicsItemCfg::NoFlags;
+	}
+}
+
+std::list<std::string> ot::GraphicsItemCfg::flagsToStringList(const GraphicsItemFlags& _flags)
+{
+	std::list<std::string> flagStrs;
+	for (uint64_t bit = 1; bit != 0; bit <<= 1)
+	{
+		if (_flags.underlying() & bit)
+		{
+			GraphicsItemFlag flag = static_cast<GraphicsItemFlag>(bit);
+			flagStrs.push_back(flagToString(flag));
+		}
+	}
+	return flagStrs;
+}
+
+ot::GraphicsItemCfg::GraphicsItemFlags ot::GraphicsItemCfg::stringListToFlags(const std::list<std::string>& _flagStrs)
+{
+	GraphicsItemFlags flags;
+	for (const std::string& flagStr : _flagStrs)
+	{
+		flags = flags | stringToFlag(flagStr);
+	}
+	return flags;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 ot::GraphicsItemCfg::GraphicsItemCfg()
 	: m_pos(0., 0.), m_flags(GraphicsItemCfg::NoFlags), m_alignment(Alignment::Center), m_uid(ot::invalidUID),
 	m_minSize(0., 0.), m_margins(0., 0., 0., 0.), m_zValue(ot::GraphicsZValues::Item),
@@ -65,7 +143,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember("Margins", JsonObject(m_margins, _allocator), _allocator);
 	_object.AddMember("AdditionalTriggerDist", JsonObject(m_additionalTriggerDistance, _allocator), _allocator);
 	_object.AddMember("ZVal", m_zValue, _allocator);
-	_object.AddMember("Flags", static_cast<uint64_t>(m_flags), _allocator);
+	_object.AddMember("Flags", JsonArray(flagsToStringList(m_flags), _allocator), _allocator);
 
 	JsonArray stringMapArr;
 	for (const auto& it : m_stringMap) {
@@ -93,7 +171,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_margins.setFromJsonObject(json::getObject(_object, "Margins"));
 	m_additionalTriggerDistance.setFromJsonObject(json::getObject(_object, "AdditionalTriggerDist"));
 	m_zValue = json::getInt(_object, "ZVal", GraphicsZValues::Item);
-	m_flags = GraphicsItemFlags(json::getUInt64(_object, "Flags"));
+	m_flags = stringListToFlags(json::getStringList(_object, "Flags"));
 
 	m_stringMap.clear();
 	ConstJsonObjectList stringMapArr = json::getObjectList(_object, "StringMap");

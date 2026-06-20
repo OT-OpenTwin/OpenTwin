@@ -74,7 +74,7 @@ void ot::GraphicsInvisibleItem::paintCustomItem(QPainter* _painter, const QStyle
 
 	const GraphicsInvisibleItemCfg* cfg = this->getItemConfiguration<GraphicsInvisibleItemCfg>();
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			PenFCfg selectedOutline(1., GraphicsItem::createSelectionBorderPainter());
 			_painter->setPen(QtFactory::toQPen(selectedOutline));

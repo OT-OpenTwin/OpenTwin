@@ -102,7 +102,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitInductor::createBlockCfg()
 {
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitInductor");
-	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
 	newConfig->setFile("Circuit/Inductor.ot.json");
 
 	std::string name = getNameOnly();

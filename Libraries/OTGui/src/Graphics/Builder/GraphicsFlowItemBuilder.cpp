@@ -83,7 +83,7 @@ void ot::GraphicsFlowItemConnector::setCustomSecondaryPainter(ot::Painter2D* _pa
 void ot::GraphicsFlowItemConnector::addToGrid(int _row, GraphicsGridLayoutItemCfg* _gridLayout, bool _isLeft) const {
 	// Connector item
 	ot::GraphicsItemCfg* itm = this->createConnectorItem();
-	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable | ot::GraphicsItemCfg::ItemHandlesState);
+	itm->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsConnectable | ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemUsesStateStyling);
 	itm->setName(m_name);
 	itm->setMargins(ot::MarginsD(0., 0., 0., 0));
 	itm->setToolTip(m_toolTip);
@@ -208,7 +208,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	root->setName(m_name);
 	root->setTitle(m_title);
 	root->setToolTip(m_toolTip);
-	root->setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGridTopLeft | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
+	root->setGraphicsItemFlags(GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemSnapsToGridTopLeft | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
 
 	// Border
 	ot::GraphicsRectangularItemCfg* bor = new ot::GraphicsRectangularItemCfg(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground));
@@ -216,7 +216,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(SizePolicy::Dynamic);
-	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
 	root->addItemTop(bor, false, true);
 
 	// Layout
@@ -239,7 +239,7 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
 	tBor->setSizePolicy(SizePolicy::Dynamic);
-	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
 	tStack->addItemTop(tBor, false, true);
 
 	// Title: Layout

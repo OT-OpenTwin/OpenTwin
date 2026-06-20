@@ -78,7 +78,7 @@ void ot::GraphicsArcItem::paintCustomItem(QPainter* _painter, const QStyleOption
 	
 	QPen borderPen = QtFactory::toQPen(cfg->getLineStyle());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			std::unique_ptr<Painter2D> newPainter(GraphicsItem::createSelectionBorderPainter());
 			borderPen.setBrush(QtFactory::toQBrush(newPainter.get()));

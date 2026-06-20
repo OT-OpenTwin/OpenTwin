@@ -42,7 +42,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	this->setGraphicsItemName(m_config.getName());
 	this->setGraphicsItemToolTip(m_config.getDescription());
-	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable | GraphicsItemCfg::ItemIsDoubleClickable);
+	this->setGraphicsItemFlags(GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable | GraphicsItemCfg::ItemIsDoubleClickable);
 	
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
 	centralLayout->setGraphicsItemName("CentralLayout");
@@ -56,7 +56,7 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	// Create items
 	GraphicsRectangularItem* border = new GraphicsRectangularItem;
 	border->setGraphicsItemName("Border");
-	border->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	border->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling | GraphicsItemCfg::ItemForwardsTooltip);
 	border->setGraphicsItemSizePolicy(SizePolicy::Dynamic);
 
 	m_inConnector = new GraphicsInvisibleItem;
@@ -75,12 +75,12 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	m_nameItem = new GraphicsTextItem;
 	m_nameItem->setGraphicsItemName("Name");
-	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling | GraphicsItemCfg::ItemForwardsTooltip);
 	m_nameItem->setGraphicsItemMargins(MarginsD(0., 3., 0., 0.));
 	
 	m_labelItem = new GraphicsTextItem;
 	m_labelItem->setGraphicsItemName("Label");
-	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling | GraphicsItemCfg::ItemForwardsTooltip);
 	
 	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
 

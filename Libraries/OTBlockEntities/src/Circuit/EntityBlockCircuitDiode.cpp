@@ -91,7 +91,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::createBlockCfg()
 {
 	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
 	newConfig->setName("EntityBlockCircuitDiode");
-	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
+	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable);
 	newConfig->setFile("Circuit/Diode.ot.json");
 	
 	std::string name = getNameOnly();

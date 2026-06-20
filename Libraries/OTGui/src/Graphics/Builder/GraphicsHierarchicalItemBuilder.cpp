@@ -160,6 +160,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 		| GraphicsItemCfg::ItemForwardsState
 		| GraphicsItemCfg::ItemIsSelectable
 		| GraphicsItemCfg::ItemIsDoubleClickable
+		| GraphicsItemCfg::ItemParticipatesInStateHandling
 	);
 
 	// Central Stack
@@ -275,7 +276,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 	con->setName(createConnectorItemName(_alignment));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
-	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
 	con->setSizePolicy(SizePolicy::Preferred);
 
 	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
@@ -346,7 +347,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	
 	if (isExpanderVisible(_alignment))
 	{
-		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemHandlesState);
+		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
 		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
 		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
@@ -363,6 +364,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() const
 {
+	ot::GraphicsItemCfg* shape = nullptr;
 	switch (m_backgroundShape)
 	{
 	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::None: return nullptr;
@@ -370,8 +372,16 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() cons
 	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse: return createEllipseShapeItem();
 	default:
 		OT_LOG_E("Unknown background shape: " + std::to_string(static_cast<int>(m_backgroundShape)));
-		return nullptr;
 	}
+
+	if (shape)
+	{
+		shape->setName(m_entityName + "_shape");
+		shape->setSizePolicy(SizePolicy::Dynamic);
+		shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
+	}
+
+	return shape;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeItem() const
@@ -379,9 +389,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeIt
 	GraphicsRectangularItemCfg* shape = new GraphicsRectangularItemCfg(m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
 	shape->setCornerRadius(m_cornerRadius);
-	shape->setName(m_entityName + "_shape");
-	shape->setSizePolicy(SizePolicy::Dynamic);
-	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
 
 	return shape;
 }
@@ -390,9 +398,6 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createEllipseShapeItem
 {
 	GraphicsEllipseItemCfg* shape = new GraphicsEllipseItemCfg(5., 5., m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
-	shape->setName(m_entityName + "_shape");
-	shape->setSizePolicy(SizePolicy::Dynamic);
-	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 
 	return shape;
 }

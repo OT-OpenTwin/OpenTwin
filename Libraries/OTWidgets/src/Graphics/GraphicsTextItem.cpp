@@ -153,7 +153,7 @@ void ot::GraphicsTextItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 
 	QPen textPen = QtFactory::toQPen(cfg->getTextStyle());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			textPen.setBrush(QtFactory::toQBrush(newPainter));

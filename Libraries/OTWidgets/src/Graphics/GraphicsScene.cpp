@@ -382,8 +382,7 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 
 				if (actualItem)
 				{
-					//if (actualItem->getGraphicsItemFlags().hasAny(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsState))
-					if (actualItem->getGraphicsItemFlags().hasAny(GraphicsItemCfg::ItemHandlesState))
+					if (actualItem->getGraphicsItemFlags().hasAny(GraphicsItemCfg::ItemParticipatesInStateHandling))
 					{
 						hoveredElement = actualItem;
 						closestDistance = distance;
