@@ -141,7 +141,7 @@ void ot::GraphicsItemCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _al
 	_object.AddMember("MinSize", JsonObject(m_minSize, _allocator), _allocator);
 	_object.AddMember("MaxSize", JsonObject(m_maxSize, _allocator), _allocator);
 	_object.AddMember("Margins", JsonObject(m_margins, _allocator), _allocator);
-	_object.AddMember("AdditionalTriggerDist", JsonObject(m_additionalTriggerDistance, _allocator), _allocator);
+	_object.AddMember("AddTrigDist", JsonObject(m_additionalTriggerDistance, _allocator), _allocator);
 	_object.AddMember("ZVal", m_zValue, _allocator);
 	_object.AddMember("Flags", JsonArray(flagsToStringList(m_flags), _allocator), _allocator);
 
@@ -169,7 +169,7 @@ void ot::GraphicsItemCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	m_minSize.setFromJsonObject(json::getObject(_object, "MinSize"));
 	m_maxSize.setFromJsonObject(json::getObject(_object, "MaxSize"));
 	m_margins.setFromJsonObject(json::getObject(_object, "Margins"));
-	m_additionalTriggerDistance.setFromJsonObject(json::getObject(_object, "AdditionalTriggerDist"));
+	m_additionalTriggerDistance.setFromJsonObject(json::getObject(_object, "AddTrigDist"));
 	m_zValue = json::getInt(_object, "ZVal", GraphicsZValues::Item);
 	m_flags = stringListToFlags(json::getStringList(_object, "Flags"));
 
