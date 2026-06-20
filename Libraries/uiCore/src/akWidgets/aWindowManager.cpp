@@ -60,15 +60,8 @@ m_window(nullptr),
 m_messenger(nullptr),
 m_uidManager(nullptr),
 m_tabToolBar(nullptr),
-m_statusLabel(nullptr),
-m_progressBar(nullptr),
-m_timerLabelHide(nullptr),
-m_timerLabelShow(nullptr),
-m_timerProgressHide(nullptr),
-m_timerProgressShow(nullptr),
 m_timerSignalLinker(nullptr),
-m_timerShowMainWindow(nullptr),
-m_progressBarContinuous(false)
+m_timerShowMainWindow(nullptr)
 {
 	// Check parameter
 	assert(_messenger != nullptr); // Nullptr provided
@@ -93,35 +86,8 @@ m_progressBarContinuous(false)
 	connect(m_tabToolBar, SIGNAL(tabClicked(int)), this, SLOT(slotTabToolbarTabClicked(int)));
 	connect(m_tabToolBar, SIGNAL(currentTabChanged(int)), this, SLOT(slotTabToolbarTabCurrentTabChanged(int)));
 
-	// Create progressbar
-	m_progressBar = new QProgressBar(m_window->statusBar());
-	m_progressBar->setMinimumWidth(180);
-	m_progressBar->setMaximumWidth(180);
-	m_progressBar->setMinimum(0);
-	m_progressBar->setValue(0);
-	m_progressBar->setMaximum(100);
-	m_progressBar->setVisible(false);
-
-	// Create status label
-	m_statusLabel = new QLabel(m_window->statusBar());
-	m_statusLabel->setMinimumWidth(250);
-	m_statusLabel->setMaximumWidth(500);
-	m_statusLabel->setText(QString());
-
-	m_window->statusBar()->addPermanentWidget(m_progressBar);
-	m_window->statusBar()->addPermanentWidget(m_statusLabel);
-	m_window->statusBar()->setVisible(true);
-
 	// Setup timer
-	m_timerLabelHide = new QTimer;
-	m_timerLabelShow = new QTimer;
-	m_timerProgressHide = new QTimer;
-	m_timerProgressShow = new QTimer;
 	m_timerShowMainWindow = new QTimer;
-	m_timerLabelHide->setInterval(1500);
-	m_timerLabelShow->setInterval(3000);
-	m_timerProgressHide->setInterval(1500);
-	m_timerProgressShow->setInterval(3000);
 	m_timerShowMainWindow->setInterval(1);
 	m_timerShowMainWindow->setSingleShot(true);
 
@@ -129,10 +95,6 @@ m_progressBarContinuous(false)
 	m_timerSignalLinker = new aWindowManagerTimerSignalLinker(this);
 	
 	// Link timer to the corresponding functions (realised via the timer type) 
-	m_timerSignalLinker->addLink(m_timerLabelHide, ak::aWindowManagerTimerSignalLinker::timerType::statusLabelHide);
-	m_timerSignalLinker->addLink(m_timerLabelShow, ak::aWindowManagerTimerSignalLinker::timerType::statusLabelShow);
-	m_timerSignalLinker->addLink(m_timerProgressHide, ak::aWindowManagerTimerSignalLinker::timerType::progressHide);
-	m_timerSignalLinker->addLink(m_timerProgressShow, ak::aWindowManagerTimerSignalLinker::timerType::progressShow);
 	m_timerSignalLinker->addLink(m_timerShowMainWindow, ak::aWindowManagerTimerSignalLinker::timerType::showWindow);
 
 	// Show main window
@@ -174,8 +136,6 @@ void ak::aWindowManager::SetObjectName(
 ) {
 	m_window->setObjectName(_alias);
 	m_window->statusBar()->setObjectName(_alias + "__StatusBar");
-	m_progressBar->setObjectName(_alias + "__ProgressBar");
-	m_statusLabel->setObjectName(_alias + "__StatusLabel");
 	m_tabToolBar->setObjectName(_alias + "__TTB");
 }
 
@@ -190,100 +150,6 @@ void ak::aWindowManager::setCentralWidget(
 // #############################################################################################################
 
 // Status
-
-void ak::aWindowManager::setStatusBarProgress(
-	int											_progress
-) {
-	if (_progress < 0 || _progress > 100) { throw aException("Progress out of range", "ak::aWindowManager::setStatusProgress()"); }
-	setStatusBarContinuous(false);
-	m_progressBar->setValue(_progress);
-}
-
-void ak::aWindowManager::setStatusBarVisible(
-	bool										_visible,
-	bool										_showDelayed
-) {
-	if (_visible) {
-		m_timerProgressShow->stop();
-		if (m_timerProgressHide->isActive()) {
-			m_timerProgressHide->stop();
-			m_progressBar->setVisible(false);
-		}
-		if (_showDelayed) {
-			m_timerProgressShow->start();
-		}
-		else { m_progressBar->setVisible(true); }
-	}
-	else {
-		m_timerProgressHide->stop();
-		if (m_timerProgressShow->isActive()) {
-			m_timerProgressShow->stop();
-			m_progressBar->setVisible(true);
-		}
-		if (_showDelayed) {
-			m_timerProgressHide->start();
-		}
-		else { m_progressBar->setVisible(false); }
-	}
-}
-
-void ak::aWindowManager::setStatusBarContinuous(
-	bool										_continuos
-) {
-	m_progressBarContinuous = _continuos;
-	if (m_progressBarContinuous) {
-		m_progressBar->setValue(0);
-		m_progressBar->setRange(0, 0);
-	}
-	else {
-		m_progressBar->setRange(0, 100);
-	}
-}
-
-bool ak::aWindowManager::getStatusBarVisible(void) const { return m_progressBar->isVisible(); }
-
-bool ak::aWindowManager::getStatusLabelVisible(void) const { return m_statusLabel->isVisible(); }
-
-QString ak::aWindowManager::getStatusLabelText(void) const { return m_statusLabel->text(); }
-
-int ak::aWindowManager::getStatusBarProgress(void) const { return m_progressBar->value(); }
-
-bool ak::aWindowManager::getStatusBarContinuous(void) const { return m_progressBarContinuous; }
-
-void ak::aWindowManager::setStatusLabelText(
-	const QString &														_status
-) {
-	m_statusLabel->setText(_status);
-	m_statusLabel->setToolTip(_status);
-}
-
-void ak::aWindowManager::setStatusLabelVisible(
-	bool																_visible,
-	bool																_showDelayed
-) {
-	if (_visible) {
-		m_timerLabelShow->stop();
-		if (m_timerLabelHide->isActive()) {
-			m_timerLabelHide->stop();
-			m_statusLabel->setVisible(false);
-		}
-		if (_showDelayed) {
-			m_timerLabelShow->start();
-		}
-		else { m_statusLabel->setVisible(true); }
-	}
-	else {
-		m_timerLabelHide->stop();
-		if (m_timerLabelShow->isActive()) {
-			m_timerLabelShow->stop();
-			m_statusLabel->setVisible(true);
-		}
-		if (_showDelayed) {
-			m_timerLabelHide->start();
-		}
-		else { m_statusLabel->setVisible(false); }
-	}
-}
 
 void ak::aWindowManager::showMaximized(void) { m_window->showMaximized(); }
 
@@ -390,42 +256,6 @@ bool ak::aWindowManager::restoreState(
 	slotRestoreSetting(actualState);
 
 	return true;
-}
-
-void ak::aWindowManager::setShowStatusObjectDelayTimerInterval(int _interval) {
-	bool labelShow = false;
-	bool progressShow = false;
-	// Check if timer is already running
-	if (m_timerLabelShow->isActive()) { m_timerLabelShow->stop(); labelShow = true; }
-	if (m_timerProgressShow->isActive()) { m_timerProgressShow->stop(); progressShow = true; }
-	// Set new interval
-	m_timerLabelShow->setInterval(_interval);
-	m_timerProgressShow->setInterval(_interval);
-	// Reastart timer if needed
-	if (labelShow) { m_timerLabelShow->start(); }
-	if (progressShow) { m_timerProgressShow->start(); }
-}
-
-void ak::aWindowManager::setHideStatusObjectDelayTimerInterval(int _interval) {
-	bool labelHide = false;
-	bool progressHide = false;
-	// Check if timer is already running
-	if (m_timerLabelHide->isActive()) { m_timerLabelHide->stop(); labelHide = true; }
-	if (m_timerProgressHide->isActive()) { m_timerProgressHide->stop(); progressHide = true; }
-	// Set new interval
-	m_timerLabelHide->setInterval(_interval);
-	m_timerProgressHide->setInterval(_interval);
-	// Reastart timer if needed
-	if (labelHide) { m_timerLabelHide->start(); }
-	if (progressHide) { m_timerProgressHide->start(); }
-}
-
-int ak::aWindowManager::getShowStatusObjectDelayTimerInterval(void) const {
-	return m_timerLabelShow->interval();
-}
-
-int ak::aWindowManager::getHideStatusObjectDelayTimerInterval(void) const {
-	return m_timerLabelHide->interval();
 }
 
 void ak::aWindowManager::setWaitingAnimationVisible(

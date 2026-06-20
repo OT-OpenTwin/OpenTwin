@@ -89,6 +89,7 @@ class QTreeWidgetItem;
 class ViewerComponent;
 class ControlsManager;
 class ShortcutManager;
+class StatusBarManager;
 class ProjectManagement;
 class ExternalServicesComponent;
 
@@ -831,7 +832,7 @@ private:
 	ot::UID						m_viewerUid;					//! The UID of the viewer
 	ot::UID						m_modelUid;					//! The UID of the model
 	
-	ot::Label* m_logIntensity;
+	StatusBarManager* m_statusBar;
 
 	struct StateInformation {
 		bool viewShown;

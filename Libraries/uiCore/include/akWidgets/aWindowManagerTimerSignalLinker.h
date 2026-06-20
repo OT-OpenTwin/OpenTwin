@@ -42,10 +42,6 @@ namespace ak {
 
 		//! Discribes the type of the timer linked with this signal linker
 		enum timerType {
-			progressShow,
-			progressHide,
-			statusLabelShow,
-			statusLabelHide,
 			showWindow
 		};
 
@@ -64,10 +60,6 @@ namespace ak {
 		void addLink(QTimer * _timer, timerType _timerType);
 
 	private Q_SLOTS:
-		void timerTimeoutProgressShow(void);
-		void timerTimeoutProgressHide(void);
-		void timerTimeoutLabelShow(void);
-		void timerTimeoutLabelHide(void);
 		void timerTimeoutShowWindow(void);
 
 	private:
