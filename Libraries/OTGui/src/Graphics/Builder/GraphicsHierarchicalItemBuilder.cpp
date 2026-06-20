@@ -287,14 +287,14 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
 		con->setConnectionDirection(ConnectionDirection::Up);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
 		break;
 
 	case Alignment::Left:
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
 		con->setConnectionDirection(ConnectionDirection::Left);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
 	case Alignment::Right:
@@ -348,7 +348,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	{
 		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemHandlesState);
 		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
-		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground)));
+		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
 		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
 	}
 	else
