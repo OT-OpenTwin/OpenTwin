@@ -419,12 +419,6 @@ void Model::resetToNew()
 	{
 		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager()));
 		rmd->setName(typeManager.getDatasetRMD());
-		rmd->registerCallbacks(
-			ot::EntityCallbackBase::Callback::Properties |
-			ot::EntityCallbackBase::Callback::Selection |
-			ot::EntityCallbackBase::Callback::DataNotify,
-			OT_INFO_SERVICE_TYPE_ImportParameterizedDataService
-		);
 		addEntityToModel(rmd->getName(), rmd, m_entityRoot, true, allNewEntities);
 	}
 	
