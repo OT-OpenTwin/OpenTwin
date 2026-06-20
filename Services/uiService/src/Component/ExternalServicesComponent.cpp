@@ -3095,29 +3095,49 @@ void ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _docum
 	ot::MessageDialogCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	std::string promptResponse = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
-	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
-	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
+	std::string callbackUrl;
+	if (_document.HasMember(OT_ACTION_PARAM_SENDER_URL))
+	{
+		callbackUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_SENDER))
+	{
+		std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
+		auto service = this->getServiceFromNameType(sender, sender);
+		if (!service)
+		{
+			OT_LOG_E("Failed to find service with name and type \"" + sender + "\" for message prompt request");
+			return;
+		}
+
+		callbackUrl = service->getServiceURL();
+	}
+	else
+	{
+		OT_LOG_E("No sender information provided for message prompt request");
+		return;
+	}
+
+	std::string responseAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+	std::string additionalInfo;
+	if (_document.HasMember(OT_ACTION_PARAM_Info))
+	{
+		additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+	}
 
 	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config, AppBase::instance()->mainWindow());
 
 	std::string queryResult = ot::MessageDialogCfg::toString(result);
 
 	ot::JsonDocument docOut;
-	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(promptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_ANSWER, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString(parameter1, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(responseAction, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_Result, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(additionalInfo, docOut.GetAllocator()), docOut.GetAllocator());
 
-	if (this->getServiceFromNameType(sender, sender) != nullptr)
+	std::string response;
+	if (!sendRelayedRequest(QUEUE, callbackUrl, docOut, response))
 	{
-		std::string senderUrl = this->getServiceFromNameType(sender, sender)->getServiceURL();
-
-		std::string response;
-		if (!sendRelayedRequest(QUEUE, senderUrl, docOut, response))
-		{
-			throw std::exception("Failed to send http request");
-		}
+		throw std::exception("Failed to send http request");
 	}
 }
 

@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/OTClassHelper.h"
+#include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGuiAPI/OTGuiAPIAPIExport.h"
 
 // std header
@@ -66,6 +67,12 @@ namespace ot {
 		static bool setEntitiesSelected(const std::list<std::string>& _entityNames, bool _selected, bool _clearSelection, bool _expandAllParents);
 		static bool setEntitySelected(UID _entityID, bool _selected, bool _clearSelection, bool _expandAllParents);
 		static bool setEntitiesSelected(const UIDList& _entityIDs, bool _selected, bool _clearSelection, bool _expandAllParents);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Prompts
+
+		static bool promptChoice(const std::string& _callbackAction, const std::string& _title, const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _additionalInfo = std::string());
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

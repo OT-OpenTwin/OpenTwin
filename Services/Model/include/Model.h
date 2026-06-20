@@ -234,7 +234,7 @@ public:
 	ModelState* getStateManager();
 	void setStateMangager(ModelState* state);
 
-	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
+	void discardRedoInfoAndSaveResponse(ot::MessageDialogCfg::BasicButton _answer, const std::string& _comment);
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 
@@ -318,7 +318,13 @@ private:
 	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
 	std::string ensureUniqueName(const std::string& name);
 
-		// Button callbacks
+	// Action handler
+	constexpr static std::string_view c_promptActionDiscardRedoInfoAndSave = "Model.Prompt.DiscardRedoInfoAndSave";
+
+	ot::ActionHandler m_actionHandler;
+	void handleDiscardRedoInfoAndSavePromptResponse(ot::JsonDocument& _document);
+
+	// Button callbacks
 	ot::ButtonHandler m_buttonHandler;
 	ot::ToolBarButtonCfg m_undoButton;
 	ot::ToolBarButtonCfg m_redoButton;

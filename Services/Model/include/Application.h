@@ -213,8 +213,6 @@ public:
 
 	// Action handler: UI callbacks
 
-	void handlePromptResponse(ot::JsonDocument& _document);
-
 	//api @action OT_ACTION_CMD_UI_TABLE_Setup
 	//api @brief Shows a table view in the UI.
 	//api @security mTLS

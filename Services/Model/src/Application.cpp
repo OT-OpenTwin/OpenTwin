@@ -28,6 +28,7 @@
 #include "base64.h"
 #include "zlib.h"
 #include "FileHandler.h"
+#include "CrossCollectionDatabaseWrapper.h"
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
@@ -35,13 +36,13 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
+#include "OTGuiAPI/Frontend.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
-#include "CrossCollectionDatabaseWrapper.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
-#include "OTGui/Dialog/PropertyDialogCfg.h"
 
 // std header
 #include <thread>
@@ -1001,21 +1002,6 @@ void Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 
 // Action handler: UI callbacks
 
-void Application::handlePromptResponse(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		throw ot::Exception::ObjectNotFound("No model created yet");
-	}
-
-	std::string response = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
-	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
-	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
-
-	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
-
-	m_model->promptResponse(response, actualAnswer, parameter1);
-}
-
 ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 	ot::VisualisationCfg visualisationCfg;
@@ -1388,7 +1374,6 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
 	
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
-	connectAction(OT_ACTION_CMD_UI_PromptResponse, this, &Application::handlePromptResponse);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, this, &Application::handleGetEntityIdentifier);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, this, &Application::handleGetEntitiesFromAnotherCollection);
 	connectAction(OT_ACTION_PARAM_MODEL_ViewsForProjectType, this, &Application::handleViewsFromProjectType);

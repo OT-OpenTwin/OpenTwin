@@ -279,28 +279,6 @@ void MicroserviceNotifier::reportInformation(const std::string& _message, const 
 	Application::instance()->queuedRequestToFrontend(inDoc, prefetchIds);
 }
 
-void MicroserviceNotifier::promptChoice(const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _promptResponse, const std::string& _parameter1)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptInformation, doc.GetAllocator()), doc.GetAllocator());
-
-	ot::MessageDialogCfg config;
-	config.setText(_message);
-	config.setIcon(_icon);
-	config.setButtons(_buttons);
-	config.setTitle("Open Twin");
-	ot::JsonObject configObj;
-	config.addToJsonObject(configObj, doc.GetAllocator());
-
-	doc.AddMember(OT_ACTION_PARAM_SENDER, rapidjson::Value("Model", doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_RESPONSE, rapidjson::Value(_promptResponse.c_str(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_PARAMETER1, rapidjson::Value(_parameter1.c_str(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Config, configObj, doc.GetAllocator());
-
-	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
-	Application::instance()->queuedRequestToFrontend(doc, prefetchIds);
-}
-
 void MicroserviceNotifier::resetAllViews(ot::UID visualizationModelID)
 {
 	ot::JsonDocument inDoc = MicroserviceAPI::BuildJsonDocFromAction(OT_ACTION_CMD_UI_VIEW_Reset);

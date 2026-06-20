@@ -137,6 +137,8 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 {
 	OT_LOG_D("Created model { \"Project.Name\": \"" + _projectName + "\", \"Project.Type\": \"" +  + " }");
 	
+	m_actionHandler.connectAction(std::string(c_promptActionDiscardRedoInfoAndSave), this, &Model::handleDiscardRedoInfoAndSavePromptResponse);
+
 	m_infoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Geometry", "Info", "Default/Information");
 	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::I));
 	m_infoButton.setButtonLockFlags(ot::LockType::ModelRead);
@@ -1831,6 +1833,25 @@ std::string Model::ensureUniqueName(const std::string& name)
 	} while (findEntityFromName(newName) != nullptr);
 
 	return newName;
+}
+
+void Model::handleDiscardRedoInfoAndSavePromptResponse(ot::JsonDocument& _document)
+{
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(ot::json::getString(_document, OT_ACTION_PARAM_Result));
+	std::string comment = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+
+	if (result != ot::MessageDialogCfg::Yes)
+	{
+		// We need to remove the redo information
+		const std::list<std::string> removedStates = getStateManager()->removeRedoModelStates();
+
+		if (!removedStates.empty())
+		{
+			removeVersionGraphVersions(removedStates);
+		}
+	}
+
+	projectSave(comment, true);
 }
 
 void Model::renameEntityWithChildren(EntityBase* entity, const std::string& newName)
@@ -3856,8 +3877,18 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 		// Disable write caching to database (this will also flush all pending writes)
 		DataBase::instance().setWritingQueueEnabled(false);
 
-		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
-			"Do you want to create a new version branch for these changes?", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No, "DiscardRedoInfoAndSave", comment);
+		if (!ot::Frontend::promptChoice(
+			std::string(c_promptActionDiscardRedoInfoAndSave),
+			"OpenTwin",
+			"There is redo information available which will be discarded if you change the model at this stage. \n\n"
+			"Do you want to create a new version branch for these changes?",
+			ot::MessageDialogCfg::Question,
+			ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No,
+			comment
+		))
+		{
+			OT_LOG_E("Failed to send prompt to frontend");
+		}
 
 		return;
 	}
@@ -3881,35 +3912,6 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 
 	updateUndoRedoStatus();
 	resetModified();
-}
-
-void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1) {
-	if (_type == "DiscardRedoInfoAndSave") {
-		if (_answer != ot::MessageDialogCfg::Yes) {
-			// We need to remove the redo information
-			const std::list<std::string> removedStates = getStateManager()->removeRedoModelStates();
-
-			if (!removedStates.empty()) {
-				removeVersionGraphVersions(removedStates);
-			}
-		}
-
-		projectSave(_parameter1, true);
-	}
-	else if (_type == "OverwriteFile") {
-		// Handle file overwrite response
-		if ((_answer & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes) {
-			// User wants to overwrite
-			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, true);
-		}
-		else if ((_answer & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
-			// User doesn't want to overwrite - add counter to filename
-			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, false);
-		}
-	}
-	else {
-		OT_LOG_E("Unknown promt type \"" + _type + "\"");
-	}
 }
 
 EntityBase* Model::getEntityByID(ot::UID _entityID) const

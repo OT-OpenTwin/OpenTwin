@@ -104,6 +104,9 @@ private:
 	//api @return Returns a ot::ReturnMessage containing the ot::GridFSFileInfo in JSON format in case of success.
 	ot::ReturnMessage handleRequestTextData(ot::JsonDocument& _document);
 
+	constexpr static std::string_view c_promptActionOverwriteFile = "Model.Prompt.OverwriteFile";
+	void handleOverwriteFilePromptResponse(ot::JsonDocument& _document);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Helper

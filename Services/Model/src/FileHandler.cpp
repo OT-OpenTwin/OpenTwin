@@ -54,6 +54,9 @@
 #include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyStringList.h"
+
+#include "OTGuiAPI/Frontend.h"
+
 // std header
 #include <assert.h>
 #include <filesystem>
@@ -79,6 +82,8 @@ FileHandler::FileHandler() {
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_RequestTextData, this, &FileHandler::handleRequestTextData);
+
+	m_actionHandler.connectAction(std::string(c_promptActionOverwriteFile), this, &FileHandler::handleOverwriteFilePromptResponse);
 }
 
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
@@ -407,6 +412,24 @@ ot::ReturnMessage FileHandler::handleRequestTextData(ot::JsonDocument& _document
 	info.setDocumentId(result.get_oid().value.to_string());
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, info.toJson());
+}
+
+void FileHandler::handleOverwriteFilePromptResponse(ot::JsonDocument& _document)
+{
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(ot::json::getString(_document, OT_ACTION_PARAM_Result));
+	std::string contentFilePath = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+
+	// Handle file overwrite response
+	if ((result & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes)
+	{
+		// User wants to overwrite
+		handleOverwriteResponse(contentFilePath, true);
+	}
+	else if ((result & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No)
+	{
+		// User doesn't want to overwrite - add counter to filename
+		handleOverwriteResponse(contentFilePath, false);
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1392,13 +1415,17 @@ void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, co
 		_metaNewContent
 	};
 
-	Application::instance()->getNotifier()->promptChoice(
+	if (!ot::Frontend::promptChoice(
+		std::string(c_promptActionOverwriteFile),
+		"OpenTwin",
 		"The files for \"" + _contentFilePath + "\" have changed.\n\nDo you want to overwrite both the content and metadata files?",
 		ot::MessageDialogCfg::Question,
 		ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No,
-		"OverwriteFile",
 		_contentFilePath
-	);
+	))
+	{
+		OT_LOG_E("Failed to send prompt to frontend");
+	}
 }
 
 std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
