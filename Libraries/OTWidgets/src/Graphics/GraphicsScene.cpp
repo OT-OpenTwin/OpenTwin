@@ -38,7 +38,7 @@
 ot::GraphicsScene::GraphicsScene(GraphicsView* _view) :
 	m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_maxTriggerDistance(0.), m_multiselectionEnabled(true), m_pressedItem(nullptr)
+	m_maxTriggerDistance(0.), m_multiselectionEnabled(true), m_pressedItem(nullptr), m_lastHoverElement(nullptr)
 {
 	OTAssertNullptr(m_view);
 
@@ -50,7 +50,7 @@ ot::GraphicsScene::GraphicsScene(GraphicsView* _view) :
 ot::GraphicsScene::GraphicsScene(const QRectF& _sceneRect, GraphicsView* _view)
 	: QGraphicsScene(_sceneRect), m_view(_view), m_connectionOrigin(nullptr), m_connectionPreview(nullptr),
 	m_connectionPreviewShape(GraphicsConnectionCfg::ConnectionShape::DirectLine), m_ignoreEvents(false), m_mouseIsPressed(false),
-	m_maxTriggerDistance(0.), m_multiselectionEnabled(true)
+	m_maxTriggerDistance(0.), m_multiselectionEnabled(true), m_pressedItem(nullptr), m_lastHoverElement(nullptr)
 {
 	OTAssertNullptr(m_view);
 	this->connect(this, &GraphicsScene::selectionChanged, this, &GraphicsScene::slotSelectionChanged);
@@ -264,10 +264,10 @@ void ot::GraphicsScene::elementAboutToBeRemoved(GraphicsElement* _element) {
 	std::list<GraphicsElement*> allElements = _element->getAllGraphicsElements();
 
 	for (GraphicsElement* element : allElements) {
-		auto it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), element);
-		while (it != m_lastHoverElements.end()) {
-			m_lastHoverElements.erase(it);
-			it = std::find(m_lastHoverElements.begin(), m_lastHoverElements.end(), element);
+		if (element == m_lastHoverElement)
+		{
+			m_lastHoverElement = nullptr;
+			break;
 		}
 	}
 }
@@ -338,6 +338,8 @@ void ot::GraphicsScene::mouseDoubleClickEvent(QGraphicsSceneMouseEvent* _event) 
 }
 
 void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
+	QPointF pos = _event->scenePos();
+
 	if (m_connectionPreview) {
 		OTAssertNullptr(m_connectionOrigin);
 		QGraphicsItem* graphicsItem = m_connectionOrigin->getQGraphicsItem();
@@ -352,55 +354,66 @@ void ot::GraphicsScene::mouseMoveEvent(QGraphicsSceneMouseEvent* _event) {
 			assert(0);
 		}
 
-		m_connectionPreview->setDestPos(_event->scenePos());
+		m_connectionPreview->setDestPos(pos);
 	}
 
 	std::list<GraphicsElement*> clearHoverElements;
-	std::list<GraphicsElement*> newHoverElements;
-
+	GraphicsElement* hoveredElement = nullptr;
+	double closestDistance = std::numeric_limits<double>::max();
+	
 	// First check for a connectable close by
-	GraphicsElement* targetedElement = this->findClosestConnectableElement(_event->scenePos());
+	GraphicsElement* targetedElement = this->findClosestConnectableElement(pos);
 	
 	if (targetedElement) {
-		newHoverElements.push_back(targetedElement);
+		hoveredElement = targetedElement;
 	}
 	else {
 		// No connectable, check for root items and connections at pos
-		QList<QGraphicsItem*> hoverItems = this->items(_event->scenePos());
+		QList<QGraphicsItem*> hoverItems = this->items(pos);
 		for (QGraphicsItem* itm : hoverItems) {
-			GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(itm);
-			GraphicsConnectionItem* actualConnection = dynamic_cast<GraphicsConnectionItem*>(itm);
-			if (actualItem) {
-				if (!actualItem->getParentGraphicsItem() && (actualItem->getGraphicsItemFlags() & (GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsState))) {
-					newHoverElements.push_back(actualItem);
+			QRectF itemRect = itm->sceneBoundingRect();
+			QPointF itemRectCenter = itemRect.center();
+			double distance = ot::Math::euclideanDistance(pos.x(), pos.y(), itemRectCenter.x(), itemRectCenter.y());
+
+			if (distance < closestDistance)
+			{
+				GraphicsItem* actualItem = dynamic_cast<GraphicsItem*>(itm);
+				GraphicsConnectionItem* actualConnection = dynamic_cast<GraphicsConnectionItem*>(itm);
+
+				if (actualItem)
+				{
+					//if (actualItem->getGraphicsItemFlags().hasAny(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsState))
+					if (actualItem->getGraphicsItemFlags().hasAny(GraphicsItemCfg::ItemHandlesState))
+					{
+						hoveredElement = actualItem;
+						closestDistance = distance;
+					}
 				}
-			}
-			else if (actualConnection) {
-				newHoverElements.push_back(actualConnection);
-			}
-			else if (itm != m_connectionPreview) {
-				OT_LOG_W("Unknown item in scene");
+				else if (actualConnection)
+				{
+					hoveredElement = actualConnection;
+					closestDistance = distance;
+				}
+				else if (itm != m_connectionPreview)
+				{
+					OT_LOG_W("Unknown item in scene");
+				}
 			}
 		}
 	}
 
 	// Check for state reset
-	for (GraphicsElement* element : m_lastHoverElements) {
-		if (std::find(newHoverElements.begin(), newHoverElements.end(), element) == newHoverElements.end()) {
-			clearHoverElements.push_back(element);
-		}
+	if (m_lastHoverElement && m_lastHoverElement != hoveredElement) {
+		m_lastHoverElement->setGraphicsElementState(GraphicsElement::HoverState, false);
 	}
+
+	if (hoveredElement && hoveredElement != m_lastHoverElement)
+	{
+		hoveredElement->setGraphicsElementState(GraphicsElement::HoverState, true);
+	}
+
+	m_lastHoverElement = hoveredElement;
 	
-	// Apply state
-	m_lastHoverElements = newHoverElements;
-
-	for (GraphicsElement* element : clearHoverElements) {
-		element->setGraphicsElementState(GraphicsElement::HoverState, false);
-	}
-	for (GraphicsElement* element : m_lastHoverElements) {
-		element->setGraphicsElementState(GraphicsElement::HoverState, true);
-	}
-
 	QGraphicsScene::mouseMoveEvent(_event);
 }
 
@@ -649,6 +662,30 @@ QList<QGraphicsItem*> ot::GraphicsScene::findItemsInTriggerDistance(const QPoint
 	else {
 		lst = this->items(_pos);
 	}
+
+	for (auto it = lst.begin(); it != lst.end();) {
+		QGraphicsItem* itm = *it;
+		GraphicsItem* actualItm = dynamic_cast<GraphicsItem*>(itm);
+		if (actualItm)
+		{
+			QRectF itemTriggerRect = actualItm->getTriggerBoundingRect();
+			if (itemTriggerRect.contains(_pos)) {
+				it++;
+			}
+			else {
+				it = lst.erase(it);
+			}
+		}
+		else if (itm->sceneBoundingRect().contains(_pos))
+		{
+			it++;
+		}
+		else
+		{
+			it = lst.erase(it);
+		}
+	}
+
 	return lst;
 }
 

@@ -178,7 +178,7 @@ namespace ot {
 		void handleSingleSelectionChanged();
 		GraphicsItem* findItemWithFlagAt(const QPointF& _pos, GraphicsItemCfg::GraphicsItemFlag _flag) const;
 
-		std::list<GraphicsElement *> m_lastHoverElements;
+		GraphicsElement* m_lastHoverElement;
 
 		bool m_ignoreEvents;
 		double m_maxTriggerDistance;
