@@ -25,6 +25,7 @@
 // OpenTwin header
 #include "OTSystem/DateTime.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/Widgets/TextEditor.h"
 
 // Qt header
 #include <QtCore/qjsondocument.h>
@@ -89,8 +90,9 @@ LogVisualizationItemViewDialog::LogVisualizationItemViewDialog(const ot::LogMess
 
 
 	QLabel* messageL = new QLabel("Message text:");
-	m_message = new QPlainTextEdit(QString::fromStdString(m_msg.getText()));
+	m_message = new ot::TextEditor(this);
 	m_message->setReadOnly(true);
+	m_message->setPlainText(QString::fromStdString(m_msg.getText()));
 
 	m_okButton = new QPushButton("Ok");
 	m_okButton->setMinimumWidth(100);
