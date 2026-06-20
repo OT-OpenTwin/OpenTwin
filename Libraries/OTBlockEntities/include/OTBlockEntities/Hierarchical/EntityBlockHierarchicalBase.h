@@ -115,6 +115,8 @@ namespace ot {
 
 		void ensureCenterImageLoaded();
 
+		virtual std::string getElementTypeString() const = 0;
+
 	private:
 		ot::UID m_centerImageUID;
 		ot::UID m_centerImageVersion;

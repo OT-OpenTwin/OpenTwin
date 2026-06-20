@@ -72,7 +72,10 @@ void ot::EntityBlockHierarchicalBase::createProperties()
 	const std::string centerImageGroup = std::string(this->centerImagePropertyGroupName);
 	const std::string footerGroup = std::string(this->footerPropertyGroupName);
 
-	EntityPropertiesBase* prop = EntityPropertiesSelection::createProperty(generalGroup, "Background Shape", GraphicsHierarchicalItemBuilder::getBackgroundShapeSelectionValues(), GraphicsHierarchicalItemBuilder::backgroundShapeToString(GraphicsHierarchicalItemBuilder::BackgroundShape::Rectangle), "", getProperties());
+	EntityPropertiesBase* prop = EntityPropertiesString::createProperty(generalGroup, "Element Type", this->getElementTypeString(), "", getProperties());
+	prop->setReadOnly(true);
+
+	prop = EntityPropertiesSelection::createProperty(generalGroup, "Background Shape", GraphicsHierarchicalItemBuilder::getBackgroundShapeSelectionValues(), GraphicsHierarchicalItemBuilder::backgroundShapeToString(GraphicsHierarchicalItemBuilder::BackgroundShape::Rectangle), "", getProperties());
 
 	prop = EntityPropertiesGuiPainter::createProperty(generalGroup, "Background", new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBackground), "", getProperties());
 	prop = EntityPropertiesGuiPainter::createProperty(generalGroup, "Border Color", new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder), "", getProperties());
