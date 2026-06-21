@@ -39,6 +39,8 @@ public:
 	EntityHandler(const std::string& _rootFolderPath);
 	virtual ~EntityHandler();
 
+	void showAll(const ot::GraphicsItemMap& _itemMap);
+
 	void createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo);
 
 	bool addConnection(const ot::GraphicsConnectionCfg& _connection);
@@ -88,5 +90,7 @@ private:
 	const std::string c_decorationFolderName;
 	const std::string c_connectionsFolder;
 	const std::string c_connectionsFolderName;
+
+	const std::list<ot::Alignment> c_connectorAlignments = { ot::Alignment::Top, ot::Alignment::Bottom, ot::Alignment::Left, ot::Alignment::Right };
 
 };

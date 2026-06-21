@@ -182,6 +182,29 @@ void ot::GraphicsItemMap::removeConnectionFromItem(UID _itemId, const std::strin
 
 // Getter
 
+ot::UIDList ot::GraphicsItemMap::getAllIDs() const
+{
+	UIDList result;
+
+	for (const auto& it : m_itemToConnectorsMap)
+	{
+		result.push_back(it.first);
+
+		for (const auto& connectorIt : it.second)
+		{
+			for (const auto& connection : connectorIt.second.connections)
+			{
+				result.push_back(connection.getUid());
+			}
+		}
+	}
+
+	result.sort();
+	result.unique();
+
+	return result;
+}
+
 bool ot::GraphicsItemMap::hasItem(UID _itemId) const
 {
 	return m_itemToConnectorsMap.find(_itemId) != m_itemToConnectorsMap.end();

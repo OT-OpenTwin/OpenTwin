@@ -65,6 +65,75 @@ EntityHandler::~EntityHandler() {
 
 }
 
+void EntityHandler::showAll(const ot::GraphicsItemMap& _itemMap) 
+{
+	ot::UIDList allEntities = _itemMap.getAllIDs();
+
+	std::list<ot::EntityInformation> entityInfos;
+	ot::ModelServiceAPI::getEntityInformation(allEntities, entityInfos);
+	ot::EntityAPI::prefetchEntities(entityInfos);
+
+	ot::NewModelStateInfo entitiesToUpdate;
+
+	for (const ot::EntityInformation& entityInfo : entityInfos) {
+		std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo));
+		if (!entity) {
+			OT_LOG_ES("Failed to read entity { \"Name\": \"" << entityInfo.getEntityName() << "\", \"ID\": " << entityInfo.getEntityID() << " }");
+			continue;
+		}
+
+		ot::EntityBlockHierarchicalBase* blockEntity = dynamic_cast<ot::EntityBlockHierarchicalBase*>(entity.get());
+		if (blockEntity)
+		{
+			bool blockNeedsUpdate = false;
+			if (blockEntity->getHidden())
+			{
+				// Show the block
+				blockEntity->setHidden(false);
+				blockNeedsUpdate = true;
+			}
+
+			// Check if any connector is collapsed
+			for (ot::Alignment alignment : c_connectorAlignments)
+			{
+				if (blockEntity->getConnectorState(alignment) != ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded)
+				{
+					blockEntity->setConnectorState(alignment, ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded);
+					blockNeedsUpdate = true;
+				}
+			}
+
+			if (blockNeedsUpdate)
+			{
+				blockEntity->storeToDataBase();
+				entitiesToUpdate.addTopologyEntity(*blockEntity);
+			}
+		}
+		else
+		{
+			ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(entity.get());
+			if (connectionEntity)
+			{
+				if (connectionEntity->getHidden())
+				{
+					connectionEntity->setHidden(false);
+					connectionEntity->storeToDataBase();
+					entitiesToUpdate.addTopologyEntity(*connectionEntity);
+				}
+			}
+			else
+			{
+				OT_LOG_ES("Unexpected entity in scene { \"Name\": \"" << entityInfo.getEntityName() << "\", \"ID\": " << entityInfo.getEntityID() << ", \"Type\": \"" << entityInfo.getEntityType() << "\" }");
+			}
+		}
+	}
+
+	if (entitiesToUpdate.hasEntities())
+	{
+		ot::ModelServiceAPI::updateTopologyEntities(entitiesToUpdate, "Expanded all items in scene");
+	}
+}
+
 void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo) {
 	ot::NewModelStateInfo newEntities;
 

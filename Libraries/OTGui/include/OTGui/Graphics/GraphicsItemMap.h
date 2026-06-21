@@ -61,6 +61,8 @@ namespace ot
 
 		// Getter
 
+		UIDList getAllIDs() const;
+
 		bool hasItem(UID _itemId) const;
 		bool hasConnector(UID _itemId, const std::string& _connectorName) const;
 		bool hasConnection(UID _connectionId) const;
