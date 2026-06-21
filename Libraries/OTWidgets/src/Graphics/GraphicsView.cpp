@@ -207,10 +207,13 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
 {
+	bool itemWasSelected = false;
+
 	auto it = m_items.find(_item->getGraphicsItemUid());
 	if (it != m_items.end())
 	{
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
+		itemWasSelected = it->second->getGraphicsItemSelected();
 		this->removeItem(_item->getGraphicsItemUid());
 	}
 
@@ -252,6 +255,13 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
 				connection.second->setDestItem(connector);
 			}
 		}
+	}
+
+	if (itemWasSelected)
+	{
+		QSignalBlocker blocker(this);
+		QSignalBlocker blocker2(m_scene);
+		_item->getQGraphicsItem()->setSelected(true);
 	}
 }
 
