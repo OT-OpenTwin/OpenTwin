@@ -65,7 +65,8 @@ private:
 
 	//! @brief Helper function for user library element management
 	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
-	
+	void promptMessageToUI(const std::string& _message, const std::string& _uiServiceUrl);
+
 	//! @brief Generate a unique element name by appending a suffix (_X) if the name already exists
 	//! @return The unique name that doesn't exist in the database
 	std::string generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
@@ -84,9 +85,19 @@ private:
 
 	//! @brief Helper function for user library element management
 	//! @brief Checks existence of library element and removes elements that don't need updating from the list
+	//! @param _elements List of library elements to check. Elements that already exist with identical content will be removed from the list.
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
+	//! @param _dependencyCheck If true, it will also check for dependencies of the library elements and their existence status. If false, it will only check the provided elements without considering dependencies.
 	//! @return The existence status of the library element
 	LibraryElementExistenceStatus updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
 
+	//! @brief Helper function to add library elements to the database
+	//! @param _elements The library elements to add
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
 	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);

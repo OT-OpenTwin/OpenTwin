@@ -254,6 +254,15 @@ void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElem
 	sendConfigToUI(promptDoc, _uiServiceUrl);
 }
 
+void Application::promptMessageToUI(const std::string& _message, const std::string& _uiServiceUrl) {
+	ot::JsonDocument promptDoc;
+	promptDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_DisplayMessage, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+	promptDoc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(_message, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+
+	// Send the prompt to the UI service
+	sendConfigToUI(promptDoc, _uiServiceUrl);
+}
+
 std::string Application::generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	std::string uniqueName = _baseName;
 	int counter = 1;
@@ -281,10 +290,29 @@ std::string Application::generateUniqueElementName(const std::string& _baseName,
 }
 
 void Application::ensureUniqueLibraryElementId(ot::LibraryElement& _element, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	// Check if an element with the same libraryElementId already exists in the database
-	std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, std::to_string(_element.getLibraryElementID()));
-	if (!existingDocJson.empty()) {
-		_element.setLibraryElementID(_element.getLibraryElementID() + 1);
+
+	uint64_t originalId = _element.getLibraryElementID();
+	uint64_t counter = 1;
+
+	// Ensure db / collection exists (once per collection)
+	if (!db.ensureDatabaseAndCollection(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl)) {
+		OT_LOG_E("Failed to ensure database and collection '" + _collectionName + "'");
+	}
+	OT_LOG_I("Database and collection '" + _collectionName + "' are ready");
+
+	while (true) {
+		uint64_t candidateId = originalId + counter;
+		std::string candidateIdStr = std::to_string(candidateId);
+		std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateIdStr);
+
+		if (existingDocJson.empty()) {
+			// ID doesn't exist, we can use it
+			_element.setLibraryElementID(candidateId);
+			OT_LOG_I("Assigned unique Library Element ID: " + candidateIdStr);
+			return;
+		}
+
+		counter++;
 	}
 }
 
@@ -1004,6 +1032,7 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 
 		// Check existence and filter using the unified function
 		LibraryElementExistenceStatus existenceStatus = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
+
 		ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
 
 
@@ -1013,6 +1042,7 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 			// Element doesn't exist - add it directly
 			OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
 			addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
+			promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", uiServiceUrl);
 			break;
 		}
 
@@ -1020,6 +1050,7 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 		{
 			// Element exists with identical content - skip it
 			OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
+			promptMessageToUI("Library element '" + userElement.getName() + "' already exists with identical content. Skipping addition.\n", uiServiceUrl);
 			break;
 		}
 
