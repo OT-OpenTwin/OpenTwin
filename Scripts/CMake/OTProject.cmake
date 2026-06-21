@@ -1335,7 +1335,7 @@ function(_ot_apply_service_debugger TARGET_NAME)
     set(_entries "")
     foreach(_cfg IN ITEMS Debug Release)
         set(OT_TARGET "${TARGET_NAME}")
-        set(OT_CFG    "${_cfg}")
+        set(OT_CFG "${_cfg}")
         # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited PATH,
         # which includes Deployment) so the loaded service resolves the same DLLs.
         if(_cfg STREQUAL "Debug")
