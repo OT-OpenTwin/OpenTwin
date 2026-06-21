@@ -624,72 +624,90 @@ void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement
 	}
 }
 
- std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	
-	// First get model info from database
-	std::string modelInfos = getModelInformation( _selectionCfg, _dbUserName, _dbUserPassword, _dbServerUrl);
+std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+
+	// Get model info from standard collection
+	std::string modelInfos = getModelInformation(_selectionCfg, _dbUserName, _dbUserPassword, _dbServerUrl);
 
 	ot::JsonDocument modelInfosDoc;
 	modelInfosDoc.fromJson(modelInfos);
 
 	ot::ModelLibraryDialogCfg dialogCfg;
 
+	// Process documents from standard collection
 	if (modelInfosDoc.IsObject()) {
 		ot::ConstJsonObject obj = modelInfosDoc.getConstObject();
 
-		if (!obj.HasMember("Documents") || !obj["Documents"].IsArray()) {
-			OT_LOG_E("Documents array not found in response");
-			return std::nullopt;
+		if (obj.HasMember("Documents") && obj["Documents"].IsArray()) {
+			ot::ConstJsonArray docs = obj["Documents"].GetArray();
+			processLibraryDocuments(docs, dialogCfg);
 		}
+	}
 
-		ot::ConstJsonArray docs = obj["Documents"].GetArray();
+	// Get model info from user collection
+	ot::LibraryElementSelectionCfg userSelectionCfg = _selectionCfg;
+	userSelectionCfg.setCollectionName(_selectionCfg.getCollectionName() + "_User");
 
-		for (const ot::JsonValue& val : docs) {
-			if (!val.IsObject()) {
-				continue;
-			}
+	std::string userModelInfos = getModelInformation(userSelectionCfg, _dbUserName, _dbUserPassword, _dbServerUrl);
 
-			ot::ConstJsonObject doc = val.GetObject();
+	ot::JsonDocument userModelInfosDoc;
+	userModelInfosDoc.fromJson(userModelInfos);
 
-			// Get name (required field)
-			if (!doc.HasMember("Name") || !doc["Name"].IsString()) {
-				OT_LOG_W("Document missing Name field, skipping");
-				continue;
-			}
-			std::string name = doc["Name"].GetString();
+	// Process documents from user collection
+	if (userModelInfosDoc.IsObject()) {
+		ot::ConstJsonObject userObj = userModelInfosDoc.getConstObject();
 
-			ot::LibraryModel model(name, "", "");
-
-			
-
-			if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {
-				ot::ConstJsonObject metaDataObj = ot::json::getObject(doc, "metaData");
-
-				for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
-					std::string key = it->name.GetString();
-					std::string value;
-
-					if (it->value.IsString()) {
-						value = it->value.GetString();
-					}
-
-					model.addMetaData(key, value);
-					dialogCfg.addFilter(key);
-					
-				}
-			}
-
-			dialogCfg.addModel(model);
+		if (userObj.HasMember("Documents") && userObj["Documents"].IsArray()) {
+			ot::ConstJsonArray userDocs = userObj["Documents"].GetArray();
+			processLibraryDocuments(userDocs, dialogCfg);
 		}
+	}
+
+	if (!dialogCfg.getModels().empty()) {
 		dialogCfg.setName("Library Selection");
 		dialogCfg.setTitle("Select Library Element");
-
 		return dialogCfg;
 	}
 
-	OT_LOG_E("ModelInfoDoc is not an object: Failed to get model infos");
+	OT_LOG_E("ModelInfoDoc is empty: Failed to get model infos");
 	return std::nullopt;
 }
+
+ void Application::processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg) {
+	 for (const ot::JsonValue& val : _documents) {
+		 if (!val.IsObject()) {
+			 continue;
+		 }
+
+		 ot::ConstJsonObject doc = val.GetObject();
+
+		 // Get name (required field)
+		 if (!doc.HasMember("Name") || !doc["Name"].IsString()) {
+			 OT_LOG_W("Document missing Name field, skipping");
+			 continue;
+		 }
+		 std::string name = doc["Name"].GetString();
+
+		 ot::LibraryModel model(name, "", "");
+
+		 if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {
+			 ot::ConstJsonObject metaDataObj = ot::json::getObject(doc, "metaData");
+
+			 for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
+				 std::string key = it->name.GetString();
+				 std::string value;
+
+				 if (it->value.IsString()) {
+					 value = it->value.GetString();
+				 }
+
+				 model.addMetaData(key, value);
+				 _dialogCfg.addFilter(key);
+			 }
+		 }
+		 _dialogCfg.addModel(model);
+	 }
+ }
 
  std::string Application::sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl) {
 	 std::string uiResponse;

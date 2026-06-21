@@ -90,6 +90,8 @@ private:
 	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	// Helper function to process library model documents
+	void processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);

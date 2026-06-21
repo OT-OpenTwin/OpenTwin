@@ -78,9 +78,7 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
     catch (std::exception) {
         OT_LOG_E("Getting Document List went wrong");
         return "";
-    }
-    
-    
+    } 
 }
 
 std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument) {
@@ -97,16 +95,29 @@ std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName
     try {
         DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
 
-        // Get the document
+        // Get the document from standard collection
         auto queryResult = fetchDocumentByName(docBase, _selectedDocument);
-        if (!queryResult) {
+        if (queryResult) {
+            bsoncxx::document::view documentView = queryResult->view();
+            return loadDocumentData(documentView, _collectionName);
+        }
+
+        // Document not found in standard collection - try user collection
+        std::string userCollectionName = _collectionName + "_User";
+
+        if (!checkCollectionExists(userCollectionName)) {
             return "";
         }
 
-        bsoncxx::document::view documentView = queryResult->view();
+        DataStorageAPI::DocumentAccessBase userDocBase(dbName, userCollectionName);
+        auto userQueryResult = fetchDocumentByName(userDocBase, _selectedDocument);
 
-        // Try to load GridFS data if available, otherwise return the document as JSON
-        return loadDocumentData(documentView, _collectionName);
+        if (!userQueryResult) {
+            return "";
+        }
+
+        bsoncxx::document::view userDocumentView = userQueryResult->view();
+        return loadDocumentData(userDocumentView, userCollectionName);
     }
     catch (const std::exception& e) {
         OT_LOG_E("Error getting complete document: " + std::string(e.what()));
