@@ -3,7 +3,7 @@
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 3. DEVENV_ROOT_2022
+REM 2. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
@@ -27,9 +27,9 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : PHREECService
+SETLOCAL enabledelayedexpansion
 
-REM Open project
+REM Testing PHREECService
 
 SET RELEASE=1
 SET DEBUG=1
@@ -44,32 +44,20 @@ IF "%1"=="DEBUG" (
   SET DEBUG=1
 )
 
-SET TYPE=/Rebuild
-SET TYPE_NAME=REBUILD
-
-IF "%2"=="BUILD" (
-	SET TYPE=/Build
-	SET TYPE_NAME=BUILD
-)
+SET "OLDPATH=%PATH%"
 
 IF %DEBUG%==1 (
-	ECHO %TYPE% DEBUGTEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PHREECService\PHREECService.vcxproj" %TYPE% "DebugTest|x64"  
-	ECHO %TYPE% DEBUG
-	"%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64\Debug\PHREECServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceDebugReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceDebugReport.xml" "PHREECService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\PHREECServiceDebugReport.xml"
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_PHREEC_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	ECHO %TYPE% RELEASETEST
-	"%DEVENV_ROOT_2022%\devenv.exe" "%OPENTWIN_DEV_ROOT%\Services\PHREECService\PHREECService.vcxproj" %TYPE% "ReleaseTest|x64"
-	ECHO %TYPE% RELEASE
-	"%OPENTWIN_DEV_ROOT%\Services\PHREECService\x64\Release\PHREECServiceTest.exe" /Out --gtest_output="xml:%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceReleaseReport.xml"
-	CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-	python "%OPENTWIN_DEV_ROOT%\Scripts\modifyXML.py" "%OPENTWIN_DEV_ROOT%\Scripts\Reports\PHREECServiceReleaseReport.xml" "PHREECService" "%OPENTWIN_DEV_ROOT%\Scripts\EditReports\PHREECServiceReleaseReport.xml"
-) 
-  
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_PHREEC_SERVICE_ROOT%" RELEASE
+)
+
+SET "PATH=%OLDPATH%"
+
 GOTO END
 
 :PAUSE_END

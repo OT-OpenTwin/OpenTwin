@@ -3,7 +3,7 @@
 REM This script requires the following environment variables to be set:
 REM 1. OPENTWIN_DEV_ROOT
 REM 2. OPENTWIN_THIRDPARTY_ROOT
-REM 3. DEVENV_ROOT_2022
+REM 2. DEVENV_ROOT_2022
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
 	goto PAUSE_END
@@ -27,9 +27,9 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
-ECHO Testing Project : uiService
+SETLOCAL enabledelayedexpansion
 
-REM Open project
+REM Testing uiService
 
 SET RELEASE=1
 SET DEBUG=1
@@ -44,21 +44,19 @@ IF "%1"=="DEBUG" (
   SET DEBUG=1
 )
 
-SET TYPE=/Rebuild
-SET TYPE_NAME=REBUILD
-
-IF "%2"=="BUILD" (
-	SET TYPE=/Build
-	SET TYPE_NAME=BUILD
-)
+SET "OLDPATH=%PATH%"
 
 IF %DEBUG%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_UICORE_ROOT%" DEBUG
+	SET "PATH=%OT_ALL_DLLD%;%ZLIB_DLLPATHD%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_UI_SERVICE_ROOT%" DEBUG
 )
 
 IF %RELEASE%==1 (
-	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_UICORE_ROOT%" RELEASE
+	SET "PATH=%OT_ALL_DLLR%;%OPENTWIN_DEV_ROOT%\Deployment;%OLDPATH%"
+	CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\UnitTestSingleProject.bat" "%OT_UI_SERVICE_ROOT%" RELEASE
 )
+
+SET "PATH=%OLDPATH%"
 
 GOTO END
 

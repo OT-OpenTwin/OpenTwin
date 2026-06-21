@@ -3,6 +3,10 @@
 /MongoDB_Server
 buildLog_Debug.txt
 buildLog_Release.txt
+
+# Test Logs
+testlog_Debug.txt
+testlog_Release.txt
 *.log
 *.exe
 /build

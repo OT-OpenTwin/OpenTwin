@@ -45,6 +45,10 @@ Output.txt
 buildLog_Debug.txt
 buildLog_Release.txt
 
+# Test Logs
+testlog_Debug.txt
+testlog_Release.txt
+
 # Output directory
 x64
 

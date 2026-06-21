@@ -26,6 +26,10 @@
 # Build Logs
 buildLog_Debug.txt
 buildLog_Release.txt
+
+# Test Logs
+testlog_Debug.txt
+testlog_Release.txt
 buildlog_Debug.txt
 buildlog_Release.txt
 
