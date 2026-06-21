@@ -80,7 +80,7 @@ public:
 	// Callbacks
 
 protected:
-	virtual ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
+	ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
 
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemClicked(const ot::GraphicsClickEvent& _eventData) override;

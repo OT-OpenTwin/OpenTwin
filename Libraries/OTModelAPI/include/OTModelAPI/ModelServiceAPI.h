@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTModelAPI/OTModelAPIExport.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/NewModelStateInfo.h"
@@ -39,6 +40,8 @@ namespace ot {
 		OT_DECL_NOMOVE(ModelServiceAPI)
 		OT_DECL_NODEFAULT(ModelServiceAPI)
 	public:
+		// ###########################################################################################################################################################################################################################################################################################################################
+		
 		// Model management
 		
 		static std::string getCurrentModelVersion(void);
@@ -50,6 +53,8 @@ namespace ot {
 		static void enableMessageQueueing(bool flag);
 		static void modelChangeOperationCompleted(const std::string& description);
 		static void storeAllEntitiesToDataBase(void);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Entity management
 
@@ -99,5 +104,12 @@ namespace ot {
 
 		static void updatePropertyGrid();
 		
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Data accessor
+
+		static ot::GraphicsItemMap getGraphicsItemMap(const std::string& _sceneEntityName);
+		static ot::GraphicsItemMap getGraphicsItemMap(UID _sceneEntityID);
+
 	};
 }
