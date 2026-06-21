@@ -263,6 +263,11 @@ QString ot::ProjectOverviewWidget::getCurrentQuickFilter() const {
 	return m_basicFilter->text();
 }
 
+void ot::ProjectOverviewWidget::selectedProjectAboutToBeRemoved()
+{
+	stopLoading();
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Slots
@@ -340,6 +345,8 @@ void ot::ProjectOverviewWidget::slotWorkerFinished() {
 // Private: Helper
 
 void ot::ProjectOverviewWidget::setProjects(const std::list<ProjectInformation>& _projects) {
+	stopLoading();
+
 	// Store expanded project groups
 	std::set<std::string> expandedProjectGroups;
 	for (auto& it : m_projectGroupItems) {
@@ -430,9 +437,11 @@ void ot::ProjectOverviewWidget::stopLoading() {
 }
 
 void ot::ProjectOverviewWidget::worker() {
-	if (!m_isLoading) {
+	if (!m_isLoading)
+	{
 		return;
 	}
+
 	// Reset
 	m_importedProjectData = ExtendedProjectInformation(m_currentlyLoadingProject);
 
@@ -444,6 +453,11 @@ void ot::ProjectOverviewWidget::worker() {
 		m_importedProjectData.setImageData(std::move(imageData), imageFormat);
 	}
 
+	if (!m_isLoading)
+	{
+		return;
+	}
+
 	std::string description;
 	ot::DocumentSyntax syntax = ot::DocumentSyntax::PlainText;
 	if (ModelState::readProjectDescription(m_currentlyLoadingProject.getCollectionName(), description, syntax)) {
@@ -451,6 +465,10 @@ void ot::ProjectOverviewWidget::worker() {
 		m_importedProjectData.setDescriptionSyntax(syntax);
 	}
 
+	if (!m_isLoading)
+	{
+		return;
+	}
 	QMetaObject::invokeMethod(this, &ProjectOverviewWidget::slotWorkerFinished, Qt::QueuedConnection);
 }
 

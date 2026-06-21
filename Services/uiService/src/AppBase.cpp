@@ -3556,6 +3556,8 @@ void AppBase::slotDeleteProject() {
 	if (msg.exec() != QMessageBox::Yes) {
 		return;
 	}
+
+	m_welcomeScreen->selectedProjectAboutToBeRemoved();
 	
 	ProjectManagement projectManager(m_loginData);
 	UserManagement userManager(m_loginData);

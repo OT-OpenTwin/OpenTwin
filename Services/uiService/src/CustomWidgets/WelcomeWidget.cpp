@@ -167,6 +167,10 @@ std::optional<ot::ProjectInformation> WelcomeWidget::getProjectInformationAt(int
 	return m_overview->getProjectInformationAt(_index);
 }
 
+void WelcomeWidget::selectedProjectAboutToBeRemoved() {
+	m_overview->selectedProjectAboutToBeRemoved();
+}
+
 void WelcomeWidget::slotCreateProject() {
 	Q_EMIT createProjectRequest();
 }
