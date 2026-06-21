@@ -36,6 +36,10 @@ namespace ot{
         LibraryElement() = default;
         virtual ~LibraryElement() = default;
 
+		bool operator==(const LibraryElement& _other) const;
+		bool operator!=(const LibraryElement& _other) const { return !(*this == _other); }
+        bool isSameElement(const LibraryElement& _other) const;
+
         // ###########################################################################################################################################################################################################################################################################################################################
 
         // Setter / Getter

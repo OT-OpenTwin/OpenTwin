@@ -25,6 +25,10 @@ namespace ot {
 	public:
 		UserLibraryElement() = default;
 		virtual ~UserLibraryElement() = default;
+
+		bool operator==(const UserLibraryElement& _other) const;
+		bool operator!=(const UserLibraryElement& _other) const { return !(*this == _other); }
+		bool isSameElement(UserLibraryElement& _other) const;
 		// ###########################################################################################################################################################################################################################################################################################################################
 		//Setter / Getter
 		

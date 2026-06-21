@@ -20,6 +20,30 @@
 #include "OTModelEntities/Lms/LibraryElement.h"
 #include "OTCore/Logging/Logger.h"
 
+bool ot::LibraryElement::operator==(const LibraryElement& _other) const {
+    return m_name == _other.m_name &&
+           m_version == _other.m_version &&
+           m_fileName == _other.m_fileName &&
+           m_hash == _other.m_hash &&
+           m_data == _other.m_data &&
+           m_requestingEntityID == _other.m_requestingEntityID &&
+           m_collectionName == _other.m_collectionName &&
+           m_callBackService == _other.m_callBackService &&
+           m_className == _other.m_className &&
+           m_newEntityFolder == _other.m_newEntityFolder &&
+           m_propertyName == _other.m_propertyName &&
+           m_libraryElementID == _other.m_libraryElementID &&
+           m_metaData == _other.m_metaData &&
+           m_additionalInfos == _other.m_additionalInfos;
+}
+
+bool ot::LibraryElement::isSameElement(const LibraryElement& _other) const {
+    return m_name == _other.m_name &&
+           m_hash == _other.m_hash &&
+           m_metaData == _other.m_metaData &&
+           m_additionalInfos == _other.m_additionalInfos;
+}
+
 std::string ot::LibraryElement::getMetaDataValue(const std::string& _key) const {
     auto it = m_metaData.find(_key);
     if (it != m_metaData.end()) {

@@ -17,6 +17,15 @@
 // OpenTwin header
 #include "OTModelEntities/Lms/UserLibraryElement.h"
 
+bool ot::UserLibraryElement::operator==(const UserLibraryElement& _other) const {
+	return ot::LibraryElement::operator==(_other) && m_owner == _other.m_owner;
+}
+
+bool ot::UserLibraryElement::isSameElement(UserLibraryElement& _other) const {
+
+	return ot::LibraryElement::isSameElement(_other);
+}
+
 void ot::UserLibraryElement::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	ot::LibraryElement::addToJsonObject(_object, _allocator); // Call base class implementation to add common members
 	_object.AddMember("Owner", ot::JsonString(m_owner, _allocator), _allocator);
