@@ -572,28 +572,36 @@ Application::LibraryElementExistenceStatus Application::updateOrCreateLibraryEle
 		if (!existingDocJson.empty()) {
 			// Element exists in database - compare hashes
 			try {
-				ot::JsonDocument existingDoc;
-				existingDoc.fromJson(existingDocJson);
+				// First check if it is an LibraryElement or UserLibraryElement and deserialize accordingly to access the isSameElement function for a more detailed comparison
+				ot::UserLibraryElement* userElement = dynamic_cast<ot::UserLibraryElement*>(it->get());
+				if (userElement) {
+					ot::UserLibraryElement existingUserElement = ot::UserLibraryElement::fromJson(existingDocJson);
 
-				// Get hash from database document
-				std::string dbHash = ot::json::getString(existingDoc, "Hash");
-
-				// Get hash from current element
-				std::string currentHash = (*it)->getHash();
-
-				// If hashes match, element exists with identical content
-				if (dbHash == currentHash) {
-					lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
-					it = _elements.erase(it);
-					continue;
+					if (existingUserElement.isSameElement(*userElement)) {
+						// Elements are identical
+						lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						it = _elements.erase(it);
+						continue;
+					}
+					else {
+						lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+					}
 				}
 				else {
-					// Hashes differ - element exists with different content
-					lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+					ot::LibraryElement existingElement = ot::LibraryElement::fromJson(existingDocJson);
+					ot::LibraryElement* currentElement = it->get();
+					if (existingElement.isSameElement(*currentElement)) {
+						lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						it = _elements.erase(it);
+						continue;
+					}
+					else {
+						lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+					}
 				}
 			}
 			catch (const std::exception& e) {
-				OT_LOG_W("Error comparing hashes for element '" + elementName + "': " + std::string(e.what()));
+				OT_LOG_E("Error comparing existing document for element '" + elementName + "' in collection '" + collectionName + "': " + std::string(e.what()));
 				lastStatus = LibraryElementExistenceStatus::Error;
 			}
 		}
@@ -601,7 +609,7 @@ Application::LibraryElementExistenceStatus Application::updateOrCreateLibraryEle
 			// Element does not exist
 			lastStatus = LibraryElementExistenceStatus::NotExisting;
 		}
-
+		
 		++it;
 	}
 

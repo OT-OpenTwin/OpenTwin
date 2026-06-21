@@ -666,6 +666,13 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
         resultDoc.AddMember(idKey, _documentView["LibraryElementID"].get_int64().value, allocator);
 	}
 
+    if (_documentView["Owner"]) {
+        rapidjson::Value ownerKey("Owner", allocator);
+        rapidjson::Value ownerVal(_documentView["Owner"].get_utf8().value.data(), allocator);
+        resultDoc.AddMember(ownerKey, ownerVal, allocator);
+        OT_LOG_D("Extracted Owner field from document");
+    }
+
     // Extract additionalInfos as complete object
     if (_documentView["additionalInfos"]) {
         bsoncxx::document::view additionalInfosView = _documentView["additionalInfos"].get_document().value;
@@ -704,6 +711,7 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
             }
         }
 
+        // WICHTIG: Korrekte Feldnamen verwenden!
         rapidjson::Value additionalInfosKey("AdditionalInfos", allocator);
         resultDoc.AddMember(additionalInfosKey, additionalInfosObj, allocator);
 
@@ -748,6 +756,7 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
                 metaDataObj.AddMember(keyVal, valueVal, allocator);
             }
         }
+        // WICHTIG: Korrekte Feldnamen verwenden!
         rapidjson::Value metaDataKey("MetaData", allocator);
         resultDoc.AddMember(metaDataKey, metaDataObj, allocator);
     }
@@ -758,6 +767,7 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
 
         if (originInfoView["fileName"]) {
             std::string fileName = std::string(originInfoView["fileName"].get_utf8().value);
+            // WICHTIG: Korrekte Feldnamen verwenden!
             rapidjson::Value fileNameKey("FileName", allocator);
             rapidjson::Value fileNameVal(fileName.c_str(), static_cast<rapidjson::SizeType>(fileName.length()), allocator);
             resultDoc.AddMember(fileNameKey, fileNameVal, allocator);
@@ -765,6 +775,7 @@ std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _docum
 
         if (originInfoView["hash"]) {
             std::string hash = std::string(originInfoView["hash"].get_utf8().value);
+            // WICHTIG: Korrekte Feldnamen verwenden!
             rapidjson::Value hashKey("Hash", allocator);
             rapidjson::Value hashVal(hash.c_str(), static_cast<rapidjson::SizeType>(hash.length()), allocator);
             resultDoc.AddMember(hashKey, hashVal, allocator);
