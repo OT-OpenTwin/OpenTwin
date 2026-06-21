@@ -280,6 +280,14 @@ std::string Application::generateUniqueElementName(const std::string& _baseName,
 	}
 }
 
+void Application::ensureUniqueLibraryElementId(ot::LibraryElement& _element, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	// Check if an element with the same libraryElementId already exists in the database
+	std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, std::to_string(_element.getLibraryElementID()));
+	if (!existingDocJson.empty()) {
+		_element.setLibraryElementID(_element.getLibraryElementID() + 1);
+	}
+}
+
 bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD) {
 
 	OT_LOG_I("Launching Model Library Updater");
@@ -343,6 +351,7 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 
 		std::list<std::shared_ptr<ot::LibraryElement>> localPtrModels;
 		for (auto& model : localModels) {
+			//ensureUniqueLibraryElementId(model, collectionName, adminUserName, adminPasswordPlain, dbAddress);
 			localPtrModels.push_back(std::make_shared<ot::LibraryElement>(std::move(model)));
 		}
 
@@ -969,7 +978,7 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 			OT_LOG_E("Failed to ensure database and collection '" + userElement.getCollectionName() + "'");
 			continue;
 		}
-		OT_LOG_I("Database and collection '" + userElement.getCollectionName() + "' are ready");
+		OT_LOG_I("Database and collection '" + userElement.getCollectionName() + "' are ready");		
 
 		// Create a single-element list for the unified function
 		std::list<std::shared_ptr<ot::LibraryElement>> singleElementList;
@@ -977,6 +986,8 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 
 		// Check existence and filter using the unified function
 		LibraryElementExistenceStatus existenceStatus = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
+		ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
+
 
 		switch (existenceStatus) {
 		case LibraryElementExistenceStatus::NotExisting:

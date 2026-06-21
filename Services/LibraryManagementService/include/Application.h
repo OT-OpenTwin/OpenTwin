@@ -65,10 +65,13 @@ private:
 
 	//! @brief Helper function for user library element management
 	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
-
+	
 	//! @brief Generate a unique element name by appending a suffix (_X) if the name already exists
 	//! @return The unique name that doesn't exist in the database
 	std::string generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	//! @brief Helper function to check if a library element with the same libraryElementId exists in the database and if so, increase the id by 1
+	void ensureUniqueLibraryElementId(ot::LibraryElement& _element, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
 	// Model library update functions
 	bool launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD);
