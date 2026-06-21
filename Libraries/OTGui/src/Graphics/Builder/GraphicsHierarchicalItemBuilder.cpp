@@ -347,7 +347,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	
 	if (isExpanderVisible(_alignment))
 	{
-		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
+		GraphicsItemCfg::GraphicsItemFlags flags = GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling;
 
 		PenFCfg pen(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
 
@@ -360,9 +360,11 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 		{
 			buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 			buttonItm->setToolTip("Collapse");
+			flags.set(GraphicsItemCfg::ItemVisibleWhenAncestorHovered | GraphicsItemCfg::ItemVisibleWhenAncestorSelected | GraphicsItemCfg::ItemVisibleWhenHovered);
 		}
 		buttonItm->setOutline(pen);
 		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
+		buttonItm->setGraphicsItemFlags(flags);
 	}
 	else
 	{
