@@ -49,7 +49,6 @@ std::string ot::GraphicsItemCfg::flagToString(GraphicsItemFlag _flag)
 	case ot::GraphicsItemCfg::ItemIsConnectable: return "Connectable";
 	case ot::GraphicsItemCfg::ItemSnapsToGridTopLeft: return "SnapTL";
 	case ot::GraphicsItemCfg::ItemSnapsToGridCenter: return "SnapCenter";
-	case ot::GraphicsItemCfg::ItemForwardsTooltip: return "FwdTip";
 	case ot::GraphicsItemCfg::ItemUserTransformEnabled: return "UserTransform";
 	case ot::GraphicsItemCfg::ItemIgnoresParentTransform: return "IgnoreParentTransform";
 	case ot::GraphicsItemCfg::ItemUsesStateStyling: return "StateStyle";
@@ -72,7 +71,6 @@ ot::GraphicsItemCfg::GraphicsItemFlag ot::GraphicsItemCfg::stringToFlag(const st
 	else if (_flagStr == "Connectable") return ot::GraphicsItemCfg::ItemIsConnectable;
 	else if (_flagStr == "SnapTL") return ot::GraphicsItemCfg::ItemSnapsToGridTopLeft;
 	else if (_flagStr == "SnapCenter") return ot::GraphicsItemCfg::ItemSnapsToGridCenter;
-	else if (_flagStr == "FwdTip") return ot::GraphicsItemCfg::ItemForwardsTooltip;
 	else if (_flagStr == "UserTransform") return ot::GraphicsItemCfg::ItemUserTransformEnabled;
 	else if (_flagStr == "IgnoreParentTransform") return ot::GraphicsItemCfg::ItemIgnoresParentTransform;
 	else if (_flagStr == "StateStyle") return ot::GraphicsItemCfg::ItemUsesStateStyling;

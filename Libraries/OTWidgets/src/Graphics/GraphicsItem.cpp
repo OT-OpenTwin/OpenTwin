@@ -91,7 +91,6 @@ ot::GraphicsItem::~GraphicsItem() {
 
 bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(_cfg);
-	OTAssertNullptr(this->getQGraphicsItem());
 	
 	ValueRAII configBlock(m_blockConfigurationNotifications, true);
 	this->setConfiguration(_cfg->createCopy());
@@ -99,13 +98,17 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(m_config);
 
 	if (m_config) {
-		this->getQGraphicsItem()->setZValue(m_config->getZValue());
+		QGraphicsItem* item = this->getQGraphicsItem();
+		OTAssertNullptr(item);
+		item->setZValue(m_config->getZValue());
 
 		m_moveStartPt = QPointF(m_config->getPosition().getX(), m_config->getPosition().getY());
 		this->setGraphicsItemName(this->getGraphicsItemName());
 		if (!m_blockFlagNotifications) {
 			this->graphicsItemFlagsChanged(this->getGraphicsItemFlags());
 		}
+
+		this->updateAcceptHoverEventFlag();
 	}
 
 	return true;
@@ -248,12 +251,16 @@ void ot::GraphicsItem::handleHoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsItem::handleToolTip(QGraphicsSceneHoverEvent* _event) {
-	if (!this->getGraphicsItemToolTip().empty())
-	{
-		ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(this->getGraphicsItemToolTip()), 1500);
-	}
-	else if ((this->getGraphicsItemFlags() & GraphicsItemCfg::ItemForwardsTooltip) && m_parent) {
-		m_parent->handleToolTip(_event);
+	OTAssertNullptr(getGraphicsScene());
+	auto items = getGraphicsScene()->items(_event->scenePos());
+
+	// Find first item with tooltip
+	for (auto item : items) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(item);
+		if (itm && !itm->getGraphicsItemToolTip().empty()) {
+			ToolTipHandler::showToolTip(_event->screenPos(), QString::fromStdString(itm->getGraphicsItemToolTip()), 1500);
+			return;
+		}
 	}
 }
 
@@ -525,6 +532,7 @@ void ot::GraphicsItem::setGraphicsItemToolTip(const std::string& _toolTip) {
 	if (!this->isSilencingConfigNotifications()) {
 		this->graphicsItemConfigurationChanged(m_config);
 	}
+	this->updateAcceptHoverEventFlag();
 }
 
 const std::string& ot::GraphicsItem::getGraphicsItemToolTip() const {
@@ -923,4 +931,10 @@ ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection()
 	else {
 		return (isDown ? ConnectionDirection::Down : ConnectionDirection::Up);
 	}
+}
+
+void ot::GraphicsItem::updateAcceptHoverEventFlag()
+{
+	OTAssertNullptr(this->getQGraphicsItem());
+	this->getQGraphicsItem()->setAcceptHoverEvents(!this->getGraphicsItemToolTip().empty());
 }

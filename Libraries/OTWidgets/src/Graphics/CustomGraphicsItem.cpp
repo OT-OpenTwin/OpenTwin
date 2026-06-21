@@ -29,7 +29,6 @@ ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
-	this->setAcceptHoverEvents(true);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 

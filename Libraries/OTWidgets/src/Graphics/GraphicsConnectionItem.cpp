@@ -47,7 +47,6 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	m_destDisconnect->setVisible(false);
 
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-	this->setAcceptHoverEvents(true);
 	this->updateConnectors();
 	this->updateOriginConnectionInformation();
 	this->updateDestConnectionInformation();

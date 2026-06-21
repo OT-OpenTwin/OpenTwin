@@ -168,7 +168,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	cStack->setName(m_entityName + "_cStack");
 	cStack->setToolTip(m_toolTip);
 	cStack->setMargins(m_connectorHeight);
-	cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	root->addItemTop(cStack, true, false);
 
 	// Connector Grid
@@ -198,7 +198,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	// Main layout
 	GraphicsGridLayoutItemCfg* mLay = new GraphicsGridLayoutItemCfg(3, 3);
 	mLay->setName(m_entityName + "_mLay");
-	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	mLay->setColumnStretch(1, 1);
 	mLay->setRowStretch(1, 1);
 	cStack->addItemTop(mLay, true, false);
@@ -214,7 +214,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	cLay->setName(m_entityName + "_cLay");
 	cLay->setMinimumSize(m_minimumSize);
 	cLay->setMaximumSize(m_maximumSize);
-	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	mLay->addChildItem(1, 1, cLay);
 
 	// Content
@@ -276,7 +276,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 	con->setName(createConnectorItemName(_alignment));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
-	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
+	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
 	con->setSizePolicy(SizePolicy::Preferred);
 
 	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
@@ -390,7 +390,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() cons
 	{
 		shape->setName(m_entityName + "_shape");
 		shape->setSizePolicy(SizePolicy::Dynamic);
-		shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
+		shape->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	}
 
 	return shape;
@@ -401,7 +401,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeIt
 	GraphicsRectangularItemCfg* shape = new GraphicsRectangularItemCfg(m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
 	shape->setCornerRadius(m_cornerRadius);
-	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
+	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 
 	return shape;
 }
@@ -446,7 +446,6 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg*
 	itm->setSizePolicy(SizePolicy::Dynamic);
 	itm->setAlignment(_info.alignment);
 	itm->setMaintainAspectRatio(_info.maintainAspectRatio);
-	itm->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	_layout->addChildItem(itm);
 }

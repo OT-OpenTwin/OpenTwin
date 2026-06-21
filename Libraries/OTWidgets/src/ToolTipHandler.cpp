@@ -24,11 +24,11 @@
 #include <QtWidgets/qtooltip.h>
 #include <QtGui/qfontmetrics.h>
 
-void ot::ToolTipHandler::showToolTip(const QPoint& _pos, const QString& _text, int _timeout) {
-	ToolTipHandler::instance().showToolTipImpl(_pos, _text, _timeout);
+void ot::ToolTipHandler::showToolTip(const QPoint& _pos, const QString& _text, int _showTimeout) {
+	ToolTipHandler::instance().showToolTipImpl(_pos, _text, _showTimeout);
 }
 
-void ot::ToolTipHandler::showToolTip(const QWidget* _widget, const QString& _text, Alignment _alignment, int _timeout) {	
+void ot::ToolTipHandler::showToolTip(const QWidget* _widget, const QString& _text, Alignment _alignment, int _showTimeout) {
 	OTAssertNullptr(_widget);
 
 	QPoint globalPos;
@@ -65,7 +65,7 @@ void ot::ToolTipHandler::showToolTip(const QWidget* _widget, const QString& _tex
 		break;
 	}
 
-	ToolTipHandler::instance().showToolTipImpl(globalPos, _text, _timeout);
+	ToolTipHandler::instance().showToolTipImpl(globalPos, _text, _showTimeout);
 }
 
 void ot::ToolTipHandler::hideToolTip(void) {
@@ -81,13 +81,13 @@ ot::ToolTipHandler& ot::ToolTipHandler::instance(void) {
 	return g_instance;
 }
 
-void ot::ToolTipHandler::showToolTipImpl(const QPoint& _pos, const QString& _text, int _timeout) {
+void ot::ToolTipHandler::showToolTipImpl(const QPoint& _pos, const QString& _text, int _showTimeout) {
 	this->hideToolTipImpl();
 
 	m_pos = _pos;
 	m_text = _text;
-	if (_timeout) {
-		m_timer.setInterval(_timeout);
+	if (_showTimeout > 0) {
+		m_timer.setInterval(_showTimeout);
 		m_timer.start();
 	}
 	else {

@@ -216,20 +216,20 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	bor->setCornerRadius(5);
 	bor->setName(m_name + "_bor");
 	bor->setSizePolicy(SizePolicy::Dynamic);
-	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
+	bor->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	root->addItemTop(bor, false, true);
 
 	// Layout
 	ot::GraphicsVBoxLayoutItemCfg* mLay = new ot::GraphicsVBoxLayoutItemCfg;
 	mLay->setName(m_name + "_mLay");
 	mLay->setMinimumSize(ot::Size2DD(50., 80.));
-	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	root->addItemTop(mLay, true, false);
 
 	// Title: Stack
 	ot::GraphicsStackItemCfg* tStack = new ot::GraphicsStackItemCfg;
 	tStack->setName(m_name + "_tStack");
-	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	tStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	mLay->addChildItem(tStack, 0);
 
 	// Title: Border
@@ -239,13 +239,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tBor->setCornerRadius(5);
 	//tBor->setSize(ot::Size2DD(200., 30.));
 	tBor->setSizePolicy(SizePolicy::Dynamic);
-	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemUsesStateStyling);
+	tBor->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	tStack->addItemTop(tBor, false, true);
 
 	// Title: Layout
 	ot::GraphicsHBoxLayoutItemCfg* tLay = new ot::GraphicsHBoxLayoutItemCfg;
 	tLay->setName(m_name + "_tLay");
-	tLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	tStack->addItemTop(tLay, true, false);
 
 	// Title: Title
@@ -254,7 +253,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	tit->setText(m_title);
 	tit->setTextPainter(painterTitleFront);
 	tit->setMinimumSize(ot::Size2DD(10., 22.));
-	tit->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	// Title: Left Corner
 	if (m_leftTitleImagePath.empty()) {
@@ -267,7 +265,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titLImg->setFixedSize(16., 16.);
 		titLImg->setAlignment(Alignment::Center);
 		titLImg->setMargins(ot::MarginsD(5., 0., 0., 0.));
-		titLImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titLImg);
 
 		MarginsD titMargins = tit->getMargins();
@@ -288,7 +285,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		titRImg->setMaximumSize(ot::Size2DD(22., 22.));
 		titRImg->setAlignment(Alignment::Center);
 		titRImg->setMargins(ot::MarginsD(0., 0., 5., 0.));
-		titRImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 		tLay->addChildItem(titRImg);
 
 		MarginsD titMargins = tit->getMargins();
@@ -299,14 +295,12 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	// Central layout
 	ot::GraphicsHBoxLayoutItemCfg* cLay = new ot::GraphicsHBoxLayoutItemCfg;
 	cLay->setName(m_name + "_cLay");
-	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	
 	// Left connector layout
 	ot::GraphicsGridLayoutItemCfg* lcLay = new ot::GraphicsGridLayoutItemCfg((int)m_left.size() + 1, 2);
 	lcLay->setName(m_name + "_lcLay");
 	lcLay->setRowStretch((int)m_left.size(), 1);
 	lcLay->setColumnStretch(1, 1);
-	lcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	int ix = 0;
 	for (const auto& c : m_left) {
@@ -319,7 +313,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	rcLay->setName(m_name + "_rcLay");
 	rcLay->setRowStretch((int)m_right.size(), 1);
 	rcLay->setColumnStretch(0, 1);
-	rcLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	ix = 0;
 	for (const auto& c : m_right) {
@@ -337,7 +330,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 		cImg->setSizePolicy(SizePolicy::Dynamic);
 		cImg->setAlignment(m_backgroundImageAlignment);
 		cImg->setMaintainAspectRatio(m_backgroundImageMaintainAspectRatio);
-		cImg->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	}
 
 	// Create central stack (if background image is set and the image insert mode is "onStack")
@@ -345,7 +337,6 @@ ot::GraphicsItemCfg* ot::GraphicsFlowItemBuilder::createGraphicsItem() const {
 	if (cImg && m_backgroundImageInsertMode == OnStack) {
 		cStack = new ot::GraphicsStackItemCfg;
 		cStack->setName(m_name + "_cStack");
-		cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 		cStack->addItemBottom(cImg, false, true);
 		cStack->addItemTop(cLay, true, false);

@@ -376,6 +376,8 @@ namespace ot {
 		virtual ConnectionDirection calculateOutwardsConnectionDirection() const;
 
 	private:
+		void updateAcceptHoverEventFlag();
+
 		GraphicsItemCfg* m_config; //! @brief Configuration used to setup this item. Default 0.
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.

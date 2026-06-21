@@ -61,35 +61,31 @@ namespace ot {
 			ItemSnapsToGridTopLeft          = 1 << 3, //! @brief Item snaps to grid on the top left corner of the bounding rect.
 			ItemSnapsToGridCenter           = 1 << 4, //! @brief Item snaps to grid at the center of the bounding rect (will be ignored if ItemSnapsToGridTopLeft is set).
 
-			//! @brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item.
-			//! @note If this flag is not set this item also wont forward tooltip requests from child items.
-			ItemForwardsTooltip             = 1 << 5,
-
 			//! @brief User transform and transform shortcuts are enabled for this item.
 			//! The user can rotate and flip the item by using the shortcuts or actions.
-			ItemUserTransformEnabled        = 1 << 6,
+			ItemUserTransformEnabled        = 1 << 5,
 
 			//! @brief Item transformations to the parent item will not affect this item.
 			//! If the item is located in a group for example, any transformations to the group won't affect this item.
 			//! The item will apply the inverse transformation to keep its transformation.
-			ItemIgnoresParentTransform      = 1 << 7,
+			ItemIgnoresParentTransform      = 1 << 6,
 
 			//! @brief The item will paint its border and/or background differently if the item is selected or is hovered by the user.
 			//! A StyleRefPainter2D will be used for painting the state.
 			//! @ref enum class ot::ColorStyleValueEntry
-			ItemUsesStateStyling            = 1 << 8,
+			ItemUsesStateStyling            = 1 << 7,
 
 			//! @brief The item will be concidered when determining the state of items by the scene.
-			ItemParticipatesInStateHandling = 1 << 9,
+			ItemParticipatesInStateHandling = 1 << 8,
 
 			//! @brief Item forwards state changes to child items.
 			//! If the root item is a container item (e.g. GraphicsGroupItem) it have this flag set in order to forward the state change to its child items.
-			ItemForwardsState               = 1 << 10,
+			ItemForwardsState               = 1 << 9,
 
-			ItemSilencesNotifcations        = 1 << 11, //! @brief Item will not send notifications to the scene when it is changed.
+			ItemSilencesNotifcations        = 1 << 10, //! @brief Item will not send notifications to the scene when it is changed.
 
-			ItemIsClickable                 = 1 << 12, //! @brief Item can be clicked by the user. If the item has a parent, the item may be clicked inside of the parent item.
-			ItemIsDoubleClickable           = 1 << 13  //! @brief Item can be double-clicked by the user. If the item has a parent, the item may be double-clicked inside of the parent item.
+			ItemIsClickable                 = 1 << 11, //! @brief Item can be clicked by the user. If the item has a parent, the item may be clicked inside of the parent item.
+			ItemIsDoubleClickable           = 1 << 12  //! @brief Item can be double-clicked by the user. If the item has a parent, the item may be double-clicked inside of the parent item.
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
 
