@@ -15,43 +15,10 @@
 
 include_guard(GLOBAL)
 
-# OpenTwin CMake project helper functions
-# This file provides helper functions to define CMake targets for OpenTwin libraries and applications,
-# following the conventions of the OpenTwin project structure and environment variables.
-#
-# =====================================================================
-# Usage for library:
-#   cmake_minimum_required(VERSION 3.20)
-#   project(<LIB_NAME> LANGUAGES CXX)
-#
-#   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
-#   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
-#
-#   ot_initialize_lib(<LIB_NAME> <LIB>_ROOT_PATH [EXPORT_MACRO])
-#
-#   ot_add_dependency(<LIB_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
-#
-#   ot_service_debug_launch(<LIB_NAME> ARGS <ARG_1> <ARG_2> ...)   # optional, core services only
-#
-#   ot_finalize_lib(<LIB_NAME>)
-#   ot_add_test(<LIB_NAME>)
-#
-# =====================================================================
-# Usage for binary:
-#   cmake_minimum_required(VERSION 3.20)
-#   project(<APP_NAME> LANGUAGES CXX)
-#
-#   include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
-#   include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
-#
-#   ot_initialize_bin(<APP_NAME> <APP>_ROOT_PATH [EXPORT_MACRO])
-#
-#   ot_add_dependency(<APP_NAME> <DEP_TOKEN_1> <DEP_TOKEN_2> ...)
-#
-#   ot_finalize_bin(<APP_NAME>)
-#   ot_add_test(<APP_NAME>)
+# OpenTwin CMake project configuration and helper functions.
+# Designed for a centralized, environment-variable-driven approach to dependency management.
+# Check documentation for usage details.
 
-# Requires OTEnvironment.cmake first (for THIRDPARTY_ROOT_PATH, OT_* paths, etc.)
 include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
@@ -375,6 +342,11 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
             $<${_OT_CFG_DEBUG}:_RELEASEDEBUG>
             $<${_OT_CFG_RELEASE}:NDEBUG>
         )
+
+        if(MSVC)
+            target_compile_options(${_core} PRIVATE $<${_OT_CFG_DEBUG}:/Od>)
+        endif()
+
         set_property(TARGET ${_core} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
     else()
         target_compile_definitions(${_core} PRIVATE
