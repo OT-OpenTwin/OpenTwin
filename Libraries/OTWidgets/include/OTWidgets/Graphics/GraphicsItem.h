@@ -375,6 +375,14 @@ namespace ot {
 		//! @callgraph
 		virtual ConnectionDirection calculateOutwardsConnectionDirection() const;
 
+		bool considerItemForPaint() const;
+
+		bool ancestorHasState(GraphicsElementState _state) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private helper
+
 	private:
 		void updateAcceptHoverEventFlag();
 

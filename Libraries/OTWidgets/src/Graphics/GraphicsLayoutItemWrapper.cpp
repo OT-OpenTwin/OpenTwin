@@ -81,6 +81,10 @@ void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOp
 }
 
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 

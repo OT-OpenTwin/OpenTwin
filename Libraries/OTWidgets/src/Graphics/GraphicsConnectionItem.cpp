@@ -95,7 +95,6 @@ QRectF ot::GraphicsConnectionItem::boundingRect() const {
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
 	if (m_config.getHandlesState()) {

@@ -194,6 +194,11 @@ void ot::GraphicsGroupItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
+
 	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
 	for (QGraphicsItem* child : childItems()) {
 		QGraphicsItem* childItem = static_cast<QGraphicsItem*>(child);

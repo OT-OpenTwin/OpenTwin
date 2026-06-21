@@ -889,6 +889,10 @@ bool ot::GraphicsItem::isSilencingConfigNotifications() const {
 	}
 }
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Protected notifier
+
 void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _state) {
 	GraphicsElement::graphicsElementStateChanged(_state);
 	this->getQGraphicsItem()->update();
@@ -932,6 +936,55 @@ ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection()
 		return (isDown ? ConnectionDirection::Down : ConnectionDirection::Up);
 	}
 }
+
+bool ot::GraphicsItem::considerItemForPaint() const
+{
+	const GraphicsItemCfg::GraphicsItemFlags& flags = this->getGraphicsItemFlags();
+
+	if (flags.hasAny(GraphicsItemCfg::ItemVisibleWhenSelected | GraphicsItemCfg::ItemVisibleWhenAncestorSelected | GraphicsItemCfg::ItemVisibleWhenHovered | GraphicsItemCfg::ItemVisibleWhenAncestorHovered))
+	{
+		if (flags.has(GraphicsItemCfg::ItemVisibleWhenSelected) && getGraphicsElementState().has(GraphicsElement::SelectedState))
+		{
+			return true;
+		}
+		else if (flags.has(GraphicsItemCfg::ItemVisibleWhenAncestorSelected) && ancestorHasState(GraphicsElement::SelectedState))
+		{
+			return true;
+		}
+		else if (flags.has(GraphicsItemCfg::ItemVisibleWhenHovered) && getGraphicsElementState().has(GraphicsElement::HoverState))
+		{
+			return true;
+		}
+		else if (flags.has(GraphicsItemCfg::ItemVisibleWhenAncestorHovered) && ancestorHasState(GraphicsElement::HoverState))
+		{
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
+	else
+	{
+		return true;
+	}
+}
+
+bool ot::GraphicsItem::ancestorHasState(GraphicsElementState _state) const
+{
+	GraphicsItem* parent = m_parent;
+	while (parent) {
+		if (parent->getGraphicsElementState().has(_state)) {
+			return true;
+		}
+		parent = parent->m_parent;
+	}
+	return false;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private helper
 
 void ot::GraphicsItem::updateAcceptHoverEventFlag()
 {

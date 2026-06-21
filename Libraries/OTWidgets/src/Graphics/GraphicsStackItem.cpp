@@ -168,7 +168,14 @@ std::list<ot::GraphicsElement*> ot::GraphicsStackItem::getAllDirectChildElements
 // Base class functions: QGraphicsItem
 
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (this->adjustChildItems()) return;
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
+	if (this->adjustChildItems())
+	{
+		return;
+	}
 
 	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
 	for (QGraphicsItem* child : childItems()) {
@@ -312,9 +319,9 @@ void ot::GraphicsStackItem::notifyChildsAboutTransformChange(const QTransform& _
 
 // Private functions
 
-bool ot::GraphicsStackItem::adjustChildItems(void) {
+bool ot::GraphicsStackItem::adjustChildItems() {
 	QSizeF masterSize(-1., -1.);
-	for (auto itm : m_items) {
+	for (const auto& itm : m_items) {
 		if (itm.isMaster) {
 			//OT_LOG_D("< MasterDetected { \"Item.Name\": \"" + itm.item->graphicsItemName() + "\", \"Width\": " + std::to_string(m_lastCalculatedSize.width()) + ", \"Height\": " + std::to_string(m_lastCalculatedSize.height()) + " }");
 			masterSize = masterSize.expandedTo(itm.item->getQGraphicsItem()->boundingRect().size());

@@ -83,6 +83,10 @@ QRectF ot::CustomGraphicsItem::boundingRect(void) const {
 }
 
 void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
 	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getPreferredGraphicsItemSize()));
 }
 
