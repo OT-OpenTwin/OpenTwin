@@ -1325,45 +1325,38 @@ function(_ot_apply_service_debugger TARGET_NAME)
         return()
     endif()
 
-    _ot_service_launch_args_json(_svc_args ${TARGET_NAME})
+    _ot_service_launch_args_json(OT_ARGS ${TARGET_NAME})
 
-    set(_content "{\n")
-    string(APPEND _content "  \"version\": \"0.2.1\",\n")
-    string(APPEND _content "  \"defaults\": {},\n")
-    string(APPEND _content "  \"configurations\": [\n")
+    # Build one configuration entry per build type from the entry template.
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry.vs.json.in" _entry_tpl)
+    string(REPLACE "\r" "" _entry_tpl "${_entry_tpl}")
+    string(REGEX REPLACE "\n+$" "" _entry_tpl "${_entry_tpl}")
 
-    set(_first TRUE)
+    set(_entries "")
     foreach(_cfg IN ITEMS Debug Release)
-        # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited
-        # PATH, which includes Deployment), so the loaded service resolves the same
-        # DLLs it always did.
+        set(OT_TARGET "${TARGET_NAME}")
+        set(OT_CFG    "${_cfg}")
+        # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited PATH,
+        # which includes Deployment) so the loaded service resolves the same DLLs.
         if(_cfg STREQUAL "Debug")
-            set(_sub "debug")
-            set(_path "\${env.OT_ALL_DLLD};\${env.PATH}")
+            set(OT_SUB  "debug")
+            set(OT_PATH "\${env.OT_ALL_DLLD};\${env.PATH}")
         else()
-            set(_sub "release")
-            set(_path "\${env.OT_ALL_DLLR};\${env.PATH}")
+            set(OT_SUB  "release")
+            set(OT_PATH "\${env.OT_ALL_DLLR};\${env.PATH}")
         endif()
-
-        if(NOT _first)
-            string(APPEND _content ",\n")
+        string(CONFIGURE "${_entry_tpl}" _entry @ONLY)
+        if(_entries STREQUAL "")
+            set(_entries "${_entry}")
+        else()
+            string(APPEND _entries ",\n${_entry}")
         endif()
-        set(_first FALSE)
-
-        string(APPEND _content
-            "    {\n"
-            "      \"type\": \"dll\",\n"
-            "      \"project\": \"CMakeLists.txt\",\n"
-            "      \"projectTarget\": \"${TARGET_NAME}.dll (${_cfg}\\\\${TARGET_NAME}.dll)\",\n"
-            "      \"name\": \"${TARGET_NAME}.dll (${_cfg}\\\\${TARGET_NAME}.dll)\",\n"
-            "      \"exe\": \"\${env.OPENTWIN_DEV_ROOT}\\\\Framework\\\\OpenTwin\\\\target\\\\${_sub}\\\\open_twin.exe\",\n"
-            "      \"args\": [ \"\${debugInfo.fullTargetPath}\"${_svc_args} ],\n"
-            "      \"env\": { \"PATH\": \"${_path}\" }\n"
-            "    }")
     endforeach()
 
-    string(APPEND _content "\n  ]\n}\n")
-
+    set(OT_LAUNCH_ENTRIES "${_entries}")
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch.vs.json.in" _envelope)
+    string(REPLACE "\r" "" _envelope "${_envelope}")
+    string(CONFIGURE "${_envelope}" _content @ONLY)
     file(WRITE "${CMAKE_SOURCE_DIR}/.vs/launch.vs.json" "${_content}")
 endfunction()
 

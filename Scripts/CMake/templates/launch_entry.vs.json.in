@@ -1,0 +1,9 @@
+    {
+      "type": "dll",
+      "project": "CMakeLists.txt",
+      "projectTarget": "@OT_TARGET@.dll (@OT_CFG@\\@OT_TARGET@.dll)",
+      "name": "@OT_TARGET@.dll (@OT_CFG@\\@OT_TARGET@.dll)",
+      "exe": "${env.OPENTWIN_DEV_ROOT}\\Framework\\OpenTwin\\target\\@OT_SUB@\\open_twin.exe",
+      "args": [ "${debugInfo.fullTargetPath}"@OT_ARGS@ ],
+      "env": { "PATH": "@OT_PATH@" }
+    }
