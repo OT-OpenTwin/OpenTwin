@@ -75,6 +75,8 @@ private:
 	bool getImageFileFormat(const std::string& _filePath, std::string& _fileName, std::string& _extension, ot::ImageFileFormat& _format) const;
 	bool getCoordinate(const ot::EntityBlock* _block, ot::Point2DD& _pos);
 
+	bool removeSubtreeIfCollapsed(const ot::GraphicsItemMap& _itemMap, std::shared_ptr<EntityBase> _block, ot::Alignment _connectorAlignment, std::list<std::shared_ptr<EntityBase>>& _entitiesToProcess, std::list<std::shared_ptr<EntityBase>>& _entitiesToStore, ot::NewModelStateInfo& _entitiesToUpdate);
+
 	const std::string c_rootFolderPath;
 	const std::string c_projectsFolder;
 	const std::string c_projectsFolderName;
