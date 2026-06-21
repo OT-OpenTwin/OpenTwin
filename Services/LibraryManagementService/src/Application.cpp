@@ -34,6 +34,7 @@
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/FileSystem/DirectoryIterator.h"
 #include "OTSystem/FileSystem/AdvancedDirectoryIterator.h"
+#include "OTGuiAPI/Frontend.h"
 
 //std header
 #include <chrono>
@@ -219,6 +220,66 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	return ot::AppExitCode::Success;
 }
 
+void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl) {
+	// Serialize the element to JSON and add database credentials
+	ot::JsonDocument configDoc;
+	ot::JsonObject elementObj;
+	_element.addToJsonObject(elementObj, configDoc.GetAllocator());
+
+	// Add database credentials to the prompt data
+	configDoc.AddMember("element", elementObj, configDoc.GetAllocator());
+	configDoc.AddMember("dbUserName", ot::JsonString(_dbUserName, configDoc.GetAllocator()), configDoc.GetAllocator());
+	configDoc.AddMember("dbUserPassword", ot::JsonString(_dbUserPassword, configDoc.GetAllocator()), configDoc.GetAllocator());
+	configDoc.AddMember("dbServerUrl", ot::JsonString(_dbServerUrl, configDoc.GetAllocator()), configDoc.GetAllocator());
+
+	std::string promptJson = configDoc.toJson();
+
+	ot::JsonDocument promptDoc;
+	promptDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptInformation, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+
+	ot::MessageDialogCfg config;
+	config.setText("The library element \"" + _element.getName() + "\" already exists.\n\nDo you want to overwrite it?");
+	config.setIcon(ot::MessageDialogCfg::Question);
+	config.setButtons(ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No);
+	config.setTitle("OpenTwin");
+
+	ot::JsonObject promptConfigObj;
+	config.addToJsonObject(promptConfigObj, promptDoc.GetAllocator());
+	promptDoc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(this->getServiceURL(), promptDoc.GetAllocator()), promptDoc.GetAllocator());
+	promptDoc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(c_promptActionOverwriteUserLibraryElement, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+	promptDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(config, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+	promptDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(promptJson, promptDoc.GetAllocator()), promptDoc.GetAllocator());
+	
+	// Send the prompt to the UI service
+	sendConfigToUI(promptDoc, _uiServiceUrl);
+}
+
+std::string Application::generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+	std::string uniqueName = _baseName;
+	int counter = 1;
+
+	// Ensure db / collection exists (once per collection)
+	if (!db.ensureDatabaseAndCollection(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl)) {
+		OT_LOG_E("Failed to ensure database and collection '" + _collectionName + "'");
+	}
+	OT_LOG_I("Database and collection '" + _collectionName + "' are ready");
+
+	// Keep trying names with incrementing suffix until we find one that doesn't exist
+	while (true) {
+		std::string candidateName = _baseName + "_" + std::to_string(counter);
+
+		// Check if this name already exists in the collection
+		std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateName);
+
+		if (existingDocJson.empty()) {
+			// Name doesn't exist, we can use it
+			return candidateName;
+		}
+
+		counter++;
+	}
+}
+
 bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD) {
 
 	OT_LOG_I("Launching Model Library Updater");
@@ -285,12 +346,13 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 			localPtrModels.push_back(std::make_shared<ot::LibraryElement>(std::move(model)));
 		}
 
-		// Filter out models that are already up-to-date (this modifies localModels in-place)
-		updateOrCreateLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
+		// Filter out models that are already up-to-date and get their existence status
+		LibraryElementExistenceStatus updateStatus = updateOrCreateLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
 
 		// If no models remain after the check, nothing to do
-		if (localModels.empty()) {
+		if (localPtrModels.empty()) {
 			OT_LOG_I("No models needed to be updated or created for collection: " + collectionName);
+			OT_LOG_D("Last element status: " + std::to_string(static_cast<int>(updateStatus)));
 			continue;
 		}
 
@@ -431,60 +493,84 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	return result;
 }
 
-void Application::updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
+Application::LibraryElementExistenceStatus Application::updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck) {
+
+	LibraryElementExistenceStatus lastStatus = LibraryElementExistenceStatus::NotExisting;
 
 	for (auto it = _elements.begin(); it != _elements.end();) {
 		// Get the collection name from the current element
 		std::string collectionName = (*it)->getCollectionName();
 		std::string elementName = (*it)->getName();
 
-		// Check if additonal depenency exists if not then skip 
-		std::string dependencyID = (*it)->getAdditionalInfoValue("DependencyID");
-		std::string dependencyCollection = (*it)->getAdditionalInfoValue("DependencyCollection");
+		if (_dependencyCheck) {
+			// Check if additional dependency exists if not then skip 
+			std::string dependencyID = (*it)->getAdditionalInfoValue("DependencyID");
+			std::string dependencyCollection = (*it)->getAdditionalInfoValue("DependencyCollection");
 
-		if (dependencyID != std::to_string(ot::invalidUID) && !dependencyID.empty() && !dependencyCollection.empty()) {
-			std::string dependencyDocJson = db.getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
-			if (dependencyDocJson.empty()) {
-				OT_LOG_E("No dependency document found for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
-				it = _elements.erase(it);
-				continue;
-			}
-			else if (dependencyDocJson == "failed") {
-				OT_LOG_E("Failed to fetch dependency document for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
-				++it;
-				continue;
+			if (dependencyID != std::to_string(ot::invalidUID) && !dependencyID.empty() && !dependencyCollection.empty()) {
+				std::string dependencyDocJson = db.getCompleteDocument(dependencyCollection, _dbUserName, _dbUserPassword, _dbServerUrl, dependencyID);
+				if (dependencyDocJson.empty()) {
+					OT_LOG_E("No dependency document found for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
+					it = _elements.erase(it);
+					continue;
+				}
+				else if (dependencyDocJson == "failed") {
+					OT_LOG_E("Failed to fetch dependency document for element '" + elementName + "' with dependency ID '" + dependencyID + "' in collection '" + dependencyCollection + "'. Skipping this element.");
+					++it;
+					continue;
+				}
 			}
 		}
-
+		
 		// Try to fetch the existing document from database
 		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		if (existingDocJson == "failed") {
 			OT_LOG_E("Failed to fetch existing document for element '" + elementName + "' in collection '" + collectionName + "'. Skipping this element.");
+			lastStatus = LibraryElementExistenceStatus::Error;
 			++it;
 			continue;
 		}
 
 		if (!existingDocJson.empty()) {
 			// Element exists in database - compare hashes
-			ot::JsonDocument existingDoc;
-			existingDoc.fromJson(existingDocJson);
+			try {
+				ot::JsonDocument existingDoc;
+				existingDoc.fromJson(existingDocJson);
 
-			// Get hash from database document
-			std::string dbHash = ot::json::getString(existingDoc, "Hash");
+				// Get hash from database document
+				std::string dbHash = ot::json::getString(existingDoc, "Hash");
 
-			// Get hash from current element
-			std::string currentHash = (*it)->getHash();
+				// Get hash from current element
+				std::string currentHash = (*it)->getHash();
 
-			// If hashes match, remove element from list (no update needed)
-			if (dbHash == currentHash) {
-				it = _elements.erase(it);
-				continue;
+				// If hashes match, element exists with identical content
+				if (dbHash == currentHash) {
+					lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+					it = _elements.erase(it);
+					continue;
+				}
+				else {
+					// Hashes differ - element exists with different content
+					lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+				}
+			}
+			catch (const std::exception& e) {
+				OT_LOG_W("Error comparing hashes for element '" + elementName + "': " + std::string(e.what()));
+				lastStatus = LibraryElementExistenceStatus::Error;
 			}
 		}
+		else {
+			// Element does not exist
+			lastStatus = LibraryElementExistenceStatus::NotExisting;
+		}
+
 		++it;
 	}
+
+	return lastStatus;
 }
+
 void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	// Process each received model
 	for (auto& model : _elements) {
@@ -861,6 +947,7 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
+	std::string uiServiceUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 
 	// Read incoming array (user library elements) and convert to LibraryElement
 	ot::ConstJsonArray elementsArray = ot::json::getArray(_document, OT_ACTION_PARAM_Config);
@@ -884,128 +971,104 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 		}
 		OT_LOG_I("Database and collection '" + userElement.getCollectionName() + "' are ready");
 
-		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
-		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(std::move(userElement)));
+		// Create a single-element list for the unified function
+		std::list<std::shared_ptr<ot::LibraryElement>> singleElementList;
+		singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
 
-		// Filter out models that are already up-to-date
-		updateOrCreateLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
-	
-		// If element was not filtered out (hash matches), add/update it
-		if (!singleElementPtrList.empty()) {
-			OT_LOG_I("Processing element '" + singleElementPtrList.front()->getName() + "' from collection '" + singleElementPtrList.front()->getCollectionName() + "'");
+		// Check existence and filter using the unified function
+		LibraryElementExistenceStatus existenceStatus = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
 
-			// Add or update in database
-			addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+		switch (existenceStatus) {
+		case LibraryElementExistenceStatus::NotExisting:
+		{
+			// Element doesn't exist - add it directly
+			OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
+			addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
+			break;
 		}
-		else {
-			OT_LOG_I("Element is already up-to-date. Skipping.");
+
+		case LibraryElementExistenceStatus::ExistingWithIdenticalContent:
+		{
+			// Element exists with identical content - skip it
+			OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
+			break;
+		}
+
+		case LibraryElementExistenceStatus::ExistingWithDifferentContent:
+		{
+			// Element exists but content is different - restore and prompt user
+			singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
+			OT_LOG_I("Library element '" + userElement.getName() + "' exists with different content. Prompting user for overwrite...");
+			promptUserForLibraryElementOverwrite(userElement, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
+			break;
+		}
+
+		case LibraryElementExistenceStatus::Error:
+		{
+			// Error occurred
+			OT_LOG_E("Error checking existence of library element '" + userElement.getName() + "'. Skipping.");
+			break;
+		}
 		}
 	}
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }
 
-//std::string Application::handleUpdateOrCreateRequest(ot::JsonDocument& _document) {
-//
-//	// Admin credentials for database operations
-//	std::string adminUserName = db.getAdminUserName();
-//	std::string adminPassword;
-//	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
-//		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-//	}
-//	else {
-//		adminPassword = ot::UserCredentials::encryptString("admin");
-//	}
-//
-//	// Hole das Array der LibraryElements
-//	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document,OT_ACTION_PARAM_Config);
-//	
-//	// Deserialisiere jedes Element
-//	std::list<ot::LibraryElement> receivedModels;
-//	for (const ot::ConstJsonObject& elementObj : elementObjects) {
-//		ot::LibraryElement element;
-//		element.setFromJsonObject(elementObj);
-//		receivedModels.push_back(element);
-//	}
-//	
-//	// Ensure database and collections exist
-//	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-//	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
-//		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
-//		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
-//	}
-//	else {
-//		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
-//
-//	}
-//
-//	// Check here if the received models are in the database and if so compare the hashes to check if an update is necessary. If the model is not in the database, create a new entry.
-//	updateOrCreateLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
-//
-//	// Create response document with received models
-//	ot::JsonDocument responseDoc;
-//	// Add the models array to response
-//	ot::JsonArray modelsArray;
-//	for (const ot::LibraryElement& model : receivedModels) {
-//		ot::JsonObject modelObj;
-//		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
-//		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
-//	}
-//	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
-//
-//	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
-//}
+std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDocument& _document) {
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(ot::json::getString(_document, OT_ACTION_PARAM_Result));
+	std::string promptJsonString = ot::json::getString(_document, OT_ACTION_PARAM_Info);
 
-//std::string Application::handleAddNewLibraryElement(ot::JsonDocument& _document) {
-//	
-//	// Admin credentials for database operations
-//	std::string adminUserName = db.getAdminUserName();
-//	std::string adminPassword;
-//	if (ot::json::exists(_document, OT_ACTION_PARAM_Value)) {
-//		adminPassword = ot::json::getString(_document, OT_ACTION_PARAM_Value);
-//	}
-//	else {
-//		adminPassword = ot::UserCredentials::encryptString("admin");
-//	}
-//
-//	// Hole das Array der LibraryElements
-//	std::list<ot::ConstJsonObject> elementObjects = ot::json::getObjectList(_document, OT_ACTION_PARAM_Config);
-//
-//	// Deserialisiere jedes Element
-//	std::list<ot::LibraryElement> receivedModels;
-//	for (const ot::ConstJsonObject& elementObj : elementObjects) {
-//		ot::LibraryElement element;
-//		element.setFromJsonObject(elementObj);
-//		receivedModels.push_back(element);
-//	}
-//
-//	// Ensure database and collections exist
-//	std::string collectionName = ot::json::getString(_document, OT_ACTION_PARAM_COLLECTION_NAME);
-//	if (!db.ensureDatabaseAndCollection(collectionName, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"))) {
-//		OT_LOG_E("Failed to ensure database and collection '" + collectionName + "'");
-//		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create database or collection").toJson();
-//	}
-//	else {
-//		OT_LOG_I("Database and collection '" + collectionName + "' are ready");
-//			
-//	}
-//	
-//	// Add or update library elements
-//	addLibraryElement(receivedModels, adminUserName, ot::UserCredentials::decryptString(adminPassword), ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_MONGODB_ADDRESS"));
-//
-//	// Create response document with updated models
-//	ot::JsonDocument responseDoc;
-//	ot::JsonArray modelsArray;
-//
-//	for (const ot::LibraryElement& model : receivedModels) {
-//		ot::JsonObject modelObj;
-//		model.addToJsonObject(modelObj, responseDoc.GetAllocator());
-//		modelsArray.PushBack(modelObj, responseDoc.GetAllocator());
-//	}
-//
-//	responseDoc.AddMember(OT_ACTION_PARAM_Config, modelsArray, responseDoc.GetAllocator());
-//	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc).toJson();
-//}
+	// Deserialize the prompt data
+	ot::JsonDocument promptDoc;
+	promptDoc.fromJson(promptJsonString);
+
+	// Extract element and database credentials from the prompt data
+	ot::ConstJsonObject elementObj = ot::json::getObject(promptDoc, "element");
+	ot::UserLibraryElement element;
+	element.setFromJsonObject(elementObj);
+
+	std::string dbUserName = ot::json::getString(promptDoc, "dbUserName");
+	std::string dbUserPassword = ot::json::getString(promptDoc, "dbUserPassword");
+	std::string dbServerUrl = ot::json::getString(promptDoc, "dbServerUrl");
+
+	std::string elementName = element.getName();
+	std::string collectionName = element.getCollectionName();
+
+	if ((result & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes) {
+		// User wants to overwrite the existing element
+		OT_LOG_I("User confirmed to overwrite library element: " + elementName);
+
+		// When overwriting increase the version number by 1
+		element.setVersion(element.getVersion() + 1);
+
+		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
+		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
+
+		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+	}
+	else if ((result & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
+		// User chose not to overwrite but to add as a new element with a unique name
+		OT_LOG_I("User declined to overwrite. Adding element with unique name.");
+
+		// Generate a unique name with suffix (e.g., "ElementName_1", "ElementName_2", etc.)
+		std::string uniqueName = generateUniqueElementName(elementName, collectionName, dbUserName, dbUserPassword, dbServerUrl);
+		element.setName(uniqueName);
+
+		OT_LOG_I("Generated unique element name: " + uniqueName);
+
+		// Add the element with the new unique name
+		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
+		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
+
+		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+
+		OT_LOG_I("Library element '" + uniqueName + "' added successfully.");
+	}
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
+}
+
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
