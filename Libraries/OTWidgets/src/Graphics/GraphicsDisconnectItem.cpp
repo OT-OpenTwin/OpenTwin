@@ -30,6 +30,7 @@ ot::GraphicsDisconnectItem::GraphicsDisconnectItem(GraphicsConnectionItem* _conn
 {
 	OTAssertNullptr(m_connection);
 
+	this->setAcceptHoverEvents(true);
 	this->setZValue(GraphicsZValues::Disconnect);
 }
 
