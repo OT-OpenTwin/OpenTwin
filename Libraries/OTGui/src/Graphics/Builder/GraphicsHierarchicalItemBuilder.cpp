@@ -348,8 +348,20 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	if (isExpanderVisible(_alignment))
 	{
 		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
-		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
-		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder)));
+
+		PenFCfg pen(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
+
+		if (isExpanderCollapsed(_alignment))
+		{
+			buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+			buttonItm->setToolTip("Expand");
+		}
+		else
+		{
+			buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
+			buttonItm->setToolTip("Collapse");
+		}
+		buttonItm->setOutline(pen);
 		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
 	}
 	else
@@ -447,6 +459,20 @@ bool ot::GraphicsHierarchicalItemBuilder::isExpanderVisible(Alignment _alignment
 	case Alignment::Bottom: return m_bottomExpanderState != ExpanderState::None;
 	case Alignment::Left: return m_leftExpanderState != ExpanderState::None;
 	case Alignment::Right: return m_rightExpanderState != ExpanderState::None;
+	default:
+		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
+		return false;
+	}
+}
+
+bool ot::GraphicsHierarchicalItemBuilder::isExpanderCollapsed(Alignment _alignment) const
+{
+	switch (_alignment)
+	{
+	case ot::Alignment::Top: return m_topExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Right: return m_rightExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Bottom: return m_bottomExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Left: return m_leftExpanderState == ExpanderState::Collapsed;
 	default:
 		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
 		return false;
