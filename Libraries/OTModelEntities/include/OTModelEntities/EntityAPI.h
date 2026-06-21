@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityInformation.h"
 
 namespace ot {
 
@@ -30,9 +31,13 @@ namespace ot {
 		OT_DECL_NOMOVE(EntityAPI)
 		OT_DECL_NODEFAULT(EntityAPI)
 	public:
-		static EntityBase* readEntityFromEntityIDandVersion(const ot::BasicEntityInformation& _entityInfo) { return readEntityFromEntityIDandVersion(_entityInfo.getEntityID(), _entityInfo.getEntityVersion()); };
+		static EntityBase* readEntityFromEntityIDandVersion(const BasicEntityInformation& _entityInfo) { return readEntityFromEntityIDandVersion(_entityInfo.getEntityID(), _entityInfo.getEntityVersion()); };
 		static EntityBase* readEntityFromEntityIDandVersion(const EntityBase& _entityInfo) { return readEntityFromEntityIDandVersion(_entityInfo.getEntityID(), _entityInfo.getEntityStorageVersion()); };
 		static EntityBase* readEntityFromEntityIDandVersion(UID _entityID, UID _version);
+
+		static void prefetchEntities(const std::list<EntityInformation>& _entityInfos);
+		static void prefetchEntities(const std::list<BasicEntityInformation>& _entityInfos);
+		static void prefetchEntities(const std::list<std::pair<UID, UID>>& _entityIDVersionPairs);
 
 	private:
 
