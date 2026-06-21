@@ -29,7 +29,7 @@ TEST_F(FixtureGrid, TestDefaultAlignment)
 {
 	std::vector<Alignment> defaultAlignments{ CacheLine64,AVX};
 	Alignment activeAlignment;
-	for each (auto align in defaultAlignments)
+	for (auto align : defaultAlignments)
 	{
 		CreateAlignedGridSP(align,13);
 		activeAlignment = GetGrid3DSP()->GetAlignment();
