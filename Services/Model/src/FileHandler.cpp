@@ -121,10 +121,12 @@ void FileHandler::handleImportPythonScriptButton() {
 
 void FileHandler::handleExportFilesToLibrary() {
 	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary);
+	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::handleExportToUserLibrary() {
 	//showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary);
+	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction) {
@@ -786,7 +788,7 @@ void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, boo
 			std::list<ot::UserLibraryElement> elementsToExport;
 			createLibraryElementsForCircuitModel(_entities.circuitModel, _entities.circuitMetaFile, elementsToExport);
 			exportLibraryElementsToUserLibrary(elementsToExport);
-			Application::instance()->getUiComponent()->displayMessage("Circuit model successfully exported to user library.\n");
+			//Application::instance()->getUiComponent()->displayMessage("Circuit model successfully exported to user library.\n");
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(std::string("Circuit model export to user library failed: ") + _e.what());
@@ -835,7 +837,7 @@ void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool
 			createLibraryElementsForPythonScript(_entities.pythonScript, _entities.pythonMetaFile, elementsToExport, pythonEnvironmentID);
 
 			exportLibraryElementsToUserLibrary(elementsToExport);
-			Application::instance()->getUiComponent()->displayMessage("Python script successfully exported to user library.\n");
+			//Application::instance()->getUiComponent()->displayMessage("Python script successfully exported to user library.\n");
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(std::string("Python export to user library failed: ") + _e.what());
@@ -1733,7 +1735,7 @@ void FileHandler::exportLibraryElementsToUserLibrary(const std::list<ot::UserLib
 	doc.AddMember(ot::JsonString(OT_PARAM_DB_USERNAME, doc.GetAllocator()), ot::JsonString(DataBase::instance().getUserName(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(ot::JsonString(OT_PARAM_DB_PASSWORD, doc.GetAllocator()), ot::JsonString(DataBase::instance().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(ot::JsonString(OT_ACTION_PARAM_DATABASE_URL, doc.GetAllocator()), ot::JsonString(DataBase::instance().getDataBaseServerURL(), doc.GetAllocator()), doc.GetAllocator());
-
+	doc.AddMember(ot::JsonString(OT_ACTION_PARAM_SERVICE_URL, doc.GetAllocator()), ot::JsonString(Application::instance()->getUiComponent()->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
 	// Send message to LMS
 	std::string response = Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
