@@ -180,7 +180,6 @@ ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	// DataBase
 	initData.setDatabaseUrl(sessionService.getDatabaseUrl());
 	initData.setUsername(m_userCredentials.getUserName());
-	initData.setPassword(m_userCredentials.getEncryptedPassword());
 	initData.setDatabaseUsername(m_dbCredentials.getUserName());
 	initData.setDatabasePassword(m_dbCredentials.getEncryptedPassword());
 	initData.setUserCollection(m_userCollection);
