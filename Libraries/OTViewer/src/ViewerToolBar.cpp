@@ -202,7 +202,7 @@ void ViewerToolBar::setupUIControlsPlot()
 	m_removeItemIDList.push_front(m_plotHideSelected = FrontendAPI::instance()->addMenuPushButton(visibilityID, "Hide Selected", "HideSelected"));
 
 	m_removeItemIDList.push_front(m_plotExportImage = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Image", "ImageSave"));
-	m_removeItemIDList.push_front(m_plotExportPlotly = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Plotly", "ImageSave"));
+	//m_removeItemIDList.push_front(m_plotExportPlotly = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Plotly", "ImageSave"));
 
 	FrontendAPI::instance()->setCurrentMenuPage("Plot");
 }
