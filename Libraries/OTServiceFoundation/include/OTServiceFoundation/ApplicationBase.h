@@ -186,6 +186,8 @@ namespace ot {
 		UID getPrefetchedEntityVersion(UID _entityID);
 		const std::map<UID, UID>& getPrefetchedEntityVersions() const { return m_prefetchedEntityVersions; };
 
+		const std::string& getLogInUserName() const { return m_loggedInUserName; };
+
 		const std::string& getDataBaseUserName() const { return m_dataBaseUserName; };
 		const std::string& getDataBaseUserPassword() const { return m_dataBaseUserPassword; };
 
@@ -429,6 +431,7 @@ namespace ot {
 		std::string                         m_collectionName;
 		std::string                         m_projectType;
 
+		std::string                         m_loggedInUserName;
 		std::string                         m_dataBaseUserName;
 		std::string                         m_dataBaseUserPassword;
 

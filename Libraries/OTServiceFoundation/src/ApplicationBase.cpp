@@ -745,6 +745,7 @@ ot::ReturnMessage ot::ApplicationBase::handleGetDebugInformation(JsonDocument& _
 	basicInfo.AddMember("CollectionName", JsonString(m_collectionName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
 	basicInfo.AddMember("ProjectType", JsonString(m_projectType, debugInfo.GetAllocator()), debugInfo.GetAllocator());
 
+	basicInfo.AddMember("Login.UserName", JsonString(m_loggedInUserName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
 	basicInfo.AddMember("DataBase.UserName", JsonString(m_dataBaseUserName, debugInfo.GetAllocator()), debugInfo.GetAllocator());
 	basicInfo.AddMember("DataBase.Password", JsonString(m_dataBaseUserPassword, debugInfo.GetAllocator()), debugInfo.GetAllocator());
 
