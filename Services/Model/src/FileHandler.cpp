@@ -1102,6 +1102,7 @@ void FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, En
 	}
 	else if (status == FileOverwriteStatus::Skip) 
 	{
+		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _manifestEntity->getNameOnly() + "\".\n");
 		return;
 	}
 }
@@ -1186,6 +1187,7 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	} 
 	else if(status == FileOverwriteStatus::Skip)
 	{
+		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _scriptEntity->getNameOnly() + "\".\n");
 		return;
 	}
 }
@@ -1254,6 +1256,7 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 		promptUserForOverwrite(modelFileName, metaFileName, modelContent, metaJson);
 	}
 	else if (status == FileOverwriteStatus::Skip) {
+		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _modelEntity->getNameOnly() + "\".\n");
 		return;
 	}
 }

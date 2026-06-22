@@ -152,19 +152,16 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	m_buttonCreateManifest = ot::ToolBarButtonCfg(pageName, groupName2, "Create Manifest", "Default/AddMaterial");
 	_ui->addMenuButton(m_buttonCreateManifest.setButtonLockFlags(modelWrite));
 
-	std::string devEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
-
-	if (!devEnv.empty()) {
-		m_buttonCreateManifestMeta = ot::ToolBarButtonCfg(pageName, groupName2,"Create Manifest Meta", "Default/Add");
-		_ui->addMenuButton(m_buttonCreateManifestMeta.setButtonLockFlags(modelWrite));
-
-		m_buttonCreatePythonMeta = ot::ToolBarButtonCfg(pageName, groupName2, "Create Text File", "Default/Add");
-		_ui->addMenuButton(m_buttonCreatePythonMeta.setButtonLockFlags(modelWrite));
-	}
-	
 	m_buttonCreatePythonScript = ot::ToolBarButtonCfg(pageName, groupName2, "Create Python Script", "Default/python");
 	_ui->addMenuButton(m_buttonCreatePythonScript.setButtonLockFlags(modelWrite));
 
+	m_buttonCreateTextFile = ot::ToolBarButtonCfg(pageName, groupName2, "Create Text File", "Default/TextVisible");
+	_ui->addMenuButton(m_buttonCreateTextFile.setButtonLockFlags(modelWrite));
+
+
+	std::string devEnv = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
+
+	
 	_blockEntityHandler.setUIComponent(_ui);
 	_blockEntityHandler.createBlockPicker();
 	
@@ -177,8 +174,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	connectToolBarButton(m_buttonCreateSolver, &m_entityCreator, &EntityCreator::createSolver);
 	connectToolBarButton(m_buttonCreateManifest, &m_entityCreator, &EntityCreator::createManifests);
 	connectToolBarButton(m_buttonCreatePythonScript, &m_entityCreator, &EntityCreator::createPythonScript);
-	connectToolBarButton(m_buttonCreatePythonMeta, &m_entityCreator, &EntityCreator::createPythonMeta);
-	connectToolBarButton(m_buttonCreateManifestMeta, &m_entityCreator, &EntityCreator::createManifestMeta);
+	connectToolBarButton(m_buttonCreateTextFile, &m_entityCreator, &EntityCreator::createTextFile);
 
 	connectToolBarButton(m_buttonRunPipeline, [this]() 
 		{

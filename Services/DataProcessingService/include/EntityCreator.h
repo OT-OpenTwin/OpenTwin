@@ -29,8 +29,7 @@ public:
 	void createPipeline();
 	void createSolver();
 	void createPythonScript();
-	void createPythonMeta();
-	void createManifestMeta();
+	void createTextFile();
 
 private:
 	ot::UID m_manifestFolderID = ot::invalidUID;

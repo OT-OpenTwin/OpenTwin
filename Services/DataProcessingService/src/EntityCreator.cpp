@@ -144,7 +144,7 @@ void EntityCreator::createPythonScript() {
 	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Python Script");
 }
 
-void EntityCreator::createPythonMeta() {
+void EntityCreator::createTextFile() {
 	auto modelComponent = Application::instance()->getModelComponent();
 	EntityFileText newTextFile(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 	newTextFile.registerCallbacks(
@@ -169,34 +169,8 @@ void EntityCreator::createPythonMeta() {
 	ot::NewModelStateInfo entityInfos;
 	entityInfos.addTopologyEntity(newTextFile);
 	entityInfos.addDataEntity(newTextFile, fileContent);
-	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Python meta file");
+	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Text File");
 }
 
 
-void EntityCreator::createManifestMeta() {
-	auto modelComponent = Application::instance()->getModelComponent();
-	EntityFileText newTextFile(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-	newTextFile.registerCallbacks(
-		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection,
-		Application::instance()->getServiceName()
-	);
-	const std::string entityName = ot::EntityName::createUniqueEntityName(ot::FolderNames::FilesFolder, ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::FilesFolder), "Text File");
-	newTextFile.setName(entityName);
-	size_t fileNamePos = entityName.find_last_of("/");
-	std::string path = entityName.substr(0, fileNamePos);
-	std::string name = entityName.substr(fileNamePos + 1);
-	std::string type = "txt";
-	EntityBinaryData fileContent(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
-	fileContent.storeToDataBase();
-	newTextFile.setDataEntity(fileContent);
-	newTextFile.setFileProperties(path, name, type);
-	newTextFile.setTextEncoding(ot::TextEncoding::UTF8);
-	newTextFile.setTreeItemEditable(true);
 
-	newTextFile.storeToDataBase();
-	ot::NewModelStateInfo entityInfos;
-	entityInfos.addTopologyEntity(newTextFile);
-	entityInfos.addDataEntity(newTextFile, fileContent);
-	ot::ModelServiceAPI::addEntitiesToModel(entityInfos, "Added Manifest meta file");
-}
