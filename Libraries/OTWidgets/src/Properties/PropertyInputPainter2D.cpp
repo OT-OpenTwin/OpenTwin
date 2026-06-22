@@ -86,11 +86,11 @@ bool ot::PropertyInputPainter2D::setupFromConfiguration(const Property* _configu
 
 	m_button->setPainter(actualProperty->getPainter());
 	m_button->setFilter(actualProperty->getFilter());
-	m_button->getPushButton()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_button->getPushButton()->setText("...");
 	}
 	m_button->getPushButton()->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+	m_button->getPushButton()->setToolTip(determineToolTipToShow());
 
 	m_button->blockSignals(false);
 
@@ -103,4 +103,9 @@ void ot::PropertyInputPainter2D::focusPropertyInput(void) {
 
 const ot::Painter2D* ot::PropertyInputPainter2D::getPainter(void) const {
 	return m_button->getPainter();
+}
+
+void ot::PropertyInputPainter2D::updateToolTip()
+{
+	m_button->getPushButton()->setToolTip(determineToolTipToShow());
 }

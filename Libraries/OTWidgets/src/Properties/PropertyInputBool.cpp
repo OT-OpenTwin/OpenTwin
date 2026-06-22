@@ -71,11 +71,11 @@ bool ot::PropertyInputBool::setupFromConfiguration(const Property* _configuratio
 	QSignalBlocker blocker(m_checkBox);
 
 	m_checkBox->setChecked(actualProperty->getValue());
-	m_checkBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_checkBox->setCheckState(Qt::PartiallyChecked);
 	}
 	m_checkBox->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+	m_checkBox->setToolTip(determineToolTipToShow());
 
 	return true;
 }
@@ -90,4 +90,9 @@ void ot::PropertyInputBool::setChecked(bool _isChecked) {
 
 bool ot::PropertyInputBool::isChecked(void) const {
 	return m_checkBox->isChecked();
+}
+
+void ot::PropertyInputBool::updateToolTip()
+{
+	m_checkBox->setToolTip(determineToolTipToShow());
 }

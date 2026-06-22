@@ -45,6 +45,9 @@ namespace ot {
 		void setChecked(bool _isChecked);
 		bool isChecked(void) const;
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private:
 		CheckBox* m_checkBox;
 	};

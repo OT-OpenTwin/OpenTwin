@@ -89,6 +89,10 @@ namespace ot {
 	private Q_SLOTS:
 		void slotEmitValueChanged(void);
 
+	protected:
+		virtual void updateToolTip() = 0;
+		QString determineToolTipToShow() const;
+
 	private:
 		std::string m_type;
 		PropertyBase m_data;

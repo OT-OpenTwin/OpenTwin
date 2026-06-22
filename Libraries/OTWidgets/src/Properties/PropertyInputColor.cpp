@@ -83,6 +83,7 @@ bool ot::PropertyInputColor::setupFromConfiguration(const Property* _configurati
 		m_colorBtn->replaceButtonText("...");
 	}
 	m_colorBtn->getPushButton()->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+	m_colorBtn->setToolTip(determineToolTipToShow());
 
 	m_colorBtn->blockSignals(false);
 
@@ -107,4 +108,9 @@ ot::Color ot::PropertyInputColor::getOTColor(void) const {
 
 QColor ot::PropertyInputColor::getColor(void) const {
 	return m_colorBtn->color();
+}
+
+void ot::PropertyInputColor::updateToolTip()
+{
+	m_colorBtn->setToolTip(determineToolTipToShow());
 }

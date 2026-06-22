@@ -159,7 +159,6 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 			m_textEdit->setText(m_text);
 		}
 
-		m_textEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_textEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
 		if (actualProperty->getMaxLength() > 0) {
 			m_textEdit->setMaxTextLength(actualProperty->getMaxLength());
@@ -167,6 +166,8 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 		else {
 			m_textEdit->setMaxTextLength(std::numeric_limits<int>::max());
 		}
+
+		m_textEdit->setToolTip(determineToolTipToShow());
 	}
 	else {
 		if (m_textEdit) {
@@ -193,7 +194,6 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 			m_lineEdit->setText(m_text);
 		}
 
-		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_lineEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
 		if (actualProperty->getMaxLength() > 0) {
 			m_lineEdit->setMaxLength(actualProperty->getMaxLength());
@@ -202,6 +202,7 @@ bool ot::PropertyInputString::setupFromConfiguration(const Property* _configurat
 			m_lineEdit->setMaxLength(std::numeric_limits<int>::max());
 		}
 		
+		m_lineEdit->setToolTip(determineToolTipToShow());
 	}
 
 	return true;
@@ -226,6 +227,20 @@ void ot::PropertyInputString::setText(const QString& _text) {
 	}
 	else if (m_textEdit) {
 		m_textEdit->setText(m_text);
+	}
+	else {
+		OT_LOG_E("No widget created");
+	}
+}
+
+void ot::PropertyInputString::updateToolTip()
+{
+	QString toolTip = determineToolTipToShow();
+	if (m_lineEdit) {
+		m_lineEdit->setToolTip(toolTip);
+	}
+	else if (m_textEdit) {
+		m_textEdit->setToolTip(toolTip);
 	}
 	else {
 		OT_LOG_E("No widget created");

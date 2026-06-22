@@ -46,6 +46,9 @@ namespace ot {
 		const Painter2D* getPainter(void) const;
 		Painter2DEditButton* getButton(void) const { return m_button; };
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private:
 		Painter2DEditButton* m_button;
 	};

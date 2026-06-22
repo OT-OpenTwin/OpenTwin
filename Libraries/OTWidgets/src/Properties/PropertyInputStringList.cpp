@@ -154,6 +154,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 		m_comboBox->addItems(lst);
 		m_comboBox->setCurrentText((this->data().getPropertyFlags() & Property::HasMultipleValues) ? "..." : m_currentText);
 		m_comboBox->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+		m_comboBox->setToolTip(determineToolTipToShow());
 	}
 	else {
 		// No custom values -> Combo Button
@@ -172,6 +173,7 @@ bool ot::PropertyInputStringList::setupFromConfiguration(const Property* _config
 		m_comboButton->setItems(lst);
 		m_comboButton->setText((this->data().getPropertyFlags() & Property::HasMultipleValues) ? "..." : m_currentText);
 		m_comboButton->setEnabled(!(this->data().getPropertyFlags() & Property::IsReadOnly));
+		m_comboButton->setToolTip(determineToolTipToShow());
 	}
 
 	return true;
@@ -221,6 +223,17 @@ QStringList ot::PropertyInputStringList::getPossibleSelection(void) const {
 		}
 	}
 	return lst;
+}
+
+void ot::PropertyInputStringList::updateToolTip()
+{
+	QString toolTip = determineToolTipToShow();
+	if (m_comboBox) {
+		m_comboBox->setToolTip(toolTip);
+	}
+	else if (m_comboButton) {
+		m_comboButton->setToolTip(toolTip);
+	}
 }
 
 void ot::PropertyInputStringList::slotTextInputChanged() {

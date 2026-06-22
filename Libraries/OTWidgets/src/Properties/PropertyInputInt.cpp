@@ -137,6 +137,18 @@ bool ot::PropertyInputInt::hasInputError(void) const {
 	}
 }
 
+void ot::PropertyInputInt::updateToolTip()
+{
+	QString toolTip = this->determineToolTipToShow();
+	if (m_spinBox) {
+		m_spinBox->setToolTip(toolTip);
+	}
+	else {
+		OTAssertNullptr(m_lineEdit);
+		m_lineEdit->setToolTip(toolTip);
+	}
+}
+
 void ot::PropertyInputInt::lclValueChanged(int) {
 	OTAssertNullptr(m_spinBox);
 	m_spinBox->setSpecialValueText("");
@@ -239,7 +251,6 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 	if (m_spinBox) {
 		m_spinBox->blockSignals(true);
 
-		m_spinBox->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_spinBox->setRange(actualProperty->getMin(), actualProperty->getMax());
 		m_spinBox->setValue(actualProperty->getValue());
 		m_spinBox->setSuffix(QString::fromStdString(actualProperty->getSuffix()));
@@ -247,6 +258,7 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 			m_spinBox->setSpecialValueText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}
 		m_spinBox->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
+		m_spinBox->setToolTip(determineToolTipToShow());
 
 		m_spinBox->blockSignals(false);
 	}
@@ -254,12 +266,12 @@ bool ot::PropertyInputInt::setupFromConfiguration(const Property* _configuration
 		OTAssertNullptr(m_lineEdit);
 		m_lineEdit->blockSignals(true);
 
-		m_lineEdit->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 		m_lineEdit->setText(QString::number(actualProperty->getValue()));
 		if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 			m_lineEdit->setText(OT_PROPERTY_INT_MULTIPLEVALUESTEXT);
 		}
 		m_lineEdit->setReadOnly(this->data().getPropertyFlags() & Property::IsReadOnly);
+		m_lineEdit->setToolTip(determineToolTipToShow());
 
 		m_lineEdit->blockSignals(false);
 	}

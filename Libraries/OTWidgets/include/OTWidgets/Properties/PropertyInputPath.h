@@ -47,6 +47,9 @@ namespace ot {
 		void setCurrentFile(const QString& _file);
 		QString currentFile(void) const;
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private:
 		PathBrowseEdit* m_path;
 	};
