@@ -1336,6 +1336,7 @@ function(_ot_apply_service_debugger TARGET_NAME)
     foreach(_cfg IN ITEMS Debug Release)
         set(OT_TARGET "${TARGET_NAME}")
         set(OT_CFG "${_cfg}")
+
         # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited PATH,
         # which includes Deployment) so the loaded service resolves the same DLLs.
         if(_cfg STREQUAL "Debug")
@@ -1345,6 +1346,10 @@ function(_ot_apply_service_debugger TARGET_NAME)
             set(OT_SUB  "release")
             set(OT_PATH "\${env.OT_ALL_DLLR};\${env.PATH}")
         endif()
+
+        # Absolute path to the built service .dll, passed to the loader as argv[1]
+        file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/build/windows-${OT_SUB}/${_cfg}/${TARGET_NAME}.dll" _dll)
+        string(REPLACE "\\" "\\\\" OT_DLL "${_dll}")
         string(CONFIGURE "${_entry_tpl}" _entry @ONLY)
         if(_entries STREQUAL "")
             set(_entries "${_entry}")
