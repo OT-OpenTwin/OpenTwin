@@ -5322,8 +5322,9 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 				}
 			}
 			auto endTime = std::chrono::system_clock::now();
-			uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-			message = (std::to_string(millisec) + " ms\n");
+			auto nanosecs = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+
+			message = TimeFormatter::formatDuration(nanosecs) + "\n";
 
 			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 		}
