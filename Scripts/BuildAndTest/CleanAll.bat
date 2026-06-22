@@ -265,6 +265,11 @@ ECHO ===============================================================
 CALL "%OT_PYRIT_SERVICE_ROOT%\Clean.bat" 
 
 ECHO ===============================================================
+ECHO Clean Service: OpenEMSService
+ECHO ===============================================================
+CALL "%OT_OPENEMS_SERVICE_ROOT%\Clean.bat" 
+
+ECHO ===============================================================
 ECHO Clean Service: PythonExecution
 ECHO ===============================================================
 CALL "%OT_PYTHON_EXECUTION_ROOT%\Clean.bat" 
