@@ -101,6 +101,10 @@ std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName
             bsoncxx::document::view documentView = queryResult->view();
             return loadDocumentData(documentView, _collectionName);
         }
+        else {
+            return "";
+        }
+
     }
     catch (const std::exception& e) {
         OT_LOG_E("Error getting complete document: " + std::string(e.what()));
