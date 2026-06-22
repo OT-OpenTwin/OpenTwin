@@ -101,23 +101,6 @@ std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName
             bsoncxx::document::view documentView = queryResult->view();
             return loadDocumentData(documentView, _collectionName);
         }
-
-        // Document not found in standard collection - try user collection
-        std::string userCollectionName = _collectionName + "_User";
-
-        if (!checkCollectionExists(userCollectionName)) {
-            return "";
-        }
-
-        DataStorageAPI::DocumentAccessBase userDocBase(dbName, userCollectionName);
-        auto userQueryResult = fetchDocumentByName(userDocBase, _selectedDocument);
-
-        if (!userQueryResult) {
-            return "";
-        }
-
-        bsoncxx::document::view userDocumentView = userQueryResult->view();
-        return loadDocumentData(userDocumentView, userCollectionName);
     }
     catch (const std::exception& e) {
         OT_LOG_E("Error getting complete document: " + std::string(e.what()));
@@ -286,105 +269,121 @@ void MongoWrapper::updateGridFSContent(const std::string& _collectionName,
         return;
     }
 }
-std::string MongoWrapper::updateGridFSAndMetadata(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _documentName, uint32_t _newVersion, const std::string& _newHash, const std::string& _newContent) {
-        // Initialization of MongoDB connection
-        if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
-            OT_LOG_E("Failed to initialize database connection for updating GridFS and metadata");
+
+std::string MongoWrapper::updateGridFSAndMetadata(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const ot::LibraryElement& _element, uint32_t _newVersion) {
+
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        OT_LOG_E("Failed to initialize database connection");
+        return "";
+    }
+
+    if (!checkCollectionExists(_collectionName)) {
+        return "";
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        auto queryResult = fetchDocumentByName(docBase, _element.getName());
+        if (!queryResult) {
+            OT_LOG_E("Document not found: " + _element.getName());
             return "";
         }
 
-        // Check if collection exists
-        if (!checkCollectionExists(_collectionName)) {
-            return "";
+        bsoncxx::document::view documentView = queryResult->view();
+
+        // Handle existing GridFS data
+        auto dataIdElement = documentView["DataID"];
+        bsoncxx::oid existingGridFSId;
+        bool hasExistingData = false;
+
+        if (dataIdElement && dataIdElement.type() == bsoncxx::type::k_oid) {
+            existingGridFSId = dataIdElement.get_oid().value;
+            hasExistingData = true;
         }
 
-        try {
-            DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+        DataStorageAPI::DocumentAPI api;
 
-            // Get the document
-            auto queryResult = fetchDocumentByName(docBase, _documentName);
-            if (!queryResult) {
-                OT_LOG_E("Document '" + _documentName + "' not found in collection '" + _collectionName + "'");
-                return "";
+        // Delete old GridFS data
+        if (hasExistingData) {
+            try {
+                bsoncxx::types::value oldId{ bsoncxx::types::b_oid{existingGridFSId} };
+                api.DeleteGridFSData(oldId, _collectionName, "Libraries");
             }
-
-            bsoncxx::document::view documentView = queryResult->view();
-
-            // Check if DataID exists (for existing documents)
-            auto dataIdElement = documentView["DataID"];
-            bsoncxx::oid existingGridFSId;
-            bool hasExistingData = false;
-
-            if (dataIdElement && dataIdElement.type() == bsoncxx::type::k_oid) {
-                existingGridFSId = dataIdElement.get_oid().value;
-                hasExistingData = true;
-            }
-
-            DataStorageAPI::DocumentAPI api;
-
-            // Delete old GridFS data if it exists
-            if (hasExistingData) {
-                try {
-                    bsoncxx::types::value oldId{ bsoncxx::types::b_oid{existingGridFSId} };
-                    api.DeleteGridFSData(oldId, _collectionName,"Libraries");
-                }
-                catch (const std::exception& deleteEx) {
-                    OT_LOG_W("Warning: Could not delete old GridFS data: " + std::string(deleteEx.what()));
-                }
-            }
-
-            // Convert the new content to binary and insert into GridFS
-            const uint8_t* newDataBuffer = reinterpret_cast<const uint8_t*>(_newContent.c_str());
-            size_t newDataSize = _newContent.size();
-
-            // Insert new binary data into GridFS
-            bsoncxx::types::value newGridfsId = api.InsertBinaryDataUsingGridFs(newDataBuffer, newDataSize, _collectionName, dbName);
-            std::string newGridfsIdStr = newGridfsId.get_oid().value.to_string();
-
-            // Build the update document with the NEW DataID and metadata updates
-            auto updateBuilder = bsoncxx::builder::basic::document{};
-            updateBuilder.append(bsoncxx::builder::basic::kvp("DataID", newGridfsId.get_oid().value));
-            updateBuilder.append(bsoncxx::builder::basic::kvp("Version", static_cast<int64_t>(_newVersion)));
-
-            // Update the hash in originInformation
-            auto originInfoBuilder = bsoncxx::builder::basic::document{};
-            originInfoBuilder.append(bsoncxx::builder::basic::kvp("hash", _newHash));
-            // Preserve the existing fileName if present
-            if (documentView["originInformation"]) {
-                bsoncxx::document::view originInfoView = documentView["originInformation"].get_document().value;
-                if (originInfoView["fileName"]) {
-                    std::string fileName = std::string(originInfoView["fileName"].get_utf8().value);
-                    originInfoBuilder.append(bsoncxx::builder::basic::kvp("fileName", fileName));
-                }
-            }
-            updateBuilder.append(bsoncxx::builder::basic::kvp("originInformation", originInfoBuilder));
-
-            // Create the filter query to find the document
-            auto filterBuilder = bsoncxx::builder::basic::document{};
-            filterBuilder.append(bsoncxx::builder::basic::kvp("Name", _documentName));
-
-            auto updateDoc = bsoncxx::builder::basic::document{};
-            updateDoc.append(bsoncxx::builder::basic::kvp("$set", updateBuilder.view()));
-
-            // Update the document in the collection with the new DataID and metadata
-            auto collection = docBase.getCollection();
-            auto result = collection.update_one(filterBuilder.view(), updateDoc.view());
-
-            if (result && result->modified_count() > 0) {
-                OT_LOG_I("Successfully updated document '" + _documentName + "' with new GridFS DataID: " + newGridfsIdStr +
-                    " and metadata (Version: " + std::to_string(_newVersion) + ")");
-                return newGridfsIdStr;
-            }
-            else {
-                OT_LOG_W("Document update completed but no documents were modified for '" + _documentName + "'");
-                return newGridfsIdStr; // Still return the ID even if no modifications reported
+            catch (const std::exception& e) {
+                OT_LOG_W("Warning deleting old GridFS: " + std::string(e.what()));
             }
         }
-        catch (const std::exception& e) {
-            OT_LOG_E("Error updating GridFS and metadata: " + std::string(e.what()));
-            return "";
+
+        // Insert new GridFS data
+        const uint8_t* newDataBuffer = reinterpret_cast<const uint8_t*>(_element.getData().c_str());
+        size_t newDataSize = _element.getData().size();
+        bsoncxx::types::value newGridfsId = api.InsertBinaryDataUsingGridFs(newDataBuffer, newDataSize, _collectionName, dbName);
+        std::string newGridfsIdStr = newGridfsId.get_oid().value.to_string();
+
+        // Build update document
+        auto updateBuilder = bsoncxx::builder::basic::document{};
+        updateBuilder.append(bsoncxx::builder::basic::kvp("DataID", newGridfsId.get_oid().value));
+        updateBuilder.append(bsoncxx::builder::basic::kvp("Version", static_cast<int64_t>(_newVersion)));
+
+        // Update originInformation
+        auto originInfoBuilder = bsoncxx::builder::basic::document{};
+        originInfoBuilder.append(bsoncxx::builder::basic::kvp("hash", _element.getHash()));
+        originInfoBuilder.append(bsoncxx::builder::basic::kvp("fileName", _element.getFileName()));
+        updateBuilder.append(bsoncxx::builder::basic::kvp("originInformation", originInfoBuilder));
+
+        // Update metaData
+        const auto& metaData = _element.getMetaData();
+        if (!metaData.empty()) {
+            auto metaDataBuilder = bsoncxx::builder::basic::document{};
+            for (const auto& pair : metaData) {
+                metaDataBuilder.append(bsoncxx::builder::basic::kvp(pair.first, pair.second));
+            }
+            updateBuilder.append(bsoncxx::builder::basic::kvp("metaData", metaDataBuilder));
         }
+        else if (documentView["metaData"] && documentView["metaData"].type() == bsoncxx::type::k_document) {
+            updateBuilder.append(bsoncxx::builder::basic::kvp("metaData", documentView["metaData"].get_document().value));
+        }
+
+        // Update additionalInfos
+        const auto& additionalInfos = _element.getAdditionalInfos();
+        if (!additionalInfos.empty()) {
+            auto addInfoBuilder = bsoncxx::builder::basic::document{};
+            for (const auto& pair : additionalInfos) {
+                addInfoBuilder.append(bsoncxx::builder::basic::kvp(pair.first, pair.second));
+            }
+            updateBuilder.append(bsoncxx::builder::basic::kvp("additionalInfos", addInfoBuilder));
+        }
+        else if (documentView["additionalInfos"] && documentView["additionalInfos"].type() == bsoncxx::type::k_document) {
+            updateBuilder.append(bsoncxx::builder::basic::kvp("additionalInfos", documentView["additionalInfos"].get_document().value));
+        }
+
+        auto filterDoc = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("Name", _element.getName())
+        );
+
+        auto updateDoc = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("$set", updateBuilder)
+        );
+
+        auto collection = docBase.getCollection();
+        auto result = collection.update_one(filterDoc.view(), updateDoc.view());
+
+        if (result && result->modified_count() > 0) {
+            OT_LOG_I("Updated document '" + _element.getName() + "' (Version: " + std::to_string(_newVersion) + ")");
+            return newGridfsIdStr;
+        }
+        else {
+            OT_LOG_W("Document '" + _element.getName() + "' was not modified");
+            return newGridfsIdStr;
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error updating GridFS and metadata: " + std::string(e.what()));
+        return "";
+    }
 }
+
 void MongoWrapper::addNewDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, ot::LibraryElement& _element) {
     // Initialization of MongoDB connection
     if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {

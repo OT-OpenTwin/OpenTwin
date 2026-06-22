@@ -644,8 +644,7 @@ void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
 			// Update existing data to GridFS and update metadata (version, hash)
-			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName, newVersion, model->getHash(), model->getData());
-
+			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model, newVersion);
 			if (!gridfsIdResult.empty()) {
 				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
 			}
@@ -827,7 +826,16 @@ std::string Application::handleGetCompleteSelectedDocument(ot::JsonDocument& _do
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
 	else {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed).toJson();
+		// Try user collection if not found in standard collection
+		std::string userCollectionName = collectionName + "_User";
+		result = db.getCompleteDocument(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+		if (!result.empty()) {
+			return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
+		}
+		else {
+			OT_LOG_E("Failed to get complete document for '" + selectedDocument + "' in collection '" + collectionName + "' and user collection '" + userCollectionName + "'");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Document not found").toJson();
+		}
 	}
 }
 
