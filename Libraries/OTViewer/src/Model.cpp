@@ -2007,6 +2007,29 @@ void Model::exportPlotAsImage()
 	}
 }
 
+void Model::exportPlotAsPlotly()
+{
+	FrontendAPI* api = FrontendAPI::instance();
+
+	if (!api)
+	{
+		return;
+	}
+
+	// Get plot
+	ot::PlotView* view = dynamic_cast<ot::PlotView*>(api->getCurrentView());
+	if (!view)
+	{
+		OT_LOG_E("Current view is not a plot");
+		return;
+	}
+	ot::Plot* plot = view->getPlot();
+	OTAssertNullptr(plot);
+
+	// ...
+
+}
+
 void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
 	// If we switch Main->Navigation->Main we don't want the tool bar to change
 	if (_viewInfo.getTitle() == m_currentCentralView.getTitle() && _viewInfo.getViewType() == m_currentCentralView.getViewType()) {
@@ -2089,6 +2112,7 @@ void Model::executeAction(ot::UID _buttonID) {
 	case ViewerToolBar::TableRemoveColumn: removeTableColumn(); break;
 
 	case ViewerToolBar::PlotExportImage: exportPlotAsImage(); break;
+	case ViewerToolBar::PlotExportPlotly: exportPlotAsPlotly(); break;
 
 	case ViewerToolBar::NoButton: break;
 	default:

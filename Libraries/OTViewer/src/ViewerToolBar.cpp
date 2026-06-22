@@ -58,6 +58,7 @@ ViewerToolBar::ButtonType ViewerToolBar::getButtonTypeFromUID(ot::UID _uid) cons
 	else if (_uid == m_tableRemoveColumnID) return ButtonType::TableRemoveColumn;
 
 	else if (_uid == m_plotExportImage) return ButtonType::PlotExportImage;
+	else if (_uid == m_plotExportPlotly) return ButtonType::PlotExportPlotly;
 	else if (_uid == m_plotShowSelected) return ButtonType::PlotShowSelected;
 	else if (_uid == m_plotHideSelected) return ButtonType::PlotHideSelected;
 
@@ -201,6 +202,7 @@ void ViewerToolBar::setupUIControlsPlot()
 	m_removeItemIDList.push_front(m_plotHideSelected = FrontendAPI::instance()->addMenuPushButton(visibilityID, "Hide Selected", "HideSelected"));
 
 	m_removeItemIDList.push_front(m_plotExportImage = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Image", "ImageSave"));
+	m_removeItemIDList.push_front(m_plotExportPlotly = FrontendAPI::instance()->addMenuPushButton(exportID, "Export Plotly", "ImageSave"));
 
 	FrontendAPI::instance()->setCurrentMenuPage("Plot");
 }
@@ -340,6 +342,7 @@ void ViewerToolBar::resetControlsData() {
 	m_tableRemoveRowID = 0;
 	
 	m_plotExportImage = 0;
+	m_plotExportPlotly = 0;
 	m_plotShowSelected = 0;
 	m_plotHideSelected = 0;
 }

@@ -241,6 +241,7 @@ private:
 	void removeTableColumn();
 
 	void exportPlotAsImage();
+	void exportPlotAsPlotly();
 
 	void viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo);
 
