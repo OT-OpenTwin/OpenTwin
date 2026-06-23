@@ -26,22 +26,20 @@
 class OT_RESULTDATAACCESS_API_EXPORT QuantityDescriptionMatrix : public QuantityDescription
 {
 public:
-	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions)
-	{
-		m_metadataQuantity.dataDimensions = { _matrixDimensions.getRow(), _matrixDimensions.getColumn() };
-		m_numberOfEntries = _matrixDimensions.getRow() * _matrixDimensions.getColumn();
-	}
-	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions, uint64_t _reserveNumberOfEntries)
-		:QuantityDescriptionMatrix(_matrixDimensions)
-	{
-		m_quantityValues.reserve(_reserveNumberOfEntries);
-		assert(_reserveNumberOfEntries == m_numberOfEntries);
-	}
-	void setValues(const std::vector<ot::GenericDataStructMatrix>& _values) { m_quantityValues = _values; };
+	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions);
+	QuantityDescriptionMatrix(const ot::MatrixEntryPointer& _matrixDimensions, uint64_t _reserveNumberOfEntries);
+	void setValues(const std::vector<ot::GenericDataStructMatrix>& _values);
+
+	void initiateZeroFilledValueMatrices(uint64_t _numberOfEntries);
+	void setValue(uint64_t _index, const ot::MatrixEntryPointer& _matrixEntry, ot::Variable& _value);
+
 	void addToValues(const ot::GenericDataStructMatrix& _value) { m_quantityValues.push_back(_value); }
+	
 	const std::vector<ot::GenericDataStructMatrix>& getValues() const { return m_quantityValues; }
-	uint64_t getNumberOfEntries() const { return  m_numberOfEntries; }
+	uint64_t getNumberOfEntries() const;
+
+	void optimizeMemory();
+
 private:
 	std::vector<ot::GenericDataStructMatrix> m_quantityValues;
-	uint64_t m_numberOfEntries;
 };

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TouchstoneHandler.cpp
 // 
 // License:
@@ -51,8 +51,11 @@ void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _nu
 {
 	m_portNumber = _numberOfPorts;
 	std::string::difference_type numberOfRows = std::count(_fileContent.begin(), _fileContent.end(), '\n');
-	m_quantityDescription = new QuantityDescriptionSParameter(m_portNumber, numberOfRows);
-
+	ot::MatrixEntryPointer dimension;
+	dimension.setColumn(m_portNumber);
+	dimension.setRow(m_portNumber);
+	m_quantityDescription = new QuantityDescriptionMatrix(dimension, numberOfRows);
+	m_currentValues = ot::GenericDataStructMatrix(dimension);
 	std::stringstream stream;
 	ot::EncodingGuesser encodingGuesser;
 	ot::TextEncoding::EncodingStandard encodingStandard =	encodingGuesser(_fileContent.c_str(), _fileContent.size());
@@ -87,20 +90,8 @@ void TouchstoneHandler::analyseFile(const std::string& _fileContent, int32_t _nu
 	{
 		analyseLine(line);
 	}
-	
-	if (m_firstValues != nullptr)
-	{
-		m_quantityDescription->pushBackFirstValue(std::move(*m_firstValues));
-		m_firstValues = nullptr;
-	}
-	
-	if (m_secondValues != nullptr)
-	{
-		m_quantityDescription->pushBackSecondValue(std::move(*m_secondValues));
-		m_secondValues = nullptr;
-	}
-
-	m_quantityDescription->optimiseMemory();
+		
+	m_quantityDescription->optimizeMemory();
 }
 
 void TouchstoneHandler::analyseLine(std::string& content)
@@ -141,6 +132,13 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 		std::stringstream stream(content);
 		std::string segment;
 
+		ot::MatrixEntryPointer matrixDef;
+		matrixDef.setColumn(m_portNumber);
+		matrixDef.setRow(m_portNumber);
+
+		// current index in the build up matrix
+		std::complex<double> currentEntry; // Current complex entry
+		bool firstValueOfTuple(true);
 		while (getline(stream, segment, ' '))
 		{
 			if (segment == "")
@@ -149,46 +147,44 @@ void TouchstoneHandler::analyseDataLine(std::string& content)
 			}
 			else
 			{
-				if (m_firstValues == nullptr)
-				{
-					ot::MatrixEntryPointer matrixDef;
-					matrixDef.setColumn(m_portNumber);
-					matrixDef.setRow(m_portNumber);
-					m_firstValues = new ot::GenericDataStructMatrix(matrixDef);
-					m_secondValues = new ot::GenericDataStructMatrix(matrixDef);
+				if (m_isFrequencyValue)
+				{					
+					m_matrixPointer.setRow(0);
+					m_matrixPointer.setColumn(0);
 					m_frequencyParameter.values.push_back(turnLineSegmentToVariable(segment));
+					m_isFrequencyValue = false;
 				}
 				else
 				{
-					if (m_firstValueOfTuple)
+					if (firstValueOfTuple)
 					{
-						m_firstValues->setValue(m_matrixEntry, turnLineSegmentToVariable(segment));
+						currentEntry.real(std::stod(segment));
 					}
 					else
 					{
-						m_secondValues->setValue(m_matrixEntry, turnLineSegmentToVariable(segment));
-						if (m_matrixEntry.getColumn() == m_portNumber - 1)
+						currentEntry.imag(std::stod(segment));
+						m_currentValues.setValue(m_matrixPointer,ot::Variable(currentEntry));
+						if (m_matrixPointer.getColumn() == m_portNumber - 1)
 						{
-							m_matrixEntry.setColumn(0);
-							if (m_matrixEntry.getRow() == m_portNumber - 1)
+							m_matrixPointer.setColumn(0);
+							if (m_matrixPointer.getRow() == m_portNumber - 1)
 							{
-								m_matrixEntry.setRow(0);
-								m_quantityDescription->pushBackFirstValue(std::move(*m_firstValues));
-								m_firstValues = nullptr;
-								m_quantityDescription->pushBackSecondValue(std::move(*m_secondValues));
-								m_secondValues = nullptr;
+								m_matrixPointer.setRow(0);
+								m_isFrequencyValue = true;
+								m_quantityDescription->addToValues(m_currentValues);
+								m_currentValues = ot::GenericDataStructMatrix(matrixDef);
 							}
 							else
 							{
-								m_matrixEntry.moveRow();
+								m_matrixPointer.moveRow();
 							}
 						}
 						else
 						{
-							m_matrixEntry.moveColumn();
+							m_matrixPointer.moveColumn();
 						}
 					}
-					m_firstValueOfTuple ^= true; //flip
+					firstValueOfTuple ^= true; //flip
 				}
 			}
 		}

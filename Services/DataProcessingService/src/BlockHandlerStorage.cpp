@@ -38,7 +38,10 @@
 
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
+
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
 #include "OTResultDataAccess/CurveFactory.h"
 
@@ -161,7 +164,6 @@ bool BlockHandlerStorage::executeSpecialized()
 								else
 								{
 									quantityDescription.reset(new QuantityDescriptionCurve());
-
 								}
 
 								quantityDescription->setMetadataQuantity(*pipelineQuantity);
@@ -177,8 +179,7 @@ bool BlockHandlerStorage::executeSpecialized()
 								datasetDescription = datasetDescriptionByQuantityLabel.find(quantityLabel);
 							}
 
-
-							const std::string& dataType = ot::TypeNames::getDoubleTypeName(); //pipelineQuantity->m_tupleDescription.getDataType();
+							ot::TupleInstance& tupleInstance = pipelineQuantity->m_tupleDescription;
 							// Now we pull the data values from the document
 							if (pipelineQuantity->dataDimensions.size() > 1) // Here the data is a matrix
 							{
@@ -195,20 +196,14 @@ bool BlockHandlerStorage::executeSpecialized()
 									const std::string valuesFieldName = QuantityContainer::getFieldName(i);
 									alreadyDealtWithFields.push_back(valuesFieldName);
 									const ot::JsonValue& matrixEntry =	entryObject[valuesFieldName.c_str()];
-									if (dataType != "")
+									
+									if (!ot::JSONToVariableConverter::typeIsCompatible(matrixEntry, tupleInstance))
 									{
-										if (!ot::JSONToVariableConverter::typeIsCompatible(matrixEntry, dataType))
-										{
-											throw std::exception(("The data type of: " + quantityLabel + " is inconsistent with the data type mentioned in its metadata.").c_str());
-										}
-										const ot::Variable value = converter(matrixEntry, dataType);
-										values.push_back(value);
+										throw std::exception(("The data type of: " + quantityLabel + " is inconsistent with the data type mentioned in its metadata.").c_str());
 									}
-									else
-									{
-										const ot::Variable value = converter(matrixEntry);
-										values.push_back(value);
-									}
+									const ot::Variable value = converter(matrixEntry, tupleInstance);
+									values.push_back(value);
+
 								}
 								ot::GenericDataStructMatrix matrixValues(matrixDimensions);
 								matrixValues.setValues(values);
@@ -218,21 +213,16 @@ bool BlockHandlerStorage::executeSpecialized()
 							{
 								const ot::JsonValue& quantityValue = entryObject[QuantityContainer::getFieldName().c_str()];
 								alreadyDealtWithFields.push_back(QuantityContainer::getFieldName());
-								QuantityDescriptionCurve * curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
-								if (dataType != "")
+								MetadataQuantity& quantityDescr =  datasetDescription->second.getQuantityDescription()->getMetadataQuantity();
+																
+								ot::Variable value = converter(quantityValue, tupleInstance);
+								if (!ot::JSONToVariableConverter::typeIsCompatible(quantityValue, tupleInstance))
 								{
-									if (!ot::JSONToVariableConverter::typeIsCompatible(quantityValue, dataType))
-									{
-										throw std::exception(("The data type of: " + quantityLabel + " is inconsistent with the data type mentioned in its metadata.").c_str());
-									}
-									ot::Variable value = converter(quantityValue, dataType);
-									curve->addDatapoint(std::move(value));
+									throw std::exception(("The data type of: " + quantityLabel + " is inconsistent with the data type mentioned in its metadata.").c_str());
 								}
-								else
-								{
-									ot::Variable value = converter(quantityValue);
-									curve->addDatapoint(std::move(value));
-								}
+
+								QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(datasetDescription->second.getQuantityDescription());
+								curve->addDatapoint(std::move(value));																
 							}
 						}
 						else

@@ -25,8 +25,6 @@
 #include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 #include "OTDataStorage/DataLakeAPI.h"
 
@@ -42,8 +40,6 @@ public:
 private:
 	DataStorageAPI::DataLakeAPI m_dataStorageAccess;
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurve* _quantityDescription);
-	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionCurveComplex* _quantityDescription);
-	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionSParameter* _quantityDescription);
 	void storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, const uint64_t _numberOfParameterValues, QuantityDescriptionMatrix* _quantityDescription);
 
 	ResultImportLogger& m_logger;

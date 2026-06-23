@@ -25,7 +25,6 @@
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/QuantityContainerSerialiser.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTDataStorage/DataLakeHelper.h"
 // std header

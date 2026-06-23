@@ -26,9 +26,7 @@
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
 
 PlotBuilder::PlotBuilder(ResultCollectionExtender& _extender, ot::ApplicationBase* _appBase)
 	:m_extender(_extender) , m_appBase(_appBase)
@@ -102,14 +100,12 @@ bool PlotBuilder::validityCheck(std::list<DatasetDescription>& _dataSetDescripti
 		if (QuantityDescriptionCurve* curve = dynamic_cast<QuantityDescriptionCurve*>(quantityDescription)) {
 			valid &= !curve->getDataPoints().empty();
 		}
-		else if (QuantityDescriptionCurveComplex* curveComplex = dynamic_cast<QuantityDescriptionCurveComplex*>(quantityDescription)) {
-			valid &= (!curveComplex->getQuantityValuesImag().empty()) && (!curveComplex->getQuantityValuesReal().empty());
-		}
 		else if (QuantityDescriptionMatrix* matrix = dynamic_cast<QuantityDescriptionMatrix*>(quantityDescription)) {
 			valid &= !matrix->getValues().empty();
 		}
-		else if (QuantityDescriptionSParameter* sparam = dynamic_cast<QuantityDescriptionSParameter*>(quantityDescription)) {
-			valid &= (!sparam->getNumberOfFirstValues() == 0) && (!sparam->getNumberOfSecondValues() == 0);
+		else
+		{
+			assert(false);
 		}
 	}
 	return valid;

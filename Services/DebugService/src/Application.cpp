@@ -55,10 +55,11 @@
 #include "OTResultDataAccess/PlotBuilder.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
 #include "OTCore/Units/SIUnits.h"
 #include "OTSystem/OperatingSystem.h"
 
+
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 // std header
 #include <thread>
 #include <fstream>
@@ -264,7 +265,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 	parameter.parameterName = "Frequency";
 	parameter.typeName = ot::TypeNames::getDoubleTypeName();
 	parameter.unit = "Hz";
-	std::unique_ptr<QuantityDescriptionCurveComplex> quantDesc(new QuantityDescriptionCurveComplex());
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 
 	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
 	for (ot::JsonSizeType i = 0; i < frequencyArray.Size(); i++)
@@ -273,18 +274,15 @@ void Application::createPlotOneComplexCurveMagPhase()
 		parameter.values.push_back(ot::Variable(value));
 	}
 	auto magnitudeArray = ot::json::getArray(sparameter, "s11_mag");
+	auto phaseArray = ot::json::getArray(sparameter, "s11_ang_deg");
 	for (ot::JsonSizeType i = 0; i < magnitudeArray.Size(); i++)
 	{
-		double value = ot::json::getDouble(magnitudeArray, i);
-		quantDesc->addValueReal(value);
+		double magnitude= ot::json::getDouble(magnitudeArray, i);
+		double phase= ot::json::getDouble(phaseArray, i);
+
+		quantDesc->addDatapoint(ot::Variable(std::complex(magnitude,phase)));
 	}
 
-	auto phaseArray = ot::json::getArray(sparameter, "s11_ang_deg");
-	for (ot::JsonSizeType i = 0; i < phaseArray.Size(); i++)
-	{
-		double value = ot::json::getDouble(phaseArray, i);
-		quantDesc->addValueImag(value);
-	}
 
 	quantDesc->setName("S11");
 	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "Deg");
@@ -336,7 +334,7 @@ void Application::createPlotOneComplexCurveRealImag()
 	parameter.parameterName = "Frequency";
 	parameter.typeName = ot::TypeNames::getDoubleTypeName();
 	parameter.unit = "Hz";
-	std::unique_ptr<QuantityDescriptionCurveComplex> quantDesc(new QuantityDescriptionCurveComplex());
+	std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
 
 	auto frequencyArray = ot::json::getArray(sparameter, "freq_Hz");
 	for (ot::JsonSizeType i = 0; i < frequencyArray.Size(); i++)
@@ -345,17 +343,13 @@ void Application::createPlotOneComplexCurveRealImag()
 		parameter.values.push_back(ot::Variable(value));
 	}
 	auto magnitudeArray = ot::json::getArray(sparameter, "s11_real");
+	auto phaseArray = ot::json::getArray(sparameter, "s11_imag");
 	for (ot::JsonSizeType i = 0; i < magnitudeArray.Size(); i++)
 	{
-		double value = ot::json::getDouble(magnitudeArray, i);
-		quantDesc->addValueReal(value);
-	}
-
-	auto phaseArray = ot::json::getArray(sparameter, "s11_imag");
-	for (ot::JsonSizeType i = 0; i < phaseArray.Size(); i++)
-	{
-		double value = ot::json::getDouble(phaseArray, i);
-		quantDesc->addValueImag(value);
+		double magnitude = ot::json::getDouble(magnitudeArray, i);
+		double phase = ot::json::getDouble(phaseArray, i);
+		std::complex<double> temp =	ot::ComplexNumberConversion::polarToCartesian(magnitude, phase);
+		quantDesc->addDatapoint(std::move(temp));
 	}
 
 	quantDesc->setName("S11");

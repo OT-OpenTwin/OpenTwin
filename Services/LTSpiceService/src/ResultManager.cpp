@@ -30,7 +30,6 @@
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
 
 #include "OTCore/FolderNames.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
@@ -289,19 +288,14 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		//Values are either complex or real
 		if (resultData.isComplex())
 		{
-			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
 			quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
 		
-			quantityDescriptionComplex->reserveSizeRealValues(numberOfXValues);
+			quantityDescriptionComplex->reserveDatapointSize(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
 			{
-				quantityDescriptionComplex->addValueReal(ot::Variable(resultData.complex(index + indexOffset, iVariable).real()));
-			}
-
-			quantityDescriptionComplex->reserveSizeImagValues(numberOfXValues);
-			for (size_t index = 0; index < numberOfXValues; index++)
-			{
-				quantityDescriptionComplex->addValueImag(ot::Variable(resultData.complex(index + indexOffset, iVariable).imag()));
+				ot::Variable value (resultData.complex(index + indexOffset, iVariable));
+				quantityDescriptionComplex->addDatapoint(std::move(value));
 			}
 
 			quantityDescription = quantityDescriptionComplex.release();
