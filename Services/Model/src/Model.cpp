@@ -2541,7 +2541,7 @@ void Model::updateEntityProperties(bool itemsVisible)
 		if (anyEntityNeedsUpdate)
 		{
 			refreshAllViews();
-			modelChangeOperationCompleted("shape properties changed");
+			modelChangeOperationCompleted("Properties changed");
 		}
 
 		enableQueuingHttpRequests(false);
@@ -2606,7 +2606,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 
 	// Now we need to notify the model service that the update operation is completed
 	refreshAllViews();
-	modelChangeOperationCompleted("shape properties changed");
+	modelChangeOperationCompleted("Properties changed");
 }
 
 void Model::updateEntity(EntityBase *entity)
