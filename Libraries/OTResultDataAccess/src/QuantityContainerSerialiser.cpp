@@ -68,7 +68,6 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
 	auto quantityMetadata = _quantityDescription->getMetadataQuantity();
-	assert(quantityMetadata.m_tupleDescription.isSingle()); //Curves should not have a tuple description, as they only have one value per quantity. 
 	
 	ot::UID quantityID = quantityMetadata.quantityIndex;
 

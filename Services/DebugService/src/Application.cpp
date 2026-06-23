@@ -285,7 +285,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 
 
 	quantDesc->setName("S11");
-	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", "Deg");
+	quantDesc->defineQuantityAsComplex(ot::ComplexNumberFormat::Polar, ot::TypeNames::getDoubleTypeName(), "", ot::SIUnits::getAngleUnitDegrees());
 
 	std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
 
