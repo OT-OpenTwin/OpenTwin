@@ -92,14 +92,15 @@ void ot::GraphicsItemMap::removeItem(UID _itemId)
 
 void ot::GraphicsItemMap::addConnection(const GraphicsConnectionInfo& _connection)
 {
-	if (_connection.hasOrigin())
+	if (_connection.hasOrigin()) 
 	{
-		getConnectionsList(_connection.getOriginUid(), _connection.getOriginConnectable()).push_back(_connection);
+		addConnectionToList(_connection.getOriginUid(), _connection.getOriginConnectable(), _connection);
 	}
 	if (_connection.hasDestination())
 	{
-		getConnectionsList(_connection.getDestinationUid(), _connection.getDestinationConnectable()).push_back(_connection);
+		addConnectionToList(_connection.getDestinationUid(), _connection.getDestinationConnectable(), _connection);
 	}
+	
 }
 
 void ot::GraphicsItemMap::removeConnection(UID _connectionId)
@@ -471,6 +472,20 @@ ot::GraphicsItemMap::GraphicsSubTreeResult ot::GraphicsItemMap::findSubTree(UID 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Helper
+
+void ot::GraphicsItemMap::addConnectionToList(UID _itemId, const std::string& _connectorName, const GraphicsConnectionInfo& _connection)
+{
+	auto& connections = getConnectionsList(_itemId, _connectorName);
+	for (auto& existingConnection : connections)
+	{
+		if (existingConnection.getUid() == _connection.getUid())
+		{
+			// Connection already exists, do not add it again
+			return;
+		}
+	}
+	connections.push_back(_connection);
+}
 
 std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo>& ot::GraphicsItemMap::getConnectorsMap(UID _itemId)
 {

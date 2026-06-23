@@ -113,6 +113,8 @@ namespace ot
 
 		// Private: Helper
 
+		void addConnectionToList(UID _itemId, const std::string& _connectorName, const GraphicsConnectionInfo& _connection);
+
 		std::map<std::string, ItemConnectorInfo>& getConnectorsMap(UID _itemId);
 		std::list<GraphicsConnectionInfo>& getConnectionsList(UID _itemId, const std::string& _connectorName);
 
