@@ -65,7 +65,7 @@ If you add a new OpenTwin library whose root variable does not match the
 function in ``OTProject.cmake``.
 
 .. note::
-This will be revised in the upcoming Environment setup changes via Python in the future.
+  This will be revised in the upcoming Environment setup changes via Python in the future.
 
 Qt tokens
 ---------
