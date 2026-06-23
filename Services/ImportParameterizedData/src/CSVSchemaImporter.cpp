@@ -129,6 +129,13 @@ void CSVSchemaImporter::execute()
 	OT_USER_LOG_I("Refining data from csv file(s)");
 	auto startProcessing = std::chrono::high_resolution_clock::now();
 	ot::NewModelStateInfo newEntityInfos;
+
+	size_t modelBatchSizes = 20;
+	std::string modelStateMessageBase = "";
+	if (csvFiles.size() > modelBatchSizes)
+	{
+		modelStateMessageBase = "Files: ";
+	}
 	for (auto& csvFile : csvFiles)
 	{
 		// First we assemble the information for the newly created series
@@ -174,14 +181,42 @@ void CSVSchemaImporter::execute()
 			assert(seriesRemoved); //Otherwise panic!
 		}
 		
+		if (counter % modelBatchSizes == 0)
+		{
+			resultCollectionExtender.setSaveModel(false);
+			resultCollectionExtender.storeCampaignChanges();
+			if (csvFiles.size() > modelBatchSizes)
+			{ 
+				std::string message = "Refined csv data. Files: " + std::to_string(counter - modelBatchSizes) + "-" + std::to_string(counter);
+				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
+			}
+			else
+			{
+				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+			}
+			newEntityInfos = ot::NewModelStateInfo();
+		}
+
 		updater.triggerUpdate(counter);
 		counter++;
 	}
 	
 	// Now we store the changes on the campaign and the model state
-	resultCollectionExtender.setSaveModel(false);
-	resultCollectionExtender.storeCampaignChanges();
-	ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+	if (newEntityInfos.hasEntities())
+	{
+		resultCollectionExtender.setSaveModel(false);
+		resultCollectionExtender.storeCampaignChanges();
+		if (csvFiles.size() > modelBatchSizes)
+		{
+			std::string message = "Refined csv data. Files: " + std::to_string((csvFiles.size()/modelBatchSizes) * modelBatchSizes) + "-" + std::to_string(csvFiles.size());
+			ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
+		}
+		else
+		{
+			ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+		}
+	}
+
 	OT_USER_LOG_I("Refinement finished.");
 	auto endProcessing = std::chrono::high_resolution_clock::now();
 	auto durationProcessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endProcessing - startProcessing);
