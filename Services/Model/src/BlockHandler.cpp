@@ -83,6 +83,14 @@ void BlockHandler::processEntity(EntityBase* _entBase) {
 	}
 }
 
+void BlockHandler::updateConnectionExplicitly(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent)
+{
+	if (!updateConnection(_changedConnection, _changeEvent)) {
+		OT_LOG_E("Could not handle connection changed event");
+		return;
+	}
+}
+
 void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
 	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 

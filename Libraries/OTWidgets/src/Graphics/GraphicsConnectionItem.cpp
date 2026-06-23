@@ -420,6 +420,12 @@ void ot::GraphicsConnectionItem::updateConnectionView() {
 	this->update();
 }
 
+void ot::GraphicsConnectionItem::updateConnectionInformation()
+{
+	this->updateOriginConnectionInformation();
+	this->updateDestConnectionInformation();
+}
+
 QPointF ot::GraphicsConnectionItem::getOriginPos() const {
 	QGraphicsItem* itm = nullptr;
 	if (m_origin) {

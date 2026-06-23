@@ -46,7 +46,7 @@ public:
 	// Fill map functions
 
 	void processEntity(EntityBase* entBase);
-
+	void updateConnectionExplicitly(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent);
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter

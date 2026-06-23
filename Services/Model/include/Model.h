@@ -72,12 +72,14 @@ public:
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) override;
+	virtual void connectionChanged(EntityBase* _entity) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 	virtual void requestVisualisationIfNeeded(ot::UID _entityID) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) override;
 	virtual const ot::ModelServiceState& getModelServiceState() const override { return m_serviceState; };
 	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const override;
+	
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string& _collectionName);
 	virtual ~Model();

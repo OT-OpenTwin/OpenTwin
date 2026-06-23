@@ -67,6 +67,7 @@ public:
 
 	virtual void entityRemoved(EntityBase* entity) {};
 	virtual void entityModified(EntityBase* entity) {};
+	virtual void connectionChanged(EntityBase* _entity) {};
 
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};

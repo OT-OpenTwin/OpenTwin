@@ -4207,6 +4207,115 @@ std::string Model::requestLibraryElement(ot::LibraryElementRequest& _config) {
 	//return "";
 }
 
+void Model::connectionChanged(EntityBase* _entity)
+{
+	// This function is called when a block's connectors are modified.
+	// We need to update the blockHandler to reflect changes (e.g., removed connectors).
+
+	if (_entity == nullptr)
+	{
+		return;
+	}
+
+	ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(_entity);
+	if(block == nullptr)
+	{
+		return;
+	}
+
+	// Get the graphics scene that contains this block
+	EntityGraphicsScene* scene = nullptr;
+
+	// Find the parent graphics scene
+	EntityBase* parent = _entity->getParent();
+	while (parent != nullptr)
+	{
+		EntityGraphicsScene* graphicsScene = dynamic_cast<EntityGraphicsScene*>(parent);
+		if (graphicsScene != nullptr)
+		{
+			scene = graphicsScene;
+			break;
+		}
+		parent = parent->getParent();
+	}
+
+	if (scene == nullptr)
+	{
+		return;
+	}
+
+	// Get all current connectors of this block
+	const auto& currentConnectors = block->getAllConnectorsByName();
+	std::set<std::string> validConnectorNames;
+
+	for (const auto& connectorPair : currentConnectors) {
+		validConnectorNames.insert(connectorPair.first);
+	}
+
+	ot::UID blockID = _entity->getEntityID();
+	ot::UID sceneID = scene->getEntityID();
+
+	// Get the graphics item map for this scene
+	const ot::GraphicsItemMap* itemMap = Application::instance()->getBlockHandler().getGraphicsItemMap(sceneID);
+	if (itemMap == nullptr)
+	{
+		return;
+	}
+
+	// Iterate through all connections in this scene and check if they reference this block
+	// We need to get all connections from the scene
+	const auto& allConnections = itemMap->getItemConnections(blockID);
+
+	for (const auto& connectionCfg : allConnections)
+	{
+		ot::UID connectionID = connectionCfg.getUid();
+		EntityBase* connectionEntity = getEntityByID(connectionID);
+
+		if (connectionEntity == nullptr)
+		{
+			continue;
+		}
+
+		ot::EntityBlockConnection* connection = dynamic_cast<ot::EntityBlockConnection*>(connectionEntity);
+		if (connection == nullptr)
+		{
+			continue;
+		}
+
+		// Get the current connection configuration
+		ot::GraphicsConnectionCfg connectionCfg_current = connection->getConnectionCfg();
+		bool needsUpdate = false;
+
+		// Check if origin connector is invalid and belongs to this block
+		if (connectionCfg_current.getOriginUid() == blockID) {
+			if (validConnectorNames.find(connectionCfg_current.getOriginConnectable()) == validConnectorNames.end()) {
+				// Origin connector was removed - unsnapt it
+				connectionCfg_current.setOriginUid(ot::invalidUID);
+				connectionCfg_current.setOriginConnectable("");
+				needsUpdate = true;
+			}
+		}
+
+		// Check if destination connector is invalid and belongs to this block
+		if (connectionCfg_current.getDestinationUid() == blockID) {
+			if (validConnectorNames.find(connectionCfg_current.getDestinationConnectable()) == validConnectorNames.end()) {
+				// Destination connector was removed - unsnapt it
+				connectionCfg_current.setDestinationUid(ot::invalidUID);
+				connectionCfg_current.setDestinationConnectable("");
+				needsUpdate = true;
+			}
+		}
+
+		// Now update the connection with the new (cleaned) information
+		if (needsUpdate) {
+			ot::GraphicsChangeEvent changeEvent;
+			changeEvent.setEditorName(scene->getName());
+
+			// Use the BlockHandler's updateConnection method to update the map and connection
+			Application::instance()->getBlockHandler().updateConnectionExplicitly(connectionCfg_current, changeEvent);
+		}
+	}
+}
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
 	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
