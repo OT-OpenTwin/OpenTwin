@@ -86,7 +86,7 @@ private:
 	double maximumEdgeLength;
 	double stepsAlongDiagonal;
 	double smallestCellRatio = 0.1;
-	double angleToleranceDeg = 1.0;
+	double angleToleranceDeg = 0.1;
 	double geometryTolerance = 1e-5;
 
 	std::list<EntityBase*> meshEntities;
