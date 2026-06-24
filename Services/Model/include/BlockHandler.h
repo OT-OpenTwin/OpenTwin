@@ -48,6 +48,8 @@ public:
 	void processEntity(EntityBase* entBase);
 	void updateConnectionExplicitly(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent);
 	void updateConnectorsExplicitly(ot::UID _blockID, std::set<std::string>& _validConnectors, ot::UID _sceneID);
+	void updateItemMapWithNewConnectionCfg(ot::UID _blockID, const ot::GraphicsConnectionCfg& _changedConnection, ot::UID _sceneID);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter

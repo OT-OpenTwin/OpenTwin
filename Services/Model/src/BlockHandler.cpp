@@ -126,6 +126,24 @@ void BlockHandler::updateConnectorsExplicitly(ot::UID _blockID, std::set<std::st
 	}
 }
 
+void BlockHandler::updateItemMapWithNewConnectionCfg(ot::UID _blockID, const ot::GraphicsConnectionCfg& _changedConnection, ot::UID _sceneID)
+{
+	// In this function we will update the item map for the given block ID with the new connection configuration
+	auto& itemMap = getOrCreateGraphicsItemMap(_sceneID);
+	const auto& connectors = itemMap.getItemConnectors(_blockID);
+
+	if(connectors.find(_changedConnection.getOriginConnectable()) != connectors.end())
+	{
+		itemMap.removeConnectionFromItem(_blockID, _changedConnection.getOriginConnectable(), _changedConnection.getUid());
+		itemMap.addConnection(_changedConnection);
+	}
+	else if(connectors.find(_changedConnection.getDestinationConnectable()) != connectors.end())
+	{
+		itemMap.removeConnectionFromItem(_blockID, _changedConnection.getDestinationConnectable(), _changedConnection.getUid());
+		itemMap.addConnection(_changedConnection);
+	}
+}
+
 void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
 	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 
@@ -1044,6 +1062,10 @@ bool BlockHandler::updateConnection(const ot::GraphicsConnectionCfg& _changedCon
 	model->getStateManager()->modifyEntityVersion(*connectionEntity);
 
 	notifyBlocksAboutConnectionChange(blocksToNotify);
+
+	// Update the item map with the new connection configuration
+	updateItemMapWithNewConnectionCfg(_changedConnection.getDestinationUid(), _changedConnection, editor->getEntityID());
+	updateItemMapWithNewConnectionCfg(_changedConnection.getOriginUid(), _changedConnection, editor->getEntityID());
 
 	return true;
 }
