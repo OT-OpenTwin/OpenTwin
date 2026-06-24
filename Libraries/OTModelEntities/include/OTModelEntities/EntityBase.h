@@ -80,6 +80,7 @@ public:
 	//! @brief Sends a pull request to the viewer to pull the visualization for the entity if it is currently visualized.
 	virtual void requestVisualisationIfNeeded(ot::UID _entityID) {};
 
+	virtual std::optional<std::string> getCollectionName(const std::string& _projectName) = 0;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
 	virtual const ot::ModelServiceState& getModelServiceState() const = 0;

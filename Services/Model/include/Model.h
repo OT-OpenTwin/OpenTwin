@@ -36,6 +36,7 @@
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "MetadataHandler.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
+#include "ProjectInfoHandler.h"
 
 // std header
 #include <string>
@@ -75,6 +76,7 @@ public:
 	virtual void connectionChanged(EntityBase* _entity) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
 	virtual void requestVisualisationIfNeeded(ot::UID _entityID) override;
+	virtual std::optional<std::string> getCollectionName(const std::string& _projectName) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) override;
 	virtual const ot::ModelServiceState& getModelServiceState() const override { return m_serviceState; };
@@ -346,6 +348,7 @@ private:
 	void handleShowDatasetInformation();
 
 	MetadataHandler m_metadataHandler;
+	ProjectInfoHandler m_projectInfoHandler;
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer*               m_entityRoot;

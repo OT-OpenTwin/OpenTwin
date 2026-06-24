@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ApplicationBase.h
 // 
 // License:
@@ -123,6 +123,7 @@ namespace ot {
 
 		//! @brief Will return the URL of the authorization service.
 		const std::string& getAuthorizationUrl() const { return m_authUrl; };
+		void setAuthorizationURL(const std::string _url) { m_authUrl = _url; }
 
 		//! @brief Will return the URL of the database.
 		const std::string& getDataBaseURL() const { return m_databaseURL; }

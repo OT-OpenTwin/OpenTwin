@@ -108,6 +108,7 @@
 
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
+#include "ProjectInfoHandler.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -4332,6 +4333,13 @@ void Model::requestVisualisationIfNeeded(ot::UID _entityID)
 	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
 	handler.requestVisualisationIfNeeded(_entityID);
 }
+
+std::optional<std::string> Model::getCollectionName(const std::string& _projectName)
+{
+	std::optional<std::string> collectionName = m_projectInfoHandler.getCollectionName(_projectName);
+	return collectionName;
+}
+
 
 std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
