@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
+#include "OTCore/MetadataHandle/Helper.h"
 
 MetadataQuantity& MetadataQuantity::operator=(const MetadataQuantity& _other)
 {
@@ -60,6 +61,43 @@ void MetadataQuantity::setFromJsonObject(const ot::ConstJsonObject& _object) {
 		m_tupleDescription.setFromJsonObject(tupleDescriptionObject);
 	}
 	dataDimensions = ot::json::getUIntVector(_object, "Dimensions");
+}
+
+size_t MetadataQuantity::getMemSize()
+{
+	size_t total = sizeof(MetadataQuantity);
+
+	// --- std::string heap allocations ---
+	total += ot::stringHeapSize(quantityName);
+	total += ot::stringHeapSize(quantityLabel);
+
+	// --- std::vector<uint32_t> dataDimensions ---
+	// capacity() gives the allocated element count; multiply by element size.
+	// sizeof(vector) is already included via sizeof(MetadataQuantity).
+	total += dataDimensions.capacity() * sizeof(uint32_t);
+
+	// --- std::vector<std::string> dependingParameterLabels ---
+	// Heap buffer for the vector elements themselves:
+	total += dependingParameterLabels.capacity() * sizeof(std::string);
+	// Plus the heap-allocated string data inside each element:
+	for (const std::string& label : dependingParameterLabels)
+	{
+		total += ot::stringHeapSize(label);
+	}
+
+	// --- std::vector<ot::UID> dependingParameterIds ---
+	total += dependingParameterIds.capacity() * sizeof(ot::UID);
+
+	// --- ot::TupleInstance m_tupleDescription ---
+	// sizeof(MetadataQuantity) already covers the in-object storage.
+	// If TupleInstance owns heap data, delegate to its own getMemSize() if available:
+	// total += m_tupleDescription.getMemSize() - sizeof(ot::TupleInstance);
+	// Otherwise, leave it at zero additional heap bytes (conservative assumption).
+
+	// --- ot::JsonDocument metaData ---
+	total += metaData.GetAllocator().Capacity();
+
+	return total;
 }
 
 void MetadataQuantity::swap(MetadataQuantity& _a, MetadataQuantity& _b)

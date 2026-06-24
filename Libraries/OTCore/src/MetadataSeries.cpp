@@ -1,4 +1,5 @@
 ﻿#include "OTCore/MetadataHandle/MetadataSeries.h"
+#include "OTCore/MetadataHandle/Helper.h"
 
 MetadataSeries::MetadataSeries(const MetadataSeries& _other)
 	: m_name(_other.m_name), m_label(_other.m_label), m_index(_other.m_index),
@@ -111,4 +112,42 @@ void MetadataSeries::setFromJsonObject(const ot::ConstJsonObject& _object)
 		quantity.setFromJsonObject(ot::json::getObject(allQuantity, i));
 		m_quantity.push_back(quantity);
 	}
+}
+
+size_t MetadataSeries::getMemSize()
+{
+	size_t total = sizeof(MetadataSeries);
+
+	// --- std::string heap allocations ---
+	total += ot::stringHeapSize(m_name);
+	total += ot::stringHeapSize(m_label);
+
+	// --- std::list<MetadataParameter> m_parameter ---
+	// Each list node allocates separately on the heap.
+	// Delegate to MetadataParameter::getMemSize() to capture all nested
+	// heap data (strings, list<Variable>, JsonDocument), then add the
+	// two list node pointers that wrap each element.
+	for (MetadataParameter& p : m_parameter)
+	{
+		total += p.getMemSize();           // full object footprint incl. sizeof(MetadataParameter)
+		total += 2 * sizeof(void*);        // list node prev/next pointers
+	}
+
+	// --- ot::UIDList m_parameterReferences ---
+	total += m_parameterReferences.size() * (sizeof(ot::UID) + 2 * sizeof(void*));
+
+	// --- std::list<MetadataQuantity> m_quantity ---
+	for (MetadataQuantity& q : m_quantity)
+	{
+		total += q.getMemSize();           // full object footprint incl. sizeof(MetadataQuantity)
+		total += 2 * sizeof(void*);        // list node prev/next pointers
+	}
+
+	// --- ot::UIDList m_quantityReferences ---
+	total += m_quantityReferences.size() * sizeof(ot::UID);
+
+	// --- ot::JsonDocument m_metaData ---
+	total += m_metaData.GetAllocator().Capacity();
+
+	return total;
 }

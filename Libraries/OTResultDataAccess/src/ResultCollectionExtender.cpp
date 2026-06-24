@@ -21,6 +21,7 @@
 #include "OTCore/DefensiveProgramming.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+#include "OTCore/MetadataHandle/Helper.h"
 
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
@@ -164,6 +165,53 @@ bool ResultCollectionExtender::removeSeries(ot::UID _uid)
 		}
 	}
 	return removed;
+}
+
+size_t ResultCollectionExtender::getMemSize()
+{
+	size_t total = sizeof(ResultCollectionExtender);
+
+	// --- std::list<const MetadataSeries*> m_seriesMetadataForStorage ---
+	// NON-OWNING pointer list — MetadataSeries objects are owned externally.
+	// Count only list node overhead + pointer payload per entry.
+	total += m_seriesMetadataForStorage.size()
+		* (sizeof(const MetadataSeries*) + 2 * sizeof(void*));
+
+	// --- std::map<std::string, uint32_t> m_parameterBuckets ---
+	// Owning value map. Each heap node holds: key string + uint32_t + tree overhead.
+	constexpr size_t mapNodeOverhead = 4 * sizeof(void*);
+	for (const auto& [key, value] : m_parameterBuckets)
+	{
+		total += ot::stringHeapSize(key);   // std::string key heap buffer
+		total += sizeof(uint32_t);      // value lives in the heap node, not in sizeof(this)
+		total += mapNodeOverhead;
+	}
+
+	// --- ResultImportLogger m_logger ---
+	// In-object storage already covered by sizeof(ResultCollectionExtender).
+	// Delegate to its own getMemSize() if available to capture its heap data:
+	total += m_logger.getMemSize() - sizeof(ResultImportLogger);
+
+	// --- std::map<std::string, MetadataQuantity*> m_quantitiesUpForStorageByLabel ---
+	// NON-OWNING pointers — owned by MetadataCampaign.
+	// Count only key heap cost + pointer payload + node overhead.
+	for (auto& [label, ptr] : m_quantitiesUpForStorageByLabel)
+	{
+		total += ot::stringHeapSize(label);
+		total += sizeof(MetadataQuantity*);
+		total += mapNodeOverhead;
+	}
+
+	// --- std::map<std::string, MetadataParameter*> m_parameterUpForStorageByLabel ---
+	// NON-OWNING pointers — same reasoning as above.
+	for (auto& [label, ptr] : m_parameterUpForStorageByLabel)
+	{
+		total += ot::stringHeapSize(label);
+		total += sizeof(MetadataParameter*);
+		total += mapNodeOverhead;
+	}
+
+	return total;
 }
 
 ot::UIDList ResultCollectionExtender::addCampaignContextDataToParameters(DatasetDescription& _dataDescription)
@@ -330,15 +378,7 @@ void ResultCollectionExtender::addMetadataToSeries(std::list<DatasetDescription>
 			if (uniqueParameter == uniqueParameters.end())
 			{
 				MetadataParameter newParameter(parameter);
-				newParameter.values.sort();
-				newParameter.values.unique();
 				uniqueParameters[parameter.parameterUID] = std::move(newParameter);
-			}
-			else
-			{
-				uniqueParameter->second.values.insert(uniqueParameter->second.values.end(), parameter.values.begin(), parameter.values.end());
-				uniqueParameter->second.values.sort();
-				uniqueParameter->second.values.unique();
 			}
 		}
 	}
@@ -387,8 +427,7 @@ bool ResultCollectionExtender::parameterIsCorrectlySet(MetadataParameter& _param
 		_parameter.parameterLabel != "" &&
 		_parameter.parameterName != "" &&
 		_parameter.parameterUID != 0 &&
-		_parameter.typeName != "" &&
-		_parameter.values.size() > 0;
+		_parameter.typeName != "";
 	//Unit and list of meta data may be empty
 	return correctlySet;
 }

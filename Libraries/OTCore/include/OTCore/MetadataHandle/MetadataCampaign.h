@@ -67,7 +67,7 @@ public:
 	{
 		m_metaData.CopyFrom(_metadata, m_metaData.GetAllocator());
 	}
-
+	size_t getMemSize();
 private:
 	std::list<MetadataSeries> m_seriesMetadata;
 	

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultImportLogger.h
 // 
 // License:
@@ -37,7 +37,7 @@ public:
 	void logD(std::string&& _message);
 	const std::string getLog(ResultImportLoggerVerbosity verbosity = ResultImportLoggerVerbosity::RELEASE);
 	void clearLog();
-
+	size_t getMemSize();
 private:
 	std::list<ResultImportLoggerEntry> m_log;
 };

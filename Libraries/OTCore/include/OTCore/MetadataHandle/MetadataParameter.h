@@ -76,5 +76,8 @@ public:
 
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
+
+	size_t getMemSize();
+
 private:
 };

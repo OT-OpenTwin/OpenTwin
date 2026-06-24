@@ -74,6 +74,7 @@ public:
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const;
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object);
 
+	size_t getMemSize();
 private:
 	std::string m_name;
 	std::string m_label;
