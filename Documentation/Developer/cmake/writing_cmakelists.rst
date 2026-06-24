@@ -158,10 +158,23 @@ release runtime in every configuration so it can link the shipped Python
    )
 
    ot_finalize_bin(PythonExecution)
+
+   # F5 debug against the RELEASE OT runtime + release python.
+   ot_bin_debug_launch(PythonExecution
+       PATH [[${env.OT_ALL_DLLR};${env.OT_PYTHON_BIN}\Release;${env.PATH}]])
+
    ot_add_test(PythonExecution)
 
+Because the subprocess is ``/MD`` while the rest of a Debug session is ``/MDd``,
+F5-debugging it must point Visual Studio at the **release** OT runtime
+(``${env.OT_ALL_DLLR}``); otherwise it loads the ``/MDd`` debug OT DLLs and crashes
+on a CRT / ``_ITERATOR_DEBUG_LEVEL`` mismatch. ``ot_bin_debug_launch`` writes that
+per-project ``launch.vs.json``; the executable is launched directly (no service
+loader) and, with no ``ARGS``, the subprocess falls back to its default server name.
+See :ref:`API reference<target CMake API Reference>`.
+
 .. warning::
-   A service that just talks to the Python subprocess over the service interface 
+   A service that just talks to the Python subprocess over the service interface
    is an ordinary library and uses ``ot_initialize_lib``.
 
 Unit tests

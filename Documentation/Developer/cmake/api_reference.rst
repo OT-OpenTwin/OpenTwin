@@ -121,6 +121,21 @@ Debug launch (Visual Studio F5)
     services do not need this; see
     :ref:`Debugging services in Visual Studio<target Debugging services>`.
 
+``ot_bin_debug_launch(<Target> [PATH <path>] [ARGS <arg> ...])``
+    Generates a Visual Studio ``launch.vs.json`` so an **executable** target can be
+    debugged with F5 (the executable counterpart of ``ot_service_debug_launch``,
+    which targets DLL services). Call it from the binary's own ``CMakeLists.txt``
+    after ``ot_finalize_bin`` - it is an explicit per-target call, never automatic,
+    so the launch config is generated only where it is requested. ``PATH`` is the
+    debug-time DLL search PATH in Visual Studio ``${env.VAR}`` syntax; pass it as a
+    bracket argument ``[[...]]`` so ``${env.VAR}`` and single backslashes are taken
+    literally (they are JSON-escaped internally). ``PATH`` defaults to the inherited
+    ``${env.PATH}`` and ``ARGS`` defaults to none. Mainly used for an
+    ``ot_initialize_bin_python`` target, which is built ``/MD`` and must therefore
+    debug against the **release** OT DLLs (``${env.OT_ALL_DLLR}``) plus release
+    python - never the ``/MDd`` debug DLLs, which would CRT- /
+    ``_ITERATOR_DEBUG_LEVEL``-mismatch and crash.
+
 Internal helpers
 ----------------
 
