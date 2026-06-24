@@ -276,6 +276,7 @@ public:
 	void handleDisplayMessage(ot::JsonDocument& _document);
 	void handleDisplayStyledMessage(ot::JsonDocument& _document);
 	void handleDisplayLogMessage(ot::JsonDocument& _document);
+	void handleDisplayStateMessage(ot::JsonDocument& _document);
 	void handleReportError(ot::JsonDocument& _document);
 	void handleReportWarning(ot::JsonDocument& _document);
 	void handleReportInformation(ot::JsonDocument& _document);

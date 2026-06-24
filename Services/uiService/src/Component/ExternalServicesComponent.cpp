@@ -244,6 +244,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_DisplayMessage, this, &ExternalServicesComponent::handleDisplayMessage);
 	connectAction(OT_ACTION_CMD_UI_DisplayStyledMessage, this, &ExternalServicesComponent::handleDisplayStyledMessage);
 	connectAction(OT_ACTION_CMD_UI_DisplayLogMessage, this, &ExternalServicesComponent::handleDisplayLogMessage);
+	connectAction(OT_ACTION_CMD_UI_DisplayStateMessage, this, &ExternalServicesComponent::handleDisplayStateMessage);
 	connectAction(OT_ACTION_CMD_UI_ReportError, this, &ExternalServicesComponent::handleReportError);
 	connectAction(OT_ACTION_CMD_UI_ReportWarning, this, &ExternalServicesComponent::handleReportWarning);
 	connectAction(OT_ACTION_CMD_UI_ReportInformation, this, &ExternalServicesComponent::handleReportInformation);
@@ -3067,6 +3068,13 @@ void ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument& _docum
 	log.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_MESSAGE));
 
 	AppBase::instance()->appendLogMessage(log);
+}
+
+void ExternalServicesComponent::handleDisplayStateMessage(ot::JsonDocument& _document)
+{
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_Text);
+	int displayTime = ot::json::getInt(_document, OT_ACTION_PARAM_Timeout);
+	ot::WindowAPI::displayTemporaryStateMessage(message, displayTime);
 }
 
 void ExternalServicesComponent::handleReportError(ot::JsonDocument& _document)

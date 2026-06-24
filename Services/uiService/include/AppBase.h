@@ -469,8 +469,6 @@ public Q_SLOTS:
 
 	void slotLockUI(bool _flag);
 	void slotLockSelectionAndModification(bool _flag);
-	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
-	void slotSetProgressBarValue(int _progressPercentage);
 
 	void slotRunCustomTimer(const QString& _timerId, int _intervalMs);
 	void queueCustomCallback(const QString& _callbackId);
@@ -497,6 +495,14 @@ public Q_SLOTS:
 	void appendHtmlInfoMessage(const QString& _html);
 
 	void slotShowOutputContextMenu(QPoint _pos);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Status bar slots
+
+	void slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous);
+	void slotSetProgressBarValue(int _progressPercentage);
+	void slotDisplayStateMessage(QString _message, int _timeoutMs);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -737,6 +743,8 @@ protected:
 
 	virtual void setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) override;
 	virtual void setProgressBarValueAPI(int _progressPercentage) override;
+
+	virtual void displayTemporaryStateMessageAPI(const std::string& _message, int _durationMs) override;
 
 	virtual void showInfoPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) override;
 	virtual void showWarningPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) override;

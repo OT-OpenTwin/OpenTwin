@@ -2322,21 +2322,6 @@ void AppBase::slotLockSelectionAndModification(bool _flag) {
 	m_projectNavigation->getTree()->setEnabled(!_flag);
 }
 
-void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
-	if (_progressBaseVisible)
-	{
-		m_statusBar->get()->showProgress(_progressMessage, (_continuous ? -1 : 0));
-	}
-	else
-	{
-		m_statusBar->get()->hideProgressDelayed();
-	}
-}
-
-void AppBase::slotSetProgressBarValue(int _progressPercentage) {
-	m_statusBar->get()->setProgressValue(_progressPercentage);
-}
-
 void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs) {
 	QTimer::singleShot(_intervalMs, [=]() {
 		Q_EMIT customTimerTimeout(_timerId);
@@ -2409,6 +2394,34 @@ void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 			m_output->getPlainTextEdit()->clear();
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Status bar slots
+
+void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous)
+{
+	if (_progressBaseVisible)
+	{
+		m_statusBar->get()->showProgress(_progressMessage, (_continuous ? -1 : 0));
+	}
+	else
+	{
+		m_statusBar->get()->hideProgressDelayed();
+	}
+}
+
+void AppBase::slotSetProgressBarValue(int _progressPercentage)
+{
+	m_statusBar->get()->setProgressValue(_progressPercentage);
+}
+
+void AppBase::slotDisplayStateMessage(QString _message, int _timeoutMs)
+{
+	auto sb = m_statusBar->get();
+	sb->showStateMessage(_message);
+	sb->hideStateMessageDelayed(_timeoutMs);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -4060,6 +4073,16 @@ void AppBase::setProgressBarValueAPI(int _progressPercentage) {
 	}
 	else {
 		this->slotSetProgressBarValue(_progressPercentage);
+	}
+}
+
+void AppBase::displayTemporaryStateMessageAPI(const std::string& _message, int _durationMs)
+{
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, &AppBase::slotDisplayStateMessage, Qt::QueuedConnection, QString::fromStdString(_message), _durationMs);
+	}
+	else {
+		this->slotDisplayStateMessage(QString::fromStdString(_message), _durationMs);
 	}
 }
 

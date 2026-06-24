@@ -120,3 +120,13 @@ bool ot::Frontend::promptChoice(const std::string& _callbackAction, const std::s
 
 	return GuiAPIManager::instance().sendQueuedRequestToFrontend(doc.toJson());
 }
+
+bool ot::Frontend::displayTemporaryStateMessage(const std::string& _message, int _displayDurationMs)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_DisplayStateMessage, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Text, ot::JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Timeout, _displayDurationMs, doc.GetAllocator());
+
+	return GuiAPIManager::instance().sendQueuedRequestToFrontend(doc.toJson());
+}

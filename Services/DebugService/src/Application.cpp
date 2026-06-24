@@ -21,11 +21,15 @@
 #include "Application.h"
 
 // OpenTwin header
+#include "OTSystem/OperatingSystem.h"
+
 #include "OTCore/FolderNames.h"
 #include "OTCore/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ThisComputerInfo.h"
+#include "OTCore/Units/SIUnits.h"
+#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 
 #include "OTGui/Painter/FillPainter2D.h"
 #include "OTGui/Painter/PainterRainbowIterator.h"
@@ -38,6 +42,8 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
 #include "OTGui/Widgets/TableCfg.h"
+
+#include "OTGuiAPI/Frontend.h"
 
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
@@ -55,11 +61,7 @@
 #include "OTResultDataAccess/PlotBuilder.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
-#include "OTCore/Units/SIUnits.h"
-#include "OTSystem/OperatingSystem.h"
 
-
-#include "OTCore/ComplexNumbers/ComplexNumberConversion.h"
 // std header
 #include <thread>
 #include <fstream>
@@ -193,6 +195,8 @@ void Application::uiDebugInfo() {
 
 	std::string resp;
 	ui->sendMessage(true, doc, resp);
+
+	ot::Frontend::displayTemporaryStateMessage("UI debug information displayed");
 }
 
 void Application::serviceDebugInfo(void) {

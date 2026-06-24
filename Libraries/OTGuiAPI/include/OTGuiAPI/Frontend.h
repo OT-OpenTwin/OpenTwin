@@ -76,6 +76,16 @@ namespace ot {
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
+		// Status bar
+
+		//! @brief Displays a temporary state message in the status bar.
+		//! State messages will be displayed to the far left of the status bar and will be removed after the specified duration.
+		//! @param _message The message to be displayed.
+		//! @param _displayDurationMs The duration in milliseconds for which the message should be displayed.
+		static bool displayTemporaryStateMessage(const std::string& _message, int _displayDurationMs = 5000);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
 		// Private
 
 	private:
