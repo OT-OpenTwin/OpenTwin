@@ -57,6 +57,9 @@ namespace ot
 		void removeConnectionFromItem(UID _itemId, UID _connectionId);
 		void removeConnectionFromItem(UID _itemId, const std::string& _connectorName, UID _connectionId);
 
+		void addConnector(UID _itemId, const std::string& _connectorName);
+		void removeConnector(UID _itemId, const std::string& _connectorName);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter

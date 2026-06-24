@@ -4266,6 +4266,8 @@ void Model::connectionChanged(EntityBase* _entity)
 	// We need to get all connections from the scene
 	const auto& allConnections = itemMap->getItemConnections(blockID);
 
+	// Now we need to check if any of the connections in the scene reference this block and if they are still valid
+	// Also make sure that we update the connections of the other blocks that are connected to this block, if the connection is still valid
 	for (const auto& connectionCfg : allConnections)
 	{
 		ot::UID connectionID = connectionCfg.getUid();
@@ -4315,6 +4317,9 @@ void Model::connectionChanged(EntityBase* _entity)
 			Application::instance()->getBlockHandler().updateConnectionExplicitly(connectionCfg_current, changeEvent);
 		}
 	}
+
+	// Finally, update the block handler's connector map for this block
+	Application::instance()->getBlockHandler().updateConnectorsExplicitly(blockID, validConnectorNames, sceneID);
 }
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {

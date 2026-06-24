@@ -91,6 +91,41 @@ void BlockHandler::updateConnectionExplicitly(const ot::GraphicsConnectionCfg& _
 	}
 }
 
+void BlockHandler::updateConnectorsExplicitly(ot::UID _blockID, std::set<std::string>& _validConnectors, ot::UID _sceneID)
+{
+
+	auto& itemMap = getOrCreateGraphicsItemMap(_sceneID);
+	// Add new valid connectors
+	for (const auto& connectorName : _validConnectors)
+	{
+		if (!itemMap.hasConnector(_blockID, connectorName))
+		{
+			// Connector is not present in the map, add it
+			itemMap.addConnector(_blockID, connectorName);
+		}
+	}
+
+	// Remove invalid connectors
+	const auto& allConnectors = itemMap.getItemConnectors(_blockID);
+	std::vector<std::string> connectorsToRemove;
+
+	for (const auto& connectorPair : allConnectors)
+	{
+		const std::string& connectorName = connectorPair.first;
+		if (_validConnectors.find(connectorName) == _validConnectors.end())
+		{
+			// Connector is no longer valid, mark it for removal
+			connectorsToRemove.push_back(connectorName);
+		}
+	}
+
+	// Remove all marked connectors
+	for (const auto& connectorName : connectorsToRemove)
+	{
+		itemMap.removeConnector(_blockID, connectorName);
+	}
+}
+
 void BlockHandler::addConnection(ot::UID _editorId, const ot::EntityBlockConnection& _toBeAddedConnection) {
 	auto& itemMap = getOrCreateGraphicsItemMap(_editorId);
 

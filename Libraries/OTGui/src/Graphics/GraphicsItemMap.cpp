@@ -179,6 +179,21 @@ void ot::GraphicsItemMap::removeConnectionFromItem(UID _itemId, const std::strin
 	}
 }
 
+void ot::GraphicsItemMap::addConnector(UID _itemId, const std::string& _connectorName)
+{
+	auto& connectorsMap = getConnectorsMap(_itemId);
+	if (connectorsMap.find(_connectorName) == connectorsMap.end())
+	{
+		connectorsMap[_connectorName] = ItemConnectorInfo(_connectorName);
+	}
+}
+
+void ot::GraphicsItemMap::removeConnector(UID _itemId, const std::string& _connectorName)
+{
+	auto& connectorsMap = getConnectorsMap(_itemId);
+	connectorsMap.erase(_connectorName);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Getter
