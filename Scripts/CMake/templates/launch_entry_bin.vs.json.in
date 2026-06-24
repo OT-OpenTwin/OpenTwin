@@ -1,0 +1,8 @@
+    {
+      "type": "default",
+      "project": "CMakeLists.txt",
+      "projectTarget": "@OT_TARGET@.exe (@OT_CFG@\\@OT_TARGET@.exe)",
+      "name": "@OT_TARGET@.exe (@OT_CFG@\\@OT_TARGET@.exe)",
+      "args": [ @OT_ARGS@ ],
+      "env": { "PATH": "@OT_PATH@" }
+    }

@@ -1254,6 +1254,7 @@ function(ot_finalize_lib TARGET_NAME)
     endif()
 
     add_library(${TARGET_NAME} SHARED $<TARGET_OBJECTS:${_core}>)
+
     target_include_directories(${TARGET_NAME} PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include")
     _ot_apply_subsystem_if_requested(${TARGET_NAME} ${_core})
 
@@ -1328,7 +1329,7 @@ function(_ot_apply_service_debugger TARGET_NAME)
     _ot_service_launch_args_json(OT_ARGS ${TARGET_NAME})
 
     # Build one configuration entry per build type from the entry template.
-    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry.vs.json.in" _entry_tpl)
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry_dll.vs.json.in" _entry_tpl)
     string(REPLACE "\r" "" _entry_tpl "${_entry_tpl}")
     string(REGEX REPLACE "\n+$" "" _entry_tpl "${_entry_tpl}")
 
@@ -1337,8 +1338,7 @@ function(_ot_apply_service_debugger TARGET_NAME)
         set(OT_TARGET "${TARGET_NAME}")
         set(OT_CFG "${_cfg}")
 
-        # PATH matches the original .vcxproj.user (OT_ALL_DLL* then the inherited PATH,
-        # which includes Deployment) so the loaded service resolves the same DLLs.
+        # PATH matches the original .vcxproj.user
         if(_cfg STREQUAL "Debug")
             set(OT_SUB  "debug")
             set(OT_PATH "\${env.OT_ALL_DLLD};\${env.PATH}")
@@ -1356,6 +1356,57 @@ function(_ot_apply_service_debugger TARGET_NAME)
         else()
             string(APPEND _entries ",\n${_entry}")
         endif()
+    endforeach()
+
+    set(OT_LAUNCH_ENTRIES "${_entries}")
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch.vs.json.in" _envelope)
+    string(REPLACE "\r" "" _envelope "${_envelope}")
+    string(CONFIGURE "${_envelope}" _content @ONLY)
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vs/launch.vs.json" "${_content}")
+endfunction()
+
+function(ot_bin_debug_launch TARGET_NAME)
+    if(NOT MSVC)
+        return()
+    endif()
+
+    cmake_parse_arguments(PARSE_ARGV 1 _OTB "" "PATH" "ARGS")
+
+    if(DEFINED _OTB_PATH)
+        set(_path "${_OTB_PATH}")
+    else()
+        set(_path "\${env.PATH}")
+    endif()
+    string(REPLACE "\\" "\\\\" _path "${_path}")
+
+    set(_args "")
+    foreach(_a IN LISTS _OTB_ARGS)
+        string(REPLACE "\\" "\\\\" _a "${_a}")
+        if(_args STREQUAL "")
+            set(_args "\"${_a}\"")
+        else()
+            string(APPEND _args ", \"${_a}\"")
+        endif()
+    endforeach()
+
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry_bin.vs.json.in" _entry_tpl)
+    string(REPLACE "\r" "" _entry_tpl "${_entry_tpl}")
+    string(REGEX REPLACE "\n+$" "" _entry_tpl "${_entry_tpl}")
+
+    set(_entries "")
+    foreach(_cfg IN ITEMS Debug Release)
+        set(OT_TARGET "${TARGET_NAME}")
+        set(OT_CFG "${_cfg}")
+        set(OT_PATH "${_path}")
+        set(OT_ARGS "${_args}")
+        string(CONFIGURE "${_entry_tpl}" _entry @ONLY)
+
+        if(_entries STREQUAL "")
+            set(_entries "${_entry}")
+        else()
+            string(APPEND _entries ",\n${_entry}")
+        endif()
+
     endforeach()
 
     set(OT_LAUNCH_ENTRIES "${_entries}")

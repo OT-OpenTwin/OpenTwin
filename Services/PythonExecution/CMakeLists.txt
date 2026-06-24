@@ -33,6 +33,11 @@ ot_add_dependency(PythonExecution
 )
 
 ot_finalize_bin(PythonExecution)
+
+ot_bin_debug_launch(PythonExecution
+    PATH [[${env.OT_ALL_DLLR};${env.OT_PYTHON_BIN}\Release;${env.PATH}]]
+)
+
 # TODO(: test suite is stale - 10/13 files reference the removed PythonAPI.h, the old
 # 0-arg initializePythonInterpreter(), and a numpy include path. Re-enable after updating the
 # tests to the current PythonWrapper API.
