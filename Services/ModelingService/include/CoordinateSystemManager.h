@@ -32,12 +32,13 @@ class TopoDS_Shape;
 
 class EntityBrep;
 class EntityCoordinateSystem;
+class Application;
 
 class CoordinateSystemManager
 {
 public:
-	CoordinateSystemManager(ot::components::UiComponent *_uiComponent, ot::components::ModelComponent *_modelComponent, ot::serviceID_t _serviceID, const std::string &_serviceName) 
-		: uiComponent(_uiComponent), modelComponent(_modelComponent), serviceID(_serviceID), serviceName(_serviceName) {};
+	CoordinateSystemManager(Application *_application, ot::serviceID_t _serviceID, const std::string &_serviceName) 
+		: application(_application), serviceID(_serviceID), serviceName(_serviceName) {};
 	virtual ~CoordinateSystemManager() {}
 
 	void createNew();
@@ -61,8 +62,11 @@ private:
 	void updateActiveLocalCoordinateSystem(gp_Pnt lcsOrigin, gp_Dir lcsNormal, gp_Vec edgeMidDirection);
 	void setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value);
 
-	ot::components::UiComponent* uiComponent;
-	ot::components::ModelComponent* modelComponent;
+	CoordinateSystemManager() = delete;
+	CoordinateSystemManager(const CoordinateSystemManager&) = delete;
+	CoordinateSystemManager& operator = (const CoordinateSystemManager&) = delete;
+
+	Application* application;
 	ot::serviceID_t serviceID;
 	std::string serviceName;
 

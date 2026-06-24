@@ -19,6 +19,7 @@
 
 #include "CoordinateSystemManager.h"
 #include "EdgesOperationBase.h"
+#include "Application.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTCommunication/ActionTypes.h"
@@ -67,7 +68,7 @@ void CoordinateSystemManager::createNew()
 {
 	std::string itemName = createUniqueName("Coordinate Systems/LCS");
 
-	EntityCoordinateSystem* csEntity = new EntityCoordinateSystem(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	EntityCoordinateSystem* csEntity = new EntityCoordinateSystem(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	csEntity->setName(itemName);
 	csEntity->createProperties();
 	csEntity->setTreeItemEditable(true);
@@ -166,13 +167,13 @@ void CoordinateSystemManager::alignFaceEdge()
 
 	if (activeCoordinateSystemName.empty() || isGlobalCoordinateSystem(entityInfo.getEntityID(), entityInfo.getEntityVersion()))
 	{
-		uiComponent->displayErrorPrompt("The currently active coordinate system is the global system and cannot be modified.");
+		application->getUiComponent()->displayErrorPrompt("The currently active coordinate system is the global system and cannot be modified.");
 		return;
 	}
 
 	// We first need to pick a face for the coordinate system
 	std::map<std::string, std::string> options;
-	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::FACE, false, "", ot::components::UiComponent::entitySelectionAction::ALIGN_LCS_FACE, "align the local coordinate system origin and normal direction", options, serviceID);
+	application->getUiComponent()->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::FACE, false, "", ot::components::UiComponent::entitySelectionAction::ALIGN_LCS_FACE, "align the local coordinate system origin and normal direction", options, serviceID);
 }
 
 void CoordinateSystemManager::facePicked(const std::string& selectionInfo)
@@ -225,13 +226,13 @@ void CoordinateSystemManager::facePicked(const std::string& selectionInfo)
 	// Get the face center (-> origin) and the corresponding normal direction (-> z axis) from the face object
 	if (!getFacePointAndNormal(face, lcsOrigin, lcsNormal))
 	{
-		uiComponent->displayErrorPrompt("The origin and face normal cannot be determined from the selected face.");
+		application->getUiComponent()->displayErrorPrompt("The origin and face normal cannot be determined from the selected face.");
 		return;
 	}
 
 	// After successfully picking the face, we now need to pick the edge for the x-axis orientation
 	std::map<std::string, std::string> options;
-	uiComponent->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, false, "", ot::components::UiComponent::entitySelectionAction::ALIGN_LCS_EDGE, "align the local coordinate system x-axis", options, serviceID);
+	application->getUiComponent()->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::entitySelectionType::EDGE, false, "", ot::components::UiComponent::entitySelectionAction::ALIGN_LCS_EDGE, "align the local coordinate system x-axis", options, serviceID);
 }
 
 void CoordinateSystemManager::edgePicked(const std::string& selectionInfo)
@@ -286,13 +287,13 @@ void CoordinateSystemManager::edgePicked(const std::string& selectionInfo)
 
 	if (!getEdgeMidpointAndDirection(edge, edgeMidPoint, edgeMidDirection))
 	{
-		uiComponent->displayErrorPrompt("The center edge direction cannot be determine from the selected edge.");
+		application->getUiComponent()->displayErrorPrompt("The center edge direction cannot be determine from the selected edge.");
 		return;
 	}
 
 	if (lcsNormal.Dot(gp_Dir(edgeMidDirection)) > cos(1e-3))
 	{
-		uiComponent->displayErrorPrompt("The selected edge direction is parallel to the selected face normal.");
+		application->getUiComponent()->displayErrorPrompt("The selected edge direction is parallel to the selected face normal.");
 		return;
 	}
 
@@ -581,7 +582,7 @@ void CoordinateSystemManager::updateActiveLocalCoordinateSystem(gp_Pnt lcsOrigin
 		ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, {}, {}, {}, "align local coordinate system: " + csEntity->getName());
 	}
 
-	uiComponent->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
+	application->getUiComponent()->refreshSelection(ot::ModelServiceAPI::getCurrentVisualizationModelID());
 }
 
 void CoordinateSystemManager::setValue(EntityCoordinateSystem* csEntity, const std::string& groupName, const std::string& propName, double value)

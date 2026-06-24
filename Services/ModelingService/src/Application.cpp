@@ -360,7 +360,7 @@ CoordinateSystemManager* Application::getCoordinateSystemManager(void)
 {
 	if (coordinateSystemManager == nullptr)
 	{
-		coordinateSystemManager = new CoordinateSystemManager(this->getUiComponent(), this->getModelComponent(), getServiceID(), getServiceName());
+		coordinateSystemManager = new CoordinateSystemManager(this, getServiceID(), getServiceName());
 	}
 
 	return coordinateSystemManager;
