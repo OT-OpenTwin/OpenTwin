@@ -336,6 +336,7 @@ std::string StudioConnector::generateExtractScript(const std::string &studioPath
 		"\"	End If\\n\"\n"
 		"\"\\n\"\n"
 		"\"	While item <> \\\"\\\"\\n\"\n"
+		"\"	    On Error Resume Next\\n\"\n"
 		"\"		ExportSolidChildItem(item)\\n\"\n"
 		"\"		item = Resulttree.GetNextItemName(item)\\n\"\n"
 		"\"	Wend\\n\"\n"
