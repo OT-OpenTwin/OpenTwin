@@ -32,8 +32,7 @@ void MeshLineCalculator::updateMeshLines()
 	// Find the base step width
 	double baseStepWidth = std::min(maximumEdgeLength, geometryBoundingBox.getDiagonal() / stepsAlongDiagonal);
 	double geometryToleranceAbsolute = geometryTolerance * geometryBoundingBox.getDiagonal();
-	double smallestMeshStep = smallestCellRatio * baseStepWidth;
-	double maximumMeshRatio = 2.0;
+	double smallestMeshStep = baseStepWidth / maximumMeshRatio;
 
 	if (problemType != nullptr)
 	{
@@ -70,9 +69,18 @@ void MeshLineCalculator::updateMeshLines()
 	std::vector<double> meshLinesZ = determineMeshLines(finalFixPlanesZ, densityRangesZ);
 
 	// Equilibrate mesh to ensure smoothness and store the mesh lines in the arrays
-	meshCoords[0] = equilibrateMeshLines(meshLinesX, maximumMeshRatio);
-	meshCoords[1] = equilibrateMeshLines(meshLinesY, maximumMeshRatio);
-	meshCoords[2] = equilibrateMeshLines(meshLinesZ, maximumMeshRatio);
+	if (meshEqulibrationRatio > 0.0)
+	{
+		meshCoords[0] = equilibrateMeshLines(meshLinesX, meshEqulibrationRatio);
+		meshCoords[1] = equilibrateMeshLines(meshLinesY, meshEqulibrationRatio);
+		meshCoords[2] = equilibrateMeshLines(meshLinesZ, meshEqulibrationRatio);
+	}
+	else
+	{
+		meshCoords[0] = meshLinesX;
+		meshCoords[1] = meshLinesY;
+		meshCoords[2] = meshLinesZ;
+	}
 }
 
 BoundingBox MeshLineCalculator::calculateBoundingBox()

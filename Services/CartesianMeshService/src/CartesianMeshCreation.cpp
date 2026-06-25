@@ -149,6 +149,8 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 		EntityPropertiesBoolean *visualizeMatricesProperty = dynamic_cast<EntityPropertiesBoolean*>(getEntityMesh()->getProperties().getProperty("Visualize matrices"));
 		EntityPropertiesDouble* maximumFrequencyProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Maximum frequency"));
 		EntityPropertiesDouble* stepsPerWavelengthProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Steps per wavelength"));
+		EntityPropertiesDouble* meshStepRatioProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Smallest mesh step ratio"));
+		EntityPropertiesDouble* meshEquilibrationRatioProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Mesh equilibration ratio"));
 
 		double maximumEdgeLength = maximumEdgeLengthProperty->getValue();
 		double stepsAlongDiagonal = stepsAlongDiagonalProperty->getValue();
@@ -156,6 +158,9 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 		if (conformalMeshProperty != nullptr) conformalMeshing = conformalMeshProperty->getValue();
 		bool visualizeMatrices = false;
 		if (visualizeMatricesProperty != nullptr) visualizeMatrices = visualizeMatricesProperty->getValue();
+
+		double meshStepRatio = (meshStepRatioProperty != nullptr) ? meshStepRatioProperty->getValue() : 10.0;
+		double meshEquilibrationRatio = (meshEquilibrationRatioProperty != nullptr) ? meshEquilibrationRatioProperty->getValue() : 2.0;
 
 		ProblemType* problemType = nullptr;
 
@@ -278,7 +283,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 		// In a first step, we need to determine the mesh line distribution. 
 		setProgressInformation("Determine mesh line distribution", true);
 
-		EntityMeshCartesianData *meshData = determineMeshLines(allEntities, maximumEdgeLength, stepsAlongDiagonal, problemType);
+		EntityMeshCartesianData *meshData = determineMeshLines(allEntities, maximumEdgeLength, stepsAlongDiagonal, meshStepRatio, meshEquilibrationRatio, problemType);
 		newTopologyEntities.push_back(meshData);
 
 		meshData->setName(getEntityMesh()->getName() + "/Mesh");
@@ -742,7 +747,7 @@ std::list<ot::UID> CartesianMeshCreation::getAllGeometryEntitiesForMeshing(void)
 	return ot::json::getUInt64List(responseDoc, OT_ACTION_PARAM_MODEL_EntityIDList);
 }
 
-EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty, ProblemType *problemType)
+EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::list<EntityBase *> &meshEntities, double maximumEdgeLength, double stepsAlongDiagonalProperty, double meshStepRatio, double meshEquilibrationRatio, ProblemType *problemType)
 {
 	EntityMeshCartesianData *data = new EntityMeshCartesianData(0, nullptr, nullptr, nullptr);
 
@@ -751,6 +756,8 @@ EntityMeshCartesianData *CartesianMeshCreation::determineMeshLines(const std::li
 	lineCalculator.setMeshEntities(meshEntities);
 	lineCalculator.setMaximumEdgeLength(maximumEdgeLength);
 	lineCalculator.setStepsAlongDiagonal(stepsAlongDiagonalProperty);
+	lineCalculator.setMaximumMeshRatio(meshStepRatio);
+	lineCalculator.setMeshEqulibrationRatio(meshEquilibrationRatio);
 	lineCalculator.setProblemType(problemType);
 
 	lineCalculator.updateMeshLines();
