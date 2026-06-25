@@ -49,6 +49,7 @@ private:
 	const std::string m_rmdEntityName = "Campaign Metadata";
 
 	std::map<std::string, MetadataAssemblyData> getAllMetadataAssemblies();
+	void getAllMetadataAssemblies(std::map<std::string, MetadataAssemblyData>& _series, MetadataAssemblyData& _campaign);
 	void addRequiredTables(const MetadataAssemblyData& _dataAssembly, std::list<string>& _requiredTables);
 	void loadRequiredTables(std::list<string>& _requiredTables, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _loadedTables);
 
