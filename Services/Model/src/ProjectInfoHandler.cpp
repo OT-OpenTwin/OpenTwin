@@ -7,11 +7,16 @@
 
 std::optional<std::string> ProjectInfoHandler::getCollectionName(const std::string& _projectName)
 {
-	auto projectInfoCacheByName = m_projectInfoCacheByName.find(_projectName);
+	std::string projectName = _projectName;
+	if (EntityPropertiesProjectList::getCurrentProjectPlaceholder() == _projectName)
+	{
+		projectName = Application::instance()->getProjectName();
+	}
+	auto projectInfoCacheByName = m_projectInfoCacheByName.find(projectName);
 	if (projectInfoCacheByName == m_projectInfoCacheByName.end())
 	{
-		requestProjectInformation(_projectName);
-		projectInfoCacheByName = m_projectInfoCacheByName.find(_projectName);
+		requestProjectInformation(projectName);
+		projectInfoCacheByName = m_projectInfoCacheByName.find(projectName);
 	}
 
 	if (projectInfoCacheByName == m_projectInfoCacheByName.end())
@@ -26,12 +31,6 @@ std::optional<std::string> ProjectInfoHandler::getCollectionName(const std::stri
 
 void ProjectInfoHandler::requestProjectInformation(const std::string& _projectName)
 {
-	std::string projectName = _projectName;
-	if (EntityPropertiesProjectList::getCurrentProjectPlaceholder() == _projectName)
-	{
-		projectName = Application::instance()->getProjectName();
-	}
-
 	std::string authURL = Application::instance()->getAuthorizationUrl();
 	if (authURL.empty())
 	{
@@ -41,10 +40,8 @@ void ProjectInfoHandler::requestProjectInformation(const std::string& _projectNa
 	const std::string thisURL = Application::instance()->getServiceURL();
 
 	ot::JsonDocument docAuth;
-	ot::JsonArray arr(std::list<std::string>{ projectName }, docAuth.GetAllocator());
-	docAuth.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_INFO, docAuth.GetAllocator()), docAuth.GetAllocator());
-	docAuth.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, arr, docAuth.GetAllocator());
-	docAuth.AddMember(OT_ACTION_PARAM_Type, OT_ACTION_GET_ALL_PROJECT_INFO, docAuth.GetAllocator());
+	docAuth.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_USER_PROJECTS, docAuth.GetAllocator()), docAuth.GetAllocator());
+	docAuth.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectName, docAuth.GetAllocator()), docAuth.GetAllocator());
 	docAuth.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(Application::instance()->getDataBaseUserName(), docAuth.GetAllocator()), docAuth.GetAllocator());
 	docAuth.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(Application::instance()->getDataBaseUserPassword(), docAuth.GetAllocator()), docAuth.GetAllocator());
 	
@@ -54,15 +51,21 @@ void ProjectInfoHandler::requestProjectInformation(const std::string& _projectNa
 		ot::JsonDocument responseDoc;
 		responseDoc.fromJson(returnMsg);
 		auto allProjects = ot::json::getArray(responseDoc, OT_ACTION_PARAM_List);
-		if (allProjects.Size() == 1)
+		// The request just applies the name as a filter. Thus other projects that contain the project name will also be returned
+		bool projectFound = false;
+		for (uint32_t i = 0; i < allProjects.Size(); i++)
 		{
 			ot::ProjectInformation project;
-			project.setFromJsonObject(ot::json::getObject(allProjects, 0));
-			m_projectInfoCacheByName[_projectName] = project;
+			project.setFromJsonObject(ot::json::getObject(allProjects, i));
+			if (project.getProjectName() == _projectName)
+			{
+				m_projectInfoCacheByName[_projectName] = project;
+				projectFound = true;
+				break;
+			}
 		}
-		else
-		{
-			assert(allProjects.Size() == 0); // We only provide one project name, then only one piece of information should be returned.
+		if (!projectFound)
+		{	
 			OT_LOG_E("Failed to receive information about project: " + _projectName);
 		}
 	}

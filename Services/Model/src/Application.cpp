@@ -743,7 +743,7 @@ ot::ReturnMessage Application::handleVisualisationDataRequest(ot::JsonDocument& 
 		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
 	}
 	catch (std::exception& e) {
-		OT_LOG_W(e.what());
+		OT_LOG_E(e.what());
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 
