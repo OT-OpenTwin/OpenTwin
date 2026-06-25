@@ -345,45 +345,54 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				const bool hasRealValues = !curveData->getYreValues().empty();
 				const bool hasImValue = !curveData->getYimValues().empty();
 
-				std::unique_ptr<QuantityDescription> quantityDescription(nullptr);
-
-				// If values have an imaginary part, they shall be treated as complex numbers which are internally stored as a tuple
-				auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
 				
-				quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+				// If values have an imaginary part, they shall be treated as complex numbers which are internally stored as a tuple
+				auto quantityDescription(std::make_unique<QuantityDescriptionCurve>());
+				
 				size_t numberOfValues = hasRealValues ? curveData->getYreValues().size() : curveData->getYimValues().size();
 				assert(curveData->getYreValues().size() == curveData->getYimValues().size() || curveData->getYreValues().size() == 0 || curveData->getYimValues().size() == 0);
-				quantityDescriptionComplex->reserveDatapointSize(numberOfValues);
+				quantityDescription->reserveDatapointSize(numberOfValues);
 					
-				if (hasRealValues && hasImValue)
+				if (hasImValue)
 				{
-					for (size_t i = 0; i < numberOfValues; i++)
-					{
-						ot::Variable val(std::complex<double>(curveData->getYreValues()[i], curveData->getYimValues()[i]));
-						quantityDescriptionComplex->addDatapoint(std::move(val));
-					}
-				}
-				else
-				{
+					quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+				
 					if (hasRealValues)
 					{
 						for (size_t i = 0; i < numberOfValues; i++)
 						{
-							quantityDescriptionComplex->addDatapoint(curveData->getYreValues()[i]);
+							ot::Variable val(std::complex<double>(curveData->getYreValues()[i], curveData->getYimValues()[i]));
+							quantityDescription->addDatapoint(std::move(val));
 						}
 					}
 					else
 					{
-						assert(hasImValue);
 						for (size_t i = 0; i < numberOfValues; i++)
 						{
-							quantityDescriptionComplex->addDatapoint(curveData->getYimValues()[i]);
+							ot::Variable val(std::complex<double>(0, curveData->getYimValues()[i]));
+							quantityDescription->addDatapoint(std::move(val));
+						}
+					}					
+				}
+				else
+				{
+					quantityDescription->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), quantityUnit);
+					size_t numberOfValues = curveData->getYreValues().size();
+					quantityDescription->reserveDatapointSize(numberOfValues);
+					if (hasRealValues)
+					{
+						for (size_t i = 0; i < numberOfValues; i++)
+						{
+							quantityDescription->addDatapoint(ot::Variable(curveData->getYreValues()[i]));
 						}
 					}
+					else
+					{
+						assert(false);
+						continue;
+					}
 				}
-				quantityDescription.reset(quantityDescriptionComplex.release());
-				
-
+					
 				
 				if (quantityName.substr(0, 6) == "Tasks/") 
 				{
