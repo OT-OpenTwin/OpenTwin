@@ -26,7 +26,7 @@
 static ot::PropertyFactoryRegistrar<ot::PropertyStringList> propertyStringListRegistrar(ot::PropertyStringList::propertyTypeString());
 
 ot::PropertyStringList::PropertyStringList(const PropertyStringList* _other) 
-	: Property(_other), m_current(_other->m_current), m_list(_other->m_list)
+	: Property(_other), m_current(_other->m_current), m_options(_other->m_options)
 {}
 
 ot::PropertyStringList::PropertyStringList(const PropertyBase & _base)
@@ -41,28 +41,28 @@ ot::PropertyStringList::PropertyStringList(const std::string& _current, Property
 	: Property(_flags), m_current(_current) 
 {}
 
-ot::PropertyStringList::PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags)
-	: Property(_flags), m_current(_current), m_list(_list) 
-{}
-
-ot::PropertyStringList::PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags)
+ot::PropertyStringList::PropertyStringList(const std::string& _current, const std::list<std::string>& _options, PropertyFlags _flags)
 	: Property(_flags), m_current(_current)
 {
-	for (const std::string& s : _list) {
-		m_list.push_back(s);
-	}
+	this->setOptions(_options);
 }
 
-ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags)
-	: Property(_name, _flags), m_current(_current), m_list(_list)
-{}
+ot::PropertyStringList::PropertyStringList(const std::string& _current, const std::vector<std::string>& _options, PropertyFlags _flags)
+	: Property(_flags), m_current(_current)
+{
+	this->setOptions(_options);
+}
 
-ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags)
+ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _options, PropertyFlags _flags)
 	: Property(_name, _flags), m_current(_current)
 {
-	for (const std::string& s : _list) {
-		m_list.push_back(s);
-	}
+	this->setOptions(_options);
+}
+
+ot::PropertyStringList::PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _options, PropertyFlags _flags)
+	: Property(_name, _flags), m_current(_current)
+{
+	this->setOptions(_options);
 }
 
 void ot::PropertyStringList::mergeWith(const Property* _other, const MergeMode& _mergeMode) {
@@ -75,20 +75,68 @@ void ot::PropertyStringList::mergeWith(const Property* _other, const MergeMode& 
 		m_current = other->m_current;
 	}
 	if (_mergeMode & PropertyBase::MergeConfig) {
-		m_list = other->m_list;
+		m_options = other->m_options;
 	}
 }
 
-ot::Property* ot::PropertyStringList::createCopy(void) const {
+ot::Property* ot::PropertyStringList::createCopy() const {
 	return new PropertyStringList(this);
 }
 
+void ot::PropertyStringList::addOption(const std::string& _value, ValueHandlingType _type)
+{
+	m_options.push_back(std::make_pair(_value, _type));
+}
+
+void ot::PropertyStringList::setOptions(const std::list<std::string>& _options) {
+	m_options.clear();
+	m_options.reserve(_options.size());
+	for (const std::string& s : _options) {
+		m_options.push_back(std::make_pair(s, ValueHandlingType::Value));
+	}
+}
+
+void ot::PropertyStringList::setOptions(const std::vector<std::string>& _options) {
+	m_options.clear();
+	m_options.reserve(_options.size());
+	for (const std::string& s : _options) {
+		m_options.push_back(std::make_pair(s, ValueHandlingType::Value));
+	}
+}
+
 void ot::PropertyStringList::getPropertyData(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
-	_object.AddMember("List", JsonArray(m_list, _allocator), _allocator);
+	JsonArray optionsArr;
+	for (const auto& opt : m_options) {
+		JsonObject optObj;
+		optObj.AddMember("V", JsonString(opt.first, _allocator), _allocator);
+		optObj.AddMember("T", JsonString(toString(opt.second), _allocator), _allocator);
+		optionsArr.PushBack(optObj, _allocator);
+	}
+	_object.AddMember("Options", optionsArr, _allocator);
 	_object.AddMember("Current", JsonString(m_current, _allocator), _allocator);
 }
 
 void ot::PropertyStringList::setPropertyData(const ot::ConstJsonObject& _object) {
-	m_list = json::getStringList(_object, "List");
+	if (_object.HasMember("Options"))
+	{
+		const auto optionsArr = json::getObjectVector(_object, "Options");
+		m_options.clear();
+		m_options.reserve(optionsArr.size());
+
+		for (const ConstJsonObject& optObj : optionsArr)
+		{
+			std::string value = json::getString(optObj, "V");
+			ValueHandlingType type = stringToValueHandlingType(json::getString(optObj, "T"));
+			m_options.push_back(std::make_pair(value, type));
+		}
+	}
+	else
+	{
+		OTAssert(_object.HasMember("List"), "Invalid");
+		for (const std::string& optStr : json::getStringVector(_object, "List"))
+		{
+			m_options.push_back(std::make_pair(optStr, ValueHandlingType::Value));
+		}
+	}
 	m_current = json::getString(_object, "Current");
 }

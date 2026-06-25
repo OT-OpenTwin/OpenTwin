@@ -631,7 +631,6 @@ public:
 	void setSuffixOptions(const std::vector<std::string>& options);
 	const std::vector<std::string>& getSuffixOptions() const;
 
-
     virtual bool isCompatible(EntityPropertiesBase* other) const override;
     virtual bool hasSameValue(EntityPropertiesBase* other) const override;
 

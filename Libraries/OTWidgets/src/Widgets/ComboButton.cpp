@@ -56,6 +56,15 @@ ot::ComboButton::~ComboButton() {
 	delete m_menu;
 }
 
+void ot::ComboButton::addItem(const QString& _item) {
+	m_menu->addAction(_item);
+}
+
+void ot::ComboButton::addItem(const QString& _item, const QVariant& _userData) {
+	QAction* action = m_menu->addAction(_item);
+	action->setData(_userData);
+}
+
 void ot::ComboButton::setItems(const QStringList& _items) {
 	m_menu->clear();
 	for (const QString& itm : _items) {
@@ -71,11 +80,12 @@ void ot::ComboButton::slotActionTriggered(QAction* _action) {
 	OTAssertNullptr(_action);
 	if (_action->text() != this->text()) {
 		this->setText(_action->text());
-		Q_EMIT textChanged();
+		m_currentUserData = _action->data();
+		Q_EMIT selectedItemChanged();
 	}
 }
 
-void ot::ComboButton::ini(void) {
+void ot::ComboButton::ini() {
 	this->setObjectName("OT_ComboButton");
 
 	this->setMenu(m_menu);

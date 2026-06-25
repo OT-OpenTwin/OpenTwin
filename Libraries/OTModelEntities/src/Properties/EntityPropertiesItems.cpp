@@ -858,9 +858,9 @@ void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _proper
 	m_value = actualProperty->getCurrent();
 
 	m_options.clear();
-	for (const std::string& s : actualProperty->getList())
+	for (const auto& opt : actualProperty->getOptions())
 	{
-		m_options.push_back(s);
+		m_options.push_back(opt.first);
 	}
 }
 

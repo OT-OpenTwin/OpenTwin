@@ -30,28 +30,31 @@
 
 #pragma warning(disable:4251)
 
-namespace ot {
+namespace ot
+{
 
 	//! @class PropertyBase
 	//! @brief The PropertyBase class is used to hold general Property information.
-	class OT_GUI_API_EXPORT PropertyBase : public Serializable {
+	class OT_GUI_API_EXPORT PropertyBase : public Serializable
+	{
 		OT_DECL_DEFCOPY(PropertyBase)
 		OT_DECL_DEFMOVE(PropertyBase)
 	public:
 		//! @enum PropertyFlag
 		//! @brief The PropertyFlag enum contains different settings for properties.
-		enum PropertyFlag {
-			NoFlags             = 0 << 0, //! @brief No property flags set
-			IsReadOnly          = 1 << 0, //! @brief Property is read only
-			IsProtected         = 1 << 1, //! @brief Property is protected
-			IsHidden            = 1 << 2, //! @brief Property is hidden to the user
-			HasMultipleValues   = 1 << 3, //! @brief Property has multiple values
-			HasInputError       = 1 << 4, //! @brief The value is invalid
-			IsDeletable         = 1 << 5, //! @brief Property is deletable
-			AllowCustomValues   = 1 << 6, //! @brief User may set user values (e.g. in the StringListProperty)
+		enum PropertyFlag
+		{
+			NoFlags = 0 << 0, //! @brief No property flags set
+			IsReadOnly = 1 << 0, //! @brief Property is read only
+			IsProtected = 1 << 1, //! @brief Property is protected
+			IsHidden = 1 << 2, //! @brief Property is hidden to the user
+			HasMultipleValues = 1 << 3, //! @brief Property has multiple values
+			HasInputError = 1 << 4, //! @brief The value is invalid
+			IsDeletable = 1 << 5, //! @brief Property is deletable
+			AllowCustomValues = 1 << 6, //! @brief User may set user values (e.g. in the StringListProperty)
 			AllowMultiselection = 1 << 7, //! @brief User may select multiple values (e.g. in the StringListProperty)
-			GroupChanges        = 1 << 8, //! @brief If enabled the changes of this and other properties after will be grouped.
-			NoSerialize         = 1 << 9  //! @brief Property will not be concidered when serializing parent object.
+			GroupChanges = 1 << 8, //! @brief If enabled the changes of this and other properties after will be grouped.
+			NoSerialize = 1 << 9  //! @brief Property will not be concidered when serializing parent object.
 		};
 
 		//! @typedef PropertyFlags
@@ -59,7 +62,8 @@ namespace ot {
 		typedef Flags<PropertyFlag> PropertyFlags;
 
 		//! @brief Merge mode used when merging with other property manager.
-		enum MergeFlag {
+		enum MergeFlag
+		{
 			NoMerge = 0 << 0, //! @brief No merge flags.
 			MergeValues = 1 << 0, //! @brief Merge values.
 			MergeConfig = 1 << 1, //! @brief Merge configuration (e.g. Flags, Name, ...).
@@ -69,6 +73,12 @@ namespace ot {
 			FullMerge = MergeValues | MergeConfig | AddMissing
 		};
 		typedef Flags<MergeFlag> MergeMode;
+
+		enum ValueHandlingType : uint32_t
+		{
+			Value, //! @brief The value is handled as a value.
+			Action //! @brief The value is handled as an action (e.g. a button).
+		};
 
 		//! @brief Creates a string representation of the provided PropertyFlag.
 		static std::string toString(PropertyFlag _flag);
@@ -81,6 +91,12 @@ namespace ot {
 
 		//! @brief Returns the PropertyFlags that are represented by the string list.
 		static PropertyFlags stringListToFlags(const std::list<std::string>& _flags);
+
+		static std::string toString(ValueHandlingType _type);
+
+		static ValueHandlingType stringToValueHandlingType(const std::string& _type);
+
+		// ###########################################################################################################################################################################################################################################################################################################################
 
 		//! @brief Default constructor.
 		//! @param _flags Intially set flags.
@@ -116,9 +132,9 @@ namespace ot {
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
-		
+
 		void setPropertyName(const std::string& _name) { m_name = _name; };
-		const std::string& getPropertyName(void) const { return m_name; };
+		const std::string& getPropertyName() const { return m_name; };
 
 		//! @brief Set the property title
 		//! If no title set the name will be used as title
@@ -126,32 +142,36 @@ namespace ot {
 
 		//! @brief Property title
 		//! If no title set the name will be used as title
-		const std::string& getPropertyTitle(void) const { return (m_title.empty() ? m_name : m_title); };
+		const std::string& getPropertyTitle() const { return (m_title.empty() ? m_name : m_title); };
 
 		void setPropertyTip(const std::string& _tip) { m_tip = _tip; };
-		std::string& getPropertyTip(void) { return m_tip; };
-		const std::string& getPropertyTip(void) const { return m_tip; };
+		std::string& getPropertyTip() { return m_tip; };
+		const std::string& getPropertyTip() const { return m_tip; };
 
 		void setPropertyFlag(PropertyFlag _flag, bool _active = true) { m_flags.set(_flag, _active); };
 		void setPropertyFlags(PropertyFlags _flags) { m_flags = _flags; };
-		PropertyFlags& getPropertyFlags(void) { return m_flags; };
-		const PropertyFlags& getPropertyFlags(void) const { return m_flags; };
+		PropertyFlags& getPropertyFlags() { return m_flags; };
+		const PropertyFlags& getPropertyFlags() const { return m_flags; };
+
+		void setCurrentValueHandlingType(ValueHandlingType _type) { m_currentValueHandlingType = _type; };
+		ValueHandlingType getCurrentValueHandlingType() const { return m_currentValueHandlingType; };
 
 		void setSpecialType(const std::string& _type) { m_specialType = _type; };
-		const std::string& getSpecialType(void) const { return m_specialType; };
+		const std::string& getSpecialType() const { return m_specialType; };
 
 		void addAdditionalPropertyData(const std::string& _key, const std::string& _data) { m_data.insert_or_assign(_key, _data); };
 		void setAdditionalPropertyData(const std::map<std::string, std::string>& _data) { m_data = _data; };
-		const std::map<std::string, std::string>& getAllAdditionalPropertyData(void) const { return m_data; };
+		const std::map<std::string, std::string>& getAllAdditionalPropertyData() const { return m_data; };
 		std::string getAdditionalPropertyData(const std::string& _key) const;
 
 	private:
-		std::string                        m_tip;         //! @brief ToolTip.
-		std::string                        m_name;        //! @brief Property name.
-		std::string                        m_title;       //! @brief Property title.
-		std::string                        m_specialType; //! @brief Special type identifier.
-		std::map<std::string, std::string> m_data;        //! @brief Additional data.
-		PropertyFlags                      m_flags;       //! @brief Flags.
+		std::string                        m_tip;                      //! @brief ToolTip.
+		std::string                        m_name;                     //! @brief Property name.
+		std::string                        m_title;                    //! @brief Property title.
+		std::string                        m_specialType;              //! @brief Special type identifier.
+		std::map<std::string, std::string> m_data;                     //! @brief Additional data.
+		PropertyFlags                      m_flags;                    //! @brief Flags.
+		ValueHandlingType                  m_currentValueHandlingType; //! @brief Current value handling type.
 	};
 
 }

@@ -59,6 +59,7 @@ namespace ot {
 
 	private:
 		QString m_currentText;
+		PropertyBase::ValueHandlingType m_currentValueHandlingType;
 		QWidget* m_parentWidget;
 		ComboBox* m_comboBox;
 		ComboButton* m_comboButton;

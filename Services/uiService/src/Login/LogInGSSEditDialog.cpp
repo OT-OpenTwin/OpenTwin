@@ -113,7 +113,7 @@ LogInGSSEditDialogEntry::LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, Lo
 	this->connect(m_name, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_url, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(m_port, &ot::LineEdit::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
-	this->connect(m_loginType, &ot::ComboButton::textChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
+	this->connect(m_loginType, &ot::ComboButton::selectedItemChanged, this, &LogInGSSEditDialogEntry::slotDataChanged);
 	this->connect(table, &QTableWidget::itemPressed, this, &LogInGSSEditDialogEntry::slotDeleteItem);
 
 	updateErrorState();

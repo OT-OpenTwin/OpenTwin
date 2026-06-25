@@ -41,18 +41,24 @@ namespace ot {
 
 		virtual void mousePressEvent(QMouseEvent* _event) override;
 
+		void addItem(const QString& _item);
+		void addItem(const QString& _item, const QVariant& _userData);
 		void setItems(const QStringList& _items);
 
+		void setCurrentUserData(const QVariant& _userData) { m_currentUserData = _userData; };
+		const QVariant& getCurrentUserData() const { return m_currentUserData; };
+
 	Q_SIGNALS:
-		void textChanged();
+		void selectedItemChanged();
 
 	private Q_SLOTS:
 		void slotActionTriggered(QAction* _action);
 
 	private:
-		void ini(void);
+		void ini();
 
 		QMenu* m_menu;
+		QVariant m_currentUserData;
 	};
 
 }
