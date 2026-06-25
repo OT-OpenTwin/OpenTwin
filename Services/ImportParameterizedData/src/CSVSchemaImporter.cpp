@@ -196,7 +196,11 @@ void CSVSchemaImporter::execute()
 			}
 			newEntityInfos = ot::NewModelStateInfo();
 		}
-
+		/*double extenderMB = double(resultCollectionExtender.getMemSize()) / (1024 * 1024);
+		double campaignMB = double(resultCollectionExtender.getMetadataCampaign().getMemSize()) / (1024 * 1024);
+	
+		OT_USER_LOG_I("Extender mem MB: " + std::to_string(extenderMB));
+		OT_USER_LOG_I("Campaign mem MB: " + std::to_string(campaignMB));*/
 		updater.triggerUpdate(counter);
 		counter++;
 	}

@@ -377,7 +377,8 @@ void ResultCollectionExtender::addMetadataToSeries(std::list<DatasetDescription>
 			auto uniqueParameter = uniqueParameters.find(parameter.parameterUID);
 			if (uniqueParameter == uniqueParameters.end())
 			{
-				MetadataParameter newParameter(parameter);
+				MetadataParameter newParameter;
+				newParameter.copyWithoutValues(parameter);
 				uniqueParameters[parameter.parameterUID] = std::move(newParameter);
 			}
 		}

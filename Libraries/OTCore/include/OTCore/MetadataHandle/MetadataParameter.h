@@ -42,7 +42,7 @@ public:
 	MetadataParameter& operator=(const MetadataParameter& _other);
 	MetadataParameter& operator=(MetadataParameter&& _other);
 	void swap(MetadataParameter& _origin, MetadataParameter& _target) noexcept;
-
+	void copyWithoutValues(const MetadataParameter& _other);
 	//Unique name
 	std::string parameterName = "";
 

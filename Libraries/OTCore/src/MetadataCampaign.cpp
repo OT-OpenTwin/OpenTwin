@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
 #include "OTCore/MetadataHandle/Helper.h"
-
+#include "OTCore/Logging/Logger.h"
 // std header
 #include <cassert>
 
@@ -247,11 +247,16 @@ size_t MetadataCampaign::getMemSize()
 	total += ot::stringHeapSize(m_campaignName);
 
 	// --- std::list<MetadataSeries> m_seriesMetadata ---
+	size_t seriesMemPart = 0;
 	for (MetadataSeries& s : m_seriesMetadata)
 	{
-		total += s.getMemSize();        // full object footprint incl. sizeof(MetadataSeries)
-		total += 2 * sizeof(void*);     // list node prev/next pointers
+		seriesMemPart += s.getMemSize();        // full object footprint incl. sizeof(MetadataSeries)
+		seriesMemPart += 2 * sizeof(void*);     // list node prev/next pointers
 	}
+
+	double seriesMemPartMB = seriesMemPart / (1024 * 1024);
+	OT_USER_LOG_I("Series Mem in MB: " + std::to_string(seriesMemPartMB));
+	total += seriesMemPart;
 
 	// --- std::map<ot::UID, MetadataQuantity> m_quantityOverviewByUID ---
 	// Each std::map node is a heap-allocated red-black tree node containing:

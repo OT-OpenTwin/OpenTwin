@@ -81,3 +81,13 @@ void MetadataParameter::swap(MetadataParameter& _origin, MetadataParameter& _tar
 	std::swap(_origin.values, _target.values);
 	_origin.metaData.Swap(_target.metaData);
 }
+
+void MetadataParameter::copyWithoutValues(const MetadataParameter& _other)
+{
+	parameterName = (_other.parameterName);
+	parameterLabel = (_other.parameterLabel);
+	parameterUID = (_other.parameterUID);
+	unit = (_other.unit);
+	typeName = (_other.typeName);
+	metaData.CopyFrom(_other.metaData, metaData.GetAllocator());
+}
