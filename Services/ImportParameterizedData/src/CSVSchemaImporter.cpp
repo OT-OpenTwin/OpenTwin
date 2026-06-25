@@ -136,12 +136,12 @@ void CSVSchemaImporter::execute()
 	{
 		modelStateMessageBase = "Files: ";
 	}
-	for (auto& csvFile : csvFiles)
+	for (auto csvFile = csvFiles.begin(); csvFile != csvFiles.end();)
 	{
 		// First we assemble the information for the newly created series
-		std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, csvFile.get());
-		std::string seriesName = createSeriesName(csvFile->getName(), existingDatasetNames, *csvDatasetImporter.get());
-		std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *csvFile.get());
+		std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
+		std::string seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
+		std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
 		ot::UID seriesUID;
 		if (!extractedMetadata.has_value())
 		{
@@ -167,9 +167,9 @@ void CSVSchemaImporter::execute()
 				resultCollectionExtender.processDataPoints(&dataset, seriesUID);
 			}
 			// Since the import was successfull, we need to set the flag in the csv file, so it is not being imported again
-			csvFile->setConsiderForRefinement(false);
-			csvFile->storeToDataBase();
-			newEntityInfos.addTopologyEntity(*csvFile.get());
+			(*csvFile)->setConsiderForRefinement(false);
+			(*csvFile)->storeToDataBase();
+			newEntityInfos.addTopologyEntity(*(*csvFile).get());
 		}
 		catch (std::exception& e)
 		{
@@ -201,6 +201,8 @@ void CSVSchemaImporter::execute()
 	
 		OT_USER_LOG_I("Extender mem MB: " + std::to_string(extenderMB));
 		OT_USER_LOG_I("Campaign mem MB: " + std::to_string(campaignMB));*/
+		csvFile = csvFiles.erase(csvFile);
+		
 		updater.triggerUpdate(counter);
 		counter++;
 	}
