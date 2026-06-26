@@ -22,8 +22,8 @@
 
 #include "OTModelEntities/EntityVis2D3D.h"
 #include "OTModelEntities/EntityResultBase.h"
-#include "OTModelEntities/Properties/PropertyBundleScaling.h"
-#include "OTModelEntities/Properties/PropertyBundleVisUnstructuredScalarSurface.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleScaling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleVisUnstructuredScalarSurface.h"
 
 #include <list>
 

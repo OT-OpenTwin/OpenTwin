@@ -22,7 +22,7 @@
 // OpenTwin header
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
-#include "OTModelEntities/Properties/PropertyBundleDataLakeQuery.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataLakeQuery.h"
 #include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
 
 class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public ot::EntityBlockPipelineBase

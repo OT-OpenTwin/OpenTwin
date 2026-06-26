@@ -23,9 +23,9 @@
 #include "VtkDriverWithScaling.h"
 #include "vtkRectilinearGrid.h"
 #include "OTModelEntities/EntityResultBase.h"
-#include "OTModelEntities/Properties/PropertyBundleDataHandlePlane.h"
-#include "OTModelEntities/Properties/PropertyBundleDataHandleScaling.h"
-#include "OTModelEntities/Properties/PropertyBundleDataHandleVisVectorVolumeComplex.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataHandlePlane.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataHandleVisVectorVolumeComplex.h"
 #include "DataSourceVtkComplex.h"
 
 #include <string>

@@ -6,7 +6,7 @@
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/IEventHandler.h"
-#include "OTModelEntities/Properties/PropertyBundleEventHandling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleEventHandling.h"
 #include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 
