@@ -43,10 +43,12 @@ class ProblemType;
 #include <map>
 #include <ctime>
 #include <algorithm>
+#include <cmath>
 
 #include <embree3/rtcore.h>
 
 #include "CartesianMeshMaterial.h"
+#include "Vector3.h"
 
 class CartesianMeshFillFront
 {
@@ -206,46 +208,6 @@ private:
 	std::list<CartesianMeshBoundaryFaceConformal *> facets;
 };
 
-class vector3
-{
-public:
-	vector3() : x(0.0), y(0.0), z(0.0) {};
-	~vector3() {};
-
-	void setX(float v) { x = v; }
-	void setY(float v) { y = v; }
-	void setZ(float v) { z = v; }
-
-	float getX(void) const { return x; }
-	float getY(void) const { return y; }
-	float getZ(void) const { return z; }
-
-	float dot(const vector3 &other) const { return x * other.x + y * other.y + z * other.z; }
-
-	vector3 operator+(const vector3 &other) const
-	{
-		vector3 result;
-		result.x = x + other.x;
-		result.y = y + other.y;
-		result.z = z + other.z;
-		return result;
-	}
-
-	vector3 operator-(const vector3 &other) const
-	{
-		vector3 result;
-		result.x = x - other.x;
-		result.y = y - other.y;
-		result.z = z - other.z;
-		return result;
-	}
-
-private:
-	float x, y, z;
-};
-
-vector3 operator*(float lhs, const vector3 &rhs);
-
 class MeshGeometryItem
 {
 public:
@@ -349,8 +311,6 @@ private:
 	void copyGeometryEntities(std::list<EntityGeometry*>& geometryEntities, std::list<EntityBase*>& entityList, const std::string &meshName);
 	bool meshNeedsUpdating(EntityBase* mesh, const std::list<std::pair<ot::UID, ot::UID>>& currentInputDependencyList);
 	void addToOutputDependencies(const std::list<ot::UID>& entityIDList, const std::list<ot::UID>& entityVersionList, std::list<std::pair<ot::UID, ot::UID>>& outputDependencyList);
-	bool shrinkTriangle(float nodes[3][3], float delta);
-	bool offsetTriangleOppositeNormal(float nodes[3][3], float delta);
 
 	enum lockType {ANY_OPERATION, MODEL_CHANGE};
 	void setUILock(bool flag, lockType type);

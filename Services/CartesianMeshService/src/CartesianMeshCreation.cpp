@@ -24,6 +24,7 @@
 #include "MeshLineCalculator.h"
 #include "ProblemType.h"
 #include "ProblemTypeElectromagneticHF.h"
+#include "WeldedMesh.h"
 
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -59,15 +60,6 @@
 
 #undef max
 #undef min
-
-vector3 operator*(float lhs, const vector3 &rhs)
-{
-	vector3 result;
-	result.setX(lhs * rhs.getX());
-	result.setY(lhs * rhs.getY());
-	result.setZ(lhs * rhs.getZ());
-	return result;
-}
 
 CartesianMeshCreation::CartesianMeshCreation() :
 	application(nullptr),
@@ -1147,34 +1139,33 @@ void CartesianMeshCreation::fillSingleShape(EntityGeometry *shape, std::vector<E
 	double lengthY = meshData->getMeshLinesY()[meshData->getNumberLinesY() - 1] - meshData->getMeshLinesY()[0];
 	double lengthZ = meshData->getMeshLinesZ()[meshData->getNumberLinesZ() - 1] - meshData->getMeshLinesZ()[0];
 
-	double meshLineTolerance = meshData->getSmallestStepWidth() * 0.01;
-
-	double lengthDiag = sqrt(lengthX * lengthX + lengthY * lengthY + lengthZ * lengthZ);
-	float delta = (float) (1e-6 * lengthDiag);
+	double meshLineTolerance = meshData->getSmallestStepWidth() * 0.2;
+	float delta = (float) (0.01 * meshLineTolerance);
+	float weldTol = (float) (1e-4 * meshData->getSmallestStepWidth());
 
 	CartesianMeshTree meshTree;
 
-	for (auto &triangle : facetData->getTriangleList())
+	WeldedMesh mesh(facetData, (float) weldTol);
+
+	// We move the mesh nodes a little bit in the opposite normal direction. This is necessary to avoid filling neighboring voxels as well.
+	mesh.computeVertexNormals();
+	mesh.movePointsInward((float) meshLineTolerance);
+
+	for (auto &triangle : mesh.getTriangles())
 	{
 		float nodes[3][3];
-
-		nodes[0][0] = (float) facetData->getNodeVector()[triangle.getNode(0)].getCoord(0);
-		nodes[0][1] = (float) facetData->getNodeVector()[triangle.getNode(0)].getCoord(1);
-		nodes[0][2] = (float) facetData->getNodeVector()[triangle.getNode(0)].getCoord(2);
-
-		nodes[1][0] = (float) facetData->getNodeVector()[triangle.getNode(1)].getCoord(0);
-		nodes[1][1] = (float) facetData->getNodeVector()[triangle.getNode(1)].getCoord(1);
-		nodes[1][2] = (float) facetData->getNodeVector()[triangle.getNode(1)].getCoord(2);
-
-		nodes[2][0] = (float) facetData->getNodeVector()[triangle.getNode(2)].getCoord(0);
-		nodes[2][1] = (float) facetData->getNodeVector()[triangle.getNode(2)].getCoord(1);
-		nodes[2][2] = (float) facetData->getNodeVector()[triangle.getNode(2)].getCoord(2);
-
-		// We reduce the size of the triangle a bit and move it in the opposite normal direction. This is necessary to avoid
-		// filling neighboring voxels as well.
-
-		shrinkTriangle(nodes, (float) meshLineTolerance);
-		offsetTriangleOppositeNormal(nodes, (float) meshLineTolerance);
+			
+		nodes[0][0] = (float) mesh.getPoints()[triangle.node[0]].getX();
+		nodes[0][1] = (float) mesh.getPoints()[triangle.node[0]].getY();
+		nodes[0][2] = (float) mesh.getPoints()[triangle.node[0]].getZ();
+								 
+		nodes[1][0] = (float) mesh.getPoints()[triangle.node[1]].getX();
+		nodes[1][1] = (float) mesh.getPoints()[triangle.node[1]].getY();
+		nodes[1][2] = (float) mesh.getPoints()[triangle.node[1]].getZ();
+								 
+		nodes[2][0] = (float) mesh.getPoints()[triangle.node[2]].getX();
+		nodes[2][1] = (float) mesh.getPoints()[triangle.node[2]].getY();
+		nodes[2][2] = (float) mesh.getPoints()[triangle.node[2]].getZ();
 
 		float xmin = std::min(nodes[0][0], std::min(nodes[1][0], nodes[2][0]));
 		float ymin = std::min(nodes[0][1], std::min(nodes[1][1], nodes[2][1]));
@@ -1186,7 +1177,7 @@ void CartesianMeshCreation::fillSingleShape(EntityGeometry *shape, std::vector<E
 
 		meshTree.renderTriangle(nodes, xmin, xmax, ymin, ymax, zmin, zmax, shapeFill, my, mz,
 							    meshData->getMeshLinesX(), meshData->getMeshLinesY(), meshData->getMeshLinesZ(),
-								0, nx-1, 0, ny-1, 0, nz-1, delta, triangleInCellInformation, triangle, shape);
+								0, nx-1, 0, ny-1, 0, nz-1, delta, triangleInCellInformation, *(triangle.triangle), shape);
 
 		shapeXmin = std::min(shapeXmin, xmin);
 		shapeXmax = std::max(shapeXmax, xmax);
@@ -1258,79 +1249,6 @@ void CartesianMeshCreation::fillSingleShape(EntityGeometry *shape, std::vector<E
 			}
 		}
 	}
-}
-
-bool CartesianMeshCreation::shrinkTriangle(float nodes[3][3], float delta)
-{
-	float c[3] = { 0,0,0 };
-
-	// Centroid
-	for (int i = 0; i < 3; ++i)
-		for (int d = 0; d < 3; ++d)
-			c[d] += nodes[i][d] / 3.0f;
-
-	float newNodes[3][3];
-
-	for (int i = 0; i < 3; ++i)
-	{
-		float vx = c[0] - nodes[i][0];
-		float vy = c[1] - nodes[i][1];
-		float vz = c[2] - nodes[i][2];
-
-		float len = std::sqrt(vx * vx + vy * vy + vz * vz);
-
-		if (len <= 1e-14)
-			return false;
-
-		// Move vertex towards the centroid
-		float move = std::min(delta, len);
-
-		newNodes[i][0] = nodes[i][0] + move * vx / len;
-		newNodes[i][1] = nodes[i][1] + move * vy / len;
-		newNodes[i][2] = nodes[i][2] + move * vz / len;
-	}
-
-	for (int i = 0; i < 3; ++i)
-		for (int d = 0; d < 3; ++d)
-			nodes[i][d] = newNodes[i][d];
-
-	return true;
-}
-
-bool CartesianMeshCreation::offsetTriangleOppositeNormal(float nodes[3][3], float delta)
-{
-	// Edge vectors
-	float ux = nodes[1][0] - nodes[0][0];
-	float uy = nodes[1][1] - nodes[0][1];
-	float uz = nodes[1][2] - nodes[0][2];
-
-	float vx = nodes[2][0] - nodes[0][0];
-	float vy = nodes[2][1] - nodes[0][1];
-	float vz = nodes[2][2] - nodes[0][2];
-
-	// Normal = u x v
-	float nx = uy * vz - uz * vy;
-	float ny = uz * vx - ux * vz;
-	float nz = ux * vy - uy * vx;
-
-	float len = std::sqrt(nx * nx + ny * ny + nz * nz);
-
-	if (len < 1e-14)
-		return false;
-
-	nx /= len;
-	ny /= len;
-	nz /= len;
-
-	// Move all nodes opposite to the normal
-	for (int i = 0; i < 3; ++i)
-	{
-		nodes[i][0] -= delta * nx;
-		nodes[i][1] -= delta * ny;
-		nodes[i][2] -= delta * nz;
-	}
-
-	return true;
 }
 
 void CartesianMeshCreation::fillSingleShapeVolume(size_t nx, size_t ny, size_t nz, std::vector<char> &shapeFill, EntityFacetData *facetData,
