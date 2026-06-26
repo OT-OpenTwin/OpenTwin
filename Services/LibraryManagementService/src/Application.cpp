@@ -580,7 +580,7 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 					}
 					else {
 						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
-						lastResult.existingElement.reset();
+						lastResult.existingElement = std::make_shared<ot::UserLibraryElement>(existingUserElement);
 					}
 				}
 				else {
@@ -595,7 +595,7 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 					}
 					else {
 						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
-						lastResult.existingElement.reset();
+						lastResult.existingElement = std::make_shared<ot::LibraryElement>(existingElement);
 					}
 				}
 			}
@@ -639,7 +639,7 @@ void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement
 
 		// Set the new version in the model
 		model->setVersion(newVersion);
-
+	
 		// Migrate/update data to GridFS
 		if (!existingDocJson.empty()) {
 			// Update existing data to GridFS and update metadata (version, hash)

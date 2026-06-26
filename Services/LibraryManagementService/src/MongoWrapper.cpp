@@ -336,6 +336,9 @@ std::string MongoWrapper::updateGridFSAndMetadata(const std::string& _collection
         originInfoBuilder.append(bsoncxx::builder::basic::kvp("fileName", _element.getFileName()));
         updateBuilder.append(bsoncxx::builder::basic::kvp("originInformation", originInfoBuilder));
 
+		// update LibraryElementID
+		updateBuilder.append(bsoncxx::builder::basic::kvp("LibraryElementID", static_cast<int64_t>(_element.getLibraryElementID())));
+
         // Update metaData
         const auto& metaData = _element.getMetaData();
         if (!metaData.empty()) {
