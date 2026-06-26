@@ -32,6 +32,7 @@
 #include "UserManagement.h"
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
+#include "StatusBarManager.h"
 #include "ProjectManagement.h"
 #include "NavigationTreeView.h"
 #include "Component/DevLogger.h"
@@ -217,7 +218,7 @@ AppBase::AppBase() :
 	m_state(AppState::NoState),
 	m_welcomeScreen(nullptr),
 	m_ttb(nullptr),
-	m_logIntensity(nullptr),
+	m_statusBar(nullptr),
 	m_lastFocusedView(nullptr),
 	m_lastFocusedCentralView(nullptr),
 	m_defaultView(nullptr),
@@ -932,30 +933,18 @@ void AppBase::createUi() {
 	// From this point on exceptions can be displayed in a message box since the UI is created
 	try {
 		try {
+			m_statusBar = new StatusBarManager(this->mainWindow());
+
 			OT_LOG_D("Creating UI");
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize Wrapper");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 1);
-			uiAPI::window::setStatusLabelVisible(m_mainWindow);
-			uiAPI::window::setStatusProgressVisible(m_mainWindow);
-			
+
 			// ########################################################################
 
 			// Setup UI
 			
 			uiAPI::window::addEventHandler(m_mainWindow, this);
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Setup tab toolbar");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 5);
-
 			ak::aWindowManager* windowManager = uiAPI::object::get<ak::aWindowManager>(m_mainWindow);
 			OTAssertNullptr(windowManager);
-
-			ot::Label* logIntensityL = new ot::Label("Log Intensity:", windowManager->window()->statusBar());
-			m_logIntensity = new ot::Label(windowManager->window()->statusBar());
-			this->updateLogIntensityInfo();
-
-			windowManager->window()->statusBar()->addPermanentWidget(logIntensityL);
-			windowManager->window()->statusBar()->addPermanentWidget(m_logIntensity);
 
 			// #######################################################################
 
@@ -967,9 +956,6 @@ void AppBase::createUi() {
 			}
 
 			Q_EMIT toolBarAvailable(m_ttb);
-
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Create docks");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 15);
 
 			// #######################################################################
 
@@ -1023,9 +1009,6 @@ void AppBase::createUi() {
 
 			m_graphicsPickerManager.setPicker(m_graphicsPicker->getGraphicsPicker());
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Create widgets");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 20);
-
 			// #######################################################################
 
 			// Create widgets
@@ -1061,15 +1044,7 @@ void AppBase::createUi() {
 			m_output->getPlainTextEdit()->setReadOnly(true);
 			m_output->getPlainTextEdit()->setAutoScrollToBottomEnabled(true);
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Set widgets to docks");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 25);
 			m_welcomeScreen->slotRefreshProjectList();
-
-			// #######################################################################
-
-			// Set widgets to docks
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Display docks");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 30);
 
 			// #######################################################################
 
@@ -1096,9 +1071,6 @@ void AppBase::createUi() {
 			//uiAPI::window::setCentralWidget(m_mainWindow, m_oldWelcomeScreen->widget());
 			//uiAPI::window::setCentralWidget(m_mainWindow, m_widgets.welcomeScreen);
 			m_widgetIsWelcome = true;
-
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Finalize wrapper");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 35);
 
 			// #######################################################################
 
@@ -1128,11 +1100,6 @@ void AppBase::createUi() {
 			
 			// #######################################################################
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Initialize viewer component");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 70);
-
-			// #######################################################################
-
 			// Create the viewer component
 			OT_LOG_D("Creating viewer component");
 
@@ -1156,9 +1123,6 @@ void AppBase::createUi() {
 
 			m_viewerComponent->setFontPath(fontPath);
 
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Finalize UI");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 90);
-			
 			m_contextMenuManager.initialize(this);
 
 			// #######################################################################
@@ -1184,13 +1148,13 @@ void AppBase::createUi() {
 			lockManager->uiElementCreated(this->getBasicServiceInformation(), m_projectNavigation->getTree(), f);
 
 			// Update status
-			uiAPI::window::setStatusLabelText(m_mainWindow, "Done");
-			uiAPI::window::setStatusProgressValue(m_mainWindow, 100);
-			uiAPI::window::setStatusLabelVisible(m_mainWindow, false);
-			uiAPI::window::setStatusProgressVisible(m_mainWindow, false);
-
 			uiAPI::setSurfaceFormatDefaultSamplesCount(4);
 			OT_LOG_D("UI creation completed");
+
+			// Display logged in user state
+			m_statusBar->get()->showStateMessage("Logged in as: " + QString::fromStdString(m_loginData.getUserName()));
+			m_statusBar->get()->hideStateMessageDelayed(10000);
+			m_loginData.getUserName();
 		}
 		catch (const aException & e) {
 			throw aException(e, "ini()");
@@ -1529,6 +1493,7 @@ void AppBase::restoreSessionState() {
 		OT_LOG_W("No project type set. Ignoring");
 		return;
 	}
+	OT_LOG_I("X: Restoring session state");
 
 	UserManagement uM(m_loginData);
 
@@ -1615,32 +1580,12 @@ ot::PropertyGridCfg AppBase::getSettingsFromDataBase(const std::string& _subKey)
 }
 
 void AppBase::updateLogIntensityInfo() {
-	ot::LogFlags flags = ot::LogDispatcher::instance().getLogFlags();
-
-	std::string info = "Currently enabled log flags:";
-
-	if (flags & ot::INFORMATION_LOG) info.append("\n - Info");
-	if (flags & ot::DETAILED_LOG) info.append("\n - Detailed Info");
-	if (flags & ot::WARNING_LOG) info.append("\n - Warning");
-	if (flags & ot::ERROR_LOG) info.append("\n - Error");
-	if (flags & ot::ALL_INCOMING_MESSAGE_LOG_FLAGS) info.append("\n - Inbound Messages");
-	if (flags & ot::ALL_OUTGOING_MESSAGE_LOG_FLAGS) info.append("\n - Outbound Messages");
-	if (flags & ot::TEST_LOG) info.append("\n - Testing");
-
-	if (flags == ot::NO_LOG) {
-		// NONE
-		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/NoLogging.png"));
-		m_logIntensity->setToolTip("Logging is disabled.");
+	if (m_statusBar) {
+		m_statusBar->updateLogIntensityInfo();
 	}
-	else if (flags & (~(ot::WARNING_LOG | ot::ERROR_LOG))) {
-		// FULL
-		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/FullLogging.png"));
-		m_logIntensity->setToolTip(QString::fromStdString(info));
-	}
-	else {
-		// DEFAULT
-		m_logIntensity->setPixmap(ot::IconManager::getPixmap("Status/BasicLogging.png"));
-		m_logIntensity->setToolTip(QString::fromStdString(info));
+	else
+	{
+		OT_LOG_E("Status bar is not initialized, cannot update log intensity info");
 	}
 }
 
@@ -1832,6 +1777,7 @@ void AppBase::clearGraphicsPickerData() {
 }
 
 ot::GraphicsViewView* AppBase::createNewGraphicsEditor(const std::string& _entityName, const QString& _title, const std::string& _pickerKey, const ot::WidgetView::InsertFlags& _viewInsertFlags, const ot::VisualisationCfg& _visualizationConfig) {
+	OT_LOG_I("X: Creating graphics editor for entity: " + _entityName);
 	ot::GraphicsViewView* newEditor = this->findGraphicsEditor(_entityName, _visualizationConfig.getVisualisingEntities());
 	if (newEditor != nullptr) {
 		OT_LOG_D("GraphicsEditor already exists { \"Editor.Name\": \"" + _entityName + "\" }. Skipping creation");
@@ -2376,17 +2322,6 @@ void AppBase::slotLockSelectionAndModification(bool _flag) {
 	m_projectNavigation->getTree()->setEnabled(!_flag);
 }
 
-void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous) {
-	uiAPI::window::setStatusLabelText(m_mainWindow, _progressMessage);
-	uiAPI::window::setStatusProgressVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusLabelVisible(m_mainWindow, _progressBaseVisible, false);
-	uiAPI::window::setStatusProgressContinuous(m_mainWindow, _continuous);
-}
-
-void AppBase::slotSetProgressBarValue(int _progressPercentage) {
-	uiAPI::window::setStatusProgressValue(m_mainWindow, _progressPercentage);
-}
-
 void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs) {
 	QTimer::singleShot(_intervalMs, [=]() {
 		Q_EMIT customTimerTimeout(_timerId);
@@ -2459,6 +2394,34 @@ void AppBase::slotShowOutputContextMenu(QPoint _pos) {
 			m_output->getPlainTextEdit()->clear();
 		}
 	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Status bar slots
+
+void AppBase::slotSetProgressBarVisibility(QString _progressMessage, bool _progressBaseVisible, bool _continuous)
+{
+	if (_progressBaseVisible)
+	{
+		m_statusBar->get()->showProgress(_progressMessage, (_continuous ? -1 : 0));
+	}
+	else
+	{
+		m_statusBar->get()->hideProgressDelayed();
+	}
+}
+
+void AppBase::slotSetProgressBarValue(int _progressPercentage)
+{
+	m_statusBar->get()->setProgressValue(_progressPercentage);
+}
+
+void AppBase::slotDisplayStateMessage(QString _message, int _timeoutMs)
+{
+	auto sb = m_statusBar->get();
+	sb->showStateMessage(_message);
+	sb->hideStateMessageDelayed(_timeoutMs);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -3606,6 +3569,8 @@ void AppBase::slotDeleteProject() {
 	if (msg.exec() != QMessageBox::Yes) {
 		return;
 	}
+
+	m_welcomeScreen->selectedProjectAboutToBeRemoved();
 	
 	ProjectManagement projectManager(m_loginData);
 	UserManagement userManager(m_loginData);
@@ -4108,6 +4073,16 @@ void AppBase::setProgressBarValueAPI(int _progressPercentage) {
 	}
 	else {
 		this->slotSetProgressBarValue(_progressPercentage);
+	}
+}
+
+void AppBase::displayTemporaryStateMessageAPI(const std::string& _message, int _durationMs)
+{
+	if (QThread::currentThread() != this->thread()) {
+		QMetaObject::invokeMethod(this, &AppBase::slotDisplayStateMessage, Qt::QueuedConnection, QString::fromStdString(_message), _durationMs);
+	}
+	else {
+		this->slotDisplayStateMessage(QString::fromStdString(_message), _durationMs);
 	}
 }
 

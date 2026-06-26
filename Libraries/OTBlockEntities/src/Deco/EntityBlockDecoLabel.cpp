@@ -43,7 +43,7 @@ ot::GraphicsItemCfg* ot::EntityBlockDecoLabel::createBlockCfg() {
 	std::unique_ptr<ot::GraphicsTextItemCfg> cfg(new ot::GraphicsTextItemCfg);
 
 	ot::GraphicsItemCfg::GraphicsItemFlags itemFlags = ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft |
-		ot::GraphicsItemCfg::ItemHandlesState | ot::GraphicsItemCfg::ItemUserTransformEnabled;
+		ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemUsesStateStyling | ot::GraphicsItemCfg::ItemUserTransformEnabled;
 
 	cfg->setGraphicsItemFlags(itemFlags);
 	cfg->setText(getText());

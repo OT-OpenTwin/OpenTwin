@@ -51,6 +51,9 @@ namespace ot {
 		QString getCurrentText() const;
 		QStringList getPossibleSelection() const;
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private Q_SLOTS:
 		void slotTextInputChanged();
 

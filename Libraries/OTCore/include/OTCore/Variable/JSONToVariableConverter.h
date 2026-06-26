@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: JSONToVariableConverter.h
 // 
 // License:
@@ -20,7 +20,7 @@
 #pragma once
 #include "OTCore/JSON/JSON.h"
 #include "Variable.h"
-
+#include "OTCore/Tuple/TupleInstance.h"
 namespace ot
 {
 	class __declspec(dllexport)  JSONToVariableConverter
@@ -29,7 +29,9 @@ namespace ot
 
 		Variable operator() (const JsonValue& value);
 		Variable operator() (const JsonValue& value, const std::string _type);
+		Variable operator() (const JsonValue& value, const ot::TupleInstance& _tupleInstance);
 		std::list<Variable> operator() (ot::ConstJsonArray & value);
-		static bool typeIsCompatible(const JsonValue& value, const std::string _type);
+		static bool typeIsCompatible(const JsonValue& value, const ot::TupleInstance& _tupleInstance);
+		static bool typeIsCompatible(const JsonValue& value, const std::string& _type);
 	};
 }

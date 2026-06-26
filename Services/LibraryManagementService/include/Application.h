@@ -52,19 +52,87 @@ public:
 
 private:
 
+	//! @brief Enum for user library element existence status
+	enum class LibraryElementExistenceStatus {
+		NotExisting,
+		ExistingWithIdenticalContent,
+		ExistingWithDifferentContent,
+		Error
+	};
+
+	//! @brief Prompt action constance
+	const std::string c_promptActionOverwriteUserLibraryElement = "LMS.Prompt.OverwriteUserElement";
+
+	//! @brief Helper function for user library element management
+	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
+	void promptMessageToUI(const std::string& _message, const std::string& _uiServiceUrl);
+
+	//! @brief Generate a unique element name by appending a suffix (_X) if the name already exists
+	//! @return The unique name that doesn't exist in the database
+	std::string generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	//! @brief Helper function to check if a library element with the same libraryElementId exists in the database and if so, increase the id by 1
+	void ensureUniqueLibraryElementId(ot::LibraryElement& _element, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
 	// Model library update functions
 	bool launchModelLibraryUpdate(const std::string& _ownURL, const std::string& _databasePWD);
-	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName);
-	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
-	std::list<ot::LibraryElement> addDataToLibraryElements(const std::list<ot::LibraryElement>& _elements, const std::string& _modelFolderPath);
 
+	//! @brief Helper function to retrieve library elements from local file system
+	//! @param _modelFolderPath The path to the folder containing the model files
+	//! @param _collectionName The name of the collection to which the library elements belong
+	//! @return A list of library elements created from the model files in the specified folder. 
+	std::list<ot::LibraryElement> getLocalModels(const std::string& _modelFolderPath, const std::string& _collectionName);
+
+	//! @brief Helper function to fill a library element with the hash of the corresponding model file. 
+	//! @param _element The library element to fill
+	//! @param _modelFolderPath The path to the folder containing the model files
+	void fillLibraryElementWithHash(ot::LibraryElement& _element, const std::string& _modelFolderPath);
+
+	//! @brief Helper function to add model data to library elements by reading the corresponding model files from the specified folder path. 
+	//! The function will match the file names with the library element file names and populate the data field of each library element accordingly.
+	//! @param _elements List of library elements to which the data should be added. Each element's file name will be used to find the corresponding model file in the specified folder.
+	//! @param _modelFolderPath The path to the folder containing the model files.
+	void addDataToLibraryElements(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _modelFolderPath);
+
+	//! @brief Helper function to retrieve model information from the database based on the provided selection configuration and database credentials. The retrieved information is returned as a JSON string.
+	//! @param _selectionCfg The library element selection configuration
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
+	//! @return The model information as a JSON string
 	std::string getModelInformation(const ot::LibraryElementSelectionCfg& _selectionCfg,
 		const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 
-	void updateOrCreateLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
-	void addLibraryElement(std::list<ot::LibraryElement>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	//! @brief Helper function for user library element management
+	//! @brief Checks existence of library element and removes elements that don't need updating from the list
+	//! @param _elements List of library elements to check. Elements that already exist with identical content will be removed from the list.
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
+	//! @param _dependencyCheck If true, it will also check for dependencies of the library elements and their existence status. If false, it will only check the provided elements without considering dependencies.
+	//! @return The existence status of the library element
+	LibraryElementExistenceStatus updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
 
+	//! @brief Helper function to add library elements to the database
+	//! @param _elements The library elements to add
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
+	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+	//! @brief Helper function to create a ModelLibraryDialogCfg based on the provided selection configuration and database credentials
+	//! @param _selectionCfg The library element selection configuration
+	//! @param _dbUserName The database user name
+	//! @param _dbUserPassword The database user password
+	//! @param _dbServerUrl The database server URL
+	//!	@return An optional ModelLibraryDialogCfg. It will contain a value if the configuration was created successfully, or std::nullopt if an error occurred (e.g., database connection failure).
 	std::optional<ot::ModelLibraryDialogCfg> createModelLibraryDialogCfg(const ot::LibraryElementSelectionCfg _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+
+
+	//! @brief Helper function to process library documents and convert them to a ModelLibraryDialogCfg
+	//! @param _documents The library documents to process
+	//! @param _dialogCfg The dialog configuration to populate
+	void processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
@@ -78,10 +146,8 @@ private:
 	OT_HANDLER(handleModelDialogConfirmed, Application, OT_ACTION_CMD_UI_ModelDialogConfirmed, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleModelDialogCanceled, Application, OT_ACTION_CMD_UI_ModelDialogCanceled, ot::SECURE_MESSAGE_TYPES)
 	OT_HANDLER(handleLibraryElementRequest, Application, OT_ACTION_CMD_LMS_LibraryElementRequest, ot::SECURE_MESSAGE_TYPES)
-
-    // ModelLibraryUpdater functions
-	//OT_HANDLER(handleUpdateOrCreateRequest, Application, OT_ACTION_CMD_LMS_UpdateOrCreateLirbaryElement, ot::SECURE_MESSAGE_TYPES)
-	//OT_HANDLER(handleAddNewLibraryElement, Application, OT_ACTION_CMD_LMS_AddNewLibraryElement, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleAddUserLibraryElement, Application, OT_ACTION_CMD_LMS_AddUserLibraryElement, ot::SECURE_MESSAGE_TYPES)
+	OT_HANDLER(handleLibraryElementOverwritePromptResponse, Application, c_promptActionOverwriteUserLibraryElement, ot::SECURE_MESSAGE_TYPES)
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

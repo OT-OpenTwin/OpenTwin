@@ -44,6 +44,8 @@ namespace ot {
 		//! @brief Will set the percentage of the progress bar
 		static void setProgressBarValue(int _progressPercentage);
 
+		static void displayTemporaryStateMessage(const std::string& _message, int _durationMs = 5000);
+
 		static void showInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage = std::string());
 		static void showWarningPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage = std::string());
 		static void showErrorPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage = std::string());
@@ -59,6 +61,8 @@ namespace ot {
 
 		virtual void setProgressBarVisibilityAPI(QString _progressMessage, bool _progressBaseVisible, bool _continuous) = 0;
 		virtual void setProgressBarValueAPI(int _progressPercentage) = 0;
+
+		virtual void displayTemporaryStateMessageAPI(const std::string& _message, int _durationMs) = 0;
 
 		virtual void showInfoPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) = 0;
 		virtual void showWarningPromptAPI(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) = 0;

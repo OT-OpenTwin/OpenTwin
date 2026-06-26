@@ -54,6 +54,7 @@ public:
 	bool removeSeries(ot::UID _uid);
 
 	ResultImportLogger& getLogger() { return m_logger; }
+	size_t getMemSize();
 protected:
 	inline bool invariant() { return true; }
 

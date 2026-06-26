@@ -375,7 +375,17 @@ namespace ot {
 		//! @callgraph
 		virtual ConnectionDirection calculateOutwardsConnectionDirection() const;
 
+		bool considerItemForPaint() const;
+
+		bool ancestorHasState(GraphicsElementState _state) const;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Private helper
+
 	private:
+		void updateAcceptHoverEventFlag();
+
 		GraphicsItemCfg* m_config; //! @brief Configuration used to setup this item. Default 0.
 		
 		QPointF m_moveStartPt; //! @brief Item move origin.

@@ -79,6 +79,8 @@ public:
 	//! @return Project information if the index is valid, std::nullopt otherwise.
 	std::optional<ot::ProjectInformation> getProjectInformationAt(int _index) const;
 
+	void selectedProjectAboutToBeRemoved();
+
 Q_SIGNALS:
 	void createProjectRequest();
 	void openProjectRequest();

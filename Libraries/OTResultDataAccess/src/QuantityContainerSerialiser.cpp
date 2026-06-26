@@ -38,23 +38,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		flushQuantityContainer(); 
 		return;
 	}
-	auto complexCurveDescription = dynamic_cast<QuantityDescriptionCurveComplex*>(_quantityDescription);
-	if (complexCurveDescription != nullptr)
-	{
-		m_logger.log("Storing data points as complex curve.");
-		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, complexCurveDescription);
-		flushQuantityContainer();
-		return;
-	}
-	auto sparameterDescription = dynamic_cast<QuantityDescriptionSParameter*>(_quantityDescription);
-	if (sparameterDescription != nullptr)
-	{
-		m_logger.log("Storing data points as s-parameter.");
-		storeDataPoints(_seriesIndex, _parameterIDs, _constParameterValues, _changingParameterValues, _numberOfParameterValues, sparameterDescription);
-		flushQuantityContainer();
-		return;
-	}
-
+	
 	auto matrixParameterDescription = dynamic_cast<QuantityDescriptionMatrix*>(_quantityDescription);
 	if (matrixParameterDescription != nullptr)
 	{
@@ -84,7 +68,6 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
 	auto quantityMetadata = _quantityDescription->getMetadataQuantity();
-	assert(quantityMetadata.m_tupleDescription.isSingle()); //Curves should not have a tuple description, as they only have one value per quantity. 
 	
 	ot::UID quantityID = quantityMetadata.quantityIndex;
 
@@ -108,128 +91,19 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			}
 		}
 
-		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityID, *dataValueItt);
+		if (dataValueItt->isComplex())
+		{
+			std::list<ot::Variable> bothValues = { dataValueItt->getComplex().real(), dataValueItt->getComplex().imag() };
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
+		}
+		else
+		{
+			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityID, *dataValueItt);
+		}
 
 		if (i != _numberOfParameterValues - 1)
 		{
 			dataValueItt++;
-		}
-	}
-}
-
-void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, uint64_t _numberOfParameterValues, QuantityDescriptionCurveComplex* _quantityDescription)
-{
-	const std::vector<ot::Variable>& realValues = _quantityDescription->getQuantityValuesReal();
-	const std::vector<ot::Variable>& imagValues = _quantityDescription->getQuantityValuesImag();
-	
-	if (imagValues.empty() || realValues.empty())
-	{
-		throw std::exception("Complex values are missing either the imaginary or the real part.");
-	}
-
-	if (imagValues.size() != realValues.size())
-	{
-		throw std::exception("Unequal amount of real and imaginary numbers.");
-	}
-
-	if (_numberOfParameterValues != realValues.size())
-	{
-		throw std::exception("Number of real values does not match the number of parameter values.");
-	}
-	if (_numberOfParameterValues != imagValues.size())
-	{
-		throw std::exception("Number of imaginary values does not match the number of parameter values.");
-	}
-	
-	std::vector<ot::Variable>::const_iterator realValueItt(realValues.begin()), imagValueItt(imagValues.begin());
-	
-	auto quantityMetadata =	_quantityDescription->getMetadataQuantity();
-	
-	ot::TupleDescriptionComplex complexTupleDescription;
-	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
-		
-	m_bucketSize = 1;
-
-	const size_t numberOfDocuments = _numberOfParameterValues * 2;
-	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
-
-	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
-	const size_t constCount = currentParameterValues.size();
-
-	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
-	{
-		currentParameterValues.resize(constCount);
-		for (auto& changingParameterValueIt : _changingParameterValues)
-		{
-			currentParameterValues.push_back(*changingParameterValueIt);
-			if (i != _numberOfParameterValues - 1)
-			{
-				changingParameterValueIt++;
-			}
-		}
-		std::list<ot::Variable> bothValues = { *realValueItt,*imagValueItt };
-		addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
-			
-		if (i != _numberOfParameterValues - 1)
-		{
-			imagValueItt++;
-			realValueItt++;
-		}
-	}
-}
-
-void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::list<ot::UID>& _parameterIDs, std::list<ot::Variable>& _constParameterValues, std::list<std::list<ot::Variable>::const_iterator>& _changingParameterValues, uint64_t _numberOfParameterValues, QuantityDescriptionSParameter* _quantityDescription)
-{
-	
-	if (_quantityDescription->getNumberOfFirstValues() == 0 || _quantityDescription->getNumberOfSecondValues() == 0)
-	{
-		throw std::exception("Complex values are missing either the imaginary or the real part.");
-	}
-
-	if (_quantityDescription->getNumberOfFirstValues() != _quantityDescription->getNumberOfSecondValues())
-	{
-		throw std::exception("Unequal amount of real and imaginary numbers.");
-	}
-
-	if (_numberOfParameterValues != _quantityDescription->getNumberOfFirstValues())
-	{
-		throw std::exception("Number of the first values does not match the number of parameter values.");
-	}
-	if (_numberOfParameterValues != _quantityDescription->getNumberOfSecondValues())
-	{
-		throw std::exception("Number of the second values does not match the number of parameter values.");
-	}
-
-	auto& quantityMetadata = _quantityDescription->getMetadataQuantity();
-	const uint32_t numberOfPorts = quantityMetadata.dataDimensions.front();
-	m_bucketSize = numberOfPorts * numberOfPorts;
-
-	ot::TupleDescriptionComplex complexTupleDescription;
-	assert(quantityMetadata.m_tupleDescription.getTupleTypeName() == complexTupleDescription.getName());
-
-	const size_t numberOfDocuments = _numberOfParameterValues * 2;
-	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
-	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
-	const size_t constCount = currentParameterValues.size();
-	for (size_t i = 0; i < _numberOfParameterValues; i++)
-	{
-		currentParameterValues.resize(constCount);
-		for (auto& changingParameterValueIt : _changingParameterValues)
-		{
-			currentParameterValues.push_back(*changingParameterValueIt);
-			if (i != _numberOfParameterValues - 1)
-			{
-				changingParameterValueIt++;
-			}
-		}
-
-		auto firstValue = _quantityDescription->getFirstValues(i);
-		auto secondValue = _quantityDescription->getSecondValues(i);
-
-		for(size_t matrixEntryIndex = 0; matrixEntryIndex < firstValue.size(); matrixEntryIndex++)
-		{
-			std::list<ot::Variable> bothValues = { firstValue[matrixEntryIndex],secondValue[matrixEntryIndex] };
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
 		}
 	}
 }
@@ -268,7 +142,15 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		const std::vector<ot::Variable>& quantityValueMatrixEntry = quantityValueMatrix.getValues();
 		for (uint32_t j = 0; j < quantityValueMatrix.getNumberOfEntries(); j++)
 		{
-			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, quantityValueMatrixEntry[j]);
+			if (quantityValueMatrixEntry[j].isComplex())
+			{
+				std::list<ot::Variable> bothValues{ quantityValueMatrixEntry[j].getComplex().real(), quantityValueMatrixEntry[j].getComplex().imag()};
+				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, bothValues);
+			}
+			else
+			{
+				addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityMetadata.quantityIndex, quantityValueMatrixEntry[j]);
+			}
 		}
 		
 	}

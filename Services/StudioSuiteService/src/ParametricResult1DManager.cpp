@@ -38,8 +38,7 @@
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurveComplex.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -346,52 +345,54 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 				const bool hasRealValues = !curveData->getYreValues().empty();
 				const bool hasImValue = !curveData->getYimValues().empty();
 
-				std::unique_ptr<QuantityDescription> quantityDescription(nullptr);
-
+				
+				// If values have an imaginary part, they shall be treated as complex numbers which are internally stored as a tuple
+				auto quantityDescription(std::make_unique<QuantityDescriptionCurve>());
+				
+				size_t numberOfValues = hasRealValues ? curveData->getYreValues().size() : curveData->getYimValues().size();
+				assert(curveData->getYreValues().size() == curveData->getYimValues().size() || curveData->getYreValues().size() == 0 || curveData->getYimValues().size() == 0);
+				quantityDescription->reserveDatapointSize(numberOfValues);
+					
 				if (hasImValue)
 				{
-					// If values have an imaginary part, they shall be treated as complex numbers which are internally stored as a tuple
-					auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurveComplex>());
+					quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
 				
-					quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
-					size_t numberOfValues = hasRealValues ? curveData->getYreValues().size() : curveData->getYimValues().size();
-					assert(curveData->getYreValues().size() == curveData->getYimValues().size() || curveData->getYreValues().size() == 0 || curveData->getYimValues().size() == 0);
-					quantityDescriptionComplex->reserveSizeImagValues(numberOfValues);
-					quantityDescriptionComplex->reserveSizeRealValues(numberOfValues);
-					
 					if (hasRealValues)
 					{
-						for (auto realValue : curveData->getYreValues())
+						for (size_t i = 0; i < numberOfValues; i++)
 						{
-							quantityDescriptionComplex->addValueReal(ot::Variable(realValue));
+							ot::Variable val(std::complex<double>(curveData->getYreValues()[i], curveData->getYimValues()[i]));
+							quantityDescription->addDatapoint(std::move(val));
 						}
 					}
 					else
 					{
 						for (size_t i = 0; i < numberOfValues; i++)
 						{
-							quantityDescriptionComplex->addValueReal(ot::Variable(0.0));
+							ot::Variable val(std::complex<double>(0, curveData->getYimValues()[i]));
+							quantityDescription->addDatapoint(std::move(val));
 						}
-					}
-
-					for (auto imValue : curveData->getYimValues())
-					{
-						quantityDescriptionComplex->addValueImag(ot::Variable(imValue));
-					}
-					quantityDescription.reset(quantityDescriptionComplex.release());
+					}					
 				}
 				else
 				{
-					auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
-					quantityDescriptionCurve->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), quantityUnit);
+					quantityDescription->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), quantityUnit);
 					size_t numberOfValues = curveData->getYreValues().size();
-					quantityDescriptionCurve->reserveDatapointSize(numberOfValues);
-					for (auto realValue : curveData->getYreValues())
+					quantityDescription->reserveDatapointSize(numberOfValues);
+					if (hasRealValues)
 					{
-						quantityDescriptionCurve->addDatapoint(ot::Variable(realValue));
+						for (size_t i = 0; i < numberOfValues; i++)
+						{
+							quantityDescription->addDatapoint(ot::Variable(curveData->getYreValues()[i]));
+						}
 					}
-					quantityDescription.reset(quantityDescriptionCurve.release());
+					else
+					{
+						assert(false);
+						continue;
+					}
 				}
+					
 				
 				if (quantityName.substr(0, 6) == "Tasks/") 
 				{
@@ -422,20 +423,20 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 		//Now we set the s-parameter matrices
 		std::vector<Result1DData*> sParameterValues;
 		uint32_t numberOfPorts = static_cast<uint32_t>(determineNumberOfPorts(_category, categoryResults, sParameterValues));
+		ot::MatrixEntryPointer matrixDimensions;
+		matrixDimensions.setRow(numberOfPorts);
+		matrixDimensions.setColumn(numberOfPorts);
 		std::string quantityUnit(""), quantityLabel("");
 		//parseAxisLabel(curveData->getXLabel(), quantityLabel, quantityUnit);
-		std::unique_ptr<QuantityDescriptionSParameter> quantityDescription(std::make_unique<QuantityDescriptionSParameter>(numberOfPorts)); //How to get this information ?
+		size_t numberOfFrequencyPoints = sParameterValues[0]->getYreValues().size();
+		std::unique_ptr<QuantityDescriptionMatrix> quantityDescription(std::make_unique<QuantityDescriptionMatrix>(matrixDimensions)); //How to get this information ?
 				
 		//Dangerous? Do all curves guaranteed have the same number of frequency points ? Are real values always existing ?
-		size_t numberOfFrequencyPoints = sParameterValues[0]->getYreValues().size();
+		quantityDescription->setName("1D Results/S-Parameters");
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
 		quantityDescription->initiateZeroFilledValueMatrices(numberOfFrequencyPoints);
 
-		quantityDescription->setName("1D Results/S-Parameters");
-		
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
-		
 		ot::MatrixEntryPointer matrixEntry;
-
 		for (matrixEntry.setRow(0); matrixEntry.getRow() < numberOfPorts; matrixEntry.moveRow())
 		{
 			uint32_t index = matrixEntry.getRow() * numberOfPorts;
@@ -447,10 +448,8 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 					std::vector<double>& imValuesOverAllFrequencies =	sParameterValues[index]->getYimValues();
 					for (size_t frequencyIndex = 0; frequencyIndex < numberOfFrequencyPoints; frequencyIndex++)
 					{
-						ot::Variable realValue = ot::Variable(realValuesOverAllFrequencies[frequencyIndex]);
-						quantityDescription->setFirstValue(frequencyIndex, matrixEntry,std::move(realValue));
-						ot::Variable imagValue = ot::Variable(imValuesOverAllFrequencies[frequencyIndex]);
-						quantityDescription->setSecondValue(frequencyIndex, matrixEntry,std::move(imagValue));
+						ot::Variable currentCmplx(std::complex<double>(realValuesOverAllFrequencies[frequencyIndex], imValuesOverAllFrequencies[frequencyIndex]));
+						quantityDescription->setValue(frequencyIndex, matrixEntry, currentCmplx);
 					}
 				}
 				index++;

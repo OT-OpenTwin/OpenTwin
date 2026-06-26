@@ -92,9 +92,13 @@ void GraphicsItemDesignerItemBase::fillBasePropertyGrid(ot::PropertyGridCfg& _co
 	newConnectionDirectionProperty->setPropertyTip("If the item is connectable the connection direction is used to calculate the connection line.");
 	generalGroup->addProperty(newConnectionDirectionProperty);
 
-	PropertyBool* newStateProperty = new PropertyBool("Handle State", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState);
-	newStateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
-	generalGroup->addProperty(newStateProperty);
+	PropertyBool* newStateParticipateProperty = new PropertyBool("Participate in State", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemParticipatesInStateHandling);
+	newStateParticipateProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
+	generalGroup->addProperty(newStateParticipateProperty);
+
+	PropertyBool* newUseStateStyleProperty = new PropertyBool("Use State Style", this->getGraphicsItem()->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling);
+	newUseStateStyleProperty->setPropertyTip("If enabled the item will update its appearance according to the current item state (e.g. ItemSelected or ItemHover)");
+	generalGroup->addProperty(newUseStateStyleProperty);
 
 	PropertyDouble* addTrigLeft = new PropertyDouble("Trigger Left", this->getGraphicsItem()->getAdditionalTriggerDistance().left(), 0., std::numeric_limits<double>::max());
 	addTrigLeft->setPropertyTip("The additional trigger distance will be added to the virtual bounding rect when handling state or click operations.");
@@ -192,14 +196,26 @@ bool GraphicsItemDesignerItemBase::basePropertyChanged(const ot::Property* _prop
 		this->getGraphicsItem()->setConnectionDirection(stringToConnectionDirection(actualProperty->getCurrent()));
 		return true;
 	}
-	else if (group->getName() == "General" && _property->getPropertyName() == "Handle State") {
+	else if (group->getName() == "General" && _property->getPropertyName() == "Participate in State") {
 		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
 		if (!actualProperty) {
 			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
 			return false;
 		}
 
-		this->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemHandlesState, actualProperty->getValue());
+		this->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemParticipatesInStateHandling, actualProperty->getValue());
+		return true;
+	}
+	else if (group->getName() == "General" && _property->getPropertyName() == "Use State Style")
+	{
+		const PropertyBool* actualProperty = dynamic_cast<const PropertyBool*>(_property);
+		if (!actualProperty)
+		{
+			OT_LOG_E("Property cast failed { \"Property\": \"" + _property->getPropertyName() + "\", \"Group\": \"" + group->getName() + "\" }");
+			return false;
+		}
+
+		this->getGraphicsItem()->setGraphicsItemFlag(ot::GraphicsItemCfg::ItemUsesStateStyling, actualProperty->getValue());
 		return true;
 	}
 	else if (group->getName() == "General" && _property->getPropertyName() == "Trigger Left") {

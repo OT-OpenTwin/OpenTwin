@@ -81,8 +81,6 @@ public:
 	//Not existing in uiComponent
 	void selectObject(ot::UID visualizationModelID, ot::UID entityID);
 	void selectObjects(ot::UID visualizationModelID, const std::list<ot::UID> &entityIDList);
-	//Not existing in uiComponent
-	void promptChoice(const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _promptResponse, const std::string& _parameter1);
 	
 	void addVisualizationContainerNode(ot::UID visModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visTypes);
 	void addVisualizationAnnotationNode(ot::UID visModelID, const ot::EntityTreeItem& _treeItem, bool isHidden,

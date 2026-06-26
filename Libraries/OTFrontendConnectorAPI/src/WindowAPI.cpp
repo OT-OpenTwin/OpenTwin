@@ -44,6 +44,11 @@ void ot::WindowAPI::setProgressBarValue(int _progressPercentage) {
 	WindowAPI::instance()->setProgressBarValueAPI(_progressPercentage);
 }
 
+void ot::WindowAPI::displayTemporaryStateMessage(const std::string& _message, int _durationMs)
+{
+	WindowAPI::instance()->displayTemporaryStateMessageAPI(_message, _durationMs);
+}
+
 void ot::WindowAPI::showInfoPrompt(const std::string& _title, const std::string& _message, const std::string& _detailedMessage) {
 	WindowAPI::instance()->showInfoPromptAPI(_title, _message, _detailedMessage);
 }

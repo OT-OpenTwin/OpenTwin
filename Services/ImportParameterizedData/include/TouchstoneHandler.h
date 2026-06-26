@@ -24,7 +24,7 @@
 
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
-#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionSParameter.h"
+#include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionMatrix.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTCore/MetadataHandle/MetadataParameter.h"
 
@@ -46,9 +46,9 @@ public:
 	void analyseFile(const std::string& _fileContent, int32_t _numberOfPorts);
 	const ts::OptionSettings& getOptionSettings() const { return m_optionSettings; }
 	const std::string& getComments() const { return m_comments; }
-	QuantityDescriptionSParameter* handOverQuantityDescription() 
+	QuantityDescriptionMatrix* handOverQuantityDescription() 
 	{
-		QuantityDescriptionSParameter* temp = m_quantityDescription;
+		QuantityDescriptionMatrix* temp = m_quantityDescription;
 		m_quantityDescription = nullptr;
 		return temp;
 	}
@@ -63,15 +63,13 @@ private:
 	uint32_t m_touchstoneVersion = 1;
 	uint32_t m_portNumber = 0;
 	
-	QuantityDescriptionSParameter* m_quantityDescription = nullptr;
+	ot::GenericDataStructMatrix m_currentValues;
+	bool m_isFrequencyValue = (true);
+	ot::MatrixEntryPointer m_matrixPointer;
+
+
+	QuantityDescriptionMatrix* m_quantityDescription = nullptr;
 	MetadataParameter m_frequencyParameter;
-
-	ot::MatrixEntryPointer m_matrixEntry;
-	
-	ot::GenericDataStructMatrix* m_firstValues = nullptr;
-	ot::GenericDataStructMatrix* m_secondValues = nullptr;
-
-	bool m_firstValueOfTuple = true;
 
 	void analyseLine(std::string& _content);
 	void analyseDataLine(std::string& _content);

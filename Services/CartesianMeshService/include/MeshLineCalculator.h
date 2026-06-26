@@ -45,13 +45,15 @@ struct MeshLineCalculatorStepRange
 class MeshLineCalculator
 {
 public:
-	MeshLineCalculator() : maximumEdgeLength(0.0), stepsAlongDiagonal(0.0), meshEntity(nullptr) {};
+	MeshLineCalculator() : maximumEdgeLength(0.0), stepsAlongDiagonal(0.0), maximumMeshRatio(0.0), meshEqulibrationRatio(0.0), meshEntity(nullptr) {};
 	~MeshLineCalculator() {};
 
 	void setMesh(EntityMeshCartesian* mesh) { meshEntity = mesh; }
 	void setMeshEntities(const std::list<EntityBase*>& entities) { meshEntities = entities; }
 	void setMaximumEdgeLength(double value) { maximumEdgeLength = value; }
 	void setStepsAlongDiagonal(double value) { stepsAlongDiagonal = value; }
+	void setMaximumMeshRatio(double value) { maximumMeshRatio = value; }
+	void setMeshEqulibrationRatio(double value) { meshEqulibrationRatio = value; }
 	void setProblemType(ProblemType* _problemType) { problemType = _problemType; }
 
 	void updateMeshLines();
@@ -85,8 +87,10 @@ private:
 
 	double maximumEdgeLength;
 	double stepsAlongDiagonal;
-	double smallestCellRatio = 0.1;
-	double angleToleranceDeg = 1.0;
+	double maximumMeshRatio;
+	double meshEqulibrationRatio;
+
+	double angleToleranceDeg = 0.1;
 	double geometryTolerance = 1e-5;
 
 	std::list<EntityBase*> meshEntities;

@@ -57,9 +57,14 @@ namespace ot
 		void removeConnectionFromItem(UID _itemId, UID _connectionId);
 		void removeConnectionFromItem(UID _itemId, const std::string& _connectorName, UID _connectionId);
 
+		void addConnector(UID _itemId, const std::string& _connectorName);
+		void removeConnector(UID _itemId, const std::string& _connectorName);
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Getter
+
+		UIDList getAllIDs() const;
 
 		bool hasItem(UID _itemId) const;
 		bool hasConnector(UID _itemId, const std::string& _connectorName) const;
@@ -69,6 +74,8 @@ namespace ot
 
 		std::list<GraphicsConnectionInfo> getItemConnections(UID _itemId) const;
 		std::list<GraphicsConnectionInfo> getItemConnections(UID _itemId, const std::string& _connectorName) const;
+
+		std::map<std::string, ItemConnectorInfo> getItemConnectors(UID _itemId) const;
 
 		//! @brief Finds a connected subtree in the graphics scene starting from a given item connector.
 		//! This function performs a breadth-first traversal over the scene graph starting at the
@@ -108,6 +115,8 @@ namespace ot
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Private: Helper
+
+		void addConnectionToList(UID _itemId, const std::string& _connectorName, const GraphicsConnectionInfo& _connection);
 
 		std::map<std::string, ItemConnectorInfo>& getConnectorsMap(UID _itemId);
 		std::list<GraphicsConnectionInfo>& getConnectionsList(UID _itemId, const std::string& _connectorName);

@@ -168,6 +168,19 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 	}
 }
 
+void ViewVisualisationHandler::requestVisualisationIfNeeded(ot::UID _entityID)
+{
+	Model* model = Application::instance()->getModel();
+	OTAssertNullptr(model);
+
+	ot::JsonDocument document;
+	document.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_VIEW_RequestVisualizationIfNeeded, document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_MODEL_ID, model->getVisualizationModel(), document.GetAllocator());
+	document.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _entityID, document.GetAllocator());
+
+	Application::instance()->queuedRequestToFrontend(document);
+}
+
 void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 {
 	Model* model = Application::instance()->getModel();

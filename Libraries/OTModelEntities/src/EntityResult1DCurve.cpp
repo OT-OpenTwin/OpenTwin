@@ -316,6 +316,22 @@ ot::Plot1DCurveCfg EntityResult1DCurve::getCurve()
 	const ot::Painter2D* painter = PropertyHelper::getPainterPropertyValue(this, "Color");
 	ot::PenFCfg penCfg(painter->createCopy());
 
+	if (getObserver() != nullptr)
+	{
+		std::optional<std::string> collectionName = getObserver()->getCollectionName(m_queryProperties.getSelectedProject(this));
+		if (collectionName.has_value())
+		{
+			if (m_dataLakeAccessCfg.getCollectionName() != collectionName.value())
+			{
+				m_dataLakeAccessCfg.setCollectionName(collectionName.value());
+			}
+		}
+		else
+		{
+			throw std::exception("Curve cannot be visualised since the collection for the selected project could not be determined.");
+		}
+	}
+
 	try
 	{
 		penCfg.setWidth(static_cast<double>(PropertyHelper::getIntegerPropertyValue(this, "Line Width")));
@@ -592,7 +608,7 @@ void EntityResult1DCurve::readSpecificDataFromDataBase(const bsoncxx::document::
 	}
 
 	// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
-	if (getObserver() != nullptr && getObserver()->projectIsOpen())
+	if (getObserver() != nullptr && getObserver()->getModelServiceState().getProjectIsOpen())
 	{
 		try
 		{

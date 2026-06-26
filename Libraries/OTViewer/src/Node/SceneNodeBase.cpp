@@ -247,3 +247,19 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 	}
 }
 
+void SceneNodeBase::requestVisualizationIfNeeded()
+{
+	const std::list<Visualiser*>& allVisualiser = getVisualiser();
+	for (Visualiser* visualiser : allVisualiser)
+	{
+		if (visualiser->getViewIsOpen()) {
+			VisualiserState state;
+			state.selected = m_selected;
+			state.singleSelection = true;
+			state.selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
+			ot::VisualiserInfo info;
+			visualiser->requestVisualization(state, info);
+		}
+	}
+}
+

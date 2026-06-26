@@ -32,12 +32,14 @@ void MeshLineCalculator::updateMeshLines()
 	// Find the base step width
 	double baseStepWidth = std::min(maximumEdgeLength, geometryBoundingBox.getDiagonal() / stepsAlongDiagonal);
 	double geometryToleranceAbsolute = geometryTolerance * geometryBoundingBox.getDiagonal();
-	double smallestMeshStep = smallestCellRatio * baseStepWidth;
-	double maximumMeshRatio = 2.0;
+	double smallestMeshStep = baseStepWidth / maximumMeshRatio;
 
 	if (problemType != nullptr)
 	{
-		baseStepWidth = std::min(baseStepWidth, problemType->getBaseStepWidth());
+		if (problemType->getBaseStepWidth() > 0.0)
+		{
+			baseStepWidth = std::min(baseStepWidth, problemType->getBaseStepWidth());
+		}
 	}
 
 	std::list<MeshLineCalculatorWeightedPoint> fixPlanesX = determineFixPlanes(0, 1.0, 0.0, 0.0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax());
@@ -67,9 +69,18 @@ void MeshLineCalculator::updateMeshLines()
 	std::vector<double> meshLinesZ = determineMeshLines(finalFixPlanesZ, densityRangesZ);
 
 	// Equilibrate mesh to ensure smoothness and store the mesh lines in the arrays
-	meshCoords[0] = equilibrateMeshLines(meshLinesX, maximumMeshRatio);
-	meshCoords[1] = equilibrateMeshLines(meshLinesY, maximumMeshRatio);
-	meshCoords[2] = equilibrateMeshLines(meshLinesZ, maximumMeshRatio);
+	if (meshEqulibrationRatio > 0.0)
+	{
+		meshCoords[0] = equilibrateMeshLines(meshLinesX, meshEqulibrationRatio);
+		meshCoords[1] = equilibrateMeshLines(meshLinesY, meshEqulibrationRatio);
+		meshCoords[2] = equilibrateMeshLines(meshLinesZ, meshEqulibrationRatio);
+	}
+	else
+	{
+		meshCoords[0] = meshLinesX;
+		meshCoords[1] = meshLinesY;
+		meshCoords[2] = meshLinesZ;
+	}
 }
 
 BoundingBox MeshLineCalculator::calculateBoundingBox()
@@ -82,13 +93,22 @@ BoundingBox MeshLineCalculator::calculateBoundingBox()
 		// Ignore the background shape which does not have a name assigned yet
 		if (!entity->getName().empty())
 		{
-			if (entity->getClassName() != "EntityContainer")
+			EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(entity);
+			if (geometryEntity != nullptr)
 			{
-				double xmin = 0.0, xmax = 0.0, ymin = 0.0, ymax = 0.0, zmin = 0.0, zmax = 0.0;
-
-				if (entity->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax))
+				EntityFacetData* facetData = geometryEntity->getFacets();
+				if (facetData != nullptr)
 				{
-					geometryBoundingBox.extend(xmin, xmax, ymin, ymax, zmin, zmax);
+					for (auto triangle : facetData->getTriangleList())
+					{
+						Geometry::Node n1 = facetData->getNodeVector()[triangle.getNode(0)];
+						Geometry::Node n2 = facetData->getNodeVector()[triangle.getNode(1)];
+						Geometry::Node n3 = facetData->getNodeVector()[triangle.getNode(2)];
+
+						geometryBoundingBox.extend(n1.getCoord(0), n1.getCoord(1), n1.getCoord(2));
+						geometryBoundingBox.extend(n2.getCoord(0), n2.getCoord(1), n2.getCoord(2));
+						geometryBoundingBox.extend(n3.getCoord(0), n3.getCoord(1), n3.getCoord(2));
+					}
 				}
 			}
 		}
@@ -542,7 +562,10 @@ double MeshLineCalculator::getVolumeMeshStepWidth(EntityBase* entity, double bas
 			CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial*>(geometryEntity->getData());
 			if (material != nullptr)
 			{
-				shapeMeshStepWidth = std::min(shapeMeshStepWidth, problemType->getMaterialBaseStepWidth(material));
+				if (problemType->getMaterialBaseStepWidth(material) != 0.0)
+				{
+					shapeMeshStepWidth = std::min(shapeMeshStepWidth, problemType->getMaterialBaseStepWidth(material));
+				}
 			}
 		}
 	}

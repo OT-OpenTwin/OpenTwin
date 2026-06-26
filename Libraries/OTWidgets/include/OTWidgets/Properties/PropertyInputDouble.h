@@ -49,6 +49,9 @@ namespace ot {
 
 		bool hasInputError(void) const;
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private Q_SLOTS:
 		void lclValueChanged(double);
 		void lclTextChanged(void);

@@ -29,7 +29,6 @@ ot::CustomGraphicsItem::CustomGraphicsItem(GraphicsItemCfg* _configuration)
 {
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setGraphicsItem(this);
-	this->setAcceptHoverEvents(true);
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
 }
 
@@ -84,6 +83,10 @@ QRectF ot::CustomGraphicsItem::boundingRect(void) const {
 }
 
 void ot::CustomGraphicsItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
 	this->paintCustomItem(_painter, _opt, _widget, this->calculatePaintArea(this->getPreferredGraphicsItemSize()));
 }
 

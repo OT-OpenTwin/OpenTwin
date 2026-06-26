@@ -29,6 +29,10 @@ class QCheckBox;
 class QShortcut;
 class QPushButton;
 class QPlainTextEdit;
+namespace ot
+{
+	class TextEditor;
+}
 
 class LogVisualizationItemViewDialog : public ot::Dialog {
 	Q_OBJECT
@@ -66,7 +70,7 @@ private:
 	QCheckBox* m_timeLocalUTC;
 	QCheckBox* m_findMessageSyntax;
 
-	QPlainTextEdit* m_message;
+	ot::TextEditor* m_message;
 
 	QPushButton* m_okButton;
 };

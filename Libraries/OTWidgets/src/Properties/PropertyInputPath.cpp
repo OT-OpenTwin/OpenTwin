@@ -76,7 +76,6 @@ bool ot::PropertyInputPath::setupFromConfiguration(const Property* _configuratio
 
 	m_path->setBrowseMode(actualProperty->getBrowseMode());
 
-	m_path->getLineEdit()->setToolTip(QString::fromStdString(this->data().getPropertyTip()));
 	if (this->data().getPropertyFlags() & Property::HasMultipleValues) {
 		m_path->setPath("...");
 	}
@@ -95,6 +94,8 @@ bool ot::PropertyInputPath::setupFromConfiguration(const Property* _configuratio
 	m_path->setFileFilter(QString::fromStdString(filterString));
 	m_path->getLineEdit()->setReadOnly(!(this->data().getPropertyFlags() & Property::IsReadOnly));
 
+	m_path->getLineEdit()->setToolTip(determineToolTipToShow());
+
 	return true;
 }
 
@@ -108,4 +109,9 @@ void ot::PropertyInputPath::setCurrentFile(const QString& _file) {
 
 QString ot::PropertyInputPath::currentFile(void) const {
 	return m_path->getPath();
+}
+
+void ot::PropertyInputPath::updateToolTip()
+{
+	m_path->getLineEdit()->setToolTip(determineToolTipToShow());
 }

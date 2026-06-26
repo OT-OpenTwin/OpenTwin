@@ -2,6 +2,8 @@
 
 // OpenTwin header
 #include "OTCore/MetadataHandle/MetadataParameter.h"
+#include <cstring> // for sizeof
+#include "OTCore/MetadataHandle/Helper.h"
 
 MetadataParameter::MetadataParameter(const MetadataParameter& _other)
 	: parameterName(_other.parameterName), parameterLabel(_other.parameterLabel), parameterUID(_other.parameterUID),
@@ -49,6 +51,26 @@ void MetadataParameter::setFromJsonObject(const ot::ConstJsonObject& _object) {
 	values = converter(array);
 }
 
+size_t MetadataParameter::getMemSize()
+{
+	size_t total = sizeof(MetadataParameter);
+
+	total += ot::stringHeapSize(parameterName);
+	total += ot::stringHeapSize(parameterLabel);
+	total += ot::stringHeapSize(unit);
+	total += ot::stringHeapSize(typeName);
+
+	for (const ot::Variable& v : values)
+	{
+		total += sizeof(std::list<ot::Variable>::value_type);
+		total += 2 * sizeof(void*);
+	}
+
+	total += metaData.GetAllocator().Capacity();
+
+	return total;
+}
+
 void MetadataParameter::swap(MetadataParameter& _origin, MetadataParameter& _target) noexcept
 {
 	std::swap(_origin.parameterName, _target.parameterName);
@@ -58,4 +80,14 @@ void MetadataParameter::swap(MetadataParameter& _origin, MetadataParameter& _tar
 	std::swap(_origin.typeName, _target.typeName);
 	std::swap(_origin.values, _target.values);
 	_origin.metaData.Swap(_target.metaData);
+}
+
+void MetadataParameter::copyWithoutValues(const MetadataParameter& _other)
+{
+	parameterName = (_other.parameterName);
+	parameterLabel = (_other.parameterLabel);
+	parameterUID = (_other.parameterUID);
+	unit = (_other.unit);
+	typeName = (_other.typeName);
+	metaData.CopyFrom(_other.metaData, metaData.GetAllocator());
 }

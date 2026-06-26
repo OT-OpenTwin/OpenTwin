@@ -60,6 +60,7 @@ namespace ot {
 		virtual void createNavigationTreeEntry() override;
 		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 		virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap) override;
+		virtual std::string getElementTypeString() const override { return "Project"; };
 
 	private:
 		std::string m_projectName;

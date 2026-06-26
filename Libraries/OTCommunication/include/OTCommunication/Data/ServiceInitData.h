@@ -84,9 +84,6 @@ namespace ot {
 		void setUsername(const std::string& _username) { m_username = _username; };
 		const std::string& getUsername() const { return m_username; };
 
-		void setPassword(const std::string& _password) { m_password = _password; };
-		const std::string& getPassword() const { return m_password; };
-
 		void setDatabaseUsername(const std::string& _databaseUsername) { m_databaseUsername = _databaseUsername; };
 		const std::string& getDatabaseUsername() const { return m_databaseUsername; };
 
@@ -113,7 +110,6 @@ namespace ot {
 
 		std::string     m_databaseUrl;
 		std::string     m_username;
-		std::string     m_password;
 		std::string     m_databaseUsername;
 		std::string     m_databasePassword;
 		std::string     m_userCollection;

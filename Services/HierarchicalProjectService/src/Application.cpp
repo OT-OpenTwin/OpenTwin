@@ -79,6 +79,11 @@ Application::Application() :
 	connectAction(c_imageSelectedAction, this, &Application::handleImageSelected);
 
 	// Initialize toolbar buttons
+	m_showAllButton = ot::ToolBarButtonCfg(c_pageName, c_viewGroupName, "Show All", "Hierarchical/ShowAll");
+	m_showAllButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
+	m_showAllButton.setButtonToolTip("Show all items by expanding all collapsed subtrees.");
+	connectToolBarButton(m_showAllButton, this, &Application::handleShowAll);
+
 	m_addProjectButton = ot::ToolBarButtonCfg(c_pageName, c_managementGroupName, "Add Project", "Hierarchical/AddProject");
 	m_addProjectButton.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ModelRead);
 	m_addProjectButton.setButtonToolTip("Add an existing project.");
@@ -159,22 +164,22 @@ void Application::uiConnected(ot::components::UiComponent* _ui) {
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 
 	_ui->addMenuPage(c_pageName);
-	_ui->addMenuGroup(c_pageName, c_managementGroupName);
 
+	_ui->addMenuGroup(c_pageName, c_viewGroupName);
+	_ui->addMenuButton(m_showAllButton);
+
+	_ui->addMenuGroup(c_pageName, c_managementGroupName);
 	_ui->addMenuButton(m_addProjectButton);
 	_ui->addMenuButton(m_addContainerButton);
 	_ui->addMenuButton(m_addDocumentButton);
 
 	_ui->addMenuGroup(c_pageName, c_selectionGroupName);
-
 	_ui->addMenuButton(m_openSelectedItems);
-
 	_ui->addMenuButton(m_addCenterImageToBlockButton);
 	_ui->addMenuButton(m_removeCenterImageFromBlockButton);
 	_ui->addMenuButton(m_updateCenterImageOfProjectButton);
 
 	_ui->addMenuGroup(c_pageName, c_decorationGroupName);
-
 	_ui->addMenuSubGroup(c_pageName, c_decorationGroupName, c_decorationSub1Name);
 	_ui->addMenuButton(m_addLabelButton);
 	_ui->addMenuButton(m_addImageButton);
@@ -203,27 +208,7 @@ ot::ReturnMessage Application::graphicsItemRequested(const ot::GraphicsItemDropE
 
 ot::ReturnMessage Application::graphicsItemClicked(const ot::GraphicsClickEvent& _eventData)
 {
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetGraphicsItemMap, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_eventData.getEditorName(), doc.GetAllocator()), doc.GetAllocator());
-
-	std::string responseStr;
-	if (!sendMessage(false, OT_INFO_SERVICE_TYPE_MODEL, doc, responseStr)) {
-		OT_LOG_E("Failed to send message to model for graphics item click event");
-		return ot::ReturnMessage::Failed;
-	}
-
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-	if (!response.isOk())
-	{
-		OT_LOG_ES("Model returned error for graphics item click event: " << response.getWhat());
-		return ot::ReturnMessage::Failed;
-	}
-
-	ot::JsonDocument itemMapDoc;
-	itemMapDoc.Parse(response.getWhat().c_str());
-
-	ot::GraphicsItemMap itemMap(itemMapDoc.getConstObject());
+	ot::GraphicsItemMap itemMap = ot::ModelServiceAPI::getGraphicsItemMap(_eventData.getEditorName());
 	m_entityHandler.expandCollapseSubtree(_eventData, itemMap);
 
 	return ot::ReturnMessage::Ok;
@@ -455,6 +440,12 @@ void Application::handleAddImage() {
 
 	auto filter = ot::FileExtension::toFilterString({ ot::FileExtension::Png, ot::FileExtension::Jpeg, ot::FileExtension::Svg });
 	ot::Frontend::requestFileForReading(c_imageSelectedAction, "Select Image", filter, true, true);
+}
+
+void Application::handleShowAll()
+{
+	ot::GraphicsItemMap itemMap = ot::ModelServiceAPI::getGraphicsItemMap(ot::FolderNames::HierarchicalProjectRoot);
+	m_entityHandler.showAll(itemMap);
 }
 
 void Application::handleOpenSelectedItems() {

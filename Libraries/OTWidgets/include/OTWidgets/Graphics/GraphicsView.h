@@ -264,6 +264,9 @@ namespace ot {
 		//! All currently selected items will notify a move change and configuration change if their position has changed.
 		void endItemMove();
 
+		//! @brief Updates the connections of the given list of connections.
+		void updateConnections(ot::UIDList _connections);
+
 		//! @brief Key to determine the picker that may drop items into the view.
 		std::string m_pickerKey;
 

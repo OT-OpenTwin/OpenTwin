@@ -51,3 +51,18 @@ EntityBase* ot::EntityAPI::readEntityFromEntityIDandVersion(UID _entityID, UID _
 
 }
 
+void ot::EntityAPI::prefetchEntities(const std::list<EntityInformation>& _entityInfos)
+{
+	DataBase::instance().prefetchDocumentsFromStorage(_entityInfos);
+}
+
+void ot::EntityAPI::prefetchEntities(const std::list<BasicEntityInformation>& _entityInfos)
+{
+	DataBase::instance().prefetchDocumentsFromStorage(_entityInfos);
+}
+
+void ot::EntityAPI::prefetchEntities(const std::list<std::pair<UID, UID>>& _entityIDVersionPairs)
+{
+	DataBase::instance().prefetchDocumentsFromStorage(_entityIDVersionPairs);
+}
+

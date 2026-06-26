@@ -55,6 +55,7 @@ public:
 		TableRemoveColumn,
 
 		PlotExportImage,
+		PlotExportPlotly,
 		PlotShowSelected,
 		PlotHideSelected,
 
@@ -121,6 +122,7 @@ private:
 	ot::UID m_tableRemoveColumnID;
 
 	ot::UID m_plotExportImage;
+	ot::UID m_plotExportPlotly;
 	ot::UID m_plotShowSelected;
 	ot::UID m_plotHideSelected;
 };

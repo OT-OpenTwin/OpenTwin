@@ -99,3 +99,34 @@ bool ot::Frontend::setEntitiesSelected(const UIDList& _entityIDs, bool _selected
 
 	return GuiAPIManager::instance().sendQueuedRequestToFrontend(uiDoc.toJson());
 }
+
+bool ot::Frontend::promptChoice(const std::string& _callbackAction, const std::string& _title, const std::string& _message, ot::MessageDialogCfg::BasicIcon _icon, ot::MessageDialogCfg::BasicButtons _buttons, const std::string& _additionalInfo)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptInformation, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::MessageDialogCfg config;
+	config.setText(_message);
+	config.setIcon(_icon);
+	config.setButtons(_buttons);
+	config.setTitle(_title);
+	ot::JsonObject configObj;
+	config.addToJsonObject(configObj, doc.GetAllocator());
+
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, JsonString(ThisService::instance().getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(_callbackAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(config, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(_additionalInfo, doc.GetAllocator()), doc.GetAllocator());
+
+	return GuiAPIManager::instance().sendQueuedRequestToFrontend(doc.toJson());
+}
+
+bool ot::Frontend::displayTemporaryStateMessage(const std::string& _message, int _displayDurationMs)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_DisplayStateMessage, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Text, ot::JsonString(_message, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Timeout, _displayDurationMs, doc.GetAllocator());
+
+	return GuiAPIManager::instance().sendQueuedRequestToFrontend(doc.toJson());
+}

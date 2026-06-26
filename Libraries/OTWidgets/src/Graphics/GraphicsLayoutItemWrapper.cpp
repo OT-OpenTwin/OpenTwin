@@ -28,7 +28,6 @@ ot::GraphicsLayoutItemWrapper::GraphicsLayoutItemWrapper(GraphicsLayoutItem* _ow
 	OTAssertNullptr(m_owner);
 	this->setSizePolicy(QSizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred));
 	this->setFlags(this->flags() | QGraphicsItem::ItemSendsScenePositionChanges);
-	this->setAcceptHoverEvents(true);
 	this->setForwardSizeChanges(true);
 }
 
@@ -82,6 +81,10 @@ void ot::GraphicsLayoutItemWrapper::callPaint(QPainter* _painter, const QStyleOp
 }
 
 void ot::GraphicsLayoutItemWrapper::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+	if (!this->considerItemForPaint())
+	{
+		return;
+	}
 	QGraphicsWidget::paint(_painter, _opt, _widget);
 }
 

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ResultImportLogger.cpp
 // 
 // License:
@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
+#include "OTCore/MetadataHandle/Helper.h"
 
 void ResultImportLogger::log(std::string& _message, ResultImportLoggerVerbosity _verbosity)
 {
@@ -62,3 +63,23 @@ void ResultImportLogger::clearLog()
 {
 	m_log.clear();
 }
+
+size_t ResultImportLogger::getMemSize()
+{
+	size_t total = sizeof(ResultImportLogger);
+
+	// --- std::list<ResultImportLoggerEntry> m_log ---
+	// Each node holds a ResultImportLoggerEntry (enum + string).
+	// The enum is a scalar — no heap cost beyond sizeof.
+	// The string may have a heap buffer.
+	for (const ResultImportLoggerEntry& entry : m_log)
+	{
+		total += sizeof(ResultImportLoggerEntry); // enum + string in-object storage
+		total += ot::stringHeapSize(entry.m_message); // string heap buffer if above SSO
+		total += 2 * sizeof(void*);               // list node prev/next pointers
+	}
+
+	return total;
+
+}
+

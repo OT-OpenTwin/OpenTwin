@@ -36,6 +36,7 @@
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "MetadataHandler.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
+#include "ProjectInfoHandler.h"
 
 // std header
 #include <string>
@@ -72,11 +73,15 @@ public:
 	virtual void sendMessageToViewer(ot::JsonDocument &doc, std::list<std::pair<ot::UID, ot::UID>> &prefetchIds) override;
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) override;
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) override;
+	virtual void connectionChanged(EntityBase* _entity) override;
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) override;
+	virtual void requestVisualisationIfNeeded(ot::UID _entityID) override;
+	virtual std::optional<std::string> getCollectionName(const std::string& _projectName) override;
 	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) override;
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) override;
-	virtual bool projectIsOpen() override;
-
+	virtual const ot::ModelServiceState& getModelServiceState() const override { return m_serviceState; };
+	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const override;
+	
 
 	Model(const std::string &_projectName, const std::string& _projectType, const std::string& _collectionName);
 	virtual ~Model();
@@ -160,7 +165,6 @@ public:
 
 	void addVisualizationContainerNode(const std::string &name, ot::UID entityID, bool isEditable);
 	
-	bool isProjectOpen() const { return m_isProjectOpen; };
 	void projectOpen(const std::string& _customVersion = std::string());
 	void projectSave(const std::string &comment, bool silentlyCreateBranch);
 
@@ -234,7 +238,7 @@ public:
 	ModelState* getStateManager();
 	void setStateMangager(ModelState* state);
 
-	void promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1);
+	void discardRedoInfoAndSaveResponse(ot::MessageDialogCfg::BasicButton _answer, const std::string& _comment);
 
 	EntityBase* getEntityByID(ot::UID _entityID) const;
 
@@ -318,7 +322,13 @@ private:
 	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
 	std::string ensureUniqueName(const std::string& name);
 
-		// Button callbacks
+	// Action handler
+	constexpr static std::string_view c_promptActionDiscardRedoInfoAndSave = "Model.Prompt.DiscardRedoInfoAndSave";
+
+	ot::ActionHandler m_actionHandler;
+	void handleDiscardRedoInfoAndSavePromptResponse(ot::JsonDocument& _document);
+
+	// Button callbacks
 	ot::ButtonHandler m_buttonHandler;
 	ot::ToolBarButtonCfg m_undoButton;
 	ot::ToolBarButtonCfg m_redoButton;
@@ -338,6 +348,7 @@ private:
 	void handleShowDatasetInformation();
 
 	MetadataHandler m_metadataHandler;
+	ProjectInfoHandler m_projectInfoHandler;
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer*               m_entityRoot;
@@ -350,7 +361,7 @@ private:
 	std::map<EntityBase*, bool>	   m_pendingEntityUpdates;
 	
 	// Temporary attributes
-	bool                           m_isProjectOpen;
+	ot::ModelServiceState          m_serviceState;
 	ot::UID						   m_visualizationModelID;
 	bool						   m_isModified;
 	std::string					   m_projectName;
@@ -365,9 +376,6 @@ private:
 
 	// Model state manager
 	ModelState *                   m_stateManager;
-
-	// Flag indicating whether the model is currently shutting down (no more modified messages are sent)
-	bool                           m_shutdown;
 
 	// List of Modal operations
 	std::list<ModalCommandBase *>  m_modalCommands;

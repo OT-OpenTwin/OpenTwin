@@ -24,7 +24,7 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
    * - ``OTQt.cmake``
      - Finds Qt 6 and defines the imported ``Qt6::*`` targets used by the
        ``Qt*`` dependency tokens.
-	 - Instead of using ``find_package()`` we directly read set environment for our ``Qt`` packges.
+       Instead of using ``find_package()`` we directly read set environment for our ``Qt`` packges.
    * - ``OTPresets.json``
      - The shared ``CMakePresets`` definition that every project includes, so
        the configurations (such as ``windows-debug`` and ``windows-release``)

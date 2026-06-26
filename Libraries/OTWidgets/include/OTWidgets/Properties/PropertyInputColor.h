@@ -53,6 +53,9 @@ namespace ot {
 
 		ColorPickButton* getColorPickButton(void) const { return m_colorBtn; };
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private:
 		ColorPickButton* m_colorBtn;
 	};

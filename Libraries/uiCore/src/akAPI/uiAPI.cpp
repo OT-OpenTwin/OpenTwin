@@ -804,33 +804,6 @@ void ak::uiAPI::window::removeEventHandler(
 	aWindowEventHandler *							_eventHandler
 ) { object::get<aWindowManager>(_windowUID)->removeEventHandler(_eventHandler); }
 
-void ak::uiAPI::window::setStatusLabelVisible(
-	UID												_windowUID,
-	bool												_visible,
-	bool												_delayed
-) { object::get<aWindowManager>(_windowUID)->setStatusLabelVisible(_visible, _delayed); }
-
-void ak::uiAPI::window::setStatusProgressVisible(
-	UID												_windowUID,
-	bool												_visible,
-	bool												_delayed
-) { object::get<aWindowManager>(_windowUID)->setStatusBarVisible(_visible, _delayed); }
-
-void ak::uiAPI::window::setStatusLabelText(
-	UID												_windowUID,
-	const QString &										_text
-) { object::get<aWindowManager>(_windowUID)->setStatusLabelText(_text); }
-
-void ak::uiAPI::window::setStatusProgressValue(
-	UID												_windowUID,
-	int													_value
-) { object::get<aWindowManager>(_windowUID)->setStatusBarProgress(_value); }
-
-void ak::uiAPI::window::setStatusProgressContinuous(
-	UID												_windowUID,
-	bool												_continuous
-) { object::get<aWindowManager>(_windowUID)->setStatusBarContinuous(_continuous); }
-
 void ak::uiAPI::window::setTabToolBarVisible(
 	UID												_windowUID,
 	bool												_visible
@@ -885,26 +858,6 @@ void ak::uiAPI::window::setWindowIcon(
 	UID												_windowUID,
 	const QIcon &										_icon
 ) { object::get<aWindowManager>(_windowUID)->setWindowIcon(_icon); }
-
-bool ak::uiAPI::window::getStatusLabelVisible(
-	UID												_windowUID
-) { return object::get<aWindowManager>(_windowUID)->getStatusLabelVisible(); }
-
-bool ak::uiAPI::window::getStatusProgressVisible(
-	UID												_windowUID
-) { return object::get<aWindowManager>(_windowUID)->getStatusBarVisible(); }
-
-QString ak::uiAPI::window::getStatusLabelText(
-	UID												_windowUID
-) { return object::get<aWindowManager>(_windowUID)->getStatusLabelText(); }
-
-int ak::uiAPI::window::getStatusProgressValue(
-	UID												_windowUID
-) { return object::get<aWindowManager>(_windowUID)->getStatusBarProgress(); }
-
-bool ak::uiAPI::window::getStatusProgressContinuous(
-	UID												_windowUID
-) { return object::get<aWindowManager>(_windowUID)->getStatusBarContinuous(); }
 
 void ak::uiAPI::window::setCentralWidget(
 	UID												_windowUID,

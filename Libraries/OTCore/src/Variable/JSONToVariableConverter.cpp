@@ -19,6 +19,8 @@
 
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ComplexNumbers/SerialisationKeys.h"
+#include "OTCore/Tuple/TupleDescriptionComplex.h"
+
 
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 {
@@ -168,6 +170,32 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	}
 }
 
+
+ot::Variable ot::JSONToVariableConverter::operator() (const ot::JsonValue& value, const ot::TupleInstance& _tupleInstance)
+{
+	if (_tupleInstance.isSingle())
+	{
+		const std::string type = _tupleInstance.getTupleElementDataTypes().front();
+		return operator()(value, type);
+	}
+	else
+	{
+		if (_tupleInstance.getTupleTypeName() == TupleDescriptionComplex::name())
+		{
+			ot::ConstJsonObject temp = value.GetObject();
+			double real = temp[ot::ComplexNumbers::SerialisationKeys::g_real.c_str()].GetDouble();
+			double imag = temp[ot::ComplexNumbers::SerialisationKeys::g_imag.c_str()].GetDouble();
+			return ot::Variable(std::complex<double>(real, imag));
+		}
+		else
+		{
+			throw std::exception("Cast to variant not possible due to type mismatch");
+		}
+			
+	}
+}
+
+
 std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArray& value)
 {
 	std::list<ot::Variable> variables;
@@ -181,21 +209,42 @@ std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArr
 	return variables;
 }
 
-bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const std::string _type)
+bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const ot::TupleInstance& _tupleInstance)
 {
 	auto type =	value.GetType();
+	bool compatible = false;
+	if (_tupleInstance.isSingle())
+	{
+		std::string type = _tupleInstance.getTupleElementDataTypes().front();
+		compatible = typeIsCompatible(value, type);
+	}
+	else
+	{
+		
+		if (_tupleInstance.getTupleTypeName() == TupleDescriptionComplex::name())
+		{
+			compatible = value.IsObject() && 
+				json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_real) &&
+				json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_imag);
+		}
+	}
+	return compatible;
+}
+
+bool ot::JSONToVariableConverter::typeIsCompatible(const ot::JsonValue& value, const std::string& _type)
+{
 	bool compatible = false;
 	if (_type == ot::TypeNames::getStringTypeName())
 	{
 		compatible = value.IsString();
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
-	{		
+	{
 		compatible = value.IsInt() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
 	{
-		compatible =  value.IsInt64() || value.IsNumber();
+		compatible = value.IsInt64() || value.IsNumber();
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
 	{
@@ -215,4 +264,3 @@ bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const
 	}
 	return compatible;
 }
-

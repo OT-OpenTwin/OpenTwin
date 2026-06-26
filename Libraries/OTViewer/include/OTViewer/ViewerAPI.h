@@ -151,6 +151,8 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 
+	__declspec(dllexport) void requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID);
+
 	/********************************************************************************************/
 
 	__declspec(dllexport) void viewerTabChanged(const ot::WidgetViewBase& _viewInfo);

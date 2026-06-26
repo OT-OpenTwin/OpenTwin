@@ -19,7 +19,8 @@
 
 // OpenTwin header
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
-
+#include "OTCore/MetadataHandle/Helper.h"
+#include "OTCore/Logging/Logger.h"
 // std header
 #include <cassert>
 
@@ -236,4 +237,66 @@ void MetadataCampaign::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 		allSeries.PushBack(object, _allocator);
 	}
 	_object.AddMember("series", allSeries, _allocator);
+}
+
+size_t MetadataCampaign::getMemSize()
+{
+	size_t total = sizeof(MetadataCampaign);
+
+	// --- std::string m_campaignName ---
+	total += ot::stringHeapSize(m_campaignName);
+
+	// --- std::list<MetadataSeries> m_seriesMetadata ---
+	size_t seriesMemPart = 0;
+	for (MetadataSeries& s : m_seriesMetadata)
+	{
+		seriesMemPart += s.getMemSize();        // full object footprint incl. sizeof(MetadataSeries)
+		seriesMemPart += 2 * sizeof(void*);     // list node prev/next pointers
+	}
+
+	double seriesMemPartMB = seriesMemPart / (1024 * 1024);
+	OT_USER_LOG_I("Series Mem in MB: " + std::to_string(seriesMemPartMB));
+	total += seriesMemPart;
+
+	// --- std::map<ot::UID, MetadataQuantity> m_quantityOverviewByUID ---
+	// Each std::map node is a heap-allocated red-black tree node containing:
+	//   - the key/value pair (std::pair<const ot::UID, MetadataQuantity>)
+	//   - three pointers (left, right, parent) + one color bit (typically padded to pointer size)
+	constexpr size_t mapNodeOverhead = 3 * sizeof(void*) + sizeof(void*); // 4 words typical
+	for (auto& [uid, quantity] : m_quantityOverviewByUID)
+	{
+		total += quantity.getMemSize();  // full object footprint incl. sizeof(MetadataQuantity)
+		total += mapNodeOverhead;
+	}
+
+	// --- std::map<ot::UID, MetadataParameter> m_parameterOverviewByUID ---
+	for (auto& [uid, parameter] : m_parameterOverviewByUID)
+	{
+		total += parameter.getMemSize(); // full object footprint incl. sizeof(MetadataParameter)
+		total += mapNodeOverhead;
+	}
+
+	// --- std::map<std::string, MetadataQuantity*> m_quantityOverviewByLabel ---
+	// These maps hold NON-OWNING pointers into m_quantityOverviewByUID.
+	// Count only the map node structure + the key string heap cost.
+	// Do NOT count the pointed-to MetadataQuantity objects (already counted above).
+	for (auto& [label, ptr] : m_quantityOverviewByLabel)
+	{
+		total += ot::stringHeapSize(label);  // std::string key heap allocation
+		total += mapNodeOverhead;        // tree node overhead
+		total += sizeof(MetadataQuantity*); // the pointer value itself (in the node payload)
+	}
+
+	// --- std::map<std::string, MetadataParameter*> m_parameterOverviewByLabel ---
+	for (const auto& [label, ptr] : m_parameterOverviewByLabel)
+	{
+		total += ot::stringHeapSize(label);
+		total += mapNodeOverhead;
+		total += sizeof(MetadataParameter*);
+	}
+
+	// --- ot::JsonDocument m_metaData ---
+	total += m_metaData.GetAllocator().Capacity();
+
+	return total;
 }

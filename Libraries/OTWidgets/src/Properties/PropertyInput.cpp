@@ -38,19 +38,40 @@ bool ot::PropertyInput::setupFromConfiguration(const Property* _configuration) {
 void ot::PropertyInput::slotValueChanged(void) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
+	updateToolTip();
 	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
 }
 
 void ot::PropertyInput::slotValueChanged(bool) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
+	updateToolTip();
 	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
 }
 
 void ot::PropertyInput::slotValueChanged(int) {
 	m_data.getPropertyFlags() &= (~Property::HasMultipleValues);
 	m_dataChanged = true;
+	updateToolTip();
 	QMetaObject::invokeMethod(this, &PropertyInput::slotEmitValueChanged, Qt::QueuedConnection);
+}
+
+QString ot::PropertyInput::determineToolTipToShow() const
+{
+	QString propertyTip = QString::fromStdString(this->data().getPropertyTip());
+	QString propertyValueString = getCurrentValue().toString();
+	if (!propertyTip.isEmpty())
+	{
+		if (!propertyValueString.isEmpty() && !m_data.getPropertyFlags().has(Property::HasMultipleValues))
+		{
+			propertyTip.append("\n\nCurrent Value: " + propertyValueString);
+		}
+	}
+	else
+	{
+		propertyTip = propertyValueString;
+	}
+	return propertyTip;
 }
 
 void ot::PropertyInput::slotEmitValueChanged(void) {

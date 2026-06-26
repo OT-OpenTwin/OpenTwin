@@ -127,6 +127,8 @@ public:
 
 	void setRequiresGlobalTransformationMatrix(bool flag) { m_requiresGlobalTransformationMatrix = flag; };
 
+	void requestVisualizationIfNeeded();
+
 protected:
 	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
 	//osg::Switch* m_shapeNode = nullptr;

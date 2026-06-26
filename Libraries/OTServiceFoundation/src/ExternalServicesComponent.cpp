@@ -201,7 +201,6 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	m_application->setDataBaseURL(_initData.getDatabaseUrl());
 	m_application->m_dbUserCollection = _initData.getUserCollection();
 	m_application->m_loggedInUserName = _initData.getUsername();
-	m_application->m_loggedInUserPassword = _initData.getPassword();
 	m_application->m_dataBaseUserName = _initData.getDatabaseUsername();
 	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
 

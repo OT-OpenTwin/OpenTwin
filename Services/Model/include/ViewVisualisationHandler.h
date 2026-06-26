@@ -27,6 +27,7 @@ class ViewVisualisationHandler
 {
 public:
 	void handleVisualisationRequest(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg);
+	void requestVisualisationIfNeeded(ot::UID _entityID);
 	void handleRenaming(ot::UID _entityID);
 private:
 	void setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView);

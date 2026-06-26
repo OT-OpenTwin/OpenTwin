@@ -98,70 +98,6 @@ namespace ak {
 			QWidget *												_centralWidget
 		);
 
-		// #############################################################################################################
-
-		// Status
-
-		//! @brief Will set the text of the status label
-		//! @param _status The text to be set
-		void setStatusLabelText(
-			const QString &											_status
-		);
-
-		//! @brief Will set the visible state of the status label
-		//! If the show delayed option is active the delay timer will start and set the visible state of the status label on timeout
-		//! @param _visible If true, the status label will be set to visible, otherwise to hidden
-		//! @param _hideDelayed If true, the status label will be hidden by the delay timer
-		void setStatusLabelVisible(
-			bool													_visible = true,
-			bool													_hideDelayed = true
-		);
-
-		//! @brief Will set the progress of the status bar
-		//! @param _progress The progress to set the status bar (0 - 100)
-		void setStatusBarProgress(
-			int														_progress
-		);
-
-		//! @brief Will set the visible state of the progress bar
-		//! If the show delayed option is active the delay timer will start and set the visible state of the progress bar on timeout
-		//! @param _visible If true, the progress bar will be set to visible, otherwise to hidden
-		//! @param _resetOnHide If true, the progress bar progress will be set to 0 if it is hidden
-		//! @param _showDelayed If true, the progress bar will be shown/hidden by the delay timer
-		void setStatusBarVisible(
-			bool													_visible,
-			bool													_showDelayed = true
-		);
-
-		//! @brief Will set the status bar to an continuous stage
-		void setStatusBarContinuous(
-			bool													_continuos = true
-		);
-
-		bool getStatusBarVisible(void) const;
-
-		bool getStatusLabelVisible(void) const;
-
-		QString getStatusLabelText(void) const;
-
-		int getStatusBarProgress(void) const;
-
-		bool getStatusBarContinuous(void) const;
-
-		//! @brief Will set the interval for the status label and progress bar show timer
-		//! @param _interval The interval to be set
-		void setShowStatusObjectDelayTimerInterval(int _interval);
-
-		//! @brief Will set the interval for the status label and progress bar hide timer
-		//! @param _interval The interval to be set
-		void setHideStatusObjectDelayTimerInterval(int _interval);
-
-		//! @brief Will return the currently set interval for the status label and progress bar show timer
-		int getShowStatusObjectDelayTimerInterval(void) const;
-
-		//! @brief Will return the currently set interval for the status label and progress bar hide timer
-		int getHideStatusObjectDelayTimerInterval(void) const;
-
 		void setWaitingAnimationVisible(
 			bool									_visible
 		);
@@ -318,23 +254,14 @@ namespace ak {
 
 		aWindow *							m_window;						//! The QMainWindow the UI manager is applying its changes to
 
-		QLabel *							m_statusLabel;					//! The label used to display status messages
-		QProgressBar *						m_progressBar;					//! The progress bar used to display the progress of
-
 		aMessenger *						m_messenger;					//! The messenger used in this object
 		aUidManager *						m_uidManager;					//! The UID manager used in this object
 		tt::TabToolbar *					m_tabToolBar;					//! The TabToolBar of this window
 		aWindowManagerTimerSignalLinker *	m_timerSignalLinker;			//! The signal linker used to link the timer singnals
 
 		QStringList							m_tabToolBarTabOrder;
-		bool								m_progressBarContinuous;		//! If true, the status bar ist currently continuous
-
-		QTimer *							m_timerProgressShow;			//! The timer used to show the progress bar delayed
-		QTimer *							m_timerProgressHide;			//! The timer used to hide the progress bar delayed
-		QTimer *							m_timerLabelShow;				//! The timer used to show the status label delayed
-		QTimer *							m_timerLabelHide;				//! The timer used to hide the status label delayed
+		
 		QTimer *							m_timerShowMainWindow;			//! The timer used to show the main window upon creation
-
 		std::vector<aTtbContainer *>		m_tabToolBarContainer;
 	};
 } // namespace ak

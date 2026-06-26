@@ -53,43 +53,96 @@ namespace ot {
 		//! @brief GraphicsItemFlag
 		enum GraphicsItemFlag : uint64_t
 		{
-			NoFlags                    = 0 << 0, //! @brief No item flags.
-			ItemIsMoveable             = 1 << 0, //! @brief Item may be used by the user. If the item has a parent, the item may be moved inside of the parent item.
-			ItemIsSelectable           = 1 << 1, //! @brief The item can be selected by the user.
-			ItemIsConnectable          = 1 << 2, //! @brief Item can be used as source or destination of a conncetion.
+			//! @brief No item flags.
+			NoFlags                             = 0 << 0,
 
-			ItemSnapsToGridTopLeft     = 1 << 3, //! @brief Item snaps to grid on the top left corner of the bounding rect.
-			ItemSnapsToGridCenter      = 1 << 4, //! @brief Item snaps to grid at the center of the bounding rect (will be ignored if ItemSnapsToGridTopLeft is set).
+			// ###########################################################################################################################################################################################################################################################################################################################
 
-			//! @brief If the user hovers over this item and no tooltip is set, the tooltip request will be forwarded to the parent item.
-			//! @note If this flag is not set this item also wont forward tooltip requests from child items.
-			ItemForwardsTooltip        = 1 << 5,
+			// User interaction
+
+			//! @brief Item may be moved by the user.
+			ItemIsMoveable                      = 1 << 0,
+
+			//! @brief The item can be selected by the user.
+			ItemIsSelectable                    = 1 << 1,
+
+			//! @brief Item can be used as source or destination of a conncetion.
+			ItemIsConnectable                   = 1 << 2,
 
 			//! @brief User transform and transform shortcuts are enabled for this item.
 			//! The user can rotate and flip the item by using the shortcuts or actions.
-			ItemUserTransformEnabled   = 1 << 6,
+			ItemUserTransformEnabled            = 1 << 3,
+
+			//! @brief Item can be clicked by the user.
+			//! If the item has a parent, the item may be clicked inside of the parent item.
+			ItemIsClickable                     = 1 << 4,
+
+			//! @brief Item can be double-clicked by the user.
+			//! If the item has a parent, the item may be double-clicked inside of the parent item.
+			ItemIsDoubleClickable               = 1 << 5,
+
+			// ###########################################################################################################################################################################################################################################################################################################################
+
+			// Item behavior
+
+			//! @brief Item snaps to grid on the top left corner of the bounding rectangle.
+			ItemSnapsToGridTopLeft              = 1 << 10,
+
+			//! @brief Item snaps to grid at the center of the bounding rectangle.
+			//! This flag will be ignored if ItemSnapsToGridTopLeft is set.
+			ItemSnapsToGridCenter               = 1 << 11,
 
 			//! @brief Item transformations to the parent item will not affect this item.
 			//! If the item is located in a group for example, any transformations to the group won't affect this item.
 			//! The item will apply the inverse transformation to keep its transformation.
-			ItemIgnoresParentTransform = 1 << 7,
+			ItemIgnoresParentTransform          = 1 << 12,
 
-			//! @brief Item receives state changes.
-			//! The item will paint its border and/or background differently if the item is selected or is hovered by the user.
+			//! @brief Item will not send notifications to the scene when it is changed.
+			ItemSilencesNotifcations            = 1 << 13,
+
+			//! @brief The item will be considered when determining the state of items by the scene.
+			ItemParticipatesInStateHandling     = 1 << 14,
+			
+			//! @brief Item forwards state changes to its child items.
+			//! This allows child items to react to state changes of the parent item (e.g. hover or selection) even if the child item is not directly hovered or selected.
+			ItemForwardsState                   = 1 << 15,
+
+			// ###########################################################################################################################################################################################################################################################################################################################
+
+			// Item appearance
+
+			//! @brief The item will paint its border and/or background differently if the item is selected or is hovered by the user.
 			//! A StyleRefPainter2D will be used for painting the state.
 			//! @ref enum class ot::ColorStyleValueEntry
-			ItemHandlesState           = 1 << 8,
+			ItemUsesStateStyling                = 1 << 20,
+						
+			//! @brief Item is only visible when selected.
+			//! This will make the item invisible by default.
+			//! Will show the item if another flag hides the item by default (e.g. ItemVisibleWhenHovered) and the item is selected.
+			ItemVisibleWhenSelected             = 1 << 21,
 
-			//! @brief Item forwards state changes to child items.
-			//! If the root item is a container item (e.g. GraphicsGroupItem) it have this flag set in order to forward the state change to its child items.
-			ItemForwardsState          = 1 << 9,
+			//! @brief Item is only visible when any of its ancestors is selected.
+			//! This will make the item invisible by default.
+			//! Will show the item if another flag hides the item by default (e.g. ItemVisibleWhenHovered) and any of its ancestors is selected.
+			ItemVisibleWhenAncestorSelected     = 1 << 22,
 
-			ItemSilencesNotifcations   = 1 << 10, //! @brief Item will not send notifications to the scene when it is changed.
+			//! @brief Item is only visible when hovered.
+			//! This will make the item invisible by default.
+			//! Will show the item if another flag hides the item by default (e.g. ItemVisibleWhenSelected) and the item is hovered.
+			ItemVisibleWhenHovered              = 1 << 23,
 
-			ItemIsClickable            = 1 << 11, //! @brief Item can be clicked by the user. If the item has a parent, the item may be clicked inside of the parent item.
-			ItemIsDoubleClickable      = 1 << 12, //! @brief Item can be double-clicked by the user. If the item has a parent, the item may be double-clicked inside of the parent item.
+			//! @brief Item is only visible when any of its parent is hovered.
+			//! This will make the item invisible by default.
+			//! Will show the item if another flag hides the item by default (e.g. ItemVisibleWhenSelected) and any of its ancestors is hovered.
+			ItemVisibleWhenAncestorHovered      = 1 << 24,
 		};
 		typedef Flags<GraphicsItemFlag> GraphicsItemFlags; //! @brief GraphicsItemFlags
+
+		static std::string flagToString(GraphicsItemFlag _flag);
+		static GraphicsItemFlag stringToFlag(const std::string& _flagStr);
+
+		static std::list<std::string> flagsToStringList(const GraphicsItemFlags& _flags);
+		static GraphicsItemFlags stringListToFlags(const std::list<std::string>& _flagStrList);
 
 		GraphicsItemCfg();
 		virtual ~GraphicsItemCfg();

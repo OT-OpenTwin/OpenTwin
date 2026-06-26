@@ -73,12 +73,6 @@ void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _st
 	bsoncxx::builder::basic::array parameter;
 	for (const auto& param : m_series.getParameter())
 	{
-		bsoncxx::builder::basic::array values;
-		VariableToBSONConverter converter;
-		for (const auto& entry : param.values)
-		{
-			converter(values, entry);
-		}
 		const std::string metadata = ot::json::toJson(param.metaData);
 		bsoncxx::document::value metadataDoc = bsoncxx::from_json(metadata);
 
@@ -88,7 +82,6 @@ void EntityMetadataSeries::addStorageData(bsoncxx::builder::basic::document& _st
 			kvp("name", param.parameterName),
 			kvp("uid", static_cast<int64_t>(param.parameterUID)),
 			kvp("unit", param.unit),
-			kvp("values", values.view()),
 			kvp("metadata", metadataDoc.view())
 		);
 		parameter.append(subdoc.view());
@@ -173,12 +166,6 @@ void EntityMetadataSeries::readSpecificDataFromDataBase(const bsoncxx::document:
 		param.unit = std::string(paramDoc["unit"].get_string().value);
 		param.typeName = std::string(paramDoc["type"].get_string().value);
 		
-		BSONToVariableConverter converter;
-		for (const auto& valElem : paramDoc["values"].get_array().value)
-		{
-			param.values.push_back(converter(valElem)); 
-		}
-
 		const std::string metaJson = bsoncxx::to_json(paramDoc["metadata"].get_document().value);
 		param.metaData.fromJson(metaJson);
 	

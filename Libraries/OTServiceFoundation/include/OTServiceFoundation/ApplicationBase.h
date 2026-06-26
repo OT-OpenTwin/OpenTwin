@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ApplicationBase.h
 // 
 // License:
@@ -123,6 +123,7 @@ namespace ot {
 
 		//! @brief Will return the URL of the authorization service.
 		const std::string& getAuthorizationUrl() const { return m_authUrl; };
+		void setAuthorizationURL(const std::string _url) { m_authUrl = _url; }
 
 		//! @brief Will return the URL of the database.
 		const std::string& getDataBaseURL() const { return m_databaseURL; }
@@ -187,7 +188,6 @@ namespace ot {
 		const std::map<UID, UID>& getPrefetchedEntityVersions() const { return m_prefetchedEntityVersions; };
 
 		const std::string& getLogInUserName() const { return m_loggedInUserName; };
-		const std::string& getLogInUserPassword() const { return m_loggedInUserPassword; };
 
 		const std::string& getDataBaseUserName() const { return m_dataBaseUserName; };
 		const std::string& getDataBaseUserPassword() const { return m_dataBaseUserPassword; };
@@ -433,7 +433,6 @@ namespace ot {
 		std::string                         m_projectType;
 
 		std::string                         m_loggedInUserName;
-		std::string                         m_loggedInUserPassword;
 		std::string                         m_dataBaseUserName;
 		std::string                         m_dataBaseUserPassword;
 

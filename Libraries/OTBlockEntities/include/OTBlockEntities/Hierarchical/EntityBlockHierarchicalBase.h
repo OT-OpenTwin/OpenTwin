@@ -52,6 +52,8 @@ namespace ot {
 
 		virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
+		virtual void connectionsHaveChanged() override;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Data accessors
@@ -113,6 +115,8 @@ namespace ot {
 
 		void ensureCenterImageLoaded();
 
+		virtual std::string getElementTypeString() const = 0;
+
 	private:
 		ot::UID m_centerImageUID;
 		ot::UID m_centerImageVersion;
@@ -128,6 +132,8 @@ namespace ot {
 		void createImageProperties(const std::string& _group, bool _isCenter);
 
 		bool updateTextProperties(const std::string& _group, const std::string& _showTextPropertyName);
+
+		GraphicsHierarchicalItemBuilder::ExpanderState determineCurrentExpanderState(Alignment _connectorAlignment);
 	};
 
 }

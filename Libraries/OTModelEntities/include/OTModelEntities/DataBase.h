@@ -106,7 +106,8 @@ public:
 	bool getAllDocumentsFromFilter(std::map<std::string, bsoncxx::types::value>& _filterPairs, std::vector<std::string>& _columnNames, bsoncxx::builder::basic::document& _doc);
 
 	void prefetchDocumentsFromStorage(const std::list<std::pair<ot::UID, ot::UID>>& _prefetchIdandVersion);
-	void prefetchDocumentsFromStorage(std::list<ot::EntityInformation> _entitiesInfo);
+	void prefetchDocumentsFromStorage(const std::list<ot::EntityInformation>& _entitiesInfo);
+	void prefetchDocumentsFromStorage(const std::list<ot::BasicEntityInformation>& _entitiesInfo);
 
 	static int64_t getIntFromView(const bsoncxx::document::view& _doc_view, const char* _elementName) { return getIntFromView(_doc_view, _elementName, 0); };
 	static int64_t getIntFromView(const bsoncxx::document::view& _doc_view, const char* _elementName, int64_t _defaultValue);

@@ -47,7 +47,6 @@ void ot::ServiceInitData::addToJsonObject(JsonValue& _jsonObject, JsonAllocator&
 
 	_jsonObject.AddMember("DatabaseUrl", JsonString(m_databaseUrl, _allocator), _allocator);
 	_jsonObject.AddMember("Username", JsonString(m_username, _allocator), _allocator);
-	_jsonObject.AddMember("Password", JsonString(m_password, _allocator), _allocator);
 	_jsonObject.AddMember("DatabaseUsername", JsonString(m_databaseUsername, _allocator), _allocator);
 	_jsonObject.AddMember("DatabasePassword", JsonString(m_databasePassword, _allocator), _allocator);
 	_jsonObject.AddMember("UserCollection", JsonString(m_userCollection, _allocator), _allocator);
@@ -70,7 +69,6 @@ void ot::ServiceInitData::setFromJsonObject(const ConstJsonObject& _jsonObject) 
 
 	m_databaseUrl = json::getString(_jsonObject, "DatabaseUrl");
 	m_username = json::getString(_jsonObject, "Username");
-	m_password = json::getString(_jsonObject, "Password");
 	m_databaseUsername = json::getString(_jsonObject, "DatabaseUsername");
 	m_databasePassword = json::getString(_jsonObject, "DatabasePassword");
 	m_userCollection = json::getString(_jsonObject, "UserCollection");

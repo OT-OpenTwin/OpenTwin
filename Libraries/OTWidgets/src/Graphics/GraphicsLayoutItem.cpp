@@ -35,7 +35,6 @@ ot::GraphicsLayoutItem::~GraphicsLayoutItem() {
 
 bool ot::GraphicsLayoutItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 	OTAssertNullptr(m_layoutWrap);
-	m_layoutWrap->setAcceptHoverEvents(true);
 	m_layoutWrap->setBlockConfigurationNotifications(true);
 	bool ret = ot::GraphicsItem::setupFromConfig(_cfg);
 	m_layoutWrap->setupFromConfig(this->getConfiguration());

@@ -22,6 +22,9 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/BasicEntityInformation.h"
+#include "OTCore/MetadataHandle/MetadataCampaign.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/CopyInformation.h"
 #include "OTGui/VisualisationCfg.h"
@@ -29,12 +32,11 @@
 #include "OTGui/Event/MenuRequestData.h"
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/ModelServiceState.h"
 #include "OTModelEntities/EntityCallbackBase.h"
 #include "OTModelEntities/EntityFactoryRegistrar.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
 #include "OTModelEntities/Properties/EntityProperties.h"
-#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
-#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
 
 // BSON header
@@ -47,10 +49,15 @@
 #include <list>
 #include <string>
 #include <optional>
+
 #pragma warning(disable : 4251)
 
 class EntityBase;
-#include "OTCore/MetadataHandle/MetadataCampaign.h"
+
+namespace ot
+{
+	class GraphicsItemMap;
+}
 
 class OT_MODELENTITIES_API_EXPORT EntityObserver
 {
@@ -58,18 +65,26 @@ public:
 	EntityObserver() {};
 	virtual ~EntityObserver() {};
 
-	virtual void entityRemoved(EntityBase *entity) {};
-	virtual void entityModified(EntityBase *entity) {};
+	virtual void entityRemoved(EntityBase* entity) {};
+	virtual void entityModified(EntityBase* entity) {};
+	virtual void connectionChanged(EntityBase* _entity) {};
 
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc) { std::list<std::pair<ot::UID, ot::UID>> prefetchIds; sendMessageToViewer(_doc, prefetchIds); };
 	virtual void sendMessageToViewer(ot::JsonDocument& _doc, std::list<std::pair<ot::UID, ot::UID>>& _prefetchIds) {};
 	virtual void requestConfigForModelDialog(ot::LibraryElementSelectionCfg& _config) {};
 	virtual std::string requestLibraryElement(ot::LibraryElementRequest& _config) { return ""; };
+	
+	//! @brief Sends a visualization request to the viewer.
 	virtual void requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg) {};
-	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
-	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); }
-	virtual bool projectIsOpen() { return true; }
 
+	//! @brief Sends a pull request to the viewer to pull the visualization for the entity if it is currently visualized.
+	virtual void requestVisualisationIfNeeded(ot::UID _entityID) {};
+
+	virtual std::optional<std::string> getCollectionName(const std::string& _projectName) = 0;
+	virtual std::optional<MetadataCampaign> getMetadataCampaign(const std::string& _projectName, std::string& _collectionName) {return std::nullopt; };
+	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
+	virtual const ot::ModelServiceState& getModelServiceState() const = 0;
+	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const { return nullptr; };
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################

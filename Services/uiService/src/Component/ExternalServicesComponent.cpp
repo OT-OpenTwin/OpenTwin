@@ -36,7 +36,7 @@
 #include "CurveHelper/CurveDatasetFactory.h"
 #include "Helper/ProgressUpdater.h"
 #include "Helper/StartArgumentParser.h"
-
+#include "OTCore/TimeFormatter.h"
 // OpenTwin System header
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
@@ -244,6 +244,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_DisplayMessage, this, &ExternalServicesComponent::handleDisplayMessage);
 	connectAction(OT_ACTION_CMD_UI_DisplayStyledMessage, this, &ExternalServicesComponent::handleDisplayStyledMessage);
 	connectAction(OT_ACTION_CMD_UI_DisplayLogMessage, this, &ExternalServicesComponent::handleDisplayLogMessage);
+	connectAction(OT_ACTION_CMD_UI_DisplayStateMessage, this, &ExternalServicesComponent::handleDisplayStateMessage);
 	connectAction(OT_ACTION_CMD_UI_ReportError, this, &ExternalServicesComponent::handleReportError);
 	connectAction(OT_ACTION_CMD_UI_ReportWarning, this, &ExternalServicesComponent::handleReportWarning);
 	connectAction(OT_ACTION_CMD_UI_ReportInformation, this, &ExternalServicesComponent::handleReportInformation);
@@ -283,6 +284,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_VIEW_RenameEntityName, this, &ExternalServicesComponent::handleRenameEntity);
 	connectAction(OT_ACTION_CMD_UI_VIEW_SetEntitySelected, this, &ExternalServicesComponent::handleSetEntitySelected);
 	connectAction(OT_ACTION_CMD_UI_VIEW_UpdateCSNode, this, &ExternalServicesComponent::handleUpdateCoordinateSystemNode);
+	connectAction(OT_ACTION_CMD_UI_VIEW_RequestVisualizationIfNeeded, this, &ExternalServicesComponent::handleRequestSceneNodeVisualizationIfNeeded);
 
 	// ToolBar
 	connectAction(OT_ACTION_CMD_UI_AddMenuPage, this, &ExternalServicesComponent::handleAddMenuPage);
@@ -3068,6 +3070,13 @@ void ExternalServicesComponent::handleDisplayLogMessage(ot::JsonDocument& _docum
 	AppBase::instance()->appendLogMessage(log);
 }
 
+void ExternalServicesComponent::handleDisplayStateMessage(ot::JsonDocument& _document)
+{
+	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_Text);
+	int displayTime = ot::json::getInt(_document, OT_ACTION_PARAM_Timeout);
+	ot::WindowAPI::displayTemporaryStateMessage(message, displayTime);
+}
+
 void ExternalServicesComponent::handleReportError(ot::JsonDocument& _document)
 {
 	std::string message = ot::json::getString(_document, OT_ACTION_PARAM_MESSAGE);
@@ -3094,29 +3103,49 @@ void ExternalServicesComponent::handlePromptInformation(ot::JsonDocument& _docum
 	ot::MessageDialogCfg config;
 	config.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
 
-	std::string promptResponse = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
-	std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
-	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
+	std::string callbackUrl;
+	if (_document.HasMember(OT_ACTION_PARAM_SENDER_URL))
+	{
+		callbackUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_SENDER))
+	{
+		std::string sender = ot::json::getString(_document, OT_ACTION_PARAM_SENDER);
+		auto service = this->getServiceFromNameType(sender, sender);
+		if (!service)
+		{
+			OT_LOG_E("Failed to find service with name and type \"" + sender + "\" for message prompt request");
+			return;
+		}
+
+		callbackUrl = service->getServiceURL();
+	}
+	else
+	{
+		OT_LOG_E("No sender information provided for message prompt request");
+		return;
+	}
+
+	std::string responseAction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+	std::string additionalInfo;
+	if (_document.HasMember(OT_ACTION_PARAM_Info))
+	{
+		additionalInfo = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+	}
 
 	ot::MessageDialogCfg::BasicButton result = AppBase::instance()->showPrompt(config, AppBase::instance()->mainWindow());
 
 	std::string queryResult = ot::MessageDialogCfg::toString(result);
 
 	ot::JsonDocument docOut;
-	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_PromptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_RESPONSE, ot::JsonString(promptResponse, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_ANSWER, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
-	docOut.AddMember(OT_ACTION_PARAM_PARAMETER1, ot::JsonString(parameter1, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_MEMBER, ot::JsonString(responseAction, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_Result, ot::JsonString(queryResult, docOut.GetAllocator()), docOut.GetAllocator());
+	docOut.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(additionalInfo, docOut.GetAllocator()), docOut.GetAllocator());
 
-	if (this->getServiceFromNameType(sender, sender) != nullptr)
+	std::string response;
+	if (!sendRelayedRequest(QUEUE, callbackUrl, docOut, response))
 	{
-		std::string senderUrl = this->getServiceFromNameType(sender, sender)->getServiceURL();
-
-		std::string response;
-		if (!sendRelayedRequest(QUEUE, senderUrl, docOut, response))
-		{
-			throw std::exception("Failed to send http request");
-		}
+		throw std::exception("Failed to send http request");
 	}
 }
 
@@ -3290,17 +3319,6 @@ void ExternalServicesComponent::handleAddCoordinateSystemNode(ot::JsonDocument& 
 	ViewerAPI::addCoordinateSystemNode(visModelID, item, visTypes, coordinateSettings, isActive);
 }
 
-void ExternalServicesComponent::handleUpdateCoordinateSystemNode(ot::JsonDocument& _document)
-{
-	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-
-	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
-	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
-	bool isActive = ot::json::getBool(_document, OT_ACTION_PARAM_Active);
-
-	ViewerAPI::updateCoordinateSystemNode(visModelID, item, coordinateSettings, isActive);
-}
-
 void ExternalServicesComponent::handleAddVis2D3DNode(ot::JsonDocument& _document)
 {
 	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
@@ -3426,6 +3444,25 @@ void ExternalServicesComponent::handleAddMeshItemFromFacetDatabase(ot::JsonDocum
 	ot::UID tetEdgesVersion = _document[OT_ACTION_PARAM_MODEL_TETEDGES_Version].GetUint64();
 
 	ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(visModelID, item, isHidden, collectionName, tetEdgesID, tetEdgesVersion);
+}
+
+void ExternalServicesComponent::handleUpdateCoordinateSystemNode(ot::JsonDocument& _document)
+{
+	ot::UID visModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
+
+	ot::EntityTreeItem item(ot::json::getObject(_document, OT_ACTION_PARAM_TreeItem));
+	std::vector<double> coordinateSettings = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_POSITION);
+	bool isActive = ot::json::getBool(_document, OT_ACTION_PARAM_Active);
+
+	ViewerAPI::updateCoordinateSystemNode(visModelID, item, coordinateSettings, isActive);
+}
+
+void ExternalServicesComponent::handleRequestSceneNodeVisualizationIfNeeded(ot::JsonDocument& _document)
+{
+	ot::UID visModelID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_ID);
+	ot::UID entityID = ot::json::getUInt64(_document, OT_ACTION_PARAM_MODEL_EntityID);
+
+	ViewerAPI::requestVisualizationIfNeeded(visModelID, entityID);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -5132,6 +5169,8 @@ void ExternalServicesComponent::applyInitialSelection()
 		return;
 	}
 
+	OT_LOG_I("X: Applying initial selection");
+
 	InitialSelectionInfo selection = m_initialSelection.back();
 	m_initialSelection.clear();
 	AppBase::instance()->setNavigationTreeItemsSelected(selection.treeIDs, true, selection.clearSelection);
@@ -5291,8 +5330,9 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 				}
 			}
 			auto endTime = std::chrono::system_clock::now();
-			uint64_t millisec = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime).count();
-			message = (std::to_string(millisec) + " ms\n");
+			auto nanosecs = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+
+			message = TimeFormatter::formatDuration(nanosecs) + "\n";
 
 			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 		}
@@ -5326,66 +5366,90 @@ void ExternalServicesComponent::workerLoadPlotData(ot::Plot1DCfg&& _plotConfig, 
 {
 	try
 	{
-		auto startTime = ot::DateTime::msSinceEpoch();
-
+		bool somethingToPlot = !_plotConfig.getXAxisParameter().empty();
+		auto startTime = std::chrono::high_resolution_clock::now();
 		// Create curves
 		const std::string collectionName = AppBase::instance()->getCurrentProjectInfo().getCollectionName();
 		CurveDatasetFactory curveFactory(collectionName);
 
 		std::list<ot::PlotDataset*> dataSets;
-
-		bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
-		int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
-
-		std::optional<ot::Plot1DCurveCfg> firstCurveCfg;
-
-		for (ot::Plot1DCurveCfg& curveCfg : _curveConfigs)
+		if (somethingToPlot)
 		{
-			std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
+			bool useLimitedNbOfCurves = _plotConfig.getUseLimitNbOfCurves();
+			int32_t limitOfCurves = _plotConfig.getLimitOfCurves();
 
-			if (!firstCurveCfg.has_value() && !newCurveDatasets.empty())
+			std::optional<ot::Plot1DCurveCfg> firstCurveCfg;
+
+			for (ot::Plot1DCurveCfg& curveCfg : _curveConfigs)
 			{
-				firstCurveCfg = curveCfg;
-			}
-
-			dataSets.splice(dataSets.begin(), newCurveDatasets);
-
-			std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
-			if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
-			{
-				break;
-			}
-		}
-
-		if (_updatePlotConfig && firstCurveCfg.has_value())
-		{
-			const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
-
-			const auto& decoders = dataLakeAccessCfg.getAllFieldDecoderParameter();
-
-			std::string paramNameX = _plotConfig.getXAxisParameter();
-			auto it = decoders.find(paramNameX);
-
-			if (it != decoders.end())
-			{
-				if (!it->second.getLabel().empty())
+				bool validForPlot = curveCfg.getDataAccessConfig().getAllFieldDecoderQuantityByLabel().size() != 0 && !curveCfg.getDataAccessConfig().getCollectionName().empty();
+				somethingToPlot |= validForPlot;
+				if (validForPlot)
 				{
-					_plotConfig.setDataLabelX(it->second.getLabel());
+
+
+					std::list<ot::PlotDataset*> newCurveDatasets = curveFactory.createCurves(_plotConfig, curveCfg);
+
+					if (!firstCurveCfg.has_value() && !newCurveDatasets.empty())
+					{
+						firstCurveCfg = curveCfg;
+					}
+
+					dataSets.splice(dataSets.begin(), newCurveDatasets);
+
+					std::list<std::string> newCurveIDDescriptions = curveFactory.getCurveIDDescriptions();
+					if (useLimitedNbOfCurves && dataSets.size() > limitOfCurves)
+					{
+						break;
+					}
 				}
-				const auto& unitsX = it->second.getTupleInstance().getTupleUnits();
-				if (unitsX.size() == 1)
+				else
 				{
-					_plotConfig.setUnitLabelX(unitsX.front());
+					std::string msg = "Cannot create curve for \"" + curveCfg.getEntityName() + ". A curve needs a project and a quantity to be selected. "
+					"Select the missing configuration(s) to proceed.\n" ;
+					ot::WindowAPI::appendOutputMessage(msg);
 				}
 			}
-			else
+
+			if (_updatePlotConfig && firstCurveCfg.has_value())
 			{
-				_plotConfig.setDataLabelX(paramNameX);
+				const auto& dataLakeAccessCfg = firstCurveCfg->getDataAccessConfig();
+
+				const auto& decoders = dataLakeAccessCfg.getAllFieldDecoderParameter();
+
+				std::string paramNameX = _plotConfig.getXAxisParameter();
+				auto it = decoders.find(paramNameX);
+
+				if (it != decoders.end())
+				{
+					if (!it->second.getLabel().empty())
+					{
+						_plotConfig.setDataLabelX(it->second.getLabel());
+					}
+					const auto& unitsX = it->second.getTupleInstance().getTupleUnits();
+					if (unitsX.size() == 1)
+					{
+						_plotConfig.setUnitLabelX(unitsX.front());
+					}
+				}
+				else
+				{
+					_plotConfig.setDataLabelX(paramNameX);
+				}
 			}
 		}
-
-		auto endTime = ot::DateTime::msSinceEpoch();
-		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), _visualizationCfg, dataSets, (endTime - startTime), _updatePlotConfig);
+		else
+		{
+			std::string msg = "Cannot create plot for \"" + _plotConfig.getEntityName() + "\": "
+				"no x-axis parameter is assigned. Select an x-axis parameter in the configuration to proceed.\n";
+			ot::WindowAPI::appendOutputMessage(msg);
+		}
+		auto endTime = std::chrono::high_resolution_clock::now();
+		auto passedTime = std::chrono::duration_cast<std::chrono::nanoseconds>(endTime - startTime);
+		std::string passedTimeString;
+		passedTimeString = TimeFormatter::formatDuration(passedTime);
+		
+		QMetaObject::invokeMethod(this, &ExternalServicesComponent::slotPlotDataLoadingCompleted, Qt::QueuedConnection, std::move(_plotConfig), somethingToPlot,_visualizationCfg, dataSets, passedTimeString, _updatePlotConfig);
 	}
 	catch (const std::exception& e)
 	{
@@ -5452,7 +5516,7 @@ void ExternalServicesComponent::slotImportFileWorkerCompleted(std::string _recei
 	this->sendRelayedRequest(EXECUTE, _receiverUrl, _message, response);
 }
 
-void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, unsigned long long _loadTimeMs, bool _updatePlotConfig)
+void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plotConfig, bool _somethingToShow, const ot::VisualisationCfg& _visualizationCfg, const std::list<ot::PlotDataset*>& _dataSets, std::string& _loadTime, bool _updatePlotConfig)
 {
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!_visualizationCfg.getSetAsActiveView())
@@ -5468,33 +5532,40 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 
 	const ot::PlotView* plotView = AppBase::instance()->findOrCreatePlot(_plotConfig, insertFlags, _visualizationCfg.getVisualisingEntities());
 	ot::Plot* plot = plotView->getPlot();
-
 	if (_updatePlotConfig)
 	{
 		plot->setConfig(std::move(_plotConfig));
 	}
 
-	// Now we add the data sets to the plot and visualise them
-	int32_t curveCounter = 0;
-
-	for (ot::PlotDataset* dataSet : _dataSets)
+	if (!_somethingToShow)
 	{
-		if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
-		{
-			dataSet->setOwnerPlot(plot);
-			plot->addDatasetToCache(dataSet);
-			dataSet->attach();
-		}
-		else
-		{
-			delete dataSet;
-			dataSet = nullptr;
-		}
-		curveCounter++;
+		plot->clear(true);
 	}
+	else
+	{
 
-	// Refresh the X data label + unit
 
+		// Now we add the data sets to the plot and visualise them
+		int32_t curveCounter = 0;
+
+		for (ot::PlotDataset* dataSet : _dataSets)
+		{
+			if (!plot->getConfig().getUseLimitNbOfCurves() || curveCounter < plot->getConfig().getLimitOfCurves())
+			{
+				dataSet->setOwnerPlot(plot);
+				plot->addDatasetToCache(dataSet);
+				dataSet->attach();
+			}
+			else
+			{
+				delete dataSet;
+				dataSet = nullptr;
+			}
+			curveCounter++;
+		}
+
+		// Refresh the X data label + unit
+	}
 
 	// Now we refresh the plot visualisation.
 	QMetaObject::invokeMethod(plot, &ot::PlotBase::applyConfig, Qt::QueuedConnection);
@@ -5503,8 +5574,8 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 	{
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
-
-	ot::WindowAPI::appendOutputMessage("Loading plot data took " + ot::DateTime::intervalToString(_loadTimeMs) + "\n");
+	ot::WindowAPI::appendOutputMessage("Loading plot data took " + _loadTime + "\n");
+	
 
 	// Finally unlock the ui and hide the progress
 	ot::WindowAPI::lockSelectionAndModification(false);

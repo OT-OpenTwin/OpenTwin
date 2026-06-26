@@ -42,11 +42,11 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 
 	this->setGraphicsItemName(m_config.getName());
 	this->setGraphicsItemToolTip(m_config.getDescription());
-	this->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable);
+	this->setGraphicsItemFlags(GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemForwardsState | GraphicsItemCfg::ItemIsSelectable | GraphicsItemCfg::ItemIsDoubleClickable);
 	
 	GraphicsGridLayoutItem* centralLayout = new GraphicsGridLayoutItem;
 	centralLayout->setGraphicsItemName("CentralLayout");
-	centralLayout->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	centralLayout->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	//m_layout->setGraphicsItemMaximumSize(std::numeric_limits<double>::max(), OT_VERSIONGRAPHITEM_Height);
 	//m_layout->setGraphicsItemSizePolicy(SizePolicy::Preferred);
 	centralLayout->getLayoutWrapper()->setMinimumSize(100., OT_VERSIONGRAPHITEM_Height);
@@ -56,31 +56,29 @@ ot::VersionGraphItem::VersionGraphItem(const VersionGraphVersionCfg& _config, in
 	// Create items
 	GraphicsRectangularItem* border = new GraphicsRectangularItem;
 	border->setGraphicsItemName("Border");
-	border->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	border->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	border->setGraphicsItemSizePolicy(SizePolicy::Dynamic);
 
 	m_inConnector = new GraphicsInvisibleItem;
 	m_inConnector->setGraphicsItemName("In");
 	m_inConnector->setGraphicsItemAlignment(Alignment::Center);
 	m_inConnector->setGraphicsItemMaximumSize(1., 1.);
-	m_inConnector->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	m_inConnector->setConnectionDirection(ConnectionDirection::Left);
 
 	m_outConnector = new GraphicsInvisibleItem;
 	m_outConnector->setGraphicsItemName("Out");
 	m_outConnector->setGraphicsItemAlignment(Alignment::Center);
 	m_outConnector->setGraphicsItemMaximumSize(1., 1.);
-	m_outConnector->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 	m_outConnector->setConnectionDirection(ConnectionDirection::Right);
 
 	m_nameItem = new GraphicsTextItem;
 	m_nameItem->setGraphicsItemName("Name");
-	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_nameItem->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	m_nameItem->setGraphicsItemMargins(MarginsD(0., 3., 0., 0.));
 	
 	m_labelItem = new GraphicsTextItem;
 	m_labelItem->setGraphicsItemName("Label");
-	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemHandlesState | GraphicsItemCfg::ItemForwardsTooltip);
+	m_labelItem->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 	
 	GraphicsInvisibleItem* spacerItem = new GraphicsInvisibleItem;
 

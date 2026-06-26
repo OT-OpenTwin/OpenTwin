@@ -46,6 +46,9 @@ public:
 	// Fill map functions
 
 	void processEntity(EntityBase* entBase);
+	void updateConnectionExplicitly(const ot::GraphicsConnectionCfg& _changedConnection, const ot::GraphicsChangeEvent& _changeEvent);
+	void updateConnectorsExplicitly(ot::UID _blockID, std::set<std::string>& _validConnectors, ot::UID _sceneID);
+	void updateItemMapWithNewConnectionCfg(ot::UID _blockID, const ot::GraphicsConnectionCfg& _changedConnection, ot::UID _sceneID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -72,12 +75,15 @@ public:
 	bool blockExists(ot::UID _editorID, ot::UID _blockID);
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
+	const ot::GraphicsItemMap* getGraphicsItemMap(ot::UID _editorID);
+	const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Callbacks
 
 protected:
-	virtual ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
+	ot::ReturnMessage handleGetGraphicsItemMap(ot::JsonDocument& _requestDocument);
 
 	virtual ot::ReturnMessage graphicsItemRequested(const ot::GraphicsItemDropEvent& _eventData) override;
 	virtual ot::ReturnMessage graphicsItemClicked(const ot::GraphicsClickEvent& _eventData) override;
@@ -152,7 +158,9 @@ private:
 	//! @return True if the snapping was handled successfully, false otherwise.
 	bool snapConnection(EntityGraphicsScene* _scene, const ot::GraphicsChangeEvent::SnapInfo& _snapInfo, ot::GraphicsConnectionCfg& _connectionCfg , std::set<ot::EntityBlockConnection*>& _processedConnections);
 
-	ot::GraphicsItemMap& getGraphicsItemMap(ot::UID _sceneID);
+	ot::GraphicsItemMap& getOrCreateGraphicsItemMap(ot::UID _sceneID);
+
+	void notifyBlocksAboutConnectionChange(const std::list<EntityBase*>& _entities);
 
 	ot::ActionHandler m_actionHandler;
 

@@ -37,7 +37,6 @@
 #include "OTWidgets/WidgetView/TableView.h"
 #include "OTWidgets/WidgetView/TextEditorView.h"
 #include "OTWidgets/WidgetView/WidgetViewManager.h"
-#include "OTWidgets/WindowManagement/StatusBarManager.h"
 #include "OTWidgets/WindowManagement/CentralWidgetManager.h"
 
 // Qt header
@@ -50,7 +49,7 @@
 class TestToolBar : public QToolBar {
 public:
 	TestToolBar(WidgetTest* _owner) :
-		m_owner(_owner), m_window(nullptr), m_centralWidgetManager(nullptr), m_toolBarManager(nullptr), m_statusBarManager(nullptr)
+		m_owner(_owner), m_window(nullptr), m_centralWidgetManager(nullptr), m_toolBarManager(nullptr)
 	{
 
 	}
@@ -98,7 +97,6 @@ private:
 	ot::MainWindow* m_window;
 	ot::CentralWidgetManager* m_centralWidgetManager;
 	ot::TabToolBar* m_toolBarManager;
-	ot::StatusBarManager* m_statusBarManager;
 };
 
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {

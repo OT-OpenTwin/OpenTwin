@@ -207,10 +207,18 @@ bool ot::GraphicsView::connectionAlreadyExists(const ot::GraphicsConnectionCfg& 
 
 void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
 {
+	bool itemWasSelected = false;
+
 	auto it = m_items.find(_item->getGraphicsItemUid());
+	ot::UIDList connectionsToUpdate;
 	if (it != m_items.end())
 	{
 		OT_LOG_D("Overwriting item with the ID \"" + std::to_string(_item->getGraphicsItemUid()));
+		itemWasSelected = it->second->getGraphicsItemSelected();
+		auto connections = it->second->getAllConnections();
+		for (auto& connection : connections) {
+			connectionsToUpdate.push_back(connection->getConfiguration().getUid());
+		}
 		this->removeItem(_item->getGraphicsItemUid());
 	}
 
@@ -253,6 +261,17 @@ void ot::GraphicsView::addItem(ot::GraphicsItem* _item)
 			}
 		}
 	}
+
+	if (itemWasSelected)
+	{
+		QSignalBlocker blocker(this);
+		QSignalBlocker blocker2(m_scene);
+		_item->getQGraphicsItem()->setSelected(true);
+	}
+
+	// Update connections
+	this->updateConnections(connectionsToUpdate);
+
 }
 
 void ot::GraphicsView::removeItem(const ot::UID& _itemUid)
@@ -980,5 +999,17 @@ void ot::GraphicsView::endItemMove()
 	if (!changeEvent.isEmpty())
 	{
 		Q_EMIT elementsChanged(changeEvent);
+	}
+}
+
+void ot::GraphicsView::updateConnections(ot::UIDList _connections)
+{
+	for (auto& connectionUid : _connections)
+	{
+		auto it = m_connections.find(connectionUid);
+		if (it != m_connections.end())
+		{
+			it->second->updateConnectionInformation();
+		}
 	}
 }

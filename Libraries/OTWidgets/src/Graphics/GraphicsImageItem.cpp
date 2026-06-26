@@ -199,7 +199,7 @@ void ot::GraphicsImageItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 
 	// Paint the border if needed
 	PenFCfg borderPen = config->getBorderPen();
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			borderPen.setPainter(GraphicsItem::createSelectionBorderPainter());
 		}

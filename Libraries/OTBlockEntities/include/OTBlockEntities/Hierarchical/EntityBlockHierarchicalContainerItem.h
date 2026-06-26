@@ -38,6 +38,9 @@ namespace ot {
 
 		virtual bool updateFromProperties() override;
 		virtual void createProperties() override;
+
+	protected:
+		virtual std::string getElementTypeString() const override { return "Container"; };
 	};
 
 }

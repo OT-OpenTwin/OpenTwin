@@ -47,7 +47,6 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	m_destDisconnect->setVisible(false);
 
 	this->setFlag(QGraphicsItem::ItemIsSelectable, true);
-	this->setAcceptHoverEvents(true);
 	this->updateConnectors();
 	this->updateOriginConnectionInformation();
 	this->updateDestConnectionInformation();
@@ -96,7 +95,6 @@ QRectF ot::GraphicsConnectionItem::boundingRect() const {
 }
 
 void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
 	if (m_config.getHandlesState()) {
@@ -420,6 +418,12 @@ void ot::GraphicsConnectionItem::updateConnectionView() {
 
 	this->prepareGeometryChange();
 	this->update();
+}
+
+void ot::GraphicsConnectionItem::updateConnectionInformation()
+{
+	this->updateOriginConnectionInformation();
+	this->updateDestConnectionInformation();
 }
 
 QPointF ot::GraphicsConnectionItem::getOriginPos() const {

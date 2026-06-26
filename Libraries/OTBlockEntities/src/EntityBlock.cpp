@@ -45,7 +45,14 @@ ot::EntityBlock::~EntityBlock()
 void ot::EntityBlock::addVisualizationNodes(void)
 {
 	createNavigationTreeEntry();
-	createBlockItem();
+	if (getObserver())
+	{
+		const auto& state = getObserver()->getModelServiceState();
+		if (state.isRunning())
+		{
+			createBlockItem();
+		}
+	}
 }
 
 void ot::EntityBlock::addConnector(const ot::Connector& connector)
@@ -242,6 +249,40 @@ void ot::EntityBlock::createNavigationTreeEntry()
 		doc.AddMember(OT_ACTION_PARAM_VisualizationTypes, ot::JsonObject(this->getVisualizationTypes(), doc.GetAllocator()), doc.GetAllocator());
 
 		getObserver()->sendMessageToViewer(doc);
+}
+
+std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo> ot::EntityBlock::getCurrentConnectorInformation() const
+{
+	auto obs = getObserver();
+	if (!obs)
+	{
+		OT_LOG_W("Cannot get graphics item map info for block entity because observer is not set { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		return std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo>();
+	}
+
+	const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
+	const auto map = obs->getGraphicsItemMap(graphicsSceneName);
+	if (!map)
+	{
+		OT_LOG_W("Item map for graphics scene \"" + graphicsSceneName + "\" not found. Cannot get connector information for block entity { \"ID\": " + std::to_string(getEntityID()) + ", \"Name\": \"" + getName() + "\" }");
+		return std::map<std::string, ot::GraphicsItemMap::ItemConnectorInfo>();
+	}
+
+	return map->getItemConnectors(getEntityID());
+}
+
+bool ot::EntityBlock::getConnectorHasCurrentlyConnection(const std::string& connectorName) const
+{
+	auto map = getCurrentConnectorInformation();
+	auto it = map.find(connectorName);
+	if (it != map.end())
+	{
+		return !it->second.connections.empty();
+	}
+	else
+	{
+		return false;
+	}
 }
 
 void ot::EntityBlock::createBlockItem()

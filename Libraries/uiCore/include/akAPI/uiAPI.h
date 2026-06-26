@@ -810,48 +810,6 @@ namespace ak {
 				aWindowEventHandler *								_eventHandler
 			);
 
-			//! @brief Will set the visible state of the status label of the provided window.
-			//! @param _windowUID The UID of the window
-			//! @param _visible If true the status label will be visible
-			UICORE_API_EXPORT void setStatusLabelVisible(
-				UID												_windowUID,
-				bool												_visible = true,
-				bool												_delayed = true
-			);
-
-			//! @brief Will set the visible state of the status progress bar of the provided window.
-			//! @param _windowUID The UID of the window
-			//! @param _visible If true the status progress bar will be visible
-			UICORE_API_EXPORT void setStatusProgressVisible(
-				UID												_windowUID,
-				bool												_visible = true,
-				bool												_delayed = true
-			);
-
-			//! @brief Will set the status label text at the provided window
-			//! @param _windowUID The UID of the window
-			//! @param _text The text to set
-			UICORE_API_EXPORT void setStatusLabelText(
-				UID												_windowUID,
-				const QString &										_text
-			);
-
-			//! @brief Will set the value of the status progress bar at the provided window
-			//! @param _windowUID The UID of the window
-			//! @param _value The value to set (0 - 100)
-			UICORE_API_EXPORT void setStatusProgressValue(
-				UID												_windowUID,
-				int													_value
-			);
-
-			//! @brief Will set the continuous option of the status progress bar at the provided window
-			//! @param _windowUID The UID of the window
-			//! @param _continuous If true the status progress bar will be displayed as a continuous bar
-			UICORE_API_EXPORT void setStatusProgressContinuous(
-				UID												_windowUID,
-				bool												_continuous = true
-			);
-
 			//! @brief Will set the visible state of the tabToolbar in the specified window
 			//! @param _windowUID The UID of the window
 			//! @param _visible If true the tabToolbar will be visible
@@ -916,36 +874,6 @@ namespace ak {
 			UICORE_API_EXPORT void setWindowIcon(
 				UID												_windowUID,
 				const QIcon &									_icon
-			);
-
-			//! @brief Will return true if the status label is visible at the provided window
-			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT bool getStatusLabelVisible(
-				UID												_windowUID
-			);
-
-			//! @brief Will return true if the status progress bar is visible at the provided window
-			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT bool getStatusProgressVisible(
-				UID												_windowUID
-			);
-
-			//! @brief Will return the status label text at the provided window
-			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT QString getStatusLabelText(
-				UID												_windowUID
-			);
-
-			//! @brief Will return the status progress bar value at the provided window
-			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT int getStatusProgressValue(
-				UID												_windowUID
-			);
-
-			//! @brief Will return the continuous option of the status progress bar at the provided window
-			//! @param _windowUID The UID of the window
-			UICORE_API_EXPORT bool getStatusProgressContinuous(
-				UID												_windowUID
 			);
 
 			//! @brief Will set the windows central widget (The widget will be added to a container, the actual central widget differs)

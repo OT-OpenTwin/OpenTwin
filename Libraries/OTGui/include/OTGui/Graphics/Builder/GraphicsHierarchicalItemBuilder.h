@@ -183,6 +183,7 @@ namespace ot {
 		void createImage(GraphicsVBoxLayoutItemCfg* _layout, const ImageInfo& _info, const std::string& _nameSuffix) const;
 
 		bool isExpanderVisible(Alignment _alignment) const;
+		bool isExpanderCollapsed(Alignment _alignment) const;
 		GraphicsTriangleItemCfg::TriangleDirection expanderDiectionFromAlignment(Alignment _alignment) const;
 
 		std::string m_entityName;

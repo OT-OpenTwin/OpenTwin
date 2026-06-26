@@ -440,7 +440,8 @@ namespace ot {
 			friend class ApplicationBase;
 			void sendSettingsData(const PropertyGridCfg& _config);
 
-			UiComponent(const UiComponent &) = delete;
+			UiComponent() = delete;
+			UiComponent(const UiComponent&) = delete;
 			UiComponent & operator = (const UiComponent &) = delete;
 
 		};

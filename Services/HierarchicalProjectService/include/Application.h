@@ -106,6 +106,8 @@ private:
 	void handleAddLabel();
 	void handleAddImage();
 
+	void handleShowAll();
+
 	void handleOpenSelectedItems();
 
 	void handleAddCenterImageToBlock();
@@ -143,11 +145,14 @@ private:
 	const std::string c_imageSelectedAction = "ImageSelected";
 
 	const std::string c_pageName = "Project";
+	const std::string c_viewGroupName = "View";
 	const std::string c_managementGroupName = "Management";
 	const std::string c_selectionGroupName = "Selection";
 
 	const std::string c_decorationGroupName = "Decoration";
 	const std::string c_decorationSub1Name = "Sub1";
+
+	ot::ToolBarButtonCfg m_showAllButton;
 
 	ot::ToolBarButtonCfg m_addProjectButton;
 	ot::ToolBarButtonCfg m_addContainerButton;

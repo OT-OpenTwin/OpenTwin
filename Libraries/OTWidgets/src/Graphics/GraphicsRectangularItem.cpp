@@ -83,7 +83,7 @@ void ot::GraphicsRectangularItem::paintCustomItem(QPainter* _painter, const QSty
 
 	QPen borderPen = QtFactory::toQPen(cfg->getOutline());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			borderPen.setBrush(QtFactory::toQBrush(newPainter));

@@ -42,7 +42,7 @@ public:
 	MetadataParameter& operator=(const MetadataParameter& _other);
 	MetadataParameter& operator=(MetadataParameter&& _other);
 	void swap(MetadataParameter& _origin, MetadataParameter& _target) noexcept;
-
+	void copyWithoutValues(const MetadataParameter& _other);
 	//Unique name
 	std::string parameterName = "";
 
@@ -75,6 +75,9 @@ public:
 	virtual void addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const override;
 
 	virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
+
+
+	size_t getMemSize();
 
 private:
 };

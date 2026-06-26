@@ -148,6 +148,8 @@ public:
 
 	void setActiveColorRamp(ColorRamp *activeColorRamp);
 
+	void requestVisualizationIfNeeded(ot::UID _modelEntityID);
+
 private Q_SLOTS:
 	void slotColorStyleChanged(void);
 	void slotUpdateViewerSettings(void);

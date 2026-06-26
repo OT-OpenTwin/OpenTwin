@@ -18,12 +18,14 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/FolderNames.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelAPI/ModelAPIManager.h"
-#include "OTCore/FolderNames.h"
 
-std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::string& _folder, bool recursive) {
+std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::string& _folder, bool recursive)
+{
 	std::list<std::string> folderItems;
 
 	JsonDocument requestDoc;
@@ -33,16 +35,18 @@ std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::stri
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return folderItems;
 	}
-	
+
 	// Process the result
 	JsonDocument responseDoc;
 	responseDoc.fromJson(response);
 
 	// Check if the received document contains the required information
-	if (!responseDoc.HasMember(OT_ACTION_PARAM_BASETYPE_List)) {
+	if (!responseDoc.HasMember(OT_ACTION_PARAM_BASETYPE_List))
+	{
 		OT_LOG_E("ERROR: The member \"" OT_ACTION_PARAM_BASETYPE_List "\" is missing");
 		return folderItems;
 	}
@@ -50,14 +54,16 @@ std::list<std::string> ot::ModelServiceAPI::getListOfFolderItems(const std::stri
 	// Get information and iterate trough entries
 	std::list<std::string> items = json::getStringList(responseDoc, OT_ACTION_PARAM_BASETYPE_List);
 
-	for (auto i : items) {
+	for (auto i : items)
+	{
 		folderItems.push_back(i);
 	}
 
 	return folderItems;
 }
 
-std::list<ot::UID> ot::ModelServiceAPI::getIDsOfFolderItemsOfType(const std::string& _folder, const std::string& _entityClassName, bool recursive) {
+std::list<ot::UID> ot::ModelServiceAPI::getIDsOfFolderItemsOfType(const std::string& _folder, const std::string& _entityClassName, bool recursive)
+{
 	std::list<ot::UID> folderItemIDs;
 
 	ot::JsonDocument requestDoc;
@@ -68,10 +74,11 @@ std::list<ot::UID> ot::ModelServiceAPI::getIDsOfFolderItemsOfType(const std::str
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return folderItemIDs;
 	}
-	
+
 	// Process the result
 	JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -80,17 +87,19 @@ std::list<ot::UID> ot::ModelServiceAPI::getIDsOfFolderItemsOfType(const std::str
 	return folderItemIDs;
 }
 
-std::string ot::ModelServiceAPI::getCurrentModelVersion(void) {
+std::string ot::ModelServiceAPI::getCurrentModelVersion(void)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetCurrentVersion, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return std::string();
 	}
-	
+
 	// Process the result from the model service
 
 	std::string modelVersion = response;
@@ -98,14 +107,16 @@ std::string ot::ModelServiceAPI::getCurrentModelVersion(void) {
 	return modelVersion;
 }
 
-ot::UID ot::ModelServiceAPI::getCurrentVisualizationModelID(void) {
+ot::UID ot::ModelServiceAPI::getCurrentVisualizationModelID(void)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return 0;
 	}
 
@@ -118,7 +129,8 @@ ot::UID ot::ModelServiceAPI::getCurrentVisualizationModelID(void) {
 	return visModelID;
 }
 
-void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& _meshFolderID, std::string& _meshName, UID& _meshID) {
+void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& _meshFolderID, std::string& _meshName, UID& _meshID)
+{
 	std::list<std::string> meshFolder = { "Meshes" };
 	std::list<EntityInformation> meshFolderInfo;
 	getEntityInformation(meshFolder, meshFolderInfo);
@@ -138,7 +150,8 @@ void ot::ModelServiceAPI::getAvailableMeshes(std::string& _meshFolderName, UID& 
 	_meshID = meshInfo.front().getEntityID();
 }
 
-void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UID& _scriptFolderID, std::string& _scriptName, UID& _scriptID) {
+void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UID& _scriptFolderID, std::string& _scriptName, UID& _scriptID)
+{
 	std::list<std::string> scriptFolder = { ot::FolderNames::PythonScriptFolder };
 	std::list<EntityInformation> scriptFolderInfo;
 	getEntityInformation(scriptFolder, scriptFolderInfo);
@@ -159,7 +172,8 @@ void ot::ModelServiceAPI::getAvailableScripts(std::string& _scriptFolderName, UI
 }
 
 
-void ot::ModelServiceAPI::addEntitiesToModel(const std::list<UID>& _topologyEntityIDList, const std::list<UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<UID>& _dataEntityIDList, const std::list<UID>& _dataEntityVersionList, const std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel, bool _considerVisualization) {
+void ot::ModelServiceAPI::addEntitiesToModel(const std::list<UID>& _topologyEntityIDList, const std::list<UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<UID>& _dataEntityIDList, const std::list<UID>& _dataEntityVersionList, const std::list<UID>& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel, bool _considerVisualization)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(_topologyEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -178,7 +192,8 @@ void ot::ModelServiceAPI::addEntitiesToModel(const std::list<UID>& _topologyEnti
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel, bool _considerVisualization) {
+void ot::ModelServiceAPI::addEntitiesToModel(std::list<UID>&& _topologyEntityIDList, std::list<UID>&& _topologyEntityVersionList, std::list<bool>&& _topologyEntityForceVisible, std::list<UID>&& _dataEntityIDList, std::list<UID>&& _dataEntityVersionList, std::list<UID>&& _dataEntityParentList, const std::string& _changeComment, bool askForBranchCreation, bool saveModel, bool _considerVisualization)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(_topologyEntityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -210,7 +225,8 @@ void ot::ModelServiceAPI::addEntitiesToModel(const NewModelStateInfo& _newModelS
 
 void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityVersion, std::string _newEntityName,
 	std::list<UID>& _dataEntityIDList, std::list<UID>& _dataEntityVersionList, std::list<UID>& _dataEntityParentList, std::list<std::string>& _childrenList,
-	const std::string& _changeComment) {
+	const std::string& _changeComment)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddGeometryOperation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, _newEntityID, requestDoc.GetAllocator());
@@ -227,15 +243,18 @@ void ot::ModelServiceAPI::addGeometryOperation(UID _newEntityID, UID _newEntityV
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::deleteEntityFromModel(UID _entityID, bool _saveModel) {
+void ot::ModelServiceAPI::deleteEntityFromModel(UID _entityID, bool _saveModel)
+{
 	ModelServiceAPI::deleteEntitiesFromModel(UIDList{ _entityID }, _saveModel);
 }
 
-void ot::ModelServiceAPI::deleteEntityFromModel(const std::string& _entityName, bool _saveModel) {
+void ot::ModelServiceAPI::deleteEntityFromModel(const std::string& _entityName, bool _saveModel)
+{
 	ModelServiceAPI::deleteEntitiesFromModel(std::list<std::string>{ _entityName }, _saveModel);
 }
 
-void ot::ModelServiceAPI::deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel) {
+void ot::ModelServiceAPI::deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityNameList, JsonArray(_entityNameList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -246,7 +265,8 @@ void ot::ModelServiceAPI::deleteEntitiesFromModel(const std::list<std::string>& 
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel) {
+void ot::ModelServiceAPI::deleteEntitiesFromModel(const UIDList& _entityIDList, bool _saveModel)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_DeleteEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entityIDList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -257,7 +277,8 @@ void ot::ModelServiceAPI::deleteEntitiesFromModel(const UIDList& _entityIDList, 
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-bool ot::ModelServiceAPI::getEntityInformation(UID _entity, EntityInformation& _entityInfo) {
+bool ot::ModelServiceAPI::getEntityInformation(UID _entity, EntityInformation& _entityInfo)
+{
 	UIDList entities{ _entity };
 	std::list<EntityInformation> entityInfoList;
 
@@ -270,7 +291,8 @@ bool ot::ModelServiceAPI::getEntityInformation(UID _entity, EntityInformation& _
 	return true;
 }
 
-bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo) {
+bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, EntityInformation& _entityInfo)
+{
 	std::list<std::string> entities{ _entity };
 	std::list<EntityInformation> entityInfoList;
 
@@ -283,7 +305,8 @@ bool ot::ModelServiceAPI::getEntityInformation(const std::string& _entity, Entit
 	return true;
 }
 
-void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo) {
+void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, std::list<EntityInformation>& _entityInfo)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityInformationFromID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -291,7 +314,8 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -316,7 +340,8 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 	std::vector<std::string> entityNameVec(entityNames.begin(), entityNames.end());
 	std::vector<std::string> entityTypeVec(entityTypes.begin(), entityTypes.end());
 
-	for (size_t index = 0; index < entityIDVec.size(); index++) {
+	for (size_t index = 0; index < entityIDVec.size(); index++)
+	{
 		EntityInformation info;
 		info.setEntityID(entityIDVec[index]);
 		info.setEntityVersion(entityVersionVec[index]);
@@ -327,7 +352,8 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<UID>& _entities, 
 	}
 }
 
-void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo) {
+void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _entities, std::list<EntityInformation>& _entityInfo)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityInformationFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -335,7 +361,8 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _en
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -360,7 +387,8 @@ void ot::ModelServiceAPI::getEntityInformation(const std::list<std::string>& _en
 	std::vector<std::string> entityNameVec(entityNames.begin(), entityNames.end());
 	std::vector<std::string> entityTypeVec(entityTypes.begin(), entityTypes.end());
 
-	for (size_t index = 0; index < entityIDVec.size(); index++) {
+	for (size_t index = 0; index < entityIDVec.size(); index++)
+	{
 		EntityInformation info;
 		info.setEntityID(entityIDVec[index]);
 		info.setEntityVersion(entityVersionVec[index]);
@@ -380,7 +408,8 @@ bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<std::st
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return false;
 	}
 
@@ -393,7 +422,7 @@ bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<std::st
 	return result;
 }
 
-bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<ot::EntityInformation> &_entities)
+bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<ot::EntityInformation>& _entities)
 {
 	std::list<std::string> entityNames;
 
@@ -405,18 +434,21 @@ bool ot::ModelServiceAPI::anySubshapeOfGeometryOperation(const std::list<ot::Ent
 	return anySubshapeOfGeometryOperation(entityNames);
 }
 
-void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformation>& _entityInfo, const std::string& typeFilter) {
+void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformation>& _entityInfo, const std::string& typeFilter)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetSelectedEntityInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
-	if (typeFilter != "") {
+	if (typeFilter != "")
+	{
 		requestDoc.AddMember(OT_ACTION_PARAM_SETTINGS_Type, JsonString(typeFilter, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	}
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -441,7 +473,8 @@ void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformati
 	std::vector<std::string> entityNameVec(entityNames.begin(), entityNames.end());
 	std::vector<std::string> entityTypeVec(entityTypes.begin(), entityTypes.end());
 
-	for (size_t index = 0; index < entityIDVec.size(); index++) {
+	for (size_t index = 0; index < entityIDVec.size(); index++)
+	{
 		EntityInformation info;
 		info.setEntityID(entityIDVec[index]);
 		info.setEntityVersion(entityVersionVec[index]);
@@ -452,7 +485,8 @@ void ot::ModelServiceAPI::getSelectedEntityInformation(std::list<EntityInformati
 	}
 }
 
-void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, std::list<EntityInformation>& _entityInfo, bool recursive) {
+void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, std::list<EntityInformation>& _entityInfo, bool recursive)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -461,7 +495,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, 
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -486,7 +521,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, 
 	std::vector<std::string> entityNameVec(entityNames.begin(), entityNames.end());
 	std::vector<std::string> entityTypeVec(entityTypes.begin(), entityTypes.end());
 
-	for (size_t index = 0; index < entityIDVec.size(); index++) {
+	for (size_t index = 0; index < entityIDVec.size(); index++)
+	{
 		EntityInformation info;
 		info.setEntityID(entityIDVec[index]);
 		info.setEntityVersion(entityVersionVec[index]);
@@ -497,7 +533,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(const std::string& _entity, 
 	}
 }
 
-void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<EntityInformation>& _entityInfo, bool recursive) {
+void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<EntityInformation>& _entityInfo, bool recursive)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityChildInformationFromID, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -506,7 +543,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<Entit
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -531,7 +569,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<Entit
 	std::vector<std::string> entityNameVec(entityNames.begin(), entityNames.end());
 	std::vector<std::string> entityTypeVec(entityTypes.begin(), entityTypes.end());
 
-	for (size_t index = 0; index < entityIDVec.size(); index++) {
+	for (size_t index = 0; index < entityIDVec.size(); index++)
+	{
 		EntityInformation info;
 		info.setEntityID(entityIDVec[index]);
 		info.setEntityVersion(entityVersionVec[index]);
@@ -542,7 +581,8 @@ void ot::ModelServiceAPI::getEntityChildInformation(UID _entity, std::list<Entit
 	}
 }
 
-void ot::ModelServiceAPI::addPropertiesToEntities(std::list<UID>& _entityList, const ot::PropertyGridCfg& _configuration) {
+void ot::ModelServiceAPI::addPropertiesToEntities(std::list<UID>& _entityList, const ot::PropertyGridCfg& _configuration)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_AddPropertiesToEntities, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, JsonArray(_entityList, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -556,7 +596,8 @@ void ot::ModelServiceAPI::addPropertiesToEntities(std::list<UID>& _entityList, c
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties) {
+void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityProperties, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -566,7 +607,8 @@ void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, cons
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -583,8 +625,10 @@ void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, cons
 	entityProperties = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
-	for (auto id : entityIDs) {
-		if (prop == entityProperties.end()) {
+	for (auto id : entityIDs)
+	{
+		if (prop == entityProperties.end())
+		{
 			OT_LOG_E("List size mismatch");
 			return;
 		}
@@ -600,7 +644,8 @@ void ot::ModelServiceAPI::getEntityProperties(UID _entity, bool _recursive, cons
 	}
 }
 
-void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties) {
+void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, bool _recursive, const std::string& _propertyGroupFilter, std::map<UID, EntityProperties>& _entityProperties)
+{
 	// Prepare the request
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_GetEntityPropertiesFromName, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -610,7 +655,8 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 
 	// Send the command
 	std::string response;
-	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response)) {
+	if (!ModelAPIManager::sendToModel(EXECUTE, requestDoc, response))
+	{
 		return;
 	}
 
@@ -627,7 +673,8 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 	entityProperties = ot::json::getObjectList(responseDoc, OT_ACTION_PARAM_MODEL_PropertyList);
 
 	auto prop = entityProperties.begin();
-	for (auto id : entityIDs) {
+	for (auto id : entityIDs)
+	{
 		ot::PropertyGridCfg cfg;
 		cfg.setFromJsonObject(*prop);
 
@@ -640,11 +687,13 @@ void ot::ModelServiceAPI::getEntityProperties(const std::string& entityName, boo
 	}
 }
 
-void ot::ModelServiceAPI::updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies) {
+void ot::ModelServiceAPI::updateTopologyEntities(const NewModelStateInfo& _updatedEntities, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies)
+{
 	updateTopologyEntities(_updatedEntities.getTopologyEntityIDs(), _updatedEntities.getTopologyEntityVersions(), _comment, _considerVisualization);
 }
 
-void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment, bool _considerVisualization, bool _updateSelfDependencies) {
+void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEntityIDs, const ot::UIDList& topologyEntityVersions, const std::string& comment, bool _considerVisualization, bool _updateSelfDependencies)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdateTopologyEntity, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_TopologyEntityIDList, JsonArray(topologyEntityIDs, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -657,7 +706,8 @@ void ot::ModelServiceAPI::updateTopologyEntities(const ot::UIDList& topologyEnti
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::enableMessageQueueing(bool flag) {
+void ot::ModelServiceAPI::enableMessageQueueing(bool flag)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_QueueMessages, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_QUEUE_FLAG, flag, requestDoc.GetAllocator());
@@ -667,7 +717,8 @@ void ot::ModelServiceAPI::enableMessageQueueing(bool flag) {
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::modelChangeOperationCompleted(const std::string& description) {
+void ot::ModelServiceAPI::modelChangeOperationCompleted(const std::string& description)
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_ModelChangeOperationCompleted, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_MODEL_Description, JsonString(description, requestDoc.GetAllocator()), requestDoc.GetAllocator());
@@ -677,7 +728,8 @@ void ot::ModelServiceAPI::modelChangeOperationCompleted(const std::string& descr
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
 
-void ot::ModelServiceAPI::storeAllEntitiesToDataBase() {
+void ot::ModelServiceAPI::storeAllEntitiesToDataBase()
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_StoreAllEntitiesToDataBase, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
@@ -687,11 +739,72 @@ void ot::ModelServiceAPI::storeAllEntitiesToDataBase() {
 }
 
 
-void ot::ModelServiceAPI::updatePropertyGrid() {
+void ot::ModelServiceAPI::updatePropertyGrid()
+{
 	JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_MODEL_UpdatePropertyGrid, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 
 	std::string response;
 	ModelAPIManager::sendToModel(EXECUTE, requestDoc, response);
 }
-	
+
+ot::GraphicsItemMap ot::ModelServiceAPI::getGraphicsItemMap(const std::string& _sceneEntityName)
+{
+	ot::GraphicsItemMap result;
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetGraphicsItemMap, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(_sceneEntityName, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string responseStr;
+	if (!ModelAPIManager::sendToModel(EXECUTE, doc, responseStr))
+	{
+		OT_LOG_E("Failed to send message to model for graphics item click event");
+	}
+	else
+	{
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (!response.isOk())
+		{
+			OT_LOG_ES("Model returned error for graphics item click event: " << response.getWhat());
+		}
+		else
+		{
+			ot::JsonDocument itemMapDoc;
+			itemMapDoc.Parse(response.getWhat().c_str());
+
+			result.setFromJsonObject(itemMapDoc.getConstObject());
+		}
+	}
+
+	return result;
+}
+
+ot::GraphicsItemMap ot::ModelServiceAPI::getGraphicsItemMap(UID _sceneEntityID)
+{
+	ot::GraphicsItemMap result;
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_GetGraphicsItemMap, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_UID, _sceneEntityID, doc.GetAllocator());
+
+	std::string responseStr;
+	if (!ModelAPIManager::sendToModel(EXECUTE, doc, responseStr))
+	{
+		OT_LOG_E("Failed to send message to model for graphics item click event");
+	}
+	else
+	{
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (!response.isOk())
+		{
+			OT_LOG_ES("Model returned error for graphics item click event: " << response.getWhat());
+		}
+		else
+		{
+			ot::JsonDocument itemMapDoc;
+			itemMapDoc.Parse(response.getWhat().c_str());
+			result.setFromJsonObject(itemMapDoc.getConstObject());
+		}
+	}
+	return result;
+}

@@ -65,6 +65,75 @@ EntityHandler::~EntityHandler() {
 
 }
 
+void EntityHandler::showAll(const ot::GraphicsItemMap& _itemMap) 
+{
+	ot::UIDList allEntities = _itemMap.getAllIDs();
+
+	std::list<ot::EntityInformation> entityInfos;
+	ot::ModelServiceAPI::getEntityInformation(allEntities, entityInfos);
+	ot::EntityAPI::prefetchEntities(entityInfos);
+
+	ot::NewModelStateInfo entitiesToUpdate;
+
+	for (const ot::EntityInformation& entityInfo : entityInfos) {
+		std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(entityInfo));
+		if (!entity) {
+			OT_LOG_ES("Failed to read entity { \"Name\": \"" << entityInfo.getEntityName() << "\", \"ID\": " << entityInfo.getEntityID() << " }");
+			continue;
+		}
+
+		ot::EntityBlockHierarchicalBase* blockEntity = dynamic_cast<ot::EntityBlockHierarchicalBase*>(entity.get());
+		if (blockEntity)
+		{
+			bool blockNeedsUpdate = false;
+			if (blockEntity->getHidden())
+			{
+				// Show the block
+				blockEntity->setHidden(false);
+				blockNeedsUpdate = true;
+			}
+
+			// Check if any connector is collapsed
+			for (ot::Alignment alignment : c_connectorAlignments)
+			{
+				if (blockEntity->getConnectorState(alignment) != ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded)
+				{
+					blockEntity->setConnectorState(alignment, ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded);
+					blockNeedsUpdate = true;
+				}
+			}
+
+			if (blockNeedsUpdate)
+			{
+				blockEntity->storeToDataBase();
+				entitiesToUpdate.addTopologyEntity(*blockEntity);
+			}
+		}
+		else
+		{
+			ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(entity.get());
+			if (connectionEntity)
+			{
+				if (connectionEntity->getHidden())
+				{
+					connectionEntity->setHidden(false);
+					connectionEntity->storeToDataBase();
+					entitiesToUpdate.addTopologyEntity(*connectionEntity);
+				}
+			}
+			else
+			{
+				OT_LOG_ES("Unexpected entity in scene { \"Name\": \"" << entityInfo.getEntityName() << "\", \"ID\": " << entityInfo.getEntityID() << ", \"Type\": \"" << entityInfo.getEntityType() << "\" }");
+			}
+		}
+	}
+
+	if (entitiesToUpdate.hasEntities())
+	{
+		ot::ModelServiceAPI::updateTopologyEntities(entitiesToUpdate, "Expanded all items in scene");
+	}
+}
+
 void EntityHandler::createProjectItemBlockEntity(const ot::ProjectInformation& _projectInfo) {
 	ot::NewModelStateInfo newEntities;
 
@@ -706,11 +775,12 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 		newExpanderState = ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded;
 	}
 
+	// Update connector state of target block
 	targetBlock->setConnectorState(expanderAlignment, newExpanderState);
 	targetBlock->storeToDataBase();
 	updatedEntities.addTopologyEntity(*targetBlock);
 
-	// Get selected project
+	// Merge item and connection IDs to get all entities in the subtree
 	ot::UIDList subtreeEntityIDs;
 	for (ot::UID itemID : subtree.items) {
 		subtreeEntityIDs.push_back(itemID);
@@ -719,17 +789,68 @@ void EntityHandler::expandCollapseSubtree(const ot::GraphicsClickEvent& _event, 
 		subtreeEntityIDs.push_back(connectionID);
 	}
 
+	// Get entity information for all entities in the subtree
 	std::list<ot::EntityInformation> subtreeEntityInfos;
 	ot::ModelServiceAPI::getEntityInformation(subtreeEntityIDs, subtreeEntityInfos);
 
+	// Read all entities in the subtree
+	ot::EntityAPI::prefetchEntities(subtreeEntityInfos);
+	std::list<std::shared_ptr<EntityBase>> entitiesToProcess;
 	for (const ot::EntityInformation& subtreeEntityInfo : subtreeEntityInfos)
 	{
-		std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(subtreeEntityInfo.getEntityID(), subtreeEntityInfo.getEntityVersion()));
+		std::shared_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(subtreeEntityInfo.getEntityID(), subtreeEntityInfo.getEntityVersion()));
 		if (!entity)
 		{
 			OT_LOG_ES("Could not read entity from database { \"EntityID\": " << subtreeEntityInfo.getEntityID() << ", \"EntityVersion\": " << subtreeEntityInfo.getEntityVersion() << " }");
 			continue;
 		}
+		entitiesToProcess.push_back(std::move(entity));
+	}
+
+	std::list<std::shared_ptr<EntityBase>> entitiesToStore;
+
+	// If expanding, check if any of the blocks has a collapsed subtree, if so, ignore that subtree
+	if (!hideSubtree)
+	{
+		bool erased = true;
+		while (erased)
+		{
+			erased = false;
+			for (auto it = entitiesToProcess.begin(); it != entitiesToProcess.end(); ++it)
+			{
+				if (removeSubtreeIfCollapsed(_itemMap, *it, ot::Alignment::Top, entitiesToProcess, entitiesToStore, updatedEntities))
+				{
+					erased = true;
+					break;
+				}
+				if (removeSubtreeIfCollapsed(_itemMap, *it, ot::Alignment::Bottom, entitiesToProcess, entitiesToStore, updatedEntities))
+				{
+					erased = true;
+					break;
+				}
+				if (removeSubtreeIfCollapsed(_itemMap, *it, ot::Alignment::Left, entitiesToProcess, entitiesToStore, updatedEntities))
+				{
+					erased = true;
+					break;
+				}
+				if (removeSubtreeIfCollapsed(_itemMap, *it, ot::Alignment::Right, entitiesToProcess, entitiesToStore, updatedEntities))
+				{
+					erased = true;
+					break;
+				}
+			}
+		}
+
+	}
+
+	for (const std::shared_ptr<EntityBase>& entity : entitiesToStore)
+	{
+		entity->storeToDataBase();
+	}
+
+	while (!entitiesToProcess.empty()) {
+		std::shared_ptr<EntityBase> entity = std::move(entitiesToProcess.front());
+		entitiesToProcess.pop_front();
 
 		ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(entity.get());
 		if (block)
@@ -817,4 +938,62 @@ bool EntityHandler::getCoordinate(const ot::EntityBlock* _block, ot::Point2DD& _
 
 	_pos = blockCoordinates->getCoordinates();
 	return true;
+}
+
+bool EntityHandler::removeSubtreeIfCollapsed(const ot::GraphicsItemMap& _itemMap, std::shared_ptr<EntityBase> _block, ot::Alignment _connectorAlignment, std::list<std::shared_ptr<EntityBase>>& _entitiesToProcess, std::list<std::shared_ptr<EntityBase>>& _entitiesToStore, ot::NewModelStateInfo& _entitiesToUpdate)
+{
+	ot::EntityBlockHierarchicalBase* block = dynamic_cast<ot::EntityBlockHierarchicalBase*>(_block.get());
+	if (!block)
+	{
+		return false;
+	}
+
+	bool erased = false;
+
+	auto childState = block->getConnectorState(_connectorAlignment);
+	if (childState == ot::GraphicsHierarchicalItemBuilder::ExpanderState::Collapsed)
+	{
+		// Subtree of this block is collapsed
+		std::string childConnectorName = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(_connectorAlignment);
+
+		auto childSubtree = _itemMap.findSubTree(block->getEntityID(), childConnectorName);
+		if (childSubtree.hasCycle)
+		{
+			OT_LOG_DS("Cycle in child subtree detected (this should not happen), resetting connector state to expanded { \"Block\": \"" << block->getName() << "\", \"Alignment\": \"" << ot::toString(_connectorAlignment) << "\" }");
+
+			// Child subtree results in a cycle, change connector state to expanded
+			block->setConnectorState(ot::Alignment::Top, ot::GraphicsHierarchicalItemBuilder::ExpanderState::Expanded);
+			_entitiesToStore.push_back(_block);
+			_entitiesToUpdate.addTopologyEntity(*_block.get());
+		}
+		else
+		{
+			// Remove all entites in the child subtree from entitiesToProcess so they remain hidden
+			std::set<ot::UID> subtreeEntityIDs;
+			for (ot::UID itemID : childSubtree.items)
+			{
+				subtreeEntityIDs.insert(itemID);
+			}
+			for (ot::UID connectionID : childSubtree.connections)
+			{
+				subtreeEntityIDs.insert(connectionID);
+			}
+
+			for (auto it = _entitiesToProcess.begin(); it != _entitiesToProcess.end(); )
+			{
+				const ot::UID entityID = (*it)->getEntityID();
+				if (subtreeEntityIDs.find(entityID) != subtreeEntityIDs.end())
+				{
+					it = _entitiesToProcess.erase(it);
+					erased = true;
+				}
+				else
+				{
+					it++;
+				}
+			}
+		}
+	}
+
+	return erased;
 }

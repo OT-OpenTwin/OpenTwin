@@ -50,6 +50,9 @@ namespace ot {
 		void setText(const QString& _text);
 		const QString& getCurrentText(void) const { return m_text; };
 
+	protected:
+		virtual void updateToolTip() override;
+
 	private Q_SLOTS:
 		void lclValueChanged(void);
 

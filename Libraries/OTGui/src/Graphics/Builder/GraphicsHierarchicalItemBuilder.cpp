@@ -160,6 +160,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 		| GraphicsItemCfg::ItemForwardsState
 		| GraphicsItemCfg::ItemIsSelectable
 		| GraphicsItemCfg::ItemIsDoubleClickable
+		| GraphicsItemCfg::ItemParticipatesInStateHandling
 	);
 
 	// Central Stack
@@ -167,7 +168,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	cStack->setName(m_entityName + "_cStack");
 	cStack->setToolTip(m_toolTip);
 	cStack->setMargins(m_connectorHeight);
-	cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	cStack->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	root->addItemTop(cStack, true, false);
 
 	// Connector Grid
@@ -197,7 +198,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	// Main layout
 	GraphicsGridLayoutItemCfg* mLay = new GraphicsGridLayoutItemCfg(3, 3);
 	mLay->setName(m_entityName + "_mLay");
-	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	mLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	mLay->setColumnStretch(1, 1);
 	mLay->setRowStretch(1, 1);
 	cStack->addItemTop(mLay, true, false);
@@ -213,7 +214,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createGraphicsItem() c
 	cLay->setName(m_entityName + "_cLay");
 	cLay->setMinimumSize(m_minimumSize);
 	cLay->setMaximumSize(m_maximumSize);
-	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemForwardsState);
+	cLay->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsState);
 	mLay->addChildItem(1, 1, cLay);
 
 	// Content
@@ -275,7 +276,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 	GraphicsEllipseItemCfg* con = new GraphicsEllipseItemCfg(0., 0., new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
 	con->setName(createConnectorItemName(_alignment));
 	con->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::Transparent)));
-	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	con->setGraphicsItemFlags(GraphicsItemCfg::ItemIsConnectable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling);
 	con->setSizePolicy(SizePolicy::Preferred);
 
 	constexpr double trigDist = GraphicsItemCfg::defaultAdditionalTriggerDistance();
@@ -287,14 +288,14 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createConnectorItem(Al
 		con->setRadiusX(m_connectorWidth);
 		con->setRadiusY(m_connectorHeight);
 		con->setConnectionDirection(ConnectionDirection::Up);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
 		break;
 
 	case Alignment::Left:
 		con->setRadiusX(m_connectorHeight);
 		con->setRadiusY(m_connectorWidth);
 		con->setConnectionDirection(ConnectionDirection::Left);
-		con->setAdditionalTriggerDistance(trigDist, trigDist, trigDist, 0.);
+		con->setAdditionalTriggerDistance(trigDist, trigDist, 0., trigDist);
 		break;
 
 	case Alignment::Right:
@@ -346,10 +347,24 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 	
 	if (isExpanderVisible(_alignment))
 	{
-		buttonItm->setGraphicsItemFlags(GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemHandlesState);
-		buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
-		buttonItm->setOutline(PenFCfg(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground)));
+		GraphicsItemCfg::GraphicsItemFlags flags = GraphicsItemCfg::ItemIsClickable | GraphicsItemCfg::ItemParticipatesInStateHandling | GraphicsItemCfg::ItemUsesStateStyling;
+
+		PenFCfg pen(1., new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemBorder));
+
+		if (isExpanderCollapsed(_alignment))
+		{
+			buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground));
+			buttonItm->setToolTip("Expand");
+		}
+		else
+		{
+			buttonItm->setBackgroundPainer(new StyleRefPainter2D(ColorStyleValueEntry::Transparent));
+			buttonItm->setToolTip("Collapse");
+			flags.set(GraphicsItemCfg::ItemVisibleWhenAncestorHovered | GraphicsItemCfg::ItemVisibleWhenAncestorSelected | GraphicsItemCfg::ItemVisibleWhenHovered);
+		}
+		buttonItm->setOutline(pen);
 		buttonItm->setTriangleDirection(expanderDiectionFromAlignment(_alignment));
+		buttonItm->setGraphicsItemFlags(flags);
 	}
 	else
 	{
@@ -363,6 +378,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createExpanderItem(ot:
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() const
 {
+	ot::GraphicsItemCfg* shape = nullptr;
 	switch (m_backgroundShape)
 	{
 	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::None: return nullptr;
@@ -370,8 +386,16 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createShapeItem() cons
 	case ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse: return createEllipseShapeItem();
 	default:
 		OT_LOG_E("Unknown background shape: " + std::to_string(static_cast<int>(m_backgroundShape)));
-		return nullptr;
 	}
+
+	if (shape)
+	{
+		shape->setName(m_entityName + "_shape");
+		shape->setSizePolicy(SizePolicy::Dynamic);
+		shape->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
+	}
+
+	return shape;
 }
 
 ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeItem() const
@@ -379,9 +403,7 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createRectangleShapeIt
 	GraphicsRectangularItemCfg* shape = new GraphicsRectangularItemCfg(m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
 	shape->setCornerRadius(m_cornerRadius);
-	shape->setName(m_entityName + "_shape");
-	shape->setSizePolicy(SizePolicy::Dynamic);
-	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
+	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemUsesStateStyling);
 
 	return shape;
 }
@@ -390,9 +412,6 @@ ot::GraphicsItemCfg* ot::GraphicsHierarchicalItemBuilder::createEllipseShapeItem
 {
 	GraphicsEllipseItemCfg* shape = new GraphicsEllipseItemCfg(5., 5., m_backgroundPainter->createCopy());
 	shape->setOutline(m_outline);
-	shape->setName(m_entityName + "_shape");
-	shape->setSizePolicy(SizePolicy::Dynamic);
-	shape->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip | GraphicsItemCfg::ItemHandlesState);
 
 	return shape;
 }
@@ -429,7 +448,6 @@ void ot::GraphicsHierarchicalItemBuilder::createImage(GraphicsVBoxLayoutItemCfg*
 	itm->setSizePolicy(SizePolicy::Dynamic);
 	itm->setAlignment(_info.alignment);
 	itm->setMaintainAspectRatio(_info.maintainAspectRatio);
-	itm->setGraphicsItemFlags(GraphicsItemCfg::ItemForwardsTooltip);
 
 	_layout->addChildItem(itm);
 }
@@ -442,6 +460,20 @@ bool ot::GraphicsHierarchicalItemBuilder::isExpanderVisible(Alignment _alignment
 	case Alignment::Bottom: return m_bottomExpanderState != ExpanderState::None;
 	case Alignment::Left: return m_leftExpanderState != ExpanderState::None;
 	case Alignment::Right: return m_rightExpanderState != ExpanderState::None;
+	default:
+		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
+		return false;
+	}
+}
+
+bool ot::GraphicsHierarchicalItemBuilder::isExpanderCollapsed(Alignment _alignment) const
+{
+	switch (_alignment)
+	{
+	case ot::Alignment::Top: return m_topExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Right: return m_rightExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Bottom: return m_bottomExpanderState == ExpanderState::Collapsed;
+	case ot::Alignment::Left: return m_leftExpanderState == ExpanderState::Collapsed;
 	default:
 		OT_LOG_E("Invalid expander alignment: " + std::to_string((int)_alignment));
 		return false;

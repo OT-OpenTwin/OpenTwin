@@ -28,6 +28,7 @@
 #include "base64.h"
 #include "zlib.h"
 #include "FileHandler.h"
+#include "CrossCollectionDatabaseWrapper.h"
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
@@ -35,13 +36,13 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/VisualisationCfg.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
+#include "OTGuiAPI/Frontend.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
-#include "CrossCollectionDatabaseWrapper.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
-#include "OTGui/Dialog/PropertyDialogCfg.h"
 
 // std header
 #include <thread>
@@ -71,7 +72,7 @@ ot::ReturnMessage Application::handleCheckProjectOpen() {
 		return ot::ReturnMessage::False;
 	}
 	else {
-		return (m_model->isProjectOpen() ? ot::ReturnMessage::True : ot::ReturnMessage::False);
+		return (m_model->getModelServiceState().getProjectIsOpen() ? ot::ReturnMessage::True : ot::ReturnMessage::False);
 	}
 }
 
@@ -742,7 +743,7 @@ ot::ReturnMessage Application::handleVisualisationDataRequest(ot::JsonDocument& 
 		m_visualisationHandler.handleVisualisationRequest(entityID, visualisationCfg);
 	}
 	catch (std::exception& e) {
-		OT_LOG_W(e.what());
+		OT_LOG_E(e.what());
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, e.what());
 	}
 
@@ -772,13 +773,22 @@ void Application::handleImportTableFile(ot::JsonDocument& _document) {
 	}
 }
 
-void Application::handleExportDialog(ot::JsonDocument& _document) {
+void Application::handleExportFileToLocalLibraryDialog(ot::JsonDocument& _document) {
 
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportDialog(pckg);
+	m_fileHandler.handleExportFileToLocalLibraryDialog(pckg);
+}
+
+void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
+	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
+	ot::PropertyDialogCfg pckg;
+	pckg.setFromJsonObject(cfgObj);
+
+	m_fileHandler.handleExportFileToUserLibraryDialog(pckg);
+
 }
 
 
@@ -991,21 +1001,6 @@ void Application::handleSetVersionLabel(ot::JsonDocument& _document) {
 // ##################################################################################################################################################################################################################
 
 // Action handler: UI callbacks
-
-void Application::handlePromptResponse(ot::JsonDocument& _document) {
-	if (!m_model) {
-		OT_LOG_E("No model created yet");
-		throw ot::Exception::ObjectNotFound("No model created yet");
-	}
-
-	std::string response = ot::json::getString(_document, OT_ACTION_PARAM_RESPONSE);
-	std::string answer = ot::json::getString(_document, OT_ACTION_PARAM_ANSWER);
-	std::string parameter1 = ot::json::getString(_document, OT_ACTION_PARAM_PARAMETER1);
-
-	ot::MessageDialogCfg::BasicButton actualAnswer = ot::MessageDialogCfg::stringToButton(answer);
-
-	m_model->promptResponse(response, actualAnswer, parameter1);
-}
 
 ot::ReturnMessage Application::handleShowTable(ot::JsonDocument& _document) {
 	const std::string tableName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
@@ -1379,7 +1374,6 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
 	
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
-	connectAction(OT_ACTION_CMD_UI_PromptResponse, this, &Application::handlePromptResponse);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, this, &Application::handleGetEntityIdentifier);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, this, &Application::handleGetEntitiesFromAnotherCollection);
 	connectAction(OT_ACTION_PARAM_MODEL_ViewsForProjectType, this, &Application::handleViewsFromProjectType);
@@ -1388,7 +1382,8 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogConfirmed, this, &Application::handleModelDialogConfirmed);
 	connectAction(OT_ACTION_CMD_MODEL_ModelDialogCanceled, this, &Application::handleModelDialogCanceled);
 	connectAction(OT_ACTION_CMD_ImportTableFile, this, &Application::handleImportTableFile);
-	connectAction(OT_ACTION_CMD_ExportFilesToLibrary, this, &Application::handleExportDialog);
+	connectAction(OT_ACTION_CMD_ExportFilesToLibrary, this, &Application::handleExportFileToLocalLibraryDialog);
+	connectAction(OT_ACTION_CMD_ExportFileToUserLibrary, this, &Application::handleExportFileToUserLibrary);
 
 	// Properties
 	connectAction(OT_ACTION_CMD_MODEL_GetEntityProperties, this, &Application::handleGetEntityProperties);

@@ -79,7 +79,7 @@ void ot::GraphicsShapeItem::paintCustomItem(QPainter* _painter, const QStyleOpti
 
 	QPen borderPen = QtFactory::toQPen(cfg->getOutline());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			borderPen.setBrush(QtFactory::toQBrush(newPainter));

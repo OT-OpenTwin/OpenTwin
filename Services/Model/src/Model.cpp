@@ -108,6 +108,7 @@
 
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
+#include "ProjectInfoHandler.h"
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 
@@ -131,14 +132,14 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_projectName(_projectName),
 	m_projectType(_projectType),
 	m_collectionName(_collectionName),
-	m_shutdown(false),
 	m_uiCreated(false),
 	m_versionGraphCreated(false),
-	m_stateManager(nullptr),
-	m_isProjectOpen(false)
+	m_stateManager(nullptr)
 {
 	OT_LOG_D("Created model { \"Project.Name\": \"" + _projectName + "\", \"Project.Type\": \"" +  + " }");
 	
+	m_actionHandler.connectAction(std::string(c_promptActionDiscardRedoInfoAndSave), this, &Model::handleDiscardRedoInfoAndSavePromptResponse);
+
 	m_infoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Geometry", "Info", "Default/Information");
 	m_infoButton.setButtonKeySequence(ot::KeySequence(ot::BasicKey::Control, ot::BasicKey::I));
 	m_infoButton.setButtonLockFlags(ot::LockType::ModelRead);
@@ -421,12 +422,6 @@ void Model::resetToNew()
 	{
 		EntityMetadataCampaign* rmd = (new EntityMetadataCampaign(createEntityUID(), nullptr, this, getStateManager()));
 		rmd->setName(typeManager.getDatasetRMD());
-		rmd->registerCallbacks(
-			ot::EntityCallbackBase::Callback::Properties |
-			ot::EntityCallbackBase::Callback::Selection |
-			ot::EntityCallbackBase::Callback::DataNotify,
-			OT_INFO_SERVICE_TYPE_ImportParameterizedDataService
-		);
 		addEntityToModel(rmd->getName(), rmd, m_entityRoot, true, allNewEntities);
 	}
 	
@@ -469,6 +464,7 @@ void Model::resetToNew()
 	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
+		auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
 		createVisualizationItems();
 		enableQueuingHttpRequests(false);
 	}	
@@ -476,7 +472,7 @@ void Model::resetToNew()
 
 Model::~Model()
 {
-	m_shutdown = true;
+	m_serviceState.setIsShuttingDown(true);
 
 	// Restore the original version if needed
 	// This must be called before cleaerAll since clearAll will reset the state manager
@@ -925,8 +921,8 @@ void Model::getModelBox(double &xmin, double &xmax, double &ymin, double &ymax, 
 
 void Model::setVisualizationModel(ot::UID visModelID)
 {
-	m_visualizationModelID = visModelID;	
-		
+	m_visualizationModelID = visModelID;
+
 	if (Application::instance()->isUiConnected())
 	{
 		enableQueuingHttpRequests(true);
@@ -936,6 +932,7 @@ void Model::setVisualizationModel(ot::UID visModelID)
 			// Ensure that the root nodes have a visualization item
 			//createVisualizationItems();
 
+			auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
 			m_entityRoot->addVisualizationNodes();
 		}
 
@@ -1839,6 +1836,25 @@ std::string Model::ensureUniqueName(const std::string& name)
 	return newName;
 }
 
+void Model::handleDiscardRedoInfoAndSavePromptResponse(ot::JsonDocument& _document)
+{
+	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(ot::json::getString(_document, OT_ACTION_PARAM_Result));
+	std::string comment = ot::json::getString(_document, OT_ACTION_PARAM_Info);
+
+	if (result != ot::MessageDialogCfg::Yes)
+	{
+		// We need to remove the redo information
+		const std::list<std::string> removedStates = getStateManager()->removeRedoModelStates();
+
+		if (!removedStates.empty())
+		{
+			removeVersionGraphVersions(removedStates);
+		}
+	}
+
+	projectSave(comment, true);
+}
+
 void Model::renameEntityWithChildren(EntityBase* entity, const std::string& newName)
 {
 	std::string oldName = entity->getName();
@@ -2526,7 +2542,7 @@ void Model::updateEntityProperties(bool itemsVisible)
 		if (anyEntityNeedsUpdate)
 		{
 			refreshAllViews();
-			modelChangeOperationCompleted("shape properties changed");
+			modelChangeOperationCompleted("Properties changed");
 		}
 
 		enableQueuingHttpRequests(false);
@@ -2591,7 +2607,7 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 
 	// Now we need to notify the model service that the update operation is completed
 	refreshAllViews();
-	modelChangeOperationCompleted("shape properties changed");
+	modelChangeOperationCompleted("Properties changed");
 }
 
 void Model::updateEntity(EntityBase *entity)
@@ -3615,6 +3631,8 @@ EntityBase *Model::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, 
 
 void Model::projectOpen(const std::string& _customVersion)
 {
+	m_serviceState.setState(ot::ModelServiceState::OpeningProject);
+
 	// First, clear the current content of the model
 	clearAll();
 
@@ -3656,7 +3674,9 @@ void Model::projectOpen(const std::string& _customVersion)
 			enableQueuingHttpRequests(false);
 		}
 
-		m_isProjectOpen = true;
+		
+		m_serviceState.setProjectIsOpen(true);
+		m_serviceState.setState(ot::ModelServiceState::Running);
 		return;
 	}
 
@@ -3690,7 +3710,8 @@ void Model::projectOpen(const std::string& _customVersion)
 			enableQueuingHttpRequests(false);
 		}
 
-		m_isProjectOpen = true;
+		m_serviceState.setProjectIsOpen(true);
+		m_serviceState.setState(ot::ModelServiceState::Running);
 		return;
 	}
 
@@ -3757,7 +3778,8 @@ void Model::projectOpen(const std::string& _customVersion)
 	// update the undo information
 	updateUndoRedoStatus();
 
-	m_isProjectOpen = true;
+	m_serviceState.setProjectIsOpen(true);
+	m_serviceState.setState(ot::ModelServiceState::Running);
 }
 
 void Model::updateVersionGraph()
@@ -3856,8 +3878,18 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 		// Disable write caching to database (this will also flush all pending writes)
 		DataBase::instance().setWritingQueueEnabled(false);
 
-		Application::instance()->getNotifier()->promptChoice("There is redo information available which will be discarded if you change the model at this stage. \n\n"
-			"Do you want to create a new version branch for these changes?", ot::MessageDialogCfg::Warning, ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No, "DiscardRedoInfoAndSave", comment);
+		if (!ot::Frontend::promptChoice(
+			std::string(c_promptActionDiscardRedoInfoAndSave),
+			"OpenTwin",
+			"There is redo information available which will be discarded if you change the model at this stage. \n\n"
+			"Do you want to create a new version branch for these changes?",
+			ot::MessageDialogCfg::Question,
+			ot::MessageDialogCfg::Yes | ot::MessageDialogCfg::No,
+			comment
+		))
+		{
+			OT_LOG_E("Failed to send prompt to frontend");
+		}
 
 		return;
 	}
@@ -3881,35 +3913,6 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 
 	updateUndoRedoStatus();
 	resetModified();
-}
-
-void Model::promptResponse(const std::string& _type, ot::MessageDialogCfg::BasicButton _answer, const std::string& _parameter1) {
-	if (_type == "DiscardRedoInfoAndSave") {
-		if (_answer != ot::MessageDialogCfg::Yes) {
-			// We need to remove the redo information
-			const std::list<std::string> removedStates = getStateManager()->removeRedoModelStates();
-
-			if (!removedStates.empty()) {
-				removeVersionGraphVersions(removedStates);
-			}
-		}
-
-		projectSave(_parameter1, true);
-	}
-	else if (_type == "OverwriteFile") {
-		// Handle file overwrite response
-		if ((_answer & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes) {
-			// User wants to overwrite
-			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, true);
-		}
-		else if ((_answer & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
-			// User doesn't want to overwrite - add counter to filename
-			Application::instance()->getFileHandler().handleOverwriteResponse(_parameter1, false);
-		}
-	}
-	else {
-		OT_LOG_E("Unknown promt type \"" + _type + "\"");
-	}
 }
 
 EntityBase* Model::getEntityByID(ot::UID _entityID) const
@@ -3963,7 +3966,9 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	}
 	_object.AddMember("PendingEntityUpdates", pendingEntityUpdatesArr, _allocator);
 
-	_object.AddMember("IsProjectOpen", m_isProjectOpen, _allocator);
+	JsonObject serviceStateObj;
+	m_serviceState.addToJsonObject(serviceStateObj, _allocator);
+	_object.AddMember("State", serviceStateObj, _allocator);
 	_object.AddMember("VisualizationModelID", m_visualizationModelID, _allocator);
 	_object.AddMember("IsModified", m_isModified, _allocator);
 	_object.AddMember("ProjectName", JsonString(m_projectName, _allocator), _allocator);
@@ -4005,8 +4010,6 @@ void Model::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _all
 	else {
 		_object.AddMember("StateManager", JsonNullValue(), _allocator);
 	}
-
-	_object.AddMember("IsShutdown", m_shutdown, _allocator);
 }
 
 void Model::enableQueuingHttpRequests(bool flag)
@@ -4034,7 +4037,7 @@ void Model::setModified()
 
 	m_isModified = true;
 
-	if (sendNotification && !m_shutdown)
+	if (sendNotification && !m_serviceState.getIsShuttingDown())
 	{
 		Application::instance()->getNotifier()->isModified(m_visualizationModelID, true);
 	}
@@ -4046,7 +4049,7 @@ void Model::resetModified()
 
 	m_isModified = false;
 
-	if (sendNotification && !m_shutdown)
+	if (sendNotification && !m_serviceState.getIsShuttingDown())
 	{
 		Application::instance()->getNotifier()->isModified(m_visualizationModelID, false);
 	}
@@ -4077,6 +4080,8 @@ void Model::uiIsAvailable(ot::components::UiComponent* _ui)
 	{
 		if (m_entityRoot != nullptr)
 		{
+			auto raii = m_serviceState.setTemporaryState(ot::ModelServiceState::BuildingNavigationTree);
+
 			m_entityRoot->addVisualizationNodes();
 		}
 
@@ -4203,10 +4208,138 @@ std::string Model::requestLibraryElement(ot::LibraryElementRequest& _config) {
 	//return "";
 }
 
+void Model::connectionChanged(EntityBase* _entity)
+{
+	// This function is called when a block's connectors are modified.
+	// We need to update the blockHandler to reflect changes (e.g., removed connectors).
+
+	if (_entity == nullptr)
+	{
+		return;
+	}
+
+	ot::EntityBlock* block = dynamic_cast<ot::EntityBlock*>(_entity);
+	if(block == nullptr)
+	{
+		return;
+	}
+
+	// Get the graphics scene that contains this block
+	EntityGraphicsScene* scene = nullptr;
+
+	// Find the parent graphics scene
+	EntityBase* parent = _entity->getParent();
+	while (parent != nullptr)
+	{
+		EntityGraphicsScene* graphicsScene = dynamic_cast<EntityGraphicsScene*>(parent);
+		if (graphicsScene != nullptr)
+		{
+			scene = graphicsScene;
+			break;
+		}
+		parent = parent->getParent();
+	}
+
+	if (scene == nullptr)
+	{
+		return;
+	}
+
+	// Get all current connectors of this block
+	const auto& currentConnectors = block->getAllConnectorsByName();
+	std::set<std::string> validConnectorNames;
+
+	for (const auto& connectorPair : currentConnectors) {
+		validConnectorNames.insert(connectorPair.first);
+	}
+
+	ot::UID blockID = _entity->getEntityID();
+	ot::UID sceneID = scene->getEntityID();
+
+	// Get the graphics item map for this scene
+	const ot::GraphicsItemMap* itemMap = Application::instance()->getBlockHandler().getGraphicsItemMap(sceneID);
+	if (itemMap == nullptr)
+	{
+		return;
+	}
+
+	// Iterate through all connections in this scene and check if they reference this block
+	// We need to get all connections from the scene
+	const auto& allConnections = itemMap->getItemConnections(blockID);
+
+	// Now we need to check if any of the connections in the scene reference this block and if they are still valid
+	// Also make sure that we update the connections of the other blocks that are connected to this block, if the connection is still valid
+	for (const auto& connectionCfg : allConnections)
+	{
+		ot::UID connectionID = connectionCfg.getUid();
+		EntityBase* connectionEntity = getEntityByID(connectionID);
+
+		if (connectionEntity == nullptr)
+		{
+			continue;
+		}
+
+		ot::EntityBlockConnection* connection = dynamic_cast<ot::EntityBlockConnection*>(connectionEntity);
+		if (connection == nullptr)
+		{
+			continue;
+		}
+
+		// Get the current connection configuration
+		ot::GraphicsConnectionCfg connectionCfg_current = connection->getConnectionCfg();
+		bool needsUpdate = false;
+
+		// Check if origin connector is invalid and belongs to this block
+		if (connectionCfg_current.getOriginUid() == blockID) {
+			if (validConnectorNames.find(connectionCfg_current.getOriginConnectable()) == validConnectorNames.end()) {
+				// Origin connector was removed - unsnapt it
+				connectionCfg_current.setOriginUid(ot::invalidUID);
+				connectionCfg_current.setOriginConnectable("");
+				needsUpdate = true;
+			}
+		}
+
+		// Check if destination connector is invalid and belongs to this block
+		if (connectionCfg_current.getDestinationUid() == blockID) {
+			if (validConnectorNames.find(connectionCfg_current.getDestinationConnectable()) == validConnectorNames.end()) {
+				// Destination connector was removed - unsnapt it
+				connectionCfg_current.setDestinationUid(ot::invalidUID);
+				connectionCfg_current.setDestinationConnectable("");
+				needsUpdate = true;
+			}
+		}
+
+		// Now update the connection with the new (cleaned) information
+		if (needsUpdate) {
+			ot::GraphicsChangeEvent changeEvent;
+			changeEvent.setEditorName(scene->getName());
+
+			// Use the BlockHandler's updateConnection method to update the map and connection
+			Application::instance()->getBlockHandler().updateConnectionExplicitly(connectionCfg_current, changeEvent);
+		}
+	}
+
+	// Finally, update the block handler's connector map for this block
+	Application::instance()->getBlockHandler().updateConnectorsExplicitly(blockID, validConnectorNames, sceneID);
+}
 void Model::requestVisualisation(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
-	Application::instance()->getVisualisationHandler().handleVisualisationRequest(_entityID, _visualisationCfg);
+	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
+	handler.handleVisualisationRequest(_entityID, _visualisationCfg);
 }
+
+void Model::requestVisualisationIfNeeded(ot::UID _entityID)
+{
+	ViewVisualisationHandler& handler = Application::instance()->getVisualisationHandler();
+	handler.requestVisualisationIfNeeded(_entityID);
+}
+
+std::optional<std::string> Model::getCollectionName(const std::string& _projectName)
+{
+	std::optional<std::string> collectionName = m_projectInfoHandler.getCollectionName(_projectName);
+	return collectionName;
+}
+
 
 std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
@@ -4225,12 +4358,11 @@ ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& 
 	return metadataHandler.createConfig(_campaign, _collectionName, _queryCfg);
 }
 
-bool Model::projectIsOpen()
+const ot::GraphicsItemMap* Model::getGraphicsItemMap(const std::string& _editorEntityName) const
 {
-	return isProjectOpen();
+	BlockHandler& handler = Application::instance()->getBlockHandler();
+	return handler.getGraphicsItemMap(_editorEntityName);
 }
-
-
 
 EntityBase *Model::findEntityFromName(const std::string &name)
 {

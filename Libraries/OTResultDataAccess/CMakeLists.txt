@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.20)
+﻿cmake_minimum_required(VERSION 3.20)
 project(OTResultDataAccess LANGUAGES CXX)
 
 set(OT_RESULTDATAACCESS_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")

@@ -81,7 +81,7 @@ void ot::GraphicsLineItem::paintCustomItem(QPainter* _painter, const QStyleOptio
 	
 	QPen linePen = QtFactory::toQPen(cfg->getLineStyle());
 
-	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemHandlesState) {
+	if (this->getGraphicsItemFlags() & GraphicsItemCfg::ItemUsesStateStyling) {
 		if ((this->getGraphicsElementState() & GraphicsElement::SelectedState) && !(this->getGraphicsElementState() & GraphicsElement::HoverState)) {
 			Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			linePen.setBrush(QtFactory::toQBrush(newPainter));

@@ -38,8 +38,8 @@ ot::GraphicsConnectionConnectorItem::GraphicsConnectionConnectorItem(GraphicsCon
 	cfg.setOutline(pen);
 	cfg.setRadiusX(r);
 	cfg.setRadiusY(r);
-	cfg.setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemHandlesState | 
-		GraphicsItemCfg::ItemIsSelectable |	GraphicsItemCfg::ItemSnapsToGridCenter //| GraphicsItemCfg::ItemSilencesNotifcations
+	cfg.setGraphicsItemFlags(GraphicsItemCfg::ItemIsMoveable | GraphicsItemCfg::ItemParticipatesInStateHandling 
+		| GraphicsItemCfg::ItemUsesStateStyling | GraphicsItemCfg::ItemIsSelectable | GraphicsItemCfg::ItemSnapsToGridCenter
 	);
 	
 	this->setupFromConfig(&cfg);

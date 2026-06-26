@@ -798,6 +798,14 @@ void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabNa
 	}
 }
 
+void ViewerAPI::requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID)
+{
+	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[_viewerID];
+	if (v != nullptr) {
+		v->getViewer()->requestVisualizationIfNeeded(_modelEntityID);
+	}
+}
+
 void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
 	if (GlobalModel::instance() != nullptr) {
 		GlobalModel::instance()->viewerTabChanged(_viewInfo);

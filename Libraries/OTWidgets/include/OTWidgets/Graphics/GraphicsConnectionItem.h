@@ -153,6 +153,8 @@ namespace ot {
 
 		void updateConnectionView();
 
+		void updateConnectionInformation();
+
 		QPointF getOriginPos() const;
 		QPointF getDestPos() const;
 
