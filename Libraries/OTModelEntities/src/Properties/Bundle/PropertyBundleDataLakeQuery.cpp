@@ -160,20 +160,20 @@ bool PropertyBundleDataLakeQuery::updatePropertyVisibility(EntityBase* _thisObje
 
 std::list<std::string> PropertyBundleDataLakeQuery::getParameterOptions(const EntityBase* _thisObject) const
 {
-	const auto& options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuerySettings + "_" + std::to_string(1))->getOptions();
+	const auto options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuerySettings + "_" + std::to_string(1))->getOptionStrings();
 	return { options.begin(), options.end() };
 }
 
 std::list<std::string> PropertyBundleDataLakeQuery::getQuantityOptions(const EntityBase* _thisObject) const
 {
-	const auto& options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptions();
+	const auto options = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptionStrings();
 	return { options.begin(), options.end() };
 }
 
 std::list<std::string> PropertyBundleDataLakeQuery::getTupleOptions(const EntityBase* _thisObject) const
 {
 	const EntityPropertiesSelection* selection = dynamic_cast<const EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
-	const auto&	options = selection->getOptions();
+	const auto options = selection->getOptionStrings();
 	if (options.size() > 0)
 	{
 		std::list<std::string> optionsWithoutTupleType = { std::next(options.begin()), options.end()};
@@ -188,7 +188,7 @@ std::string PropertyBundleDataLakeQuery::getTupleType(const EntityBase* _thisObj
 	const auto& options = selection->getOptions();
 	if (options.size() > 0)
 	{
-		return options.front();
+		return options.front().first;
 	}
 	return {};
 }
@@ -329,8 +329,9 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		quantityLabels.push_front("");
 
 		auto temp = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings);
-		std::list<std::string> currentOptions = { temp->getOptions().begin(), temp->getOptions().end() };
-		if (currentOptions != quantityLabels)
+		const auto currentOptions = temp->getOptionStrings();
+		std::list<std::string> currentOptionsList = { currentOptions.begin(), currentOptions.end() };
+		if (currentOptionsList != quantityLabels)
 		{
 			temp->resetOptions(quantityLabels);
 			temp->setNeedsUpdate();
@@ -339,7 +340,8 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 
 
 	bool quantityChanged = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->needsUpdate();
-	const auto& availableQuantityLabels = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptions();
+	const auto availableQuantityLabels = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, m_groupQuantitySettings)->getOptionStrings();
+
 	std::list<std::string> availableQuantityLabelsList = { availableQuantityLabels.begin(), availableQuantityLabels.end() };
 	if (projectChanged || seriesChanged || quantityChanged)
 	{
@@ -413,7 +415,7 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 
 		// If the parameter options have changed, we need to update them.
 		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(1);
-		auto& temp = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->getOptions();
+		const auto temp = PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->getOptionStrings();
 		std::list<std::string> currentOptions = { temp.begin(),temp.end() };
 		if (currentOptions != parameterLabel)
 		{
@@ -492,7 +494,13 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 		if (formatSelection->needsUpdate())
 		{
 			EntityPropertiesSelection* componentSelection = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
-			const std::string tupleName = *componentSelection->getOptions().begin();
+			std::string tupleName;
+			const auto& options = componentSelection->getOptions();
+			if (!options.empty())
+			{
+				tupleName = options.front().first;
+			}
+
 			ot::TupleDescription* tupleDescription = TupleFactory::create(tupleName);
 			if (tupleDescription != nullptr)
 			{
@@ -628,7 +636,12 @@ ot::ValueComparisonDescription PropertyBundleDataLakeQuery::getQuantityQuery(Ent
 		instance.setTupleUnits(units);
 
 		EntityPropertiesSelection* componentSelection = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
-		const std::string tupleName = *componentSelection->getOptions().begin();
+		std::string tupleName;
+		const auto& options = componentSelection->getOptions();
+		if (!options.empty())
+		{
+			tupleName = options.front().first;
+		}
 		instance.setTupleTypeName(tupleName);
 
 		const std::string tupleTargetFormat = PropertyHelper::getSelectionPropertyValue(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings);
@@ -735,17 +748,17 @@ bool PropertyBundleDataLakeQuery::setTupleSelectionOptions(EntityBase* _thisObje
 {
 	bool refresh = false;
 	EntityPropertiesSelection* selectionComponent = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyQuantityComponent, m_groupQuantitySettings));
-	refresh |= selectionComponent->getOptions() != _elementOptions;
+	refresh |= selectionComponent->getOptionStrings() != _elementOptions;
 	selectionComponent->resetOptions(_elementOptions);
 	selectionComponent->setNeedsUpdate();
 	
 	EntityPropertiesSelection* selectionFormat =dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleFormat, m_groupQuantitySettings));
-	refresh |= selectionFormat->getOptions() != _formatOptions;
+	refresh |= selectionFormat->getOptionStrings() != _formatOptions;
 	selectionFormat->resetOptions(_formatOptions);
 	selectionFormat->setNeedsUpdate();
 
 	EntityPropertiesSelection* selectionUnits = dynamic_cast<EntityPropertiesSelection*>(PropertyHelper::getSelectionProperty(_thisObject, m_propertyTupleUnit, m_groupQuantitySettings));
-	refresh |= selectionUnits->getOptions() != _unitOptions;
+	refresh |= selectionUnits->getOptionStrings() != _unitOptions;
 	selectionUnits->resetOptions(_unitOptions);
 	selectionUnits->setNeedsUpdate();
 	return refresh;

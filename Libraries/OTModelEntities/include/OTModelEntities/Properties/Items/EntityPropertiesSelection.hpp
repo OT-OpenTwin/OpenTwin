@@ -9,7 +9,7 @@ template <typename TContainer>
 void EntityPropertiesSelection::resetOptionsImpl(const TContainer& _options)
 {
 	// Clear and reserve space
-	m_options.clear();	
+	m_options.clear();
 	m_options.reserve(_options.size());
 	
 	// Add options
@@ -26,7 +26,7 @@ void EntityPropertiesSelection::resetOptionsImpl(const TContainer& _options)
 	}
 	else
 	{
-		m_value = m_options.front();
+		m_value = m_options.front().first;
 	}
 
 }

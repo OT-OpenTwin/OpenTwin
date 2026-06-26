@@ -79,6 +79,8 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);
 
+	virtual ot::PropertyBase::ValueHandlingType getCurrentValueHandlingType() const { return ot::PropertyBase::ValueHandlingType::Value; };
+
 	EntityPropertiesBase& operator=(const EntityPropertiesBase& other);
 
 protected:

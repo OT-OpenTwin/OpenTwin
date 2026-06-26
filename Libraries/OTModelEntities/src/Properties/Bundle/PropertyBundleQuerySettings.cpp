@@ -61,7 +61,7 @@ void ot::PropertyBundleQuerySettings::setQueryDefinitions(const std::list<std::s
 void ot::PropertyBundleQuerySettings::reload(EntityBase* _entity)
 {
 	std::string groupName = getGroupName(1);
-	const std::vector<std::string>& options = PropertyHelper::getSelectionProperty(_entity, m_propertyName, groupName)->getOptions();
+	const std::vector<std::string> options = PropertyHelper::getSelectionProperty(_entity, m_propertyName, groupName)->getOptionStrings();
 	m_nameSelectionOptions = { options.begin(), options.end() };
 	m_maxNumberOfQueryDefinitions =	(uint32_t)m_nameSelectionOptions.size();
 }

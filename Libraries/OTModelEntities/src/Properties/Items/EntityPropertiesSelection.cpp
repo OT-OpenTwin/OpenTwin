@@ -37,17 +37,23 @@ EntityPropertiesSelection* EntityPropertiesSelection::createProperty(const std::
 	return prop;
 }
 
-EntityPropertiesSelection::EntityPropertiesSelection() : m_allowCustomValues(false)
+EntityPropertiesSelection::EntityPropertiesSelection() : m_allowCustomValues(false),
+	m_currentValueHandlingType(ot::PropertyBase::ValueHandlingType::Value)
 {}
 
 EntityPropertiesSelection::EntityPropertiesSelection(const EntityPropertiesSelection& _other)
-	: EntityPropertiesBase(_other), m_value(_other.m_value), m_options(_other.m_options), m_allowCustomValues(_other.m_allowCustomValues)
+	: EntityPropertiesBase(_other), m_value(_other.m_value), m_options(_other.m_options), m_allowCustomValues(_other.m_allowCustomValues),
+	m_currentValueHandlingType(_other.m_currentValueHandlingType)
 {}
 
 void EntityPropertiesSelection::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
 {
-	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), m_value, m_options);
+	ot::PropertyStringList* newProp = new ot::PropertyStringList;
+	newProp->setPropertyName(this->getName());
 	newProp->setPropertyFlag(ot::Property::AllowCustomValues, m_allowCustomValues);
+	newProp->setOptions(m_options);
+	newProp->setCurrent(m_value);
+	newProp->setCurrentValueHandlingType(m_currentValueHandlingType);
 	this->setupPropertyData(_configuration, newProp);
 }
 
@@ -64,11 +70,8 @@ void EntityPropertiesSelection::setFromConfiguration(const ot::Property* _proper
 	if (m_value != actualProperty->getCurrent()) setNeedsUpdate();
 	m_value = actualProperty->getCurrent();
 
-	m_options.clear();
-	for (const auto& opt : actualProperty->getOptions())
-	{
-		m_options.push_back(opt.first);
-	}
+	m_options = actualProperty->getOptions();
+	m_currentValueHandlingType = actualProperty->getCurrentValueHandlingType();
 }
 
 void EntityPropertiesSelection::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* _root)
@@ -76,14 +79,42 @@ void EntityPropertiesSelection::addToJsonObject(ot::JsonObject& _jsonObject, ot:
 	EntityPropertiesBase::addToJsonObject(_jsonObject, _allocator, _root);
 
 	_jsonObject.AddMember("Value", ot::JsonString(m_value, _allocator), _allocator);
-	_jsonObject.AddMember("Options", ot::JsonArray(m_options, _allocator), _allocator);
+	ot::JsonArray optionsArray;
+	for (const auto& opt : m_options)
+	{
+		ot::JsonObject optionObject;
+		optionObject.AddMember("V", ot::JsonString(opt.first, _allocator), _allocator);
+		optionObject.AddMember("T", ot::JsonString(ot::PropertyBase::toString(opt.second), _allocator), _allocator);
+		optionsArray.PushBack(optionObject, _allocator);
+	}
+	_jsonObject.AddMember("Options", optionsArray, _allocator);
 	_jsonObject.AddMember("AllowCustom", m_allowCustomValues, _allocator);
 }
 
 void EntityPropertiesSelection::readFromJsonObject(const ot::ConstJsonObject& _object, EntityBase* _root)
 {
 	EntityPropertiesBase::readFromJsonObject(_object, _root);
-	resetOptions(ot::json::getStringList(_object, "Options"));
+
+	ot::ConstJsonArray optionsArray = ot::json::getArray(_object, "Options");
+	m_options.clear();
+	m_options.reserve(optionsArray.Size());
+	for (ot::JsonSizeType i = 0; i < optionsArray.Size(); i++)
+	{
+		if (ot::json::isString(optionsArray, i))
+		{
+			addOption(ot::json::getString(optionsArray, i));
+		}
+		else
+		{
+			ot::ConstJsonObject optionObject = ot::json::getObject(optionsArray, i);
+			std::string value = ot::json::getString(optionObject, "V");
+			std::string typeStr = ot::json::getString(optionObject, "T");
+			ot::PropertyBase::ValueHandlingType type = ot::PropertyBase::stringToValueHandlingType(typeStr);
+			addOption(value, type);
+		}
+	}
+	m_options.shrink_to_fit();
+
 	if (_object.HasMember("AllowCustom"))
 	{
 		setAllowCustomValues(ot::json::getBool(_object, "AllowCustom", true));
@@ -103,6 +134,7 @@ void EntityPropertiesSelection::copySettings(EntityPropertiesBase* other, Entity
 	{
 		assert(checkCompatibilityOfSettings(*entity));
 		setValue(entity->getValue());
+		m_currentValueHandlingType = entity->getCurrentValueHandlingType();
 	}
 }
 
@@ -127,9 +159,21 @@ bool EntityPropertiesSelection::hasSameValue(EntityPropertiesBase* other) const
 
 bool EntityPropertiesSelection::setValue(const std::string& s)
 {
-	if (!m_allowCustomValues && std::find(m_options.begin(), m_options.end(), s) == m_options.end())
+	if (!m_allowCustomValues)
 	{
-		return false; // This value is not a valid option
+		bool found = false;
+		for (const auto& opt : m_options)
+		{
+			if (opt.first == s)
+			{
+				found = true;
+				break;
+			}
+		}
+		if (!found)
+		{
+			return false; // This value is not a valid option
+		}
 	}
 
 	if (m_value != s)
@@ -150,13 +194,37 @@ void EntityPropertiesSelection::setAllowCustomValues(bool _allowCustomValues)
 	}
 }
 
+void EntityPropertiesSelection::addOption(const std::string& _option, ot::PropertyBase::ValueHandlingType _valueHandlingType)
+{
+	auto pair = std::make_pair(_option, _valueHandlingType);
+	assert(std::find(m_options.begin(), m_options.end(), pair) == m_options.end());
+	m_options.push_back(std::move(pair));
+}
+
+std::vector<std::string> EntityPropertiesSelection::getOptionStrings() const
+{
+	std::vector<std::string> result;
+	result.reserve(m_options.size());
+	for (const auto& item : m_options)
+	{
+		result.push_back(item.first);
+	}
+	return result;
+}
+
 bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropertiesSelection& other) const
 {
-	if (m_options.size() != other.m_options.size()) return false;
+	if (m_options.size() != other.m_options.size())
+	{
+		return false;
+	}
 
 	for (int i = 0; i < m_options.size(); i++)
 	{
-		if (m_options[i] != other.m_options[i]) return false;
+		if (m_options[i].first != other.m_options[i].first || m_options[i].second != other.m_options[i].second)
+		{
+			return false;
+		}
 	}
 
 	return true;
@@ -165,7 +233,10 @@ bool EntityPropertiesSelection::checkCompatibilityOfSettings(const EntityPropert
 bool EntityPropertiesSelection::isCompatible(EntityPropertiesBase* other) const
 {
 	EntityPropertiesSelection* otherItem = dynamic_cast<EntityPropertiesSelection*>(other);
-	if (otherItem == nullptr) return false;
+	if (otherItem == nullptr)
+	{
+		return false;
+	}
 
 	return checkCompatibilityOfSettings(*otherItem);
 }

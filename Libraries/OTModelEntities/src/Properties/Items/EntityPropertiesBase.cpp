@@ -49,6 +49,12 @@ void EntityPropertiesBase::setFromConfiguration(const ot::Property* _property, E
 
 void EntityPropertiesBase::addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root)
 {
+	if (getCurrentValueHandlingType() != ot::PropertyBase::ValueHandlingType::Value)
+	{
+		OTAssert(0, "Invalid property value handling while storing property to database");
+		OT_LOG_ES("Invalid property value handling while storing property to database { \"PropertyName\": \"" << getName() << "\" }");
+	}
+
 	_jsonObject.AddMember("Type", ot::JsonString(this->getTypeString(), _allocator), _allocator);
 	_jsonObject.AddMember("MultipleValues", this->hasMultipleValues(), _allocator);
 	_jsonObject.AddMember("ReadOnly", this->getReadOnly(), _allocator);
