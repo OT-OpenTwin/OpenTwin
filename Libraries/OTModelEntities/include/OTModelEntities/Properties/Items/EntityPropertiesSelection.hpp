@@ -3,7 +3,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/Properties/EntityPropertiesItems.h"
+#include "OTModelEntities/Properties/Items/EntityPropertiesSelection.h"
 
 template <typename TContainer>
 void EntityPropertiesSelection::resetOptionsImpl(const TContainer& _options)
