@@ -231,6 +231,7 @@ void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElem
 	configDoc.AddMember("dbUserName", ot::JsonString(_dbUserName, configDoc.GetAllocator()), configDoc.GetAllocator());
 	configDoc.AddMember("dbUserPassword", ot::JsonString(_dbUserPassword, configDoc.GetAllocator()), configDoc.GetAllocator());
 	configDoc.AddMember("dbServerUrl", ot::JsonString(_dbServerUrl, configDoc.GetAllocator()), configDoc.GetAllocator());
+	configDoc.AddMember("uiServiceUrl", ot::JsonString(_uiServiceUrl, configDoc.GetAllocator()), configDoc.GetAllocator());
 
 	std::string promptJson = configDoc.toJson();
 
@@ -1107,6 +1108,7 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 	std::string dbUserName = ot::json::getString(promptDoc, "dbUserName");
 	std::string dbUserPassword = ot::json::getString(promptDoc, "dbUserPassword");
 	std::string dbServerUrl = ot::json::getString(promptDoc, "dbServerUrl");
+	std::string uiServiceUrl = ot::json::getString(promptDoc, "uiServiceUrl");
 
 	std::string elementName = element.getName();
 	std::string collectionName = element.getCollectionName();
@@ -1122,6 +1124,9 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
 
 		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+
+		std::string message = "Library element '" + elementName + "' has been overwritten successfully.";
+		promptMessageToUI(message, uiServiceUrl);
 	}
 	else if ((result & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
 		// User chose not to overwrite but to add as a new element with a unique name
@@ -1138,6 +1143,9 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
 
 		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
+
+		std::string message = "Library element added with unique name: '" + uniqueName + "'.";
+		promptMessageToUI(message, uiServiceUrl);
 
 		OT_LOG_I("Library element '" + uniqueName + "' added successfully.");
 	}
