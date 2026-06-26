@@ -268,6 +268,9 @@ public:
 	//!@brief Set whether the entity should update its own version in the dependency lists during the next save operation
 	void setUpdateSelfDependency(bool _updateSelfDepedency) { m_updateSelfDepedency = _updateSelfDepedency; }
 
+	//! @brief Will be called whenever a property value has been selected where the value handling type is not a value.
+	virtual void nonValuePropertyValueChanged(const EntityPropertiesBase* _property) {};
+
 protected:
 
 	//! @brief Will set the default tree item.
