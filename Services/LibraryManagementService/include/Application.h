@@ -60,6 +60,13 @@ private:
 		Error
 	};
 
+	//! @brief Result struct for updateOrCreateLibraryElement
+	//! Combines the existence status with an optional cached DB element (only set for ExistingWithIdenticalContent)
+	struct LibraryElementCheckResult {
+		LibraryElementExistenceStatus status = LibraryElementExistenceStatus::NotExisting;
+		std::optional<std::shared_ptr<ot::LibraryElement>> existingElement;
+	};
+
 	//! @brief Prompt action constance
 	const std::string c_promptActionOverwriteUserLibraryElement = "LMS.Prompt.OverwriteUserElement";
 
@@ -111,7 +118,7 @@ private:
 	//! @param _dbServerUrl The database server URL
 	//! @param _dependencyCheck If true, it will also check for dependencies of the library elements and their existence status. If false, it will only check the provided elements without considering dependencies.
 	//! @return The existence status of the library element
-	LibraryElementExistenceStatus updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
+	LibraryElementCheckResult updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
 
 	//! @brief Helper function to add library elements to the database
 	//! @param _elements The library elements to add

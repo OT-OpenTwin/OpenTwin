@@ -384,13 +384,11 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 			localPtrModels.push_back(std::make_shared<ot::LibraryElement>(std::move(model)));
 		}
 
-		// Filter out models that are already up-to-date and get their existence status
-		LibraryElementExistenceStatus updateStatus = updateOrCreateLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
+		LibraryElementCheckResult checkResult = updateOrCreateLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
 
-		// If no models remain after the check, nothing to do
 		if (localPtrModels.empty()) {
 			OT_LOG_I("No models needed to be updated or created for collection: " + collectionName);
-			OT_LOG_D("Last element status: " + std::to_string(static_cast<int>(updateStatus)));
+			OT_LOG_D("Last element status: " + std::to_string(static_cast<int>(checkResult.status)));
 			continue;
 		}
 
@@ -531,17 +529,15 @@ std::string Application::getModelInformation(const ot::LibraryElementSelectionCf
 	return result;
 }
 
-Application::LibraryElementExistenceStatus Application::updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck) {
-
-	LibraryElementExistenceStatus lastStatus = LibraryElementExistenceStatus::NotExisting;
+Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement( std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck)
+{
+	LibraryElementCheckResult lastResult;
 
 	for (auto it = _elements.begin(); it != _elements.end();) {
-		// Get the collection name from the current element
 		std::string collectionName = (*it)->getCollectionName();
 		std::string elementName = (*it)->getName();
 
 		if (_dependencyCheck) {
-			// Check if additional dependency exists if not then skip 
 			std::string dependencyID = (*it)->getAdditionalInfoValue("DependencyID");
 			std::string dependencyCollection = (*it)->getAdditionalInfoValue("DependencyCollection");
 
@@ -559,64 +555,66 @@ Application::LibraryElementExistenceStatus Application::updateOrCreateLibraryEle
 				}
 			}
 		}
-		
-		// Try to fetch the existing document from database
+
 		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		if (existingDocJson == "failed") {
 			OT_LOG_E("Failed to fetch existing document for element '" + elementName + "' in collection '" + collectionName + "'. Skipping this element.");
-			lastStatus = LibraryElementExistenceStatus::Error;
+			lastResult.status = LibraryElementExistenceStatus::Error;
+			lastResult.existingElement.reset();
 			++it;
 			continue;
 		}
 
 		if (!existingDocJson.empty()) {
-			// Element exists in database - compare hashes
 			try {
-				// First check if it is an LibraryElement or UserLibraryElement and deserialize accordingly to access the isSameElement function for a more detailed comparison
 				ot::UserLibraryElement* userElement = dynamic_cast<ot::UserLibraryElement*>(it->get());
 				if (userElement) {
 					ot::UserLibraryElement existingUserElement = ot::UserLibraryElement::fromJson(existingDocJson);
 
 					if (existingUserElement.isSameElement(*userElement)) {
-						// Elements are identical
-						lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						lastResult.existingElement = std::make_shared<ot::UserLibraryElement>(existingUserElement);
 						it = _elements.erase(it);
 						continue;
 					}
 					else {
-						lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+						lastResult.existingElement.reset();
 					}
 				}
 				else {
 					ot::LibraryElement existingElement = ot::LibraryElement::fromJson(existingDocJson);
 					ot::LibraryElement* currentElement = it->get();
+
 					if (existingElement.isSameElement(*currentElement)) {
-						lastStatus = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+						lastResult.existingElement = std::make_shared<ot::LibraryElement>(existingElement);
 						it = _elements.erase(it);
 						continue;
 					}
 					else {
-						lastStatus = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
+						lastResult.existingElement.reset();
 					}
 				}
 			}
 			catch (const std::exception& e) {
 				OT_LOG_E("Error comparing existing document for element '" + elementName + "' in collection '" + collectionName + "': " + std::string(e.what()));
-				lastStatus = LibraryElementExistenceStatus::Error;
+				lastResult.status = LibraryElementExistenceStatus::Error;
+				lastResult.existingElement.reset();
 			}
 		}
 		else {
-			// Element does not exist
-			lastStatus = LibraryElementExistenceStatus::NotExisting;
+			lastResult.status = LibraryElementExistenceStatus::NotExisting;
+			lastResult.existingElement.reset();
 		}
-		
+
 		++it;
 	}
 
-	return lastStatus;
+	return lastResult;
 }
-
 void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	// Process each received model
 	for (auto& model : _elements) {
@@ -1024,6 +1022,9 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 	// Read incoming array (user library elements) and convert to LibraryElement
 	ot::ConstJsonArray elementsArray = ot::json::getArray(_document, OT_ACTION_PARAM_Config);
 
+	// Initialize previous check result to handle dependencies
+	LibraryElementCheckResult previousCheckResult;
+
 	for (const ot::JsonValue& val : elementsArray) {
 		if (!val.IsObject()) continue;
 
@@ -1032,6 +1033,14 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 		// Deserialize as UserLibraryElement to capture Owner and future fields
 		ot::UserLibraryElement userElement;
 		userElement.setFromJsonObject(elementObj);
+
+		// If the previous check result has an existing element, set the DependencyID in the current userElement
+		// Since only export of one element at a time is supported, we can use the previous check result to set the dependency for the next element
+		if (previousCheckResult.existingElement.has_value()) {
+			uint64_t dependencyId = previousCheckResult.existingElement.value()->getLibraryElementID();
+			userElement.addAdditionalInfo("DependencyID", std::to_string(dependencyId));
+			OT_LOG_D("Set DependencyID=" + std::to_string(dependencyId) + " from previous DB element for element '" + userElement.getName() + "'");
+		}
 
 		// Calculate hash
 		fillLibraryElementWithHash(userElement, "");
@@ -1048,45 +1057,51 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 		singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
 
 		// Check existence and filter using the unified function
-		LibraryElementExistenceStatus existenceStatus = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
+		LibraryElementCheckResult checkResult = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
 
 		ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
 
+		switch (checkResult.status) {
 
-		switch (existenceStatus) {
-		case LibraryElementExistenceStatus::NotExisting:
-		{
-			// Element doesn't exist - add it directly
-			OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
-			addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
-			promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", uiServiceUrl);
-			break;
+			case LibraryElementExistenceStatus::NotExisting:
+			{
+				OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
+				addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
+				promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", uiServiceUrl);
+				checkResult.existingElement = std::make_shared<ot::UserLibraryElement>(userElement);
+				break;
+			}
+
+			case LibraryElementExistenceStatus::ExistingWithIdenticalContent:
+			{
+				OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
+
+				if (checkResult.existingElement.has_value()) {
+					OT_LOG_D("Cached DB element ID: " + std::to_string(checkResult.existingElement.value()->getLibraryElementID()));
+				}
+				promptMessageToUI("Library element '" + userElement.getName() + "' already exists with identical content. Skipping addition.\n", uiServiceUrl);
+				break;
+			}
+
+			case LibraryElementExistenceStatus::ExistingWithDifferentContent:
+			{
+				// Element exists but content is different — restore and prompt user
+				singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
+				OT_LOG_I("Library element '" + userElement.getName() + "' exists with different content. Prompting user for overwrite...");
+				promptUserForLibraryElementOverwrite(userElement, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
+				checkResult.existingElement = std::make_shared<ot::UserLibraryElement>(userElement);
+				break;
+			}
+
+			case LibraryElementExistenceStatus::Error:
+			{
+				OT_LOG_E("Error checking existence of library element '" + userElement.getName() + "'. Skipping.");
+				break;
+			}
 		}
 
-		case LibraryElementExistenceStatus::ExistingWithIdenticalContent:
-		{
-			// Element exists with identical content - skip it
-			OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
-			promptMessageToUI("Library element '" + userElement.getName() + "' already exists with identical content. Skipping addition.\n", uiServiceUrl);
-			break;
-		}
-
-		case LibraryElementExistenceStatus::ExistingWithDifferentContent:
-		{
-			// Element exists but content is different - restore and prompt user
-			singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
-			OT_LOG_I("Library element '" + userElement.getName() + "' exists with different content. Prompting user for overwrite...");
-			promptUserForLibraryElementOverwrite(userElement, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
-			break;
-		}
-
-		case LibraryElementExistenceStatus::Error:
-		{
-			// Error occurred
-			OT_LOG_E("Error checking existence of library element '" + userElement.getName() + "'. Skipping.");
-			break;
-		}
-		}
+		// Update the previous check result for the next iteration
+		previousCheckResult = checkResult;
 	}
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
