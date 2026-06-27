@@ -128,7 +128,7 @@ bool EntityBlockPython::updateFromProperties()
 	{
 		ot::LibraryElementSelectionCfg config;
 		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName("PythonEnvironments");
+		config.setCollectionName("Environments");
 		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
 		config.setEntityType(EntityPythonManifest::className());
 		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
