@@ -33,11 +33,13 @@ class QWidget;
 class QGroupBox;
 class QGridLayout;
 
+
 namespace ot {
 
 	class Label;
 	class LineEdit;
 	class ComboBox;
+	class ComboButton;
 
 	class OT_WIDGETS_API_EXPORT ModelLibraryDialog : public Dialog {
 		Q_OBJECT
@@ -62,6 +64,7 @@ namespace ot {
 		void slotConfirm();
 		void slotFilterChanged();
 		void slotModelChanged();
+		void slotSourceSelectionChanged();
 
 	private:
 		struct FilterInputEntry {
@@ -70,11 +73,15 @@ namespace ot {
 			LineEdit* edit = nullptr;
 		};
 
+		void updateNameEdit();
+
 		ModelLibraryDialogCfg m_config;
 
+		ComboButton* m_sourceSelection;
 		ComboBox* m_nameEdit;
 		std::string m_selectedName;
 		std::list<FilterInputEntry> m_filterEntries;
+		std::list<LibraryModel> m_sourceFilteredModels;
 
 		QGroupBox* m_infoGroup;
 		QGridLayout* m_infoLayout;

@@ -724,6 +724,10 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 
 		 ot::LibraryModel model(name, "", "");
 
+		 if (doc.HasMember("Owner") && doc["Owner"].IsString()) {
+			 model.setOwner(doc["Owner"].GetString());
+		 }
+
 		 if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {
 			 ot::ConstJsonObject metaDataObj = ot::json::getObject(doc, "metaData");
 
