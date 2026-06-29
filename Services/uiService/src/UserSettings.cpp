@@ -25,24 +25,29 @@
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 
-UserSettings& UserSettings::instance(void) {
+UserSettings& UserSettings::instance()
+{
 	static UserSettings g_instance;
 	return g_instance;
 }
 
-void UserSettings::showDialog(void) {
+void UserSettings::showDialog()
+{
 	ot::ApplicationPropertiesManager::instance().showDialog();
 }
 
-void UserSettings::showDialog(const QString& _group) {
+void UserSettings::showDialog(const QString& _group)
+{
 	ot::ApplicationPropertiesManager::instance().showDialog();
 }
 
-void UserSettings::clear(void) {
+void UserSettings::clear()
+{
 	ot::ApplicationPropertiesManager::instance().clear();
 }
 
-void UserSettings::addSettings(const std::string& _serviceName, const ot::PropertyGridCfg& _config) {
+void UserSettings::addSettings(const std::string& _serviceName, const ot::PropertyGridCfg& _config)
+{
 	ot::ApplicationPropertiesManager::instance().add(_serviceName, _config);
 }
 
@@ -50,14 +55,19 @@ void UserSettings::addSettings(const std::string& _serviceName, const ot::Proper
 
 // Slots
 
-void UserSettings::slotItemChanged(const std::string& _owner, const ot::Property* _property) {
-	AppBase::instance()->settingsChanged(_owner, _property);
+void UserSettings::slotItemsChanged(const std::string& _owner, const std::list<const ot::Property*>& _properties)
+{
+	for (const ot::Property* property : _properties)
+	{
+		AppBase::instance()->settingsChanged(_owner, property);
+	}
 }
 
 // #######################################################################################
 
 // Private member
 
-UserSettings::UserSettings() {
-	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertyChanged, this, &UserSettings::slotItemChanged);
+UserSettings::UserSettings()
+{
+	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertiesChanged, this, &UserSettings::slotItemsChanged);
 }

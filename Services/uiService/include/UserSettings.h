@@ -35,9 +35,9 @@ class UserSettings : public QObject {
 	Q_OBJECT
 	OT_DECL_NOCOPY(UserSettings)
 public:
-	static UserSettings& instance(void);
+	static UserSettings& instance();
 
-	void showDialog(void);
+	void showDialog();
 
 	void showDialog(const QString& _group);
 
@@ -45,14 +45,14 @@ public:
 
 	// Data management
 
-	void clear(void);
+	void clear();
 
 	void addSettings(const std::string& _serviceName, const ot::PropertyGridCfg& _config);
 
 	// #######################################################################################
 
 private Q_SLOTS:
-	void slotItemChanged(const std::string& _owner, const ot::Property* _property);
+	void slotItemsChanged(const std::string& _owner, const std::list<const ot::Property*>& _properties);
 
 private:
 	UserSettings();

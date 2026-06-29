@@ -39,7 +39,7 @@ SettingsManager::SettingsManager(AppBase* _app)
 {
 	this->updateGeneralSettings();
 
-	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertyChanged, this, &SettingsManager::slotPropertyChanged);
+	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertiesChanged, this, &SettingsManager::slotPropertiesChanged);
 	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertyDeleteRequested, this, &SettingsManager::slotPropertyDeleteRequested);
 }
 
@@ -53,16 +53,19 @@ bool SettingsManager::showDialog(void) {
 	return ok;
 }
 
-void SettingsManager::slotPropertyChanged(const std::string& _owner, const ot::Property* const _property) {
-	std::string propertyPath = _property->getPropertyPath();
+void SettingsManager::slotPropertiesChanged(const std::string& _owner, const std::list <const ot::Property* > & _properties)
+{
+	for (const ot::Property* _property : _properties)
+	{
+		std::string propertyPath = _property->getPropertyPath();
 
-	OT_LOG_I("Property change { \"Owner\": \"" + _owner + "\", \"Property\": \"" + propertyPath + "\" }");
+		OT_LOG_I("Property change { \"Owner\": \"" + _owner + "\", \"Property\": \"" + propertyPath + "\" }");
 
-	if (_owner == "General") {
-		this->generalSettingsChanged(propertyPath, _property);
-	}	
-	
-
+		if (_owner == "General")
+		{
+			this->generalSettingsChanged(propertyPath, _property);
+		}
+	}
 }
 
 void SettingsManager::slotPropertyDeleteRequested(const std::string& _owner, const ot::Property* const _property) {

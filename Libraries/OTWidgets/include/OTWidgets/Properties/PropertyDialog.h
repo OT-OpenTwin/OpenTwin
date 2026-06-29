@@ -64,7 +64,7 @@ namespace ot {
 		PropertyDialogCfg createConfiguration() const;
 
 	Q_SIGNALS:
-		void propertyChanged(const Property* _property);
+		void propertiesChanged(const std::list<const Property*>& _properties);
 		void propertyDeleteRequested(const Property* _property);
 
 		//! @brief Is emitted whenever the property grid was setup from the active configuration.
@@ -78,7 +78,7 @@ namespace ot {
 	private Q_SLOTS:
 		void slotConfirm();
 		void slotTreeSelectionChanged();
-		void slotPropertiesChanged(const std::list<const Property*>& _property);
+		void slotPropertiesChanged(const std::list<const Property*>& _properties);
 		void slotPropertyDeleteRequested(const Property* _property);
 
 		// ###########################################################################################################################################################################################################################################################################################################################
