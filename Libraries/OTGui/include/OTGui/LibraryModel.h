@@ -35,8 +35,8 @@ namespace ot {
 	public:
 
 		enum class ModelOrigin {
-			User,
-			Public
+			Custom,
+			BuiltIn
 		};
 
 		static std::string modelOriginToString(ModelOrigin _origin);
@@ -59,7 +59,7 @@ namespace ot {
 		void setElementType(const std::string& _elementType) { m_elementType = _elementType; };
 		const std::string& getElementType() const { return m_elementType; }
 
-		ModelOrigin getModelOrigin() const { return m_owner.empty() ? ModelOrigin::Public : ModelOrigin::User; }
+		ModelOrigin getModelOrigin() const { return m_owner.empty() ? ModelOrigin::BuiltIn : ModelOrigin::Custom; }
 
 		void setOwner(const std::string& _owner) { m_owner = _owner; };
 		const std::string& getOwner() const { return m_owner; }

@@ -47,12 +47,11 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 	Label* titleLabel = new Label("Name:", this);
 	titleLay->addWidget(titleLabel);
 
-	m_sourceSelection = new ComboButton(this);
+	m_sourceSelection = new ComboButton("All", this);
 
 	// Fill the source selection
-	m_sourceSelection->addItem("All");
-	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::User)));
-	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Public)));
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Custom)));
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::BuiltIn)));
 
 	titleLay->addWidget(m_sourceSelection);
 
@@ -131,6 +130,7 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 
 	// Initialize models
 	this->slotFilterChanged();
+	this->slotSourceSelectionChanged();
 }
 
 ot::ModelLibraryDialog::~ModelLibraryDialog() {

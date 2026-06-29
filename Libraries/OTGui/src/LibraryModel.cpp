@@ -31,10 +31,10 @@
 
 std::string ot::LibraryModel::modelOriginToString(ModelOrigin _origin) {
     switch (_origin) {
-    case ModelOrigin::User:
-        return "User";
-    case ModelOrigin::Public:
-        return "Public";
+    case ModelOrigin::Custom:
+        return "Custom";
+    case ModelOrigin::BuiltIn:
+        return "Built-in";
     default:
         OT_LOG_E("Invalid model origin value: " + std::to_string(static_cast<int>(_origin)));
         return "Invalid";
@@ -42,11 +42,11 @@ std::string ot::LibraryModel::modelOriginToString(ModelOrigin _origin) {
 }
 
 ot::LibraryModel::ModelOrigin ot::LibraryModel::stringToModelOrigin(const std::string& _origin) {
-    if (_origin == "User") {
-        return ModelOrigin::User;
+    if (_origin == "Custom") {
+        return ModelOrigin::Custom;
     }
-    else if (_origin == "Public") {
-        return ModelOrigin::Public;
+    else if (_origin == "Built-in") {
+        return ModelOrigin::BuiltIn;
     }
     else {
         OT_LOG_E("Invalid model origin string: " + _origin);
