@@ -67,7 +67,7 @@ namespace ot
 		//! @brief Shows a progress bar with the given message and progress values.
 		//! If the progress value is negative, an infinite progress bar is shown.
 		void showProgress(const QString& _message, int _progress);
-		void hideProgressDelayed(int _timeoutMs = 5000);
+		void hideProgressDelayed(int _timeoutMs = 1500);
 		void hideProgress();
 
 		void setProgressValue(int _progress);
