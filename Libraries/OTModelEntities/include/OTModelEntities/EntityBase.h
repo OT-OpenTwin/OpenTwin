@@ -269,7 +269,7 @@ public:
 	void setUpdateSelfDependency(bool _updateSelfDepedency) { m_updateSelfDepedency = _updateSelfDepedency; }
 
 	//! @brief Will be called whenever a property value has been selected where the value handling type is not a value.
-	virtual void nonValuePropertyValueChanged(const EntityPropertiesBase* _property) {};
+	virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) {};
 
 protected:
 
