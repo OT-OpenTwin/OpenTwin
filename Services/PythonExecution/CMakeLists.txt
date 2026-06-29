@@ -20,6 +20,7 @@ ot_add_dependency(PythonExecution
     OTModelEntities
     OTDataStorage
     OTModelAPI
+    OTCADEntities
     OTBlockEntities
     RJSON
     CURL
@@ -33,6 +34,7 @@ ot_add_dependency(PythonExecution
 )
 
 ot_finalize_bin(PythonExecution)
+ot_bin_use_release_qt(PythonExecution)
 
 ot_bin_debug_launch(PythonExecution
     PATH [[${env.OT_ALL_DLLR};${env.OT_PYTHON_BIN}\Release;${env.PATH}]]
