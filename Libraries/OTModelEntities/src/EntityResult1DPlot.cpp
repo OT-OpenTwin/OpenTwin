@@ -432,7 +432,7 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 		ot::String::toString(ot::String::Scientific),
 		ot::String::toString(ot::String::Engineering)
 	};
-	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Decimal), "", getProperties());
+	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Engineering), "", getProperties());
 	EntityPropertiesInteger::createProperty(_axisName, "Display number precision", 3, 1, 99, "", getProperties())->setAllowCustomValues(false);
 }
 
