@@ -29,4 +29,5 @@ ot_add_dependency(RelayService
 )
 
 ot_finalize_lib(RelayService)
+ot_deploy_app_configuration(RelayService)
 ot_add_test(RelayService)
