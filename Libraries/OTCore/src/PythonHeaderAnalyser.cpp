@@ -13,11 +13,10 @@ bool PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 	std::string script(_scriptContent.begin(), _scriptContent.end());
 	std::istringstream scriptStream(script);
 	std::string scriptLine;
-	std::getline(scriptStream, scriptLine);
-
+	
 	int lineCounter = 1;
 	bool success = true;
-	while (scriptLine.empty() || scriptLine[0] == '#')
+	while (std::getline(scriptStream, scriptLine) && (scriptLine.empty() || scriptLine[0] == '#'))
 	{
 		try
 		{
@@ -46,7 +45,6 @@ bool PythonHeaderAnalyser::analysePythonScript(const std::string& _scriptContent
 			success = false;
 		}
 
-		std::getline(scriptStream, scriptLine);
 		lineCounter++;
 	}
 	return success;
