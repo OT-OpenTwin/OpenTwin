@@ -344,12 +344,12 @@ void LogInDialog::slotLogIn() {
 		return;
 	}
 
-	if (m_username->text().isEmpty()) {
+	if (m_username->text().isEmpty() && !m_isSSOLogin) {
 		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
 		return;
 	}
 
-	if (m_password->text().isEmpty()) {
+	if (m_password->text().isEmpty() && !m_isSSOLogin) {
 		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
 		return;
 	}
