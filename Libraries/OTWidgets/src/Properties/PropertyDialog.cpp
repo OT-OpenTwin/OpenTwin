@@ -115,7 +115,7 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	// Create controls
 	Splitter* cSplitter = new Splitter(this);
 	cLay->addWidget(cSplitter, 1);
-
+	
 	m_navigation = new PropertyDialogNavigation(cSplitter);
 	cSplitter->addWidget(m_navigation->getQWidget());
 
@@ -225,6 +225,25 @@ ot::PropertyDialogCfg ot::PropertyDialog::createConfiguration() const
 	cfg.setGridConfig(m_grid->createGridConfig());
 
 	return cfg;
+}
+
+void ot::PropertyDialog::addData(const QString& _key, const QVariant& _value)
+{
+	m_data.insert_or_assign(_key, _value);
+}
+
+QVariant ot::PropertyDialog::getData(const QString& _key) const
+{
+	auto it = m_data.find(_key);
+	if (it == m_data.end())
+	{
+		OT_LOG_E("Key not found");
+		return QVariant();
+	}
+	else
+	{
+		return it->second;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

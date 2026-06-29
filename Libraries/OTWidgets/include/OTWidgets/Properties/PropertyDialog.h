@@ -63,6 +63,9 @@ namespace ot {
 
 		PropertyDialogCfg createConfiguration() const;
 
+		void addData(const QString& _key, const QVariant& _value);
+		QVariant getData(const QString& _key) const;
+
 	Q_SIGNALS:
 		void propertiesChanged(const std::list<const Property*>& _properties);
 		void propertyDeleteRequested(const Property* _property);
@@ -101,6 +104,8 @@ namespace ot {
 		QTreeWidgetItem* findTreeItem(QTreeWidgetItem* _parent, QStringList _path) const;
 
 		std::map<QTreeWidgetItem*, PropertyDialogEntry> m_treeMap;
+
+		std::map<QString, QVariant> m_data;
 
 		std::list<const Property*> m_changedProperties;
 		PropertyDialogNavigation* m_navigation;
