@@ -7,8 +7,11 @@ void PropertyBundleEventHandling::setProperties(EntityBase* _thisObject)
 {
 	assert(m_manifestFolderID != ot::invalidUID && m_scriptFolderID != ot::invalidUID);
 
-	EntityPropertiesExtendedEntityList::createProperty(m_group, m_propertyEnvironment, ot::FolderNames::PythonManifestFolder, m_manifestFolderID,"",-1, { "< Load from Library >" }, { "" }, "default", _thisObject->getProperties());
-	EntityPropertiesExtendedEntityList::createProperty(m_group, m_propertyScript, ot::FolderNames::PythonScriptFolder, m_scriptFolderID, "", -1, { "< Load from Library >" }, { "" }, "default", _thisObject->getProperties());
+	EntityPropertiesExtendedEntityList* prop = EntityPropertiesExtendedEntityList::createProperty(m_group, m_propertyEnvironment, ot::FolderNames::PythonManifestFolder, m_manifestFolderID, "", -1, "default", _thisObject->getProperties());
+	prop->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
+
+	prop = EntityPropertiesExtendedEntityList::createProperty(m_group, m_propertyScript, ot::FolderNames::PythonScriptFolder, m_scriptFolderID, "", -1, "default", _thisObject->getProperties());
+	prop->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
 }
 
 bool PropertyBundleEventHandling::updatePropertyVisibility(EntityBase* _thisObject)

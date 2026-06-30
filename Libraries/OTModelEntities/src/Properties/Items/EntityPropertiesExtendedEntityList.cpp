@@ -8,15 +8,17 @@
 #include "OTModelEntities/Properties/EntityProperties.h"
 #include "OTModelEntities/Properties/Items/EntityPropertiesExtendedEntityList.h"
 
-EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList() : EntityPropertiesEntityList() {}
+EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList() 
+	: EntityPropertiesEntityList(), m_currentValueHandlingType(ot::PropertyBase::ValueHandlingType::Value) {}
 
-EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::vector<std::string>& prefixOptions, const std::vector<std::string>& suffixOptions)
-	: EntityPropertiesEntityList(n, contName, contID, valName, valID), m_prefixOptions(prefixOptions), m_suffixOptions(suffixOptions)
+EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID)
+	: EntityPropertiesEntityList(n, contName, contID, valName, valID), m_currentValueHandlingType(ot::PropertyBase::ValueHandlingType::Value)
 {}
 
 EntityPropertiesExtendedEntityList::EntityPropertiesExtendedEntityList(const EntityPropertiesExtendedEntityList& _other)
 	: EntityPropertiesEntityList(_other)
 {
+	m_currentValueHandlingType = _other.m_currentValueHandlingType;
 	m_prefixOptions = _other.m_prefixOptions;
 	m_suffixOptions = _other.m_suffixOptions;
 }
@@ -26,6 +28,7 @@ EntityPropertiesExtendedEntityList& EntityPropertiesExtendedEntityList::operator
 	if (&_other != this)
 	{
 		EntityPropertiesEntityList::operator=(_other);
+		m_currentValueHandlingType = _other.m_currentValueHandlingType;
 		m_prefixOptions = _other.m_prefixOptions;
 		m_suffixOptions = _other.m_suffixOptions;
 	}
@@ -37,22 +40,21 @@ void EntityPropertiesExtendedEntityList::clearPrefixOptions()
 	m_prefixOptions.clear();
 }
 
-void EntityPropertiesExtendedEntityList::addPrefixOption(const std::string& option)
+void EntityPropertiesExtendedEntityList::addPrefixOption(const std::string& _option, ot::PropertyBase::ValueHandlingType _valueHandlingType)
 {
-	if (std::find(m_prefixOptions.begin(), m_prefixOptions.end(), option) == m_prefixOptions.end())
+	bool found = false;
+	for (const auto& opt : m_prefixOptions)
 	{
-		m_prefixOptions.push_back(option);
+		if (opt.first == _option)
+		{
+			found = true;
+			break;
+		}
 	}
-}
-
-void EntityPropertiesExtendedEntityList::setPrefixOptions(const std::vector<std::string>& options)
-{
-	m_prefixOptions = options;
-}
-
-const std::vector<std::string>& EntityPropertiesExtendedEntityList::getPrefixOptions() const
-{
-	return m_prefixOptions;
+	if (!found)
+	{
+		m_prefixOptions.push_back(std::make_pair(_option, _valueHandlingType));
+	}
 }
 
 void EntityPropertiesExtendedEntityList::clearSuffixOptions()
@@ -60,22 +62,22 @@ void EntityPropertiesExtendedEntityList::clearSuffixOptions()
 	m_suffixOptions.clear();
 }
 
-void EntityPropertiesExtendedEntityList::addSuffixOption(const std::string& option)
+void EntityPropertiesExtendedEntityList::addSuffixOption(const std::string& _option, ot::PropertyBase::ValueHandlingType _valueHandlingType)
 {
-	if (std::find(m_suffixOptions.begin(), m_suffixOptions.end(), option) == m_suffixOptions.end())
+	bool found = false;
+	for (const auto& opt : m_suffixOptions)
 	{
-		m_suffixOptions.push_back(option);
+		if (opt.first == _option)
+		{
+			found = true;
+			break;
+		}
 	}
-}
 
-void EntityPropertiesExtendedEntityList::setSuffixOptions(const std::vector<std::string>& options)
-{
-	m_suffixOptions = options;
-}
-
-const std::vector<std::string>& EntityPropertiesExtendedEntityList::getSuffixOptions() const
-{
-	return m_suffixOptions;
+	if (!found)
+	{
+		m_suffixOptions.push_back(std::make_pair(_option, _valueHandlingType));
+	}
 }
 
 bool EntityPropertiesExtendedEntityList::isCompatible(EntityPropertiesBase* other) const
@@ -106,14 +108,12 @@ bool EntityPropertiesExtendedEntityList::isCompatible(EntityPropertiesBase* othe
 
 void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property* _property, EntityBase* root)
 {
-
 	// 1. Load prefix/suffix options from JSON
 	// 2. Load entity data (Container/Value Name and ID)
 	// 3. Set the new ValueName from UI input
 	// 4. Check if the new value is a prefix/suffix option
 	//    - If YES: Set ValueID to invalidUID (no entity exists)
 	//    - If NO: Call updateValueAndContainer() to sync name/ID
-
 
 	std::string oldValueName = getValueName();
 
@@ -136,12 +136,22 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 		if (dataDoc.HasMember("PrefixOptions") && dataDoc["PrefixOptions"].IsArray())
 		{
 			m_prefixOptions.clear();
-			const auto& prefixArray = dataDoc["PrefixOptions"].GetArray();
+			const auto prefixArray = dataDoc["PrefixOptions"].GetArray();
 			for (const auto& opt : prefixArray)
 			{
 				if (opt.IsString())
 				{
-					m_prefixOptions.push_back(opt.GetString());
+					addPrefixOption(opt.GetString(), ot::PropertyBase::ValueHandlingType::Value);
+				}
+				else if (opt.IsObject())
+				{
+					std::string optionName = ot::json::getString(opt, "V");
+					ot::PropertyBase::ValueHandlingType valueHandlingType = ot::PropertyBase::stringToValueHandlingType(ot::json::getString(opt, "T", ot::PropertyBase::toString(ot::PropertyBase::ValueHandlingType::Value)));
+					addPrefixOption(optionName, valueHandlingType);
+				}
+				else
+				{
+					OT_LOG_E("Invalid prefix option format in ExtendedOptions JSON");
 				}
 			}
 		}
@@ -154,7 +164,17 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 			{
 				if (opt.IsString())
 				{
-					m_suffixOptions.push_back(opt.GetString());
+					addSuffixOption(opt.GetString(), ot::PropertyBase::ValueHandlingType::Value);
+				}
+				else if (opt.IsObject())
+				{
+					std::string optionName = ot::json::getString(opt, "V");
+					ot::PropertyBase::ValueHandlingType valueHandlingType = ot::PropertyBase::stringToValueHandlingType(ot::json::getString(opt, "T", ot::PropertyBase::toString(ot::PropertyBase::ValueHandlingType::Value)));
+					addSuffixOption(optionName, valueHandlingType);
+				}
+				else
+				{
+					OT_LOG_E("Invalid suffix option format in ExtendedOptions JSON");
 				}
 			}
 		}
@@ -178,7 +198,7 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 	bool isPrefixOrSuffix = false;
 	for (const auto& prefixOption : m_prefixOptions)
 	{
-		if (getValueName() == prefixOption)
+		if (getValueName() == prefixOption.first)
 		{
 			isPrefixOrSuffix = true;
 			break;
@@ -187,7 +207,7 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 
 	for (const auto& suffixOption : m_suffixOptions)
 	{
-		if (getValueName() == suffixOption)
+		if (getValueName() == suffixOption.first)
 		{
 			isPrefixOrSuffix = true;
 			break;
@@ -206,7 +226,7 @@ void EntityPropertiesExtendedEntityList::setFromConfiguration(const ot::Property
 		this->updateValueAndContainer(root, opt);
 	}
 
-
+	m_currentValueHandlingType = actualProperty->getCurrentValueHandlingType();
 }
 
 void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg& _configuration, EntityBase* root)
@@ -217,7 +237,7 @@ void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg&
 	// 3. All suffix options 
 	// Note: Does NOT call updateValueAndContainer() to avoid overwriting the current ValueName if it's a prefix/suffix option.
 
-	std::list<std::string> opt;
+	std::list<std::pair<std::string, ot::PropertyBase::ValueHandlingType>> opt;
 
 	for (const auto& prefixOption : m_prefixOptions)
 	{
@@ -236,7 +256,7 @@ void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg&
 		{
 			for (auto child : container->getChildrenList())
 			{
-				opt.push_back(child->getName());
+				opt.push_back(std::make_pair(child->getName(), ot::PropertyBase::ValueHandlingType::Value));
 			}
 		}
 	}
@@ -261,16 +281,36 @@ void EntityPropertiesExtendedEntityList::addToConfiguration(ot::PropertyGridCfg&
 	ot::JsonDocument extendedDataDoc;
 	if (!m_prefixOptions.empty())
 	{
-		extendedDataDoc.AddMember("PrefixOptions", ot::JsonArray(m_prefixOptions, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+		ot::JsonArray prefixArr;
+		for (const auto& prefixOption : m_prefixOptions)
+		{
+			ot::JsonObject prefixObj;
+			prefixObj.AddMember("V", ot::JsonString(prefixOption.first, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+			prefixObj.AddMember("T", ot::JsonString(ot::PropertyBase::toString(prefixOption.second), extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+			prefixArr.PushBack(prefixObj, extendedDataDoc.GetAllocator());
+		}
+		extendedDataDoc.AddMember("PrefixOptions", prefixArr, extendedDataDoc.GetAllocator());
 	}
 	if (!m_suffixOptions.empty())
 	{
-		extendedDataDoc.AddMember("SuffixOptions", ot::JsonArray(m_suffixOptions, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+		ot::JsonArray suffixArr;
+		for (const auto& suffixOption : m_suffixOptions)
+		{
+			ot::JsonObject suffixObj;
+			suffixObj.AddMember("V", ot::JsonString(suffixOption.first, extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+			suffixObj.AddMember("T", ot::JsonString(ot::PropertyBase::toString(suffixOption.second), extendedDataDoc.GetAllocator()), extendedDataDoc.GetAllocator());
+			suffixArr.PushBack(suffixObj, extendedDataDoc.GetAllocator());
+		}
+		extendedDataDoc.AddMember("SuffixOptions", suffixArr, extendedDataDoc.GetAllocator());
 	}
 
-	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), opt);
+	std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>> optVec(opt.begin(), opt.end());
+
+	ot::PropertyStringList* newProp = new ot::PropertyStringList(this->getName(), this->getValueName(), std::list<std::string>());
+	newProp->setOptions(optVec);
 	newProp->setSpecialType("ExtendedEntityList");
 	newProp->addAdditionalPropertyData("EntityData", dataDoc.toJson());
+	newProp->setCurrentValueHandlingType(m_currentValueHandlingType);
 
 	if (!extendedDataDoc.IsNull())
 	{
@@ -294,7 +334,17 @@ void EntityPropertiesExtendedEntityList::readFromJsonObject(const ot::ConstJsonO
 		{
 			if (opt.IsString())
 			{
-				m_prefixOptions.push_back(opt.GetString());
+				addPrefixOption(opt.GetString(), ot::PropertyBase::ValueHandlingType::Value);
+			}
+			else if (opt.IsObject())
+			{
+				std::string optionName = ot::json::getString(opt, "V");
+				ot::PropertyBase::ValueHandlingType valueHandlingType = ot::PropertyBase::stringToValueHandlingType(ot::json::getString(opt, "T", ot::PropertyBase::toString(ot::PropertyBase::ValueHandlingType::Value)));
+				addPrefixOption(optionName, valueHandlingType);
+			}
+			else
+			{
+				OT_LOG_E("Invalid prefix option format in JSON");
 			}
 		}
 	}
@@ -308,7 +358,17 @@ void EntityPropertiesExtendedEntityList::readFromJsonObject(const ot::ConstJsonO
 		{
 			if (opt.IsString())
 			{
-				m_suffixOptions.push_back(opt.GetString());
+				addSuffixOption(opt.GetString(), ot::PropertyBase::ValueHandlingType::Value);
+			}
+			else if (opt.IsObject())
+			{
+				std::string optionName = ot::json::getString(opt, "V");
+				ot::PropertyBase::ValueHandlingType valueHandlingType = ot::PropertyBase::stringToValueHandlingType(ot::json::getString(opt, "T", ot::PropertyBase::toString(ot::PropertyBase::ValueHandlingType::Value)));
+				addSuffixOption(optionName, valueHandlingType);
+			}
+			else
+			{
+				OT_LOG_E("Invalid suffix option format in JSON");
 			}
 		}
 	}
@@ -319,12 +379,28 @@ void EntityPropertiesExtendedEntityList::addToJsonObject(ot::JsonObject& _jsonOb
 	EntityPropertiesEntityList::addToJsonObject(_jsonObject, _allocator, _root);
 	if (!m_prefixOptions.empty())
 	{
-		_jsonObject.AddMember("PrefixOptions", ot::JsonArray(m_prefixOptions, _allocator), _allocator);
+		ot::JsonArray prefixArr;
+		for (const auto& prefixOption : m_prefixOptions)
+		{
+			ot::JsonObject prefixObj;
+			prefixObj.AddMember("V", ot::JsonString(prefixOption.first, _allocator), _allocator);
+			prefixObj.AddMember("T", ot::JsonString(ot::PropertyBase::toString(prefixOption.second), _allocator), _allocator);
+			prefixArr.PushBack(prefixObj, _allocator);
+		}
+		_jsonObject.AddMember("PrefixOptions", prefixArr, _allocator);
 	}
 
 	if (!m_suffixOptions.empty())
 	{
-		_jsonObject.AddMember("SuffixOptions", ot::JsonArray(m_suffixOptions, _allocator), _allocator);
+		ot::JsonArray suffixArr;
+		for (const auto& suffixOption : m_suffixOptions)
+		{
+			ot::JsonObject suffixObj;
+			suffixObj.AddMember("V", ot::JsonString(suffixOption.first, _allocator), _allocator);
+			suffixObj.AddMember("T", ot::JsonString(ot::PropertyBase::toString(suffixOption.second), _allocator), _allocator);
+			suffixArr.PushBack(suffixObj, _allocator);
+		}
+		_jsonObject.AddMember("SuffixOptions", suffixArr, _allocator);
 	}
 }
 
@@ -335,6 +411,7 @@ void EntityPropertiesExtendedEntityList::copySettings(EntityPropertiesBase* othe
 	EntityPropertiesExtendedEntityList* otherList = dynamic_cast<EntityPropertiesExtendedEntityList*>(other);
 	if (otherList != nullptr)
 	{
+		m_currentValueHandlingType = otherList->m_currentValueHandlingType;
 		m_prefixOptions = otherList->m_prefixOptions;
 		m_suffixOptions = otherList->m_suffixOptions;
 	}
@@ -364,8 +441,7 @@ bool EntityPropertiesExtendedEntityList::hasSameValue(EntityPropertiesBase* othe
 }
 
 EntityPropertiesExtendedEntityList* EntityPropertiesExtendedEntityList::createProperty(const std::string& group, const std::string& name, const std::string& contName, ot::UID contID,
-	const std::string& valName, ot::UID valID, const std::vector<std::string>& prefixOptions,
-	const std::vector<std::string>& suffixOptions, const std::string& defaultCategory, EntityProperties& properties)
+	const std::string& valName, ot::UID valID, const std::string& defaultCategory, EntityProperties& properties)
 {
 	// Load the template defaults if any
 	TemplateDefaultManager::getTemplateDefaultManager()->loadDefaults(defaultCategory);
@@ -374,7 +450,7 @@ EntityPropertiesExtendedEntityList* EntityPropertiesExtendedEntityList::createPr
 	std::string value = TemplateDefaultManager::getTemplateDefaultManager()->getDefaultString(defaultCategory, name, valName);
 
 	// Finally create the new property
-	EntityPropertiesExtendedEntityList* newProperty = new EntityPropertiesExtendedEntityList(name, contName, contID, value, valID, prefixOptions, suffixOptions);
+	EntityPropertiesExtendedEntityList* newProperty = new EntityPropertiesExtendedEntityList(name, contName, contID, value, valID);
 	properties.createProperty(newProperty, group);
 	return newProperty;
 }

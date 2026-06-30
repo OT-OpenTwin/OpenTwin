@@ -14,11 +14,9 @@ public:
 	static std::string typeString() { return "extendedentityList"; };
 
 	EntityPropertiesExtendedEntityList();
-	virtual ~EntityPropertiesExtendedEntityList() {};
-
-	EntityPropertiesExtendedEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID, const std::vector<std::string>& prefixOptions = std::vector<std::string>(), const std::vector<std::string>& suffixOptions = std::vector<std::string>());
-
+	EntityPropertiesExtendedEntityList(const std::string& n, const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID);
 	EntityPropertiesExtendedEntityList(const EntityPropertiesExtendedEntityList& other);
+	virtual ~EntityPropertiesExtendedEntityList() {};
 
 	virtual EntityPropertiesBase* createCopy() const override { return new EntityPropertiesExtendedEntityList(*this); };
 
@@ -27,21 +25,15 @@ public:
 	virtual eType getType() const override { return EXTENDEDENTITYLIST; };
 	virtual std::string getTypeString() const override { return EntityPropertiesExtendedEntityList::typeString(); };
 
-	//! \brief Prefix options management.
-	//! Prefix options are displayed at the beginning of the dropdown list.
-	//! They do NOT correspond to actual entities in the container.
+	void setPrefixOptions(const std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>>& _options) { m_prefixOptions = _options; };
+	void addPrefixOption(const std::string& _option, ot::PropertyBase::ValueHandlingType _valueHandlingType = ot::PropertyBase::ValueHandlingType::Value);
+	const std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>>& getPrefixOptions() const { return m_prefixOptions; };
 	void clearPrefixOptions();
-	void addPrefixOption(const std::string& option);
-	void setPrefixOptions(const std::vector<std::string>& options);
-	const std::vector<std::string>& getPrefixOptions() const;
 
-	//! \brief Suffix options management.
-	//! Suffix options are displayed at the end of the dropdown list.
-	//! They do NOT correspond to actual entities in the container.
+	void setSuffixOptions(const std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>>& _options) { m_suffixOptions = _options; };
+	void addSuffixOption(const std::string& _option, ot::PropertyBase::ValueHandlingType _valueHandlingType = ot::PropertyBase::ValueHandlingType::Value);
+	const std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>>& getSuffixOptions() const { return m_suffixOptions; };
 	void clearSuffixOptions();
-	void addSuffixOption(const std::string& option);
-	void setSuffixOptions(const std::vector<std::string>& options);
-	const std::vector<std::string>& getSuffixOptions() const;
 
 	virtual bool isCompatible(EntityPropertiesBase* other) const override;
 	virtual bool hasSameValue(EntityPropertiesBase* other) const override;
@@ -54,11 +46,14 @@ public:
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root) override;
 
+	virtual ot::PropertyBase::ValueHandlingType getCurrentValueHandlingType() const override { return m_currentValueHandlingType; };
+
 	static EntityPropertiesExtendedEntityList* createProperty(const std::string& group, const std::string& name,
 		const std::string& contName, ot::UID contID, const std::string& valName, ot::UID valID,
-		const std::vector<std::string>& prefixOptions, const std::vector<std::string>& suffixOptions, const std::string& defaultCategory, EntityProperties& properties);
+		const std::string& defaultCategory, EntityProperties& properties);
 
 private:
-	std::vector<std::string> m_prefixOptions;
-	std::vector<std::string> m_suffixOptions;
+	ot::PropertyBase::ValueHandlingType m_currentValueHandlingType;
+	std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>> m_prefixOptions;
+	std::vector<std::pair<std::string, ot::PropertyBase::ValueHandlingType>> m_suffixOptions;
 };
