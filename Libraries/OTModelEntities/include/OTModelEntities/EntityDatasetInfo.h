@@ -52,6 +52,8 @@ namespace ot {
 		// Special library interface function
 		virtual std::list<ot::LibraryElement> libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo) override;
 
+		virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) override;
+
 	protected:
 
 		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;

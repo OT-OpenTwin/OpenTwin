@@ -65,27 +65,10 @@ bool ot::EntityDatasetInfo::updateFromProperties()
 
 	if (modelProperty->getValueName() == "< Load from Library >") {
 
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName("PythonScripts");
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(EntityPythonScript::className());
-		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
-		config.setPropertyName("Script");
-
-		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
+		
 	}
 	else if (manifestProperty->getValueName() == "< Load from Library >") {
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName("PythonEnvironments");
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(EntityPythonManifest::className());
-		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-		config.setPropertyName("Environment");
-		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
+		
 	}
 	
 	bool dataUpdate = PropertyHelper::getEntityProjectListProperty(this, "Project", "General")->needsUpdate();
@@ -339,6 +322,67 @@ std::list<ot::LibraryElement> ot::EntityDatasetInfo::libraryElementWasSet(const 
 	return resultList;
 }
 
+void ot::EntityDatasetInfo::nonValuePropertyValueSelected(const EntityPropertiesBase* _property)
+{
+	if (_property->getName() == "Script")
+	{
+		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
+		if (!actualProperty)
+		{
+			OT_LOG_E("Property cast failed for property \"Script\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+			return;
+		}
+
+		const std::string selectedValue = actualProperty->getValueName();
+		if (selectedValue == "< Load from Library >")
+		{
+			ot::LibraryElementSelectionCfg config;
+			config.setRequestingEntityID(this->getEntityID());
+			config.setCollectionName("PythonScripts");
+			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+			config.setEntityType(EntityPythonScript::className());
+			config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
+			config.setPropertyName("Script");
+
+			// if it was selected use observer to send message to LMS
+			getObserver()->requestConfigForModelDialog(config);
+		}
+		else
+		{
+			OT_LOG_E("Unexpected value selected for property \"Script\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\", \"SelectedValue\": \"" + selectedValue + "\" }");
+		}
+	}
+	else if (_property->getName() == "Environment")
+	{
+		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
+		if (!actualProperty)
+		{
+			OT_LOG_E("Property cast failed for property \"Environment\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+			return;
+		}
+		const std::string selectedValue = actualProperty->getValueName();
+		if (selectedValue == "< Load from Library >")
+		{
+			ot::LibraryElementSelectionCfg config;
+			config.setRequestingEntityID(this->getEntityID());
+			config.setCollectionName("PythonEnvironments");
+			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+			config.setEntityType(EntityPythonManifest::className());
+			config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+			config.setPropertyName("Environment");
+			// if it was selected use observer to send message to LMS
+			getObserver()->requestConfigForModelDialog(config);
+		}
+		else
+		{
+			OT_LOG_E("Unexpected value selected for property \"Environment\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\", \"SelectedValue\": \"" + selectedValue + "\" }");
+		}
+	}
+	else
+	{
+		OT_LOG_E("Unexpected non value property change for property \"" + _property->getName() + "\" in EntityDatasetInfo { \"Entity\": \"" + getName() + "\" }");
+	}
+}
 
 void ot::EntityDatasetInfo::addStorageData(bsoncxx::builder::basic::document& _storage)
 {

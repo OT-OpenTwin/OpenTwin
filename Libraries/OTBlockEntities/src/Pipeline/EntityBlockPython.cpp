@@ -97,45 +97,29 @@ ot::GraphicsItemCfg* EntityBlockPython::createBlockCfg()
 
 bool EntityBlockPython::updateFromProperties()
 {
-	// Check if LoadFromLibrary was selected
 	auto basePropertyModel = getProperties().getProperty(m_propertyNameScripts);
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
-	if (modelProperty == nullptr) {
+	if (modelProperty == nullptr)
+	{
 		OT_LOG_E("Model selection property cast failed");
 		return false;
 	}
 
 	auto basePropertyManifest = getProperties().getProperty(m_propertyNameEnvironments);
 	auto manifestProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyManifest);
-	if(manifestProperty == nullptr)
+	if (manifestProperty == nullptr)
 	{
 		OT_LOG_E("Manifest selection property cast failed");
 		return false;
 	}
 
-	if (modelProperty->getValueName() == "< Load from Library >") {
-
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName("PythonScripts");
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(EntityPythonScript::className());
-		config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
-		config.setPropertyName(m_propertyNameScripts);
-
-		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
-	} else if(manifestProperty->getValueName() == "< Load from Library >")
+	if (modelProperty->getValueName() == "< Load from Library >")
 	{
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName("Environments");
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(EntityPythonManifest::className());
-		config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-		config.setPropertyName(m_propertyNameEnvironments);
-		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
+
+	}
+	else if (manifestProperty->getValueName() == "< Load from Library >")
+	{
+		
 	}
 
 	auto scriptSelectionProperty =	getProperties().getProperty(m_propertyNameScripts);
@@ -205,6 +189,65 @@ std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::
 		return resultList;
 	}
 	return resultList;
+}
+
+void EntityBlockPython::nonValuePropertyValueSelected(const EntityPropertiesBase* _property)
+{
+	OTAssertNullptr(getObserver());
+
+	if (_property->getName() == m_propertyNameScripts)
+	{
+		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property is not of type EntityPropertiesExtendedEntityList");
+			return;
+		}
+
+		std::string selectedValueName = actualProperty->getValueName();
+		if (selectedValueName == "< Load from Library >") {
+			ot::LibraryElementSelectionCfg config;
+			config.setRequestingEntityID(this->getEntityID());
+			config.setCollectionName("PythonScripts");
+			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+			config.setEntityType(EntityPythonScript::className());
+			config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
+			config.setPropertyName(m_propertyNameScripts);
+
+			// if it was selected use observer to send message to LMS
+			getObserver()->requestConfigForModelDialog(config);
+		}
+		else
+		{
+			OT_LOG_E("Unknown value selected for property " + m_propertyNameScripts + ": " + selectedValueName);
+		}
+	}
+	else if (_property->getName() == m_propertyNameEnvironments)
+	{
+		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
+		if (!actualProperty) {
+			OT_LOG_E("Property is not of type EntityPropertiesExtendedEntityList");
+			return;
+		}
+
+		const std::string selectedValueName = actualProperty->getValueName();
+
+		if (selectedValueName == "< Load from Library >")
+		{
+			ot::LibraryElementSelectionCfg config;
+			config.setRequestingEntityID(this->getEntityID());
+			config.setCollectionName("Environments");
+			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+			config.setEntityType(EntityPythonManifest::className());
+			config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+			config.setPropertyName(m_propertyNameEnvironments);
+			// if it was selected use observer to send message to LMS
+			getObserver()->requestConfigForModelDialog(config);
+		}
+		else
+		{
+			OT_LOG_E("Unknown value selected for property " + m_propertyNameEnvironments + ": " + selectedValueName);
+		}
+	}
 }
 
 void EntityBlockPython::updateBlockAccordingToScriptHeader()
