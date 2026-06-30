@@ -26,15 +26,22 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
+#include "OTCore/CoreTypes.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
+
+#include "OTGui/GuiTypes.h"
 #include "OTGui/KeySequence.h"
 #include "OTGui/VersionGraphVersionCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyString.h"
 #include "OTGui/Dialog/SelectEntitiesDialogCfg.h"
 #include "OTGui/Widgets/NavigationTreeItemCfg.h"
+
 #include "OTGuiAPI/Frontend.h"
+
+#include "OTCommunication/ActionTypes.h"
+#include "OTServiceFoundation/Foundation.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 
 #include "OTModelEntities/DataBase.h"
@@ -71,10 +78,6 @@
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
 #include "rapidjson/writer.h"
-
-#include "OTCore/CoreTypes.h"
-#include "OTGui/GuiTypes.h"
-#include "OTCommunication/ActionTypes.h"
 
 #include "TopExp_Explorer.hxx"
 #include "TopoDS.hxx"
@@ -1369,7 +1372,7 @@ std::list<EntityBase*> Model::getListOfSelectedEntities(const std::string& typeF
 void Model::addPropertiesToEntities(std::list<ot::UID>& entityIDList, const ot::PropertyGridCfg& _configuration)
 {
 	EntityProperties properties;
-	properties.buildFromConfiguration(_configuration, getRootNode());
+	properties.buildFromConfiguration(_configuration, getRootNode(), EntityProperties::All);
 
 	std::list<EntityPropertiesBase*> allProperties = properties.getListOfAllProperties();
 
@@ -1741,34 +1744,39 @@ void Model::setPropertiesFromJson(const std::list<ot::UID> &entityIDList, const 
 	}
 	else {
 		std::list<EntityBase*> entities;
-		for (auto entityID : entityIDList) entities.push_back(getEntityByID(entityID));
+		for (auto entityID : entityIDList)
+		{
+			entities.push_back(getEntityByID(entityID));
+		}
 
-		EntityProperties properties;
-		properties.buildFromConfiguration(_configuration, getRootNode());
+		EntityProperties valueProperties;
+		valueProperties.buildFromConfiguration(_configuration, getRootNode(), EntityProperties::ValueOnly);
 
-		handleParentGroupPropertyChange(entities, properties);
+		handleParentGroupPropertyChange(entities, valueProperties);
 
-		setProperties(entities, properties);
+		setProperties(entities, valueProperties);
 
-		updateEntityProperties(itemsVisible);
+		EntityProperties nonValueProperties;
+		nonValueProperties.buildFromConfiguration(_configuration, getRootNode(), EntityProperties::NonValueOnly);
+		updateEntityProperties(itemsVisible, std::move(entities), std::move(nonValueProperties));
 	}
 }
 
-void Model::handleParentGroupPropertyChange(std::list<EntityBase*> &entities, EntityProperties &properties)
+void Model::handleParentGroupPropertyChange(const std::list<EntityBase*>& _entities, EntityProperties& _nonValueProperties)
 {
 	std::string newGroupName;
 	
-	EntityPropertiesEntityList* groupProp = dynamic_cast<EntityPropertiesEntityList*>(properties.getProperty("Parent Group", "Group"));
+	EntityPropertiesEntityList* groupProp = dynamic_cast<EntityPropertiesEntityList*>(_nonValueProperties.getProperty("Parent Group", "Group"));
 
 	if (groupProp != nullptr)
 	{
 		newGroupName = groupProp->getValueName();
-		properties.deleteProperty(groupProp->getName(), groupProp->getGroup());
+		_nonValueProperties.deleteProperty(groupProp->getName(), groupProp->getGroup());
 	}
 
 	if (!newGroupName.empty())
 	{
-		applyParentGroupChange(entities, newGroupName);
+		applyParentGroupChange(_entities, newGroupName);
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_LatestParentGroup, doc.GetAllocator()), doc.GetAllocator());
@@ -1779,7 +1787,7 @@ void Model::handleParentGroupPropertyChange(std::list<EntityBase*> &entities, En
 	}
 }
 
-void Model::applyParentGroupChange(std::list<EntityBase*> &entities, const std::string & newParentGroup)
+void Model::applyParentGroupChange(const std::list<EntityBase*> &entities, const std::string & newParentGroup)
 {
 	enableQueuingHttpRequests(true);
 	std::list<ot::UID> itemsToSelect;
@@ -2436,13 +2444,13 @@ std::list<EntityBase*> Model::getListOfEntitiesToConsiderForPropertyChange(const
 	return entitiesToSet;
 }
 
-void Model::setProperties(const std::list<EntityBase *> &entities, EntityProperties &props)
+void Model::setProperties(const std::list<EntityBase *>& _entities, EntityProperties& _valueProperties)
 {
-	std::list<EntityBase*> entitiesToSet = getListOfEntitiesToConsiderForPropertyChange(entities);
+	std::list<EntityBase*> entitiesToSet = getListOfEntitiesToConsiderForPropertyChange(_entities);
 
 	for (auto entity : entitiesToSet)
 	{
-		entity->getProperties().readFromProperties(props, getRootNode());
+		entity->getProperties().readFromProperties(_valueProperties, getRootNode());
 
 		if (entity->getProperties().anyPropertyNeedsUpdate())
 		{
@@ -2457,7 +2465,14 @@ bool Model::entitiesNeedUpdate()
 	return (!m_pendingEntityUpdates.empty());
 }
 
-void Model::updateEntityProperties(bool itemsVisible)
+void Model::updateEntityProperties(bool _itemsVisible)
+{
+	std::list<EntityBase*> entities;
+	EntityProperties nonValueProperties;
+	this->updateEntityProperties(_itemsVisible, std::move(entities), std::move(nonValueProperties));
+}
+
+void Model::updateEntityProperties(bool _itemsVisible, std::list<EntityBase*>&& _entitiesForNonValueProperties, EntityProperties&& _nonValueProperties)
 {
 	enableQueuingHttpRequests(true);
 
@@ -2545,6 +2560,8 @@ void Model::updateEntityProperties(bool itemsVisible)
 			modelChangeOperationCompleted("Properties changed");
 		}
 
+		notifyNonValuePropertiesSelected(_entitiesForNonValueProperties, _nonValueProperties);
+
 		enableQueuingHttpRequests(false);
 	}
 	else
@@ -2555,17 +2572,59 @@ void Model::updateEntityProperties(bool itemsVisible)
 		// thread ensures that the model service is not blocked and remains responsive to other services requests.
 		// This thread needs to send a XXX message at the end.
 
-		std::thread workerThread(&Model::otherServicesUpdate, this, otherServicesUpdate, itemsVisible);
+		ot::UIDList entitiesForNonValueProperties;
+		for (auto entity : _entitiesForNonValueProperties)
+		{
+			entitiesForNonValueProperties.push_back(entity->getEntityID());
+		}
+
+		std::thread workerThread(&Model::otherServicesUpdate, this, otherServicesUpdate, _itemsVisible, std::move(entitiesForNonValueProperties), std::move(_nonValueProperties));
 		workerThread.detach();
 	}
 }
 
-void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible)
+void Model::notifyNonValuePropertiesSelected(const ot::UIDList& _entityIDList, const EntityProperties& _nonValueProperties)
+{
+	std::list<EntityBase*> entities;
+	for (ot::UID entityID : _entityIDList)
+	{
+		EntityBase* entity = getEntityByID(entityID);
+		if (entity != nullptr)
+		{
+			entities.push_back(entity);
+		}
+	}
+
+	this->notifyNonValuePropertiesSelected(entities, _nonValueProperties);
+}
+
+void Model::notifyNonValuePropertiesSelected(const std::list<EntityBase*>& _entitiesForNonValueProperties, const EntityProperties& _nonValueProperties)
+{
+	if (_nonValueProperties.isEmpty()) 
+	{
+		return;
+	}
+
+	auto props = _nonValueProperties.getListOfAllProperties();
+
+	for (EntityBase* entity : _entitiesForNonValueProperties)
+	{
+		if (entity != nullptr)
+		{
+			for (auto prop : props)
+			{
+				entity->nonValuePropertyValueSelected(prop);
+			}
+		}
+	}
+}
+
+void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> _otherServicesUpdate, bool _itemsVisible, ot::UIDList&& _entitiesForNonValueProperties, EntityProperties&& _nonValueProperties)
 {
 	ot::LockTypes lockFlag(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
 	ot::UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
 
-	for (const auto& serviceUpdate : otherServicesUpdate)
+	for (const auto& serviceUpdate : _otherServicesUpdate)
 	{
 		if (serviceUpdate.first == Application::instance()->getServiceName()) {
 			continue;
@@ -2594,13 +2653,12 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 			changedEntitiesInfos.PushBack(entityInfoSerialised, notify.GetAllocator());
 		}
 
-
 		notify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_PropertyChanged, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, changedEntitiesInfos, notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(entityIDs, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_EntityVersionList, ot::JsonArray(entityVersions, notify.GetAllocator()), notify.GetAllocator());
 		notify.AddMember(OT_ACTION_PARAM_MODEL_BrepVersionList, ot::JsonArray(brepVersions, notify.GetAllocator()), notify.GetAllocator());
-		notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, itemsVisible, notify.GetAllocator());
+		notify.AddMember(OT_ACTION_PARAM_MODEL_ItemsVisible, _itemsVisible, notify.GetAllocator());
 
 		Application::instance()->getNotifier()->sendMessageToService(false, serviceUpdate.first, notify);
 	}
@@ -2608,6 +2666,21 @@ void Model::otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UI
 	// Now we need to notify the model service that the update operation is completed
 	refreshAllViews();
 	modelChangeOperationCompleted("Properties changed");
+
+	// If we have non value properties selected, we need to simulate a self message to perform the notification.
+	// This will ensure that no other action is currently handled which could modify the selected entities and properties.
+	if (!_nonValueProperties.isEmpty())
+	{	
+		ot::JsonDocument selfNotify;
+		selfNotify.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_MODEL_NotifyNonValuePropertiesSelected, selfNotify.GetAllocator()), selfNotify.GetAllocator());
+		selfNotify.AddMember(OT_ACTION_PARAM_MODEL_EntityIDList, ot::JsonArray(_entitiesForNonValueProperties, selfNotify.GetAllocator()), selfNotify.GetAllocator());
+
+		ot::PropertyGridCfg selfNotifyCfg;
+		_nonValueProperties.addToConfiguration(nullptr, false, selfNotifyCfg);
+		selfNotify.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(selfNotifyCfg, selfNotify.GetAllocator()), selfNotify.GetAllocator());
+
+		ot::foundation::performAction(selfNotify.toJson(), Application::instance()->getServiceURL());
+	}
 }
 
 void Model::updateEntity(EntityBase *entity)
@@ -4991,7 +5064,7 @@ void Model::updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot:
 	// Update the properties, if requested
 	if (updateProperties)
 	{
-		geomEntity->getProperties().buildFromConfiguration(_configuration, getRootNode());
+		geomEntity->getProperties().buildFromConfiguration(_configuration, getRootNode(), EntityProperties::All);
 	}
 
 	// Release the brep and facets (if loaded)

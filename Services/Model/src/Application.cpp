@@ -942,6 +942,23 @@ void Application::handleDeleteProperty(ot::JsonDocument& _document) {
 	m_model->deleteProperty(entityIDList, propertyName, groupName);
 }
 
+void Application::handleNotifyNonValuePropertiesSelected(ot::JsonDocument& _document)
+{
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	ot::UIDList entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	ot::PropertyGridCfg cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	EntityProperties props;
+	props.buildFromConfiguration(cfg, nullptr, EntityProperties::NonValueOnly);
+
+	m_model->notifyNonValuePropertiesSelected(entityIDList, props);
+}
+
 // ##################################################################################################################################################################################################################
 
 // Action handler: Versions

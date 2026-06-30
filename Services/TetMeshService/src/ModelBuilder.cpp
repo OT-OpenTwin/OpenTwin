@@ -364,7 +364,7 @@ EntityGeometry *ModelBuilder::createGeometryEntity(const std::string &name, Topo
 		application->getServiceName()
 	);
 
-	entityGeom->getProperties().buildFromConfiguration(shapeProperties, nullptr);
+	entityGeom->getProperties().buildFromConfiguration(shapeProperties, nullptr, EntityProperties::All);
 	entityGeom->getProperties().forceResetUpdateForAllProperties();
 
 	entityGeom->getProperties().setAllPropertiesReadOnly();

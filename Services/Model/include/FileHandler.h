@@ -70,9 +70,6 @@ private:
 	ot::UIDList m_entityVersionsData;
 	std::list<bool> m_forceVisible;
 
-
-
-	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Button Handler
@@ -85,6 +82,7 @@ private:
 
 	//! @brief Shows a dialog to select a file for export to either local directory or user database collection.
 	void showExportDialog(const std::string& _title, const std::string& _callbackAction);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Action Handler
@@ -128,6 +126,7 @@ private:
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
+	
 	// Export to library functions
 
 	//! @brief Struct to hold the entities related to an export operation together for easier handling
