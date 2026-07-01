@@ -51,26 +51,37 @@ bool ot::EntityDatasetInfo::updateFromProperties()
 	// Check if LoadFromLibrary was selected
 	auto basePropertyModel = getProperties().getProperty("Script");
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
-	if (modelProperty == nullptr) {
+	if (modelProperty == nullptr)
+	{
 		OT_LOG_E("Model selection property cast failed");
 		return false;
 	}
 
 	auto basePropertyManifest = getProperties().getProperty("Environment");
 	auto manifestProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyManifest);
-	if (manifestProperty == nullptr) {
+	if (manifestProperty == nullptr)
+	{
 		OT_LOG_E("Manifest selection property cast failed");
 		return false;
 	}
 
-	if (modelProperty->getValueName() == "< Load from Library >") {
+	// #########################################################
 
-		
+	// Legacy support (before introcuding value action handling)
+
+	if (modelProperty->getValueName() == "< Load from Library >" && modelProperty->getCurrentValueHandlingType() == ot::PropertyBase::ValueHandlingType::Value)
+	{
+		requestScriptLoadFromLibrary();
 	}
-	else if (manifestProperty->getValueName() == "< Load from Library >") {
-		
+	else if (manifestProperty->getValueName() == "< Load from Library >" && manifestProperty->getCurrentValueHandlingType() == ot::PropertyBase::ValueHandlingType::Value)
+	{
+		requestManifestLoadFromLibrary();
 	}
+
+	// Legacy support (before introcuding value action handling)
 	
+	// #########################################################
+
 	bool dataUpdate = PropertyHelper::getEntityProjectListProperty(this, "Project", "General")->needsUpdate();
 	if (dataUpdate)
 	{
@@ -86,7 +97,7 @@ bool ot::EntityDatasetInfo::updateFromProperties()
 	getProperties().forceResetUpdateForAllProperties();
 
 	// No changes
-	return false; 
+	return false;
 }
 
 void ot::EntityDatasetInfo::createProperties(const std::string& _initialProjectName, ot::UID _scriptFolder, ot::UID _manifestFolder)
@@ -259,8 +270,8 @@ std::string ot::EntityDatasetInfo::getEnvironmentName()
 std::optional<std::string> ot::EntityDatasetInfo::getEventHandlingFunction(PythonEventType _type, std::map<ot::UID, EntityBase*>& _entityMap)
 {
 	auto idAndName = m_propertyBundleEventHandling.getSelectedScript(this);
-	
-	EntityBase* base =	readEntityFromEntityID(nullptr, idAndName.first, _entityMap);
+
+	EntityBase* base = readEntityFromEntityID(nullptr, idAndName.first, _entityMap);
 	if (base != nullptr)
 	{
 		EntityFileText* script = dynamic_cast<EntityFileText*>(base);
@@ -280,18 +291,20 @@ std::optional<std::string> ot::EntityDatasetInfo::getEventHandlingFunction(Pytho
 			}
 		}
 	}
-	
+
 	return std::nullopt;
-	
+
 }
 
-std::list<ot::LibraryElement> ot::EntityDatasetInfo::libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo) {
+std::list<ot::LibraryElement> ot::EntityDatasetInfo::libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo)
+{
 
 	std::list<ot::LibraryElement> resultList;
 
 	std::string dependencyID = _libraryElement.getAdditionalInfoValue("DependencyID");
 	std::string dependencyCollection = _libraryElement.getAdditionalInfoValue("DependencyCollection");
-	if (!dependencyID.empty() && dependencyID != std::to_string(ot::invalidUID)) {
+	if (!dependencyID.empty() && dependencyID != std::to_string(ot::invalidUID))
+	{
 		// Create the LibraryElementRequest configuration
 		ot::LibraryElementRequest request;
 		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
@@ -336,16 +349,7 @@ void ot::EntityDatasetInfo::nonValuePropertyValueSelected(const EntityProperties
 		const std::string selectedValue = actualProperty->getValueName();
 		if (selectedValue == "< Load from Library >")
 		{
-			ot::LibraryElementSelectionCfg config;
-			config.setRequestingEntityID(this->getEntityID());
-			config.setCollectionName("PythonScripts");
-			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-			config.setEntityType(EntityPythonScript::className());
-			config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
-			config.setPropertyName("Script");
-
-			// if it was selected use observer to send message to LMS
-			getObserver()->requestConfigForModelDialog(config);
+			requestScriptLoadFromLibrary();
 		}
 		else
 		{
@@ -363,15 +367,7 @@ void ot::EntityDatasetInfo::nonValuePropertyValueSelected(const EntityProperties
 		const std::string selectedValue = actualProperty->getValueName();
 		if (selectedValue == "< Load from Library >")
 		{
-			ot::LibraryElementSelectionCfg config;
-			config.setRequestingEntityID(this->getEntityID());
-			config.setCollectionName("PythonEnvironments");
-			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-			config.setEntityType(EntityPythonManifest::className());
-			config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-			config.setPropertyName("Environment");
-			// if it was selected use observer to send message to LMS
-			getObserver()->requestConfigForModelDialog(config);
+			requestManifestLoadFromLibrary();
 		}
 		else
 		{
@@ -409,7 +405,7 @@ void ot::EntityDatasetInfo::readSpecificDataFromDataBase(const bsoncxx::document
 	if (docIt != _docView.end())
 	{
 		std::string filterJsonStr(docIt->get_string().value);
-		
+
 		if (!filterJsonStr.empty())
 		{
 			JsonDocument filtersArr;
@@ -429,4 +425,31 @@ void ot::EntityDatasetInfo::readSpecificDataFromDataBase(const bsoncxx::document
 			}
 		}
 	}
+}
+
+void ot::EntityDatasetInfo::requestScriptLoadFromLibrary()
+{
+	ot::LibraryElementSelectionCfg config;
+	config.setRequestingEntityID(this->getEntityID());
+	config.setCollectionName("PythonScripts");
+	config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+	config.setEntityType(EntityPythonScript::className());
+	config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
+	config.setPropertyName("Script");
+
+	// if it was selected use observer to send message to LMS
+	getObserver()->requestConfigForModelDialog(config);
+}
+
+void ot::EntityDatasetInfo::requestManifestLoadFromLibrary()
+{
+	ot::LibraryElementSelectionCfg config;
+	config.setRequestingEntityID(this->getEntityID());
+	config.setCollectionName("PythonEnvironments");
+	config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+	config.setEntityType(EntityPythonManifest::className());
+	config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+	config.setPropertyName("Environment");
+	// if it was selected use observer to send message to LMS
+	getObserver()->requestConfigForModelDialog(config);
 }

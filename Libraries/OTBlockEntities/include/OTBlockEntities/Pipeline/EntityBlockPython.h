@@ -57,4 +57,7 @@ private:
 
 	void updateBlockAccordingToScriptHeader();
 	void resetBlockRelatedAttributes();
+
+	void requestScriptLoadFromLibrary();
+	void requestManifestLoadFromLibrary();
 };

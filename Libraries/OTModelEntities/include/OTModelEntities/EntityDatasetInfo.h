@@ -62,5 +62,8 @@ namespace ot {
 	private:
 		PropertyBundleEventHandling m_propertyBundleEventHandling;
 		std::list<ValueComparisonDescription> m_activeFilters;
+
+		void requestScriptLoadFromLibrary();
+		void requestManifestLoadFromLibrary();
 	};
 }

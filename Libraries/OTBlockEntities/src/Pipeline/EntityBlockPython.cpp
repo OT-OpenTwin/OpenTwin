@@ -38,7 +38,7 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 	treeItem.setVisibleIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	treeItem.setHiddenIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	this->setDefaultTreeItem(treeItem);
-	
+
 	setBlockTitle("Python");
 
 	resetModified();
@@ -90,7 +90,7 @@ ot::GraphicsItemCfg* EntityBlockPython::createBlockCfg()
 	const std::string blockName = getClassName();
 	const std::string blockTitel = createBlockHeadline();
 	addConnectors(block);
-	
+
 	auto graphicsItemConfig = block.createGraphicsItem();
 	return graphicsItemConfig;
 }
@@ -113,16 +113,24 @@ bool EntityBlockPython::updateFromProperties()
 		return false;
 	}
 
-	if (modelProperty->getValueName() == "< Load from Library >")
-	{
+	// #########################################################
 
-	}
-	else if (manifestProperty->getValueName() == "< Load from Library >")
+	// Legacy support (before introcuding value action handling)
+
+	if (modelProperty->getValueName() == "< Load from Library >" && modelProperty->getCurrentValueHandlingType() == ot::PropertyBase::ValueHandlingType::Value)
 	{
-		
+		requestScriptLoadFromLibrary();
+	}
+	else if (manifestProperty->getValueName() == "< Load from Library >" && manifestProperty->getCurrentValueHandlingType() == ot::PropertyBase::ValueHandlingType::Value)
+	{
+		requestManifestLoadFromLibrary();
 	}
 
-	auto scriptSelectionProperty =	getProperties().getProperty(m_propertyNameScripts);
+	// Legacy support (before introcuding value action handling)
+
+	// #########################################################
+
+	auto scriptSelectionProperty = getProperties().getProperty(m_propertyNameScripts);
 	if (scriptSelectionProperty->needsUpdate())
 	{
 		updateBlockAccordingToScriptHeader();
@@ -133,8 +141,9 @@ bool EntityBlockPython::updateFromProperties()
 	return true;
 }
 
-void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID) {
-	
+void EntityBlockPython::setScriptFolder(ot::UID _scriptFolderID)
+{
+
 	auto propBase = getProperties().getProperty(m_propertyNameScripts);
 	auto scriptSelection = dynamic_cast<EntityPropertiesEntityList*>(propBase);
 	scriptSelection->setEntityContainerID(_scriptFolderID);
@@ -154,13 +163,15 @@ void EntityBlockPython::setManifestFolder(ot::UID _manifestFolderID)
 	//manifestProperty->setEntityContainerID(_manifestFolderID);
 }
 
-std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::LibraryElement& _libraryElement,EntityBase* _entity ,ot::NewModelStateInfo& _newStateInfo) {
-	
+std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo)
+{
+
 	std::list<ot::LibraryElement> resultList;
-	
+
 	std::string dependencyID = _libraryElement.getAdditionalInfoValue("DependencyID");
 	std::string dependencyCollection = _libraryElement.getAdditionalInfoValue("DependencyCollection");
-	if (!dependencyID.empty() && dependencyID != std::to_string(ot::invalidUID)) {
+	if (!dependencyID.empty() && dependencyID != std::to_string(ot::invalidUID))
+	{
 		// Create the LibraryElementRequest configuration
 		ot::LibraryElementRequest request;
 		request.setRequestingEntityID(_libraryElement.getRequestingEntityID());
@@ -179,10 +190,10 @@ std::list<ot::LibraryElement> EntityBlockPython::libraryElementWasSet(const ot::
 		ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(answer);
 		ot::JsonDocument responseDoc;
 		responseDoc.fromJson(rMsg.getWhat());
-		
+
 		ot::LibraryElement returnedElement;
 		returnedElement.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_Config));
-		
+
 		resultList.push_back(returnedElement);
 
 
@@ -198,23 +209,16 @@ void EntityBlockPython::nonValuePropertyValueSelected(const EntityPropertiesBase
 	if (_property->getName() == m_propertyNameScripts)
 	{
 		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
-		if (!actualProperty) {
+		if (!actualProperty)
+		{
 			OT_LOG_E("Property is not of type EntityPropertiesExtendedEntityList");
 			return;
 		}
 
 		std::string selectedValueName = actualProperty->getValueName();
-		if (selectedValueName == "< Load from Library >") {
-			ot::LibraryElementSelectionCfg config;
-			config.setRequestingEntityID(this->getEntityID());
-			config.setCollectionName("PythonScripts");
-			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-			config.setEntityType(EntityPythonScript::className());
-			config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
-			config.setPropertyName(m_propertyNameScripts);
-
-			// if it was selected use observer to send message to LMS
-			getObserver()->requestConfigForModelDialog(config);
+		if (selectedValueName == "< Load from Library >")
+		{
+			requestScriptLoadFromLibrary();
 		}
 		else
 		{
@@ -224,7 +228,8 @@ void EntityBlockPython::nonValuePropertyValueSelected(const EntityPropertiesBase
 	else if (_property->getName() == m_propertyNameEnvironments)
 	{
 		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
-		if (!actualProperty) {
+		if (!actualProperty)
+		{
 			OT_LOG_E("Property is not of type EntityPropertiesExtendedEntityList");
 			return;
 		}
@@ -233,15 +238,7 @@ void EntityBlockPython::nonValuePropertyValueSelected(const EntityPropertiesBase
 
 		if (selectedValueName == "< Load from Library >")
 		{
-			ot::LibraryElementSelectionCfg config;
-			config.setRequestingEntityID(this->getEntityID());
-			config.setCollectionName("Environments");
-			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-			config.setEntityType(EntityPythonManifest::className());
-			config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
-			config.setPropertyName(m_propertyNameEnvironments);
-			// if it was selected use observer to send message to LMS
-			getObserver()->requestConfigForModelDialog(config);
+			requestManifestLoadFromLibrary();
 		}
 		else
 		{
@@ -254,9 +251,9 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 {
 	resetBlockRelatedAttributes();
 
-	auto propertyBase =	getProperties().getProperty(m_propertyNameScripts);
+	auto propertyBase = getProperties().getProperty(m_propertyNameScripts);
 	auto propertyEntityList = dynamic_cast<EntityPropertiesExtendedEntityList*>(propertyBase);
-	if(propertyEntityList->getValueName() == "< Load from Library >" || propertyEntityList->getValueName() == "")
+	if (propertyEntityList->getValueName() == "< Load from Library >" || propertyEntityList->getValueName() == "")
 	{
 		return; // No script selected, so we do not need to update the block.
 	}
@@ -264,7 +261,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 	//auto propertyBase = getProperties().getProperty(m_propertyNameScripts);
 	//auto propertyEntityList = dynamic_cast<EntityPropertiesEntityList*>(propertyBase);
 	ot::UID scriptID = propertyEntityList->getValueID();
-	std::map<ot::UID,EntityBase*> entityMap;
+	std::map<ot::UID, EntityBase*> entityMap;
 	EntityBase* baseEntity = readEntityFromEntityID(nullptr, scriptID, entityMap);
 	assert(baseEntity != nullptr);
 	std::shared_ptr<EntityFile> scriptEntity(dynamic_cast<EntityFile*>(baseEntity));
@@ -279,7 +276,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 		auto allConnectors = headerInterpreter.getAllConnectors();
 		auto allProperties = headerInterpreter.getAllProperties();
 
-		for (auto& connector : allConnectors) 
+		for (auto& connector : allConnectors)
 		{
 			addConnector(std::move(connector));
 		}
@@ -294,8 +291,8 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 		std::string report = headerInterpreter.getErrorReport();
 		report = "\nError while analysing pythonscript:\n" + report;
 		ot::JsonDocument cmdDoc;
-		cmdDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_DisplayMessage,cmdDoc.GetAllocator());
-		auto jReport =	ot::JsonString(report, cmdDoc.GetAllocator());
+		cmdDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_UI_DisplayMessage, cmdDoc.GetAllocator());
+		auto jReport = ot::JsonString(report, cmdDoc.GetAllocator());
 		cmdDoc.AddMember(OT_ACTION_PARAM_MESSAGE, jReport, cmdDoc.GetAllocator());
 		getObserver()->sendMessageToViewer(cmdDoc);
 	}
@@ -304,7 +301,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 void EntityBlockPython::resetBlockRelatedAttributes()
 {
 	clearConnectors();
-	
+
 	auto allProperties = getProperties().getListOfAllProperties();
 	for (auto& property : allProperties)
 	{
@@ -316,6 +313,33 @@ void EntityBlockPython::resetBlockRelatedAttributes()
 			getProperties().deleteProperty(propertyName, propertyGroupName);
 		}
 	}
-	
+
+}
+
+void EntityBlockPython::requestScriptLoadFromLibrary()
+{
+	ot::LibraryElementSelectionCfg config;
+	config.setRequestingEntityID(this->getEntityID());
+	config.setCollectionName("PythonScripts");
+	config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+	config.setEntityType(EntityPythonScript::className());
+	config.setNewEntityFolder(ot::FolderNames::PythonScriptFolder);
+	config.setPropertyName(m_propertyNameScripts);
+
+	// if it was selected use observer to send message to LMS
+	getObserver()->requestConfigForModelDialog(config);
+}
+
+void EntityBlockPython::requestManifestLoadFromLibrary()
+{
+	ot::LibraryElementSelectionCfg config;
+	config.setRequestingEntityID(this->getEntityID());
+	config.setCollectionName("Environments");
+	config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+	config.setEntityType(EntityPythonManifest::className());
+	config.setNewEntityFolder(ot::FolderNames::PythonManifestFolder);
+	config.setPropertyName(m_propertyNameEnvironments);
+	// if it was selected use observer to send message to LMS
+	getObserver()->requestConfigForModelDialog(config);
 }
 
