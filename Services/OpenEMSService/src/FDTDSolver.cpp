@@ -147,7 +147,8 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 	runCommand << "from CSXCAD  import ContinuousStructure\n";
 	runCommand << "from openEMS import openEMS\n";
 	runCommand << "from openEMS.physical_constants import *\n";
-	runCommand << "Sim_Path = \"" << escapeBackslashes(tempDirPath) << "\"\n";
+	runCommand << "from pathlib import Path\n";
+	runCommand << "Sim_Path = str(Path(\"" << escapeBackslashes(tempDirPath) << "\").resolve())\n";
 }
 
 void FDTDSolver::addUnits(std::stringstream& runCommand)
