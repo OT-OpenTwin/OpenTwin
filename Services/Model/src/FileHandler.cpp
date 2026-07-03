@@ -54,6 +54,7 @@
 #include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Properties/PropertyString.h"
 
 #include "OTGuiAPI/Frontend.h"
 
@@ -120,16 +121,16 @@ void FileHandler::handleImportPythonScriptButton() {
 }
 
 void FileHandler::handleExportFilesToLibrary() {
-	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary);
-	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
+	// This is the local export, show metadata file lists
+	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
 }
 
 void FileHandler::handleExportToUserLibrary() {
-	//showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary);
-	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
+	// This is the user export, show additional info fields
+	showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
 }
 
-void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction) {
+void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction, bool _isLocalExport) {
 	Model* model = Application::instance()->getModel();
 
 	// Get Entities from respective folders
@@ -145,26 +146,49 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 
 	ot::PropertyDialogCfg dialogConfig;
 	dialogConfig.setTitle(_title);
-	dialogConfig.setName(_title == "Export to Library" ? "ExportToLibraryDialog" : "ExportToUserLibraryDialog");
+	dialogConfig.setName(_isLocalExport ? "ExportToLibraryDialog" : "ExportToUserLibraryDialog");
 
 	ot::PropertyGridCfg gridConfig;
 	ot::PropertyGroup* pythonScriptGroup = new ot::PropertyGroup(m_pythonScriptDialogGroup);
 	ot::PropertyGroup* circuitModelGroup = new ot::PropertyGroup(m_circuitModelDialogGroup);
 
-	// Create properties using ot::PropertyStringList instead of EntityPropertiesSelection
+	// Create basic properties (always present)
 	ot::PropertyStringList* circuitModelsProp = new ot::PropertyStringList("Circuit Models", "", circuitModels);
-	ot::PropertyStringList* circuitModelMetaProp = new ot::PropertyStringList("Circuit Model Metadata File", "", metaFiles);
 	ot::PropertyStringList* pythonScriptProp = new ot::PropertyStringList("Python Script", "", pythonScripts);
-	ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
-	ot::PropertyStringList* pythonMetaProp = new ot::PropertyStringList("Python Metadata File", "", metaFiles);
-	ot::PropertyStringList* manifestMetaProp = new ot::PropertyStringList("Manifest Metadata File", "", metaFiles);
 
 	circuitModelGroup->addProperty(circuitModelsProp);
-	circuitModelGroup->addProperty(circuitModelMetaProp);
 	pythonScriptGroup->addProperty(pythonScriptProp);
-	pythonScriptGroup->addProperty(pythonManifestProp);
-	pythonScriptGroup->addProperty(pythonMetaProp);
-	pythonScriptGroup->addProperty(manifestMetaProp);
+
+	if (_isLocalExport) {
+		// Local Export: Show dropdowns for all metadata files
+		ot::PropertyStringList* circuitModelMetaProp = new ot::PropertyStringList("Circuit Model Metadata File", "", metaFiles);
+		ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
+		ot::PropertyStringList* pythonMetaProp = new ot::PropertyStringList("Python Metadata File", "", metaFiles);
+		ot::PropertyStringList* manifestMetaProp = new ot::PropertyStringList("Manifest Metadata File", "", metaFiles);
+
+		circuitModelGroup->addProperty(circuitModelMetaProp);
+		pythonScriptGroup->addProperty(pythonManifestProp);
+		pythonScriptGroup->addProperty(pythonMetaProp);
+		pythonScriptGroup->addProperty(manifestMetaProp);
+	}
+	else {
+		// User Export: Show manifest selection and text fields for additional info
+		ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
+		ot::PropertyString* circuitAdditionalInfoProp = new ot::PropertyString("Circuit Model Additional Info", "");
+		ot::PropertyString* circuitDescriptionProp = new ot::PropertyString("Circuit Model Description", "");
+		ot::PropertyString* pythonAdditionalInfoProp = new ot::PropertyString("Python Script Additional Info", "");
+		ot::PropertyString* pythonDescriptionProp = new ot::PropertyString("Python Script Description", "");
+		ot::PropertyString* manifestAdditionalInfoProp = new ot::PropertyString("Manifest Additional Info", "");
+		ot::PropertyString* manifestDescriptionProp = new ot::PropertyString("Manifest Description", "");
+
+		circuitModelGroup->addProperty(circuitAdditionalInfoProp);
+		circuitModelGroup->addProperty(circuitDescriptionProp);
+		pythonScriptGroup->addProperty(pythonManifestProp);
+		pythonScriptGroup->addProperty(pythonAdditionalInfoProp);
+		pythonScriptGroup->addProperty(pythonDescriptionProp);
+		pythonScriptGroup->addProperty(manifestAdditionalInfoProp);
+		pythonScriptGroup->addProperty(manifestDescriptionProp);
+	}
 
 	gridConfig.addRootGroup(pythonScriptGroup);
 	gridConfig.addRootGroup(circuitModelGroup);
@@ -181,6 +205,7 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 	std::string response;
 	Application::instance()->getUiComponent()->sendMessage(true, doc, response);
 }
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action Handler
@@ -673,91 +698,74 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	m_forceVisible.push_back(false);
 }
 
-FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg) {
+FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg, bool _isUserExport) {
 	Model* model = Application::instance()->getModel();
 	DialogExportEntities entities;
 
-	// Get circuit model properties
+	// Get properties that are always present
 	const ot::PropertyStringList* circuitModelProperty = dynamic_cast<const ot::PropertyStringList*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Models"));
-	const ot::PropertyStringList* circuitModelMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
-		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Metadata File"));
-
-	// Get Python properties
 	const ot::PropertyStringList* pythonScriptProperty = dynamic_cast<const ot::PropertyStringList*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script"));
 	const ot::PropertyStringList* pythonManifestProperty = dynamic_cast<const ot::PropertyStringList*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Manifest"));
-	const ot::PropertyStringList* pythonMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
-		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Metadata File"));
-	const ot::PropertyStringList* manifestMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
-		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Metadata File"));
 
 	// Determine export type
-	entities.isPythonExport = (pythonScriptProperty != nullptr && pythonMetaProperty != nullptr);
-	entities.isCircuitExport = (circuitModelProperty != nullptr && circuitModelMetaProperty != nullptr);
+	entities.isPythonExport = (pythonScriptProperty != nullptr && !pythonScriptProperty->getCurrent().empty());
+	entities.isCircuitExport = (circuitModelProperty != nullptr && !circuitModelProperty->getCurrent().empty());
 
 	if (!entities.isPythonExport && !entities.isCircuitExport) {
-		OT_LOG_E("Error: Could not retrieve required properties for export.");
+		OT_LOG_D("No items selected for export.");
 		return entities;
 	}
 
-	// Load circuit model entities
-	if (entities.isCircuitExport) {
-		std::string circuitModelPath = circuitModelProperty->getCurrent();
-		std::string circuitModelMetaPath = circuitModelMetaProperty->getCurrent();
-
-		if (circuitModelPath.empty() || circuitModelMetaPath.empty()) {
-			OT_LOG_E("Circuit model path is empty.");
-			return entities;
+	if (_isUserExport) {
+		// User Library Export: Load entities and additional info from text fields
+		if (entities.isCircuitExport) {
+			entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelProperty->getCurrent(), "Circuit model"));
+			// For user export, meta file is not selected, so we can't load it here.
+			// The additional info is handled during the creation of the UserLibraryElement.
 		}
-
-		entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelPath, "Circuit model"));
-		entities.circuitMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelMetaPath, "Circuit model metadata"));
-
-		if (!entities.circuitModel || !entities.circuitMetaFile || !validateMetaDataFile(entities.circuitMetaFile)) {
-			return entities;
+		if (entities.isPythonExport) {
+			entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptProperty->getCurrent(), "Python script"));
+			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty()) {
+				entities.pythonManifest = dynamic_cast<EntityPythonManifest*>(loadEntityByPath(pythonManifestProperty->getCurrent(), "Python manifest"));
+			}
+			// Meta files are not selected in this dialog.
 		}
 	}
+	else {
+		// Local Library Export: Load entities and their corresponding metadata files
+		const ot::PropertyStringList* circuitModelMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
+			_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Metadata File"));
+		const ot::PropertyStringList* pythonMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
+			_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Metadata File"));
+		const ot::PropertyStringList* manifestMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
+			_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Metadata File"));
 
-	// Load Python entities
-	if (entities.isPythonExport) {
-		std::string pythonScriptPath = pythonScriptProperty->getCurrent();
-		std::string pythonMetaPath = pythonMetaProperty->getCurrent();
-		std::string pythonManifestPath = pythonManifestProperty ? pythonManifestProperty->getCurrent() : "";
-		std::string manifestMetaPath = manifestMetaProperty ? manifestMetaProperty->getCurrent() : "";
-
-		if (pythonScriptPath.empty() || pythonMetaPath.empty()) {
-			OT_LOG_E("Python script path is empty.");
-			return entities;
-		}
-
-		entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptPath, "Python script"));
-		entities.pythonMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonMetaPath, "Python metadata"));
-
-		if (!entities.pythonScript || !entities.pythonMetaFile || !validateMetaDataFile(entities.pythonMetaFile)) {
-			return entities;
-		}
-
-		// Optional: Load manifest entities if provided
-		if (!pythonManifestPath.empty()) {
-			EntityBase* manifestEntity = model->findEntityFromName(pythonManifestPath);
-			if (manifestEntity) {
-				entities.pythonManifest = dynamic_cast<EntityPythonManifest*>(manifestEntity);
+		if (entities.isCircuitExport) {
+			entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelProperty->getCurrent(), "Circuit model"));
+			entities.circuitMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelMetaProperty->getCurrent(), "Circuit model metadata"));
+			if (!entities.circuitModel || !entities.circuitMetaFile || !validateMetaDataFile(entities.circuitMetaFile)) {
+				entities.isCircuitExport = false; 
 			}
 		}
-
-		if (!manifestMetaPath.empty()) {
-			EntityBase* manifestMetaEntity = model->findEntityFromName(manifestMetaPath);
-			if (manifestMetaEntity) {
-				entities.manifestMetaFile = dynamic_cast<EntityFileText*>(manifestMetaEntity);
+		if (entities.isPythonExport) {
+			entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptProperty->getCurrent(), "Python script"));
+			entities.pythonMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonMetaProperty->getCurrent(), "Python metadata"));
+			if (!entities.pythonScript || !entities.pythonMetaFile || !validateMetaDataFile(entities.pythonMetaFile)) {
+				entities.isPythonExport = false; 
 			}
-		}
 
-		// Validate manifest if provided
-		if (entities.pythonManifest && entities.manifestMetaFile) {
-			if (!validateMetaDataFile(entities.manifestMetaFile)) {
-				return entities;
+			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty()) {
+				entities.pythonManifest = dynamic_cast<EntityPythonManifest*>(loadEntityByPath(pythonManifestProperty->getCurrent(), "Python manifest"));
+				if (manifestMetaProperty && !manifestMetaProperty->getCurrent().empty()) {
+					entities.manifestMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(manifestMetaProperty->getCurrent(), "Manifest metadata"));
+					if (!entities.pythonManifest || !entities.manifestMetaFile || !validateMetaDataFile(entities.manifestMetaFile)) {
+						entities.pythonManifest = nullptr;
+						entities.manifestMetaFile = nullptr;
+					}
+				}
 			}
 		}
 	}
@@ -782,13 +790,12 @@ EntityBase* FileHandler::loadEntityByPath(const std::string& _entityPath, const 
 	return entity;
 }
 
-void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, bool _exportToUserLibrary) {
+void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg) {
 	if (_exportToUserLibrary) {
 		try {
 			std::list<ot::UserLibraryElement> elementsToExport;
-			createLibraryElementsForCircuitModel(_entities.circuitModel, _entities.circuitMetaFile, elementsToExport);
+			createLibraryElementsForCircuitModel(_entities.circuitModel, _dialogCfg, elementsToExport);
 			exportLibraryElementsToUserLibrary(elementsToExport);
-			//Application::instance()->getUiComponent()->displayMessage("Circuit model successfully exported to user library.\n");
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(std::string("Circuit model export to user library failed: ") + _e.what());
@@ -820,24 +827,22 @@ void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, boo
 	}
 }
 
-void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool _exportToUserLibrary) {
-	bool hasFullPythonExport = (_entities.pythonManifest != nullptr && _entities.manifestMetaFile != nullptr);
+
+void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg) {
+	bool hasFullPythonExport = (_entities.pythonManifest != nullptr);
 
 	if (_exportToUserLibrary) {
 		try {
 			std::list<ot::UserLibraryElement> elementsToExport;
 
-			// Add manifest if available
 			if (hasFullPythonExport) {
-				createLibraryElementsForPythonManifest(_entities.pythonManifest, _entities.manifestMetaFile, elementsToExport);
+				createLibraryElementsForPythonManifest(_entities.pythonManifest, _dialogCfg, elementsToExport);
 			}
 
-			// Add script with optional dependency information
 			ot::UID pythonEnvironmentID = hasFullPythonExport ? _entities.pythonManifest->getManifestID() : ot::invalidUID;
-			createLibraryElementsForPythonScript(_entities.pythonScript, _entities.pythonMetaFile, elementsToExport, pythonEnvironmentID);
+			createLibraryElementsForPythonScript(_entities.pythonScript, pythonEnvironmentID, _dialogCfg, elementsToExport);
 
 			exportLibraryElementsToUserLibrary(elementsToExport);
-			//Application::instance()->getUiComponent()->displayMessage("Python script successfully exported to user library.\n");
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(std::string("Python export to user library failed: ") + _e.what());
@@ -1525,41 +1530,23 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 	m_pendingFileOverwrites.erase(it);
 }
 
-void FileHandler::handleExportFileToLocalLibraryDialog(const ot::PropertyDialogCfg& _dialogCfg) {
-	DialogExportEntities entities = loadDialogEntities(_dialogCfg);
+void FileHandler::handleExportFileDialog(const ot::PropertyDialogCfg& _dialogCfg, bool _exportToUserLibrary)
+{
+	DialogExportEntities entities = loadDialogEntities(_dialogCfg, _exportToUserLibrary);
 	if (!entities.isCircuitExport && !entities.isPythonExport) {
 		return;
 	}
 
 	if (entities.isCircuitExport) {
-		handleCircuitExport(entities, false); // Export to Library
+		handleCircuitExport(entities, _exportToUserLibrary, _dialogCfg);
 	}
 	else if (entities.isPythonExport) {
-		handlePythonExport(entities, false); // Export to Library
+		handlePythonExport(entities, _exportToUserLibrary, _dialogCfg);
 	}
 }
 
-void FileHandler::handleExportFileToUserLibraryDialog(const ot::PropertyDialogCfg& _dialogCfg) {
-	DialogExportEntities entities = loadDialogEntities(_dialogCfg);
-	if (!entities.isCircuitExport && !entities.isPythonExport) {
-		return;
-	}
-
-	if (entities.isCircuitExport) {
-		handleCircuitExport(entities, true); // Export to User Library
-	}
-	else if (entities.isPythonExport) {
-		handlePythonExport(entities, true); // Export to User Library
-	}
-}
-
-void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, std::list<ot::UserLibraryElement>& _elementsToExport) {
-	assert(_modelEntity != nullptr && _metaEntity != nullptr);
-
-	// Read metadata and extract fields
-	std::string metaContent = _metaEntity->getText();
-	ot::JsonDocument metaDoc;
-	metaDoc.fromJson(metaContent);
+void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+	assert(_modelEntity != nullptr);
 
 	// Create LibraryElement
 	ot::UserLibraryElement libraryElement;
@@ -1571,48 +1558,24 @@ void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEnt
 	libraryElement.setCollectionName(m_circuitModelUserCollectionName);
 	libraryElement.setOwner(Application::instance()->getLogInUserName());
 
-	// Extract MetaData from metadata file
-	if (ot::json::exists(metaDoc, "MetaData") && ot::json::isObject(metaDoc, "MetaData")) {
-		ot::ConstJsonObject metaDataObj = ot::json::getObject(metaDoc, "MetaData");
-		for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addMetaData(key, value);
-		}
-	}
+	// Extract additional info and description from the dialog config
+	const ot::PropertyString* circuitAdditionalInfoProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Additional Info"));
+	const ot::PropertyString* circuitDescriptionProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Description"));
 
-	// Extract AdditionalInfos from metadata file
-	if (ot::json::exists(metaDoc, "AdditionalInfos") && ot::json::isObject(metaDoc, "AdditionalInfos")) {
-		ot::ConstJsonObject additionalInfosObj = ot::json::getObject(metaDoc, "AdditionalInfos");
-		for (auto it = additionalInfosObj.MemberBegin(); it != additionalInfosObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addAdditionalInfo(key, value);
-		} 
+	if (circuitAdditionalInfoProp) {
+		libraryElement.addAdditionalInfo("Info", circuitAdditionalInfoProp->getValue());
+	}
+	if (circuitDescriptionProp) {
+		libraryElement.addMetaData("Description", circuitDescriptionProp->getValue());
 	}
 
 	_elementsToExport.push_back(libraryElement);
 }
 
-void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, std::list<ot::UserLibraryElement>& _elementsToExport, ot::UID _environmentID) {
-	assert(_scriptEntity != nullptr && _metaEntity != nullptr);
-
-	// Read metadata and extract fields
-	std::string metaContent = _metaEntity->getText();
-	ot::JsonDocument metaDoc;
-	metaDoc.fromJson(metaContent);
+void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEntity, ot::UID _environmentID, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+	assert(_scriptEntity != nullptr);
 
 	// Create LibraryElement
 	ot::UserLibraryElement libraryElement;
@@ -1624,36 +1587,17 @@ void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEn
 	libraryElement.setCollectionName(m_pythonUserCollectionName);
 	libraryElement.setOwner(Application::instance()->getLogInUserName());
 
-	// Extract MetaData from metadata file
-	if (ot::json::exists(metaDoc, "MetaData") && ot::json::isObject(metaDoc, "MetaData")) {
-		ot::ConstJsonObject metaDataObj = ot::json::getObject(metaDoc, "MetaData");
-		for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addMetaData(key, value);
-		}
-	}
+	// Extract additional info and description from the dialog config
+	const ot::PropertyString* pythonAdditionalInfoProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script Additional Info"));
+	const ot::PropertyString* pythonDescriptionProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script Description"));
 
-	// Extract AdditionalInfos from metadata file
-	if (ot::json::exists(metaDoc, "AdditionalInfos") && ot::json::isObject(metaDoc, "AdditionalInfos")) {
-		ot::ConstJsonObject additionalInfosObj = ot::json::getObject(metaDoc, "AdditionalInfos");
-		for (auto it = additionalInfosObj.MemberBegin(); it != additionalInfosObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addAdditionalInfo(key, value);
-		}
+	if (pythonAdditionalInfoProp) {
+		libraryElement.addAdditionalInfo("Info", pythonAdditionalInfoProp->getValue());
+	}
+	if (pythonDescriptionProp) {
+		libraryElement.addMetaData("Description", pythonDescriptionProp->getValue());
 	}
 
 	// Add DependencyID and DependencyCollection if environment ID is valid
@@ -1665,13 +1609,8 @@ void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEn
 	_elementsToExport.push_back(libraryElement);
 }
 
-void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, std::list<ot::UserLibraryElement>& _elementsToExport) {
-	assert(_manifestEntity != nullptr && _metaEntity != nullptr);
-
-	// Read metadata and extract fields
-	std::string metaContent = _metaEntity->getText();
-	ot::JsonDocument metaDoc;
-	metaDoc.fromJson(metaContent);
+void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _manifestEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+	assert(_manifestEntity != nullptr);
 
 	// Create LibraryElement
 	ot::UserLibraryElement libraryElement;
@@ -1683,36 +1622,17 @@ void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _
 	libraryElement.setCollectionName(m_environmentUserCollectionName);
 	libraryElement.setOwner(Application::instance()->getLogInUserName());
 
-	// Extract MetaData from metadata file
-	if (ot::json::exists(metaDoc, "MetaData") && ot::json::isObject(metaDoc, "MetaData")) {
-		ot::ConstJsonObject metaDataObj = ot::json::getObject(metaDoc, "MetaData");
-		for (auto it = metaDataObj.MemberBegin(); it != metaDataObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addMetaData(key, value);
-		}
-	}
+	// Extract additional info and description from the dialog config
+	const ot::PropertyString* manifestAdditionalInfoProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Additional Info"));
+	const ot::PropertyString* manifestDescriptionProp = dynamic_cast<const ot::PropertyString*>(
+		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Description"));
 
-	// Extract AdditionalInfos from metadata file
-	if (ot::json::exists(metaDoc, "AdditionalInfos") && ot::json::isObject(metaDoc, "AdditionalInfos")) {
-		ot::ConstJsonObject additionalInfosObj = ot::json::getObject(metaDoc, "AdditionalInfos");
-		for (auto it = additionalInfosObj.MemberBegin(); it != additionalInfosObj.MemberEnd(); ++it) {
-			std::string key = it->name.GetString();
-			std::string value;
-			if (it->value.IsString()) {
-				value = it->value.GetString();
-			}
-			else if (it->value.IsNumber()) {
-				value = std::to_string(it->value.GetDouble());
-			}
-			libraryElement.addAdditionalInfo(key, value);
-		}
+	if (manifestAdditionalInfoProp) {
+		libraryElement.addAdditionalInfo("Info", manifestAdditionalInfoProp->getValue());
+	}
+	if (manifestDescriptionProp) {
+		libraryElement.addMetaData("Description", manifestDescriptionProp->getValue());
 	}
 
 	_elementsToExport.push_back(libraryElement);

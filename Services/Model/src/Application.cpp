@@ -774,12 +774,11 @@ void Application::handleImportTableFile(ot::JsonDocument& _document) {
 }
 
 void Application::handleExportFileToLocalLibraryDialog(ot::JsonDocument& _document) {
-
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportFileToLocalLibraryDialog(pckg);
+	m_fileHandler.handleExportFileDialog(pckg, false);
 }
 
 void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
@@ -787,8 +786,7 @@ void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportFileToUserLibraryDialog(pckg);
-
+	m_fileHandler.handleExportFileDialog(pckg, true);
 }
 
 
