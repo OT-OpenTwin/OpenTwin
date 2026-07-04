@@ -43,7 +43,7 @@ public:
 private:
 	void loadSelfIntersectionObject(SelfIntersectionCheck &intersectionChecker);
 	bool checkSelfIntersection(SelfIntersectionCheck &checker);
-	void visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation);
+	void visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation, int pass);
 	std::string quadraticExpression(double localSize, double Sdelta, std::vector<double> partnerFaces);
 	std::string linearExpression(double localSize, double Sdelta, std::vector<double> partnerFaces);
 

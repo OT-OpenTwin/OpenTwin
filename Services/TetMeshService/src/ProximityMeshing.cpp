@@ -64,7 +64,7 @@ bool ProximityMeshing::fixMeshIntersections(const std::string &meshName, int pro
 	else if (proximityMeshing == 1 && hasSelfIntersections) 
 	{
 		IntersectingInfo = intersectionChecker.TrisSelfIntersecting();
-		visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations);
+		visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations, 0);
 
 		application->getUiComponent()->displayMessage("\nERROR: Self-intersections are detected in the surface mesh, so no volume mesh can be created. Please consider refining the mesh.\n");
 
@@ -221,14 +221,14 @@ bool ProximityMeshing::fixMeshIntersections(const std::string &meshName, int pro
 			if (!hasSelfIntersections)
 			{
 				IntersectingInfo = intersectionChecker.TrisSelfIntersecting();
-				visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations);
+				visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations, ipass);
 				break;
 			}
 			else 
 			{
 				gmsh::option::setNumber("Mesh.AngleToleranceFacetOverlap", 0.01);
 				IntersectingInfo = intersectionChecker.TrisSelfIntersecting();
-				visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations);
+				visualiseSelfIntersections(meshName, IntersectingInfo, errorAnnotations, ipass);
 			}
 		}
 	}
@@ -308,7 +308,7 @@ bool ProximityMeshing::checkSelfIntersection(SelfIntersectionCheck &checker)
 	return checkSelfIntersect;
 }
 
-void ProximityMeshing::visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation)
+void ProximityMeshing::visualiseSelfIntersections(const std::string &meshName, std::vector < std::tuple<double, double, double, uint32_t, uint32_t> > IntersectingInfo, std::list<EntityAnnotation *> &errorAnnotation, int pass)
 {
 	EntityAnnotation *annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	
@@ -319,7 +319,11 @@ void ProximityMeshing::visualiseSelfIntersections(const std::string &meshName, s
 			annotation->addPoint(std::get<0>(IntersectingInfo[i]), std::get<1>(IntersectingInfo[i]), std::get<2>(IntersectingInfo[i]), 1.0, 0.0, 0.0);
 		}
 
-		annotation->setName(meshName + "/Mesh Errors/Self-intersections");
+		std::string annotationName = meshName + "/Mesh Errors/Self-intersections";
+
+		if (pass > 0) annotationName += " (Pass " + std::to_string(pass) + ")";
+
+		annotation->setName(annotationName);
 		annotation->setInitiallyHidden(true);
 
 		errorAnnotation.push_back(annotation);
