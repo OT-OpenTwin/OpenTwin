@@ -26,14 +26,24 @@ class Application;
 
 class EntityGeometry;
 class EntityBase;
+class EntityAnnotation;
 
 class BRepAlgoAPI_BuilderAlgo;
-class TopoDS_Shape;
 
-#include <list>
-#include <string>
 #include <vector>
+#include <string>
+#include <sstream>
+#include <list>
 #include <map>
+#include <utility>
+
+#include <TopoDS_Shape.hxx>
+#include <TopoDS_Solid.hxx>
+#include <TopoDS_Face.hxx>
+#include <TopoDS_Edge.hxx>
+#include <gp_Pnt.hxx>
+#include <Bnd_Box.hxx>
+#include <gp_Pnt2d.hxx>
 
 #include "OTGui/Properties/PropertyGridCfg.h"
 
@@ -47,6 +57,61 @@ public:
 
 	std::list<EntityGeometry *> &getModelEntities(void) { return modelEntities; }
 	std::list<std::vector<std::string>>  &getAllShapeOverlaps(void) { return allShapeOverlaps; }
+
+	struct ShapeDiagnosticPoint
+	{
+		gp_Pnt point;
+		TopoDS_Shape sourceShape;
+		std::string reason;
+	};
+
+	struct CoincidentFacePair
+	{
+		TopoDS_Face first;
+		TopoDS_Face second;
+		double distance = 0.0;
+	};
+
+	struct ShapeCheckReport
+	{
+		bool occValid = false;
+		bool hasSolid = false;
+		bool hasPositiveVolume = false;
+		bool closed = true;
+		bool manifold = true;
+		bool meshable = false;
+
+		double totalVolume = 0.0;
+
+		std::vector<TopoDS_Shape> invalidSubShapes;
+
+		std::vector<TopoDS_Edge> freeEdges;
+		std::vector<TopoDS_Edge> nonManifoldEdges;
+		std::vector<TopoDS_Edge> isolatedEdges;
+		std::vector<TopoDS_Edge> degeneratedEdges;
+		std::vector<TopoDS_Edge> tooShortEdges;
+
+		std::vector<TopoDS_Face> invalidFaces;
+		std::vector<TopoDS_Face> tooSmallFaces;
+
+		std::vector<TopoDS_Solid> invalidSolids;
+		std::vector<TopoDS_Solid> negativeOrZeroVolumeSolids;
+
+		std::vector<CoincidentFacePair> coincidentFaces;
+
+		std::vector<ShapeDiagnosticPoint> diagnosticPoints;
+
+		std::vector<std::string> messages;
+
+		std::string toString() const;
+	};
+
+	ShapeCheckReport checkShapeForVolumeMeshing(
+		const TopoDS_Shape& shape,
+		double minEdgeLength = 1.0e-9,
+		double minFaceArea = 1.0e-18,
+		double minVolume = 1.0e-27,
+		bool checkGeometry = true) const;
 
 private:
 	std::string checkMaterialAssignmentForShapes(std::list<EntityGeometry *> &geometryEntities);
@@ -63,6 +128,88 @@ private:
 	EntityGeometry *createGeometryEntity(const std::string &name, TopoDS_Shape &shape, const ot::PropertyGridCfg& shapeProperties);
 	void storeEntities(void);
 
+	void collectOccInvalidSubShapes(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		bool checkGeometry) const;
+
+	void checkEdgeIncidence(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report) const;
+
+	void checkDegeneratedAndSmallEdges(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		double minEdgeLength) const;
+
+	void checkSmallFaces(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		double minFaceArea) const;
+
+	void checkSolidsAndVolumes(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		double minVolume) const;
+
+	bool areFacesCoincidentBySampling(
+		const TopoDS_Face& a,
+		const TopoDS_Face& b,
+		double distanceTolerance,
+		int samplesPerDirection,
+		int minInteriorHits) const;
+
+	void checkCoincidentFacesInList(
+		const std::vector<TopoDS_Face>& faces,
+		ShapeCheckReport& report,
+		double distanceTolerance,
+		double areaTolerance,
+		int samplesPerDirection,
+		int minInteriorHits) const;
+
+	void checkCoincidentFaces(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		double distanceTolerance,
+		double areaTolerance,
+		int samplesPerDirection,
+		int minInteriorHits) const;
+
+	bool samplePointOnFace(
+		const TopoDS_Face& face,
+		double u,
+		double v,
+		gp_Pnt& point) const;
+
+	bool isPointStrictlyInsideFaceUV(
+		const TopoDS_Face& face,
+		const gp_Pnt& point,
+		double tolerance) const;
+
+	bool isPointStrictlyInsideFace(
+		const TopoDS_Face& face,
+		const gp_Pnt& point,
+		double tolerance) const;
+
+	void extractFaceTriangles(
+		const TopoDS_Face& face,
+		EntityAnnotation* annotation,
+		double r,
+		double g,
+		double b,
+		double linearDeflection = 1.0e-3,
+		double angularDeflection = 0.5) const;
+
+	double edgeLength(const TopoDS_Edge& edge) const;
+	double faceArea(const TopoDS_Face& face) const;
+	double solidVolume(const TopoDS_Solid& solid) const;
+	gp_Pnt computeEdgeMidPoint(const TopoDS_Edge& edge) const;
+	gp_Pnt computeFaceCenterPoint(const TopoDS_Face& face) const;
+	void checkShapesForMeshing(const std::string& meshName);
+
+	void collectDiagnosticPoints(ShapeCheckReport& report) const;
+
+	std::string brepCheckStatusToString(int status) const;
 	Application *application;
 	std::list<EntityGeometry *> modelEntities;
 	std::map<std::string, double> meshPriorities;

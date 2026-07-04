@@ -29,14 +29,50 @@
 #include "OTModelEntities/Database.h"
 #include "OTModelEntities/EntityMaterial.h"
 #include "OTModelEntities/TemplateDefaultManager.h"
+#include "OTModelEntities/EntityAnnotation.h"
+#include "OTModelEntities/EntityAnnotationData.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
 
-#include "BRepPrimAPI_MakeSphere.hxx"
-#include "BRepAlgoAPI_BuilderAlgo.hxx"
-#include "TopExp_Explorer.hxx"
-#include "BRepAlgoAPI_Fuse.hxx"
-#include "TopoDS.hxx"
+#include <BRepPrimAPI_MakeSphere.hxx>
+#include <BRepAlgoAPI_BuilderAlgo.hxx>
+#include <TopExp_Explorer.hxx>
+#include <BRepAlgoAPI_Fuse.hxx>
+#include <TopoDS.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepGProp.hxx>
+#include <GProp_GProps.hxx>
+#include <Geom_Curve.hxx>
+#include <Geom_Surface.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepAdaptor_Surface.hxx>
+#include <GeomAPI_ProjectPointOnSurf.hxx>
+
+#include <TopAbs_ShapeEnum.hxx>
+#include <TopExp.hxx>
+
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <TopTools_IndexedDataMapOfShapeListOfShape.hxx>
+#include <TopTools_ListOfShape.hxx>
+
+#include <BRepCheck_Analyzer.hxx>
+#include <BRepCheck_Result.hxx>
+#include <BRepCheck_ListOfStatus.hxx>
+#include <BRepCheck_ListIteratorOfListOfStatus.hxx>
+#include <BRepCheck_Status.hxx>
+#include <BRepExtrema_DistShapeShape.hxx>
+#include <BRepBndLib.hxx>
+#include <BRepMesh_IncrementalMesh.hxx>
+#include <Poly_Triangulation.hxx>
+#include <Poly_Triangle.hxx>
+#include <TopLoc_Location.hxx>
+#include <TopAbs_Orientation.hxx>
+#include <TColgp_Array1OfPnt.hxx>
+#include <Poly_Array1OfTriangle.hxx>
+#include <Bnd_Box.hxx>
+#include <BRepTools.hxx>
+#include <BRepClass_FaceClassifier.hxx>
+#include <TopAbs_State.hxx>
 
 ModelBuilder::~ModelBuilder()
 {
@@ -249,6 +285,9 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 		removeUnnecessaryHierarchies();
 	}
 
+	// Check all shapes for their ability to be meshed (e.g. check for near conincident faces)
+	checkShapesForMeshing(meshName);
+
 	// Now store all the newly created mesh model entities
 	storeEntities();
 
@@ -272,6 +311,43 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 		throw message;
 	}
 }
+
+void ModelBuilder::checkShapesForMeshing(const std::string& meshName)
+{
+	for (auto geometryEntity : modelEntities)
+	{
+		auto report = checkShapeForVolumeMeshing(geometryEntity->getBrep());
+
+		std::cout << report.toString() << std::endl;
+
+		if (!report.meshable)
+		{
+			EntityAnnotation* annotation = new EntityAnnotation(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+
+			for (const auto& p : report.diagnosticPoints)
+			{
+				const gp_Pnt& q = p.point;
+
+				annotation->addPoint(q.X(), q.Y(), q.Z(), 1.0, 0.0, 0.0);
+			}
+
+			for (const auto& pair : report.coincidentFaces)
+			{
+				extractFaceTriangles(pair.first, annotation, 1.0, 0.0, 0.0);
+				extractFaceTriangles(pair.second, annotation, 1.0, 0.5, 0.0);
+			}
+
+			annotation->setName(meshName + "/Mesh Errors/" + geometryEntity->getName());
+			annotation->setInitiallyHidden(true);
+
+			annotation->storeToDataBase();
+			application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
+			application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), annotation->getAnnotationData()->getEntityStorageVersion(), annotation->getEntityID());
+		}
+	}
+
+}
+
 
 double ModelBuilder::getMeshPriority(EntityBase *entity, MaterialManager &materialManager)
 {
@@ -646,4 +722,771 @@ bool ModelBuilder::mergeChildren(std::vector<std::string> &childList, std::map<s
 	}
 
 	return mergePerformed;
+}
+
+std::string ModelBuilder::ShapeCheckReport::toString() const
+{
+	std::ostringstream os;
+
+	os << "Shape check report\n";
+	os << "------------------\n";
+	os << "OCC valid:        " << occValid << "\n";
+	os << "Has solid:        " << hasSolid << "\n";
+	os << "Positive volume:  " << hasPositiveVolume << "\n";
+	os << "Closed:           " << closed << "\n";
+	os << "Manifold:         " << manifold << "\n";
+	os << "Meshable:         " << meshable << "\n";
+	os << "Total volume:     " << totalVolume << "\n\n";
+
+	os << "Invalid subshapes:       " << invalidSubShapes.size() << "\n";
+	os << "Invalid faces:           " << invalidFaces.size() << "\n";
+	os << "Invalid solids:          " << invalidSolids.size() << "\n";
+	os << "Free edges:              " << freeEdges.size() << "\n";
+	os << "Isolated edges:          " << isolatedEdges.size() << "\n";
+	os << "Non-manifold edges:      " << nonManifoldEdges.size() << "\n";
+	os << "Degenerated edges:       " << degeneratedEdges.size() << "\n";
+	os << "Too short edges:         " << tooShortEdges.size() << "\n";
+	os << "Too small faces:         " << tooSmallFaces.size() << "\n";
+	os << "Zero/negative solids:    " << negativeOrZeroVolumeSolids.size() << "\n";
+
+	for (const auto& msg : messages)
+		os << "- " << msg << "\n";
+
+	return os.str();
+}
+
+ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
+	const TopoDS_Shape& shape,
+	double minEdgeLength,
+	double minFaceArea,
+	double minVolume,
+	bool checkGeometry) const
+{
+	ShapeCheckReport report;
+
+	collectOccInvalidSubShapes(shape, report, checkGeometry);
+	checkEdgeIncidence(shape, report);
+	checkDegeneratedAndSmallEdges(shape, report, minEdgeLength);
+	checkSmallFaces(shape, report, minFaceArea);
+	checkSolidsAndVolumes(shape, report, minVolume);
+	checkCoincidentFaces(
+		shape,
+		report,
+		1e-8,     // distance tolerance
+		1e-16,    // area tolerance
+		5,        // samples per direction
+		4);       // required interior hits
+
+	report.meshable =
+		report.occValid &&
+		report.hasSolid &&
+		report.hasPositiveVolume &&
+		report.closed &&
+		report.manifold &&
+		report.freeEdges.empty() &&
+		report.isolatedEdges.empty() &&
+		report.nonManifoldEdges.empty() &&
+		report.invalidFaces.empty() &&
+		report.invalidSolids.empty() &&
+		report.negativeOrZeroVolumeSolids.empty() &&
+		report.coincidentFaces.empty();
+
+	if (!report.occValid)
+		report.messages.push_back("Shape is not valid according to BRepCheck_Analyzer.");
+
+	if (!report.closed)
+		report.messages.push_back("Shape is not closed. Free or isolated edges were found.");
+
+	if (!report.manifold)
+		report.messages.push_back("Shape is non-manifold. At least one edge has more than two adjacent faces.");
+
+	if (!report.hasSolid)
+		report.messages.push_back("Shape does not contain any solid.");
+
+	if (!report.hasPositiveVolume)
+		report.messages.push_back("Shape has no positive volume.");
+
+	collectDiagnosticPoints(report);
+
+	return report;
+}
+
+void ModelBuilder::collectOccInvalidSubShapes(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	bool checkGeometry) const
+{
+	BRepCheck_Analyzer analyzer(shape, checkGeometry);
+	report.occValid = analyzer.IsValid();
+
+	const TopAbs_ShapeEnum types[] = {
+		TopAbs_VERTEX,
+		TopAbs_EDGE,
+		TopAbs_WIRE,
+		TopAbs_FACE,
+		TopAbs_SHELL,
+		TopAbs_SOLID,
+		TopAbs_COMPSOLID,
+		TopAbs_COMPOUND
+	};
+
+	for (TopAbs_ShapeEnum type : types)
+	{
+		for (TopExp_Explorer ex(shape, type); ex.More(); ex.Next())
+		{
+			const TopoDS_Shape& subShape = ex.Current();
+
+			if (analyzer.IsValid(subShape))
+				continue;
+
+			report.invalidSubShapes.push_back(subShape);
+
+			if (type == TopAbs_FACE)
+				report.invalidFaces.push_back(TopoDS::Face(subShape));
+
+			if (type == TopAbs_SOLID)
+				report.invalidSolids.push_back(TopoDS::Solid(subShape));
+
+			Handle(BRepCheck_Result) result = analyzer.Result(subShape);
+
+			if (!result.IsNull())
+			{
+				const BRepCheck_ListOfStatus& statuses = result->Status();
+
+				for (BRepCheck_ListIteratorOfListOfStatus it(statuses); it.More(); it.Next())
+				{
+					std::string statusName = brepCheckStatusToString(static_cast<int>(it.Value()));
+
+					if (statusName != "NoError")
+						report.messages.push_back("OCC check: " + statusName);
+				}
+			}
+		}
+	}
+}
+
+void ModelBuilder::checkEdgeIncidence(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report) const
+{
+	TopTools_IndexedDataMapOfShapeListOfShape edgeToFaces;
+	TopExp::MapShapesAndAncestors(shape, TopAbs_EDGE, TopAbs_FACE, edgeToFaces);
+
+	for (int i = 1; i <= edgeToFaces.Extent(); ++i)
+	{
+		const TopoDS_Edge& edge = TopoDS::Edge(edgeToFaces.FindKey(i));
+		const TopTools_ListOfShape& faces = edgeToFaces.FindFromIndex(i);
+
+		const int numberOfAdjacentFaces = faces.Extent();
+		const bool isDegenerated = BRep_Tool::Degenerated(edge);
+
+		if (numberOfAdjacentFaces == 0)
+		{
+			if (isDegenerated)
+			{
+				// Degenerated pole edges can appear on spherical, conical, or periodic surfaces.
+				// They do not necessarily indicate an open boundary.
+				continue;
+			}
+
+			report.isolatedEdges.push_back(edge);
+			report.closed = false;
+			report.manifold = false;
+		}
+		else if (numberOfAdjacentFaces == 1)
+		{
+			if (isDegenerated)
+			{
+				// A degenerated edge with one adjacent face is usually a collapsed parametric boundary.
+				// Do not classify it as a free edge.
+				continue;
+			}
+
+			report.freeEdges.push_back(edge);
+			report.closed = false;
+		}
+		else if (numberOfAdjacentFaces > 2)
+		{
+			if (isDegenerated)
+			{
+				// Degenerated edges may have unusual topological incidence.
+				// Treat them as tolerated unless you want a strict B-Rep check mode.
+				continue;
+			}
+
+			report.nonManifoldEdges.push_back(edge);
+			report.manifold = false;
+		}
+	}
+}
+
+void ModelBuilder::checkDegeneratedAndSmallEdges(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	double minEdgeLength) const
+{
+	for (TopExp_Explorer ex(shape, TopAbs_EDGE); ex.More(); ex.Next())
+	{
+		const TopoDS_Edge& edge = TopoDS::Edge(ex.Current());
+
+		if (BRep_Tool::Degenerated(edge))
+		{
+			// Degenerated edges are common and valid on spherical or conical poles.
+			// Keep them out of the error list.
+			//
+			// Optional:
+			// report.toleratedDegeneratedEdges.push_back(edge);
+			continue;
+		}
+
+		const double length = edgeLength(edge);
+
+		if (length > 0.0 && length < minEdgeLength)
+			report.tooShortEdges.push_back(edge);
+	}
+}
+
+void ModelBuilder::checkSmallFaces(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	double minFaceArea) const
+{
+	for (TopExp_Explorer ex(shape, TopAbs_FACE); ex.More(); ex.Next())
+	{
+		const TopoDS_Face& face = TopoDS::Face(ex.Current());
+		const double area = faceArea(face);
+
+		if (area > 0.0 && area < minFaceArea)
+			report.tooSmallFaces.push_back(face);
+	}
+}
+
+void ModelBuilder::checkSolidsAndVolumes(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	double minVolume) const
+{
+	TopTools_IndexedMapOfShape solids;
+	TopExp::MapShapes(shape, TopAbs_SOLID, solids);
+
+	report.hasSolid = solids.Extent() > 0;
+
+	double totalVolume = 0.0;
+
+	for (int i = 1; i <= solids.Extent(); ++i)
+	{
+		const TopoDS_Solid& solid = TopoDS::Solid(solids(i));
+		const double volume = solidVolume(solid);
+
+		totalVolume += volume;
+
+		if (volume <= minVolume)
+			report.negativeOrZeroVolumeSolids.push_back(solid);
+	}
+
+	report.totalVolume = totalVolume;
+	report.hasPositiveVolume = totalVolume > minVolume;
+}
+
+bool boxesOverlapWithTolerance(
+	const Bnd_Box& a,
+	const Bnd_Box& b,
+	double tolerance)
+{
+	Bnd_Box aa = a;
+	Bnd_Box bb = b;
+
+	aa.Enlarge(tolerance);
+	bb.Enlarge(tolerance);
+
+	return !aa.IsOut(bb);
+}
+
+void ModelBuilder::checkCoincidentFaces(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	double distanceTolerance,
+	double areaTolerance,
+	int samplesPerDirection,
+	int minInteriorHits) const
+{
+	bool found = false;
+
+	for (TopExp_Explorer solidEx(shape, TopAbs_SOLID); solidEx.More(); solidEx.Next())
+	{
+		const TopoDS_Solid solid = TopoDS::Solid(solidEx.Current());
+
+		std::vector<TopoDS_Face> faces;
+
+		for (TopExp_Explorer shellEx(solid, TopAbs_SHELL); shellEx.More(); shellEx.Next())
+		{
+			const TopoDS_Shell shell = TopoDS::Shell(shellEx.Current());
+
+			for (TopExp_Explorer faceEx(shell, TopAbs_FACE); faceEx.More(); faceEx.Next())
+			{
+				TopoDS_Face face = TopoDS::Face(faceEx.Current());
+
+				if (face.Orientation() == TopAbs_FORWARD ||
+					face.Orientation() == TopAbs_REVERSED)
+				{
+					faces.push_back(face);
+				}
+			}
+		}
+
+		const std::size_t oldCount = report.coincidentFaces.size();
+
+		checkCoincidentFacesInList(
+			faces,
+			report,
+			distanceTolerance,
+			areaTolerance,
+			samplesPerDirection,
+			minInteriorHits);
+
+		if (report.coincidentFaces.size() > oldCount)
+			found = true;
+	}
+
+	if (found)
+	{
+		report.messages.push_back(
+			"Coincident or nearly coincident boundary faces were found. "
+			"The topology may be valid, but the model can contain zero-thickness regions.");
+	}
+}
+
+void ModelBuilder::checkCoincidentFacesInList(
+	const std::vector<TopoDS_Face>& faces,
+	ShapeCheckReport& report,
+	double distanceTolerance,
+	double areaTolerance,
+	int samplesPerDirection,
+	int minInteriorHits) const
+{
+	std::vector<Bnd_Box> boxes;
+	std::vector<double> areas;
+
+	boxes.reserve(faces.size());
+	areas.reserve(faces.size());
+
+	for (const auto& face : faces)
+	{
+		Bnd_Box box;
+		BRepBndLib::Add(face, box);
+
+		boxes.push_back(box);
+		areas.push_back(faceArea(face));
+	}
+
+	for (std::size_t i = 0; i < faces.size(); ++i)
+	{
+		for (std::size_t j = i + 1; j < faces.size(); ++j)
+		{
+			if (!boxesOverlapWithTolerance(boxes[i], boxes[j], distanceTolerance))
+				continue;
+
+			const double areaA = areas[i];
+			const double areaB = areas[j];
+
+			if (areaA <= areaTolerance || areaB <= areaTolerance)
+				continue;
+
+			const double maxArea = std::max(areaA, areaB);
+
+			if (std::abs(areaA - areaB) > 0.05 * maxArea)
+				continue;
+
+			BRepExtrema_DistShapeShape dist(faces[i], faces[j]);
+			dist.Perform();
+
+			if (!dist.IsDone())
+				continue;
+
+			if (dist.Value() > distanceTolerance)
+				continue;
+
+			// Important: use &&, not ||.
+			// Both trimmed faces must contain several interior points of the other face.
+			const bool coincident =
+				areFacesCoincidentBySampling(
+					faces[i],
+					faces[j],
+					distanceTolerance,
+					samplesPerDirection,
+					minInteriorHits) &&
+				areFacesCoincidentBySampling(
+					faces[j],
+					faces[i],
+					distanceTolerance,
+					samplesPerDirection,
+					minInteriorHits);
+
+			if (!coincident)
+				continue;
+
+			CoincidentFacePair pair;
+			pair.first = faces[i];
+			pair.second = faces[j];
+			pair.distance = dist.Value();
+
+			report.coincidentFaces.push_back(pair);
+		}
+	}
+}
+
+bool ModelBuilder::areFacesCoincidentBySampling(
+	const TopoDS_Face& a,
+	const TopoDS_Face& b,
+	double distanceTolerance,
+	int samplesPerDirection,
+	int minInteriorHits) const
+{
+	Standard_Real uMin = 0.0;
+	Standard_Real uMax = 0.0;
+	Standard_Real vMin = 0.0;
+	Standard_Real vMax = 0.0;
+
+	BRepTools::UVBounds(a, uMin, uMax, vMin, vMax);
+
+	if (uMax <= uMin || vMax <= vMin)
+		return false;
+
+	BRepAdaptor_Surface adaptorA(a);
+
+	int interiorHits = 0;
+
+	for (int iu = 1; iu <= samplesPerDirection; ++iu)
+	{
+		const double u =
+			uMin + (uMax - uMin) * static_cast<double>(iu) /
+			static_cast<double>(samplesPerDirection + 1);
+
+		for (int iv = 1; iv <= samplesPerDirection; ++iv)
+		{
+			const double v =
+				vMin + (vMax - vMin) * static_cast<double>(iv) /
+				static_cast<double>(samplesPerDirection + 1);
+
+			gp_Pnt p = adaptorA.Value(u, v);
+
+			// The sample must be strictly inside the trimmed source face.
+			if (!isPointStrictlyInsideFaceUV(a, p, distanceTolerance))
+				continue;
+
+			// The same 3D point must also be strictly inside the trimmed target face.
+			// This excludes edge-only contacts and complementary cylinder patches.
+			if (!isPointStrictlyInsideFaceUV(b, p, distanceTolerance))
+				continue;
+
+			++interiorHits;
+
+			if (interiorHits >= minInteriorHits)
+				return true;
+		}
+	}
+
+	return false;
+}
+
+bool ModelBuilder::samplePointOnFace(
+	const TopoDS_Face& face,
+	double u,
+	double v,
+	gp_Pnt& point) const
+{
+	BRepAdaptor_Surface adaptor(face);
+	Handle(Geom_Surface) surface = adaptor.Surface().Surface();
+
+	if (surface.IsNull())
+		return false;
+
+	point = surface->Value(u, v);
+	return true;
+}
+
+bool ModelBuilder::isPointStrictlyInsideFaceUV(
+	const TopoDS_Face& face,
+	const gp_Pnt& point,
+	double tolerance) const
+{
+	BRepAdaptor_Surface adaptor(face);
+	Handle(Geom_Surface) surface = adaptor.Surface().Surface();
+
+	if (surface.IsNull())
+		return false;
+
+	GeomAPI_ProjectPointOnSurf projector(point, surface);
+
+	if (projector.NbPoints() < 1)
+		return false;
+
+	Standard_Real u = 0.0;
+	Standard_Real v = 0.0;
+	projector.LowerDistanceParameters(u, v);
+
+	gp_Pnt projected = surface->Value(u, v);
+
+	if (point.Distance(projected) > tolerance)
+		return false;
+
+	BRepClass_FaceClassifier classifier;
+	classifier.Perform(face, gp_Pnt2d(u, v), tolerance);
+
+	return classifier.State() == TopAbs_IN;
+}
+
+double ModelBuilder::edgeLength(const TopoDS_Edge& edge) const
+{
+	GProp_GProps props;
+	BRepGProp::LinearProperties(edge, props);
+	return props.Mass();
+}
+
+double ModelBuilder::faceArea(const TopoDS_Face& face) const
+{
+	GProp_GProps props;
+	BRepGProp::SurfaceProperties(face, props);
+	return props.Mass();
+}
+
+double ModelBuilder::solidVolume(const TopoDS_Solid& solid) const
+{
+	GProp_GProps props;
+	BRepGProp::VolumeProperties(solid, props);
+	return props.Mass();
+}
+
+std::string ModelBuilder::brepCheckStatusToString(int status) const
+{
+	switch (static_cast<BRepCheck_Status>(status))
+	{
+	case BRepCheck_NoError: return "NoError";
+	case BRepCheck_InvalidPointOnCurve: return "InvalidPointOnCurve";
+	case BRepCheck_InvalidPointOnCurveOnSurface: return "InvalidPointOnCurveOnSurface";
+	case BRepCheck_InvalidPointOnSurface: return "InvalidPointOnSurface";
+	case BRepCheck_No3DCurve: return "No3DCurve";
+	case BRepCheck_Multiple3DCurve: return "Multiple3DCurve";
+	case BRepCheck_Invalid3DCurve: return "Invalid3DCurve";
+	case BRepCheck_NoCurveOnSurface: return "NoCurveOnSurface";
+	case BRepCheck_InvalidCurveOnSurface: return "InvalidCurveOnSurface";
+	case BRepCheck_InvalidCurveOnClosedSurface: return "InvalidCurveOnClosedSurface";
+	case BRepCheck_InvalidSameRangeFlag: return "InvalidSameRangeFlag";
+	case BRepCheck_InvalidSameParameterFlag: return "InvalidSameParameterFlag";
+	case BRepCheck_InvalidDegeneratedFlag: return "InvalidDegeneratedFlag";
+	case BRepCheck_FreeEdge: return "FreeEdge";
+	case BRepCheck_InvalidMultiConnexity: return "InvalidMultiConnexity";
+	case BRepCheck_InvalidRange: return "InvalidRange";
+	case BRepCheck_EmptyWire: return "EmptyWire";
+	case BRepCheck_RedundantEdge: return "RedundantEdge";
+	case BRepCheck_SelfIntersectingWire: return "SelfIntersectingWire";
+	case BRepCheck_NoSurface: return "NoSurface";
+	case BRepCheck_InvalidWire: return "InvalidWire";
+	case BRepCheck_RedundantWire: return "RedundantWire";
+	case BRepCheck_IntersectingWires: return "IntersectingWires";
+	case BRepCheck_InvalidImbricationOfWires: return "InvalidImbricationOfWires";
+	case BRepCheck_EmptyShell: return "EmptyShell";
+	case BRepCheck_RedundantFace: return "RedundantFace";
+	case BRepCheck_UnorientableShape: return "UnorientableShape";
+	case BRepCheck_NotClosed: return "NotClosed";
+	case BRepCheck_NotConnected: return "NotConnected";
+	case BRepCheck_SubshapeNotInShape: return "SubshapeNotInShape";
+	case BRepCheck_BadOrientation: return "BadOrientation";
+	case BRepCheck_BadOrientationOfSubshape: return "BadOrientationOfSubshape";
+	case BRepCheck_InvalidToleranceValue: return "InvalidToleranceValue";
+	case BRepCheck_CheckFail: return "CheckFail";
+	default: return "Unknown";
+	}
+}
+
+gp_Pnt ModelBuilder::computeEdgeMidPoint(const TopoDS_Edge& edge) const
+{
+	Standard_Real first = 0.0;
+	Standard_Real last = 0.0;
+
+	Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+
+	if (!curve.IsNull())
+	{
+		const Standard_Real mid = 0.5 * (first + last);
+		return curve->Value(mid);
+	}
+
+	GProp_GProps props;
+	BRepGProp::LinearProperties(edge, props);
+	return props.CentreOfMass();
+}
+
+gp_Pnt ModelBuilder::computeFaceCenterPoint(const TopoDS_Face& face) const
+{
+	Standard_Real uMin = 0.0;
+	Standard_Real uMax = 0.0;
+	Standard_Real vMin = 0.0;
+	Standard_Real vMax = 0.0;
+
+	BRepTools::UVBounds(face, uMin, uMax, vMin, vMax);
+
+	BRepAdaptor_Surface adaptor(face);
+
+	const double tolerance = 1.0e-7;
+
+	// Try the parametric center first.
+	{
+		const Standard_Real u = 0.5 * (uMin + uMax);
+		const Standard_Real v = 0.5 * (vMin + vMax);
+
+		gp_Pnt p = adaptor.Value(u, v);
+
+		if (isPointStrictlyInsideFace(face, p, tolerance))
+			return p;
+	}
+
+	// Search a valid inner sample point in UV space.
+	const int samples = 15;
+
+	for (int iu = 1; iu <= samples; ++iu)
+	{
+		const Standard_Real u =
+			uMin + (uMax - uMin) * static_cast<double>(iu) /
+			static_cast<double>(samples + 1);
+
+		for (int iv = 1; iv <= samples; ++iv)
+		{
+			const Standard_Real v =
+				vMin + (vMax - vMin) * static_cast<double>(iv) /
+				static_cast<double>(samples + 1);
+
+			gp_Pnt p = adaptor.Value(u, v);
+
+			if (isPointStrictlyInsideFace(face, p, tolerance))
+				return p;
+		}
+	}
+
+	// Fallback: use the surface center of mass only as last resort.
+	// This point is not guaranteed to lie on curved faces such as cylinders.
+	GProp_GProps props;
+	BRepGProp::SurfaceProperties(face, props);
+	gp_Pnt center = props.CentreOfMass();
+
+	return center;
+}
+
+bool ModelBuilder::isPointStrictlyInsideFace(
+	const TopoDS_Face& face,
+	const gp_Pnt& point,
+	double tolerance) const
+{
+	BRepClass_FaceClassifier classifier(face, point, tolerance);
+
+	// Strictly require IN.
+	// ON would also be true for edge contacts, which should not be considered.
+	return classifier.State() == TopAbs_IN;
+}
+
+void ModelBuilder::collectDiagnosticPoints(ShapeCheckReport& report) const
+{
+	auto addEdgePoint = [&](const TopoDS_Edge& edge, const std::string& reason)
+		{
+			ShapeDiagnosticPoint p;
+			p.point = computeEdgeMidPoint(edge);
+			p.sourceShape = edge;
+			p.reason = reason;
+			report.diagnosticPoints.push_back(p);
+		};
+
+	auto addFacePoint = [&](const TopoDS_Face& face, const std::string& reason)
+		{
+			ShapeDiagnosticPoint p;
+			p.point = computeFaceCenterPoint(face);
+			p.sourceShape = face;
+			p.reason = reason;
+			report.diagnosticPoints.push_back(p);
+		};
+
+	for (const auto& edge : report.freeEdges)
+		addEdgePoint(edge, "Free edge");
+
+	for (const auto& edge : report.nonManifoldEdges)
+		addEdgePoint(edge, "Non-manifold edge");
+
+	for (const auto& edge : report.isolatedEdges)
+		addEdgePoint(edge, "Isolated edge");
+
+	for (const auto& edge : report.degeneratedEdges)
+		addEdgePoint(edge, "Degenerated edge");
+
+	for (const auto& edge : report.tooShortEdges)
+		addEdgePoint(edge, "Too short edge");
+
+	for (const auto& face : report.invalidFaces)
+		addFacePoint(face, "Invalid face");
+
+	for (const auto& face : report.tooSmallFaces)
+		addFacePoint(face, "Too small face");
+
+	for (const auto& pair : report.coincidentFaces)
+	{
+		addFacePoint(pair.first, "Coincident face pair");
+	}
+}
+
+void ModelBuilder::extractFaceTriangles(
+	const TopoDS_Face& face,
+	EntityAnnotation* annotation,
+	double r,
+	double g,
+	double b,
+	double linearDeflection,
+	double angularDeflection) const
+{
+	if (annotation == nullptr)
+		return;
+
+	BRepMesh_IncrementalMesh mesher(
+		face,
+		linearDeflection,
+		Standard_False,
+		angularDeflection,
+		Standard_True);
+
+	TopLoc_Location location;
+	Handle(Poly_Triangulation) triangulation =
+		BRep_Tool::Triangulation(face, location);
+
+	if (triangulation.IsNull())
+		return;
+
+	const gp_Trsf transform = location.Transformation();
+
+	for (int i = 1; i <= triangulation->NbTriangles(); ++i)
+	{
+		int n1, n2, n3;
+		triangulation->Triangle(i).Get(n1, n2, n3);
+
+		gp_Pnt p1 = triangulation->Node(n1);
+		gp_Pnt p2 = triangulation->Node(n2);
+		gp_Pnt p3 = triangulation->Node(n3);
+
+		p1.Transform(transform);
+		p2.Transform(transform);
+		p3.Transform(transform);
+
+		if (face.Orientation() == TopAbs_REVERSED)
+		{
+			annotation->addTriangle(
+				p1.X(), p1.Y(), p1.Z(),
+				p3.X(), p3.Y(), p3.Z(),
+				p2.X(), p2.Y(), p2.Z(),
+				r, g, b);
+		}
+		else
+		{
+			annotation->addTriangle(
+				p1.X(), p1.Y(), p1.Z(),
+				p2.X(), p2.Y(), p2.Z(),
+				p3.X(), p3.Y(), p3.Z(),
+				r, g, b);
+		}
+	}
 }
