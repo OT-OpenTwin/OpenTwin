@@ -33,6 +33,7 @@
 #include "OTModelEntities/EntityAnnotationData.h"
 
 #include "OTServiceFoundation/ModelComponent.h"
+#include "OTServiceFoundation/UiComponent.h"
 
 #include <BRepPrimAPI_MakeSphere.hxx>
 #include <BRepAlgoAPI_BuilderAlgo.hxx>
@@ -73,6 +74,13 @@
 #include <BRepTools.hxx>
 #include <BRepClass_FaceClassifier.hxx>
 #include <TopAbs_State.hxx>
+#include <BRepLProp_SLProps.hxx>
+#include <TopoDS_Solid.hxx>
+#include <TopoDS_Shell.hxx>
+#include <TopoDS_Face.hxx>
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 ModelBuilder::~ModelBuilder()
 {
@@ -108,7 +116,7 @@ void ModelBuilder::buildModel(const std::string &meshName, std::list<EntityGeome
 	}
 
 	// Build the non-manifold model for meshing
-	buildNonManifoldModel(meshName, geometryEntities, properties, materialManager);
+	buildNonManifoldModel(meshName, geometryEntities, properties, materialManager, stepWidthManager);
 }
 
 std::string ModelBuilder::checkMaterialAssignmentForShapes(std::list<EntityGeometry *> &geometryEntities)
@@ -234,7 +242,7 @@ std::string ModelBuilder::addBoundingSphere(std::list<EntityGeometry *> &geometr
 	return error;
 }
 
-void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<EntityGeometry *> &geometryEntities, Properties &properties, MaterialManager &materialManager)
+void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<EntityGeometry *> &geometryEntities, Properties &properties, MaterialManager &materialManager, StepWidthManager& stepWidthManager)
 {
 	// First of all, perform a non-reg unite operation on all shapes
 	TopTools_ListOfShape inputs;
@@ -286,7 +294,7 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 	}
 
 	// Check all shapes for their ability to be meshed (e.g. check for near conincident faces)
-	checkShapesForMeshing(meshName);
+	checkShapesForMeshing(meshName, stepWidthManager.getMaximumEdgeLength() * 0.1);
 
 	// Now store all the newly created mesh model entities
 	storeEntities();
@@ -312,11 +320,15 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 	}
 }
 
-void ModelBuilder::checkShapesForMeshing(const std::string& meshName)
+void ModelBuilder::checkShapesForMeshing(const std::string& meshName, double gapTolerance)
 {
 	for (auto geometryEntity : modelEntities)
 	{
-		auto report = checkShapeForVolumeMeshing(geometryEntity->getBrep());
+		double minEdgeLength = 1.0e-9;
+		double minFaceArea = 1.0e-18;
+		double minVolume = 1.0e-27;
+
+		auto report = checkShapeForVolumeMeshing(geometryEntity->getBrep(), minEdgeLength, minFaceArea, minVolume, gapTolerance);
 
 		std::cout << report.toString() << std::endl;
 
@@ -337,17 +349,28 @@ void ModelBuilder::checkShapesForMeshing(const std::string& meshName)
 				extractFaceTriangles(pair.second, annotation, 1.0, 0.5, 0.0);
 			}
 
-			annotation->setName(meshName + "/Mesh Errors/" + geometryEntity->getName());
+			visualizeThinGapFaces(report, annotation);
+
+			annotation->setName(meshName + "/Mesh Warnings/" + geometryEntity->getName());
 			annotation->setInitiallyHidden(true);
 
 			annotation->storeToDataBase();
 			application->getModelComponent()->addNewTopologyEntity(annotation->getEntityID(), annotation->getEntityStorageVersion(), true);
 			application->getModelComponent()->addNewDataEntity(annotation->getAnnotationData()->getEntityID(), annotation->getAnnotationData()->getEntityStorageVersion(), annotation->getEntityID());
+
+			ot::StyledTextBuilder message;
+			message << "\n[" << ot::StyledText::Warning << ot::StyledText::Bold << "WARNING" << ot::StyledText::ClearStyle << "] "
+				<< geometryEntity->getName() << ":\n";
+			
+			for (auto msg : report.messages)
+			{
+				message << msg << "\n";
+			}
+
+			Application::instance()->getUiComponent()->displayStyledMessage(message);
 		}
 	}
-
 }
-
 
 double ModelBuilder::getMeshPriority(EntityBase *entity, MaterialManager &materialManager)
 {
@@ -760,6 +783,7 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 	double minEdgeLength,
 	double minFaceArea,
 	double minVolume,
+	double gapTolerance,
 	bool checkGeometry) const
 {
 	ShapeCheckReport report;
@@ -776,6 +800,14 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 		1e-16,    // area tolerance
 		5,        // samples per direction
 		4);       // required interior hits
+	checkThinGaps(
+		shape,
+		report,
+		gapTolerance,   // gap tolerance
+		1.0e-12,  // area tolerance
+		9,        // samples per direction
+		0.30,     // minimum hit ratio
+		5.0);     // maximum distance variation
 
 	report.meshable =
 		report.occValid &&
@@ -789,7 +821,8 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 		report.invalidFaces.empty() &&
 		report.invalidSolids.empty() &&
 		report.negativeOrZeroVolumeSolids.empty() &&
-		report.coincidentFaces.empty();
+		report.coincidentFaces.empty() &&
+		report.thinGapFaces.empty();
 
 	if (!report.occValid)
 		report.messages.push_back("Shape is not valid according to BRepCheck_Analyzer.");
@@ -1490,3 +1523,315 @@ void ModelBuilder::extractFaceTriangles(
 		}
 	}
 }
+
+bool ModelBuilder::computeFaceNormalAtUV(
+	const TopoDS_Face& face,
+	double u,
+	double v,
+	gp_Vec& normal) const
+{
+	BRepAdaptor_Surface adaptor(face);
+	BRepLProp_SLProps props(adaptor, u, v, 1, 1.0e-9);
+
+	if (!props.IsNormalDefined())
+		return false;
+
+	gp_Dir n = props.Normal();
+
+	if (face.Orientation() == TopAbs_REVERSED)
+		n.Reverse();
+
+	normal = gp_Vec(n);
+	return true;
+}
+
+bool ModelBuilder::analyzeThinGapBySampling(
+	const TopoDS_Face& a,
+	const TopoDS_Face& b,
+	ThinGapFacePair& result,
+	double gapTolerance,
+	int samplesPerDirection,
+	double minHitRatio,
+	double maxDistanceVariation) const
+{
+	Standard_Real uMin, uMax, vMin, vMax;
+	BRepTools::UVBounds(a, uMin, uMax, vMin, vMax);
+
+	if (uMax <= uMin || vMax <= vMin)
+		return false;
+
+	BRepAdaptor_Surface adaptorA(a);
+	BRepAdaptor_Surface adaptorB(b);
+	Handle(Geom_Surface) surfaceB = adaptorB.Surface().Surface();
+
+	if (surfaceB.IsNull())
+		return false;
+
+	int validSamples = 0;
+	int hits = 0;
+
+	double minDist = std::numeric_limits<double>::max();
+	double maxDist = 0.0;
+	double sumDist = 0.0;
+
+	std::vector<gp_Pnt> hitPoints;
+
+	// Use only the inner UV region to avoid wedge-like edge contacts.
+	const double innerMin = 0.20;
+	const double innerMax = 0.80;
+
+	for (int iu = 0; iu < samplesPerDirection; ++iu)
+	{
+		const double tu =
+			innerMin + (innerMax - innerMin) *
+			static_cast<double>(iu) /
+			static_cast<double>(std::max(1, samplesPerDirection - 1));
+
+		const double u = uMin + (uMax - uMin) * tu;
+
+		for (int iv = 0; iv < samplesPerDirection; ++iv)
+		{
+			const double tv =
+				innerMin + (innerMax - innerMin) *
+				static_cast<double>(iv) /
+				static_cast<double>(std::max(1, samplesPerDirection - 1));
+
+			const double v = vMin + (vMax - vMin) * tv;
+
+			gp_Pnt p = adaptorA.Value(u, v);
+
+			if (!isPointStrictlyInsideFaceUV(a, p, gapTolerance))
+				continue;
+
+			++validSamples;
+
+			GeomAPI_ProjectPointOnSurf projector(p, surfaceB);
+
+			if (projector.NbPoints() < 1)
+				continue;
+
+			Standard_Real ub = 0.0;
+			Standard_Real vb = 0.0;
+			projector.LowerDistanceParameters(ub, vb);
+
+			gp_Pnt q = surfaceB->Value(ub, vb);
+			const double d = p.Distance(q);
+
+			if (d <= 0.0 || d > gapTolerance)
+				continue;
+
+			if (!isPointStrictlyInsideFaceUV(b, q, gapTolerance))
+				continue;
+
+			gp_Vec normalA;
+			gp_Vec normalB;
+
+			if (!computeFaceNormalAtUV(a, u, v, normalA))
+				continue;
+
+			if (!computeFaceNormalAtUV(b, ub, vb, normalB))
+				continue;
+
+			normalA.Normalize();
+			normalB.Normalize();
+
+			// Thin gaps usually have opposite-facing normals.
+			const double dot = normalA.Dot(normalB);
+
+			if (dot > -0.7)
+				continue;
+
+			++hits;
+
+			minDist = std::min(minDist, d);
+			maxDist = std::max(maxDist, d);
+			sumDist += d;
+
+			hitPoints.push_back(p);
+		}
+	}
+
+	if (validSamples == 0 || hits == 0)
+		return false;
+
+	const double hitRatio = static_cast<double>(hits) / static_cast<double>(validSamples);
+
+	if (hitRatio < minHitRatio)
+		return false;
+
+	const double meanDist = sumDist / static_cast<double>(hits);
+
+	// Reject wedge-like situations where the distance changes too much.
+	if (minDist > 0.0 && maxDist / minDist > maxDistanceVariation)
+		return false;
+
+	result.first = a;
+	result.second = b;
+	result.minDistance = minDist;
+	result.meanDistance = meanDist;
+	result.maxDistance = maxDist;
+	result.hitRatio = hitRatio;
+	result.diagnosticPoints = std::move(hitPoints);
+
+	return true;
+}
+
+void ModelBuilder::checkThinGapsInList(
+	const std::vector<TopoDS_Face>& faces,
+	ShapeCheckReport& report,
+	double gapTolerance,
+	double areaTolerance,
+	int samplesPerDirection,
+	double minHitRatio,
+	double maxDistanceVariation) const
+{
+	std::vector<Bnd_Box> boxes;
+	std::vector<double> areas;
+
+	boxes.reserve(faces.size());
+	areas.reserve(faces.size());
+
+	for (const auto& face : faces)
+	{
+		Bnd_Box box;
+		BRepBndLib::Add(face, box);
+		box.Enlarge(gapTolerance);
+
+		boxes.push_back(box);
+		areas.push_back(faceArea(face));
+	}
+
+	for (std::size_t i = 0; i < faces.size(); ++i)
+	{
+		for (std::size_t j = i + 1; j < faces.size(); ++j)
+		{
+			if (boxes[i].IsOut(boxes[j]))
+				continue;
+
+			if (areas[i] <= areaTolerance || areas[j] <= areaTolerance)
+				continue;
+
+			BRepExtrema_DistShapeShape dist(faces[i], faces[j]);
+			dist.Perform();
+
+			if (!dist.IsDone())
+				continue;
+
+			const double minDistance = dist.Value();
+
+			if (minDistance <= 0.0 || minDistance > gapTolerance)
+				continue;
+
+			ThinGapFacePair gap;
+
+			const bool found =
+				analyzeThinGapBySampling(
+					faces[i],
+					faces[j],
+					gap,
+					gapTolerance,
+					samplesPerDirection,
+					minHitRatio,
+					maxDistanceVariation) ||
+				analyzeThinGapBySampling(
+					faces[j],
+					faces[i],
+					gap,
+					gapTolerance,
+					samplesPerDirection,
+					minHitRatio,
+					maxDistanceVariation);
+
+			if (!found)
+				continue;
+
+			report.thinGapFaces.push_back(gap);
+		}
+	}
+}
+
+void ModelBuilder::checkThinGaps(
+	const TopoDS_Shape& shape,
+	ShapeCheckReport& report,
+	double gapTolerance,
+	double areaTolerance,
+	int samplesPerDirection,
+	double minHitRatio,
+	double maxDistanceVariation) const
+{
+	bool found = false;
+
+	for (TopExp_Explorer solidEx(shape, TopAbs_SOLID); solidEx.More(); solidEx.Next())
+	{
+		TopoDS_Solid solid = TopoDS::Solid(solidEx.Current());
+
+		std::vector<TopoDS_Face> faces;
+
+		for (TopExp_Explorer shellEx(solid, TopAbs_SHELL); shellEx.More(); shellEx.Next())
+		{
+			TopoDS_Shell shell = TopoDS::Shell(shellEx.Current());
+
+			for (TopExp_Explorer faceEx(shell, TopAbs_FACE); faceEx.More(); faceEx.Next())
+			{
+				TopoDS_Face face = TopoDS::Face(faceEx.Current());
+
+				if (face.Orientation() == TopAbs_FORWARD ||
+					face.Orientation() == TopAbs_REVERSED)
+				{
+					faces.push_back(face);
+				}
+			}
+		}
+
+		const std::size_t oldCount = report.thinGapFaces.size();
+
+		checkThinGapsInList(
+			faces,
+			report,
+			gapTolerance,
+			areaTolerance,
+			samplesPerDirection,
+			minHitRatio,
+			maxDistanceVariation);
+
+		if (report.thinGapFaces.size() > oldCount)
+			found = true;
+	}
+
+	if (found)
+	{
+		report.messages.push_back(
+			"Thin gaps between nearby opposite boundary faces were found. "
+			"The shape may be topologically valid but problematic for surface or volume meshing.");
+	}
+}
+
+void ModelBuilder::visualizeThinGapFaces(
+	const ShapeCheckReport& report,
+	EntityAnnotation* annotation,
+	double linearDeflection,
+	double angularDeflection) const
+{
+	if (annotation == nullptr)
+		return;
+
+	for (const auto& gap : report.thinGapFaces)
+	{
+		// First face (red)
+		extractFaceTriangles(
+			gap.first,
+			annotation,
+			1.0, 0.0, 0.0,
+			linearDeflection,
+			angularDeflection);
+
+		// Second face (orange)
+		extractFaceTriangles(
+			gap.second,
+			annotation,
+			1.0, 0.5, 0.0,
+			linearDeflection,
+			angularDeflection);
+	}
+}
+

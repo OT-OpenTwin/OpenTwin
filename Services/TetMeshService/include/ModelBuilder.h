@@ -72,6 +72,19 @@ public:
 		double distance = 0.0;
 	};
 
+	struct ThinGapFacePair
+	{
+		TopoDS_Face first;
+		TopoDS_Face second;
+
+		double minDistance = 0.0;
+		double meanDistance = 0.0;
+		double maxDistance = 0.0;
+		double hitRatio = 0.0;
+
+		std::vector<gp_Pnt> diagnosticPoints;
+	};
+
 	struct ShapeCheckReport
 	{
 		bool occValid = false;
@@ -98,6 +111,7 @@ public:
 		std::vector<TopoDS_Solid> negativeOrZeroVolumeSolids;
 
 		std::vector<CoincidentFacePair> coincidentFaces;
+		std::vector<ThinGapFacePair> thinGapFaces;
 
 		std::vector<ShapeDiagnosticPoint> diagnosticPoints;
 
@@ -111,13 +125,14 @@ public:
 		double minEdgeLength = 1.0e-9,
 		double minFaceArea = 1.0e-18,
 		double minVolume = 1.0e-27,
+		double gapTolerance = 0.1,
 		bool checkGeometry = true) const;
 
 private:
 	std::string checkMaterialAssignmentForShapes(std::list<EntityGeometry *> &geometryEntities);
 	std::string checkMaterialAssignmentForBoundingSphere(Properties &properties);
 	std::string addBoundingSphere(std::list<EntityGeometry *> &geometryEntities, Properties &properties, StepWidthManager &stepWidthManager);
-	void buildNonManifoldModel(const std::string &meshName, std::list<EntityGeometry *> &geometryEntities, Properties &properties, MaterialManager &materialManager);
+	void buildNonManifoldModel(const std::string &meshName, std::list<EntityGeometry *> &geometryEntities, Properties &properties, MaterialManager &materialManager, StepWidthManager& stepWidthManager);
 	double getMeshPriority(EntityBase *entity, MaterialManager &materialManager);
 	void createAllShapes(BRepAlgoAPI_BuilderAlgo &booleanOperation, const std::string &meshName, EntityGeometry *entity, double meshPriority);
 	void analyzeOverlaps(void);
@@ -200,12 +215,51 @@ private:
 		double linearDeflection = 1.0e-3,
 		double angularDeflection = 0.5) const;
 
+	void checkThinGaps(
+		const TopoDS_Shape& shape,
+		ShapeCheckReport& report,
+		double gapTolerance,
+		double areaTolerance,
+		int samplesPerDirection = 9,
+		double minHitRatio = 0.30,
+		double maxDistanceVariation = 5.0) const;
+
+	void checkThinGapsInList(
+		const std::vector<TopoDS_Face>& faces,
+		ShapeCheckReport& report,
+		double gapTolerance,
+		double areaTolerance,
+		int samplesPerDirection,
+		double minHitRatio,
+		double maxDistanceVariation) const;
+
+	bool analyzeThinGapBySampling(
+		const TopoDS_Face& a,
+		const TopoDS_Face& b,
+		ThinGapFacePair& result,
+		double gapTolerance,
+		int samplesPerDirection,
+		double minHitRatio,
+		double maxDistanceVariation) const;
+
+	bool computeFaceNormalAtUV(
+		const TopoDS_Face& face,
+		double u,
+		double v,
+		gp_Vec& normal) const;
+
+	void visualizeThinGapFaces(
+		const ShapeCheckReport& report,
+		EntityAnnotation* annotation,
+		double linearDeflection = 1.0e-3,
+		double angularDeflection = 0.5) const;
+
 	double edgeLength(const TopoDS_Edge& edge) const;
 	double faceArea(const TopoDS_Face& face) const;
 	double solidVolume(const TopoDS_Solid& solid) const;
 	gp_Pnt computeEdgeMidPoint(const TopoDS_Edge& edge) const;
 	gp_Pnt computeFaceCenterPoint(const TopoDS_Face& face) const;
-	void checkShapesForMeshing(const std::string& meshName);
+	void checkShapesForMeshing(const std::string& meshName, double gapTolerance);
 
 	void collectDiagnosticPoints(ShapeCheckReport& report) const;
 
