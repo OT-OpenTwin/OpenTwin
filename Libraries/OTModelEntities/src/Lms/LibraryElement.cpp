@@ -39,9 +39,7 @@ bool ot::LibraryElement::operator==(const LibraryElement& _other) const {
 
 bool ot::LibraryElement::isSameElement(const LibraryElement& _other) const {
     return m_name == _other.m_name &&
-           m_hash == _other.m_hash &&
-           m_metaData == _other.m_metaData &&
-           m_additionalInfos == _other.m_additionalInfos;
+           m_hash == _other.m_hash;
 }
 
 std::string ot::LibraryElement::getMetaDataValue(const std::string& _key) const {
@@ -195,7 +193,7 @@ void ot::LibraryElement::setFromJsonObject(const ot::ConstJsonObject& _object) {
         }
     }
 
-    // Deserialize additional infos - mit Schutz vor ungültigen Objekten
+    // Deserialize additional infos - mit Schutz vor ungï¿½ltigen Objekten
     m_additionalInfos.clear();
     if (_object.HasMember("AdditionalInfos")) {
         ot::ConstJsonObject additionalInfosObj = ot::json::getObject(_object, "AdditionalInfos");
