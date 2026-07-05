@@ -37,9 +37,15 @@ bool ot::LibraryElement::operator==(const LibraryElement& _other) const {
            m_additionalInfos == _other.m_additionalInfos;
 }
 
-bool ot::LibraryElement::isSameElement(const LibraryElement& _other) const {
+bool ot::LibraryElement::isSameContent(const LibraryElement& _other) const {
     return m_name == _other.m_name &&
-           m_hash == _other.m_hash;
+        m_hash == _other.m_hash &&
+        getMetaDataValue("Description") == _other.getMetaDataValue("Description");
+}
+
+bool ot::LibraryElement::isSameElement(const LibraryElement& _other) const {
+    return isSameContent(_other) &&
+        getAdditionalInfoValue("DependencyID") == _other.getAdditionalInfoValue("DependencyID");
 }
 
 std::string ot::LibraryElement::getMetaDataValue(const std::string& _key) const {
