@@ -22,6 +22,9 @@
 #include "OTDataStorage/GridFSFileInfo.h"
 #include "OTModelEntities/DataBase.h"
 
+// std header
+#include <map>
+
 std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg,
                                           const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
     
@@ -48,26 +51,65 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
     }
     
     
-    try{
+    try {
         DataStorageAPI::DocumentAccessBase docBase(dbName, collectionName);
 
-		// Build combined filter query based on additional info filters and metadata filters
-		bsoncxx::document::value filterQuery = buildCombinedFilterQuery(filters, metadataFilters);
+        bsoncxx::document::value filterQuery = buildCombinedFilterQuery(filters, metadataFilters);
 
-		// Get all documents matching the filter query a
-		auto results = docBase.GetAllDocument(std::move(filterQuery), bsoncxx::document::view{}, 0);
+        auto results = docBase.GetAllDocument(std::move(filterQuery), bsoncxx::document::view{}, 0);
+
+        // Nur die höchste Version je "Name" behalten
+        std::map<std::string, bsoncxx::document::value> newestByName;
+
+        for (auto result : results) {
+            auto nameElement = result["Name"];
+            if (!nameElement || nameElement.type() != bsoncxx::type::k_utf8) {
+                continue;
+            }
+            std::string name = std::string(nameElement.get_utf8().value);
+
+            int64_t currentVersion = 0;
+            auto versionElement = result["Version"];
+            if (versionElement) {
+                if (versionElement.type() == bsoncxx::type::k_int64) {
+                    currentVersion = versionElement.get_int64().value;
+                }
+                else if (versionElement.type() == bsoncxx::type::k_int32) {
+                    currentVersion = versionElement.get_int32().value;
+                }
+            }
+
+            auto it = newestByName.find(name);
+            if (it == newestByName.end()) {
+                newestByName.emplace(name, bsoncxx::document::value(result));
+            }
+            else {
+                int64_t existingVersion = 0;
+                auto existingVersionElement = it->second.view()["Version"];
+                if (existingVersionElement) {
+                    if (existingVersionElement.type() == bsoncxx::type::k_int64) {
+                        existingVersion = existingVersionElement.get_int64().value;
+                    }
+                    else if (existingVersionElement.type() == bsoncxx::type::k_int32) {
+                        existingVersion = existingVersionElement.get_int32().value;
+                    }
+                }
+                if (currentVersion > existingVersion) {
+                    it->second = bsoncxx::document::value(result);
+                }
+            }
+        }
 
         std::string responseData = "{ \"Documents\": [";
         bool isFirst = true;
-        for (auto result : results) {
+        for (const auto& pair : newestByName) {
             if (!isFirst) {
                 responseData += ",";
             }
-            responseData += bsoncxx::to_json(result);
+            responseData += bsoncxx::to_json(pair.second.view());
             isFirst = false;
         }
         responseData += "]}";
-
 
         if (responseData == "{ \"Documents\": []}") {
             OT_LOG_W("No documents found in collection: " + collectionName);
@@ -78,7 +120,7 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
     catch (std::exception) {
         OT_LOG_E("Getting Document List went wrong");
         return "";
-    } 
+    }
 }
 
 std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument) {
@@ -108,6 +150,37 @@ std::string MongoWrapper::getCompleteDocument(const std::string& _collectionName
     }
     catch (const std::exception& e) {
         OT_LOG_E("Error getting complete document: " + std::string(e.what()));
+        return "";
+    }
+}
+
+std::string MongoWrapper::getNewestCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument)
+{
+    // Initialization of MongoDB connection
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        return "failed";
+    }
+
+    // Check if collection exists
+    if (!checkCollectionExists(_collectionName)) {
+        return "failed";
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        // Get the document with the highest "Version" that matches by _id / LibraryElementID / Name
+        auto queryResult = fetchNewestDocumentByName(docBase, _selectedDocument);
+        if (queryResult) {
+            bsoncxx::document::view documentView = queryResult->view();
+            return loadDocumentData(documentView, _collectionName);
+        }
+        else {
+            return "";
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error getting newest complete document: " + std::string(e.what()));
         return "";
     }
 }
@@ -645,6 +718,76 @@ bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchDocumentByN
         bsoncxx::builder::basic::kvp("Name", _documentName)
     );
     return _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
+}
+
+bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchNewestDocumentByName(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName)
+{
+    // If it looks like an ObjectId, _id is unique anyway -> a single GetDocument is enough
+    if (_documentName.length() == 24 &&
+        _documentName.find_first_not_of("0123456789abcdefABCDEF") == std::string::npos) {
+        try {
+            bsoncxx::oid oid(_documentName);
+            auto filterQuery = bsoncxx::builder::basic::make_document(
+                bsoncxx::builder::basic::kvp("_id", oid)
+            );
+            auto result = _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
+            if (result) {
+                return result;
+            }
+        }
+        catch (const std::exception&) {
+      
+        }
+    }
+
+    // Try LibraryElementID (numeric) first – multiple versions can share the same ID
+    try {
+        int64_t elementId = std::stoll(_documentName);
+        auto filterQuery = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("LibraryElementID", elementId)
+        );
+        auto result = findNewestByFilter(_docBase, bsoncxx::document::value(filterQuery));
+        if (result) {
+            return result;
+        }
+    }
+    catch (const std::exception&) {
+       
+    }
+
+    // Fall back to Name field – multiple versions can share the same Name
+    auto nameFilter = bsoncxx::builder::basic::make_document(
+        bsoncxx::builder::basic::kvp("Name", _documentName)
+    );
+    return findNewestByFilter(_docBase, bsoncxx::document::value(nameFilter));
+}
+
+bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::findNewestByFilter(DataStorageAPI::DocumentAccessBase& _docBase, bsoncxx::document::value _filter)
+{
+    auto results = _docBase.GetAllDocument(std::move(_filter), bsoncxx::document::view{}, 0);
+
+    bsoncxx::stdx::optional<bsoncxx::document::value> newestDoc;
+    int64_t highestVersion = -1;
+
+    for (auto result : results) {
+        int64_t currentVersion = 0;
+        auto versionElement = result["Version"];
+        if (versionElement) {
+            if (versionElement.type() == bsoncxx::type::k_int64) {
+                currentVersion = versionElement.get_int64().value;
+            }
+            else if (versionElement.type() == bsoncxx::type::k_int32) {
+                currentVersion = versionElement.get_int32().value;
+            }
+        }
+
+        if (currentVersion >= highestVersion) {
+            highestVersion = currentVersion;
+            newestDoc = bsoncxx::document::value(result); // owning copy, view würde nach Cursor-Fortschritt dangeln
+        }
+    }
+
+    return newestDoc;
 }
 
 std::string MongoWrapper::loadDocumentData(const bsoncxx::document::view& _documentView, const std::string& _collectionName) {

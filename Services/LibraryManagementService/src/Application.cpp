@@ -279,9 +279,9 @@ std::string Application::generateUniqueElementName(const std::string& _baseName,
 		std::string candidateName = _baseName + "_" + std::to_string(counter);
 
 		// Check if this name already exists in the collection
-		std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateName);
+		std::string existingDocJson = db.getNewestCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateName);
 
-		if (existingDocJson.empty()) {
+		if (existingDocJson.empty() || existingDocJson == "failed") {
 			// Name doesn't exist, we can use it
 			return candidateName;
 		}
@@ -304,9 +304,9 @@ void Application::ensureUniqueLibraryElementId(ot::LibraryElement& _element, con
 	while (true) {
 		uint64_t candidateId = originalId + counter;
 		std::string candidateIdStr = std::to_string(candidateId);
-		std::string existingDocJson = db.getCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateIdStr);
+		std::string existingDocJson = db.getNewestCompleteDocument(_collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, candidateIdStr);
 
-		if (existingDocJson.empty()) {
+		if (existingDocJson.empty() || existingDocJson == "failed") {
 			// ID doesn't exist, we can use it
 			_element.setLibraryElementID(candidateId);
 			OT_LOG_I("Assigned unique Library Element ID: " + candidateIdStr);
@@ -615,20 +615,21 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 
 	return lastResult;
 }
+
 void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
 	// Process each received model
 	for (auto& model : _elements) {
 		std::string collectionName = model->getCollectionName();
 		std::string elementName = model->getName();
 
-		// Try to fetch existing document from database
-		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+		// Try to fetch newest existing document from database
+		std::string existingDocJson = db.getNewestCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		uint32_t newVersion = 1;
 		ot::UID libraryElementID = model->getLibraryElementID();
 
 		// If document exists, increment version
-		if (!existingDocJson.empty()) {
+		if (!existingDocJson.empty() && existingDocJson != "failed") {
 			ot::JsonDocument existingDoc;
 			existingDoc.fromJson(existingDocJson);
 
@@ -817,15 +818,14 @@ std::string Application::handleGetCompleteSelectedDocument(ot::JsonDocument& _do
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db.getCompleteDocument(collectionName,dbUserName,dbUserPassword,dbServerUrl,selectedDocument);
-	if (!result.empty()) {	
+	auto result = db.getNewestCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+	if (!result.empty() && result != "failed") {
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
 	else {
-		// Try user collection if not found in standard collection
 		std::string userCollectionName = collectionName + "_User";
-		result = db.getCompleteDocument(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
-		if (!result.empty()) {
+		result = db.getNewestCompleteDocument(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+		if (!result.empty() && result != "failed") {
 			return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 		}
 		else {
@@ -972,10 +972,10 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 	std::string collectionName = requestConfig.getCollectionName();
 	std::string environmentInfo = requestConfig.getValue();
 
-	// Get the complete document from database
-	auto documentResult = db.getCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, environmentInfo);
+	// Get the complete document from database (newest version)
+	auto documentResult = db.getNewestCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, environmentInfo);
 
-	if (documentResult.empty()) {
+	if (documentResult.empty() || documentResult == "failed") {
 		OT_LOG_E("Failed to load document: " + environmentInfo + " from collection: " + collectionName);
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Document not found").toJson();
 	}
