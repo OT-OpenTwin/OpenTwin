@@ -220,14 +220,21 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	return ot::AppExitCode::Success;
 }
 
-void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl) {
-	// Serialize the element to JSON and add database credentials
+void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, std::list<ot::JsonDocument>& _remainingElements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl)
+{
 	ot::JsonDocument configDoc;
 	ot::JsonObject elementObj;
 	_element.addToJsonObject(elementObj, configDoc.GetAllocator());
-
-	// Add database credentials to the prompt data
 	configDoc.AddMember("element", elementObj, configDoc.GetAllocator());
+
+	ot::JsonArray remainingArr; 
+	for (auto& remainingDoc : _remainingElements) {
+		ot::JsonValue remainingCopy;
+		remainingCopy.CopyFrom(remainingDoc, configDoc.GetAllocator()); 
+		remainingArr.PushBack(remainingCopy, configDoc.GetAllocator()); 
+	}
+	configDoc.AddMember("remainingElements", remainingArr, configDoc.GetAllocator());
+
 	configDoc.AddMember("dbUserName", ot::JsonString(_dbUserName, configDoc.GetAllocator()), configDoc.GetAllocator());
 	configDoc.AddMember("dbUserPassword", ot::JsonString(_dbUserPassword, configDoc.GetAllocator()), configDoc.GetAllocator());
 	configDoc.AddMember("dbServerUrl", ot::JsonString(_dbServerUrl, configDoc.GetAllocator()), configDoc.GetAllocator());
@@ -250,8 +257,7 @@ void Application::promptUserForLibraryElementOverwrite(const ot::UserLibraryElem
 	promptDoc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(c_promptActionOverwriteUserLibraryElement, promptDoc.GetAllocator()), promptDoc.GetAllocator());
 	promptDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(config, promptDoc.GetAllocator()), promptDoc.GetAllocator());
 	promptDoc.AddMember(OT_ACTION_PARAM_Info, ot::JsonString(promptJson, promptDoc.GetAllocator()), promptDoc.GetAllocator());
-	
-	// Send the prompt to the UI service
+
 	sendConfigToUI(promptDoc, _uiServiceUrl);
 }
 
@@ -262,6 +268,96 @@ void Application::promptMessageToUI(const std::string& _message, const std::stri
 
 	// Send the prompt to the UI service
 	sendConfigToUI(promptDoc, _uiServiceUrl);
+}
+
+void Application::processNextLibraryElement(std::list<ot::JsonDocument> _remainingElements, std::optional<ot::UID> _previousElementId, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl)
+{
+	while (!_remainingElements.empty()) {
+		ot::JsonDocument elementDoc = std::move(_remainingElements.front());
+		_remainingElements.pop_front();
+
+		ot::UserLibraryElement userElement;
+		userElement.setFromJsonObject(elementDoc.getConstObject());
+
+		if (_previousElementId.has_value()) {
+			userElement.addAdditionalInfo("DependencyID", std::to_string(_previousElementId.value()));
+		}
+
+		fillLibraryElementWithHash(userElement, "");
+
+		if (!db.ensureDatabaseAndCollection(userElement.getCollectionName(), _dbUserName, _dbUserPassword, _dbServerUrl)) {
+			OT_LOG_E("Failed to ensure database and collection '" + userElement.getCollectionName() + "'");
+			continue; 
+		}
+
+		std::list<std::shared_ptr<ot::LibraryElement>> singleElementList;
+		singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
+
+		LibraryElementCheckResult checkResult = updateOrCreateLibraryElement(singleElementList, _dbUserName, _dbUserPassword, _dbServerUrl, false);
+
+		switch (checkResult.status) {
+
+		case LibraryElementExistenceStatus::NotExisting:
+		{
+			OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
+
+			ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), _dbUserName, _dbUserPassword, _dbServerUrl);
+			singleElementList.clear();
+			auto modelPtr = std::make_shared<ot::UserLibraryElement>(userElement);
+			singleElementList.push_back(modelPtr);
+
+			addLibraryElement(singleElementList, _dbUserName, _dbUserPassword, _dbServerUrl);
+			promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", _uiServiceUrl);
+
+			_previousElementId = modelPtr->getLibraryElementID();
+			break;
+		}
+
+		case LibraryElementExistenceStatus::ExistingWithIdenticalContent:
+		{
+			OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
+			promptMessageToUI("Library element '" + userElement.getName() + "' already exists with identical content. Skipping addition.\n", _uiServiceUrl);
+
+			_previousElementId = checkResult.existingElement.has_value()
+				? checkResult.existingElement.value()->getLibraryElementID()
+				: userElement.getLibraryElementID();
+			break;
+		}
+
+		case LibraryElementExistenceStatus::ExistingWithSameContentButNewDependency:
+		{
+			OT_LOG_I("Library element '" + userElement.getName() + "' content unchanged, dependency changed. Auto-updating dependency link.");
+
+			singleElementList.clear();
+			auto modelPtr = std::make_shared<ot::UserLibraryElement>(userElement);
+			singleElementList.push_back(modelPtr);
+			addLibraryElement(singleElementList, _dbUserName, _dbUserPassword, _dbServerUrl);
+
+			promptMessageToUI("Library element '" + userElement.getName() + "' dependency link updated.\n", _uiServiceUrl);
+
+			_previousElementId = modelPtr->getLibraryElementID();
+			break;
+		}
+
+		case LibraryElementExistenceStatus::ExistingWithDifferentContent:
+		{
+			OT_LOG_I("Library element '" + userElement.getName() + "' exists with different content. Prompting user for overwrite...");
+
+
+			// Important: We do not continue processing the remaining elements here. The user must first decide whether to 
+			// overwrite the existing element or not. 
+			// The remaining elements are passed along in the prompt payload and will be processed later in handleLibraryElementOverwritePromptResponse based on the user's decision.
+			promptUserForLibraryElementOverwrite(userElement, _remainingElements, _dbUserName, _dbUserPassword, _dbServerUrl, _uiServiceUrl);
+			return;
+		}
+
+		case LibraryElementExistenceStatus::Error:
+		{
+			OT_LOG_E("Error checking existence of library element '" + userElement.getName() + "'. Skipping.");
+			break;
+		}
+		}
+	}
 }
 
 std::string Application::generateUniqueElementName(const std::string& _baseName, const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
@@ -572,11 +668,19 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 				if (userElement) {
 					ot::UserLibraryElement existingUserElement = ot::UserLibraryElement::fromJson(existingDocJson);
 
-					if (existingUserElement.isSameElement(*userElement)) {
-						lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
-						lastResult.existingElement = std::make_shared<ot::UserLibraryElement>(existingUserElement);
-						it = _elements.erase(it);
-						continue;
+					if (existingUserElement.isSameContent(*userElement)) {
+						if (existingUserElement.getAdditionalInfoValue("DependencyID") == userElement->getAdditionalInfoValue("DependencyID")) {
+							// Content and Dependency are the same -> No update needed
+							lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+							lastResult.existingElement = std::make_shared<ot::UserLibraryElement>(existingUserElement);
+							it = _elements.erase(it);
+							continue;
+						}
+						else {
+							// Content changed, but Dependency changed -> Update, but with new dependency
+							lastResult.status = LibraryElementExistenceStatus::ExistingWithSameContentButNewDependency;
+							lastResult.existingElement = std::make_shared<ot::UserLibraryElement>(existingUserElement);
+						}
 					}
 					else {
 						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
@@ -587,11 +691,19 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 					ot::LibraryElement existingElement = ot::LibraryElement::fromJson(existingDocJson);
 					ot::LibraryElement* currentElement = it->get();
 
-					if (existingElement.isSameElement(*currentElement)) {
-						lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
-						lastResult.existingElement = std::make_shared<ot::LibraryElement>(existingElement);
-						it = _elements.erase(it);
-						continue;
+					if (existingElement.isSameContent(*currentElement)) {
+						if (existingElement.getAdditionalInfoValue("DependencyID") == currentElement->getAdditionalInfoValue("DependencyID"))
+						{
+
+							lastResult.status = LibraryElementExistenceStatus::ExistingWithIdenticalContent;
+							lastResult.existingElement = std::make_shared<ot::LibraryElement>(existingElement);
+							it = _elements.erase(it);
+							continue;
+						}
+						else {
+							lastResult.status = LibraryElementExistenceStatus::ExistingWithSameContentButNewDependency;
+							lastResult.existingElement = std::make_shared<ot::LibraryElement>(existingElement);
+						}
 					}
 					else {
 						lastResult.status = LibraryElementExistenceStatus::ExistingWithDifferentContent;
@@ -1037,102 +1149,24 @@ std::string Application::handleLibraryElementRequest(ot::JsonDocument& _document
 
 std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document) {
 
-	// Extract database credentials
 	std::string dbUserName = ot::json::getString(_document, OT_PARAM_DB_USERNAME);
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 	std::string uiServiceUrl = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 
-	// Read incoming array (user library elements) and convert to LibraryElement
 	ot::ConstJsonArray elementsArray = ot::json::getArray(_document, OT_ACTION_PARAM_Config);
 
-	// Initialize previous check result to handle dependencies
-	LibraryElementCheckResult previousCheckResult;
-
+	std::list<ot::JsonDocument> elementDocs;
 	for (const ot::JsonValue& val : elementsArray) {
-		if (!val.IsObject()) continue;
-
-		ot::ConstJsonObject elementObj = val.GetObject();
-
-		// Deserialize as UserLibraryElement to capture Owner and future fields
-		ot::UserLibraryElement userElement;
-		userElement.setFromJsonObject(elementObj);
-
-		// If the previous check result has an existing element, set the DependencyID in the current userElement
-		// Since only export of one element at a time is supported, we can use the previous check result to set the dependency for the next element
-		if (previousCheckResult.existingElement.has_value()) {
-			uint64_t dependencyId = previousCheckResult.existingElement.value()->getLibraryElementID();
-			userElement.addAdditionalInfo("DependencyID", std::to_string(dependencyId));
-			OT_LOG_D("Set DependencyID=" + std::to_string(dependencyId) + " from previous DB element for element '" + userElement.getName() + "'");
-		}
-
-		// Calculate hash
-		fillLibraryElementWithHash(userElement, "");
-
-		// Ensure DB/collection exists
-		if (!db.ensureDatabaseAndCollection(userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl)) {
-			OT_LOG_E("Failed to ensure database and collection '" + userElement.getCollectionName() + "'");
+		if (!val.IsObject()) {
 			continue;
 		}
-		OT_LOG_I("Database and collection '" + userElement.getCollectionName() + "' are ready");		
-
-		// Create a single-element list for the unified function
-		std::list<std::shared_ptr<ot::LibraryElement>> singleElementList;
-		singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
-
-		// Check existence and filter using the unified function
-		LibraryElementCheckResult checkResult = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
-
-		
-
-		switch (checkResult.status) {
-
-			case LibraryElementExistenceStatus::NotExisting:
-			{
-				OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
-
-				// Ensure unique ID for the new library element
-				ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
-				singleElementList.clear();
-				singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
-
-				addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
-				promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", uiServiceUrl);
-				checkResult.existingElement = std::make_shared<ot::UserLibraryElement>(userElement);
-				break;
-			}
-
-			case LibraryElementExistenceStatus::ExistingWithIdenticalContent:
-			{
-				OT_LOG_I("Library element '" + userElement.getName() + "' already exists with identical content. Skipping.");
-
-				if (checkResult.existingElement.has_value()) {
-					OT_LOG_D("Cached DB element ID: " + std::to_string(checkResult.existingElement.value()->getLibraryElementID()));
-				}
-				promptMessageToUI("Library element '" + userElement.getName() + "' already exists with identical content. Skipping addition.\n", uiServiceUrl);
-				break;
-			}
-
-			case LibraryElementExistenceStatus::ExistingWithDifferentContent:
-			{
-				// Element exists but content is different — restore and prompt user
-				singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
-				OT_LOG_I("Library element '" + userElement.getName() + "' exists with different content. Prompting user for overwrite...");
-				promptUserForLibraryElementOverwrite(userElement, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
-				checkResult.existingElement = std::make_shared<ot::UserLibraryElement>(userElement);
-				break;
-			}
-
-			case LibraryElementExistenceStatus::Error:
-			{
-				OT_LOG_E("Error checking existence of library element '" + userElement.getName() + "'. Skipping.");
-				break;
-			}
-		}
-
-		// Update the previous check result for the next iteration
-		previousCheckResult = checkResult;
+		ot::JsonDocument elementDoc;
+		elementDoc.CopyFrom(val, elementDoc.GetAllocator());
+		elementDocs.push_back(std::move(elementDoc));
 	}
+
+	processNextLibraryElement(std::move(elementDocs), std::nullopt, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }
@@ -1141,11 +1175,9 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 	ot::MessageDialogCfg::BasicButton result = ot::MessageDialogCfg::stringToButton(ot::json::getString(_document, OT_ACTION_PARAM_Result));
 	std::string promptJsonString = ot::json::getString(_document, OT_ACTION_PARAM_Info);
 
-	// Deserialize the prompt data
 	ot::JsonDocument promptDoc;
 	promptDoc.fromJson(promptJsonString);
 
-	// Extract element and database credentials from the prompt data
 	ot::ConstJsonObject elementObj = ot::json::getObject(promptDoc, "element");
 	ot::UserLibraryElement element;
 	element.setFromJsonObject(elementObj);
@@ -1155,48 +1187,57 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 	std::string dbServerUrl = ot::json::getString(promptDoc, "dbServerUrl");
 	std::string uiServiceUrl = ot::json::getString(promptDoc, "uiServiceUrl");
 
+	// Remaining elements to process after the user's decision
+	std::list<ot::JsonDocument> remainingElements;
+	if (promptDoc.HasMember("remainingElements")) {
+		ot::ConstJsonArray remainingArr = ot::json::getArray(promptDoc, "remainingElements");
+		for (const ot::JsonValue& val : remainingArr) {
+			if (!val.IsObject()) {
+				continue;
+			}
+			ot::JsonDocument elementDoc;
+			elementDoc.CopyFrom(val, elementDoc.GetAllocator()); // ANNAHME, siehe Hinweis oben
+			remainingElements.push_back(std::move(elementDoc));
+		}
+	}
+
 	std::string elementName = element.getName();
 	std::string collectionName = element.getCollectionName();
+	ot::UID finalElementId = element.getLibraryElementID();
 
 	if ((result & ot::MessageDialogCfg::Yes) == ot::MessageDialogCfg::Yes) {
-		// User wants to overwrite the existing element
 		OT_LOG_I("User confirmed to overwrite library element: " + elementName);
 
-		// When overwriting increase the version number by 1
-		element.setVersion(element.getVersion() + 1);
-
 		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
-		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
+		auto modelPtr = std::make_shared<ot::UserLibraryElement>(element);
+		singleElementPtrList.push_back(modelPtr);
 
 		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
 
-		std::string message = "Library element '" + elementName + "' has been overwritten successfully.";
-		promptMessageToUI(message, uiServiceUrl);
+		finalElementId = modelPtr->getLibraryElementID();
+
+		promptMessageToUI("Library element '" + elementName + "' has been overwritten successfully.", uiServiceUrl);
 	}
 	else if ((result & ot::MessageDialogCfg::No) == ot::MessageDialogCfg::No) {
-		// User chose not to overwrite but to add as a new element with a unique name
 		OT_LOG_I("User declined to overwrite. Adding element with unique name.");
 
-		// Generate a unique name with suffix (e.g., "ElementName_1", "ElementName_2", etc.)
 		std::string uniqueName = generateUniqueElementName(elementName, collectionName, dbUserName, dbUserPassword, dbServerUrl);
 		element.setName(uniqueName);
 
-		OT_LOG_I("Generated unique element name: " + uniqueName);
-
-		// Ensure the new unique name is also unique in the database
 		ensureUniqueLibraryElementId(element, collectionName, dbUserName, dbUserPassword, dbServerUrl);
 
-		// Add the element with the new unique name
 		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
-		singleElementPtrList.push_back(std::make_shared<ot::UserLibraryElement>(element));
+		auto modelPtr = std::make_shared<ot::UserLibraryElement>(element);
+		singleElementPtrList.push_back(modelPtr);
 
 		addLibraryElement(singleElementPtrList, dbUserName, dbUserPassword, dbServerUrl);
 
-		std::string message = "Library element added with unique name: '" + uniqueName + "'.";
-		promptMessageToUI(message, uiServiceUrl);
+		finalElementId = modelPtr->getLibraryElementID();
 
-		OT_LOG_I("Library element '" + uniqueName + "' added successfully.");
+		promptMessageToUI("Library element added with unique name: '" + uniqueName + "'.", uiServiceUrl);
 	}
+
+	processNextLibraryElement(std::move(remainingElements), finalElementId, dbUserName, dbUserPassword, dbServerUrl, uiServiceUrl);
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok).toJson();
 }

@@ -56,6 +56,7 @@ private:
 	enum class LibraryElementExistenceStatus {
 		NotExisting,
 		ExistingWithIdenticalContent,
+		ExistingWithSameContentButNewDependency,
 		ExistingWithDifferentContent,
 		Error
 	};
@@ -71,8 +72,19 @@ private:
 	const std::string c_promptActionOverwriteUserLibraryElement = "LMS.Prompt.OverwriteUserElement";
 
 	//! @brief Helper function for user library element management
-	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
+	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, std::list<ot::JsonDocument>& _remainingElements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
 	void promptMessageToUI(const std::string& _message, const std::string& _uiServiceUrl);
+
+	//! @brief Processes elements of an export request strictly one after another.
+	//! If an element needs a user decision (overwrite prompt), processing of the remaining
+	//! elements is deferred and resumed later from handleLibraryElementOverwritePromptResponse -
+	//! with the previous element's FINAL (decided) LibraryElementID already known, so DependencyID
+	//! chains are always correct, never based on a stale/pending ID.
+	//! @param _remainingElements Not-yet-processed elements, in original order, as raw JSON.
+	//! @param _previousElementId Final LibraryElementID of the element processed right before this
+	//! call. std::nullopt for the very first element (no predecessor).
+	void processNextLibraryElement(std::list<ot::JsonDocument> _remainingElements, std::optional<ot::UID> _previousElementId, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
+
 
 	//! @brief Generate a unique element name by appending a suffix (_X) if the name already exists
 	//! @return The unique name that doesn't exist in the database
