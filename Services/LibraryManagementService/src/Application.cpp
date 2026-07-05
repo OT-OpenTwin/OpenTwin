@@ -625,6 +625,7 @@ void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement
 		std::string existingDocJson = db.getCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
 
 		uint32_t newVersion = 1;
+		ot::UID libraryElementID = model->getLibraryElementID();
 
 		// If document exists, increment version
 		if (!existingDocJson.empty()) {
@@ -635,26 +636,18 @@ void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement
 			if (existingDoc.HasMember("Version") && existingDoc["Version"].IsUint()) {
 				newVersion = existingDoc["Version"].GetUint() + 1;
 			}
+
+			// Get existing LibraryElementID if present
+			if (existingDoc.HasMember("LibraryElementID") && existingDoc["LibraryElementID"].IsUint64()) {
+				libraryElementID = existingDoc["LibraryElementID"].GetUint64();
+			}
 		}
 
 		// Set the new version in the model
 		model->setVersion(newVersion);
-	
-		// Migrate/update data to GridFS
-		if (!existingDocJson.empty()) {
-			// Update existing data to GridFS and update metadata (version, hash)
-			std::string gridfsIdResult = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model, newVersion);
-			if (!gridfsIdResult.empty()) {
-				OT_LOG_I("Successfully updated document '" + elementName + "' with new GridFS ID: " + gridfsIdResult);
-			}
-			else {
-				OT_LOG_E("Failed to update document '" + elementName + "'");
-			}
-		}
-		else {
-			// Migrate new entry data to GridFS
-			db.addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model);
-		}
+		model->setLibraryElementID(libraryElementID);
+
+		db.addNewDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model);
 	}
 }
 
