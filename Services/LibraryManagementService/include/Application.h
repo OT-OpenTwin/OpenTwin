@@ -125,7 +125,10 @@ private:
 	//! @param _dbUserName The database user name
 	//! @param _dbUserPassword The database user password
 	//! @param _dbServerUrl The database server URL
-	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	//! @param _allowUpdate If true, an existing element with the same name will be updated in place
+	//! instead of inserting a new document. If false (default), a new document is always inserted,
+	//! even if an element with the same name already exists.
+	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _allowUpdate = false);
 
 	//! @brief Helper function to create a ModelLibraryDialogCfg based on the provided selection configuration and database credentials
 	//! @param _selectionCfg The library element selection configuration

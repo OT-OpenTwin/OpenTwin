@@ -396,7 +396,7 @@ bool Application::launchModelLibraryUpdate(const std::string& _ownURL, const std
 		addDataToLibraryElements(localPtrModels, libraryDataPath);
 
 		// Add or update remaining library elements in DB
-		addLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress);
+		addLibraryElement(localPtrModels, adminUserName, adminPasswordPlain, dbAddress, true);
 		OT_LOG_D("Completed add/update for collection: " + collectionName);
 	}
 
@@ -616,35 +616,62 @@ Application::LibraryElementCheckResult Application::updateOrCreateLibraryElement
 	return lastResult;
 }
 
-void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
-	// Process each received model
+void Application::addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _allowUpdate) {
 	for (auto& model : _elements) {
 		std::string collectionName = model->getCollectionName();
 		std::string elementName = model->getName();
 
-		// Try to fetch newest existing document from database
 		std::string existingDocJson = db.getNewestCompleteDocument(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, elementName);
+		bool foundExisting = !existingDocJson.empty() && existingDocJson != "failed";
 
-		uint32_t newVersion = 1;
-		ot::UID libraryElementID = model->getLibraryElementID();
-
-		// If document exists, increment version
-		if (!existingDocJson.empty() && existingDocJson != "failed") {
+		if (_allowUpdate && foundExisting) {
+			// Element already exists -> update the existing document instead of inserting a new one
 			ot::JsonDocument existingDoc;
 			existingDoc.fromJson(existingDocJson);
 
-			// Get current version and increment
+			uint32_t newVersion = 1;
 			if (existingDoc.HasMember("Version") && existingDoc["Version"].IsUint()) {
 				newVersion = existingDoc["Version"].GetUint() + 1;
 			}
 
-			// Get existing LibraryElementID if present
+			ot::UID libraryElementID = model->getLibraryElementID();
+			if (existingDoc.HasMember("LibraryElementID") && existingDoc["LibraryElementID"].IsUint64()) {
+				libraryElementID = existingDoc["LibraryElementID"].GetUint64();
+			}
+
+			model->setVersion(newVersion);
+			model->setLibraryElementID(libraryElementID);
+
+			std::string newDataId = db.updateGridFSAndMetadata(collectionName, _dbUserName, _dbUserPassword, _dbServerUrl, *model, newVersion);
+			if (newDataId.empty()) {
+				OT_LOG_E("Failed to update existing library element '" + elementName + "' in collection '" + collectionName + "'");
+			}
+			else {
+				OT_LOG_I("Updated existing library element '" + elementName + "' in collection '" + collectionName + "' to version " + std::to_string(newVersion));
+			}
+			continue;
+		}
+
+		if (existingDocJson == "failed") {
+			OT_LOG_W("Could not verify existing version for '" + elementName + "' before adding (database error). Proceeding with insert as Version 1.");
+		}
+
+		// Insert as a new document
+		uint32_t newVersion = 1;
+		ot::UID libraryElementID = model->getLibraryElementID();
+
+		if (foundExisting) {
+			ot::JsonDocument existingDoc;
+			existingDoc.fromJson(existingDocJson);
+
+			if (existingDoc.HasMember("Version") && existingDoc["Version"].IsUint()) {
+				newVersion = existingDoc["Version"].GetUint() + 1;
+			}
 			if (existingDoc.HasMember("LibraryElementID") && existingDoc["LibraryElementID"].IsUint64()) {
 				libraryElementID = existingDoc["LibraryElementID"].GetUint64();
 			}
 		}
 
-		// Set the new version in the model
 		model->setVersion(newVersion);
 		model->setLibraryElementID(libraryElementID);
 
