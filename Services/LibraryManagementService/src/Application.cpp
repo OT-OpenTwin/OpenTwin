@@ -1056,13 +1056,19 @@ std::string Application::handleAddUserLibraryElement(ot::JsonDocument& _document
 		// Check existence and filter using the unified function
 		LibraryElementCheckResult checkResult = updateOrCreateLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl, false);
 
-		ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
+		
 
 		switch (checkResult.status) {
 
 			case LibraryElementExistenceStatus::NotExisting:
 			{
 				OT_LOG_I("Adding new library element '" + userElement.getName() + "'");
+
+				// Ensure unique ID for the new library element
+				ensureUniqueLibraryElementId(userElement, userElement.getCollectionName(), dbUserName, dbUserPassword, dbServerUrl);
+				singleElementList.clear();
+				singleElementList.push_back(std::make_shared<ot::UserLibraryElement>(userElement));
+
 				addLibraryElement(singleElementList, dbUserName, dbUserPassword, dbServerUrl);
 				promptMessageToUI("Library element '" + userElement.getName() + "' added successfully.\n", uiServiceUrl);
 				checkResult.existingElement = std::make_shared<ot::UserLibraryElement>(userElement);
@@ -1149,6 +1155,9 @@ std::string Application::handleLibraryElementOverwritePromptResponse(ot::JsonDoc
 		element.setName(uniqueName);
 
 		OT_LOG_I("Generated unique element name: " + uniqueName);
+
+		// Ensure the new unique name is also unique in the database
+		ensureUniqueLibraryElementId(element, collectionName, dbUserName, dbUserPassword, dbServerUrl);
 
 		// Add the element with the new unique name
 		std::list<std::shared_ptr<ot::LibraryElement>> singleElementPtrList;
