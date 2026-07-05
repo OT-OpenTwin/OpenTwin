@@ -122,12 +122,14 @@ void FileHandler::handleImportPythonScriptButton() {
 
 void FileHandler::handleExportFilesToLibrary() {
 	// This is the local export, show metadata file lists
-	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
+	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
+	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::handleExportToUserLibrary() {
 	// This is the user export, show additional info fields
-	showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
+	//showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
+	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction, bool _isLocalExport) {
