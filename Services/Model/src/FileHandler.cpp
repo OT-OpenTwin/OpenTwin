@@ -176,17 +176,13 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 		ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
 		ot::PropertyString* circuitAdditionalInfoProp = new ot::PropertyString("Circuit Model Additional Info", "");
 		ot::PropertyString* circuitDescriptionProp = new ot::PropertyString("Circuit Model Description", "");
-		ot::PropertyString* pythonAdditionalInfoProp = new ot::PropertyString("Python Script Additional Info", "");
 		ot::PropertyString* pythonDescriptionProp = new ot::PropertyString("Python Script Description", "");
-		ot::PropertyString* manifestAdditionalInfoProp = new ot::PropertyString("Manifest Additional Info", "");
 		ot::PropertyString* manifestDescriptionProp = new ot::PropertyString("Manifest Description", "");
 
 		circuitModelGroup->addProperty(circuitAdditionalInfoProp);
 		circuitModelGroup->addProperty(circuitDescriptionProp);
 		pythonScriptGroup->addProperty(pythonManifestProp);
-		pythonScriptGroup->addProperty(pythonAdditionalInfoProp);
 		pythonScriptGroup->addProperty(pythonDescriptionProp);
-		pythonScriptGroup->addProperty(manifestAdditionalInfoProp);
 		pythonScriptGroup->addProperty(manifestDescriptionProp);
 	}
 
