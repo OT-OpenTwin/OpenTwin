@@ -44,6 +44,7 @@ class BRepAlgoAPI_BuilderAlgo;
 #include <gp_Pnt.hxx>
 #include <Bnd_Box.hxx>
 #include <gp_Pnt2d.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
 
 #include "OTGui/Properties/PropertyGridCfg.h"
 
@@ -205,6 +206,18 @@ private:
 		const TopoDS_Face& face,
 		const gp_Pnt& point,
 		double tolerance) const;
+
+	bool isPlanarFace(const TopoDS_Face& face) const;
+
+	bool isToleratedTouchingEdge(
+		const TopoDS_Edge& edge,
+		const TopTools_ListOfShape& adjacentFaces,
+		double angleTolerance = 1.0e-3) const;
+
+	bool computeFaceNormalNearEdge(
+		const TopoDS_Face& face,
+		const TopoDS_Edge& edge,
+		gp_Vec& normal) const;
 
 	void extractFaceTriangles(
 		const TopoDS_Face& face,

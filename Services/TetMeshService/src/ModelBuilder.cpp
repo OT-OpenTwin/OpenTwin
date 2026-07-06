@@ -78,6 +78,9 @@
 #include <TopoDS_Solid.hxx>
 #include <TopoDS_Shell.hxx>
 #include <TopoDS_Face.hxx>
+#include <TopTools_ListIteratorOfListOfShape.hxx>
+#include <gp_Vec.hxx>
+
 #include <algorithm>
 #include <cmath>
 #include <limits>
@@ -947,6 +950,13 @@ void ModelBuilder::checkEdgeIncidence(
 				continue;
 			}
 
+			if (isToleratedTouchingEdge(edge, faces))
+			{
+				// Two solids touch along this edge.
+				// This is non-manifold in a strict sense, but accepted for this workflow.
+				continue;
+			}
+
 			report.nonManifoldEdges.push_back(edge);
 			report.manifold = false;
 		}
@@ -1775,8 +1785,7 @@ void ModelBuilder::checkThinGaps(
 			{
 				TopoDS_Face face = TopoDS::Face(faceEx.Current());
 
-				if (face.Orientation() == TopAbs_FORWARD ||
-					face.Orientation() == TopAbs_REVERSED)
+				if ((face.Orientation() == TopAbs_FORWARD || face.Orientation() == TopAbs_REVERSED) && !isPlanarFace(face))
 				{
 					faces.push_back(face);
 				}
@@ -1833,5 +1842,124 @@ void ModelBuilder::visualizeThinGapFaces(
 			linearDeflection,
 			angularDeflection);
 	}
+}
+
+bool ModelBuilder::isPlanarFace(const TopoDS_Face& face) const
+{
+	BRepAdaptor_Surface adaptor(face);
+	return adaptor.GetType() == GeomAbs_Plane;
+}
+
+bool ModelBuilder::isToleratedTouchingEdge(
+	const TopoDS_Edge& edge,
+	const TopTools_ListOfShape& adjacentFaces,
+	double angleTolerance) const
+{
+	std::vector<TopoDS_Face> faces;
+
+	for (TopTools_ListIteratorOfListOfShape it(adjacentFaces); it.More(); it.Next())
+		faces.push_back(TopoDS::Face(it.Value()));
+
+	if (faces.size() != 4)
+		return false;
+
+	std::vector<gp_Vec> normals;
+
+	for (const auto& face : faces)
+	{
+		gp_Vec n;
+
+		if (!computeFaceNormalNearEdge(face, edge, n))
+			return false;
+
+		if (n.Magnitude() <= 0.0)
+			return false;
+
+		n.Normalize();
+		normals.push_back(n);
+	}
+
+	std::vector<bool> used(4, false);
+	int oppositePairs = 0;
+
+	for (int i = 0; i < 4; ++i)
+	{
+		if (used[i])
+			continue;
+
+		int bestJ = -1;
+		double bestDot = 1.0;
+
+		for (int j = i + 1; j < 4; ++j)
+		{
+			if (used[j])
+				continue;
+
+			const double dot = normals[i].Dot(normals[j]);
+
+			if (dot < bestDot)
+			{
+				bestDot = dot;
+				bestJ = j;
+			}
+		}
+
+		if (bestJ < 0)
+			return false;
+
+		// Opposite normals indicate two faces belonging to two different touching sheets.
+		if (bestDot > -1.0 + angleTolerance)
+			return false;
+
+		used[i] = true;
+		used[bestJ] = true;
+		++oppositePairs;
+	}
+
+	return oppositePairs == 2;
+}
+
+bool ModelBuilder::computeFaceNormalNearEdge(
+	const TopoDS_Face& face,
+	const TopoDS_Edge& edge,
+	gp_Vec& normal) const
+{
+	Standard_Real first = 0.0;
+	Standard_Real last = 0.0;
+
+	Handle(Geom_Curve) curve = BRep_Tool::Curve(edge, first, last);
+
+	if (curve.IsNull())
+		return false;
+
+	const gp_Pnt edgePoint = curve->Value(0.5 * (first + last));
+
+	BRepAdaptor_Surface adaptor(face);
+	Handle(Geom_Surface) surface = adaptor.Surface().Surface();
+
+	if (surface.IsNull())
+		return false;
+
+	GeomAPI_ProjectPointOnSurf projector(edgePoint, surface);
+
+	if (projector.NbPoints() < 1)
+		return false;
+
+	Standard_Real u = 0.0;
+	Standard_Real v = 0.0;
+	projector.LowerDistanceParameters(u, v);
+
+	BRepLProp_SLProps props(adaptor, u, v, 1, 1.0e-9);
+
+	if (!props.IsNormalDefined())
+		return false;
+
+	gp_Dir dir = props.Normal();
+
+	if (face.Orientation() == TopAbs_REVERSED)
+		dir.Reverse();
+
+	normal = gp_Vec(dir);
+	return true;
 }
 
