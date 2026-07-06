@@ -189,7 +189,7 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 	}
 
 	gridConfig.addRootGroup(pythonScriptGroup);
-	gridConfig.addRootGroup(circuitModelGroup);
+	//gridConfig.addRootGroup(circuitModelGroup);
 	dialogConfig.setGridConfig(gridConfig);
 
 	ot::JsonDocument doc;
