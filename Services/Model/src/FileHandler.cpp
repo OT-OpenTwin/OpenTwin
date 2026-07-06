@@ -1518,10 +1518,34 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 		std::string newContentPath = createIncrementedPath(pending.contentFilePath);
 		std::string newMetaPath = createIncrementedPath(pending.metaFilePath);
 
+		// Derive the new base name (without extension) and the new content file name
+		// from the actually assigned incremented content path, so the metadata stays
+		// consistent with the file it is stored alongside.
+		std::string newContentFileName = std::filesystem::path(newContentPath).filename().string();
+		std::string newBaseName = std::filesystem::path(newContentPath).stem().string();
+
+		std::string metaContent = pending.metaNewContent;
+		try {
+			ot::JsonDocument metaDoc;
+			metaDoc.fromJson(metaContent);
+
+			// Update Name and FileName to match the actually written, incremented file
+			metaDoc.RemoveMember("Name");
+			metaDoc.AddMember("Name", ot::JsonString(newBaseName, metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+			metaDoc.RemoveMember("FileName");
+			metaDoc.AddMember("FileName", ot::JsonString(newContentFileName, metaDoc.GetAllocator()), metaDoc.GetAllocator());
+
+			metaContent = ot::json::toJson(metaDoc);
+		}
+		catch (const std::exception& _e) {
+			OT_LOG_W("Failed to update Name/FileName in metadata for incremented file: " + std::string(_e.what()));
+		}
+
 		// Write both files with new names
 		writeFileToPath(newContentPath, pending.contentNewContent);
-		writeFileToPath(newMetaPath, pending.metaNewContent);
-		OT_LOG_D("Files written with new names: \"" + newContentPath + "\" and \"" + newMetaPath + "\"");
+		writeFileToPath(newMetaPath, metaContent);
+		OT_LOG_D("Files written with new names: \"" + newContentPath + "\" and \"" + newMetaPath + "\", metadata updated to Name=\"" + newBaseName + "\", FileName=\"" + newContentFileName + "\"");
 	}
 
 	// Remove from pending list
