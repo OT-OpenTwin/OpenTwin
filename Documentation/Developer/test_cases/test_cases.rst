@@ -16,3 +16,4 @@ Test Cases
     test_cases_logger_and_otoolkit
     test_cases_management
     test_cases_connection_handling
+    test_cases_python_script_export
