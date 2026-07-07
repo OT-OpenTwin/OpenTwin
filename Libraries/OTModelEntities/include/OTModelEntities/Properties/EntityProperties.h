@@ -36,9 +36,22 @@ namespace ot { class PropertyGroup; };
 class OT_MODELENTITIES_API_EXPORT EntityProperties
 {
 public:
+	enum LoadFromConfigMode
+	{
+		All,
+		ValueOnly,
+		NonValueOnly
+	};
+
 	EntityProperties() : m_needsUpdate(false) {};
-	EntityProperties(const EntityProperties &other);
+	EntityProperties(const EntityProperties& _other);
+	EntityProperties(EntityProperties&& _other) noexcept;
 	virtual ~EntityProperties();
+
+	EntityProperties& operator=(const EntityProperties& other);
+	EntityProperties& operator=(EntityProperties&& other) noexcept;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
 
 	void merge(EntityProperties& other);
 
@@ -70,8 +83,8 @@ public:
 	void forceResetUpdateForAllProperties();
 
 	void addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _config) const;
-	void buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root);
-	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root);
+	void buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root, LoadFromConfigMode _mode);
+	void buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root, LoadFromConfigMode _mode);
 
 	std::string createJSON(EntityBase* root, bool visibleOnly) const;
 	void buildFromJSON(const std::string& prop, EntityBase* root);
@@ -79,12 +92,12 @@ public:
 	void checkMatchingProperties(EntityProperties &other);
 	void readFromProperties(const EntityProperties &other, EntityBase *root);
 
-	EntityProperties& operator=(const EntityProperties &other);
-
 	void setAllPropertiesReadOnly();
 	void setAllPropertiesNonProtected();
 
+	bool isEmpty() const { return m_properties.empty(); };
 	std::list<EntityPropertiesBase*> getListOfAllProperties();
+	std::list<const EntityPropertiesBase*> getListOfAllProperties() const;
 	std::list<EntityPropertiesBase *> getListOfPropertiesWhichNeedUpdate();
 	std::list<EntityPropertiesDouble *> getListOfNumericalProperties();
 	size_t getNumberOfProperties() const { return m_properties.size(); }

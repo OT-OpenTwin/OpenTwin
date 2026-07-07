@@ -47,7 +47,7 @@ public:
 	const QString& getExternalToolsDebugPath(void) const { return m_externalToolsDebugPath; };
 
 private Q_SLOTS:
-	void slotPropertyChanged(const std::string& _owner, const ot::Property* const _property);
+	void slotPropertiesChanged(const std::string& _owner, const std::list<const ot::Property*>& _properties);
 	void slotPropertyDeleteRequested(const std::string& _owner, const ot::Property* const _property);
 
 private:

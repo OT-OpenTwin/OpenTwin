@@ -48,7 +48,7 @@ namespace ot {
 		std::list<const Property*> getChangedProperties(void) const { return m_changedProperties; };
 
 	Q_SIGNALS:
-		void propertyChanged(const std::string& _owner, const Property* _property);
+		void propertiesChanged(const std::string& _owner, const std::list<const Property*>& _properties);
 		void propertyDeleteRequested(const std::string& _owner, const Property* _property);
 
 	public:
@@ -76,7 +76,7 @@ namespace ot {
 		// Private
 
 	private Q_SLOTS:
-		void slotPropertyChanged(const Property* _property);
+		void slotPropertiesChanged(const std::list<const Property*>& _properties);
 		void slotPropertyDeleteRequested(const Property* _property);
 
 	private:

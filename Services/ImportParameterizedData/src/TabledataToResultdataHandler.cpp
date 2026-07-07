@@ -59,12 +59,15 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	std::string fullReport("");
 	
 	Documentation::INSTANCE()->ClearDocumentation();
-	auto allMetadataAssembliesByNames = getAllMetadataAssemblies();
+	std::map<std::string, MetadataAssemblyData> allSeriesMetadataAssembliesByNames;
+	MetadataAssemblyData campaign;
+	getAllMetadataAssemblies(allSeriesMetadataAssembliesByNames,campaign);
+
 	fullReport += Documentation::INSTANCE()->GetFullDocumentation();
 	_uiComponent->displayMessage(Documentation::INSTANCE()->GetFullDocumentation());
 	Documentation::INSTANCE()->ClearDocumentation();
 
-	if (allMetadataAssembliesByNames.size() == 0)
+	if (allSeriesMetadataAssembliesByNames.size() == 0 && campaign.m_allSelectionRanges.size())
 	{
 		_uiComponent->displayMessage("No range selections found for creating a dataset.\n");
 		return;
@@ -88,7 +91,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	//Consistency checks for the data categorizations
 	DataCategorizationConsistencyChecker checker;
 	bool categorizationsAreValid = true;
-	categorizationsAreValid &= checker.isValidAllMSMDHaveParameterAndQuantities(allMetadataAssembliesByNames);
+	categorizationsAreValid &= checker.isValidAllMSMDHaveParameterAndQuantities(allSeriesMetadataAssembliesByNames);
 	//categorizationsAreValid &= checker.isValidAllParameterAndQuantitiesReferenceSameTable(allMetadataAssembliesByNames);
 
 	if (!categorizationsAreValid)
@@ -102,21 +105,11 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 	_uiComponent->displayMessage("Start analysis of range selections.\n\n");
 	bool newDataHasBeenAdded = false;
 	//Updating RMD
-	const MetadataAssemblyData* rmdAssemblyData = nullptr;
-	for (const auto& metadataAssemblyByName : allMetadataAssembliesByNames)
-	{
-		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
-		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::researchMetadata)
-		{
-			rmdAssemblyData = metadataAssembly;
-			break;
-		}
-	}
-	if (rmdAssemblyData == nullptr) { throw std::exception("RMD categorization entity could not be found."); }
+		
 	_uiComponent->displayMessage("Updating Campaign metadata\n");
 	std::list<std::string> requiredTables;
 	std::map<std::string, std::shared_ptr<ot::IVisualisationTable>> loadedTables;
-	addRequiredTables(*rmdAssemblyData, requiredTables);
+	addRequiredTables(campaign, requiredTables);
 	requiredTables.unique();
 	if (requiredTables.size() == 0)
 	{
@@ -138,7 +131,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 
 		//Filling a new EntityMetadataSeries object with its fields.
 		KeyValuesExtractor rmdData;
-		rmdData.loadAllRangeSelectionInformation(*rmdAssemblyData, loadedTables);
+		rmdData.loadAllRangeSelectionInformation(campaign, loadedTables);
 		ot::JsonDocument allMetadataEntries;
 		rangeData2Json(allMetadataEntries, std::move(rmdData));
 		if(!allMetadataEntries.ObjectEmpty())
@@ -152,24 +145,13 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		newDataHasBeenAdded = true;
 	}
 
-	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.
-	std::list<std::pair<const std::string, MetadataAssemblyData>*> allMSMDMetadataAssembliesByNames;
-	for (auto& metadataAssemblyByName : allMetadataAssembliesByNames)
-	{
-		const MetadataAssemblyData* metadataAssembly = &metadataAssemblyByName.second;
-		if (metadataAssembly->m_dataCategory == EntityParameterizedDataCategorization::DataCategorie::measurementSeriesMetadata)
-		{
-			allMSMDMetadataAssembliesByNames.push_back(&metadataAssemblyByName);
-		}
-	}
-
-	
+	//Only the MSMDs are analysed here. They reference to their contained parameter and quantity objects.	
 	_uiComponent->displayMessage("Start analysis of series metadata.\n");
 
-	for (auto& metadataAssemblyByName : allMSMDMetadataAssembliesByNames)
+	for (auto& metadataAssemblyByName : allSeriesMetadataAssembliesByNames)
 	{
 
-		std::string seriesName = metadataAssemblyByName->first;
+		std::string seriesName = metadataAssemblyByName.first;
 		seriesName = seriesName.substr(seriesName.find_last_of('/') + 1, seriesName.size());
 		std::list<std::string> additionalTakenNames;
 		seriesName = CreateNewUniqueTopologyNamePlainPossible(ot::FolderNames::DatasetFolder, seriesName, additionalTakenNames);
@@ -179,7 +161,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 		std::list<DatasetDescription> datasets; 
 		try
 		{
-			datasets = extractDataset(metadataAssemblyByName->second, loadedTables, seriesMetaDataRangeSelections);
+			datasets = extractDataset(metadataAssemblyByName.second, loadedTables, seriesMetaDataRangeSelections);
 		}
 		catch (std::exception& e)
 		{
@@ -202,7 +184,7 @@ void TabledataToResultdataHandler::createDataCollection(const std::string& dbURL
 			_uiComponent->displayMessage("Create " + seriesName + ":\n");
 			ot::UID seriesUID = resultCollectionExtender.buildSeriesMetadata(datasets, seriesName, additionalMetadata);
 			
-			unsetConsiderForImport(metadataAssemblyByName->second);
+			unsetConsiderForImport(metadataAssemblyByName.second);
 
 			fullReport += logger.getLog();
 			logger.clearLog();
@@ -298,6 +280,76 @@ std::map<std::string, MetadataAssemblyData> TabledataToResultdataHandler::getAll
 	assert(allRangeEntities.size() == 0);
 
 	return allMetadataAssembliesByName;
+}
+
+void TabledataToResultdataHandler::getAllMetadataAssemblies(std::map<std::string, MetadataAssemblyData>& _series, MetadataAssemblyData& _campaign)
+{
+	//Load all selection ranges
+	EntityTableSelectedRanges tempEntity;
+	ot::UIDList selectionRangeIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(CategorisationFolderNames::getRootFolderName(), tempEntity.getClassName(), true);
+	Application::instance()->prefetchDocumentsFromStorage(selectionRangeIDs);
+
+	std::list<std::shared_ptr<EntityTableSelectedRanges>> allRangeEntities;
+
+	for (ot::UID selectionRangeID : selectionRangeIDs)
+	{
+		auto baseEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(selectionRangeID, Application::instance()->getPrefetchedEntityVersion(selectionRangeID));
+		std::shared_ptr<EntityTableSelectedRanges> rangeEntity(dynamic_cast<EntityTableSelectedRanges*>(baseEntity));
+		assert(rangeEntity != nullptr);
+		if (rangeEntity->getConsiderForImport())
+		{
+			allRangeEntities.push_back(rangeEntity);
+		}
+	}
+
+	Documentation::INSTANCE()->AddToDocumentation("Found " + std::to_string(allRangeEntities.size()) + " selection ranges considered for import.\n");
+
+
+	for (auto& rangeSelection : allRangeEntities)
+	{
+		std::string entityName = rangeSelection->getName();
+		size_t level = ot::EntityName::getTopologyLevel(entityName);
+		if (level == 2)
+		{
+			_campaign.m_allSelectionRanges.push_back(rangeSelection);
+		}
+		else
+		{
+			std::optional<std::string> seriesName = ot::EntityName::getSubName(entityName, 2);
+			assert(seriesName.has_value());
+			auto series = _series.find(seriesName.value());
+			MetadataAssemblyData* parameter = nullptr;
+			MetadataAssemblyData * quantity = nullptr;
+			if (series == _series.end())
+			{
+				MetadataAssemblyData newSeries;
+				parameter = new MetadataAssemblyData();
+				quantity = new MetadataAssemblyData();
+				_series.insert(std::make_pair<>(seriesName.value(),std::move(newSeries)));
+				series = _series.find(seriesName.value());
+				series->second.m_next = parameter;
+				parameter->m_next = quantity;
+			}
+			else
+			{
+				parameter = series->second.m_next;
+				quantity = parameter->m_next;
+			}
+			assert(series != _series.end());
+			if (entityName.find(CategorisationFolderNames::getParameterFolderName()) != std::string::npos)
+			{
+				parameter->m_allSelectionRanges.push_back(rangeSelection);
+			}
+			else if (entityName.find(CategorisationFolderNames::getQuantityFolderName()) != std::string::npos)
+			{
+				quantity->m_allSelectionRanges.push_back(rangeSelection);
+			}
+			else
+			{
+				assert(false);
+			}
+		}
+	}
 }
 
 //! @brief Determines if a selection range belongs to a metadata series or campaign, depending on the name topology. Selection ranges of the campaign are laying one level above the series.

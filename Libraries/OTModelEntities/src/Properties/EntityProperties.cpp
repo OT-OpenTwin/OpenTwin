@@ -39,6 +39,73 @@ EntityProperties::~EntityProperties()
 	deleteAllProperties();
 }
 
+EntityProperties::EntityProperties(const EntityProperties& other)
+{
+	m_needsUpdate = other.m_needsUpdate;
+
+	for (auto prop : other.m_propertiesList)
+	{
+		// Add the current property
+		EntityPropertiesBase* newProp = prop->createCopy();
+
+		createProperty(newProp, prop->getGroup());
+	}
+}
+
+EntityProperties::EntityProperties(EntityProperties&& other) noexcept
+{
+	m_needsUpdate = other.m_needsUpdate;
+	m_properties = std::move(other.m_properties);
+	m_propertiesList = std::move(other.m_propertiesList);
+	other.m_needsUpdate = false;
+	other.m_properties.clear();
+	other.m_propertiesList.clear();
+
+	for (auto prop : m_propertiesList)
+	{
+		prop->setContainer(this);
+	}
+}
+
+EntityProperties& EntityProperties::operator=(const EntityProperties& other)
+{
+	deleteAllProperties();
+
+	m_needsUpdate = other.m_needsUpdate;
+
+	for (auto prop : other.m_propertiesList)
+	{
+		// Add the current property
+		EntityPropertiesBase* newProp = prop->createCopy();
+
+		createProperty(newProp, prop->getGroup());
+	}
+
+	return *this;
+}
+
+EntityProperties& EntityProperties::operator=(EntityProperties&& other) noexcept
+{
+	deleteAllProperties();
+	
+	m_needsUpdate = other.m_needsUpdate;
+	m_properties = std::move(other.m_properties);
+	m_propertiesList = std::move(other.m_propertiesList);
+	
+	other.m_needsUpdate = false;
+	other.m_properties.clear();
+	other.m_propertiesList.clear();
+	
+	for (auto prop : m_propertiesList)
+	{
+		prop->setContainer(this);
+	}
+
+	return *this;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
 void EntityProperties::merge(EntityProperties& other)
 {
 	for (auto prop : other.m_propertiesList)
@@ -174,36 +241,6 @@ void EntityProperties::forceResetUpdateForAllProperties()
 	m_needsUpdate = false;
 }
 
-EntityProperties::EntityProperties(const EntityProperties& other)
-{
-	m_needsUpdate = other.m_needsUpdate;
-
-	for (auto prop : other.m_propertiesList)
-	{
-		// Add the current property
-		EntityPropertiesBase* newProp = prop->createCopy();
-
-		createProperty(newProp, prop->getGroup());
-	}
-}
-
-EntityProperties& EntityProperties::operator=(const EntityProperties &other)
-{
-	deleteAllProperties();
-
-	m_needsUpdate = other.m_needsUpdate;
-
-	for (auto prop : other.m_propertiesList)
-	{
-		// Add the current property
-		EntityPropertiesBase *newProp =prop->createCopy();
-
-		createProperty(newProp, prop->getGroup());
-	}
-
-	return *this;
-}
-
 void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot::PropertyGridCfg& _configuration) const
 {
 	// Here we convert the entire container with all its entities into a JSON document
@@ -217,20 +254,29 @@ void EntityProperties::addToConfiguration(EntityBase *root, bool visibleOnly, ot
 	}
 }
 
-void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root)
+void EntityProperties::buildFromConfiguration(const ot::PropertyGridCfg& _config, EntityBase* root, LoadFromConfigMode _mode)
 {
 	// Here we re-build the current container with the settings in the JSON document. All previous settings will be overridden.
 
 	deleteAllProperties();
 
 	for (const ot::PropertyGroup* g : _config.getRootGroups()) {
-		this->buildFromConfiguration(g, root);
+		this->buildFromConfiguration(g, root, _mode);
 	}
 }
 
-void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root)
+void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupConfig, EntityBase* root, LoadFromConfigMode _mode)
 {
 	for (const ot::Property* p : _groupConfig->getProperties()) {
+		if (_mode == LoadFromConfigMode::ValueOnly && p->getCurrentValueHandlingType() != ot::PropertyBase::ValueHandlingType::Value)
+		{
+			continue;
+		}
+		else if (_mode == LoadFromConfigMode::NonValueOnly && p->getCurrentValueHandlingType() == ot::PropertyBase::ValueHandlingType::Value)
+		{
+			continue;
+		}
+
 		EntityPropertiesBase* newSetting(nullptr);
 
 		if (p->getPropertyType() == ot::PropertyBool::propertyTypeString()) newSetting = new EntityPropertiesBoolean;
@@ -242,8 +288,8 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 		else if (p->getPropertyType() == ot::PropertyStringList::propertyTypeString()) {
 			if (p->getSpecialType() == "EntityList") newSetting = new EntityPropertiesEntityList;
 			else if (p->getSpecialType() == "ProjectList") newSetting = new EntityPropertiesProjectList;
-			else if (p->getSpecialType().empty()) newSetting = new EntityPropertiesSelection;
 			else if (p->getSpecialType() == "ExtendedEntityList") newSetting = new EntityPropertiesExtendedEntityList;
+			else if (p->getSpecialType().empty()) newSetting = new EntityPropertiesSelection;
 			else {
 				OT_LOG_E("Unknown string list property special type \"" + p->getSpecialType() + "\"");
 				return;
@@ -264,7 +310,7 @@ void EntityProperties::buildFromConfiguration(const ot::PropertyGroup* _groupCon
 	}
 
 	for (const ot::PropertyGroup* childGroup : _groupConfig->getChildGroups()) {
-		this->buildFromConfiguration(childGroup, root);
+		this->buildFromConfiguration(childGroup, root, _mode);
 	}
 }
 
@@ -439,9 +485,9 @@ void EntityProperties::checkMatchingProperties(EntityProperties &other)
 	}
 
 	// Now finally remove the incompatible properties from the other container
-	for (auto prop : removeProperties)
+	for (const auto& prop : removeProperties)
 	{
-		other.deleteProperty(prop.first,prop.second);
+		other.deleteProperty(prop.first, prop.second);
 	}
 }
 
@@ -487,7 +533,7 @@ void EntityProperties::readFromProperties(const EntityProperties &other, EntityB
 
 void EntityProperties::setAllPropertiesReadOnly()
 {
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		prop.second->setReadOnly(true);
 	}
@@ -495,7 +541,7 @@ void EntityProperties::setAllPropertiesReadOnly()
 
 void EntityProperties::setAllPropertiesNonProtected()
 {
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		prop.second->setProtected(false);
 	}
@@ -505,7 +551,19 @@ std::list<EntityPropertiesBase*> EntityProperties::getListOfAllProperties()
 {
 	std::list<EntityPropertiesBase*> allProperties;
 
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
+	{
+		allProperties.push_back(prop.second);
+	}
+
+	return allProperties;
+}
+
+std::list<const EntityPropertiesBase*> EntityProperties::getListOfAllProperties() const
+{
+	std::list<const EntityPropertiesBase*> allProperties;
+
+	for (const auto& prop : m_properties)
 	{
 		allProperties.push_back(prop.second);
 	}
@@ -517,7 +575,7 @@ std::list<EntityPropertiesBase *> EntityProperties::getListOfPropertiesWhichNeed
 {
 	std::list<EntityPropertiesBase *> needsUpdate;
 
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		if (prop.second->needsUpdate())
 		{
@@ -532,7 +590,7 @@ std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperti
 {
 	std::list<EntityPropertiesDouble *> numericalProperty;
 
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		EntityPropertiesDouble *doubleProp = dynamic_cast<EntityPropertiesDouble *>(prop.second);
 
@@ -554,7 +612,7 @@ std::list<EntityPropertiesDouble *> EntityProperties::getListOfNumericalProperti
 std::list<std::string> EntityProperties::getListOfPropertiesForGroup(const std::string &group) const {
 	std::list<std::string> propertyList;
 
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		if (prop.second->getGroup() == group)
 		{
@@ -569,7 +627,7 @@ std::list<std::string> EntityProperties::getListOfGroups() const
 {
 	std::list<std::string> groupNames;
 
-	for (auto prop : m_properties)
+	for (const auto& prop : m_properties)
 	{
 		groupNames.push_back(prop.second->getGroup());
 	}

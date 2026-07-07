@@ -39,25 +39,28 @@ namespace ot {
 		explicit PropertyStringList(const PropertyBase& _base);
 		explicit PropertyStringList(PropertyFlags _flags = PropertyFlags(NoFlags));
 		explicit PropertyStringList(const std::string& _current, PropertyFlags _flags = PropertyFlags(NoFlags)) ;
-		explicit PropertyStringList(const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
-		explicit PropertyStringList(const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
-		explicit PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
-		explicit PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _list, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyStringList(const std::string& _current, const std::list<std::string>& _options, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyStringList(const std::string& _current, const std::vector<std::string>& _options, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyStringList(const std::string& _name, const std::string& _current, const std::list<std::string>& _options, PropertyFlags _flags = PropertyFlags(NoFlags));
+		explicit PropertyStringList(const std::string& _name, const std::string& _current, const std::vector<std::string>& _options, PropertyFlags _flags = PropertyFlags(NoFlags));
 		virtual ~PropertyStringList() {};
 
-		static std::string propertyTypeString(void) { return "StringList"; };
-		virtual std::string getPropertyType(void) const override { return PropertyStringList::propertyTypeString(); };
+		static std::string propertyTypeString() { return "StringList"; };
+		virtual std::string getPropertyType() const override { return PropertyStringList::propertyTypeString(); };
 
 		virtual void mergeWith(const Property* _other, const MergeMode& _mergeMode) override;
 
-		virtual Property* createCopy(void) const override;
+		virtual Property* createCopy() const override;
 
-		void setList(const std::list<std::string>& _values) { m_list = _values; };
-		std::list<std::string>& getList(void) { return m_list; };
-		const std::list<std::string>& getList(void) const { return m_list; };
+		void addOption(const std::string& _value, ValueHandlingType _type = ValueHandlingType::Value);
+		void setOptions(const std::list<std::string>& _values);
+		void setOptions(const std::vector<std::string>& _values);
+		void setOptions(const std::vector<std::pair<std::string, ValueHandlingType>>& _values) { m_options = _values; };
+		void setOptions(std::vector<std::pair<std::string, ValueHandlingType>>&& _values) { m_options = std::move(_values); };
+		const std::vector<std::pair<std::string, ValueHandlingType>>& getOptions() const { return m_options; };
 
 		void setCurrent(const std::string& _current) { m_current = _current; };
-		const std::string& getCurrent(void) const { return m_current; };
+		const std::string& getCurrent() const { return m_current; };
 
 	protected:
 		//! @brief Add the property data to the provided JSON object
@@ -73,7 +76,7 @@ namespace ot {
 
 	private:
 		std::string m_current;
-		std::list<std::string> m_list;
+		std::vector<std::pair<std::string, ValueHandlingType>> m_options;
 	};
 
 }

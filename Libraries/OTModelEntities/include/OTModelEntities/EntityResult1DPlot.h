@@ -23,7 +23,7 @@
 #include "OTCore/Symbol.h"
 #include "OTModelEntities/EntityContainer.h"
 #include "OTModelEntities/Visualization/IVisualisationPlot1D.h"
-#include "OTModelEntities/Properties/PropertyBundleQuerySettings.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleQuerySettings.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 
 class OT_MODELENTITIES_API_EXPORT EntityResult1DPlot: public EntityContainer, public ot::IVisualisationPlot1D

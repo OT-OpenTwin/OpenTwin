@@ -1666,7 +1666,7 @@ void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration) {
 		userProjectNames.remove(currentProjectName);
 		
 		userProjectNames.insert(userProjectNames.begin(), EntityPropertiesProjectList::getCurrentProjectPlaceholder());
-		actualProp->setList(userProjectNames);
+		actualProp->setOptions(userProjectNames);
 	}
 
 	m_propertyGrid->getPropertyGrid()->setupGridFromConfig(_configuration);

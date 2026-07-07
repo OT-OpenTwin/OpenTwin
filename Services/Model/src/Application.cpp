@@ -774,12 +774,11 @@ void Application::handleImportTableFile(ot::JsonDocument& _document) {
 }
 
 void Application::handleExportFileToLocalLibraryDialog(ot::JsonDocument& _document) {
-
 	ot::ConstJsonObject cfgObj = ot::json::getObject(_document, OT_ACTION_PARAM_Config);
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportFileToLocalLibraryDialog(pckg);
+	m_fileHandler.handleExportFileDialog(pckg, false);
 }
 
 void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
@@ -787,8 +786,7 @@ void Application::handleExportFileToUserLibrary(ot::JsonDocument& _document) {
 	ot::PropertyDialogCfg pckg;
 	pckg.setFromJsonObject(cfgObj);
 
-	m_fileHandler.handleExportFileToUserLibraryDialog(pckg);
-
+	m_fileHandler.handleExportFileDialog(pckg, true);
 }
 
 
@@ -940,6 +938,23 @@ void Application::handleDeleteProperty(ot::JsonDocument& _document) {
 		groupName = ot::json::getString(_document, OT_PARAM_GROUP);
 	}
 	m_model->deleteProperty(entityIDList, propertyName, groupName);
+}
+
+void Application::handleNotifyNonValuePropertiesSelected(ot::JsonDocument& _document)
+{
+	if (!m_model) {
+		OT_LOG_E("No model created yet");
+		throw ot::Exception::ObjectNotFound("No model created yet");
+	}
+
+	ot::UIDList entityIDList = ot::json::getUInt64List(_document, OT_ACTION_PARAM_MODEL_EntityIDList);
+	ot::PropertyGridCfg cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	EntityProperties props;
+	props.buildFromConfiguration(cfg, nullptr, EntityProperties::NonValueOnly);
+
+	m_model->notifyNonValuePropertiesSelected(entityIDList, props);
 }
 
 // ##################################################################################################################################################################################################################

@@ -206,13 +206,13 @@ void EntityResult1DPlot::setTupleSettings(const std::string& _tupleType, const s
 		if (description != nullptr)
 		{
 			std::vector<std::string> tupleOptionsVec = description->getAllTupleElementNames();
-			if (quCompYAxis->getOptions() != tupleOptionsVec)
+			if (quCompYAxis->getOptionStrings() != tupleOptionsVec)
 			{
 				quCompYAxis->resetOptions(tupleOptionsVec);
 			}
 			//For the other two axis settings it is also possible to select the parameter, but we skip the empty entry at the beginning of the list.
 			tupleOptionsVec.insert(tupleOptionsVec.end(), ++_parameterOptions.begin(), _parameterOptions.end());
-			if (quCompRadiusAxis->getOptions() != tupleOptionsVec)
+			if (quCompRadiusAxis->getOptionStrings() != tupleOptionsVec)
 			{
 				quCompRadiusAxis->resetOptions(tupleOptionsVec);
 				quCompPhaseAxis->resetOptions(tupleOptionsVec);
@@ -432,7 +432,7 @@ void EntityResult1DPlot::createAxisProperties(const std::string& _axisName)
 		ot::String::toString(ot::String::Scientific),
 		ot::String::toString(ot::String::Engineering)
 	};
-	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Decimal), "", getProperties());
+	EntityPropertiesSelection::createProperty(_axisName, "Display number format", std::move(displayNumberFormatOptions), ot::String::toString(ot::String::Engineering), "", getProperties());
 	EntityPropertiesInteger::createProperty(_axisName, "Display number precision", 3, 1, 99, "", getProperties())->setAllowCustomValues(false);
 }
 
@@ -692,7 +692,7 @@ void EntityResult1DPlot::updateCurveDependencies()
 
 	auto parameterSelection = PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName());
 	const std::string currentSelection = parameterSelection->getValue();
-	if (parameterSelection != nullptr && parameterSelection->getOptions() != queryParameterList)
+	if (parameterSelection != nullptr && parameterSelection->getOptionStrings() != queryParameterList)
 	{
 		const std::string currentParameterSelection = parameterSelection->getValue();
 		parameterSelection->resetOptions(queryParameterList);
@@ -700,7 +700,7 @@ void EntityResult1DPlot::updateCurveDependencies()
 		{
 			parameterSelection->setValue(currentParameterSelection);
 		}
-		const auto& temp = parameterSelection->getOptions();
+		const auto& temp = parameterSelection->getOptionStrings();
 		if (std::find(temp.begin(), temp.end(), currentSelection) != temp.end())
 		{
 			parameterSelection->setValue(currentSelection);

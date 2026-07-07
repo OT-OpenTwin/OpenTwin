@@ -22,8 +22,8 @@
 #include "VisualizationServiceTypes.h"
 #include "VtkDriverWithScaling.h"
 #include "OTModelEntities/EntityResultBase.h"
-#include "OTModelEntities/Properties/PropertyBundleDataHandleScaling.h"
-#include "OTModelEntities/Properties/PropertyBundleDataHandleVisUnstructuredScalarSurface.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataHandleScaling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataHandleVisUnstructuredScalarSurface.h"
 #include "DataSourceUnstructuredMesh.h"
 
 #include <string>

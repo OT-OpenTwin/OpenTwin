@@ -27,6 +27,32 @@
 #define OT_JSON_MEMBER_MetaData "Metadata"
 #define OT_JSON_MEMBER_Key "Key"
 #define OT_JSON_MEMBER_Value "Value"
+#define OT_JSON_MEMBER_Owner "Owner"
+
+std::string ot::LibraryModel::modelOriginToString(ModelOrigin _origin) {
+    switch (_origin) {
+    case ModelOrigin::Custom:
+        return "Custom";
+    case ModelOrigin::BuiltIn:
+        return "Built-in";
+    default:
+        OT_LOG_E("Invalid model origin value: " + std::to_string(static_cast<int>(_origin)));
+        return "Invalid";
+    }
+}
+
+ot::LibraryModel::ModelOrigin ot::LibraryModel::stringToModelOrigin(const std::string& _origin) {
+    if (_origin == "Custom") {
+        return ModelOrigin::Custom;
+    }
+    else if (_origin == "Built-in") {
+        return ModelOrigin::BuiltIn;
+    }
+    else {
+        OT_LOG_E("Invalid model origin string: " + _origin);
+        throw std::invalid_argument("Invalid model origin string: " + _origin);
+    }
+}
 
 ot::LibraryModel::LibraryModel(const std::string& _name, const std::string& _modelType, const std::string& _elementType) 
 	: m_name(_name), m_modelType(_modelType), m_elementType(_elementType)
@@ -58,7 +84,8 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
     _object.AddMember(OT_JSON_MEMBER_Name, JsonString(m_name, _allocator), _allocator);
     _object.AddMember(OT_JSON_MEMBER_ModelType, JsonString(m_modelType, _allocator), _allocator);
     _object.AddMember(OT_JSON_MEMBER_ElementType, JsonString(m_elementType, _allocator), _allocator);
-  
+	_object.AddMember(OT_JSON_MEMBER_Owner, JsonString(m_owner, _allocator), _allocator);
+
     JsonArray stringMapArr;
     for (const auto& it : m_metaData) {
         JsonObject stringMapObj;
@@ -74,6 +101,10 @@ void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
     m_modelType = json::getString(_object, OT_JSON_MEMBER_ModelType);
     m_elementType = json::getString(_object, OT_JSON_MEMBER_ElementType);
     
+    if(_object.HasMember(OT_JSON_MEMBER_Owner)) {
+        m_owner = json::getString(_object, OT_JSON_MEMBER_Owner);
+	}
+
     m_metaData.clear();
     for (const ConstJsonObject& metaDataObj : json::getObjectList(_object, OT_JSON_MEMBER_MetaData)) {
         std::string k = json::getString(metaDataObj, OT_JSON_MEMBER_Key);

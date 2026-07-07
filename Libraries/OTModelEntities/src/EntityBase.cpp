@@ -29,11 +29,11 @@
 //#define DISPLAY_MEMORY_CONSUMPTION
 
 #ifdef DISPLAY_MEMORY_CONSUMPTION
-	#include <windows.h>
-	#include <psapi.h>
+#include <windows.h>
+#include <psapi.h>
 #endif
 
-_declspec(dllexport) DataStorageAPI::UniqueUIDGenerator *globalUidGenerator = nullptr;
+_declspec(dllexport) DataStorageAPI::UniqueUIDGenerator* globalUidGenerator = nullptr;
 
 EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
 	m_initiallyHidden(false),
@@ -51,57 +51,72 @@ EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, M
 	m_treeItem.setEntityID(_ID);
 }
 
-EntityBase::~EntityBase() {
-	if (m_parentEntity != nullptr) {
+EntityBase::~EntityBase()
+{
+	if (m_parentEntity != nullptr)
+	{
 		m_parentEntity->removeChild(this);
 	}
-	if (m_observer != nullptr) {
+	if (m_observer != nullptr)
+	{
 		m_observer->entityRemoved(this);
 	}
 }
 
-void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator) {
-	if (globalUidGenerator == nullptr) {
+void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator* _uidGenerator)
+{
+	if (globalUidGenerator == nullptr)
+	{
 		globalUidGenerator = _uidGenerator;
 	}
-	else {
+	else
+	{
 		assert(globalUidGenerator == _uidGenerator);
 	}
 }
 
-DataStorageAPI::UniqueUIDGenerator *EntityBase::getUidGenerator(void) {
+DataStorageAPI::UniqueUIDGenerator* EntityBase::getUidGenerator(void)
+{
 	return globalUidGenerator;
 }
 
-void EntityBase::setName(const std::string& _name) {
+void EntityBase::setName(const std::string& _name)
+{
 	m_treeItem.setEntityName(_name);
 	setModified();
 }
 
-std::string EntityBase::getNameOnly() const {
+std::string EntityBase::getNameOnly() const
+{
 	std::list<std::string> tmp = ot::String::split(this->getName(), '/', true);
-	if (tmp.empty()) {
+	if (tmp.empty())
+	{
 		return this->getName();
 	}
-	else {
+	else
+	{
 		return tmp.back();
 	}
 }
 
-void EntityBase::setEntityID(ot::UID _id) {
-	if (_id != m_treeItem.getEntityID()) {
+void EntityBase::setEntityID(ot::UID _id)
+{
+	if (_id != m_treeItem.getEntityID())
+	{
 		m_treeItem.setEntityID(_id);
 		setModified();
 	}
 }
 
-void EntityBase::setModified(void) {
+void EntityBase::setModified(void)
+{
 	if (m_observer != nullptr) m_observer->entityModified(this);
-	
+
 	m_isModified = true;
 }
 
-bool EntityBase::updateFromProperties(void) {
+bool EntityBase::updateFromProperties(void)
+{
 	// This is the standard base class handler. Therefore no specific update code is provided for this entity.
 	// We check whether there are any property updates needed (which should not be the case).
 	assert(!getProperties().anyPropertyNeedsUpdate());
@@ -109,13 +124,16 @@ bool EntityBase::updateFromProperties(void) {
 	return false; // No property grid update necessary
 }
 
-void EntityBase::storeToDataBase(void) {
-	if (!getModified()) {
+void EntityBase::storeToDataBase(void)
+{
+	if (!getModified())
+	{
 		return;
 	}
 
 	assert(globalUidGenerator != nullptr);
-	if (globalUidGenerator == nullptr) {
+	if (globalUidGenerator == nullptr)
+	{
 		return;
 	}
 
@@ -124,10 +142,12 @@ void EntityBase::storeToDataBase(void) {
 	storeToDataBase(entityVersion);
 }
 
-void EntityBase::storeToDataBase(ot::UID _givenEntityVersion) {
+void EntityBase::storeToDataBase(ot::UID _givenEntityVersion)
+{
 	if (!getModified()) return;
-	
-	if (getEntityID() == ot::invalidUID) {
+
+	if (getEntityID() == ot::invalidUID)
+	{
 		OT_LOG_E("Storing entity with invalid ID to database. { \"Entity\": \"" + getName() + "\" }");
 		OTAssert(0, "Invalid entity ID when storing to data base");
 	}
@@ -143,7 +163,8 @@ void EntityBase::storeToDataBase(ot::UID _givenEntityVersion) {
 	resetModified();
 }
 
-void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, ModelState *ms, const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) {
+void EntityBase::restoreFromDataBase(EntityBase* parent, EntityObserver* obs, ModelState* ms, const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+{
 	setParent(parent);
 	setObserver(obs);
 	setModelState(ms);
@@ -168,91 +189,108 @@ void EntityBase::restoreFromDataBase(EntityBase *parent, EntityObserver *obs, Mo
 	}
 }
 
-void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase *>& _entityMap) {
-	try {
+void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap)
+{
+	try
+	{
 		std::string schemaVersionKey = "SchemaVersion_" + getClassName();
-		int schemaVersion = (int) DataBase::getIntFromView(_docView, schemaVersionKey.c_str());
+		int schemaVersion = (int)DataBase::getIntFromView(_docView, schemaVersionKey.c_str());
 		if (schemaVersion != getSchemaVersion()) throw (std::exception());
 
 		m_treeItem.setEntityID(DataBase::getIntFromView(_docView, "EntityID"));
 		m_treeItem.setEntityVersion(DataBase::getIntFromView(_docView, "Version"));
 		m_treeItem.setEntityName(std::string(_docView["Name"].get_utf8().value.data()));
-		m_initiallyHidden      = _docView["initiallyHidden"].get_bool();
-		auto bsonObj           = _docView["Properties"].get_document();
+		m_initiallyHidden = _docView["initiallyHidden"].get_bool();
+		auto bsonObj = _docView["Properties"].get_document();
 
 		clearCallbacks(true);
 
 		auto docIt = _docView.find("Owner");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			registerCallbacks(Callback::Properties | Callback::Selection | Callback::DataNotify, docIt->get_utf8().value.data(), true);
 		}
-		
+
 		docIt = _docView.find("Callbacks");
-		if (docIt != _docView.end()) {
-			for (auto&& it : docIt->get_array().value) {
+		if (docIt != _docView.end())
+		{
+			for (auto&& it : docIt->get_array().value)
+			{
 				auto kvp = it.get_document().view();
 				CallbackFlags cb(DataBase::getIntFromView(kvp, "Callbacks"));
 				std::string serviceName = kvp["ServiceName"].get_utf8().value.data();
 				registerCallbacks(cb, serviceName, true);
 			}
 		}
-				
+
 		m_manageParentVisibility = true;
 		docIt = _docView.find("manageParentVisibility");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_manageParentVisibility = docIt->get_bool();
 		}
-		
+
 		m_manageChildVisibility = true;
 		docIt = _docView.find("manageChildVisibility");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_manageChildVisibility = docIt->get_bool();
 		}
 
 		m_isDeletable = true;
 		docIt = _docView.find("isDeletable");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_isDeletable = docIt->get_bool();
 		}
 
 		docIt = _docView.find("isEditable");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_treeItem.setIsEditable(docIt->get_bool());
 		}
 
 		docIt = _docView.find("selectChildren");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_treeItem.setSelectChilds(docIt->get_bool());
 		}
 
 		docIt = _docView.find("VisibleTreeIcon");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_treeItem.setVisibleIcon(docIt->get_string().value.data());
-			if (m_treeItem.getIcons().getVisibleIcon().find('/') == std::string::npos) {
+			if (m_treeItem.getIcons().getVisibleIcon().find('/') == std::string::npos)
+			{
 				// Old format without path, update to new format
 				m_treeItem.setVisibleIcon("Default/" + m_treeItem.getIcons().getVisibleIcon());
 			}
 		}
 
 		docIt = _docView.find("HiddenTreeIcon");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_treeItem.setHiddenIcon(docIt->get_string().value.data());
-			if (m_treeItem.getIcons().getHiddenIcon().find('/') == std::string::npos) {
+			if (m_treeItem.getIcons().getHiddenIcon().find('/') == std::string::npos)
+			{
 				// Old format without path, update to new format
 				m_treeItem.setHiddenIcon("Default/" + m_treeItem.getIcons().getHiddenIcon());
 			}
 		}
 
 		docIt = _docView.find("VisualizationTypes");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_visualizationTypes.setVisualisations(ot::VisualisationTypes::VisTypes(static_cast<uint64_t>(DataBase::getIntFromView(_docView, "VisualizationTypes"))));
 		}
 
 		docIt = _docView.find("CustomViewFlags");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			m_visualizationTypes.clearCustomViewFlags();
 			auto customViewFlagsArray = docIt->get_array().value;
-			for (auto&& it : customViewFlagsArray) {
+			for (auto&& it : customViewFlagsArray)
+			{
 				auto kvp = it.get_document().view();
 				ot::VisualisationTypes::VisualisationType visType = static_cast<ot::VisualisationTypes::VisualisationType>(static_cast<uint64_t>(DataBase::getIntFromView(kvp, "VisualisationType")));
 				ot::WidgetViewBase::ViewFlags flags(static_cast<uint64_t>(DataBase::getIntFromView(kvp, "ViewFlags")));
@@ -261,7 +299,8 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view& _do
 		}
 
 		docIt = _docView.find("IsCopyable");
-		if (docIt != _docView.end()) {
+		if (docIt != _docView.end())
+		{
 			setIsCopyable(docIt->get_bool());
 		}
 
@@ -273,30 +312,36 @@ void EntityBase::readSpecificDataFromDataBase(const bsoncxx::document::view& _do
 		std::string propertiesJSON = bsoncxx::to_json(bsonObj);
 		m_properties.buildFromJSON(propertiesJSON, nullptr);
 		m_properties.forceResetUpdateForAllProperties();
-		
+
 		resetModified();
 	}
-	catch (std::exception _e) {
+	catch (std::exception _e)
+	{
 		OT_LOG_E(_e.what()); // Read failed
 	}
 }
 
-void EntityBase::addPrefetchingRequirementsForTopology(std::list<ot::UID> &prefetchIds) {
-	if (getEntityID() > 0) {
+void EntityBase::addPrefetchingRequirementsForTopology(std::list<ot::UID>& prefetchIds)
+{
+	if (getEntityID() > 0)
+	{
 		prefetchIds.push_back(getEntityID());
 	}
 }
 
-ot::UID EntityBase::createEntityUID(void) {
+ot::UID EntityBase::createEntityUID(void)
+{
 	assert(getUidGenerator() != nullptr);
 
 	return getUidGenerator()->getUID();
 }
 
-EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap) {
+EntityBase* EntityBase::readEntityFromEntityIDAndVersion(EntityBase* parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase*>& entityMap)
+{
 	auto doc = bsoncxx::builder::basic::document{};
 
-	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc)) {
+	if (!DataBase::instance().getDocumentFromEntityIDandVersion(entityID, version, doc))
+	{
 		return nullptr;
 	}
 
@@ -306,7 +351,8 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 
 	EntityBase* entity = EntityFactory::instance().create(entityType);
 
-	if (entity == nullptr) {
+	if (entity == nullptr)
+	{
 		return nullptr;
 	}
 
@@ -315,23 +361,27 @@ EntityBase *EntityBase::readEntityFromEntityIDAndVersion(EntityBase *parent, ot:
 	return entity;
 }
 
-EntityBase *EntityBase::readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap) {
+EntityBase* EntityBase::readEntityFromEntityID(EntityBase* parent, ot::UID entityID, std::map<ot::UID, EntityBase*>& entityMap)
+{
 	assert(m_modelState != nullptr);
 	ot::UID version = m_modelState->getCurrentEntityVersion(entityID);
 
 	return readEntityFromEntityIDAndVersion(parent, entityID, version, entityMap);
 }
 
-ot::UID EntityBase::getCurrentEntityVersion(ot::UID entityID) {
+ot::UID EntityBase::getCurrentEntityVersion(ot::UID entityID)
+{
 	assert(m_modelState != nullptr);
 	return m_modelState->getCurrentEntityVersion(entityID);
 }
 
-void EntityBase::entityIsStored(void) {
+void EntityBase::entityIsStored(void)
+{
 	// Determined the parent ID
 	ot::UID parentID = 0;
 
-	if (getParent() != nullptr) {
+	if (getParent() != nullptr)
+	{
 		parentID = getParent()->getEntityID();
 		assert(parentID != 0);
 		assert(parentID != ot::invalidUID);
@@ -343,7 +393,8 @@ void EntityBase::entityIsStored(void) {
 
 	ModelStateEntity::tEntityType entityType = ModelStateEntity::tEntityType::DATA;
 
-	switch (getEntityType()) {
+	switch (getEntityType())
+	{
 	case EntityBase::TOPOLOGY:
 		entityType = ModelStateEntity::tEntityType::TOPOLOGY;
 		break;
@@ -354,7 +405,8 @@ void EntityBase::entityIsStored(void) {
 		assert(0); // Unknown entity type
 	}
 
-	if (m_modelState != nullptr) {
+	if (m_modelState != nullptr)
+	{
 		m_modelState->storeEntity(getEntityID(), parentID, getEntityStorageVersion(), entityType);
 	}
 }
@@ -369,16 +421,20 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 
 	// Prepare the callback array
 	std::map<std::string, CallbackFlags> serviceCallbacksMap;
-	for (const auto& pair : getCallbackData()) {
+	for (const auto& pair : getCallbackData())
+	{
 		Callback cb = pair.first;
 		const std::list<std::string>& services = pair.second;
-		for (const auto& serviceName : services) {
+		for (const auto& serviceName : services)
+		{
 			auto it = serviceCallbacksMap.find(serviceName);
-			if (it != serviceCallbacksMap.end()) {
+			if (it != serviceCallbacksMap.end())
+			{
 				it->second |= cb;
 
 			}
-			else {
+			else
+			{
 				serviceCallbacksMap.emplace(serviceName, cb);
 			}
 		}
@@ -387,7 +443,8 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 	// Fill the callback array
 	bsoncxx::builder::basic::array callbackArray;
 
-	for (const auto& pair : serviceCallbacksMap) {
+	for (const auto& pair : serviceCallbacksMap)
+	{
 		const std::string& serviceName = pair.first;
 		CallbackFlags cb = pair.second;
 		bsoncxx::builder::basic::document cbDoc;
@@ -408,22 +465,28 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		bsoncxx::builder::basic::kvp("Callbacks", callbackArray)
 	);
 
-	if (m_treeItem.getIsEditableChanged()){
+	if (m_treeItem.getIsEditableChanged())
+	{
 		doc.append(bsoncxx::builder::basic::kvp("isEditable", m_treeItem.getIsEditable()));
 	}
-	if (m_treeItem.getSelectChildsChanged()) {
+	if (m_treeItem.getSelectChildsChanged())
+	{
 		doc.append(bsoncxx::builder::basic::kvp("selectChildren", m_treeItem.getSelectChilds()));
 	}
-	if (m_treeItem.getIconsChanged()) {
+	if (m_treeItem.getIconsChanged())
+	{
 		doc.append(bsoncxx::builder::basic::kvp("VisibleTreeIcon", m_treeItem.getIcons().getVisibleIcon()));
 		doc.append(bsoncxx::builder::basic::kvp("HiddenTreeIcon", m_treeItem.getIcons().getHiddenIcon()));
 	}
-	if (m_visualizationTypes.getVisualizationsModified()) {
+	if (m_visualizationTypes.getVisualizationsModified())
+	{
 		doc.append(bsoncxx::builder::basic::kvp("VisualizationTypes", static_cast<int64_t>(m_visualizationTypes.getVisualisations().underlying())));
 	}
-	if (m_visualizationTypes.getCustomViewFlagsModified()) {
+	if (m_visualizationTypes.getCustomViewFlagsModified())
+	{
 		bsoncxx::builder::basic::array customViewFlagsArray;
-		for (const auto& pair : m_visualizationTypes.getCustomViewFlags()) {
+		for (const auto& pair : m_visualizationTypes.getCustomViewFlags())
+		{
 			ot::VisualisationTypes::VisualisationType visType = pair.first;
 			ot::WidgetViewBase::ViewFlags flags = pair.second;
 			bsoncxx::builder::basic::document cvfDoc;
@@ -433,7 +496,8 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 		}
 		doc.append(bsoncxx::builder::basic::kvp("CustomViewFlags", customViewFlagsArray));
 	}
-	if (m_isCopyableChanged) {
+	if (m_isCopyableChanged)
+	{
 		doc.append(bsoncxx::builder::basic::kvp("IsCopyable", m_isCopyable));
 	}
 
@@ -442,8 +506,8 @@ bsoncxx::builder::basic::document EntityBase::serialiseAsMongoDocument()
 	storeDependencyArray(doc, "OutputDependency", m_outputDependency);
 
 	m_updateSelfDepedency = false; // The self dependencies should only be updated during the next save. Subsequent saves should not be affected.
-								   // The item will be kept in memory in the model service. If we would not reset the flag, all subsequent changes
-								   // would not be tracked in the dependencies.
+	// The item will be kept in memory in the model service. If we would not reset the flag, all subsequent changes
+	// would not be tracked in the dependencies.
 
 	addStorageData(doc);
 
@@ -536,28 +600,45 @@ void EntityBase::setOutputDependency(const std::list<std::pair<ot::UID, ot::UID>
 	setModified();
 }
 
-void EntityBase::detachFromHierarchy(void) {
+void EntityBase::nonValuePropertyValueSelected(const EntityPropertiesBase* _property)
+{
+	OT_LOG_WS("Unhandled non value property selection { "
+		"\"Name\": \"" << _property->getName()
+		<< "\", \"Group\": \"" << _property->getGroup() 
+		<< "\", \"HandlingType\": \"" << ot::PropertyBase::toString(_property->getCurrentValueHandlingType()) 
+		<< "\" }"
+	);
+}
+
+void EntityBase::detachFromHierarchy(void)
+{
 	// Here we detach the entity from the hierarcy which means detaching from the parent.
-	if (getParent() != nullptr) {
+	if (getParent() != nullptr)
+	{
 		getParent()->removeChild(this);
 		setParent(nullptr);
 	}
 }
 
-void EntityBase::addVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+void EntityBase::addVisualizationType(ot::VisualisationTypes::VisualisationType _type)
+{
 	m_visualizationTypes.addVisualisation(_type);
 }
 
-void EntityBase::removeVisualizationType(ot::VisualisationTypes::VisualisationType _type) {
+void EntityBase::removeVisualizationType(ot::VisualisationTypes::VisualisationType _type)
+{
 	m_visualizationTypes.removeVisualisation(_type);
 }
 
-void EntityBase::setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags) {
+void EntityBase::setCustomVisualizationViewFlags(ot::VisualisationTypes::VisualisationType _visType, ot::WidgetViewBase::ViewFlags _flags)
+{
 	m_visualizationTypes.setCustomViewFlags(_visType, _flags);
 }
 
-void EntityBase::setIsCopyable(bool _isCopyable) {
-	if (m_isCopyable != _isCopyable) {
+void EntityBase::setIsCopyable(bool _isCopyable)
+{
+	if (m_isCopyable != _isCopyable)
+	{
 		m_isCopyable = _isCopyable;
 		m_isCopyableChanged = true;
 		setModified();
@@ -588,7 +669,8 @@ void EntityBase::fillContextMenu(const ot::MenuRequestData* _requestData, ot::Me
 
 // Protected methods
 
-void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {
+void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem)
+{
 	ot::UID uid = m_treeItem.getEntityID();
 	ot::UID ver = m_treeItem.getEntityVersion();
 
@@ -600,7 +682,8 @@ void EntityBase::setDefaultTreeItem(const ot::EntityTreeItem& _treeItem) {
 	m_treeItem.resetModified();
 }
 
-void EntityBase::setDefaultVisualizationTypes(const ot::VisualisationTypes& _types) {
+void EntityBase::setDefaultVisualizationTypes(const ot::VisualisationTypes& _types)
+{
 	m_visualizationTypes = _types;
 	m_visualizationTypes.resetModified();
 }

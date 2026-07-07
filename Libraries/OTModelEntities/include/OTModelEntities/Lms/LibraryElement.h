@@ -38,6 +38,12 @@ namespace ot{
 
 		bool operator==(const LibraryElement& _other) const;
 		bool operator!=(const LibraryElement& _other) const { return !(*this == _other); }
+
+        //! @brief Compares only the functional content (name, hash, description), ignoring dependency links.
+        bool isSameContent(const LibraryElement& _other) const;
+
+        //! @brief Compares content AND the dependency link (DependencyID). Two elements with identical
+        //! content but a different DependencyID are NOT considered the same element anymore.
         bool isSameElement(const LibraryElement& _other) const;
 
         // ###########################################################################################################################################################################################################################################################################################################################

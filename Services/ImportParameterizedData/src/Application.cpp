@@ -400,7 +400,7 @@ void Application::ProcessActionDetached(const std::string& _action, ot::JsonDocu
 			_touchstoneToResultdata->createResultdata(value);
 		}
 		else if (_action == "CreateSelectedRangeEntity") {
-			this->getUiComponent()->displayMessage("Storing table range categorisations.");
+			this->getUiComponent()->displayMessage("Storing table range classifications\n.");
 			try {
 				auto listOfSerializedRanges = ot::json::getObjectList(_doc, "Ranges");
 				std::vector<ot::TableRange> ranges;

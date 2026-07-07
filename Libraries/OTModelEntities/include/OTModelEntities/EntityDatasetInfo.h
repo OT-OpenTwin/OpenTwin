@@ -6,7 +6,7 @@
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/IEventHandler.h"
-#include "OTModelEntities/Properties/PropertyBundleEventHandling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleEventHandling.h"
 #include "OTModelEntities/Lms/EntityBlockLibraryInterface.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
 
@@ -52,6 +52,8 @@ namespace ot {
 		// Special library interface function
 		virtual std::list<ot::LibraryElement> libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity, ot::NewModelStateInfo& _newStateInfo) override;
 
+		virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) override;
+
 	protected:
 
 		virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
@@ -60,5 +62,8 @@ namespace ot {
 	private:
 		PropertyBundleEventHandling m_propertyBundleEventHandling;
 		std::list<ValueComparisonDescription> m_activeFilters;
+
+		void requestScriptLoadFromLibrary();
+		void requestManifestLoadFromLibrary();
 	};
 }

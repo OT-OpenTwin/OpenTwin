@@ -56,16 +56,35 @@ private:
 	enum class LibraryElementExistenceStatus {
 		NotExisting,
 		ExistingWithIdenticalContent,
+		ExistingWithSameContentButNewDependency,
 		ExistingWithDifferentContent,
 		Error
+	};
+
+	//! @brief Result struct for updateOrCreateLibraryElement
+	//! Combines the existence status with an optional cached DB element (only set for ExistingWithIdenticalContent)
+	struct LibraryElementCheckResult {
+		LibraryElementExistenceStatus status = LibraryElementExistenceStatus::NotExisting;
+		std::optional<std::shared_ptr<ot::LibraryElement>> existingElement;
 	};
 
 	//! @brief Prompt action constance
 	const std::string c_promptActionOverwriteUserLibraryElement = "LMS.Prompt.OverwriteUserElement";
 
 	//! @brief Helper function for user library element management
-	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
+	void promptUserForLibraryElementOverwrite(const ot::UserLibraryElement& _element, std::list<ot::JsonDocument>& _remainingElements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
 	void promptMessageToUI(const std::string& _message, const std::string& _uiServiceUrl);
+
+	//! @brief Processes elements of an export request strictly one after another.
+	//! If an element needs a user decision (overwrite prompt), processing of the remaining
+	//! elements is deferred and resumed later from handleLibraryElementOverwritePromptResponse -
+	//! with the previous element's FINAL (decided) LibraryElementID already known, so DependencyID
+	//! chains are always correct, never based on a stale/pending ID.
+	//! @param _remainingElements Not-yet-processed elements, in original order, as raw JSON.
+	//! @param _previousElementId Final LibraryElementID of the element processed right before this
+	//! call. std::nullopt for the very first element (no predecessor).
+	void processNextLibraryElement(std::list<ot::JsonDocument> _remainingElements, std::optional<ot::UID> _previousElementId, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _uiServiceUrl);
+
 
 	//! @brief Generate a unique element name by appending a suffix (_X) if the name already exists
 	//! @return The unique name that doesn't exist in the database
@@ -111,14 +130,17 @@ private:
 	//! @param _dbServerUrl The database server URL
 	//! @param _dependencyCheck If true, it will also check for dependencies of the library elements and their existence status. If false, it will only check the provided elements without considering dependencies.
 	//! @return The existence status of the library element
-	LibraryElementExistenceStatus updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
+	LibraryElementCheckResult updateOrCreateLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _dependencyCheck = true);
 
 	//! @brief Helper function to add library elements to the database
 	//! @param _elements The library elements to add
 	//! @param _dbUserName The database user name
 	//! @param _dbUserPassword The database user password
 	//! @param _dbServerUrl The database server URL
-	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
+	//! @param _allowUpdate If true, an existing element with the same name will be updated in place
+	//! instead of inserting a new document. If false (default), a new document is always inserted,
+	//! even if an element with the same name already exists.
+	void addLibraryElement(std::list<std::shared_ptr<ot::LibraryElement>>& _elements, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, bool _allowUpdate = false);
 
 	//! @brief Helper function to create a ModelLibraryDialogCfg based on the provided selection configuration and database credentials
 	//! @param _selectionCfg The library element selection configuration

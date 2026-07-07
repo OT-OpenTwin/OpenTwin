@@ -45,12 +45,12 @@ ot::Dialog::DialogResult ot::ApplicationPropertiesManager::showDialog(void) {
 	m_dialog = new PropertyDialog(dialogCfg);
 	m_dialog->setWindowTitle(m_dialogTitle);
 
-	this->connect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->connect(m_dialog, &PropertyDialog::propertiesChanged, this, &ApplicationPropertiesManager::slotPropertiesChanged);
 	this->connect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
 
 	Dialog::DialogResult result = m_dialog->showDialog();
 
-	this->disconnect(m_dialog, &PropertyDialog::propertyChanged, this, &ApplicationPropertiesManager::slotPropertyChanged);
+	this->disconnect(m_dialog, &PropertyDialog::propertiesChanged, this, &ApplicationPropertiesManager::slotPropertiesChanged);
 	this->disconnect(m_dialog, &PropertyDialog::propertyDeleteRequested, this, &ApplicationPropertiesManager::slotPropertyDeleteRequested);
 
 	if (result == Dialog::Ok) {
@@ -95,11 +95,18 @@ void ot::ApplicationPropertiesManager::setDialogTitle(const QString& _title) {
 
 // Private
 
-void ot::ApplicationPropertiesManager::slotPropertyChanged(const Property* _property) {
+void ot::ApplicationPropertiesManager::slotPropertiesChanged(const std::list<const Property*>& _properties) {
 	std::string owner;
-	std::unique_ptr<Property> cleanedProperty(this->createCleanedSlotProperty(_property, owner));
-	OTAssertNullptr(cleanedProperty);
-	Q_EMIT propertyChanged(owner, cleanedProperty.get());
+	std::list<std::unique_ptr<Property>> cleanedProperties;
+	std::list<const Property*> cleanedPropertiesForSignal;
+	for (const Property* prop : _properties) {
+		std::unique_ptr<Property> cleanedProperty(this->createCleanedSlotProperty(prop, owner));
+		OTAssertNullptr(cleanedProperty);
+		cleanedProperties.push_back(std::move(cleanedProperty));
+		cleanedPropertiesForSignal.push_back(cleanedProperties.back().get());
+	}
+
+	Q_EMIT propertiesChanged(owner, cleanedPropertiesForSignal);
 }
 
 void ot::ApplicationPropertiesManager::slotPropertyDeleteRequested(const Property* _property) {

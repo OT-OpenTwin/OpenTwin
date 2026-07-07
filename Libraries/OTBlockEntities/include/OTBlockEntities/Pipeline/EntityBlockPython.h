@@ -48,10 +48,16 @@ public:
 
 	// Special library interface function
 	virtual std::list<ot::LibraryElement> libraryElementWasSet(const ot::LibraryElement& _libraryElement, EntityBase* _entity,ot::NewModelStateInfo& _newStateInfo) override;
+
+	virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) override;
+
 private:
 	const std::string m_propertyNameScripts = "Scripts";
 	const std::string m_propertyNameEnvironments = "Environment";
 
 	void updateBlockAccordingToScriptHeader();
 	void resetBlockRelatedAttributes();
+
+	void requestScriptLoadFromLibrary();
+	void requestManifestLoadFromLibrary();
 };

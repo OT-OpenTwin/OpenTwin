@@ -64,7 +64,7 @@ QString ot::PropertyInput::determineToolTipToShow() const
 	{
 		if (!propertyValueString.isEmpty() && !m_data.getPropertyFlags().has(Property::HasMultipleValues))
 		{
-			propertyTip.append("\n\nCurrent Value: " + propertyValueString);
+			propertyTip.append("\n\n" + propertyValueString);
 		}
 	}
 	else

@@ -82,15 +82,68 @@ ot::PropertyBase::PropertyFlags ot::PropertyBase::stringListToFlags(const std::l
 	return ret;
 }
 
+std::string ot::PropertyBase::toString(ValueHandlingType _type)
+{
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-void ot::PropertyBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
+	// DO NOT CHANGE SERIALIZATION
+
+	// THESE STRING ARE USED IN DATABASE
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	switch (_type)
+	{
+	case ot::PropertyBase::Value: return "Value";
+	case ot::PropertyBase::Action: return "Action";
+	default:
+		OT_LOG_ES("Unknown value handling type (" << static_cast<uint32_t>(_type) << ")");
+		return "Value";
+	}
+}
+
+ot::PropertyBase::ValueHandlingType ot::PropertyBase::stringToValueHandlingType(const std::string& _type)
+{
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	
+	// DO NOT CHANGE SERIALIZATION
+
+	// THESE STRING ARE USED IN DATABASE
+
+	// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+	if (_type == PropertyBase::toString(PropertyBase::Value)) { return PropertyBase::Value; }
+	else if (_type == PropertyBase::toString(PropertyBase::Action)) { return PropertyBase::Action; }
+	else {
+		OT_LOG_ES("Unknown value handling type \"" << _type << "\"");
+		return PropertyBase::Value;
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+ot::PropertyBase::PropertyBase(PropertyFlags _flags)
+	: m_flags(_flags), m_currentValueHandlingType(ot::PropertyBase::Value)
+{}
+
+ot::PropertyBase::PropertyBase(const std::string& _name, PropertyFlags _flags)
+	: m_name(_name), m_flags(_flags), m_currentValueHandlingType(ot::PropertyBase::Value)
+{}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Base class functions
+
+void ot::PropertyBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const
+{
 	_object.AddMember("Tip", JsonString(m_tip, _allocator), _allocator);
 	_object.AddMember("Name", JsonString(m_name, _allocator), _allocator);
 	_object.AddMember("Title", JsonString(m_title, _allocator), _allocator);
 	_object.AddMember("SpecialType", JsonString(m_specialType, _allocator), _allocator);
 
 	JsonArray dataArr;
-	for (const auto& it : m_data) {
+	for (const auto& it : m_data)
+	{
 		JsonObject dataObj;
 		dataObj.AddMember("Key", JsonString(it.first, _allocator), _allocator);
 		dataObj.AddMember("Value", JsonString(it.second, _allocator), _allocator);
@@ -99,9 +152,11 @@ void ot::PropertyBase::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
 
 	_object.AddMember("Data", dataArr, _allocator);
 	_object.AddMember("Flags", JsonArray(this->toStringList(m_flags), _allocator), _allocator);
+	_object.AddMember("CurrentValueHandlingType", JsonString(this->toString(m_currentValueHandlingType), _allocator), _allocator);
 }
 
-void ot::PropertyBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
+void ot::PropertyBase::setFromJsonObject(const ot::ConstJsonObject& _object)
+{
 	m_tip = json::getString(_object, "Tip");
 	m_name = json::getString(_object, "Name");
 	m_title = json::getString(_object, "Title");
@@ -109,36 +164,42 @@ void ot::PropertyBase::setFromJsonObject(const ot::ConstJsonObject& _object) {
 
 	m_data.clear();
 	ConstJsonObjectList dataArr = json::getObjectList(_object, "Data");
-	for (ConstJsonObject& dataObj : dataArr) {
+	for (ConstJsonObject& dataObj : dataArr)
+	{
 		std::string key = json::getString(dataObj, "Key");
 		std::string value = json::getString(dataObj, "Value");
 		m_data.insert_or_assign(key, value);
 	}
 
 	m_flags = this->stringListToFlags(json::getStringList(_object, "Flags"));
+	if (_object.HasMember("CurrentValueHandlingType"))
+	{
+		m_currentValueHandlingType = this->stringToValueHandlingType(json::getString(_object, "CurrentValueHandlingType"));
+	}
 }
 
-void ot::PropertyBase::mergeWith(const PropertyBase& _other, const MergeMode& _mergeMode) {
-	if (_mergeMode & PropertyBase::MergeConfig) {
+void ot::PropertyBase::mergeWith(const PropertyBase& _other, const MergeMode& _mergeMode)
+{
+	if (_mergeMode & PropertyBase::MergeConfig)
+	{
 		this->PropertyBase::operator=(_other);
 	}
 }
 
-ot::PropertyBase::PropertyBase(PropertyFlags _flags)
-	: m_flags(_flags)
-{}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-ot::PropertyBase::PropertyBase(const std::string& _name, PropertyFlags _flags)
-	: m_name(_name), m_flags(_flags)
-{}
+// Setter / Getter
 
-std::string ot::PropertyBase::getAdditionalPropertyData(const std::string& _key) const {
+std::string ot::PropertyBase::getAdditionalPropertyData(const std::string& _key) const
+{
 	const auto& it = m_data.find(_key);
-	if (it == m_data.end()) {
+	if (it == m_data.end())
+	{
 		OT_LOG_E("Data not found");
 		return std::string();
 	}
-	else {
+	else
+	{
 		return it->second;
 	}
 }

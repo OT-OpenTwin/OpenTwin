@@ -42,55 +42,61 @@
 
 // Property dialog tree
 
-namespace ot {
+namespace ot
+{
 
-		class PropertyDialog::PropertyDialogNavigation : public TreeWidgetFilter {
-			OT_DECL_NOCOPY(PropertyDialogNavigation)
+	class PropertyDialog::PropertyDialogNavigation : public TreeWidgetFilter
+	{
+		OT_DECL_NOCOPY(PropertyDialogNavigation)
 			OT_DECL_NOMOVE(PropertyDialogNavigation)
 			OT_DECL_NODEFAULT(PropertyDialogNavigation)
-		public:
-			PropertyDialogNavigation(QWidget* _parent) : TreeWidgetFilter(_parent) {
-				this->getTreeWidget()->setHeaderHidden(true);
-				this->setOTWidgetFlags(ot::WidgetFlag::ApplyFilterOnTextChange | ot::WidgetFlag::ApplyFilterOnReturn);
-			}
+	public:
+		PropertyDialogNavigation(QWidget* _parent) : TreeWidgetFilter(_parent)
+		{
+			this->getTreeWidget()->setHeaderHidden(true);
+			this->setOTWidgetFlags(ot::WidgetFlag::ApplyFilterOnTextChange | ot::WidgetFlag::ApplyFilterOnReturn);
+		}
 
-		private:
+	private:
 
-		}; // class PropertyDialogNavigation;
+	}; // class PropertyDialogNavigation;
 
-		// ###########################################################################################################################################################################################################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		// ###########################################################################################################################################################################################################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		// ###########################################################################################################################################################################################################################################################################################################################
+	// ###########################################################################################################################################################################################################################################################################################################################
 
-		class PropertyDialog::PropertyDialogEntry {
-		public:
-			PropertyDialog::PropertyDialogEntry() : m_treeItem(nullptr) {};
+	class PropertyDialog::PropertyDialogEntry
+	{
+	public:
+		PropertyDialog::PropertyDialogEntry() : m_treeItem(nullptr) {};
 
-			PropertyDialogEntry(const PropertyDialogEntry& _other) {
-				*this = _other;
-			}
+		PropertyDialogEntry(const PropertyDialogEntry& _other)
+		{
+			*this = _other;
+		}
 
-			PropertyDialogEntry& operator = (const PropertyDialogEntry& _other) {
-				if (this == &_other) return *this;
+		PropertyDialogEntry& operator = (const PropertyDialogEntry& _other)
+		{
+			if (this == &_other) return *this;
 
-				m_treeItem = _other.m_treeItem;
-				m_gridConfig = _other.m_gridConfig;
+			m_treeItem = _other.m_treeItem;
+			m_gridConfig = _other.m_gridConfig;
 
-				return *this;
-			}
+			return *this;
+		}
 
-			void setTreeItem(TreeWidgetItem* _item) { m_treeItem = _item; };
-			TreeWidgetItem* getTreeItem() const { return m_treeItem; };
+		void setTreeItem(TreeWidgetItem* _item) { m_treeItem = _item; };
+		TreeWidgetItem* getTreeItem() const { return m_treeItem; };
 
-			void setGridConfig(const PropertyGridCfg& _config) { m_gridConfig = _config; };
-			const PropertyGridCfg& getGridConfig() const { return m_gridConfig; };
+		void setGridConfig(const PropertyGridCfg& _config) { m_gridConfig = _config; };
+		const PropertyGridCfg& getGridConfig() const { return m_gridConfig; };
 
-		private:
-			TreeWidgetItem* m_treeItem;
-			PropertyGridCfg m_gridConfig;
-		};
+	private:
+		TreeWidgetItem* m_treeItem;
+		PropertyGridCfg m_gridConfig;
+	};
 
 } // namespace ot
 
@@ -105,11 +111,11 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 {
 	// Create layouts
 	QVBoxLayout* cLay = new QVBoxLayout(this);
-	
+
 	// Create controls
 	Splitter* cSplitter = new Splitter(this);
 	cLay->addWidget(cSplitter, 1);
-
+	
 	m_navigation = new PropertyDialogNavigation(cSplitter);
 	cSplitter->addWidget(m_navigation->getQWidget());
 
@@ -142,23 +148,30 @@ ot::PropertyDialog::PropertyDialog(const PropertyDialogCfg& _config, QWidget* _p
 	this->slotTreeSelectionChanged();
 }
 
-ot::PropertyDialog::~PropertyDialog() {
+ot::PropertyDialog::~PropertyDialog()
+{
 	m_treeMap.clear();
-	for (const Property* prop : m_changedProperties) {
+	for (const Property* prop : m_changedProperties)
+	{
 		delete prop;
 	}
 }
 
-void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config) {
+void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config)
+{
 	// Store currently selected navigation item
 	QStringList currentFocus;
-	if (!m_navigation->getTreeWidget()->selectedItems().isEmpty()) {
-		if (m_navigation->getTreeWidget()->selectedItems().count() > 1) {
+	if (!m_navigation->getTreeWidget()->selectedItems().isEmpty())
+	{
+		if (m_navigation->getTreeWidget()->selectedItems().count() > 1)
+		{
 			OT_LOG_E("Multiselection is not supported");
 		}
-		else {
+		else
+		{
 			QTreeWidgetItem* itm = m_navigation->getTreeWidget()->selectedItems().front();
-			while (itm) {
+			while (itm)
+			{
 				currentFocus.push_front(itm->text(0));
 				itm = itm->parent();
 			}
@@ -174,14 +187,17 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 	this->iniData(_config);
 
 	// Restore selected item
-	if (!currentFocus.empty()) {
+	if (!currentFocus.empty())
+	{
 		QTreeWidgetItem* newFocus = this->findTreeItem(m_navigation->getTreeWidget()->invisibleRootItem(), currentFocus);
-		if (newFocus) {
+		if (newFocus)
+		{
 			newFocus->setSelected(true);
 
 			newFocus = newFocus->parent();
 
-			while (newFocus) {
+			while (newFocus)
+			{
 				newFocus->setExpanded(true);
 				newFocus = newFocus->parent();
 			}
@@ -189,13 +205,15 @@ void ot::PropertyDialog::setupFromConfiguration(const PropertyDialogCfg& _config
 			m_grid->getTreeWidget()->verticalScrollBar()->setSliderPosition(currentSliderPos);
 		}
 	}
-	else if (m_navigation->getTreeWidget()->topLevelItemCount() > 0) {
+	else if (m_navigation->getTreeWidget()->topLevelItemCount() > 0)
+	{
 		QTreeWidgetItem* itm = m_navigation->getTreeWidget()->topLevelItem(0);
 		itm->setSelected(true);
 	}
 }
 
-void ot::PropertyDialog::setConfirmButtonEnabled(bool _enabled) {
+void ot::PropertyDialog::setConfirmButtonEnabled(bool _enabled)
+{
 	m_confirmButton->setEnabled(_enabled);
 }
 
@@ -209,25 +227,49 @@ ot::PropertyDialogCfg ot::PropertyDialog::createConfiguration() const
 	return cfg;
 }
 
+void ot::PropertyDialog::addData(const QString& _key, const QVariant& _value)
+{
+	m_data.insert_or_assign(_key, _value);
+}
+
+QVariant ot::PropertyDialog::getData(const QString& _key) const
+{
+	auto it = m_data.find(_key);
+	if (it == m_data.end())
+	{
+		OT_LOG_E("Key not found");
+		return QVariant();
+	}
+	else
+	{
+		return it->second;
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private slots
 
-void ot::PropertyDialog::slotConfirm() {
-	if ((this->dialogFlags() & DialogCfg::CancelOnNoChange) && !m_changed) {
+void ot::PropertyDialog::slotConfirm()
+{
+	if ((this->dialogFlags() & DialogCfg::CancelOnNoChange) && !m_changed)
+	{
 		this->closeDialog(Dialog::Cancel);
 	}
-	else {
+	else
+	{
 		this->closeDialog(Dialog::Ok);
 	}
 }
 
-void ot::PropertyDialog::slotTreeSelectionChanged() {
+void ot::PropertyDialog::slotTreeSelectionChanged()
+{
 	m_grid->clear();
 	if (m_navigation->getTreeWidget()->selectedItems().count() != 1) return;
 
 	const auto& it = m_treeMap.find(m_navigation->getTreeWidget()->selectedItems().front());
-	if (it == m_treeMap.end()) {
+	if (it == m_treeMap.end())
+	{
 		OT_LOG_E("Unknown item selected");
 		return;
 	}
@@ -237,16 +279,19 @@ void ot::PropertyDialog::slotTreeSelectionChanged() {
 	Q_EMIT propertyGridRefreshed();
 }
 
-void ot::PropertyDialog::slotPropertiesChanged(const std::list<const Property*>& _properties) {
-	for (const Property* prop : _properties) {
+void ot::PropertyDialog::slotPropertiesChanged(const std::list<const Property*>& _properties)
+{
+	for (const Property* prop : _properties)
+	{
 		// Store a copy if the signal is not used and the properties need to be accessed all at once after the dialog was confirmed.
 		m_changedProperties.push_back(prop->createCopyWithParents());
-
-		Q_EMIT propertyChanged(prop);
 	}
+
+	Q_EMIT propertiesChanged(_properties);
 }
 
-void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* _property) {
+void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* _property)
+{
 	Q_EMIT propertyDeleteRequested(_property);
 }
 
@@ -254,16 +299,20 @@ void ot::PropertyDialog::slotPropertyDeleteRequested(const Property* _property) 
 
 // Private helper
 
-void ot::PropertyDialog::iniData(const PropertyDialogCfg& _config) {
-	for (PropertyGroup* group : _config.getRootGroups()) {
+void ot::PropertyDialog::iniData(const PropertyDialogCfg& _config)
+{
+	for (PropertyGroup* group : _config.getRootGroups())
+	{
 		this->iniGroup(m_navigation->getTreeWidget()->invisibleRootItem(), group);
 	}
 }
 
-void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group) {
+void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const PropertyGroup* _group)
+{
 	if (_group->isEmpty()) return;
 
-	if (this->childItemExists(_parentTreeItem, QString::fromStdString(_group->getTitle()))) {
+	if (this->childItemExists(_parentTreeItem, QString::fromStdString(_group->getTitle())))
+	{
 		OT_LOG_E("Child item already exists");
 		return;
 	}
@@ -278,35 +327,42 @@ void ot::PropertyDialog::iniGroup(QTreeWidgetItem* _parentTreeItem, const Proper
 
 	newEntry.setGridConfig(newGridConfig);
 
-	for (PropertyGroup* childGroup : _group->getChildGroups()) {
+	for (PropertyGroup* childGroup : _group->getChildGroups())
+	{
 		this->iniGroup(newEntry.getTreeItem(), childGroup);
 	}
 
-	for (Property* prop : _group->getProperties()) {
+	for (Property* prop : _group->getProperties())
+	{
 		QString propText = QString::fromStdString(prop->getPropertyName()) + " | " + QString::fromStdString(prop->getPropertyTitle());
-		if (!this->childItemExists(newEntry.getTreeItem(), propText)) {
+		if (!this->childItemExists(newEntry.getTreeItem(), propText))
+		{
 			TreeWidgetItem* propItem = new TreeWidgetItem;
 			propItem->setText(0, propText);
 			newEntry.getTreeItem()->addChild(propItem);
 			propItem->setNavigationItemFlag(NavigationTreeItemCfg::ItemIsInvisible);
 			propItem->setHidden(true);
-		}	
+		}
 	}
 
 	m_treeMap.insert_or_assign(newEntry.getTreeItem(), newEntry);
 }
 
-bool ot::PropertyDialog::childItemExists(QTreeWidgetItem* _item, const QString& _text) {
-	for (int i = 0; i < _item->childCount(); i++) {
+bool ot::PropertyDialog::childItemExists(QTreeWidgetItem* _item, const QString& _text)
+{
+	for (int i = 0; i < _item->childCount(); i++)
+	{
 		if (_item->child(i)->text(0) == _text) return true;
 	}
 	return false;
 }
 
-ot::PropertyGroup* ot::PropertyDialog::createRootGroupConfig(const PropertyGroup* _group) {
+ot::PropertyGroup* ot::PropertyDialog::createRootGroupConfig(const PropertyGroup* _group)
+{
 	PropertyGroup* result = _group->createCopy(true);
 	PropertyGroup* parentGroup = _group->getParentGroup();
-	while (parentGroup) {
+	while (parentGroup)
+	{
 		PropertyGroup* newParent = parentGroup->createCopy(false);
 		newParent->addChildGroup(result);
 		result = newParent;
@@ -315,13 +371,16 @@ ot::PropertyGroup* ot::PropertyDialog::createRootGroupConfig(const PropertyGroup
 	return result;
 }
 
-QTreeWidgetItem* ot::PropertyDialog::findTreeItem(QTreeWidgetItem* _parent, QStringList _path) const {
+QTreeWidgetItem* ot::PropertyDialog::findTreeItem(QTreeWidgetItem* _parent, QStringList _path) const
+{
 	if (_path.isEmpty()) return nullptr;
 	QString txt = _path.front();
 	_path.pop_front();
 
-	for (int i = 0; i < _parent->childCount(); i++) {
-		if (_parent->child(i)->text(0) == txt) {
+	for (int i = 0; i < _parent->childCount(); i++)
+	{
+		if (_parent->child(i)->text(0) == txt)
+		{
 			if (_path.isEmpty()) return _parent->child(i);
 			else return this->findTreeItem(_parent->child(i), _path);
 		}

@@ -25,6 +25,7 @@
 #include "OTWidgets/Widgets/LineEdit.h"
 #include "OTWidgets/Widgets/ComboBox.h"
 #include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/ComboButton.h"
 
 // Qt header
 #include <QtWidgets/qlayout.h>
@@ -45,6 +46,14 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 	
 	Label* titleLabel = new Label("Name:", this);
 	titleLay->addWidget(titleLabel);
+
+	m_sourceSelection = new ComboButton("All", this);
+
+	// Fill the source selection
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Custom)));
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::BuiltIn)));
+
+	titleLay->addWidget(m_sourceSelection);
 
 	m_nameEdit = new ComboBox(this);
 	m_nameEdit->setEditable(true);
@@ -113,11 +122,15 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 	this->connect(okButton, &PushButton::clicked, this, &ModelLibraryDialog::slotConfirm);
 	this->connect(cancelButton, &PushButton::clicked, this, &ModelLibraryDialog::closeCancel);
 
+	// Source selection changed
+	this->connect(m_sourceSelection, &ComboButton::selectedItemChanged, this, &ModelLibraryDialog::slotSourceSelectionChanged);
+
 	// Initialize window
 	this->connect(m_nameEdit, &ComboBox::currentTextChanged, this, &ModelLibraryDialog::slotModelChanged);
 
 	// Initialize models
 	this->slotFilterChanged();
+	this->slotSourceSelectionChanged();
 }
 
 ot::ModelLibraryDialog::~ModelLibraryDialog() {
@@ -150,37 +163,8 @@ void ot::ModelLibraryDialog::slotConfirm() {
 }
 
 void ot::ModelLibraryDialog::slotFilterChanged() {
-	// Store edit settings
-	QString txt = m_nameEdit->currentText();
-
-	m_nameEdit->clear();
-
-	// Go trough all models
-	for (const LibraryModel& model : m_config.getModels()) {
-		bool match = true;
-
-		// Check all filters
-		for (const FilterInputEntry& entry : m_filterEntries) {
-			if (!entry.edit->text().isEmpty()) {
-				// Ensure model has the data
-				if (model.hasMetaDataValue(entry.name)) {
-					const std::string metaDataValue = String::toLower(model.getMetaDataValue(entry.name));
-					const std::string filterValue = String::toLower(entry.edit->text().toStdString());
-					if (metaDataValue.find(filterValue) == std::string::npos) {
-						match = false;
-						break;
-					}
-				}
-			}
-		}
-
-		if (match) {
-			m_nameEdit->addItem(QString::fromStdString(model.getName()));
-		}
-	}
-
-	// Restore edit settings
-	m_nameEdit->setCurrentText(txt);
+	
+	this->updateNameEdit();
 }
 
 void ot::ModelLibraryDialog::slotModelChanged() {
@@ -214,6 +198,19 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 				m_infoWidgets.push_back(edit);
 				r++;
 			}
+
+			if (!model.getOwner().empty()) {
+				// Add owner info
+				Label* label = new Label("Owner", this);
+				LineEdit* edit = new LineEdit(QString::fromStdString(model.getOwner()), this);
+				edit->setReadOnly(true);
+				m_infoLayout->addWidget(label, r, 0);
+				m_infoLayout->addWidget(edit, r, 1);
+				m_infoWidgets.push_back(label);
+				m_infoWidgets.push_back(edit);
+				r++;
+			}
+
 			m_infoLayout->setRowStretch(r, 1);
 
 			if (r > 0) {
@@ -223,4 +220,54 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 			break;
 		}
 	}
+}
+
+void ot::ModelLibraryDialog::slotSourceSelectionChanged()
+{
+	m_sourceFilteredModels.clear();
+	std::string selectedSource = m_sourceSelection->text().toStdString();
+
+	for (const LibraryModel& model : m_config.getModels()) {
+		if (selectedSource != "All") {
+			LibraryModel::ModelOrigin selectedOrigin =
+				LibraryModel::stringToModelOrigin(selectedSource);
+			if (model.getModelOrigin() != selectedOrigin) continue;
+		}
+		m_sourceFilteredModels.push_back(model);
+	}
+	this->updateNameEdit();
+}
+
+void ot::ModelLibraryDialog::updateNameEdit()
+{
+	// Store edit settings
+	QString txt = m_nameEdit->currentText();
+	m_nameEdit->clear();
+
+	// Go trough all models
+	for (const LibraryModel& model : m_sourceFilteredModels) {
+		bool match = true;
+
+		// Check all filters
+		for (const FilterInputEntry& entry : m_filterEntries) {
+			if (!entry.edit->text().isEmpty()) {
+				// Ensure model has the data
+				if (model.hasMetaDataValue(entry.name)) {
+					const std::string metaDataValue = String::toLower(model.getMetaDataValue(entry.name));
+					const std::string filterValue = String::toLower(entry.edit->text().toStdString());
+					if (metaDataValue.find(filterValue) == std::string::npos) {
+						match = false;
+						break;
+					}
+				}
+			}
+		}
+
+		if (match) {
+			m_nameEdit->addItem(QString::fromStdString(model.getName()));
+		}
+	}
+
+	// Restore edit settings
+	m_nameEdit->setCurrentText(txt);
 }

@@ -33,6 +33,15 @@ namespace ot {
 		OT_DECL_DEFCOPY(LibraryModel)
 		OT_DECL_DEFMOVE(LibraryModel)
 	public:
+
+		enum class ModelOrigin {
+			Custom,
+			BuiltIn
+		};
+
+		static std::string modelOriginToString(ModelOrigin _origin);
+		static ModelOrigin stringToModelOrigin(const std::string& _origin);
+
 		LibraryModel() = default;
 		LibraryModel(const std::string& _name, const std::string& _modelType, const std::string& _elementType);
 		virtual ~LibraryModel() = default;
@@ -47,8 +56,13 @@ namespace ot {
 		void setModelType(const std::string& _modelType) { m_modelType = _modelType; };
 		const std::string& getModeltype() const { return m_modelType; }
 
-		void setElementType(const std::string& _modelType) { m_elementType = m_elementType; };
+		void setElementType(const std::string& _elementType) { m_elementType = _elementType; };
 		const std::string& getElementType() const { return m_elementType; }
+
+		ModelOrigin getModelOrigin() const { return m_owner.empty() ? ModelOrigin::BuiltIn : ModelOrigin::Custom; }
+
+		void setOwner(const std::string& _owner) { m_owner = _owner; };
+		const std::string& getOwner() const { return m_owner; }
 
 		void addMetaData(const std::string& _key, const std::string& _value);
 		bool hasMetaDataValue(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); };
@@ -72,7 +86,9 @@ namespace ot {
 	private:
 		std::string m_name;
 		std::string m_modelType;
+		std::string m_owner;
 		std::string m_elementType;
 		std::unordered_map<std::string, std::string> m_metaData;
+		
 	};
 }

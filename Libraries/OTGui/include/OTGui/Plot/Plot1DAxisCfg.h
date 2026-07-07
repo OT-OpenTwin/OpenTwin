@@ -185,7 +185,7 @@ namespace ot {
 		bool m_autoDetermineAxisLabel = true;
 		std::string m_axisLabel = "";
 
-		String::DisplayNumberFormat m_displayNumberFormat = String::DisplayNumberFormat::Decimal;
+		String::DisplayNumberFormat m_displayNumberFormat = String::DisplayNumberFormat::Engineering;
 		int32_t m_displayNumberPrecision = 3;
 
 		AxisQuantityComponent m_axisQuantityComponent = AxisQuantityComponent::Undefined;

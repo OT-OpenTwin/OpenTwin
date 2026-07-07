@@ -21,9 +21,9 @@
 #pragma warning(disable : 4251)
 
 #include "OTModelEntities/EntityVis2D3D.h"
-#include "OTModelEntities/Properties/PropertyBundlePlane.h"
-#include "OTModelEntities/Properties/PropertyBundleScaling.h"
-#include "OTModelEntities/Properties/PropertyBundleVis2D3D.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundlePlane.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleScaling.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleVis2D3D.h"
 
 class __declspec(dllexport) EntityVisCartesianFaceScalar : public EntityVis2D3D
 {

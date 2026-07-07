@@ -110,7 +110,10 @@ public:
 	void        deleteProperty(const std::list<ot::UID>& entityIDList, const std::string &propertyName, const std::string& propertyGroup);
 
 	bool entitiesNeedUpdate();
-	void updateEntityProperties(bool itemsVisible);
+	void updateEntityProperties(bool _itemsVisible);
+	void updateEntityProperties(bool _itemsVisible, std::list<EntityBase*>&& _entitiesForNonValueProperties, EntityProperties&& _nonValueProperties);
+	void notifyNonValuePropertiesSelected(const ot::UIDList& _entityIDList, const EntityProperties& _nonValueProperties);
+	void notifyNonValuePropertiesSelected(const std::list<EntityBase*>& _entitiesForNonValueProperties, const EntityProperties& _nonValueProperties);
 
 	void deleteEntity(EntityBase *entity);
 	double calculateDeflectionFromListOfEntities(std::list<EntityBase *> &entities);
@@ -289,7 +292,7 @@ private:
 	void addChildrenEntitiesToList(EntityGeometry* entity, std::list<std::pair<ot::UID, ot::UID>>& childrenEntities);
 	void recursivelyAddEntityInfo(EntityBase *entity, std::map<ot::UID, ot::UID> &entityVersionMap);
 	void determineIDandVersionForEntityWithChildren(EntityBase *entity, std::list<ot::UID> &entityInfoIDList, std::list<ot::UID> &entityInfoVersionList);
-	void otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> otherServicesUpdate, bool itemsVisible);
+	void otherServicesUpdate(std::map<std::string, std::list<std::pair<ot::UID, ot::UID>>> _otherServicesUpdate, bool _itemsVisible, ot::UIDList&& _entitiesForNonValueProperties, EntityProperties&& _nonValueProperties);
 	void performUpdateVisualizationEntity(std::list<ot::UID> entityIDs, std::list<ot::UID> entityVersions, std::list<ot::UID> brepVersions, std::list<std::string> callbackServices);
 	bool updateNumericalValues(EntityBase *entity);
 	bool evaluateExpressionDouble(const std::string &expression, double &value, ot::UID entityID, const std::string &propertyName, const std::string& propertyGroup);
@@ -317,8 +320,8 @@ private:
 	std::list<EntityBase*> FindTopLevelBlockEntities(std::list<EntityBase*>& entityID);
 	std::list<EntityBase*> getTopLevelEntitiesByName(std::list<EntityBase*> entities);
 	void determineActiveCoordinateSystem();
-	void handleParentGroupPropertyChange(std::list<EntityBase*> &entities, EntityProperties& properties);
-	void applyParentGroupChange(std::list<EntityBase*> &entities, const std::string& newParentGroup);
+	void handleParentGroupPropertyChange(const std::list<EntityBase*>& _entities, EntityProperties& _valueProperties);
+	void applyParentGroupChange(const std::list<EntityBase*> &entities, const std::string& newParentGroup);
 	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
 	std::string ensureUniqueName(const std::string& name);
 
