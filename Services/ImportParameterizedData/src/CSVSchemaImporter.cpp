@@ -17,217 +17,224 @@
 
 void CSVSchemaImporter::execute()
 {
-	auto startPreprocessing = std::chrono::high_resolution_clock::now();
-	// First we check the settings for the importer
-	auto csvDatasetImporter = loadSelectedCSVImporter();
-	if (csvDatasetImporter == nullptr)
+	try
 	{
-		OT_USER_LOG_E("Running the csv dataset import requires the selection of a single importer.");
-		return;
-	}
-
-	std::string importerRunSettings = "Performing a data refinement of csv files. Selected settings:\n"
-	"Metadata files added to the datasets by the chosen format of: " + csvDatasetImporter->getMetadataSelectionFormatString() + "\n"
-	"CSV files are selected by the criteria: " + csvDatasetImporter->getCSVSelectionFormatString() + "\n"
-	"New datasets are named by the format of: " + csvDatasetImporter->getNamingFormatString();
-	OT_USER_LOG_I(importerRunSettings);
-
-	std::list<std::unique_ptr<EntityFileCSV>> csvFiles;
-	loadCSVFiles(csvFiles, *csvDatasetImporter.get());
-	if (csvFiles.size() == 0)
-	{
-		OT_USER_LOG_E("No csv files found that are considered for refinement and match the selected format.");
-		return;
-	}
-	OT_USER_LOG_I("Number of considered csv files: " + std::to_string(csvFiles.size()));
-
-	std::string seriesClassificationName = csvDatasetImporter->getSelectedSeriesClassification();
-	if (seriesClassificationName.empty())
-	{
-		OT_USER_LOG_E("No series classification selected.");
-		return;
-	}
-	OT_USER_LOG_I("Using classification: " + seriesClassificationName);
-
-	std::map<std::string, std::unique_ptr<EntityFileText>> metadataFiles;
-	loadJsonFiles(metadataFiles, csvFiles, *csvDatasetImporter.get());
-	bool interruptAtWarnings = csvDatasetImporter->interruptAtWarnings();
-	if (csvDatasetImporter->getMetadataSelectionFormat() == EntityDatasetImporterCSV::MetadataSelectionFormat::SameName && metadataFiles.size() != csvFiles.size())
-	{
-		OT_USER_LOG_W("Failed to find a metadata file for every csv file.");
-		if (interruptAtWarnings)
+		auto startPreprocessing = std::chrono::high_resolution_clock::now();
+		// First we check the settings for the importer
+		auto csvDatasetImporter = loadSelectedCSVImporter();
+		if (csvDatasetImporter == nullptr)
 		{
+			OT_USER_LOG_E("Running the csv dataset import requires the selection of a single importer.");
 			return;
 		}
-	}
-	
-	// Now we load and check the table selection ranges
-	MetadataAssemblyData seriesMetadataAssemblyData(extractMetadataAssembly(seriesClassificationName));
-	MetadataAssemblyData* parameter =  seriesMetadataAssemblyData.m_next;
-	MetadataAssemblyData* quantity =  parameter->m_next;
-	bool quantMissing = quantity->m_allSelectionRanges.size() == 0;
-	bool paramMissing = parameter->m_allSelectionRanges.size() == 0;
-	if (quantMissing || paramMissing)
-	{
-		std::string missingComponent =  paramMissing && quantMissing ? "Parameter and quantity" : paramMissing  ? "Parameter" : "Quantity";
-		OT_USER_LOG_E(missingComponent + " classification(s) without table ranges in : " + seriesClassificationName);
-		return;
-	}
 
-	std::set<std::string> referencedTableNames;
-	std::set<std::string> referencesWithoutEntireColumnOrRow;
-	for (auto& selectionRange : parameter->m_allSelectionRanges)
-	{
-		referencedTableNames.insert(selectionRange->getTableName());		
-		if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+		std::string importerRunSettings = "Performing a data refinement of csv files. Selected settings:\n"
+			"Metadata files added to the datasets by the chosen format of: " + csvDatasetImporter->getMetadataSelectionFormatString() + "\n"
+			"CSV files are selected by the criteria: " + csvDatasetImporter->getCSVSelectionFormatString() + "\n"
+			"New datasets are named by the format of: " + csvDatasetImporter->getNamingFormatString();
+		OT_USER_LOG_I(importerRunSettings);
+
+		std::list<std::unique_ptr<EntityFileCSV>> csvFiles;
+		loadCSVFiles(csvFiles, *csvDatasetImporter.get());
+		if (csvFiles.size() == 0)
 		{
-			referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+			OT_USER_LOG_E("No csv files found that are considered for refinement and match the selected format.");
+			return;
 		}
-	}
-	for (auto& selectionRange : quantity->m_allSelectionRanges)
-	{
-		referencedTableNames.insert(selectionRange->getTableName());
-		if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+		OT_USER_LOG_I("Number of considered csv files: " + std::to_string(csvFiles.size()));
+
+		std::string seriesClassificationName = csvDatasetImporter->getSelectedSeriesClassification();
+		if (seriesClassificationName.empty())
 		{
-			referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+			OT_USER_LOG_E("No series classification selected.");
+			return;
 		}
-	}
+		OT_USER_LOG_I("Using classification: " + seriesClassificationName);
 
-	if (referencedTableNames.size() != 1)
-	{
-		std::string allReferencedTableNames;
-		for (const std::string& referencedTableName : referencedTableNames)
+		std::map<std::string, std::unique_ptr<EntityFileText>> metadataFiles;
+		loadJsonFiles(metadataFiles, csvFiles, *csvDatasetImporter.get());
+		bool interruptAtWarnings = csvDatasetImporter->interruptAtWarnings();
+		if (csvDatasetImporter->getMetadataSelectionFormat() == EntityDatasetImporterCSV::MetadataSelectionFormat::SameName && metadataFiles.size() != csvFiles.size())
 		{
-			allReferencedTableNames += referencedTableName + ", ";
-		}
-		OT_USER_LOG_E("Table ranges reference different tables: " + allReferencedTableNames.substr(0,allReferencedTableNames.size() -2));
-		return;
-	}
-	
-	if (referencesWithoutEntireColumnOrRow.size() != 0)
-	{
-		std::string allReferencedTableNames;
-		for (const std::string& referencedTableName : referencesWithoutEntireColumnOrRow)
-		{
-			allReferencedTableNames += referencedTableName + ", ";
-		}
-		OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(0, allReferencedTableNames.size() - 2));
-	}
-
-	auto endPreprocessing = std::chrono::high_resolution_clock::now();
-	auto durationPreprocessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endPreprocessing - startPreprocessing);
-	const std::string durationPreprocessingFormatted = TimeFormatter::formatDuration(durationPreprocessing);
-	OT_USER_LOG_I("Preprocessing took: " + durationPreprocessingFormatted);
-	// Now we start the creation of the datasets
-	std::list<std::string> existingDatasetNames = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder);
-	ResultCollectionExtender resultCollectionExtender(Application::instance());
-
-	ProgressUpdater updater(Application::instance()->getUiComponent(), "Importing data from csv files");
-	uint32_t counter(1);
-	updater.setTotalNumberOfSteps(static_cast<uint32_t>(csvFiles.size()));
-
-	OT_USER_LOG_I("Refining data from csv file(s)");
-	auto startProcessing = std::chrono::high_resolution_clock::now();
-	ot::NewModelStateInfo newEntityInfos;
-
-	size_t modelBatchSizes = 20;
-	std::string modelStateMessageBase = "";
-	if (csvFiles.size() > modelBatchSizes)
-	{
-		modelStateMessageBase = "Files: ";
-	}
-	for (auto csvFile = csvFiles.begin(); csvFile != csvFiles.end();)
-	{
-		// First we assemble the information for the newly created series
-		std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
-		std::string seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
-		std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
-		ot::UID seriesUID;
-		if (!extractedMetadata.has_value())
-		{
+			OT_USER_LOG_W("Failed to find a metadata file for every csv file.");
 			if (interruptAtWarnings)
 			{
 				return;
 			}
-			else
-			{
-				seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, ot::JsonDocument());
-			}
-		}
-		else
-		{
-			seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, extractedMetadata.value());
 		}
 
-		// Then we store the data points
-		try
+		// Now we load and check the table selection ranges
+		MetadataAssemblyData seriesMetadataAssemblyData(extractMetadataAssembly(seriesClassificationName));
+		MetadataAssemblyData* parameter = seriesMetadataAssemblyData.m_next;
+		MetadataAssemblyData* quantity = parameter->m_next;
+		bool quantMissing = quantity->m_allSelectionRanges.size() == 0;
+		bool paramMissing = parameter->m_allSelectionRanges.size() == 0;
+		if (quantMissing || paramMissing)
 		{
-			for (DatasetDescription& dataset : datasetDescriptions)
-			{
-				resultCollectionExtender.processDataPoints(&dataset, seriesUID);
-			}
-			// Since the import was successfull, we need to set the flag in the csv file, so it is not being imported again
-			(*csvFile)->setConsiderForRefinement(false);
-			(*csvFile)->storeToDataBase();
-			newEntityInfos.addTopologyEntity(*(*csvFile).get());
-		}
-		catch (std::exception& e)
-		{
-			std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
-				"Creation of series \"" + seriesName + "\" failed.";
-			OT_USER_LOG_E(exceptionMessage);
+			std::string missingComponent = paramMissing && quantMissing ? "Parameter and quantity" : paramMissing ? "Parameter" : "Quantity";
+			OT_USER_LOG_E(missingComponent + " classification(s) without table ranges in : " + seriesClassificationName);
 			return;
-			bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
-			assert(seriesRemoved); //Otherwise panic!
 		}
-		
-		if (counter % modelBatchSizes == 0)
+
+		std::set<std::string> referencedTableNames;
+		std::set<std::string> referencesWithoutEntireColumnOrRow;
+		for (auto& selectionRange : parameter->m_allSelectionRanges)
+		{
+			referencedTableNames.insert(selectionRange->getTableName());
+			if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+			{
+				referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+			}
+		}
+		for (auto& selectionRange : quantity->m_allSelectionRanges)
+		{
+			referencedTableNames.insert(selectionRange->getTableName());
+			if (!selectionRange->getSelectEntireColumn() && !selectionRange->getSelectEntireRow())
+			{
+				referencesWithoutEntireColumnOrRow.insert(selectionRange->getName());
+			}
+		}
+
+		if (referencedTableNames.size() != 1)
+		{
+			std::string allReferencedTableNames;
+			for (const std::string& referencedTableName : referencedTableNames)
+			{
+				allReferencedTableNames += referencedTableName + ", ";
+			}
+			OT_USER_LOG_E("Table ranges reference different tables: " + allReferencedTableNames.substr(0, allReferencedTableNames.size() - 2));
+			return;
+		}
+
+		if (referencesWithoutEntireColumnOrRow.size() != 0)
+		{
+			std::string allReferencedTableNames;
+			for (const std::string& referencedTableName : referencesWithoutEntireColumnOrRow)
+			{
+				allReferencedTableNames += referencedTableName + ", ";
+			}
+			OT_USER_LOG_W("Range(s) detected that does not select an entire column/row. If a explicit range is applied to a table that does not fit the range, it may lead to unexpected behaviour. Detected ranges: " + allReferencedTableNames.substr(0, allReferencedTableNames.size() - 2));
+		}
+
+		auto endPreprocessing = std::chrono::high_resolution_clock::now();
+		auto durationPreprocessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endPreprocessing - startPreprocessing);
+		const std::string durationPreprocessingFormatted = TimeFormatter::formatDuration(durationPreprocessing);
+		OT_USER_LOG_I("Preprocessing took: " + durationPreprocessingFormatted);
+		// Now we start the creation of the datasets
+		std::list<std::string> existingDatasetNames = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::DatasetFolder);
+		ResultCollectionExtender resultCollectionExtender(Application::instance());
+
+		ProgressUpdater updater(Application::instance()->getUiComponent(), "Importing data from csv files");
+		uint32_t counter(1);
+		updater.setTotalNumberOfSteps(static_cast<uint32_t>(csvFiles.size()));
+
+		OT_USER_LOG_I("Refining data from csv file(s)");
+		auto startProcessing = std::chrono::high_resolution_clock::now();
+		ot::NewModelStateInfo newEntityInfos;
+
+		size_t modelBatchSizes = 20;
+		std::string modelStateMessageBase = "";
+		if (csvFiles.size() > modelBatchSizes)
+		{
+			modelStateMessageBase = "Files: ";
+		}
+		for (auto csvFile = csvFiles.begin(); csvFile != csvFiles.end();)
+		{
+			// First we assemble the information for the newly created series
+			std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
+			std::string seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
+			std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
+			ot::UID seriesUID;
+			if (!extractedMetadata.has_value())
+			{
+				if (interruptAtWarnings)
+				{
+					return;
+				}
+				else
+				{
+					seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, ot::JsonDocument());
+				}
+			}
+			else
+			{
+				seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, extractedMetadata.value());
+			}
+
+			// Then we store the data points
+			try
+			{
+				for (DatasetDescription& dataset : datasetDescriptions)
+				{
+					resultCollectionExtender.processDataPoints(&dataset, seriesUID);
+				}
+				// Since the import was successfull, we need to set the flag in the csv file, so it is not being imported again
+				(*csvFile)->setConsiderForRefinement(false);
+				(*csvFile)->storeToDataBase();
+				newEntityInfos.addTopologyEntity(*(*csvFile).get());
+			}
+			catch (std::exception& e)
+			{
+				std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
+					"Creation of series \"" + seriesName + "\" failed.";
+				OT_USER_LOG_E(exceptionMessage);
+				return;
+				bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
+				assert(seriesRemoved); //Otherwise panic!
+			}
+
+			if (counter % modelBatchSizes == 0)
+			{
+				resultCollectionExtender.setSaveModel(false);
+				resultCollectionExtender.storeCampaignChanges();
+				if (csvFiles.size() > modelBatchSizes)
+				{
+					std::string message = "Refined csv data. Files: " + std::to_string(counter - modelBatchSizes) + "-" + std::to_string(counter);
+					ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
+				}
+				else
+				{
+					ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+				}
+				newEntityInfos = ot::NewModelStateInfo();
+			}
+			/*double extenderMB = double(resultCollectionExtender.getMemSize()) / (1024 * 1024);
+			double campaignMB = double(resultCollectionExtender.getMetadataCampaign().getMemSize()) / (1024 * 1024);
+
+			OT_USER_LOG_I("Extender mem MB: " + std::to_string(extenderMB));
+			OT_USER_LOG_I("Campaign mem MB: " + std::to_string(campaignMB));*/
+			csvFile = csvFiles.erase(csvFile);
+
+			updater.triggerUpdate(counter);
+			counter++;
+		}
+
+		// Now we store the changes on the campaign and the model state
+		if (newEntityInfos.hasEntities())
 		{
 			resultCollectionExtender.setSaveModel(false);
 			resultCollectionExtender.storeCampaignChanges();
 			if (csvFiles.size() > modelBatchSizes)
-			{ 
-				std::string message = "Refined csv data. Files: " + std::to_string(counter - modelBatchSizes) + "-" + std::to_string(counter);
+			{
+				std::string message = "Refined csv data. Files: " + std::to_string((csvFiles.size() / modelBatchSizes) * modelBatchSizes) + "-" + std::to_string(csvFiles.size());
 				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
 			}
 			else
 			{
 				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
 			}
-			newEntityInfos = ot::NewModelStateInfo();
 		}
-		/*double extenderMB = double(resultCollectionExtender.getMemSize()) / (1024 * 1024);
-		double campaignMB = double(resultCollectionExtender.getMetadataCampaign().getMemSize()) / (1024 * 1024);
-	
-		OT_USER_LOG_I("Extender mem MB: " + std::to_string(extenderMB));
-		OT_USER_LOG_I("Campaign mem MB: " + std::to_string(campaignMB));*/
-		csvFile = csvFiles.erase(csvFile);
-		
-		updater.triggerUpdate(counter);
-		counter++;
-	}
-	
-	// Now we store the changes on the campaign and the model state
-	if (newEntityInfos.hasEntities())
-	{
-		resultCollectionExtender.setSaveModel(false);
-		resultCollectionExtender.storeCampaignChanges();
-		if (csvFiles.size() > modelBatchSizes)
-		{
-			std::string message = "Refined csv data. Files: " + std::to_string((csvFiles.size()/modelBatchSizes) * modelBatchSizes) + "-" + std::to_string(csvFiles.size());
-			ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
-		}
-		else
-		{
-			ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
-		}
-	}
 
-	OT_USER_LOG_I("Refinement finished.");
-	auto endProcessing = std::chrono::high_resolution_clock::now();
-	auto durationProcessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endProcessing - startProcessing);
-	const std::string durationProcessingFormatted = TimeFormatter::formatDuration(durationProcessing);
-	OT_USER_LOG_I("Processing took: " + durationProcessingFormatted);
+		OT_USER_LOG_I("Refinement finished.");
+		auto endProcessing = std::chrono::high_resolution_clock::now();
+		auto durationProcessing = std::chrono::duration_cast<std::chrono::nanoseconds>(endProcessing - startProcessing);
+		const std::string durationProcessingFormatted = TimeFormatter::formatDuration(durationProcessing);
+		OT_USER_LOG_I("Processing took: " + durationProcessingFormatted);
+	}
+	catch (const std::exception& _e)
+	{
+		OT_USER_LOG_E("Execution failed due to error: " + std::string(_e.what()));
+	}
 }
 
 void CSVSchemaImporter::loadCSVFiles(std::list<std::unique_ptr<EntityFileCSV>>& _csvFiles, EntityDatasetImporterCSV& _csvImporter)
