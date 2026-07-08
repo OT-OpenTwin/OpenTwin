@@ -4451,6 +4451,17 @@ std::string Model::getCurrentModelVersion()
 
 void Model::activateVersion(const std::string& _version)
 {
+	std::thread workerThread(&Model::activateVersionWorker, this, _version);
+	workerThread.detach();
+}
+
+void Model::activateVersionWorker(const std::string& _version)
+{
+	ot::LockTypes lockFlag(ot::LockType::ModelWrite | ot::LockType::NavigationWrite | ot::LockType::ViewWrite | ot::LockType::Properties);
+	ot::UILockWrapper uiLock(Application::instance()->getUiComponent(), lockFlag);
+
+	Application::instance()->getUiComponent()->setProgressInformation("Changing version: " + _version, true);
+
 	enableQueuingHttpRequests(true);
 
 	if (getStateManager()->loadModelState(_version))
@@ -4462,6 +4473,7 @@ void Model::activateVersion(const std::string& _version)
 	// Refresh the view and send all messages
 	refreshAllViews();
 
+	Application::instance()->getUiComponent()->closeProgressInformation();
 	enableQueuingHttpRequests(false);
 }
 
