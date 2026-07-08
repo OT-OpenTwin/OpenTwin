@@ -54,7 +54,7 @@ private:
 	void processNode(const TDF_Label &itemLabel, std::string prefix, STEPCAFControl_Reader *reader, TopLoc_Location aLocation, const std::string &rootName, std::map<std::string, bool> &existingEntityNames, std::string &messages, int &shapesIndex, int numberOfShapes, bool buildShapes);
 	void splitCompoundShapes(TopoDS_Shape &itemShape, std::list<TopoDS_Shape> &shapeList);
 	void analyzeGeometry(EntityGeometry *entityGeom, std::string &messages);
-	void simplifyComplexSplines(EntityGeometry *entityGeom, double maxRatioForComplexSplines);
+	bool simplifyComplexSplines(EntityGeometry *entityGeom, double maxRatioForComplexSplines);
 	std::string determineUniqueRootName(const std::string &fileName);
 
 	std::list<EntityGeometry *> entityList;

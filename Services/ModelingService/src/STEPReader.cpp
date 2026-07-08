@@ -191,11 +191,14 @@ void STEPReader::analyzeGeometry(EntityGeometry *entityGeom, std::string &messag
 		messages += "INFORMATION: " + entityGeom->getName() + " has faces with a large number of spline nodes (" + std::to_string(maxRatio) + ").\n"
 			"These faces are automatically simplified by splitting them into multiple less complex faces. It might be necessary to perform a healing operation on this shape.\n\n";
 
-		simplifyComplexSplines(entityGeom, maxRatioForComplexSplines);
+		if (!simplifyComplexSplines(entityGeom, maxRatioForComplexSplines))
+		{
+			messages += "WARNING: The spline splitting operation has failed, no splines have been simplified.\n\n";
+		}
 	}
 }
 
-void STEPReader::simplifyComplexSplines(EntityGeometry *entityGeom, double maxRatioForComplexSplines)
+bool STEPReader::simplifyComplexSplines(EntityGeometry *entityGeom, double maxRatioForComplexSplines)
 {
 	TopoDS_Shape shape = entityGeom->getBrep();
 
@@ -206,7 +209,9 @@ void STEPReader::simplifyComplexSplines(EntityGeometry *entityGeom, double maxRa
 
 	bool shapeModified = false;
 
-	for (int iloop = 1; iloop <= 10; iloop++)
+	int maxLoops = 10;
+
+	for (int iloop = 1; iloop <= maxLoops; iloop++)
 	{
 		bool faceReplaced = false;
 
@@ -264,7 +269,11 @@ void STEPReader::simplifyComplexSplines(EntityGeometry *entityGeom, double maxRa
 		}
 
 		if (!faceReplaced) break;
-		assert(iloop < 10); // If this assertion fires, we havce reached the maximum number of refinement operations
+		if (iloop == maxLoops)
+		{
+			// We have reached the maximum number of refinement operations, so spline replacement was not successful
+			shapeModified = false; // No not change the shape
+		}
 	}
 
 	if (shapeModified)
@@ -275,6 +284,8 @@ void STEPReader::simplifyComplexSplines(EntityGeometry *entityGeom, double maxRa
 
 		entityGeom->setBrep(shape);
 	}
+
+	return shapeModified;
 }
 
 std::string STEPReader::getNameFromLabel(const TDF_Label &label)
