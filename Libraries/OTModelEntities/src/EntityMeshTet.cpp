@@ -82,6 +82,7 @@ void EntityMeshTet::createProperties(const std::string materialsFolder, ot::UID 
 	EntityPropertiesDouble::createProperty("Additional refinement", "Maximum edge length for refinements",  0.0, "Tetrahedral Meshing", getProperties());
 
 	// Model creation properties
+	EntityPropertiesBoolean::createProperty("Model creation", "Store geometry", false, "Tetrahedral Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Model creation", "Check for missing materials", true, "Tetrahedral Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Model creation", "Use mesh priorities", true, "Tetrahedral Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Model creation", "Merge shapes", true, "Tetrahedral Meshing", getProperties());
@@ -260,6 +261,13 @@ bool EntityMeshTet::hasMeshData(void)
 {
 	if (meshData != nullptr) return true;
 	if (meshDataStorageId != -1) return true;
+
+	return false;
+}
+
+bool EntityMeshTet::hasMeshDataLoaded(void)
+{
+	if (meshData != nullptr) return true;
 
 	return false;
 }

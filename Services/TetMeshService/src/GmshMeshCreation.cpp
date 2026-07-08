@@ -158,6 +158,8 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 
 		properties.readSettings(getEntityMesh());
 
+		meshModelBuilder.setStoreGeometry(properties.getStoreGeometry());
+
 		MaterialManager materialManager(application);
 		materialManager.loadNecessaryMaterials(geometryEntities, properties, inputDependencyList);
 
@@ -440,7 +442,7 @@ void GmshMeshCreation::updateMesh(EntityMeshTet *mesh)
 	// Terminate the gmsh component
 	gmsh::finalize();
 
-	if (getEntityMesh()->hasMeshData())
+	if (getEntityMesh()->hasMeshDataLoaded())
 	{
 		// Write the properties of the mesh data entity
 		EntityPropertiesBoolean::createProperty("Mesh Visualization", "Show volume mesh", false, "", getEntityMesh()->getMeshData()->getProperties());

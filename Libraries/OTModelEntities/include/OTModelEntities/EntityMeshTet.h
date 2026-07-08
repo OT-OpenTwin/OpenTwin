@@ -57,6 +57,7 @@ public:
 
 	EntityMeshTetData *getMeshData(void);
 	bool hasMeshData(void);
+	bool hasMeshDataLoaded(void);
 
 	virtual void storeToDataBase(void) override;
 

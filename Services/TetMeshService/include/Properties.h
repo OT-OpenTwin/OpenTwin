@@ -57,6 +57,7 @@ public:
 	double		getTolerance(void) { return tolerance; }
 	bool		getUseDistanceForVolumeMeshRefinement(void) { return useDistanceForVolumeMeshRefinement; }
 	int			getElementOrder(void) { return elementOrder; }
+	bool		getStoreGeometry(void) { return storeGeometry; }
 
 	EntityPropertiesEntityList *getBoundingSphereMaterial(void) { return boundingSphereMaterial; }
 
@@ -84,6 +85,7 @@ private:
 	double		meshStepsOnBoundingSphere;
 	double		tolerance;
 	bool		useDistanceForVolumeMeshRefinement;
+	bool        storeGeometry;
 
 	EntityPropertiesEntityList *boundingSphereMaterial;
 };
