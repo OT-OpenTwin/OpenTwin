@@ -14,3 +14,7 @@ ot_add_dependency(ConfigMongoDBWithAuth
 )
 
 ot_finalize_bin(ConfigMongoDBWithAuth)
+
+ot_tool_bin_debug_launch(ConfigMongoDBWithAuth
+    PATHD "@OT_ALL_DLLD@;@PATH@"
+)

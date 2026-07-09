@@ -11,3 +11,7 @@ ot_add_dependency(FileHeaderUpdater
 )
 
 ot_finalize_bin(FileHeaderUpdater)
+
+ot_tool_bin_debug_launch(FileHeaderUpdater
+    ARGSD "--dry" "--config" "@OPENTWIN_DEV_ROOT@\\Tools\\FileHeaderUpdater\\OT_FHU_Config.json"
+)

@@ -32,3 +32,10 @@ ot_add_dependency(OToolkit
 )
 
 ot_finalize_lib(OToolkit)
+
+ot_tool_debug_launch(OToolkit
+    ARGSD "unused" "127.0.0.1:8080" "unused" "unused"
+    ARGSR "unused" "127.0.0.1:8094" "127.0.0.1:8095" "unused"
+    PATHD "@OT_DEFAULT_SERVICE_DLLD@;@OT_GUI_ROOT@\\@OT_CDLLD@;@OT_WIDGETS_ROOT@\\@OT_CDLLD@;@OT_OTOOLKITAPI_ROOT@\\@OT_CDLLD@;@QT_ADS_ROOT@\\lib;@QT_DLLD@;@PATH@"
+    PATHR "@QT_DLLR@;@OT_DEFAULT_SERVICE_DLLR@;@OT_WIDGETS_ROOT@\\@OT_CDLLR@;@OT_OTOOLKITAPI_ROOT@\\@OT_CDLLR@;@QT_ADS_ROOT@\\lib;@PATH@"
+)

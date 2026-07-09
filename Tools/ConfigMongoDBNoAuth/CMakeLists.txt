@@ -15,3 +15,7 @@ ot_add_dependency(ConfigMongoDBNoAuth
 )
 
 ot_finalize_bin(ConfigMongoDBNoAuth)
+
+ot_tool_bin_debug_launch(ConfigMongoDBNoAuth
+    PATHD "@OT_ALL_DLLD@;@PATH@"
+)

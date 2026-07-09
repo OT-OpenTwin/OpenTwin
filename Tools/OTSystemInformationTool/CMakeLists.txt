@@ -13,3 +13,8 @@ ot_add_dependency(OTSystemInformationTool
 )
 
 ot_finalize_bin(OTSystemInformationTool)
+
+ot_tool_bin_debug_launch(OTSystemInformationTool
+    ARGSD "Output.txt"
+    PATHD "@OT_SYSTEM_ROOT@\\@OT_CDLLD@;@OT_CORE_ROOT@\\@OT_CDLLD@;@PATH@"
+)

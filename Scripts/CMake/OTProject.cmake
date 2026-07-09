@@ -1431,6 +1431,118 @@ function(ot_bin_debug_launch TARGET_NAME)
     file(WRITE "${CMAKE_SOURCE_DIR}/.vs/launch.vs.json" "${_content}")
 endfunction()
 
+function(_ot_tool_json_escape OUT_VAR RAW)
+    string(REPLACE "\\" "\\\\" _v "${RAW}")
+    string(REPLACE "\"" "\\\"" _v "${_v}")
+    string(REGEX REPLACE "@([A-Za-z_][A-Za-z0-9_]*)@" "\${env.\\1}" _v "${_v}")
+    set(${OUT_VAR} "${_v}" PARENT_SCOPE)
+endfunction()
+
+function(_ot_tool_args_json OUT_VAR LEADING)
+    set(_s "")
+    foreach(_arg IN LISTS ARGN)
+        _ot_tool_json_escape(_arg "${_arg}")
+        if(_s STREQUAL "" AND LEADING STREQUAL "")
+            set(_s "\"${_arg}\"")
+        else()
+            string(APPEND _s ", \"${_arg}\"")
+        endif()
+    endforeach()
+    set(${OUT_VAR} "${_s}" PARENT_SCOPE)
+endfunction()
+
+function(_ot_tool_launch_path OUT_VAR RAW FALLBACK)
+    if("${RAW}" STREQUAL "")
+        set(${OUT_VAR} "${FALLBACK}" PARENT_SCOPE)
+        return()
+    endif()
+    _ot_tool_json_escape(_v "${RAW}")
+    set(${OUT_VAR} "${_v}" PARENT_SCOPE)
+endfunction()
+
+function(_ot_tool_write_launch TARGET_NAME CONTENT)
+    set(OT_LAUNCH_ENTRIES "${CONTENT}")
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch.vs.json.in" _envelope)
+    string(REPLACE "\r" "" _envelope "${_envelope}")
+    string(CONFIGURE "${_envelope}" _content @ONLY)
+    file(WRITE "${CMAKE_SOURCE_DIR}/.vs/launch.vs.json" "${_content}")
+endfunction()
+
+function(ot_tool_debug_launch TARGET_NAME)
+    if(NOT MSVC)
+        return()
+    endif()
+
+    cmake_parse_arguments(PARSE_ARGV 1 _OTT "" "PATHD;PATHR" "ARGSD;ARGSR")
+
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry_dll.vs.json.in" _entry_tpl)
+    string(REPLACE "\r" "" _entry_tpl "${_entry_tpl}")
+    string(REGEX REPLACE "\n+$" "" _entry_tpl "${_entry_tpl}")
+
+    set(_entries "")
+    foreach(_cfg IN ITEMS Debug Release)
+        set(OT_TARGET "${TARGET_NAME}")
+        set(OT_CFG "${_cfg}")
+
+        if(_cfg STREQUAL "Debug")
+            set(OT_SUB "debug")
+            _ot_tool_args_json(OT_ARGS "," ${_OTT_ARGSD})
+            _ot_tool_launch_path(OT_PATH "${_OTT_PATHD}" "\${env.OT_ALL_DLLD};\${env.PATH}")
+        else()
+            set(OT_SUB "release")
+            _ot_tool_args_json(OT_ARGS "," ${_OTT_ARGSR})
+            _ot_tool_launch_path(OT_PATH "${_OTT_PATHR}" "\${env.OT_ALL_DLLR};\${env.PATH}")
+        endif()
+
+        file(TO_NATIVE_PATH "${CMAKE_SOURCE_DIR}/build/windows-${OT_SUB}/${_cfg}/${TARGET_NAME}.dll" _dll)
+        string(REPLACE "\\" "\\\\" OT_DLL "${_dll}")
+
+        string(CONFIGURE "${_entry_tpl}" _entry @ONLY)
+        if(_entries STREQUAL "")
+            set(_entries "${_entry}")
+        else()
+            string(APPEND _entries ",\n${_entry}")
+        endif()
+    endforeach()
+
+    _ot_tool_write_launch(${TARGET_NAME} "${_entries}")
+endfunction()
+
+function(ot_tool_bin_debug_launch TARGET_NAME)
+    if(NOT MSVC)
+        return()
+    endif()
+
+    cmake_parse_arguments(PARSE_ARGV 1 _OTT "" "PATHD;PATHR" "ARGSD;ARGSR")
+
+    file(READ "$ENV{OT_CMAKE_DIR}/templates/launch_entry_bin.vs.json.in" _entry_tpl)
+    string(REPLACE "\r" "" _entry_tpl "${_entry_tpl}")
+    string(REGEX REPLACE "\n+$" "" _entry_tpl "${_entry_tpl}")
+
+    set(_entries "")
+    foreach(_cfg IN ITEMS Debug Release)
+        set(OT_TARGET "${TARGET_NAME}")
+        set(OT_CFG "${_cfg}")
+
+        if(_cfg STREQUAL "Debug")
+            _ot_tool_args_json(OT_ARGS "" ${_OTT_ARGSD})
+            _ot_tool_launch_path(OT_PATH "${_OTT_PATHD}" "\${env.PATH}")
+        else()
+            _ot_tool_args_json(OT_ARGS "" ${_OTT_ARGSR})
+            _ot_tool_launch_path(OT_PATH "${_OTT_PATHR}" "\${env.PATH}")
+        endif()
+
+        string(CONFIGURE "${_entry_tpl}" _entry @ONLY)
+        if(_entries STREQUAL "")
+            set(_entries "${_entry}")
+        else()
+            string(APPEND _entries ",\n${_entry}")
+        endif()
+    endforeach()
+
+    _ot_tool_write_launch(${TARGET_NAME} "${_entries}")
+endfunction()
+
 # ------------------------------------------------------------
 #  tests
 # ------------------------------------------------------------

@@ -14,3 +14,7 @@ ot_add_dependency(SetPermissions
 )
 
 ot_finalize_bin(SetPermissions)
+
+ot_tool_bin_debug_launch(SetPermissions
+    PATHD "@OT_ALL_DLLD@;@PATH@"
+)

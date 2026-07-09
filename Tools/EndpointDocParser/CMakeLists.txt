@@ -15,3 +15,7 @@ ot_add_dependency(EndpointDocParser
 
 ot_finalize_bin(EndpointDocParser)
 ot_add_test(EndpointDocParser)
+
+ot_tool_bin_debug_launch(EndpointDocParser
+    PATHD "@OT_SYSTEM_ROOT@\\@OT_CDLLD@;@OT_CORE_ROOT@\\@OT_CDLLD@;@ZLIB_DLLPATHD@;@PATH@"
+)

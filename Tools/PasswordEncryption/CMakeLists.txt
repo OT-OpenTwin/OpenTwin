@@ -14,3 +14,7 @@ ot_add_dependency(PasswordEncryption
 )
 
 ot_finalize_bin(PasswordEncryption)
+
+ot_tool_bin_debug_launch(PasswordEncryption
+    PATHD "@OT_ALL_DLLD@;@PATH@"
+)
