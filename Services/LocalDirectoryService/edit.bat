@@ -27,6 +27,13 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+REM Check if the setup LDS exists
+IF NOT EXIST "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\OpenTwin_set_up_LDS.bat" (
+    ECHO The script "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\OpenTwin_set_up_LDS.bat" does not exist.
+    goto PAUSE_END
+)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Launcher\OpenTwin_set_up_LDS.bat"
+
 ECHO Launching development enviroment
 
 REM Open project
