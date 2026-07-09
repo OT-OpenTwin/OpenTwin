@@ -324,6 +324,7 @@ private:
 	void applyParentGroupChange(const std::list<EntityBase*> &entities, const std::string& newParentGroup);
 	void renameEntityWithChildren(EntityBase* entity, const std::string& newName);
 	std::string ensureUniqueName(const std::string& name);
+	void activateVersionWorker(const std::string& _version);
 
 	// Action handler
 	constexpr static std::string_view c_promptActionDiscardRedoInfoAndSave = "Model.Prompt.DiscardRedoInfoAndSave";

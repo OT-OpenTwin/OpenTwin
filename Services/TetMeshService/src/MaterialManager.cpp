@@ -45,7 +45,7 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 		{
 			if (application->getModelComponent()->getCurrentMaterialName(materialProperty).empty())
 			{
-				throw std::string("ERROR: No material defined for shape: " + entity->getName() + "\n\n");
+				throw std::string("ERROR: No valid material defined for shape: " + entity->getName() + "\n\n");
 			}
 
 			materialNames.push_back(application->getModelComponent()->getCurrentMaterialName(materialProperty));
@@ -59,7 +59,7 @@ void MaterialManager::loadNecessaryMaterials(std::list<EntityGeometry *> geometr
 		{
 			if (application->getModelComponent()->getCurrentMaterialName(properties.getBoundingSphereMaterial()).empty())
 			{
-				throw std::string("ERROR: No material defined for background sphere\n\n");
+				throw std::string("ERROR: No valid material defined for background sphere\n\n");
 			}
 
 			materialNames.push_back(application->getModelComponent()->getCurrentMaterialName(properties.getBoundingSphereMaterial()));

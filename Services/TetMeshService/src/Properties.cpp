@@ -48,7 +48,8 @@ Properties::Properties() :
 	meshStepsOnBoundingSphere(0.0),
 	tolerance(0.0),
 	useDistanceForVolumeMeshRefinement(false),
-	boundingSphereMaterial(nullptr)
+	boundingSphereMaterial(nullptr),
+	storeGeometry(true)
 {
 
 }
@@ -117,6 +118,12 @@ void Properties::readSettings(EntityMeshTet *mesh)
 	assert(boundingSphereMaterialProperty != nullptr);
 
 	EntityPropertiesSelection *elementOrderProperty = dynamic_cast<EntityPropertiesSelection*>(mesh->getProperties().getProperty("Element order"));
+
+	EntityPropertiesBoolean* storeGeometryProperty = dynamic_cast<EntityPropertiesBoolean*>(mesh->getProperties().getProperty("Store geometry"));
+	if (storeGeometryProperty != nullptr)
+	{
+		storeGeometry = storeGeometryProperty->getValue();
+	}
 
 	maximumEdgeLengthValue	= maximumEdgeLengthProperty->getValue();
 	meshOptimization		= (optimizeMesh == nullptr) ? true : optimizeMesh->getValue();

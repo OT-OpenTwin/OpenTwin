@@ -300,7 +300,10 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 	checkShapesForMeshing(meshName, stepWidthManager.getMaximumEdgeLength() * 0.1);
 
 	// Now store all the newly created mesh model entities
-	storeEntities();
+	if (storeGeometry)
+	{
+		storeEntities();
+	}
 
 	// Check whether any unresolved overlaps are remaining
 	if (allShapeOverlaps.size() > 0)
@@ -810,7 +813,7 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 		1.0e-12,  // area tolerance
 		9,        // samples per direction
 		0.30,     // minimum hit ratio
-		5.0);     // maximum distance variation
+		0.5);     // maximum relative standard deviation
 
 	report.meshable =
 		report.occValid &&
@@ -1562,8 +1565,11 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	double gapTolerance,
 	int samplesPerDirection,
 	double minHitRatio,
-	double maxDistanceVariation) const
+	double maxRelativeStdDev) const
 {
+	const double classifierTolerance = 1.0e-7;
+	const double projectionTolerance = 1.0e-7;
+
 	Standard_Real uMin, uMax, vMin, vMax;
 	BRepTools::UVBounds(a, uMin, uMax, vMin, vMax);
 
@@ -1577,18 +1583,13 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	if (surfaceB.IsNull())
 		return false;
 
-	int validSamples = 0;
-	int hits = 0;
+	std::vector<double> distances;
+	std::vector<gp_Pnt> diagnosticPoints;
 
-	double minDist = std::numeric_limits<double>::max();
-	double maxDist = 0.0;
-	double sumDist = 0.0;
-
-	std::vector<gp_Pnt> hitPoints;
-
-	// Use only the inner UV region to avoid wedge-like edge contacts.
 	const double innerMin = 0.20;
 	const double innerMax = 0.80;
+
+	int validSamples = 0;
 
 	for (int iu = 0; iu < samplesPerDirection; ++iu)
 	{
@@ -1610,7 +1611,7 @@ bool ModelBuilder::analyzeThinGapBySampling(
 
 			gp_Pnt p = adaptorA.Value(u, v);
 
-			if (!isPointStrictlyInsideFaceUV(a, p, gapTolerance))
+			if (!isPointStrictlyInsideFaceUV(a, p, classifierTolerance))
 				continue;
 
 			++validSamples;
@@ -1625,12 +1626,13 @@ bool ModelBuilder::analyzeThinGapBySampling(
 			projector.LowerDistanceParameters(ub, vb);
 
 			gp_Pnt q = surfaceB->Value(ub, vb);
-			const double d = p.Distance(q);
 
-			if (d <= 0.0 || d > gapTolerance)
+			if (!isPointStrictlyInsideFaceUV(b, q, classifierTolerance))
 				continue;
 
-			if (!isPointStrictlyInsideFaceUV(b, q, gapTolerance))
+			const double d = p.Distance(q);
+
+			if (d <= projectionTolerance)
 				continue;
 
 			gp_Vec normalA;
@@ -1645,34 +1647,62 @@ bool ModelBuilder::analyzeThinGapBySampling(
 			normalA.Normalize();
 			normalB.Normalize();
 
-			// Thin gaps usually have opposite-facing normals.
 			const double dot = normalA.Dot(normalB);
 
+			// Thin gaps are expected between opposite-facing boundary faces.
 			if (dot > -0.7)
 				continue;
 
-			++hits;
-
-			minDist = std::min(minDist, d);
-			maxDist = std::max(maxDist, d);
-			sumDist += d;
-
-			hitPoints.push_back(p);
+			distances.push_back(d);
+			diagnosticPoints.push_back(p);
 		}
 	}
 
-	if (validSamples == 0 || hits == 0)
+	if (validSamples == 0 || distances.empty())
 		return false;
 
-	const double hitRatio = static_cast<double>(hits) / static_cast<double>(validSamples);
+	const double hitRatio =
+		static_cast<double>(distances.size()) /
+		static_cast<double>(validSamples);
 
 	if (hitRatio < minHitRatio)
 		return false;
 
-	const double meanDist = sumDist / static_cast<double>(hits);
+	double minDist = distances.front();
+	double maxDist = distances.front();
+	double sumDist = 0.0;
 
-	// Reject wedge-like situations where the distance changes too much.
-	if (minDist > 0.0 && maxDist / minDist > maxDistanceVariation)
+	for (double d : distances)
+	{
+		minDist = std::min(minDist, d);
+		maxDist = std::max(maxDist, d);
+		sumDist += d;
+	}
+
+	const double meanDist = sumDist / static_cast<double>(distances.size());
+
+	double variance = 0.0;
+
+	for (double d : distances)
+	{
+		const double diff = d - meanDist;
+		variance += diff * diff;
+	}
+
+	variance /= static_cast<double>(distances.size());
+
+	const double stdDev = std::sqrt(variance);
+	const double relativeStdDev =
+		meanDist > 0.0 ? stdDev / meanDist : std::numeric_limits<double>::max();
+
+	// Final decision only here:
+	// The tolerance is used to classify the finished distance statistics,
+	// not to control which samples are collected.
+	if (meanDist > gapTolerance)
+		return false;
+
+	// Reject wedge-like cases where distances vary too much.
+	if (relativeStdDev > maxRelativeStdDev)
 		return false;
 
 	result.first = a;
@@ -1681,7 +1711,7 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	result.meanDistance = meanDist;
 	result.maxDistance = maxDist;
 	result.hitRatio = hitRatio;
-	result.diagnosticPoints = std::move(hitPoints);
+	result.diagnosticPoints = std::move(diagnosticPoints);
 
 	return true;
 }
@@ -1693,7 +1723,7 @@ void ModelBuilder::checkThinGapsInList(
 	double areaTolerance,
 	int samplesPerDirection,
 	double minHitRatio,
-	double maxDistanceVariation) const
+	double maxRelativeStdDev) const
 {
 	std::vector<Bnd_Box> boxes;
 	std::vector<double> areas;
@@ -1742,7 +1772,7 @@ void ModelBuilder::checkThinGapsInList(
 					gapTolerance,
 					samplesPerDirection,
 					minHitRatio,
-					maxDistanceVariation) ||
+					maxRelativeStdDev) ||
 				analyzeThinGapBySampling(
 					faces[j],
 					faces[i],
@@ -1750,7 +1780,7 @@ void ModelBuilder::checkThinGapsInList(
 					gapTolerance,
 					samplesPerDirection,
 					minHitRatio,
-					maxDistanceVariation);
+					maxRelativeStdDev);
 
 			if (!found)
 				continue;

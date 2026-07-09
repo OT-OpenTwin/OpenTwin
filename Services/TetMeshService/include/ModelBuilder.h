@@ -51,8 +51,10 @@ class BRepAlgoAPI_BuilderAlgo;
 class ModelBuilder
 {
 public:
-	ModelBuilder(Application *app) : application(app) {};
+	ModelBuilder(Application *app) : application(app) , storeGeometry(true) {};
 	~ModelBuilder();
+
+	void setStoreGeometry(bool flag) { storeGeometry = flag; };
 
 	void buildModel(const std::string &meshName, std::list<EntityGeometry *> &geometryEntities, Properties &properties, StepWidthManager &stepWidthManager, MaterialManager &materialManager);
 
@@ -235,7 +237,7 @@ private:
 		double areaTolerance,
 		int samplesPerDirection = 9,
 		double minHitRatio = 0.30,
-		double maxDistanceVariation = 5.0) const;
+		double maxRelativeStdDev = 0.5) const;
 
 	void checkThinGapsInList(
 		const std::vector<TopoDS_Face>& faces,
@@ -282,4 +284,5 @@ private:
 	std::map<std::string, double> meshPriorities;
 	std::map<std::string, std::string> parentShapeName;
 	std::list<std::vector<std::string>> allShapeOverlaps;
+	bool storeGeometry;
 };
