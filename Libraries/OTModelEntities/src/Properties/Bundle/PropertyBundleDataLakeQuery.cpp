@@ -249,11 +249,20 @@ bool PropertyBundleDataLakeQuery::updateOptions(EntityBase* _thisObject, Metadat
 	if (projectChanged)
 	{
 		ot::JsonDocument overView;
-		for (const MetadataSeries& series : allSeries)
+		try
 		{
-			const ot::JsonDocument& metadata = series.getMetadata();
-			ot::json::mergeObjects(overView, metadata, overView.GetAllocator());
+			for (const MetadataSeries& series : allSeries)
+			{
+				const ot::JsonDocument& metadata = series.getMetadata();
+				ot::json::mergeObjects(overView, metadata, overView.GetAllocator());
+			}
 		}
+		catch (const std::exception& _e)
+		{
+			OT_USER_LOG_E("Failed to merge metadata overview: " + std::string(_e.what()));
+			overView = ot::JsonDocument();
+		}
+		
 		std::list<std::string> allOptions;
 		vectorize(overView, allOptions, "");
 		allOptions.push_front("");
