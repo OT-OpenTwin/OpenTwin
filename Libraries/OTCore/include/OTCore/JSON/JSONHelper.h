@@ -584,7 +584,8 @@ namespace ot {
 		//! @param _secureMerge If true, an exception is thrown if 
 		OT_CORE_API_EXPORT void mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value& _srcObject, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
 		OT_CORE_API_EXPORT void mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& _srcArray, rapidjson::Document::AllocatorType& _allocator, bool _secureMerge = true);
-
+		// @brief Returns the type of the value. Rapidjson  has different type enums for true and false booleans. So this function normalises the type to rapidjson::kTrueType.
+		OT_CORE_API_EXPORT rapidjson::Type getNormaliseType(const rapidjson::Value& _v);
 
 		OT_CORE_API_EXPORT bool isOfType(const JsonValue& _value, const std::string& _typeName);
 		OT_CORE_API_EXPORT std::string getTypeName(const JsonValue& _value);

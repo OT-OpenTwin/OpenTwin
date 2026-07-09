@@ -1573,7 +1573,9 @@ void ot::json::mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value
 		auto dstIt = _dstObject.FindMember(srcIt->name);
 		if (dstIt != _dstObject.MemberEnd())
 		{
-			if (srcIt->value.GetType() != dstIt->value.GetType())
+			auto sourceType = ot::json::getNormaliseType(srcIt->value);
+			auto destType = ot::json::getNormaliseType(dstIt->value);
+			if (sourceType!= destType)
 			{
 				if (_secureMerge) {
 					throw std::exception(("Type conflict in the field: " + std::string(srcIt->name.GetString())).c_str());
@@ -1626,6 +1628,11 @@ void ot::json::mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& 
 		arrayEntry.CopyFrom(*arrayIt, _allocator);
 		destArray.PushBack(arrayEntry, _allocator);
 	}
+}
+
+rapidjson::Type ot::json::getNormaliseType(const rapidjson::Value& _v)
+{
+	return _v.IsBool() ? rapidjson::kTrueType : _v.GetType();
 }
 
 bool ot::json::isOfType(const JsonValue& _value, const std::string& _typeName)
