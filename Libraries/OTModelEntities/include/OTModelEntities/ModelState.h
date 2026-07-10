@@ -184,6 +184,9 @@ public:
 	// Write the version information to the entity in the data base
 	void updateVersionEntity(const std::string& _version);
 
+	// Build the information map containing the list of children for each item
+	void buildChildrenInformation();
+
 	//! @brief Adds an image to the project.
 	//! Any existing image will be replaced.
 	//! @param _imageData The image data to add.
@@ -234,9 +237,6 @@ private:
 	// Clear the information map containing the list of children for each item
 	void clearChildrenInformation();
 
-	// Build the information map containing the list of children for each item
-	void buildChildrenInformation();
-	
 	// Add an entity to the child list of its parent entity
 	void addEntityToParent(ot::UID entityID, ot::UID parentID);
 

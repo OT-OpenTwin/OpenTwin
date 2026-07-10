@@ -281,6 +281,7 @@ void ModelState::modifyEntityParent(ot::UID entityID, ot::UID parentEntityID)
 void ModelState::removeEntity(ot::UID entityID, bool considerChildren)
 {
 	//std::cout << "remove entity: " << entityID << std::endl;
+	//std::cout << m_entities.size() << std::endl;
 
 	if (m_entities.count(entityID) > 0)
 	{

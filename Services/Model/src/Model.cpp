@@ -1805,6 +1805,9 @@ void Model::applyParentGroupChange(const std::list<EntityBase*> &entities, const
 		itemsToSelect.push_back(entity->getEntityID());
 	}
 
+	// We have changed the parent child relations due to the group change. Update them according to the new topology
+	getStateManager()->buildChildrenInformation();
+
 	// Finally, reset the parent group change property for all entities, since we have already handled this change
 	for (auto entity : entities)
 	{
