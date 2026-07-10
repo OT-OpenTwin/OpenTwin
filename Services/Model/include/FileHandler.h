@@ -113,19 +113,36 @@ private:
 		bool isCircuitExport = false;
 	};
 
+	enum class FileOverwriteStatus {
+		Write,
+		Skip,
+		PromptUser
+	};
+
+	struct PendingScriptExport {
+		std::string contentFilePath;
+		std::string contentData;
+		std::string metaFilePath;
+		std::string metaContent;
+		FileOverwriteStatus status = FileOverwriteStatus::Skip;
+	};
+
 	struct PendingFileOverwrite {
 		std::string contentFilePath;
 		std::string contentNewContent;
 		std::string metaFilePath;
 		std::string metaNewContent;
+
+		bool hasLinkedScriptExport = false;
+		PendingScriptExport linkedScriptExport;
 	};
 
 	std::map<std::string, PendingFileOverwrite> m_pendingFileOverwrites;
 
-	enum class FileOverwriteStatus {
-		Write,
-		Skip,
-		PromptUser
+	struct ExportResult {
+		FileOverwriteStatus status;
+		ot::UID libraryElementID;
+		std::string contentFilePath;
 	};
 
 	DialogExportEntities loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg, bool _isUserExport);
@@ -141,13 +158,19 @@ private:
 	std::string ensureFileExtension(const std::string& _fileName, const std::string& _extension) const;
 
 	void exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID);
-	void exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
+	ExportResult exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath);
 
 	FileOverwriteStatus checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent, const std::string& _metaFilePath, const std::string& _metaNewContent) const;
 	void promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath, const std::string& _contentNewContent, const std::string& _metaNewContent) const;
 	std::string createIncrementedPath(const std::string& _filePath);
+
+	ot::UID readLibraryElementIDFromMetaFile(const std::string& _metaFilePath) const;
+	PendingScriptExport prepareScriptExportData(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
+	void processLinkedScriptExport(const PendingScriptExport& _scriptExport, ot::UID _manifestLibraryElementID);
+	std::string updateDependencyIDInMetaContent(const std::string& _metaContent, ot::UID _newDependencyID);
+	void updateExistingMetaFileDependencyID(const std::string& _metaFilePath, ot::UID _newDependencyID);
 
 	void createLibraryElementsForCircuitModel(EntityFileText* _modelEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport);
 	void createLibraryElementsForPythonScript(EntityFileText* _scriptEntity, ot::UID _environmentID, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport);
