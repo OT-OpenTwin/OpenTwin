@@ -59,17 +59,26 @@ void ot::PropertyInput::slotValueChanged(int) {
 QString ot::PropertyInput::determineToolTipToShow() const
 {
 	QString propertyTip = QString::fromStdString(this->data().getPropertyTip());
-	QString propertyValueString = getCurrentValue().toString();
 	if (!propertyTip.isEmpty())
 	{
-		if (!propertyValueString.isEmpty() && !m_data.getPropertyFlags().has(Property::HasMultipleValues))
+		if (!m_data.getPropertyFlags().has(Property::HasMultipleValues))
 		{
-			propertyTip.append("\n\n" + propertyValueString);
+			QString propertyValueString = getCurrentValue().toString();
+
+			if (!propertyValueString.isEmpty())
+			{
+				propertyTip.append("\n\n" + propertyValueString);
+			}
 		}
 	}
 	else
 	{
-		propertyTip = propertyValueString;
+		if (!m_data.getPropertyFlags().has(Property::HasMultipleValues))
+		{
+			QString propertyValueString = getCurrentValue().toString();
+
+			propertyTip = propertyValueString;
+		}
 	}
 	return propertyTip;
 }
