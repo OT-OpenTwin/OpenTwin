@@ -83,7 +83,10 @@ public:
 		double minDistance = 0.0;
 		double meanDistance = 0.0;
 		double maxDistance = 0.0;
+
 		double hitRatio = 0.0;
+		double characteristicLength = 0.0;
+		double relativeGap = 0.0;
 
 		std::vector<gp_Pnt> diagnosticPoints;
 	};
@@ -128,7 +131,7 @@ public:
 		double minEdgeLength = 1.0e-9,
 		double minFaceArea = 1.0e-18,
 		double minVolume = 1.0e-27,
-		double gapTolerance = 0.1,
+		double minimumMeshSize = 0.1,
 		bool checkGeometry = true) const;
 
 private:
@@ -233,29 +236,36 @@ private:
 	void checkThinGaps(
 		const TopoDS_Shape& shape,
 		ShapeCheckReport& report,
-		double gapTolerance,
-		double areaTolerance,
+		double minimumMeshSize,
+		double gapFactor = 0.5,
+		double maxRelativeGap = 0.05,
+		double minRelevantFaceSizeFactor = 0.5,
 		int samplesPerDirection = 9,
 		double minHitRatio = 0.30,
-		double maxRelativeStdDev = 0.5) const;
+		double maxRelativeStdDev = 0.50) const;
 
 	void checkThinGapsInList(
 		const std::vector<TopoDS_Face>& faces,
 		ShapeCheckReport& report,
-		double gapTolerance,
-		double areaTolerance,
+		double minimumMeshSize,
+		double gapFactor,
+		double maxRelativeGap,
+		double minRelevantFaceSizeFactor,
 		int samplesPerDirection,
 		double minHitRatio,
-		double maxDistanceVariation) const;
+		double maxRelativeStdDev) const;
 
 	bool analyzeThinGapBySampling(
 		const TopoDS_Face& a,
 		const TopoDS_Face& b,
 		ThinGapFacePair& result,
-		double gapTolerance,
+		double minimumMeshSize,
+		double gapFactor,
+		double maxRelativeGap,
+		double minRelevantFaceSizeFactor,
 		int samplesPerDirection,
 		double minHitRatio,
-		double maxDistanceVariation) const;
+		double maxRelativeStdDev) const;
 
 	bool computeFaceNormalAtUV(
 		const TopoDS_Face& face,
@@ -274,7 +284,7 @@ private:
 	double solidVolume(const TopoDS_Solid& solid) const;
 	gp_Pnt computeEdgeMidPoint(const TopoDS_Edge& edge) const;
 	gp_Pnt computeFaceCenterPoint(const TopoDS_Face& face) const;
-	void checkShapesForMeshing(const std::string& meshName, double gapTolerance);
+	void checkShapesForMeshing(const std::string& meshName, double minimumMeshSize);
 
 	void collectDiagnosticPoints(ShapeCheckReport& report) const;
 

@@ -326,7 +326,7 @@ void ModelBuilder::buildNonManifoldModel(const std::string &meshName, std::list<
 	}
 }
 
-void ModelBuilder::checkShapesForMeshing(const std::string& meshName, double gapTolerance)
+void ModelBuilder::checkShapesForMeshing(const std::string& meshName, double minimumMeshSize)
 {
 	for (auto geometryEntity : modelEntities)
 	{
@@ -334,7 +334,7 @@ void ModelBuilder::checkShapesForMeshing(const std::string& meshName, double gap
 		double minFaceArea = 1.0e-18;
 		double minVolume = 1.0e-27;
 
-		auto report = checkShapeForVolumeMeshing(geometryEntity->getBrep(), minEdgeLength, minFaceArea, minVolume, gapTolerance);
+		auto report = checkShapeForVolumeMeshing(geometryEntity->getBrep(), minEdgeLength, minFaceArea, minVolume, minimumMeshSize);
 
 		std::cout << report.toString() << std::endl;
 
@@ -789,7 +789,7 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 	double minEdgeLength,
 	double minFaceArea,
 	double minVolume,
-	double gapTolerance,
+	double minimumMeshSize,
 	bool checkGeometry) const
 {
 	ShapeCheckReport report;
@@ -809,11 +809,13 @@ ModelBuilder::ShapeCheckReport ModelBuilder::checkShapeForVolumeMeshing(
 	checkThinGaps(
 		shape,
 		report,
-		gapTolerance,   // gap tolerance
-		1.0e-12,  // area tolerance
-		9,        // samples per direction
-		0.30,     // minimum hit ratio
-		0.5);     // maximum relative standard deviation
+		minimumMeshSize,
+		0.5,   // Gap tolerance is 50% of minimum mesh size
+		0.05,  // Gap must be below 5% of the local face size
+		0.5,   // Face size must be at least 50% of minimum mesh size
+		9,     // Samples per direction
+		0.30,  // Minimum hit ratio
+		0.50); // Maximum relative standard deviation
 
 	report.meshable =
 		report.occValid &&
@@ -1562,15 +1564,46 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	const TopoDS_Face& a,
 	const TopoDS_Face& b,
 	ThinGapFacePair& result,
-	double gapTolerance,
+	double minimumMeshSize,
+	double gapFactor,
+	double maxRelativeGap,
+	double minRelevantFaceSizeFactor,
 	int samplesPerDirection,
 	double minHitRatio,
 	double maxRelativeStdDev) const
 {
 	const double classifierTolerance = 1.0e-7;
-	const double projectionTolerance = 1.0e-7;
+	const double projectionTolerance = 1.0e-9;
 
-	Standard_Real uMin, uMax, vMin, vMax;
+	const double areaA = faceArea(a);
+	const double areaB = faceArea(b);
+
+	if (areaA <= 0.0 || areaB <= 0.0)
+		return false;
+
+	// Use the smaller face as the relevant geometric scale.
+	const double characteristicLength =
+		std::sqrt(std::min(areaA, areaB));
+
+	if (characteristicLength <= 0.0)
+		return false;
+
+	// Ignore very small face pairs in the thin-gap check.
+	// They can be handled by a separate small-feature check.
+	const double minRelevantFaceSize =
+		minRelevantFaceSizeFactor * minimumMeshSize;
+
+	if (characteristicLength < minRelevantFaceSize)
+		return false;
+
+	const double gapTolerance =
+		gapFactor * minimumMeshSize;
+
+	Standard_Real uMin = 0.0;
+	Standard_Real uMax = 0.0;
+	Standard_Real vMin = 0.0;
+	Standard_Real vMax = 0.0;
+
 	BRepTools::UVBounds(a, uMin, uMax, vMin, vMax);
 
 	if (uMax <= uMin || vMax <= vMin)
@@ -1578,7 +1611,9 @@ bool ModelBuilder::analyzeThinGapBySampling(
 
 	BRepAdaptor_Surface adaptorA(a);
 	BRepAdaptor_Surface adaptorB(b);
-	Handle(Geom_Surface) surfaceB = adaptorB.Surface().Surface();
+
+	Handle(Geom_Surface) surfaceB =
+		adaptorB.Surface().Surface();
 
 	if (surfaceB.IsNull())
 		return false;
@@ -1586,74 +1621,116 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	std::vector<double> distances;
 	std::vector<gp_Pnt> diagnosticPoints;
 
+	int validSamples = 0;
+
+	// Avoid samples close to trimmed face boundaries.
 	const double innerMin = 0.20;
 	const double innerMax = 0.80;
-
-	int validSamples = 0;
 
 	for (int iu = 0; iu < samplesPerDirection; ++iu)
 	{
 		const double tu =
-			innerMin + (innerMax - innerMin) *
+			innerMin +
+			(innerMax - innerMin) *
 			static_cast<double>(iu) /
-			static_cast<double>(std::max(1, samplesPerDirection - 1));
+			static_cast<double>(
+				std::max(1, samplesPerDirection - 1));
 
-		const double u = uMin + (uMax - uMin) * tu;
+		const double u =
+			uMin + (uMax - uMin) * tu;
 
 		for (int iv = 0; iv < samplesPerDirection; ++iv)
 		{
 			const double tv =
-				innerMin + (innerMax - innerMin) *
+				innerMin +
+				(innerMax - innerMin) *
 				static_cast<double>(iv) /
-				static_cast<double>(std::max(1, samplesPerDirection - 1));
+				static_cast<double>(
+					std::max(1, samplesPerDirection - 1));
 
-			const double v = vMin + (vMax - vMin) * tv;
+			const double v =
+				vMin + (vMax - vMin) * tv;
 
-			gp_Pnt p = adaptorA.Value(u, v);
+			const gp_Pnt p = adaptorA.Value(u, v);
 
-			if (!isPointStrictlyInsideFaceUV(a, p, classifierTolerance))
+			if (!isPointStrictlyInsideFaceUV(
+				a,
+				p,
+				classifierTolerance))
+			{
 				continue;
+			}
 
 			++validSamples;
 
-			GeomAPI_ProjectPointOnSurf projector(p, surfaceB);
+			GeomAPI_ProjectPointOnSurf projector(
+				p,
+				surfaceB);
 
 			if (projector.NbPoints() < 1)
 				continue;
 
 			Standard_Real ub = 0.0;
 			Standard_Real vb = 0.0;
+
 			projector.LowerDistanceParameters(ub, vb);
 
-			gp_Pnt q = surfaceB->Value(ub, vb);
+			const gp_Pnt q =
+				surfaceB->Value(ub, vb);
 
-			if (!isPointStrictlyInsideFaceUV(b, q, classifierTolerance))
+			if (!isPointStrictlyInsideFaceUV(
+				b,
+				q,
+				classifierTolerance))
+			{
 				continue;
+			}
 
-			const double d = p.Distance(q);
+			const double distance = p.Distance(q);
 
-			if (d <= projectionTolerance)
+			// Coincident faces belong to a separate check.
+			if (distance <= projectionTolerance)
 				continue;
 
 			gp_Vec normalA;
 			gp_Vec normalB;
 
-			if (!computeFaceNormalAtUV(a, u, v, normalA))
+			if (!computeFaceNormalAtUV(
+				a,
+				u,
+				v,
+				normalA))
+			{
 				continue;
+			}
 
-			if (!computeFaceNormalAtUV(b, ub, vb, normalB))
+			if (!computeFaceNormalAtUV(
+				b,
+				ub,
+				vb,
+				normalB))
+			{
 				continue;
+			}
+
+			if (normalA.SquareMagnitude() <= 0.0 ||
+				normalB.SquareMagnitude() <= 0.0)
+			{
+				continue;
+			}
 
 			normalA.Normalize();
 			normalB.Normalize();
 
-			const double dot = normalA.Dot(normalB);
+			// A thin material layer normally lies between
+			// opposite-facing boundary faces.
+			const double normalDot =
+				normalA.Dot(normalB);
 
-			// Thin gaps are expected between opposite-facing boundary faces.
-			if (dot > -0.7)
+			if (normalDot > -0.7)
 				continue;
 
-			distances.push_back(d);
+			distances.push_back(distance);
 			diagnosticPoints.push_back(p);
 		}
 	}
@@ -1668,50 +1745,78 @@ bool ModelBuilder::analyzeThinGapBySampling(
 	if (hitRatio < minHitRatio)
 		return false;
 
-	double minDist = distances.front();
-	double maxDist = distances.front();
-	double sumDist = 0.0;
+	double minDistance =
+		std::numeric_limits<double>::max();
 
-	for (double d : distances)
+	double maxDistance = 0.0;
+	double sumDistance = 0.0;
+
+	for (const double distance : distances)
 	{
-		minDist = std::min(minDist, d);
-		maxDist = std::max(maxDist, d);
-		sumDist += d;
+		minDistance =
+			std::min(minDistance, distance);
+
+		maxDistance =
+			std::max(maxDistance, distance);
+
+		sumDistance += distance;
 	}
 
-	const double meanDist = sumDist / static_cast<double>(distances.size());
+	const double meanDistance =
+		sumDistance /
+		static_cast<double>(distances.size());
 
 	double variance = 0.0;
 
-	for (double d : distances)
+	for (const double distance : distances)
 	{
-		const double diff = d - meanDist;
-		variance += diff * diff;
+		const double difference =
+			distance - meanDistance;
+
+		variance += difference * difference;
 	}
 
-	variance /= static_cast<double>(distances.size());
+	variance /=
+		static_cast<double>(distances.size());
 
-	const double stdDev = std::sqrt(variance);
-	const double relativeStdDev =
-		meanDist > 0.0 ? stdDev / meanDist : std::numeric_limits<double>::max();
+	const double standardDeviation =
+		std::sqrt(variance);
 
-	// Final decision only here:
-	// The tolerance is used to classify the finished distance statistics,
-	// not to control which samples are collected.
-	if (meanDist > gapTolerance)
+	const double relativeStandardDeviation =
+		meanDistance > 0.0
+		? standardDeviation / meanDistance
+		: std::numeric_limits<double>::max();
+
+	// Absolute mesh-related condition.
+	if (meanDistance > gapTolerance)
 		return false;
 
-	// Reject wedge-like cases where distances vary too much.
-	if (relativeStdDev > maxRelativeStdDev)
+	// Relative geometry condition.
+	// This prevents small faces from being reported merely because
+	// the global mesh-dependent tolerance is large.
+	const double relativeGap =
+		meanDistance / characteristicLength;
+
+	if (relativeGap > maxRelativeGap)
+		return false;
+
+	// Reject wedge-like configurations.
+	if (relativeStandardDeviation > maxRelativeStdDev)
 		return false;
 
 	result.first = a;
 	result.second = b;
-	result.minDistance = minDist;
-	result.meanDistance = meanDist;
-	result.maxDistance = maxDist;
+
+	result.minDistance = minDistance;
+	result.meanDistance = meanDistance;
+	result.maxDistance = maxDistance;
+
 	result.hitRatio = hitRatio;
-	result.diagnosticPoints = std::move(diagnosticPoints);
+	result.characteristicLength = characteristicLength;
+	result.relativeGap = relativeGap;
+
+	result.diagnosticPoints =
+		std::move(diagnosticPoints);
 
 	return true;
 }
@@ -1719,19 +1824,24 @@ bool ModelBuilder::analyzeThinGapBySampling(
 void ModelBuilder::checkThinGapsInList(
 	const std::vector<TopoDS_Face>& faces,
 	ShapeCheckReport& report,
-	double gapTolerance,
-	double areaTolerance,
+	double minimumMeshSize,
+	double gapFactor,
+	double maxRelativeGap,
+	double minRelevantFaceSizeFactor,
 	int samplesPerDirection,
 	double minHitRatio,
 	double maxRelativeStdDev) const
 {
+	const double gapTolerance =
+		gapFactor * minimumMeshSize;
+
 	std::vector<Bnd_Box> boxes;
 	std::vector<double> areas;
 
 	boxes.reserve(faces.size());
 	areas.reserve(faces.size());
 
-	for (const auto& face : faces)
+	for (const TopoDS_Face& face : faces)
 	{
 		Bnd_Box box;
 		BRepBndLib::Add(face, box);
@@ -1743,49 +1853,76 @@ void ModelBuilder::checkThinGapsInList(
 
 	for (std::size_t i = 0; i < faces.size(); ++i)
 	{
-		for (std::size_t j = i + 1; j < faces.size(); ++j)
+		for (std::size_t j = i + 1;
+			j < faces.size();
+			++j)
 		{
 			if (boxes[i].IsOut(boxes[j]))
 				continue;
 
-			if (areas[i] <= areaTolerance || areas[j] <= areaTolerance)
+			if (areas[i] <= 0.0 || areas[j] <= 0.0)
 				continue;
 
-			BRepExtrema_DistShapeShape dist(faces[i], faces[j]);
-			dist.Perform();
+			BRepExtrema_DistShapeShape distanceCheck(
+				faces[i],
+				faces[j]);
 
-			if (!dist.IsDone())
+			distanceCheck.Perform();
+
+			if (!distanceCheck.IsDone())
 				continue;
 
-			const double minDistance = dist.Value();
+			const double minimumDistance =
+				distanceCheck.Value();
 
-			if (minDistance <= 0.0 || minDistance > gapTolerance)
+			// Zero distance is handled by the coincident-face check.
+			if (minimumDistance <= 0.0)
+				continue;
+
+			if (minimumDistance > gapTolerance)
 				continue;
 
 			ThinGapFacePair gap;
 
-			const bool found =
+			const bool foundForward =
 				analyzeThinGapBySampling(
 					faces[i],
 					faces[j],
 					gap,
-					gapTolerance,
-					samplesPerDirection,
-					minHitRatio,
-					maxRelativeStdDev) ||
-				analyzeThinGapBySampling(
-					faces[j],
-					faces[i],
-					gap,
-					gapTolerance,
+					minimumMeshSize,
+					gapFactor,
+					maxRelativeGap,
+					minRelevantFaceSizeFactor,
 					samplesPerDirection,
 					minHitRatio,
 					maxRelativeStdDev);
 
-			if (!found)
-				continue;
+			if (foundForward)
+			{
+				report.thinGapFaces.push_back(
+					std::move(gap));
 
-			report.thinGapFaces.push_back(gap);
+				continue;
+			}
+
+			const bool foundBackward =
+				analyzeThinGapBySampling(
+					faces[j],
+					faces[i],
+					gap,
+					minimumMeshSize,
+					gapFactor,
+					maxRelativeGap,
+					minRelevantFaceSizeFactor,
+					samplesPerDirection,
+					minHitRatio,
+					maxRelativeStdDev);
+
+			if (foundBackward)
+			{
+				report.thinGapFaces.push_back(
+					std::move(gap));
+			}
 		}
 	}
 }
@@ -1793,55 +1930,77 @@ void ModelBuilder::checkThinGapsInList(
 void ModelBuilder::checkThinGaps(
 	const TopoDS_Shape& shape,
 	ShapeCheckReport& report,
-	double gapTolerance,
-	double areaTolerance,
+	double minimumMeshSize,
+	double gapFactor,
+	double maxRelativeGap,
+	double minRelevantFaceSizeFactor,
 	int samplesPerDirection,
 	double minHitRatio,
-	double maxDistanceVariation) const
+	double maxRelativeStdDev) const
 {
-	bool found = false;
+	const std::size_t initialCount =
+		report.thinGapFaces.size();
 
-	for (TopExp_Explorer solidEx(shape, TopAbs_SOLID); solidEx.More(); solidEx.Next())
+	for (TopExp_Explorer solidEx(
+		shape,
+		TopAbs_SOLID);
+		solidEx.More();
+		solidEx.Next())
 	{
-		TopoDS_Solid solid = TopoDS::Solid(solidEx.Current());
+		const TopoDS_Solid solid =
+			TopoDS::Solid(solidEx.Current());
 
 		std::vector<TopoDS_Face> faces;
 
-		for (TopExp_Explorer shellEx(solid, TopAbs_SHELL); shellEx.More(); shellEx.Next())
+		for (TopExp_Explorer shellEx(
+			solid,
+			TopAbs_SHELL);
+			shellEx.More();
+			shellEx.Next())
 		{
-			TopoDS_Shell shell = TopoDS::Shell(shellEx.Current());
+			const TopoDS_Shell shell =
+				TopoDS::Shell(shellEx.Current());
 
-			for (TopExp_Explorer faceEx(shell, TopAbs_FACE); faceEx.More(); faceEx.Next())
+			for (TopExp_Explorer faceEx(
+				shell,
+				TopAbs_FACE);
+				faceEx.More();
+				faceEx.Next())
 			{
-				TopoDS_Face face = TopoDS::Face(faceEx.Current());
+				const TopoDS_Face face =
+					TopoDS::Face(faceEx.Current());
 
-				if ((face.Orientation() == TopAbs_FORWARD || face.Orientation() == TopAbs_REVERSED) && !isPlanarFace(face))
+				if (face.Orientation() != TopAbs_FORWARD &&
+					face.Orientation() != TopAbs_REVERSED)
 				{
-					faces.push_back(face);
+					continue;
 				}
+
+				// Keep the existing exclusion for planar faces.
+				if (isPlanarFace(face))
+					continue;
+
+				faces.push_back(face);
 			}
 		}
-
-		const std::size_t oldCount = report.thinGapFaces.size();
 
 		checkThinGapsInList(
 			faces,
 			report,
-			gapTolerance,
-			areaTolerance,
+			minimumMeshSize,
+			gapFactor,
+			maxRelativeGap,
+			minRelevantFaceSizeFactor,
 			samplesPerDirection,
 			minHitRatio,
-			maxDistanceVariation);
-
-		if (report.thinGapFaces.size() > oldCount)
-			found = true;
+			maxRelativeStdDev);
 	}
 
-	if (found)
+	if (report.thinGapFaces.size() > initialCount)
 	{
 		report.messages.push_back(
-			"Thin gaps between nearby opposite boundary faces were found. "
-			"The shape may be topologically valid but problematic for surface or volume meshing.");
+			"Thin curved gaps were found relative to the "
+			"configured minimum mesh size.");
 	}
 }
 
