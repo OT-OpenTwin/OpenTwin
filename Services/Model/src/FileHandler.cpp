@@ -122,7 +122,7 @@ void FileHandler::handleImportPythonScriptButton() {
 
 void FileHandler::handleExportFilesToLibrary() {
 	// This is the local export, show metadata file lists
-	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
+	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
 	//Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
