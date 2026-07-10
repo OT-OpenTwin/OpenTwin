@@ -126,6 +126,9 @@ void STEPWriter::getExportFileContent(std::string& data)
         {
             std::string name = brepNameMap[brepItem.getEntityID()];
 
+			// We remove the leading "Geometry/" from the name
+			name = name.substr(strlen("Geometry/"));
+
             std::vector<double> color = brepColorMap[brepItem.getEntityID()];
             assert(color.size() == 3);
             Quantity_Color col(color[0], color[1], color[2], Quantity_TOC_RGB);
