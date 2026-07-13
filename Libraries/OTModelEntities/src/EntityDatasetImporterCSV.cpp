@@ -148,6 +148,13 @@ std::string EntityDatasetImporterCSV::getSelectedSeriesClassification()
 	return selectedSeriesClassification;
 }
 
+void EntityDatasetImporterCSV::fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg)
+{
+	_menuCfg.addButton("Run", "Run", "ContextMenu/Run.png", ot::MenuButtonCfg::ButtonAction::TriggerButton)->setTriggerButton("Import Parameterized Data/Data Import/Execute CSV Refinement Engine");
+	_menuCfg.addSeparator();
+	EntityBase::fillContextMenu(_requestData, _menuCfg);
+}
+
 void EntityDatasetImporterCSV::createProperties(const std::string& _rmdClassificationFolderName, ot::UID _rmdClassificationFolderUID)
 {
 

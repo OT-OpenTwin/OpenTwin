@@ -45,6 +45,8 @@ public:
 	bool interruptAtWarnings();
 	std::string getSelectedSeriesClassification();
 
+	virtual void fillContextMenu(const ot::MenuRequestData* _requestData, ot::MenuCfg& _menuCfg) override;
+
 private:
 	static std::map<std::string, MetadataSelectionFormat> m_metadataIdentificationsByName;
 	static std::map<std::string, CSVSelectionFormat> m_consideredCSVByName;
