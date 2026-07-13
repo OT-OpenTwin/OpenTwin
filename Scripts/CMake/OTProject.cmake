@@ -74,7 +74,7 @@ function(_ot_target_core_name OUT_VAR TARGET_NAME)
     set(${OUT_VAR} "${TARGET_NAME}_core" PARENT_SCOPE)
 endfunction()
 
-# ot_add_debug_release_link_dirs(<target> <debug-dir> <release-dir>)
+# _ot_add_debug_release_link_dirs(<target> <debug-dir> <release-dir>)
 #
 # Adds configuration-specific link directories to <target>.
 #   - <debug-dir> is used only for Debug
@@ -162,34 +162,21 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
     endif()
 
     if(DEP_TOKEN STREQUAL "OTFMC")
-        if(DEFINED ENV{OT_FILE_MANAGER_CONNECTOR_ROOT} AND NOT "$ENV{OT_FILE_MANAGER_CONNECTOR_ROOT}" STREQUAL "")
-            set(${OUT_VAR} "OT_FILE_MANAGER_CONNECTOR_ROOT" PARENT_SCOPE)
-            return()
-        endif()
-        if(DEFINED ENV{OT_FMC_ROOT} AND NOT "$ENV{OT_FMC_ROOT}" STREQUAL "")
-            set(${OUT_VAR} "OT_FMC_ROOT" PARENT_SCOPE)
-            return()
-        endif()
-        if(DEFINED ENV{OTFMC_ROOT} AND NOT "$ENV{OTFMC_ROOT}" STREQUAL "")
-            set(${OUT_VAR} "OTFMC_ROOT" PARENT_SCOPE)
-            return()
-        endif()
+        set(${OUT_VAR} "OT_FILE_MANAGER_CONNECTOR_ROOT" PARENT_SCOPE)
+        return()
     endif()
 
     _ot_guess_ot_root_envvar(_guess "${DEP_TOKEN}")
 
-    string(REPLACE "_" "" _guess_no_underscores "${_guess}")
-
+    # Fallback for tokens whose env var does not separate the words, e.g.
+    # OTGuiAPI -> OT_GUIAPI_ROOT, where the guess would produce OT_GUI_API_ROOT.
     string(REGEX REPLACE "^OT" "" _name "${DEP_TOKEN}")
     string(TOUPPER "${_name}" _name_u)
-    set(_candidate_compact "OT${_name_u}_ROOT")
     set(_candidate_split "OT_${_name_u}_ROOT")
 
     set(_candidates "")
     list(APPEND _candidates "${_guess}")
-    list(APPEND _candidates "${_guess_no_underscores}")
     list(APPEND _candidates "${_candidate_split}")
-    list(APPEND _candidates "${_candidate_compact}")
 
     foreach(_envName IN LISTS _candidates)
         if(DEFINED ENV{${_envName}} AND NOT "$ENV{${_envName}}" STREQUAL "")
@@ -201,40 +188,20 @@ function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
     set(${OUT_VAR} "${_guess}" PARENT_SCOPE)
 endfunction()
 
+# Subdirectory holding the public headers of an OT project, e.g. "include".
+# OT_INC_PATH comes from OTEnvironment.cmake.
 function(_ot_get_ot_inc_suffix OUT_VAR)
-    if(DEFINED ENV{OT_INC} AND NOT "$ENV{OT_INC}" STREQUAL "")
-        set(${OUT_VAR} "$ENV{OT_INC}" PARENT_SCOPE)
+    if(NOT "${OT_INC_PATH}" STREQUAL "")
+        set(${OUT_VAR} "${OT_INC_PATH}" PARENT_SCOPE)
     else()
         set(${OUT_VAR} "include" PARENT_SCOPE)
     endif()
 endfunction()
 
-
-function(_ot_env_get_path OUT_VAR ENV_NAME)
-    if(DEFINED ENV{${ENV_NAME}} AND NOT "$ENV{${ENV_NAME}}" STREQUAL "")
-        set(_v "$ENV{${ENV_NAME}}")
-        string(REPLACE "\"" "" _v "${_v}")
-        file(TO_CMAKE_PATH "${_v}" _v)
-        set(${OUT_VAR} "${_v}" PARENT_SCOPE)
-    else()
-        set(${OUT_VAR} "" PARENT_SCOPE)
-    endif()
-endfunction()
-
-function(_ot_env_get_list OUT_VAR ENV_NAME)
-    if(DEFINED ENV{${ENV_NAME}} AND NOT "$ENV{${ENV_NAME}}" STREQUAL "")
-        set(_v "$ENV{${ENV_NAME}}")
-        string(REPLACE "\"" "" _v "${_v}")
-        set(${OUT_VAR} "${_v}" PARENT_SCOPE)
-    else()
-        set(${OUT_VAR} "" PARENT_SCOPE)
-    endif()
-endfunction()
-
 function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
-    _ot_env_get_path(_inc  "${TP_NAME}_INC")
-    _ot_env_get_path(_incd "${TP_NAME}_INCD")
-    _ot_env_get_path(_incr "${TP_NAME}_INCR")
+    ot_get_env_path(_inc  "${TP_NAME}_INC")
+    ot_get_env_path(_incd "${TP_NAME}_INCD")
+    ot_get_env_path(_incr "${TP_NAME}_INCR")
 
     # Prefer the single include dir if provided
     if(NOT "${_inc}" STREQUAL "")
@@ -262,8 +229,8 @@ function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
 endfunction()
 
 function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
-    _ot_env_get_path(_libpathd "${TP_NAME}_LIBPATHD")
-    _ot_env_get_path(_libpathr "${TP_NAME}_LIBPATHR")
+    ot_get_env_path(_libpathd "${TP_NAME}_LIBPATHD")
+    ot_get_env_path(_libpathr "${TP_NAME}_LIBPATHR")
 
     if(NOT "${_libpathd}" STREQUAL "")
         target_link_directories("${FINAL_TARGET}" PRIVATE
@@ -278,8 +245,8 @@ function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
     endif()
 
     # Preferred: per-config lib lists
-    _ot_env_get_list(_libd "${TP_NAME}_LIBD")
-    _ot_env_get_list(_libr "${TP_NAME}_LIBR")
+    ot_get_env_list(_libd "${TP_NAME}_LIBD")
+    ot_get_env_list(_libr "${TP_NAME}_LIBR")
 
     if(NOT "${_libd}" STREQUAL "")
         target_link_libraries("${FINAL_TARGET}" PRIVATE
@@ -295,9 +262,9 @@ function(_ot_apply_tp_to_final FINAL_TARGET TP_NAME)
 
     # Compatibility fallback: single list used for all configs
     if("${_libd}" STREQUAL "" AND "${_libr}" STREQUAL "")
-        _ot_env_get_list(_lib_any "${TP_NAME}_LIB")
+        ot_get_env_list(_lib_any "${TP_NAME}_LIB")
         if("${_lib_any}" STREQUAL "")
-            _ot_env_get_list(_lib_any "${TP_NAME}_LIBS")
+            ot_get_env_list(_lib_any "${TP_NAME}_LIBS")
         endif()
 
         if(NOT "${_lib_any}" STREQUAL "")
@@ -312,7 +279,7 @@ endfunction()
 function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     if(NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "")
         message(FATAL_ERROR
-            "ot_initialize_lib(${TARGET_NAME} ...): root path var '${ROOT_PATH_VAR}' is not set. "
+            "ot_initialize_lib/bin(${TARGET_NAME} ...): root path var '${ROOT_PATH_VAR}' is not set. "
             "Did you run SetupEnvironment.bat and include OTEnvironment.cmake?"
         )
     endif()
@@ -373,10 +340,7 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     set_property(TARGET ${_core} PROPERTY OT_SUBSYSTEM_OVERRIDES "")
 
     # Add root include path using OT_INC suffix (or include)
-    set(_incSuffix "${OT_INC_PATH}")
-    if("${_incSuffix}" STREQUAL "")
-        set(_incSuffix "include")
-    endif()
+    _ot_get_ot_inc_suffix(_incSuffix)
 
     target_include_directories(${_core} PRIVATE
         "${_rootPath}/${_incSuffix}"
@@ -730,7 +694,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
-    # QWT / QWTPOLAR headers
+    # QWT headers
     if(DEP STREQUAL "QWT")
         if(QWT_LIB_INCD_PATH)
             target_include_directories("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCD_PATH}")
@@ -796,7 +760,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     endif()
 
     if(DEP STREQUAL "MONGO_BOOST")
-        _ot_env_get_path(_mongo_boost_root "MONGO_BOOST_ROOT")
+        ot_get_env_path(_mongo_boost_root "MONGO_BOOST_ROOT")
         if(NOT "${_mongo_boost_root}" STREQUAL "")
             target_include_directories("${CORE_TARGET}" PRIVATE "${_mongo_boost_root}")
         endif()
@@ -849,9 +813,9 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         return()
     endif()
 
-    _ot_env_get_path(_inc  "${DEP}_INC")
-    _ot_env_get_path(_incd "${DEP}_INCD")
-    _ot_env_get_path(_incr "${DEP}_INCR")
+    ot_get_env_path(_inc  "${DEP}_INC")
+    ot_get_env_path(_incd "${DEP}_INCD")
+    ot_get_env_path(_incr "${DEP}_INCR")
     if(NOT ("${_inc}" STREQUAL "" AND "${_incd}" STREQUAL "" AND "${_incr}" STREQUAL ""))
         _ot_apply_tp_to_core("${CORE_TARGET}" "${DEP}")
         return()
@@ -1048,10 +1012,8 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
                 "odbc32"
             )
             target_link_libraries("${FINAL_TARGET}" PRIVATE ${_system_libs})
-        elseif(UNIX AND NOT APPLE)
-            # UNIX/LINUX libs ...
-            target_link_libraries("${FINAL_TARGET}" PRIVATE ${_system_libs})
         endif()
+        # No UNIX/Linux system libraries are required yet
         return()
     endif()
 
@@ -1165,14 +1127,14 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         return()
     endif()
 
-    _ot_env_get_path(_libpathd "${DEP}_LIBPATHD")
-    _ot_env_get_path(_libpathr "${DEP}_LIBPATHR")
+    ot_get_env_path(_libpathd "${DEP}_LIBPATHD")
+    ot_get_env_path(_libpathr "${DEP}_LIBPATHR")
     if(NOT ("${_libpathd}" STREQUAL "" AND "${_libpathr}" STREQUAL ""))
         _ot_apply_tp_to_final("${FINAL_TARGET}" "${DEP}")
         return()
     endif()
 
-    message(WARNING "ot_finalize_lib(${FINAL_TARGET}): Unknown dependency token '${DEP}'")
+    message(WARNING "ot_add_dependency(${FINAL_TARGET} ...): Unknown dependency token '${DEP}'")
 
 endfunction()
 
@@ -1474,7 +1436,7 @@ function(_ot_tool_launch_path OUT_VAR RAW FALLBACK)
     set(${OUT_VAR} "${_v}" PARENT_SCOPE)
 endfunction()
 
-function(_ot_tool_write_launch TARGET_NAME CONTENT)
+function(_ot_tool_write_launch CONTENT)
     set(OT_LAUNCH_ENTRIES "${CONTENT}")
     file(READ "$ENV{OT_CMAKE_DIR}/templates/launch.vs.json.in" _envelope)
     string(REPLACE "\r" "" _envelope "${_envelope}")
@@ -1519,7 +1481,7 @@ function(ot_tool_debug_launch TARGET_NAME)
         endif()
     endforeach()
 
-    _ot_tool_write_launch(${TARGET_NAME} "${_entries}")
+    _ot_tool_write_launch("${_entries}")
 endfunction()
 
 function(ot_tool_bin_debug_launch TARGET_NAME)
@@ -1554,7 +1516,7 @@ function(ot_tool_bin_debug_launch TARGET_NAME)
         endif()
     endforeach()
 
-    _ot_tool_write_launch(${TARGET_NAME} "${_entries}")
+    _ot_tool_write_launch("${_entries}")
 endfunction()
 
 # ------------------------------------------------------------
