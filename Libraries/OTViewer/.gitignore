@@ -48,10 +48,10 @@ buildLog_Release.txt
 # Test Logs
 testlog_Debug.txt
 testlog_Release.txt
-build/
 
 # Output directory
 x64
+build/
 
 # VS internal build directory
 /**/.vs

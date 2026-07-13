@@ -48,6 +48,7 @@ testlog_Release.txt
 
 # Output directory
 x64
+build/
 
 # Google test directory
 packages

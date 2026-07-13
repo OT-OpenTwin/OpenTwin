@@ -62,4 +62,4 @@ bld/
 [Ll]ogs/
 
 *.user
-/build
+build/

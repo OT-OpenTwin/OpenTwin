@@ -51,4 +51,4 @@ x64
 
 # VS internal build directory
 /**/.vs
-/build
+build/
