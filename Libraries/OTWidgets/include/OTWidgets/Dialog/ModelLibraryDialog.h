@@ -55,6 +55,7 @@ namespace ot {
 		// Setter / Getter
 
 		const std::string& getSelectedName() const { return m_selectedName; };
+		const std::string& getSelectedOwner() const { return m_selectedOwner; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -74,12 +75,14 @@ namespace ot {
 		};
 
 		void updateNameEdit();
+		const LibraryModel* getSelectedModel() const;
 
 		ModelLibraryDialogCfg m_config;
 
 		ComboButton* m_sourceSelection;
 		ComboBox* m_nameEdit;
 		std::string m_selectedName;
+		std::string m_selectedOwner;
 		std::list<FilterInputEntry> m_filterEntries;
 		std::list<LibraryModel> m_sourceFilteredModels;
 
