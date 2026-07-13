@@ -99,7 +99,7 @@ private:
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
-	
+
 	// Export to library functions
 
 	struct DialogExportEntities {
@@ -167,6 +167,19 @@ private:
 	std::string createIncrementedPath(const std::string& _filePath);
 
 	ot::UID readLibraryElementIDFromMetaFile(const std::string& _metaFilePath) const;
+
+	//! @brief Holds the LibraryElementID and Version already stored in an existing meta file on disk.
+	struct ExistingMetaInfo {
+		bool exists = false;
+		ot::UID libraryElementID = ot::invalidUID;
+		int version = 0;
+	};
+
+	//! @brief Reads the LibraryElementID and Version from an existing meta file, if present.
+	//! Used so that on overwrite the LibraryElementID stays stable and the Version can be incremented
+	//! from its actual current value instead of being reset to 1 on every export.
+	ExistingMetaInfo readExistingMetaInfo(const std::string& _metaFilePath) const;
+
 	PendingScriptExport prepareScriptExportData(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID);
 	void processLinkedScriptExport(const PendingScriptExport& _scriptExport, ot::UID _manifestLibraryElementID);
 	std::string updateDependencyIDInMetaContent(const std::string& _metaContent, ot::UID _newDependencyID);

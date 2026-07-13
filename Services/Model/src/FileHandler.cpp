@@ -90,7 +90,7 @@ FileHandler::FileHandler() {
 void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 {
 	const std::string pageName = Application::getToolBarPageName();
-	
+
 	_uiComponent->addMenuGroup(pageName, c_groupName);
 
 	_uiComponent->addMenuButton(m_buttonPythonImport);
@@ -122,14 +122,14 @@ void FileHandler::handleImportPythonScriptButton() {
 
 void FileHandler::handleExportFilesToLibrary() {
 	// This is the local export, show metadata file lists
-	//showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
+	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
 	//Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::handleExportToUserLibrary() {
 	// This is the user export, show additional info fields
-	//showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
-	Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
+	showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
+	//Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
 void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction, bool _isLocalExport) {
@@ -464,7 +464,7 @@ void FileHandler::handleOverwriteFilePromptResponse(ot::JsonDocument& _document)
 void FileHandler::importFile(const std::string& _fileMask, const std::string& _dialogTitle, const std::string& _functionName)
 {
 	const std::string& serviceURL = Application::instance()->getServiceURL();
-	const std::string serviceName =	Application::instance()->getServiceName();
+	const std::string serviceName = Application::instance()->getServiceName();
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_RequestFileForReading, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_UI_DIALOG_TITLE, ot::JsonString(_dialogTitle, doc.GetAllocator()), doc.GetAllocator());
@@ -492,13 +492,13 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	{
 		//QueuingDatabaseWritingRAII queueDatabase;
 		auto info = fileInfos.begin();
-		
+
 		ProgressUpdater updater(uiComponent, "Importing files");
 		updater.setTotalNumberOfSteps(fileNames.size());
 		uint32_t counter(0);
 		uiComponent->displayMessage("Storing document(s) in database: ");
 		auto start = std::chrono::system_clock::now();
-		
+
 		Model* model = Application::instance()->getModel();
 		assert(model != nullptr);
 		std::list<std::string> folderContent = model->getListOfFolderItems(_folderName, false);
@@ -515,19 +515,19 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 				api.DeleteGridFSData(id, info->getCollectionName());
 				compressedData = std::string(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 			}
-			
+
 			uint64_t dataLen = static_cast<uint64_t>(info->getUncompressedSize());
 			std::unique_ptr<uint8_t[]> data(ot::String::decompressBase64(compressedData.c_str(), dataLen));
 			info++;
-		
+
 			storeFileInDataBase(std::string(reinterpret_cast<const char*>(data.get()), dataLen), fileName, folderContent, _folderName, fileFilter);
 			updater.triggerUpdate(counter);
 		}
 		auto end = std::chrono::system_clock::now();
-		uint64_t passedTime =	std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
+		uint64_t passedTime = std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count();
 		uiComponent->displayMessage(std::to_string(passedTime) + " ms\nModel update: ");
 	}
-	ProgressUpdater updater(uiComponent, "Performing model update",true);
+	ProgressUpdater updater(uiComponent, "Performing model update", true);
 	auto start = std::chrono::system_clock::now();
 	addTextFilesToModel();
 	clearBuffer();
@@ -586,12 +586,12 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 		const std::string scriptName = eventHandler->getScriptName();
 		const std::string environmentName = eventHandler->getEnvironmentName();
 		auto& entityMap = Application::instance()->getModel()->getAllEntitiesByUID();
-		std::optional<std::string> functionName = eventHandler->getEventHandlingFunction(PythonEventType::TableFilterChanged,entityMap);
+		std::optional<std::string> functionName = eventHandler->getEventHandlingFunction(PythonEventType::TableFilterChanged, entityMap);
 		if (functionName.has_value())
 		{
 			// Otherwise there is no handler for this event in the script.
 			const std::string temp = functionName.value();
-			auto asyncRequest = [_event, scriptName,temp]()
+			auto asyncRequest = [_event, scriptName, temp]()
 				{
 					try
 					{
@@ -600,7 +600,7 @@ void FileHandler::processTableColumnFilterChanged(const ot::TableFilterChangeEve
 						ot::PythonServiceInterface interface(Application::instance()->getConnectedServiceByName(OT_INFO_SERVICE_TYPE_PYTHON_EXECUTION_SERVICE)->getServiceURL());
 						std::list<ot::ValueComparisonDescription> valueCompares = _event.getFilterDescriptions();
 						PythonParameter parameter = PyhonParameterBuilderValueComparisons::create("", valueCompares);
-						interface.addScriptWithParameter(scriptName,temp, parameter);
+						interface.addScriptWithParameter(scriptName, temp, parameter);
 						ot::ReturnMessage answer = interface.sendExecutionOrder();
 						if (answer.getStatus() != ot::ReturnMessage::Ok)
 						{
@@ -652,9 +652,9 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 {
 	Model* model = Application::instance()->getModel();
 	assert(model != nullptr);
-	
-	ot::UID entIDData =	model->createEntityUID();
-	ot::UID entIDTopo =	model->createEntityUID();
+
+	ot::UID entIDData = model->createEntityUID();
+	ot::UID entIDTopo = model->createEntityUID();
 	const std::string serviceName = Application::instance()->getServiceName();
 
 	size_t fileNamePos = _fileName.find_last_of("/");
@@ -665,7 +665,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	std::unique_ptr<EntityFileText> textFile;
 	if (type == "csv")
 	{
-		textFile.reset(new EntityFileCSV (entIDTopo, nullptr, nullptr, nullptr));
+		textFile.reset(new EntityFileCSV(entIDTopo, nullptr, nullptr, nullptr));
 	}
 	else
 	{
@@ -679,7 +679,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	textFile->setDataEntity(fileContent);
 
 	ot::EncodingGuesser guesser;
-	textFile->setFileProperties(path, name,type);
+	textFile->setFileProperties(path, name, type);
 
 	textFile->setFileFilter(_fileFilter);
 
@@ -745,14 +745,14 @@ FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::Prop
 			entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelProperty->getCurrent(), "Circuit model"));
 			entities.circuitMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelMetaProperty->getCurrent(), "Circuit model metadata"));
 			if (!entities.circuitModel || !entities.circuitMetaFile || !validateMetaDataFile(entities.circuitMetaFile)) {
-				entities.isCircuitExport = false; 
+				entities.isCircuitExport = false;
 			}
 		}
 		if (entities.isPythonExport) {
 			entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptProperty->getCurrent(), "Python script"));
 			entities.pythonMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonMetaProperty->getCurrent(), "Python metadata"));
 			if (!entities.pythonScript || !entities.pythonMetaFile || !validateMetaDataFile(entities.pythonMetaFile)) {
-				entities.isPythonExport = false; 
+				entities.isPythonExport = false;
 			}
 
 			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty()) {
@@ -896,7 +896,7 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 	}
 
 	// Validate mandatory fields
-	std::list<std::string> mandatoryFields = {"MetaData", "AdditionalInfos" };
+	std::list<std::string> mandatoryFields = { "MetaData", "AdditionalInfos" };
 	for (const auto& field : mandatoryFields) {
 		if (!ot::json::exists(metaDoc, field)) {
 			model->reportError(
@@ -956,7 +956,7 @@ std::string FileHandler::ensureFileExtension(const std::string& _fileName, const
 	if (_fileName.size() >= _extension.size()) {
 		std::string fileEnd = _fileName.substr(_fileName.size() - _extension.size());
 		if (fileEnd == _extension) {
-			return _fileName; 
+			return _fileName;
 		}
 	}
 	return _fileName + _extension;
@@ -1061,6 +1061,41 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 	}
 }
 
+FileHandler::ExistingMetaInfo FileHandler::readExistingMetaInfo(const std::string& _metaFilePath) const {
+	ExistingMetaInfo info;
+
+	std::ifstream file(_metaFilePath);
+	if (!file.is_open()) {
+		// No existing meta file -> this is a fresh export, defaults (exists = false) are correct.
+		return info;
+	}
+
+	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+	file.close();
+
+	try {
+		ot::JsonDocument doc;
+		doc.fromJson(content);
+
+		if (doc.HasMember("LibraryElementID")) {
+			const auto& val = doc["LibraryElementID"];
+			if (val.IsUint64()) info.libraryElementID = val.GetUint64();
+			else if (val.IsInt64()) info.libraryElementID = static_cast<ot::UID>(val.GetInt64());
+		}
+
+		if (ot::json::exists(doc, "Version") && ot::json::isInt(doc, "Version")) {
+			info.version = ot::json::getInt(doc, "Version");
+		}
+
+		info.exists = true;
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E("Failed to read existing meta file \"" + _metaFilePath + "\": " + _e.what());
+	}
+
+	return info;
+}
+
 FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID) {
 	assert(_manifestEntity != nullptr && _metaEntity != nullptr);
 
@@ -1085,15 +1120,22 @@ FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest
 
 	FileOverwriteStatus status = checkAndHandleFileOverwrite(manifestFileName, manifestContent, metaFileName, metaJson);
 
+	// Read whatever LibraryElementID/Version is already stored on disk (if any), so overwrites
+	// keep the same LibraryElementID and increment from the actual current Version instead of
+	// always resetting to 1.
+	ExistingMetaInfo existingInfo = readExistingMetaInfo(metaFileName);
+	ot::UID libraryElementID = existingInfo.exists ? existingInfo.libraryElementID : _manifestEntity->getManifestID();
+	int version = existingInfo.exists ? existingInfo.version : 1;
+
 	// Check if files exist and if content changed (only checks, no prompt yet)
 	if (status == FileOverwriteStatus::Write)
 	{
 		// File check passed - NOW add the dynamic parameters
 		metaDoc.RemoveMember("LibraryElementID");
-		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_manifestEntity->getManifestID()), metaDoc.GetAllocator());
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Version");
-		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+		metaDoc.AddMember("Version", ot::JsonValue(version), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Name");
 		metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1105,16 +1147,18 @@ FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest
 
 		writeFileToPath(manifestFileName, manifestContent);
 		writeFileToPath(metaFileName, metaJson);
-		return { FileOverwriteStatus::Write, _manifestEntity->getManifestID(), manifestFileName };
+		return { FileOverwriteStatus::Write, libraryElementID, manifestFileName };
 	}
-	else if(status == FileOverwriteStatus::PromptUser)
+	else if (status == FileOverwriteStatus::PromptUser)
 	{
-		// File check indicated changes - NOW add dynamic parameters and prompt
+		// File check indicated changes - NOW add dynamic parameters and prompt.
+		// LibraryElementID and Version reflect the existing file on disk; handleOverwriteResponse
+		// will keep the LibraryElementID and increment the Version from this current value.
 		metaDoc.RemoveMember("LibraryElementID");
-		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_manifestEntity->getManifestID()), metaDoc.GetAllocator());
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Version");
-		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+		metaDoc.AddMember("Version", ot::JsonValue(version), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Name");
 		metaDoc.AddMember("Name", ot::JsonString(_manifestEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1126,9 +1170,9 @@ FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest
 
 		// NOW prompt with the updated content
 		promptUserForOverwrite(manifestFileName, metaFileName, manifestContent, metaJson);
-		return { FileOverwriteStatus::PromptUser, _manifestEntity->getManifestID(), manifestFileName };
+		return { FileOverwriteStatus::PromptUser, libraryElementID, manifestFileName };
 	}
-	else if (status == FileOverwriteStatus::Skip) 
+	else if (status == FileOverwriteStatus::Skip)
 	{
 		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _manifestEntity->getNameOnly() + "\".\n");
 		ot::UID existingLibID = readLibraryElementIDFromMetaFile(metaFileName);
@@ -1152,6 +1196,11 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 		promptUserForOverwrite(prepared.contentFilePath, prepared.metaFilePath, prepared.contentData, prepared.metaContent);
 	}
 	else if (prepared.status == FileOverwriteStatus::Skip) {
+		// Content and compared metadata are identical, but the DependencyID is intentionally excluded
+		// from that comparison (see checkAndHandleFileOverwrite) and may be stale if the environment
+		// was newly created or received a new LibraryElementID. Fix it up on disk even though the
+		// rest of the script export is skipped.
+		updateExistingMetaFileDependencyID(prepared.metaFilePath, _environmentID);
 		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _scriptEntity->getNameOnly() + "\".\n");
 	}
 }
@@ -1180,14 +1229,21 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 
 	FileOverwriteStatus status = checkAndHandleFileOverwrite(modelFileName, modelContent, metaFileName, metaJson);
 
+	// Read whatever LibraryElementID/Version is already stored on disk (if any), so overwrites
+	// keep the same LibraryElementID and increment from the actual current Version instead of
+	// always resetting to 1.
+	ExistingMetaInfo existingInfo = readExistingMetaInfo(metaFileName);
+	ot::UID libraryElementID = existingInfo.exists ? existingInfo.libraryElementID : _modelEntity->getEntityID();
+	int version = existingInfo.exists ? existingInfo.version : 1;
+
 	// Check if files exist and if content changed (only checks, no prompt yet!)
 	if (status == FileOverwriteStatus::Write) {
 		// File check passed - NOW add the dynamic parameters
 		metaDoc.RemoveMember("LibraryElementID");
-		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_modelEntity->getEntityID()), metaDoc.GetAllocator());
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Version");
-		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+		metaDoc.AddMember("Version", ot::JsonValue(version), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Name");
 		metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1201,12 +1257,14 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 		writeFileToPath(metaFileName, metaJson);
 	}
 	else if (status == FileOverwriteStatus::PromptUser) {
-		// File check indicated changes - NOW add dynamic parameters and prompt
+		// File check indicated changes - NOW add dynamic parameters and prompt.
+		// LibraryElementID and Version reflect the existing file on disk; handleOverwriteResponse
+		// will keep the LibraryElementID and increment the Version from this current value.
 		metaDoc.RemoveMember("LibraryElementID");
-		metaDoc.AddMember("LibraryElementID", ot::JsonValue(_modelEntity->getEntityID()), metaDoc.GetAllocator());
+		metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Version");
-		metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+		metaDoc.AddMember("Version", ot::JsonValue(version), metaDoc.GetAllocator());
 
 		metaDoc.RemoveMember("Name");
 		metaDoc.AddMember("Name", ot::JsonString(_modelEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1375,7 +1433,7 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 
 void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath,
 	const std::string& _contentNewContent, const std::string& _metaNewContent) const {
-	
+
 	// Store the pending file overwrites (both content and meta together)
 	const_cast<FileHandler*>(this)->m_pendingFileOverwrites[_contentFilePath] = {
 		_contentFilePath,
@@ -1453,14 +1511,17 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 		try {
 			metaDoc.fromJson(metaContent);
 
-			// Read existing LibraryElementID (needed for linked script DependencyID)
+			// Read existing LibraryElementID (kept stable - it already reflects what is on disk,
+			// since prepareScriptExportData / exportPythonManifest / exportCircuitModel read it
+			// from the existing meta file before building this pending entry)
 			if (metaDoc.HasMember("LibraryElementID")) {
 				const auto& val = metaDoc["LibraryElementID"];
 				if (val.IsUint64()) finalLibraryElementID = val.GetUint64();
 				else if (val.IsInt64()) finalLibraryElementID = static_cast<ot::UID>(val.GetInt64());
 			}
 
-			// Increment the version
+			// Increment the version starting from the actual current version stored in pending
+			// (which itself was read from the existing file on disk, not hardcoded to 1)
 			int currentVersion = 1;
 			if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version")) {
 				currentVersion = ot::json::getInt(metaDoc, "Version");
@@ -1502,6 +1563,10 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 			finalLibraryElementID = Application::instance()->getModel()->createEntityUID();
 			metaDoc.RemoveMember("LibraryElementID");
 			metaDoc.AddMember("LibraryElementID", ot::JsonValue(finalLibraryElementID), metaDoc.GetAllocator());
+
+			// New copy starts fresh at Version 1
+			metaDoc.RemoveMember("Version");
+			metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
 
 			// Update Name and FileName to match the actually written, incremented file
 			metaDoc.RemoveMember("Name");
@@ -1715,12 +1780,19 @@ FileHandler::PendingScriptExport FileHandler::prepareScriptExportData(EntityFile
 	// Check overwrite status (using pre-dynamic-param meta for comparison)
 	result.status = checkAndHandleFileOverwrite(result.contentFilePath, result.contentData, result.metaFilePath, metaJson);
 
+	// Read whatever LibraryElementID/Version is already stored on disk (if any), so overwrites
+	// keep the same LibraryElementID and increment from the actual current Version instead of
+	// always resetting to 1.
+	ExistingMetaInfo existingInfo = readExistingMetaInfo(result.metaFilePath);
+	ot::UID libraryElementID = existingInfo.exists ? existingInfo.libraryElementID : _scriptEntity->getEntityID();
+	int version = existingInfo.exists ? existingInfo.version : 1;
+
 	// Add dynamic parameters
 	metaDoc.RemoveMember("LibraryElementID");
-	metaDoc.AddMember("LibraryElementID", ot::JsonValue(_scriptEntity->getEntityID()), metaDoc.GetAllocator());
+	metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
 
 	metaDoc.RemoveMember("Version");
-	metaDoc.AddMember("Version", ot::JsonValue(1), metaDoc.GetAllocator());
+	metaDoc.AddMember("Version", ot::JsonValue(version), metaDoc.GetAllocator());
 
 	metaDoc.RemoveMember("Name");
 	metaDoc.AddMember("Name", ot::JsonString(_scriptEntity->getNameOnly(), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1770,6 +1842,13 @@ std::string FileHandler::updateDependencyIDInMetaContent(const std::string& _met
 			metaDoc["AdditionalInfos"].AddMember("DependencyID",
 				ot::JsonString(std::to_string(_newDependencyID), metaDoc.GetAllocator()),
 				metaDoc.GetAllocator());
+		}
+
+		// Increment version when dependency is updated
+		if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version")) {
+			int currentVersion = ot::json::getInt(metaDoc, "Version");
+			metaDoc.RemoveMember("Version");
+			metaDoc.AddMember("Version", ot::JsonValue(currentVersion + 1), metaDoc.GetAllocator());
 		}
 
 		return ot::json::toJson(metaDoc);
