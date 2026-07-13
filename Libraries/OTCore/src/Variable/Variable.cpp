@@ -167,6 +167,11 @@ bool ot::Variable::isNumeric() const
 	return isFloat() || isDouble() || isInt32() || isInt64() || isComplex();
 }
 
+bool ot::Variable::isNotANumber() const
+{
+	return std::holds_alternative<std::monostate>(m_value);
+}
+
 float ot::Variable::getFloat() const
 {
 	return std::get<float>(m_value);
@@ -392,25 +397,29 @@ std::string ot::Variable::getTypeName() const
 	const size_t index = m_value.index();
 	if (index == 0)
 	{
-		return ot::TypeNames::getInt32TypeName();
+		return ot::TypeNames::getNotANumberTypeName();
 	}
 	else if (index == 1)
 	{
-		return ot::TypeNames::getInt64TypeName();
+		return ot::TypeNames::getInt32TypeName();
 	}
 	else if (index == 2)
 	{
-		return ot::TypeNames::getBoolTypeName();
+		return ot::TypeNames::getInt64TypeName();
 	}
 	else if (index == 3)
 	{
-		return ot::TypeNames::getFloatTypeName();
+		return ot::TypeNames::getBoolTypeName();
 	}
 	else if (index == 4)
 	{
-		return ot::TypeNames::getDoubleTypeName();
+		return ot::TypeNames::getFloatTypeName();
 	}
 	else if (index == 5)
+	{
+		return ot::TypeNames::getDoubleTypeName();
+	}
+	else if (index == 6)
 	{
 		return ot::TypeNames::getStringTypeName();
 	}

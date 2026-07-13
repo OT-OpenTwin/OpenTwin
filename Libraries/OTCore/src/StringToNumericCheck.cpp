@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: StringToNumericCheck.cpp
 // 
 // License:
@@ -21,6 +21,7 @@
 #include "OTSystem/DateTime.h"
 #include <stdint.h>
 #include <charconv>
+#include "OTCore/String.h"
 
 bool ot::StringToNumericCheck::fitsInInt32(const std::string& str)
 {
@@ -60,4 +61,10 @@ bool ot::StringToNumericCheck::fitsInDouble(const std::string& str)
 		fits = ec == std::errc() && ptr == str.data() + str.size();
 	}
 	return fits;
+}
+
+bool ot::StringToNumericCheck::isNotANumber(const std::string& str)
+{
+	std::string temp = ot::String::toLower(str);
+	return temp == "nan" || temp == "inf" || temp == "-inf" || temp == "+inf";
 }

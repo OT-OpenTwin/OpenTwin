@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: VariableToBSONConverter.cpp
 // 
 // License:
@@ -46,6 +46,10 @@ void VariableToBSONConverter::operator()(bsoncxx::builder::basic::document& doc,
 	{
 		doc.append(bsoncxx::builder::basic::kvp(fieldName, value.getInt64()));
 	}
+	else if (value.isNotANumber())
+	{
+		doc.append(bsoncxx::builder::basic::kvp(fieldName, bsoncxx::types::b_null{}));
+	}
 	else
 	{
 		assert(0);
@@ -77,6 +81,10 @@ void VariableToBSONConverter::operator()(bsoncxx::builder::basic::array& array, 
 	else if (value.isInt64())
 	{
 		array.append(value.getInt64());
+	}
+	else if (value.isNotANumber())
+	{
+		array.append(bsoncxx::types::b_null{});
 	}
 	else
 	{

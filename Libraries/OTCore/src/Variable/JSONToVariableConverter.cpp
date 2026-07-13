@@ -94,6 +94,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 		}
 		return ot::Variable(std::complex<double>(realPart, imagPart));
 	}
+	else if (value.IsNull())
+	{
+		return ot::Variable();
+	}
 	else
 	{
 		throw std::exception("Not supported type for rapidjson::Value to variable_t conversion.");
@@ -120,6 +124,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		{
 			return ot::Variable(value.GetInt());
 		}
+		else if (value.IsNull())
+		{
+			return ot::Variable();
+		}
 		else
 		{
 			throw std::exception("Cast to variant not possible due to type mismatch");
@@ -130,6 +138,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		if (value.IsInt64() || value.IsInt())
 		{
 			return ot::Variable(value.GetInt64());
+		}
+		else if (value.IsNull())
+		{
+			return ot::Variable();
 		}
 		else
 		{
@@ -142,6 +154,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		{
 			return ot::Variable(value.GetFloat());
 		}
+		else if (value.IsNull())
+		{
+			return ot::Variable();
+		}
 		else
 		{
 			throw std::exception("Cast to variant not possible due to type mismatch");
@@ -152,7 +168,10 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		if (value.IsNumber())
 		{
 			return ot::Variable(value.GetDouble());
-
+		}
+		else if (value.IsNull())
+		{
+			return ot::Variable();
 		}
 		else
 		{
@@ -240,19 +259,19 @@ bool ot::JSONToVariableConverter::typeIsCompatible(const ot::JsonValue& value, c
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
 	{
-		compatible = value.IsInt() || value.IsNumber();
+		compatible = value.IsInt() || value.IsNumber() || value.IsNull();
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
 	{
-		compatible = value.IsInt64() || value.IsNumber();
+		compatible = value.IsInt64() || value.IsNumber() || value.IsNull();
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
 	{
-		compatible = value.IsFloat() || value.IsNumber();
+		compatible = value.IsFloat() || value.IsNumber() || value.IsNull();
 	}
 	else if (_type == ot::TypeNames::getDoubleTypeName())
 	{
-		compatible = value.IsDouble() || value.IsNumber();
+		compatible = value.IsDouble() || value.IsNumber() || value.IsNull();
 	}
 	else if (_type == ot::TypeNames::getBoolTypeName())
 	{

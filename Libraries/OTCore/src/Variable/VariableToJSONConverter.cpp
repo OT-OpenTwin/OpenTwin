@@ -22,7 +22,6 @@
 
 ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)
 {
-
 	if (value.isInt32())
 	{
 		ot::JsonValue rJValue;
@@ -68,6 +67,11 @@ ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, Jso
 		rJValue.AddMember(realKey, complexValue.real(), jsonAllocator);
 		ot::JsonString imagKey(ot::ComplexNumbers::SerialisationKeys::g_imag, jsonAllocator);
 		rJValue.AddMember(imagKey, complexValue.imag(), jsonAllocator);
+		return rJValue;
+	}
+	else if (value.isNotANumber())
+	{
+		ot::JsonValue rJValue(rapidjson::kNullType);
 		return rJValue;
 	}
 	else

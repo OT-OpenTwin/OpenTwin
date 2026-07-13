@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: StringToNumericCheck.h
 // 
 // License:
@@ -29,5 +29,6 @@ namespace ot
 		bool __declspec(dllexport) fitsInInt64(const std::string& str);
 		bool __declspec(dllexport) fitsInFloat(const std::string& str);
 		bool __declspec(dllexport) fitsInDouble(const std::string& str);
+		bool __declspec(dllexport) isNotANumber(const std::string& str);
 	}
 }

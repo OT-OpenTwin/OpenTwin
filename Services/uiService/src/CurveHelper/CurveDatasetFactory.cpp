@@ -114,7 +114,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			OT_LOG_D("No units found for the x-axis parameter");
 		}
 	}
-
+	// The display parameter is the parameter that is going to be used for the x-axis. The remaining ones are being dealt with as additional dependencies
 	additionalParameterDecoders.erase(displayParameterLabel);
 
 	// ! Careful. This is a code duplication. The same logic is being used in the ResultCollectionAccess lib in the QuantityContainer class.

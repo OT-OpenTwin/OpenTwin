@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: TypeNames.h
 // 
 // License:
@@ -36,5 +36,6 @@ namespace ot
 		static std::string getCharTypeName() { return "char"; };
 		static std::string getBoolTypeName() { return "bool"; };
 		static std::string getDateTimeTypeName() { return "datetime"; };
+		static std::string getNotANumberTypeName() { return "NoN"; };
 	};
 }

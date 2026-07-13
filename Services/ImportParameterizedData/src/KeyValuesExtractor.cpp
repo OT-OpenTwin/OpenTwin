@@ -299,107 +299,116 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 				ot::StringToVariableConverter converter;
 				const std::string& targetType = _rangeTypesByRangeNames[fieldName];
 
-				if (targetType == ot::TypeNames::getDateTimeTypeName())
+				if (ot::StringToNumericCheck::isNotANumber(fieldValueStringFixed))
 				{
-					fieldValueStringFixed.erase(std::remove(fieldValueStringFixed.begin(), fieldValueStringFixed.end(), '"'), fieldValueStringFixed.end());
-					const size_t firstNonSpace = fieldValueStringFixed.find_first_not_of(" \t\r\n");
-					if (firstNonSpace == std::string::npos)
-					{
-						fieldValueStringFixed.clear();
-					}
-					else
-					{
-						const size_t lastNonSpace = fieldValueStringFixed.find_last_not_of(" \t\r\n");
-						fieldValueStringFixed = fieldValueStringFixed.substr(firstNonSpace, lastNonSpace - firstNonSpace + 1);
-					}
+					values.push_back(ot::Variable());
 				}
 				else
 				{
-					converter.normaliseNumericString(fieldValueStringFixed, _decimalSeparator);
-					if (fieldValueStringFixed == "")
-					{
-						fieldValueStringFixed = "0";
-					}
-				}
 
-				if (targetType == ot::TypeNames::getDoubleTypeName())
-				{
-					const bool dataTypeFits =	ot::StringToNumericCheck::fitsInDouble(fieldValueStringFixed);
-					if (dataTypeFits)
+					if (targetType == ot::TypeNames::getDateTimeTypeName())
 					{
-						const double valueOfCastedType = std::stod(fieldValueStringFixed);
-						values.push_back(ot::Variable(valueOfCastedType));
-					}
-					else
-					{
-						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
-						allFieldsConverted = false;
-					}
-				}
-				else if (targetType == ot::TypeNames::getFloatTypeName())
-				{
-					const bool dataTypeFits = ot::StringToNumericCheck::fitsInFloat(fieldValueStringFixed);
-					if (dataTypeFits)
-					{
-						const double valueOfCastedType = std::stof(fieldValueStringFixed);
-						values.push_back(ot::Variable(valueOfCastedType));
-					}
-					else
-					{
-						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
-						allFieldsConverted = false;
-					}
-				}
-				else if (targetType == ot::TypeNames::getInt32TypeName())
-				{
-					bool dataTypeFits = ot::StringToNumericCheck::fitsInInt32(fieldValueStringFixed);
-					if (dataTypeFits)
-					{
-						const double valueOfCastedType = std::stoi(fieldValueStringFixed);
-						values.push_back(ot::Variable(valueOfCastedType));
-					}
-					else
-					{
-						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
-						allFieldsConverted = false;
-					}
-				}
-				else if (targetType == ot::TypeNames::getInt64TypeName())
-				{
-					bool dataTypeFits = ot::StringToNumericCheck::fitsInInt64(fieldValueStringFixed);
-					if (dataTypeFits)
-					{
-						const int64_t valueOfCastedType = std::stoll(fieldValueStringFixed);
-						values.push_back(ot::Variable(valueOfCastedType));
-					}
-					else
-					{
-						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
-						allFieldsConverted = false;
-					}
-				}
-				else if (targetType == ot::TypeNames::getDateTimeTypeName())
-				{
-					auto fmt = ot::DateTime::detectDateTimeFormat(fieldValueStringFixed);
-					if (fmt.has_value())
-					{
-						int64_t valueOfCastedType = 0;
-
-						if (*fmt == ot::DateTime::Duration)
+						fieldValueStringFixed.erase(std::remove(fieldValueStringFixed.begin(), fieldValueStringFixed.end(), '"'), fieldValueStringFixed.end());
+						const size_t firstNonSpace = fieldValueStringFixed.find_first_not_of(" \t\r\n");
+						if (firstNonSpace == std::string::npos)
 						{
-							valueOfCastedType = ot::DateTime::durationToMsec(fieldValueStringFixed);
+							fieldValueStringFixed.clear();
 						}
 						else
 						{
-							valueOfCastedType = ot::DateTime::timestampToMsec(fieldValueStringFixed, *fmt);
+							const size_t lastNonSpace = fieldValueStringFixed.find_last_not_of(" \t\r\n");
+							fieldValueStringFixed = fieldValueStringFixed.substr(firstNonSpace, lastNonSpace - firstNonSpace + 1);
 						}
-
-						values.push_back(ot::Variable(valueOfCastedType));
 					}
 					else
 					{
-						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
-						allFieldsConverted = false;
+						converter.normaliseNumericString(fieldValueStringFixed, _decimalSeparator);
+						if (fieldValueStringFixed == "")
+						{
+							fieldValueStringFixed = "0";
+						}
+					}
+
+					if (targetType == ot::TypeNames::getDoubleTypeName())
+					{
+						const bool dataTypeFits = ot::StringToNumericCheck::fitsInDouble(fieldValueStringFixed);
+						if (dataTypeFits)
+						{
+							const double valueOfCastedType = std::stod(fieldValueStringFixed);
+							values.push_back(ot::Variable(valueOfCastedType));
+						}
+						else
+						{
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							allFieldsConverted = false;
+						}
+					}
+					else if (targetType == ot::TypeNames::getFloatTypeName())
+					{
+						const bool dataTypeFits = ot::StringToNumericCheck::fitsInFloat(fieldValueStringFixed);
+						if (dataTypeFits)
+						{
+							const double valueOfCastedType = std::stof(fieldValueStringFixed);
+							values.push_back(ot::Variable(valueOfCastedType));
+						}
+						else
+						{
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							allFieldsConverted = false;
+						}
+					}
+					else if (targetType == ot::TypeNames::getInt32TypeName())
+					{
+
+						bool dataTypeFits = ot::StringToNumericCheck::fitsInInt32(fieldValueStringFixed);
+						if (dataTypeFits)
+						{
+							const double valueOfCastedType = std::stoi(fieldValueStringFixed);
+							values.push_back(ot::Variable(valueOfCastedType));
+						}
+						else
+						{
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							allFieldsConverted = false;
+						}
+					}
+					else if (targetType == ot::TypeNames::getInt64TypeName())
+					{
+						bool dataTypeFits = ot::StringToNumericCheck::fitsInInt64(fieldValueStringFixed);
+						if (dataTypeFits)
+						{
+							const int64_t valueOfCastedType = std::stoll(fieldValueStringFixed);
+							values.push_back(ot::Variable(valueOfCastedType));
+						}
+						else
+						{
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							allFieldsConverted = false;
+						}
+					}
+					else if (targetType == ot::TypeNames::getDateTimeTypeName())
+					{
+						auto fmt = ot::DateTime::detectDateTimeFormat(fieldValueStringFixed);
+						if (fmt.has_value())
+						{
+							int64_t valueOfCastedType = 0;
+
+							if (*fmt == ot::DateTime::Duration)
+							{
+								valueOfCastedType = ot::DateTime::durationToMsec(fieldValueStringFixed);
+							}
+							else
+							{
+								valueOfCastedType = ot::DateTime::timestampToMsec(fieldValueStringFixed, *fmt);
+							}
+
+							values.push_back(ot::Variable(valueOfCastedType));
+						}
+						else
+						{
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							allFieldsConverted = false;
+						}
 					}
 				}
 			}

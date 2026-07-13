@@ -79,6 +79,7 @@ namespace ot {
 		bool isConstCharPtr() const;
 		bool isComplex() const;
 		bool isNumeric() const;
+		bool isNotANumber() const;
 
 		float getFloat() const;
 		double getDouble() const;
@@ -109,7 +110,8 @@ namespace ot {
 	private:
 		friend class VariableHelper;
 
-		using variable_t = std::variant<int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
+		// Caution: Remember to update the getTypeName method when changing the order of types or adding another one. The method uses the indices of the variants.
+		using variable_t = std::variant<std::monostate,int32_t, int64_t, bool, float, double ,std::string, std::complex<double>>;
 		variable_t m_value;		
 		
 		inline bool DoubleCompare(const double& a, const double& b) const
