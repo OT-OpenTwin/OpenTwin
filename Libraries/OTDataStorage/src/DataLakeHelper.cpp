@@ -34,6 +34,11 @@ ot::JsonDocument DataLakeHelper::executeQuery(const ot::DataLakeAccessCfg& _conf
 			const std::string queryResponse = dbResponse.getResult();
 			ot::JsonDocument doc;
 			doc.fromJson(queryResponse);
+			if (doc.HasParseError())
+			{
+				throw std::exception("Error parsing the query response from the database: " + doc.GetParseError());
+			}
+
 			if (doc.HasMember("Documents"))
 			{
 				auto& allMongoDocuments = doc["Documents"];
