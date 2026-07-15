@@ -40,42 +40,10 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 	QVBoxLayout* rootLay = new QVBoxLayout(this);
 	rootLay->setContentsMargins(0, 0, 0, 0);
 
-	QHBoxLayout* titleLay = new QHBoxLayout;
-	rootLay->addLayout(titleLay);
-
-	Label* titleLabel = new Label("Name:", this);
-	titleLay->addWidget(titleLabel);
-
-	m_sourceSelection = new ComboButton("All", this);
-
-	// Fill the source selection
-	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Custom)));
-	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::BuiltIn)));
-
-	titleLay->addWidget(m_sourceSelection);
-
-	m_nameEdit = new ComboBox(this);
-	m_nameEdit->setEditable(true);
-	titleLay->addWidget(m_nameEdit, 1);
-
-	// Create filter layout
-	QScrollArea* dataArea = new QScrollArea(this);
-	dataArea->setWidgetResizable(true);
-	dataArea->setFrameShape(QFrame::NoFrame);
-	dataArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	dataArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-	dataArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Preferred);
-	rootLay->addWidget(dataArea);
-
-	QWidget* dataLayW = new QWidget(dataArea);
-	dataArea->setWidget(dataLayW);
-
-	QVBoxLayout* dataLay = new QVBoxLayout(dataLayW);
-	dataLay->setContentsMargins(0, 0, 0, 0);
-
-	QGroupBox* filterWidget = new QGroupBox("Filter", dataArea);
+	// Create filter layout FIRST (top)
+	QGroupBox* filterWidget = new QGroupBox("Filter", this);
 	QGridLayout* filterLay = new QGridLayout(filterWidget);
-	dataLay->addWidget(filterWidget);
+	rootLay->addWidget(filterWidget);
 
 	// Create filters
 	int r = 0;
@@ -101,8 +69,41 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 		filterLay->setColumnStretch(1, 1);
 	}
 
-	m_infoGroup = new QGroupBox("Info", dataArea);
+	// Title layout with Name and Source Selection
+	QHBoxLayout* titleLay = new QHBoxLayout;
+	rootLay->addLayout(titleLay);
 
+	Label* titleLabel = new Label("Name:", this);
+	titleLay->addWidget(titleLabel);
+
+	m_sourceSelection = new ComboButton("All", this);
+
+	// Fill the source selection
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Custom)));
+	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::BuiltIn)));
+
+	titleLay->addWidget(m_sourceSelection);
+
+	m_nameEdit = new ComboBox(this);
+	m_nameEdit->setEditable(true);
+	titleLay->addWidget(m_nameEdit, 1);
+
+	// Create scroll area for info (middle, expandable)
+	QScrollArea* dataArea = new QScrollArea(this);
+	dataArea->setWidgetResizable(true);
+	dataArea->setFrameShape(QFrame::NoFrame);
+	dataArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	dataArea->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+	dataArea->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+	rootLay->addWidget(dataArea, 1);
+
+	QWidget* dataLayW = new QWidget(dataArea);
+	dataArea->setWidget(dataLayW);
+
+	QVBoxLayout* dataLay = new QVBoxLayout(dataLayW);
+	dataLay->setContentsMargins(0, 0, 0, 0);
+
+	m_infoGroup = new QGroupBox("Info", dataArea);
 	m_infoLayout = new QGridLayout(m_infoGroup);
 	m_infoLayout->setColumnStretch(1, 1);
 	dataLay->addWidget(m_infoGroup);
@@ -110,7 +111,7 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 
 	dataLay->addStretch(1);
 
-	// Create buttons
+	// Create buttons (bottom)
 	QHBoxLayout* buttonLay = new QHBoxLayout;
 	rootLay->addLayout(buttonLay);
 	PushButton* okButton = new PushButton("OK", this);
