@@ -179,7 +179,10 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 		ot::PropertyString* circuitAdditionalInfoProp = new ot::PropertyString("Circuit Model Additional Info", "");
 		ot::PropertyString* circuitDescriptionProp = new ot::PropertyString("Circuit Model Description", "");
 		ot::PropertyString* pythonDescriptionProp = new ot::PropertyString("Python Script Description", "");
+		pythonDescriptionProp->setMultiline(true);
+
 		ot::PropertyString* manifestDescriptionProp = new ot::PropertyString("Manifest Description", "");
+		manifestDescriptionProp->setMultiline(true);
 
 		circuitModelGroup->addProperty(circuitAdditionalInfoProp);
 		circuitModelGroup->addProperty(circuitDescriptionProp);
