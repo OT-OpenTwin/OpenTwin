@@ -85,6 +85,7 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
     _object.AddMember(OT_JSON_MEMBER_ModelType, JsonString(m_modelType, _allocator), _allocator);
     _object.AddMember(OT_JSON_MEMBER_ElementType, JsonString(m_elementType, _allocator), _allocator);
 	_object.AddMember(OT_JSON_MEMBER_Owner, JsonString(m_owner, _allocator), _allocator);
+	_object.AddMember("CollectionName", ot::JsonString(m_collectionName, _allocator), _allocator);
 
     JsonArray stringMapArr;
     for (const auto& it : m_metaData) {
@@ -104,6 +105,10 @@ void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
     if(_object.HasMember(OT_JSON_MEMBER_Owner)) {
         m_owner = json::getString(_object, OT_JSON_MEMBER_Owner);
 	}
+
+    if (ot::json::exists(_object, "CollectionName")) {
+        m_collectionName = ot::json::getString(_object, "CollectionName");
+    }
 
     m_metaData.clear();
     for (const ConstJsonObject& metaDataObj : json::getObjectList(_object, OT_JSON_MEMBER_MetaData)) {

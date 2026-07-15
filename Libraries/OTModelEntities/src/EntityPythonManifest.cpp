@@ -115,7 +115,24 @@ void EntityPythonManifest::setLibraryElement(const ot::LibraryElement& _libraryE
 
 	this->setText(_libraryElement.getData());
 
-	this->setTreeItemEditable(true);	
+	this->setTreeItemEditable(true);
+
+	// Add Description if available
+	std::string description;
+	if (_libraryElement.hasMetaData("Description")) {
+		description = _libraryElement.getMetaDataValue("Description");
+	}
+	else if (_libraryElement.hasAdditionalInfo("Description")) {
+		description = _libraryElement.getAdditionalInfoValue("Description");
+	}
+
+	if (!description.empty()) {
+		EntityPropertiesString* descProp = EntityPropertiesString::createProperty("Library Info", "Description", description, "default", this->getProperties());
+		if (descProp) {
+			descProp->setIsMultiline(true);
+			descProp->setReadOnly(true);
+		}
+	}
 }
 
 bool EntityPythonManifest::checkIfLibraryElementContentMatches(const ot::LibraryElement& _libraryElement) {

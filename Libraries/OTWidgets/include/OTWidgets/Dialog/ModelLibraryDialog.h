@@ -50,6 +50,10 @@ namespace ot {
 		explicit ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWidget* _parent);
 		virtual ~ModelLibraryDialog();
 
+		//! @brief Get the selected library model object
+		//! @return Pointer to the selected LibraryModel object, or nullptr if none selected
+		const LibraryModel* getSelectedModel() const;
+
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Setter / Getter
@@ -75,7 +79,7 @@ namespace ot {
 		};
 
 		void updateNameEdit();
-		const LibraryModel* getSelectedModel() const;
+
 
 		ModelLibraryDialogCfg m_config;
 

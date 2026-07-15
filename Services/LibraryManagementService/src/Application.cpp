@@ -807,7 +807,7 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 
 		if (obj.HasMember("Documents") && obj["Documents"].IsArray()) {
 			ot::ConstJsonArray docs = obj["Documents"].GetArray();
-			processLibraryDocuments(docs, dialogCfg);
+			processLibraryDocuments(docs, dialogCfg, _selectionCfg.getCollectionName(), false);
 		}
 	}
 
@@ -826,7 +826,7 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 
 		if (userObj.HasMember("Documents") && userObj["Documents"].IsArray()) {
 			ot::ConstJsonArray userDocs = userObj["Documents"].GetArray();
-			processLibraryDocuments(userDocs, dialogCfg);
+			processLibraryDocuments(userDocs, dialogCfg, _selectionCfg.getCollectionName(), true);
 		}
 	}
 
@@ -840,7 +840,7 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 	return std::nullopt;
 }
 
- void Application::processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg) {
+ void Application::processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg, const std::string& _collectioName, bool _isCustomElement) {
 	 for (const ot::JsonValue& val : _documents) {
 		 if (!val.IsObject()) {
 			 continue;
@@ -859,6 +859,14 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 
 		 if (doc.HasMember("Owner") && doc["Owner"].IsString()) {
 			 model.setOwner(doc["Owner"].GetString());
+		 }
+
+		 std::string collecitonName;
+		 if (_isCustomElement) {
+			model.setCollectionName(_collectioName + "_User");
+		 }
+		 else {
+			 model.setCollectionName(_collectioName);
 		 }
 
 		 if (doc.HasMember("metaData") && doc["metaData"].IsObject()) {

@@ -4931,6 +4931,21 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	{
 		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(dia.getSelectedName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		// Get the selected model with its collection name
+		const ot::LibraryModel* selectedModel = dia.getSelectedModel();
+		if (selectedModel != nullptr) {
+			std::string collectionName = selectedModel->getCollectionName();
+			if (!collectionName.empty()) {
+				responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			}
+			else {
+				OT_LOG_W("Selected model has no collection name");
+			}
+		}
+		else {
+			OT_LOG_W("Failed to get selected model");
+		}
 	}
 	else
 	{

@@ -64,6 +64,9 @@ namespace ot {
 		void setOwner(const std::string& _owner) { m_owner = _owner; };
 		const std::string& getOwner() const { return m_owner; }
 
+		void setCollectionName(const std::string& _collectionName) { m_collectionName = _collectionName; }
+		const std::string& getCollectionName() const { return m_collectionName; }
+
 		void addMetaData(const std::string& _key, const std::string& _value);
 		bool hasMetaDataValue(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); };
 		std::string getMetaDataValue(const std::string& _key) const;
@@ -88,6 +91,7 @@ namespace ot {
 		std::string m_modelType;
 		std::string m_owner;
 		std::string m_elementType;
+		std::string m_collectionName;
 		std::unordered_map<std::string, std::string> m_metaData;
 		
 	};

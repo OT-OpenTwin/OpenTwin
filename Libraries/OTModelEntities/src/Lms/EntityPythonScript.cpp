@@ -63,4 +63,21 @@ void EntityPythonScript::setLibraryElement(const ot::LibraryElement& _libraryEle
 
 	// Set text encoding to UTF-8
 	this->setTextEncoding(guesser(_libraryElement.getData().data(), _libraryElement.getData().size()));
+
+	// Add Description if available
+	std::string description;
+	if (_libraryElement.hasMetaData("Description")) {
+		description = _libraryElement.getMetaDataValue("Description");
+	}
+	else if (_libraryElement.hasAdditionalInfo("Description")) {
+		description = _libraryElement.getAdditionalInfoValue("Description");
+	}
+
+	if (!description.empty()) {
+		EntityPropertiesString* descProp = EntityPropertiesString::createProperty("Library Info", "Description", description, "default", this->getProperties());
+		if (descProp) {
+			descProp->setIsMultiline(true);
+			descProp->setReadOnly(true);
+		}
+	}
 }

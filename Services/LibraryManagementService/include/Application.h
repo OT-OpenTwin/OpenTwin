@@ -154,7 +154,7 @@ private:
 	//! @brief Helper function to process library documents and convert them to a ModelLibraryDialogCfg
 	//! @param _documents The library documents to process
 	//! @param _dialogCfg The dialog configuration to populate
-	void processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg);
+	void processLibraryDocuments(const ot::ConstJsonArray& _documents, ot::ModelLibraryDialogCfg& _dialogCfg, const std::string& _collectionName ,bool isCustomElement);
 
 	std::string sendConfigToUI(const ot::JsonDocument& _doc, const std::string& _uiUrl);
 	std::string sendMessageToModel(const ot::JsonDocument& _doc, const std::string& _modelUrl);
