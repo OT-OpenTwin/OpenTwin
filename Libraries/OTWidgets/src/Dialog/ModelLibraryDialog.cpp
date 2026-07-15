@@ -227,8 +227,13 @@ void ot::ModelLibraryDialog::updateNameEdit()
 	QString txt = m_nameEdit->currentText();
 	m_nameEdit->clear();
 
+	// Add empty option (default)
+	m_nameEdit->addItem("", -1);
+
 	// Go through all models
 	size_t itemIndex = 0;
+	std::string selectedSource = m_sourceSelection->text().toStdString();
+
 	for (const LibraryModel& model : m_sourceFilteredModels) {
 		bool match = true;
 
@@ -248,14 +253,29 @@ void ot::ModelLibraryDialog::updateNameEdit()
 		}
 
 		if (match) {
-			// Display only the name, store index as data
-			m_nameEdit->addItem(QString::fromStdString(model.getName()), static_cast<int>(itemIndex));
+			// Build display text
+			QString displayText = QString::fromStdString(model.getName());
+
+			// Add origin tag when showing "All" sources
+			if (selectedSource == "All") {
+				std::string originTag = LibraryModel::modelOriginToString(model.getModelOrigin());
+				displayText += " [" + QString::fromStdString(originTag) + "]";
+			}
+
+			// Display name with optional origin tag, store index as data
+			m_nameEdit->addItem(displayText, static_cast<int>(itemIndex));
 			itemIndex++;
 		}
 	}
 
-	// Restore edit settings
-	m_nameEdit->setCurrentText(txt);
+	// Restore edit settings - if previous text is not available, keep empty selection
+	int indexOfText = m_nameEdit->findText(txt);
+	if (indexOfText >= 0) {
+		m_nameEdit->setCurrentIndex(indexOfText);
+	}
+	else {
+		m_nameEdit->setCurrentIndex(0);  // Default to empty option
+	}
 }
 
 const ot::LibraryModel* ot::ModelLibraryDialog::getSelectedModel() const {
