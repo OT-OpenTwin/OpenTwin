@@ -25,7 +25,7 @@
 #include "OTWidgets/Widgets/ComboBox.h"
 #include "OTWidgets/Widgets/PushButton.h"
 #include "OTWidgets/Widgets/ComboButton.h"
-
+#include "OTWidgets/Widgets/PlainTextEdit.h"
 // Qt header
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qgroupbox.h>
@@ -177,9 +177,26 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 	int r = 0;
 	for (const auto& metaData : selectedModel->getMetaData()) {
 		Label* label = new Label(QString::fromStdString(metaData.first), this);
-		LineEdit* edit = new LineEdit(QString::fromStdString(metaData.second), this);
-		edit->setReadOnly(true);
-		m_infoLayout->addWidget(label, r, 0);
+
+		// Check if this is the Description field
+		bool isDescription = (metaData.first == "Description" || metaData.first == "description");
+
+		QWidget* edit = nullptr;
+		if (isDescription) {
+			// Multi-line for description
+			PlainTextEdit* plainEdit = new PlainTextEdit(this);
+			plainEdit->setPlainText(QString::fromStdString(metaData.second));
+			plainEdit->setReadOnly(true);
+			edit = plainEdit;
+		}
+		else {
+			// Single-line for other fields
+			LineEdit* lineEdit = new LineEdit(QString::fromStdString(metaData.second), this);
+			lineEdit->setReadOnly(true);
+			edit = lineEdit;
+		}
+
+		m_infoLayout->addWidget(label, r, 0, Qt::AlignTop);
 		m_infoLayout->addWidget(edit, r, 1);
 		m_infoWidgets.push_back(label);
 		m_infoWidgets.push_back(edit);
@@ -187,11 +204,11 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 	}
 
 	if (!selectedModel->getOwner().empty()) {
-		// Add owner info
+		// Add owner info (always single-line)
 		Label* label = new Label("Owner", this);
 		LineEdit* edit = new LineEdit(QString::fromStdString(selectedModel->getOwner()), this);
 		edit->setReadOnly(true);
-		m_infoLayout->addWidget(label, r, 0);
+		m_infoLayout->addWidget(label, r, 0, Qt::AlignTop);
 		m_infoLayout->addWidget(edit, r, 1);
 		m_infoWidgets.push_back(label);
 		m_infoWidgets.push_back(edit);
