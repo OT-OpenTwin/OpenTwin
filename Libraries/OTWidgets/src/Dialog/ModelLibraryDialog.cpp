@@ -230,10 +230,11 @@ void ot::ModelLibraryDialog::updateNameEdit()
 	// Add empty option (default)
 	m_nameEdit->addItem("", -1);
 
-	// Go through all models
-	size_t itemIndex = 0;
+	// Build list of filtered models with their original indices
+	std::vector<int> filteredIndices;
 	std::string selectedSource = m_sourceSelection->text().toStdString();
 
+	int modelIndex = 0;
 	for (const LibraryModel& model : m_sourceFilteredModels) {
 		bool match = true;
 
@@ -249,23 +250,36 @@ void ot::ModelLibraryDialog::updateNameEdit()
 						break;
 					}
 				}
+				else {
+					// If filter field is not empty but model doesn't have this metadata, exclude it
+					match = false;
+					break;
+				}
 			}
 		}
 
 		if (match) {
-			// Build display text
-			QString displayText = QString::fromStdString(model.getName());
-
-			// Add origin tag when showing "All" sources
-			if (selectedSource == "All") {
-				std::string originTag = LibraryModel::modelOriginToString(model.getModelOrigin());
-				displayText += " [" + QString::fromStdString(originTag) + "]";
-			}
-
-			// Display name with optional origin tag, store index as data
-			m_nameEdit->addItem(displayText, static_cast<int>(itemIndex));
-			itemIndex++;
+			filteredIndices.push_back(modelIndex);
 		}
+
+		modelIndex++;
+	}
+
+	// Now add filtered items to ComboBox
+	for (size_t i = 0; i < filteredIndices.size(); ++i) {
+		const LibraryModel& model = *std::next(m_sourceFilteredModels.begin(), filteredIndices[i]);
+
+		// Build display text
+		QString displayText = QString::fromStdString(model.getName());
+
+		// Add origin tag when showing "All" sources
+		if (selectedSource == "All") {
+			std::string originTag = LibraryModel::modelOriginToString(model.getModelOrigin());
+			displayText += " [" + QString::fromStdString(originTag) + "]";
+		}
+
+		// Store the actual model index (position in m_sourceFilteredModels)
+		m_nameEdit->addItem(displayText, filteredIndices[i]);
 	}
 
 	// Restore edit settings - if previous text is not available, keep empty selection
