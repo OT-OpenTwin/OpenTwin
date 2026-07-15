@@ -1633,10 +1633,10 @@ void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEnt
 	const ot::PropertyString* circuitDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Description"));
 
-	if (circuitAdditionalInfoProp) {
+	if (circuitAdditionalInfoProp && !circuitAdditionalInfoProp->getValue().empty()) {
 		libraryElement.addAdditionalInfo("Info", circuitAdditionalInfoProp->getValue());
 	}
-	if (circuitDescriptionProp) {
+	if (circuitDescriptionProp && !circuitDescriptionProp->getValue().empty()) {
 		libraryElement.addMetaData("Description", circuitDescriptionProp->getValue());
 	}
 
@@ -1662,10 +1662,10 @@ void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEn
 	const ot::PropertyString* pythonDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script Description"));
 
-	if (pythonAdditionalInfoProp) {
+	if (pythonAdditionalInfoProp && !pythonAdditionalInfoProp->getValue().empty()) {
 		libraryElement.addAdditionalInfo("Info", pythonAdditionalInfoProp->getValue());
 	}
-	if (pythonDescriptionProp) {
+	if (pythonDescriptionProp && !pythonDescriptionProp->getValue().empty()) {
 		libraryElement.addMetaData("Description", pythonDescriptionProp->getValue());
 	}
 
@@ -1697,10 +1697,10 @@ void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _
 	const ot::PropertyString* manifestDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Description"));
 
-	if (manifestAdditionalInfoProp) {
+	if (manifestAdditionalInfoProp && !manifestAdditionalInfoProp->getValue().empty()) {
 		libraryElement.addAdditionalInfo("Info", manifestAdditionalInfoProp->getValue());
 	}
-	if (manifestDescriptionProp) {
+	if (manifestDescriptionProp && !manifestDescriptionProp->getValue().empty()) {
 		libraryElement.addMetaData("Description", manifestDescriptionProp->getValue());
 	}
 
