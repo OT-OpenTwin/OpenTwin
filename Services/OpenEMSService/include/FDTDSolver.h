@@ -37,10 +37,12 @@ public:
 	virtual ~FDTDSolver() {};
 
 	std::string generateRunCommand();
-	void convertAndStoreResults();
+	void convertAndStoreResults(const std::string &logFileText);
 
 private:
 	void addPreparationData(std::stringstream& runCommand);
+	void addSolverSetup(std::stringstream& runCommand);
+	void addBoundaries(std::stringstream& runCommand);
 	void addSolverRun(std::stringstream& runCommand);
 	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
@@ -57,6 +59,7 @@ private:
 	double extractRangeMax(const std::vector<char>& data);
 	void convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D, int readDataColumnOnly = -1);
 	void convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
+	double readTimeStepWidthFromLogText(const std::string& logFileText);
 
 	Application* application;
 	EntityBase *solverEntity;

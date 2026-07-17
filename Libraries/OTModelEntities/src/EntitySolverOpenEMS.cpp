@@ -38,23 +38,25 @@ void EntitySolverOpenEMS::createProperties(std::string& _meshFolderName, ot::UID
 
 	// Boundary conditions value list
 	std::list<std::string> boundaryValues{ "PEC", "PMC", "MUR", "PML_8" };
-	// Excitation types lists
-	std::list<std::string> excitationTypes{ "Gauss Excitation" };
-	
-	//EntityPropertiesDouble::createProperty("Frequency", "Start Frequency", 0, "OpenEMSSolver", getProperties());
-	//EntityPropertiesDouble::createProperty("Frequency", "End Frequency", 0, "OpenEMSSolver", getProperties());
-	//EntityPropertiesInteger::createProperty("Simulation Settings", "Timesteps", 10000, "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Simulation Settings", "Excitation Type", excitationTypes, "Gauss Excitation", "OpenEMSSolver", getProperties());
-	//EntityPropertiesDouble::createProperty("Simulation Settings", "End Criteria", 1e-5, "OpenEMSSolver", getProperties());
-	//EntityPropertiesInteger::createProperty("Simulation Settings", "Oversampling", 6, "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Xmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Xmax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Ymin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Ymax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Zmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	//EntityPropertiesSelection::createProperty("Boundary Conditions", "Zmax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
-	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "OpenEMSSolver", getProperties());
 
+	// Excitation types lists
+	std::list<std::string> excitationTypes{ "Gaussian" };
+	
+	EntityPropertiesSelection::createProperty("Excitation", "Type", excitationTypes, "Gaussian", "OpenEMSSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Excitation", "Fmin", 0, "OpenEMSSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Excitation", "Fmax", 0, "OpenEMSSolver", getProperties());
+
+	EntityPropertiesInteger::createProperty("Simulation", "Max. timesteps", 1000000, "OpenEMSSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Simulation", "Energy stop level", 1e-5, "OpenEMSSolver", getProperties());
+
+	EntityPropertiesSelection::createProperty("Boundaries", "Xmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundaries", "Xmax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundaries", "Ymin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundaries", "Ymax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundaries", "Zmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+	EntityPropertiesSelection::createProperty("Boundaries", "Zmax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
+
+	EntityPropertiesBoolean::createProperty("Specials", "Debug", false, "OpenEMSSolver", getProperties());
 
 	// Configure the visibility
 	updateFromProperties();

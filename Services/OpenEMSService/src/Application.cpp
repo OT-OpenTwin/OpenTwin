@@ -433,6 +433,10 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	{
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, error).toJson();
 	}
+	catch (...)
+	{
+		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Unknown error").toJson();
+	}
 
 	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
 	
@@ -448,7 +452,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		ot::StyledTextBuilder message;
 		message << "\n[" << ot::StyledText::Error << ot::StyledText::Bold << "ERROR" << ot::StyledText::ClearStyle << "] " << "OpenEMS solver failed : (" << returnValue.getWhat() << ")\n";
 
-		m_subprocessManager->addLogText("ERROR: OpenEMS solver failed : (" + returnValue.getWhat() + ")\n", true);
+		m_subprocessManager->addLogText("ERROR: OpenEMS solver failed (" + returnValue.getWhat() + ")\n", true);
 		success = false;
 	}
 	else
@@ -457,16 +461,18 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 		m_subprocessManager->addLogText(message, true);
 		success = false;
 	}
+
+	std::string logFileText;
+	m_subprocessManager->endLogging(logFileText);
 	 
 	// Convert and store the results
 	if (success)
 	{
-		fdtdSolver.convertAndStoreResults();
+		fdtdSolver.convertAndStoreResults(logFileText);
 	}
 
 	// Stop the python subprocess to ensure that all file handles are closed
-	std::string logFileText;
-	m_subprocessManager->endLogging(logFileText);
+
 	m_subprocessManager->shutdownSubprocess();
 
 	// Remove the temp dir if requested

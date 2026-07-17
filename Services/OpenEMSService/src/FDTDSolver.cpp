@@ -62,14 +62,12 @@ std::string FDTDSolver::generateRunCommand()
 	
 	addPreparationData(runCommand);
 	addUnits(runCommand);
-
-	// addSolverSetup
+	addSolverSetup(runCommand);
 	// addMesh
 	// addGeometry
 	// addPorts
-	// addBoundaries
+	addBoundaries(runCommand);
 	// addMonitors
-
 
 	std::string text =
 		"# waveguide dimensions\n"
@@ -89,13 +87,6 @@ std::string FDTDSolver::generateRunCommand()
 		"\n"
 		"#targeted mesh resolution\n"
 		"mesh_res = lambda0/30\n"
-		"\n"
-		"### Setup FDTD parameter & excitation function\n"
-		"FDTD = openEMS(NrTS=1e4);\n"
-		"FDTD.SetGaussExcite(0.5*(f_start+f_stop),0.5*(f_stop-f_start));\n"
-		"\n"
-		"# boundary conditions\n"
-		"FDTD.SetBoundaryCond([0, 0, 0, 0, 3, 3]);\n"
 		"\n"
 		"### Setup geometry & mesh\n"
 		"CSX = ContinuousStructure()\n"
@@ -159,12 +150,67 @@ void FDTDSolver::addUnits(std::stringstream& runCommand)
 	entityUnits = dynamic_cast<EntityUnits*>(ot::EntityAPI::readEntityFromEntityIDandVersion(unitsInfo.getEntityID(), unitsInfo.getEntityVersion()));
 	if (entityUnits == nullptr)
 	{
-		throw("ERROR: Unable to read units\n");
+		throw(std::string("Unable to read units"));
 	}
 	
 	runCommand << "gunit = " << entityUnits->getScaleToSIDimension() << "\n";
 	runCommand << "funit = " << entityUnits->getScaleToSIFrequency() << "\n";
 	runCommand << "tunit = " << entityUnits->getScaleToSITime() << "\n";
+}
+
+void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
+{
+	EntityPropertiesSelection* excitationTypeProperty  = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Type"));
+	EntityPropertiesDouble*    fMinProperty            = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Fmin"));
+	EntityPropertiesDouble*    fMaxProperty            = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Fmax"));
+	EntityPropertiesInteger*   maxTimestepsProperty    = dynamic_cast<EntityPropertiesInteger*>(solverEntity->getProperties().getProperty("Max. timesteps"));
+	EntityPropertiesDouble*    energyStopLevelProperty = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Energy stop level"));
+
+	std::string excitationType = (excitationTypeProperty != nullptr) ? excitationTypeProperty->getValue() : "Gaussian";
+	double fMin                = (fMinProperty != nullptr) ? fMinProperty->getValue() : 0.0;
+	double fMax                = (fMaxProperty != nullptr) ? fMaxProperty->getValue() : 0.0;
+	long long maxTimesteps     = (maxTimestepsProperty != nullptr) ? maxTimestepsProperty->getValue() : 1000000;
+	double energyStopLevel     = (energyStopLevelProperty != nullptr) ? energyStopLevelProperty->getValue() : 1e-5;
+
+	double centerFreq    = 0.5 * (fMin + fMax) * entityUnits->getScaleToSIFrequency();
+	double halfBandwidth = 0.5 * (fMax - fMin) * entityUnits->getScaleToSIFrequency();
+
+	runCommand << "FDTD = openEMS(NrTS=" << maxTimesteps << ", EndCriteria=" << energyStopLevel << ")\n";
+
+	if (excitationType == "Gaussian")
+	{
+		if (fMin >= fMax || fMax == 0.0) throw(std::string("Invalid frequency range. Range must not be empty."));
+	
+		runCommand << "FDTD.SetGaussExcite(" << centerFreq << "," << halfBandwidth << ")\n";
+	}
+	else
+	{
+		assert(0); // Unknown excitation type
+	}
+}
+
+void FDTDSolver::addBoundaries(std::stringstream& runCommand)
+{
+	EntityPropertiesSelection* xminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Xmin"));
+	EntityPropertiesSelection* xmaxBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Xmax"));
+	EntityPropertiesSelection* yminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Ymin"));
+	EntityPropertiesSelection* ymaxBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Ymax"));
+	EntityPropertiesSelection* zminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Zmin"));
+	EntityPropertiesSelection* zmaxBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Zmax"));
+
+	std::string xminBoundary = (xminBoundaryProperty != nullptr) ? xminBoundaryProperty->getValue() : "PEC";
+	std::string xmaxBoundary = (xmaxBoundaryProperty != nullptr) ? xmaxBoundaryProperty->getValue() : "PEC";
+	std::string yminBoundary = (yminBoundaryProperty != nullptr) ? yminBoundaryProperty->getValue() : "PEC";
+	std::string ymaxBoundary = (ymaxBoundaryProperty != nullptr) ? ymaxBoundaryProperty->getValue() : "PEC";
+	std::string zminBoundary = (zminBoundaryProperty != nullptr) ? zminBoundaryProperty->getValue() : "PEC";
+	std::string zmaxBoundary = (zmaxBoundaryProperty != nullptr) ? zmaxBoundaryProperty->getValue() : "PEC";
+
+	runCommand << "FDTD.SetBoundaryCond(['" << xminBoundary << "', '" 
+											<< xmaxBoundary << "', '" 
+											<< yminBoundary << "', '" 
+											<< ymaxBoundary << "', '" 
+											<< zminBoundary << "', '" 
+											<< zmaxBoundary << "'])\n";
 }
 
 void FDTDSolver::addSolverRun(std::stringstream& runCommand)
@@ -213,9 +259,10 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"\n";
 }
 
-void FDTDSolver::convertAndStoreResults()
+void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 {
-	timeStepWidth = 5.18459e-13;
+	timeStepWidth = readTimeStepWidthFromLogText(logFileText);
+	if (timeStepWidth == 0.0) throw(std::string("Unable to determine time step width."));
 
 	convertAndStoreFrequencyDomainDump("E-Field Complex", "E-Field", "V/m");
 	convertAndStoreTimeDomainDump("E-Field Time", "E-Field", "V/m");
@@ -234,6 +281,37 @@ void FDTDSolver::convertAndStoreResults()
 	convert1DFrequencySpectrum("S-Parameter/S2,1", "s21", "S2,1", result1D);
 
 	result1D.storeResults();
+}
+
+double FDTDSolver::readTimeStepWidthFromLogText(const std::string& logFileText)
+{
+	const std::string keyword = "FDTD timestep is: ";
+
+	const std::size_t valueStart = logFileText.find(keyword);
+	if (valueStart == std::string::npos) 
+	{
+		return 0.0;
+	}
+
+	const std::size_t numberStart = valueStart + keyword.length();
+	const std::size_t semicolonPos = logFileText.find(';', numberStart);
+
+	if (semicolonPos == std::string::npos) 
+	{
+		return 0.0;
+	}
+
+	try 
+	{
+		const std::string numberText =
+			logFileText.substr(numberStart, semicolonPos - numberStart);
+
+		return std::stod(numberText);
+	}
+	catch (const std::exception&) 
+	{
+		return 0.0;
+	}
 }
 
 void FDTDSolver::convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager &result1D, int readDataColumnOnly)
