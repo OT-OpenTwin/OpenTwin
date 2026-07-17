@@ -26,6 +26,7 @@
 // std header
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 namespace ot {
 
@@ -67,6 +68,9 @@ namespace ot {
 		void setCollectionName(const std::string& _collectionName) { m_collectionName = _collectionName; }
 		const std::string& getCollectionName() const { return m_collectionName; }
 
+		void setVersions(const std::vector<int64_t>& _versions) { m_versions = _versions; }
+		const std::vector<int64_t>& getVersions() const { return m_versions; }
+
 		void addMetaData(const std::string& _key, const std::string& _value);
 		bool hasMetaDataValue(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); };
 		std::string getMetaDataValue(const std::string& _key) const;
@@ -93,6 +97,7 @@ namespace ot {
 		std::string m_elementType;
 		std::string m_collectionName;
 		std::unordered_map<std::string, std::string> m_metaData;
+		std::vector<int64_t> m_versions;
 		
 	};
 }

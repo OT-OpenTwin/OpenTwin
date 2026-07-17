@@ -88,6 +88,13 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 	m_nameEdit->setEditable(true);
 	titleLay->addWidget(m_nameEdit, 1);
 
+	Label* versionLabel = new Label("Version:", this);
+	titleLay->addWidget(versionLabel);
+
+	m_versionEdit = new ComboBox(this);
+	m_versionEdit->setEditable(false);
+	titleLay->addWidget(m_versionEdit);
+
 	// Create scroll area for info (middle, expandable)
 	QScrollArea* dataArea = new QScrollArea(this);
 	dataArea->setWidgetResizable(true);
@@ -150,6 +157,10 @@ void ot::ModelLibraryDialog::slotConfirm() {
 
 	m_selectedName = selectedModel->getName();
 	m_selectedOwner = selectedModel->getOwner();
+	m_selectedVersion = 0;
+	if (m_versionEdit->count() > 0) {
+		m_selectedVersion = m_versionEdit->currentData().toLongLong();
+	}
 	this->closeOk();
 }
 
@@ -170,7 +181,17 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 
 	if (selectedModel == nullptr) {
 		m_infoGroup->setVisible(false);
+		m_versionEdit->clear();
 		return;
+	}
+
+	// Populate version dropdown
+	m_versionEdit->clear();
+	for (int64_t v : selectedModel->getVersions()) {
+		m_versionEdit->addItem(QString::number(v), v);
+	}
+	if (m_versionEdit->count() > 0) {
+		m_versionEdit->setCurrentIndex(0); // Default to the first (highest/newest) version
 	}
 
 	// Add info widgets

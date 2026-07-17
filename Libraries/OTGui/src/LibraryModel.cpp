@@ -95,6 +95,12 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
         stringMapArr.PushBack(stringMapObj, _allocator);
     }
     _object.AddMember(OT_JSON_MEMBER_MetaData, stringMapArr, _allocator);
+
+    JsonArray versionsArr;
+    for (int64_t v : m_versions) {
+        versionsArr.PushBack(v, _allocator);
+    }
+    _object.AddMember("Versions", versionsArr, _allocator);
 }
 
 void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -115,5 +121,11 @@ void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
         std::string k = json::getString(metaDataObj, OT_JSON_MEMBER_Key);
         std::string v = json::getString(metaDataObj, OT_JSON_MEMBER_Value);
         m_metaData.insert_or_assign(k, v);
+    }
+
+    m_versions.clear();
+    if (ot::json::exists(_object, "Versions")) {
+        std::list<int64_t> vList = ot::json::getInt64List(_object, "Versions");
+        m_versions.assign(vList.begin(), vList.end());
     }
 }

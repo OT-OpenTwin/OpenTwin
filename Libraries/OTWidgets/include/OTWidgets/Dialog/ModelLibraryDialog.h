@@ -60,6 +60,7 @@ namespace ot {
 
 		const std::string& getSelectedName() const { return m_selectedName; };
 		const std::string& getSelectedOwner() const { return m_selectedOwner; };
+		int64_t getSelectedVersion() const { return m_selectedVersion; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,8 +86,10 @@ namespace ot {
 
 		ComboButton* m_sourceSelection;
 		ComboBox* m_nameEdit;
+		ComboBox* m_versionEdit;
 		std::string m_selectedName;
 		std::string m_selectedOwner;
+		int64_t m_selectedVersion = 0;
 		std::list<FilterInputEntry> m_filterEntries;
 		std::list<LibraryModel> m_sourceFilteredModels;
 
