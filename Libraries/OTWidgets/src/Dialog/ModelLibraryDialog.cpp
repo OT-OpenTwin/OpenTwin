@@ -36,9 +36,10 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 {
 	m_config = std::move(_config);
 
-	// Create basic layout
+	// Create basic layout with decent margins and spacing
 	QVBoxLayout* rootLay = new QVBoxLayout(this);
-	rootLay->setContentsMargins(0, 0, 0, 0);
+	rootLay->setContentsMargins(10, 10, 10, 10);
+	rootLay->setSpacing(10);
 
 	// Create filter layout FIRST (top)
 	QGroupBox* filterWidget = new QGroupBox("Filter", this);
@@ -69,31 +70,34 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 		filterLay->setColumnStretch(1, 1);
 	}
 
-	// Title layout with Name and Source Selection
-	QHBoxLayout* titleLay = new QHBoxLayout;
-	rootLay->addLayout(titleLay);
+	// Selection layout with Name and Version inputs
+	QGridLayout* selectionLay = new QGridLayout;
+	selectionLay->setContentsMargins(0, 0, 0, 0);
+	selectionLay->setHorizontalSpacing(8);
+	selectionLay->setVerticalSpacing(8);
+	rootLay->addLayout(selectionLay);
 
 	Label* titleLabel = new Label("Name:", this);
-	titleLay->addWidget(titleLabel);
+	selectionLay->addWidget(titleLabel, 0, 0, Qt::AlignVCenter);
 
 	m_sourceSelection = new ComboButton("All", this);
-
-	// Fill the source selection
 	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::Custom)));
 	m_sourceSelection->addItem(QString::fromStdString(LibraryModel::modelOriginToString(LibraryModel::ModelOrigin::BuiltIn)));
-
-	titleLay->addWidget(m_sourceSelection);
+	selectionLay->addWidget(m_sourceSelection, 0, 1, Qt::AlignVCenter);
 
 	m_nameEdit = new ComboBox(this);
 	m_nameEdit->setEditable(true);
-	titleLay->addWidget(m_nameEdit, 1);
+	selectionLay->addWidget(m_nameEdit, 0, 2, Qt::AlignVCenter);
 
 	Label* versionLabel = new Label("Version:", this);
-	titleLay->addWidget(versionLabel);
+	selectionLay->addWidget(versionLabel, 1, 0, Qt::AlignVCenter);
 
 	m_versionEdit = new ComboBox(this);
 	m_versionEdit->setEditable(false);
-	titleLay->addWidget(m_versionEdit);
+	m_versionEdit->setFixedWidth(120);
+	selectionLay->addWidget(m_versionEdit, 1, 1, 1, 2, Qt::AlignLeft | Qt::AlignVCenter);
+
+	selectionLay->setColumnStretch(2, 1);
 
 	// Create scroll area for info (middle, expandable)
 	QScrollArea* dataArea = new QScrollArea(this);
