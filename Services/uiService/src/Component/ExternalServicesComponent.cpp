@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ExternalServicesComponent.cpp
 // 
 // License:
@@ -4931,6 +4931,9 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 	{
 		responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ModelDialogConfirmed, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 		responseDoc.AddMember(OT_ACTION_PARAM_Value, ot::JsonString(dia.getSelectedName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		int64_t selectedVersion = dia.getSelectedVersion();
+		responseDoc.AddMember("Version", selectedVersion, responseDoc.GetAllocator());
 
 		// Get the selected model with its collection name
 		const ot::LibraryModel* selectedModel = dia.getSelectedModel();

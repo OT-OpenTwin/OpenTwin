@@ -67,6 +67,7 @@ public:
 	std::string getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl);
 	std::string getCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
 	std::string getNewestCompleteDocument(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
+	std::string getCompleteDocumentWithVersion(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument, int64_t _version);
 	void migrateLibraryEntryDataToGridFS(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument);
 	void updateGridFSContent(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument, const std::string& _newContent);
 	std::string updateGridFSAndMetadata(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const ot::LibraryElement& _element, uint32_t _newVersion);
@@ -93,6 +94,7 @@ private:
 	bsoncxx::document::value buildCombinedFilterQuery(const std::list<std::pair<std::string, std::string>>& _additionalFilters, const std::list<std::pair<std::string, std::string>>& _metadataFilters);
 	bsoncxx::stdx::optional<bsoncxx::document::value> fetchDocumentByName(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName);
 	bsoncxx::stdx::optional<bsoncxx::document::value> fetchNewestDocumentByName(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName);
+	bsoncxx::stdx::optional<bsoncxx::document::value> fetchDocumentByNameAndVersion(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName, int64_t _version);
 	bsoncxx::stdx::optional<bsoncxx::document::value> findNewestByFilter(DataStorageAPI::DocumentAccessBase& _docBase, bsoncxx::document::value _filter);
 
 	// Data loading helpers

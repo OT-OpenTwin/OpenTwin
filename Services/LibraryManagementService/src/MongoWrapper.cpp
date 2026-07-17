@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: MongoWrapper.cpp
 // 
 // License:
@@ -24,6 +24,11 @@
 
 // std header
 #include <map>
+#include <vector>
+#include <algorithm>
+#include <rapidjson/document.h>
+#include <rapidjson/writer.h>
+#include <rapidjson/stringbuffer.h>
 
 std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& _selectionCfg,
                                           const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl) {
@@ -58,8 +63,9 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
 
         auto results = docBase.GetAllDocument(std::move(filterQuery), bsoncxx::document::view{}, 0);
 
-        // Nur die höchste Version je "Name" behalten
+        // Only keep the highest version per "Name", but collect all versions
         std::map<std::string, bsoncxx::document::value> newestByName;
+        std::map<std::string, std::vector<int64_t>> versionsByName;
 
         for (auto result : results) {
             auto nameElement = result["Name"];
@@ -78,6 +84,8 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
                     currentVersion = versionElement.get_int32().value;
                 }
             }
+
+            versionsByName[name].push_back(currentVersion);
 
             auto it = newestByName.find(name);
             if (it == newestByName.end()) {
@@ -100,16 +108,35 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
             }
         }
 
-        std::string responseData = "{ \"Documents\": [";
-        bool isFirst = true;
+        rapidjson::Document responseDoc;
+        responseDoc.SetObject();
+        rapidjson::Value docArray(rapidjson::kArrayType);
+        auto& allocator = responseDoc.GetAllocator();
+
         for (const auto& pair : newestByName) {
-            if (!isFirst) {
-                responseData += ",";
+            std::string docJsonStr = bsoncxx::to_json(pair.second.view());
+            rapidjson::Document singleDoc;
+            singleDoc.Parse(docJsonStr.c_str());
+            if (!singleDoc.HasParseError() && singleDoc.IsObject()) {
+                rapidjson::Value versionsArr(rapidjson::kArrayType);
+                auto& versions = versionsByName[pair.first];
+                std::sort(versions.begin(), versions.end(), std::greater<int64_t>());
+                for (int64_t v : versions) {
+                    versionsArr.PushBack(v, allocator);
+                }
+                singleDoc.AddMember("Versions", versionsArr, allocator);
+                
+                rapidjson::Value singleDocVal;
+                singleDocVal.CopyFrom(singleDoc, allocator);
+                docArray.PushBack(singleDocVal, allocator);
             }
-            responseData += bsoncxx::to_json(pair.second.view());
-            isFirst = false;
         }
-        responseData += "]}";
+        responseDoc.AddMember("Documents", docArray, allocator);
+
+        rapidjson::StringBuffer buffer;
+        rapidjson::Writer<rapidjson::StringBuffer> writer(buffer);
+        responseDoc.Accept(writer);
+        std::string responseData = buffer.GetString();
 
         if (responseData == "{ \"Documents\": []}") {
             OT_LOG_W("No documents found in collection: " + collectionName);
@@ -783,7 +810,7 @@ bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::findNewestByFilt
 
         if (currentVersion >= highestVersion) {
             highestVersion = currentVersion;
-            newestDoc = bsoncxx::document::value(result); // owning copy, view würde nach Cursor-Fortschritt dangeln
+            newestDoc = bsoncxx::document::value(result); // owning copy, view would dangle after cursor advancement
         }
     }
 
@@ -1171,4 +1198,60 @@ bsoncxx::document::value MongoWrapper::buildCombinedFilterQuery(const std::list<
     }
 
     return make_document(kvp("$and", andArrayBuilder));
+}
+
+std::string MongoWrapper::getCompleteDocumentWithVersion(const std::string& _collectionName, const std::string& _dbUserName, const std::string& _dbUserPassword, const std::string& _dbServerUrl, const std::string& _selectedDocument, int64_t _version)
+{
+    // Initialization of MongoDB connection
+    if (!initializeConnection(_dbUserName, _dbUserPassword, _dbServerUrl)) {
+        return "failed";
+    }
+
+    // Check if collection exists
+    if (!checkCollectionExists(_collectionName)) {
+        return "failed";
+    }
+
+    try {
+        DataStorageAPI::DocumentAccessBase docBase(dbName, _collectionName);
+
+        // Get the document matching by Name/LibraryElementID and Version
+        auto queryResult = fetchDocumentByNameAndVersion(docBase, _selectedDocument, _version);
+        if (queryResult) {
+            bsoncxx::document::view documentView = queryResult->view();
+            return loadDocumentData(documentView, _collectionName);
+        }
+        else {
+            return "";
+        }
+    }
+    catch (const std::exception& e) {
+        OT_LOG_E("Error getting complete document with version: " + std::string(e.what()));
+        return "";
+    }
+}
+
+bsoncxx::stdx::optional<bsoncxx::document::value> MongoWrapper::fetchDocumentByNameAndVersion(DataStorageAPI::DocumentAccessBase& _docBase, const std::string& _documentName, int64_t _version)
+{
+    // Try LibraryElementID and Version first
+    try {
+        int64_t elementId = std::stoll(_documentName);
+        auto filterQuery = bsoncxx::builder::basic::make_document(
+            bsoncxx::builder::basic::kvp("LibraryElementID", elementId),
+            bsoncxx::builder::basic::kvp("Version", _version)
+        );
+        auto result = _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
+        if (result) {
+            return result;
+        }
+    }
+    catch (const std::exception&) {
+    }
+
+    // Fall back to Name field and Version
+    auto filterQuery = bsoncxx::builder::basic::make_document(
+        bsoncxx::builder::basic::kvp("Name", _documentName),
+        bsoncxx::builder::basic::kvp("Version", _version)
+    );
+    return _docBase.GetDocument(std::move(filterQuery), bsoncxx::document::view{});
 }

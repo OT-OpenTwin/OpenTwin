@@ -857,6 +857,19 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 
 		 ot::LibraryModel model(name, "", "");
 
+		 std::vector<int64_t> versions;
+		 if (doc.HasMember("Versions") && doc["Versions"].IsArray()) {
+			 for (const auto& v : doc["Versions"].GetArray()) {
+				 if (v.IsInt64()) {
+					 versions.push_back(v.GetInt64());
+				 }
+				 else if (v.IsInt()) {
+					 versions.push_back(v.GetInt());
+				 }
+			 }
+		 }
+		 model.setVersions(versions);
+
 		 if (doc.HasMember("Owner") && doc["Owner"].IsString()) {
 			 model.setOwner(doc["Owner"].GetString());
 		 }
@@ -965,18 +978,36 @@ std::string Application::handleGetCompleteSelectedDocument(ot::JsonDocument& _do
 	std::string dbUserPassword = ot::json::getString(_document, OT_PARAM_DB_PASSWORD);
 	std::string dbServerUrl = ot::json::getString(_document, OT_ACTION_PARAM_DATABASE_URL);
 
-	auto result = db.getNewestCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+	int64_t version = -1;
+	bool hasVersion = ot::json::exists(_document, "Version");
+	if (hasVersion) {
+		version = ot::json::getInt64(_document, "Version");
+	}
+
+	std::string result;
+	if (hasVersion && version > 0) {
+		result = db.getCompleteDocumentWithVersion(collectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument, version);
+	}
+	else {
+		result = db.getNewestCompleteDocument(collectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+	}
+
 	if (!result.empty() && result != "failed") {
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 	}
 	else {
 		std::string userCollectionName = collectionName + "_User";
-		result = db.getNewestCompleteDocument(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+		if (hasVersion && version > 0) {
+			result = db.getCompleteDocumentWithVersion(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument, version);
+		}
+		else {
+			result = db.getNewestCompleteDocument(userCollectionName, dbUserName, dbUserPassword, dbServerUrl, selectedDocument);
+		}
 		if (!result.empty() && result != "failed") {
 			return ot::ReturnMessage(ot::ReturnMessage::Ok, result).toJson();
 		}
 		else {
-			OT_LOG_E("Failed to get complete document for '" + selectedDocument + "' in collection '" + collectionName + "' and user collection '" + userCollectionName + "'");
+			OT_LOG_E("Failed to get complete document for '" + selectedDocument + "' (version: " + std::to_string(version) + ") in collection '" + collectionName + "' and user collection '" + userCollectionName + "'");
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Document not found").toJson();
 		}
 	}
