@@ -870,6 +870,32 @@ std::optional<ot::ModelLibraryDialogCfg> Application::createModelLibraryDialogCf
 		 }
 		 model.setVersions(versions);
 
+		 std::map<int64_t, ot::LibraryModel::VersionInfo> versionDetails;
+		 if (doc.HasMember("VersionDetails") && doc["VersionDetails"].IsArray()) {
+			 for (const auto& detailVal : doc["VersionDetails"].GetArray()) {
+				 if (detailVal.IsObject()) {
+					 ot::ConstJsonObject detailObj = detailVal.GetObject();
+					 int64_t v = ot::json::getInt64(detailObj, "Version");
+					 ot::LibraryModel::VersionInfo info;
+					 if (detailObj.HasMember("Owner") && detailObj["Owner"].IsString()) {
+						 info.owner = detailObj["Owner"].GetString();
+					 }
+					 if (detailObj.HasMember("MetaData") && detailObj["MetaData"].IsArray()) {
+						 for (const auto& metaVal : detailObj["MetaData"].GetArray()) {
+							 if (metaVal.IsObject()) {
+								 ot::ConstJsonObject metaObj = metaVal.GetObject();
+								 std::string key = ot::json::getString(metaObj, "Key");
+								 std::string val = ot::json::getString(metaObj, "Value");
+								 info.metaData.insert_or_assign(key, val);
+							 }
+						 }
+					 }
+					 versionDetails.emplace(v, std::move(info));
+				 }
+			 }
+		 }
+		 model.setVersionDetails(versionDetails);
+
 		 if (doc.HasMember("Owner") && doc["Owner"].IsString()) {
 			 model.setOwner(doc["Owner"].GetString());
 		 }

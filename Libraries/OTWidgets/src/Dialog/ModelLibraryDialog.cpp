@@ -138,6 +138,7 @@ ot::ModelLibraryDialog::ModelLibraryDialog(ModelLibraryDialogCfg&& _config, QWid
 
 	// Initialize window
 	this->connect(m_nameEdit, QOverload<int>::of(&ComboBox::currentIndexChanged), this, &ModelLibraryDialog::slotModelChanged);
+	this->connect(m_versionEdit, QOverload<int>::of(&ComboBox::currentIndexChanged), this, &ModelLibraryDialog::slotVersionChanged);
 
 	// Initialize models
 	this->slotFilterChanged();
@@ -173,6 +174,29 @@ void ot::ModelLibraryDialog::slotFilterChanged() {
 }
 
 void ot::ModelLibraryDialog::slotModelChanged() {
+	const LibraryModel* selectedModel = this->getSelectedModel();
+
+	if (selectedModel == nullptr) {
+		m_infoGroup->setVisible(false);
+		m_versionEdit->clear();
+		return;
+	}
+
+	// Populate version dropdown
+	m_versionEdit->blockSignals(true);
+	m_versionEdit->clear();
+	for (int64_t v : selectedModel->getVersions()) {
+		m_versionEdit->addItem(QString::number(v), v);
+	}
+	if (m_versionEdit->count() > 0) {
+		m_versionEdit->setCurrentIndex(0); // Default to the first (highest/newest) version
+	}
+	m_versionEdit->blockSignals(false);
+
+	this->slotVersionChanged();
+}
+
+void ot::ModelLibraryDialog::slotVersionChanged() {
 	for (QWidget* w : m_infoWidgets) {
 		w->setVisible(false);
 		m_infoLayout->removeWidget(w);
@@ -183,24 +207,27 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 
 	const LibraryModel* selectedModel = this->getSelectedModel();
 
-	if (selectedModel == nullptr) {
+	if (selectedModel == nullptr || m_versionEdit->count() == 0) {
 		m_infoGroup->setVisible(false);
-		m_versionEdit->clear();
 		return;
 	}
 
-	// Populate version dropdown
-	m_versionEdit->clear();
-	for (int64_t v : selectedModel->getVersions()) {
-		m_versionEdit->addItem(QString::number(v), v);
-	}
-	if (m_versionEdit->count() > 0) {
-		m_versionEdit->setCurrentIndex(0); // Default to the first (highest/newest) version
+	int64_t selectedVersion = m_versionEdit->currentData().toLongLong();
+
+	// Look up the metadata for the selected version
+	std::unordered_map<std::string, std::string> metaDataToShow = selectedModel->getMetaData();
+	std::string ownerToShow = selectedModel->getOwner();
+
+	const auto& details = selectedModel->getVersionDetails();
+	auto it = details.find(selectedVersion);
+	if (it != details.end()) {
+		metaDataToShow = it->second.metaData;
+		ownerToShow = it->second.owner;
 	}
 
 	// Add info widgets
 	int r = 0;
-	for (const auto& metaData : selectedModel->getMetaData()) {
+	for (const auto& metaData : metaDataToShow) {
 		Label* label = new Label(QString::fromStdString(metaData.first), this);
 
 		// Check if this is the Description field
@@ -228,10 +255,10 @@ void ot::ModelLibraryDialog::slotModelChanged() {
 		r++;
 	}
 
-	if (!selectedModel->getOwner().empty()) {
+	if (!ownerToShow.empty()) {
 		// Add owner info (always single-line)
 		Label* label = new Label("Owner", this);
-		LineEdit* edit = new LineEdit(QString::fromStdString(selectedModel->getOwner()), this);
+		LineEdit* edit = new LineEdit(QString::fromStdString(ownerToShow), this);
 		edit->setReadOnly(true);
 		m_infoLayout->addWidget(label, r, 0, Qt::AlignTop);
 		m_infoLayout->addWidget(edit, r, 1);

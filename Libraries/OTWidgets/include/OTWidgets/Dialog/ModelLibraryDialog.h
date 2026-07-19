@@ -71,6 +71,7 @@ namespace ot {
 		void slotFilterChanged();
 		void slotModelChanged();
 		void slotSourceSelectionChanged();
+		void slotVersionChanged();
 
 	private:
 		struct FilterInputEntry {

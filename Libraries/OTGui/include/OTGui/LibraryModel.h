@@ -27,6 +27,7 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <map>
 
 namespace ot {
 
@@ -34,6 +35,11 @@ namespace ot {
 		OT_DECL_DEFCOPY(LibraryModel)
 		OT_DECL_DEFMOVE(LibraryModel)
 	public:
+
+		struct VersionInfo {
+			std::string owner;
+			std::unordered_map<std::string, std::string> metaData;
+		};
 
 		enum class ModelOrigin {
 			Custom,
@@ -71,6 +77,9 @@ namespace ot {
 		void setVersions(const std::vector<int64_t>& _versions) { m_versions = _versions; }
 		const std::vector<int64_t>& getVersions() const { return m_versions; }
 
+		void setVersionDetails(const std::map<int64_t, VersionInfo>& _details) { m_versionDetails = _details; }
+		const std::map<int64_t, VersionInfo>& getVersionDetails() const { return m_versionDetails; }
+
 		void addMetaData(const std::string& _key, const std::string& _value);
 		bool hasMetaDataValue(const std::string& _key) const { return m_metaData.find(_key) != m_metaData.end(); };
 		std::string getMetaDataValue(const std::string& _key) const;
@@ -98,6 +107,7 @@ namespace ot {
 		std::string m_collectionName;
 		std::unordered_map<std::string, std::string> m_metaData;
 		std::vector<int64_t> m_versions;
+		std::map<int64_t, VersionInfo> m_versionDetails;
 		
 	};
 }

@@ -101,6 +101,24 @@ void ot::LibraryModel::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator
         versionsArr.PushBack(v, _allocator);
     }
     _object.AddMember("Versions", versionsArr, _allocator);
+
+    JsonArray detailsArr;
+    for (const auto& detail : m_versionDetails) {
+        JsonObject detailObj;
+        detailObj.AddMember("Version", detail.first, _allocator);
+        detailObj.AddMember("Owner", JsonString(detail.second.owner, _allocator), _allocator);
+        
+        JsonArray metaArr;
+        for (const auto& meta : detail.second.metaData) {
+            JsonObject metaObj;
+            metaObj.AddMember(OT_JSON_MEMBER_Key, JsonString(meta.first, _allocator), _allocator);
+            metaObj.AddMember(OT_JSON_MEMBER_Value, JsonString(meta.second, _allocator), _allocator);
+            metaArr.PushBack(metaObj, _allocator);
+        }
+        detailObj.AddMember("MetaData", metaArr, _allocator);
+        detailsArr.PushBack(detailObj, _allocator);
+    }
+    _object.AddMember("VersionDetails", detailsArr, _allocator);
 }
 
 void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -127,5 +145,22 @@ void ot::LibraryModel::setFromJsonObject(const ot::ConstJsonObject& _object) {
     if (ot::json::exists(_object, "Versions")) {
         std::list<int64_t> vList = ot::json::getInt64List(_object, "Versions");
         m_versions.assign(vList.begin(), vList.end());
+    }
+
+    m_versionDetails.clear();
+    if (ot::json::exists(_object, "VersionDetails")) {
+        for (const ConstJsonObject& detailObj : json::getObjectList(_object, "VersionDetails")) {
+            int64_t v = json::getInt64(detailObj, "Version");
+            VersionInfo info;
+            if (detailObj.HasMember("Owner")) {
+                info.owner = json::getString(detailObj, "Owner");
+            }
+            for (const ConstJsonObject& metaObj : json::getObjectList(detailObj, "MetaData")) {
+                std::string k = json::getString(metaObj, OT_JSON_MEMBER_Key);
+                std::string val = json::getString(metaObj, OT_JSON_MEMBER_Value);
+                info.metaData.insert_or_assign(k, val);
+            }
+            m_versionDetails.emplace(v, std::move(info));
+        }
     }
 }

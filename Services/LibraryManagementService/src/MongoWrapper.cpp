@@ -63,9 +63,18 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
 
         auto results = docBase.GetAllDocument(std::move(filterQuery), bsoncxx::document::view{}, 0);
 
-        // Only keep the highest version per "Name", but collect all versions
+        // Only keep the highest version per "Name", but collect all versions and their metadata
         std::map<std::string, bsoncxx::document::value> newestByName;
-        std::map<std::string, std::vector<int64_t>> versionsByName;
+        
+        struct TempVersionDetail {
+            int64_t version;
+            std::string owner;
+            std::unordered_map<std::string, std::string> metaData;
+
+            TempVersionDetail(int64_t _version, const std::string& _owner, std::unordered_map<std::string, std::string>&& _meta)
+                : version(_version), owner(_owner), metaData(std::move(_meta)) {}
+        };
+        std::map<std::string, std::vector<TempVersionDetail>> detailsByName;
 
         for (auto result : results) {
             auto nameElement = result["Name"];
@@ -85,7 +94,25 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
                 }
             }
 
-            versionsByName[name].push_back(currentVersion);
+            std::string owner = "";
+            auto ownerElement = result["Owner"];
+            if (ownerElement && ownerElement.type() == bsoncxx::type::k_utf8) {
+                owner = std::string(ownerElement.get_utf8().value);
+            }
+
+            std::unordered_map<std::string, std::string> metaMap;
+            auto metaElement = result["metaData"];
+            if (metaElement && metaElement.type() == bsoncxx::type::k_document) {
+                auto metaDoc = metaElement.get_document().value;
+                for (auto it = metaDoc.begin(); it != metaDoc.end(); ++it) {
+                    if (it->type() == bsoncxx::type::k_utf8) {
+                        metaMap.emplace(std::string(it->key().data(), it->key().length()), 
+                                        std::string(it->get_utf8().value.data(), it->get_utf8().value.length()));
+                    }
+                }
+            }
+
+            detailsByName[name].emplace_back(currentVersion, owner, std::move(metaMap));
 
             auto it = newestByName.find(name);
             if (it == newestByName.end()) {
@@ -119,13 +146,34 @@ std::string MongoWrapper::getDocumentList(const ot::LibraryElementSelectionCfg& 
             singleDoc.Parse(docJsonStr.c_str());
             if (!singleDoc.HasParseError() && singleDoc.IsObject()) {
                 rapidjson::Value versionsArr(rapidjson::kArrayType);
-                auto& versions = versionsByName[pair.first];
+                std::vector<int64_t> versions;
+                for (const auto& d : detailsByName[pair.first]) {
+                    versions.push_back(d.version);
+                }
                 std::sort(versions.begin(), versions.end(), std::greater<int64_t>());
                 for (int64_t v : versions) {
                     versionsArr.PushBack(v, allocator);
                 }
                 singleDoc.AddMember("Versions", versionsArr, allocator);
                 
+                rapidjson::Value detailsArr(rapidjson::kArrayType);
+                for (const auto& d : detailsByName[pair.first]) {
+                    rapidjson::Value detailObj(rapidjson::kObjectType);
+                    detailObj.AddMember("Version", d.version, allocator);
+                    detailObj.AddMember("Owner", rapidjson::Value(d.owner.c_str(), allocator), allocator);
+                    
+                    rapidjson::Value metaArr(rapidjson::kArrayType);
+                    for (const auto& meta : d.metaData) {
+                        rapidjson::Value metaObj(rapidjson::kObjectType);
+                        metaObj.AddMember("Key", rapidjson::Value(meta.first.c_str(), allocator), allocator);
+                        metaObj.AddMember("Value", rapidjson::Value(meta.second.c_str(), allocator), allocator);
+                        metaArr.PushBack(metaObj, allocator);
+                    }
+                    detailObj.AddMember("MetaData", metaArr, allocator);
+                    detailsArr.PushBack(detailObj, allocator);
+                }
+                singleDoc.AddMember("VersionDetails", detailsArr, allocator);
+
                 rapidjson::Value singleDocVal;
                 singleDocVal.CopyFrom(singleDoc, allocator);
                 docArray.PushBack(singleDocVal, allocator);
