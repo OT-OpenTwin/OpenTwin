@@ -22,12 +22,14 @@
 #include <string>
 #include <vector>
 #include <list>
+#include <map>
 
 class Application;
 
 class EntityBase;
 class EntityMeshCartesian;
 class EntityUnits;
+class EntityFacetData;
 class ResultManager;
 
 class FDTDSolver
@@ -42,7 +44,8 @@ public:
 private:
 	void addPreparationData(std::stringstream& runCommand);
 	void addSolverSetup(std::stringstream& runCommand);
-	void addBoundaries(std::stringstream& runCommand);
+	void addMesh(std::stringstream& runCommand);
+	void addGeometry(std::stringstream& runCommand);
 	void addSolverRun(std::stringstream& runCommand);
 	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
@@ -60,6 +63,11 @@ private:
 	void convert1DTimeSignal(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D, int readDataColumnOnly = -1);
 	void convert1DFrequencySpectrum(const std::string& resultName, const std::string& fileName, const std::string& quantityName, ResultManager& result1D);
 	double readTimeStepWidthFromLogText(const std::string& logFileText);
+	bool storeSTLGeometry(EntityFacetData* facetData, const std::string& stlFileName);
+	std::map<std::string, int> createIntegerPriorities(const std::map<std::string, double>& shapeNameToPriorityMap, double tolerance = 1e-5);
+	void addBackgroundMaterial(std::stringstream& runCommand);
+	void readMeshLineInformation();
+	void writeLinesArray(const std::string& direction, const std::vector<double>& linesArray, std::stringstream& runCommand);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -67,6 +75,8 @@ private:
 	std::string openEMSPath;
 	std::string tempDirPath;
 	double timeStepWidth;
+
+	std::vector<double> xLines, yLines, zLines;
 
 	EntityUnits* entityUnits;
 };

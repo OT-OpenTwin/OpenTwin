@@ -26,16 +26,21 @@
 
 #include "OTModelEntities/EntitySolver.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
+#include "OTModelEntities/EntityMeshCartesianData.h"
 #include "OTModelEntities/EntityUnits.h"
+#include "OTModelEntities/EntityMaterial.h"
 #include "OTModelEntities/EntityBinaryData.h"
 #include "OTModelEntities/EntityInformation.h"
 #include "OTModelEntities/EntityResultVtkComplex.h"
 #include "OTModelEntities/EntityResultVtkTime.h"
 #include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
 #include "OTModelEntities/EntityVisVtkVectorVolumeTime.h"
+#include "OTModelEntities/DataBase.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
+
+#include "OTCADEntities/EntityGeometry.h"
 
 #include <fstream>
 #include <filesystem>
@@ -59,59 +64,34 @@ FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, Ent
 std::string FDTDSolver::generateRunCommand()
 {
 	std::stringstream runCommand;
-	
+	runCommand << std::defaultfloat << std::setprecision(12);
+
 	addPreparationData(runCommand);
 	addUnits(runCommand);
 	addSolverSetup(runCommand);
-	// addMesh
-	// addGeometry
+	addMesh(runCommand);
+	addGeometry(runCommand);
 	// addPorts
-	addBoundaries(runCommand);
 	// addMonitors
 
+	runCommand << "## Apply the waveguide port\n"
+				  "# waveguide dimensions\n"
+				  "# WR42\n"
+				  "a = 10.7;   #waveguide width\n"
+				  "b = 4.3;    #waveguide height\n"
+				  "length = 50.0;\n"
+				  "#waveguide TE-mode definition\n"
+				  "TE_mode = 'TE10';\n"
+				  "ports = []\n"
+				  "start=[0, 0, " << zLines[10] << "];\n"
+				  "stop =[a, b, " << zLines[15] << "];\n"
+				  "ports.append(FDTD.AddRectWaveGuidePort( 0, start, stop, 'z', a*gunit, b*gunit, TE_mode, 1))\n"
+				  "\n"
+				  "start=[0, 0, " << zLines[zLines.size() - 12] << "];\n"
+				  "stop =[a, b, " << zLines[zLines.size() - 17] << "];\n"
+				  "ports.append(FDTD.AddRectWaveGuidePort( 1, start, stop, 'z', a*gunit, b*gunit, TE_mode))\n";
+
 	std::string text =
-		"# waveguide dimensions\n"
-		"# WR42\n"
-		"a = 10.7;   #waveguide width\n"
-		"b = 4.3;    #waveguide height\n"
-		"length = 50.0;\n"
-		"\n"
-		"# frequency range of interest\n"
-		"f_start = 20e9;\n"
-		"f_0     = 24e9;\n"
-		"f_stop  = 26e9;\n"
-		"lambda0 = C0/f_0/gunit;\n"
-		"\n"
-		"#waveguide TE-mode definition\n"
-		"TE_mode = 'TE10';\n"
-		"\n"
-		"#targeted mesh resolution\n"
-		"mesh_res = lambda0/30\n"
-		"\n"
-		"### Setup geometry & mesh\n"
-		"CSX = ContinuousStructure()\n"
-		"FDTD.SetCSX(CSX)\n"
-		"mesh = CSX.GetGrid()\n"
-		"mesh.SetDeltaUnit(gunit)\n"
-		"\n"
-		"mesh.AddLine('x', [0, a])\n"
-		"mesh.AddLine('y', [0, b])\n"
-		"mesh.AddLine('z', [0, length])\n"
-		"\n"
-		"## Apply the waveguide port\n"
-		"ports = []\n"
-		"start=[0, 0, 10*mesh_res];\n"
-		"stop =[a, b, 15*mesh_res];\n"
-		"mesh.AddLine('z', [start[2], stop[2]])\n"
-		"ports.append(FDTD.AddRectWaveGuidePort( 0, start, stop, 'z', a*gunit, b*gunit, TE_mode, 1))\n"
-		"\n"
-		"start=[0, 0, length-10*mesh_res];\n"
-		"stop =[a, b, length-15*mesh_res];\n"
-		"mesh.AddLine('z', [start[2], stop[2]])\n"
-		"ports.append(FDTD.AddRectWaveGuidePort( 1, start, stop, 'z', a*gunit, b*gunit, TE_mode))\n"
-		"\n"
-		"mesh.SmoothMeshLines('all', mesh_res, ratio=1.4)\n"
-		"\n"
 		"### Define dump box...\n"
 		"#Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop], sub_sampling=[2,2,2])\n"
 		"Ef = CSX.AddDump('E-Field Complex', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
@@ -130,8 +110,59 @@ std::string FDTDSolver::generateRunCommand()
 	return runCommand.str();
 }
 
+void FDTDSolver::readMeshLineInformation()
+{
+	// Here we load the mesh data object and get the mesh line distribution from there
+	ot::EntityInformation meshDataInfo;
+	ot::ModelServiceAPI::getEntityInformation(meshEntity->getMeshDataStorageId(), meshDataInfo);
+
+	EntityMeshCartesianData *meshDataEntity = dynamic_cast<EntityMeshCartesianData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(meshDataInfo.getEntityID(), meshDataInfo.getEntityVersion()));
+	if (meshDataEntity == nullptr)
+	{
+		throw(std::string("Unable to read mesh data"));
+	}
+
+	xLines = meshDataEntity->getMeshLinesX();
+	yLines = meshDataEntity->getMeshLinesY();
+	zLines = meshDataEntity->getMeshLinesZ();
+
+	delete meshDataEntity;
+	meshDataEntity = nullptr;
+}
+
+void FDTDSolver::writeLinesArray(const std::string& direction, const std::vector<double>& linesArray, std::stringstream& runCommand)
+{
+	runCommand << "mesh.SetLines('" << direction << "', [";
+
+	for (size_t index = 0; index < linesArray.size() - 1; index++)
+	{
+		runCommand << linesArray[index] << ", ";
+	}
+
+	runCommand << linesArray.back() << "])\n";
+}
+
+void FDTDSolver::addMesh(std::stringstream& runCommand)
+{
+	readMeshLineInformation();
+
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Define mesh\n";
+	runCommand << "#=================================================================================\n";
+
+	runCommand << "mesh = CSX.GetGrid()\n";
+	runCommand << "mesh.SetDeltaUnit(gunit)\n";
+	writeLinesArray("x", xLines, runCommand);
+	writeLinesArray("y", yLines, runCommand);
+	writeLinesArray("z", zLines, runCommand);
+}
+
 void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 {
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Import python packages and set path variable\n";
+	runCommand << "#=================================================================================\n";
+
 	runCommand << "import os, tempfile\n";
 	runCommand << "import numpy as np\n";
 	runCommand << "os.environ[\"OPENEMS_INSTALL_PATH\"] = \"" << escapeBackslashes(openEMSPath) << "\"\n";
@@ -153,9 +184,380 @@ void FDTDSolver::addUnits(std::stringstream& runCommand)
 		throw(std::string("Unable to read units"));
 	}
 	
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Set units\n";
+	runCommand << "#=================================================================================\n";
+
 	runCommand << "gunit = " << entityUnits->getScaleToSIDimension() << "\n";
 	runCommand << "funit = " << entityUnits->getScaleToSIFrequency() << "\n";
 	runCommand << "tunit = " << entityUnits->getScaleToSITime() << "\n";
+}
+
+void FDTDSolver::addGeometry(std::stringstream& runCommand)
+{
+	// Loop through all entities below the mesh entities geometry folder. If this folder does not exist, raise an exception
+	ot::UIDList geometryEntitiesID = ot::ModelServiceAPI::getIDsOfFolderItemsOfType(meshEntity->getName() + "/Geometry", "EntityGeometry", true);
+	if (geometryEntitiesID.empty()) throw(std::string("Unable to read geometry from mesh"));
+
+	std::list<ot::EntityInformation> geometryEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(geometryEntitiesID, geometryEntitiesInfo);
+
+	// Read all geometry entities
+	DataBase::instance().prefetchDocumentsFromStorage(geometryEntitiesInfo);
+
+	std::list<EntityGeometry*> geometryEntities;
+	for (auto geomEntity : geometryEntitiesInfo)
+	{
+		EntityGeometry *geometry = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(geomEntity.getEntityID(), geomEntity.getEntityVersion()));
+		if (geometry == nullptr)
+		{
+			throw(std::string("Unable to read geometry from mesh"));
+		}
+		if (geometry->getName() != meshEntity->getName() + "/Geometry/Background")  // Ignore the background material, since this will be handled separately later
+		{
+			geometryEntities.push_back(geometry);
+		}
+	}
+
+	// Sort the geometry entities by material
+	ot::UIDList facetIdList;
+	std::list<std::string> materialNames;
+	std::map<std::string, std::list<EntityGeometry*>> materialToGeometryMap;
+
+	for (auto geom : geometryEntities)
+	{
+		facetIdList.push_back(geom->getFacetsPrefetchID());
+
+		EntityPropertiesEntityList* material = dynamic_cast<EntityPropertiesEntityList*>(geom->getProperties().getProperty("Material"));
+		if (material == nullptr)
+		{
+			throw(std::string("No material defined for shape: " + geom->getName()));
+		}
+
+		std::string materialName = material->getValueName();
+		materialNames.push_back(materialName);
+
+		materialToGeometryMap[materialName].push_back(geom);
+	}
+
+	std::list<ot::EntityInformation> facetEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(facetIdList, facetEntitiesInfo);
+
+	// Build a map for the facet entities id -> version information
+	std::map<ot::UID, ot::UID> facetIDtoVersionMap;
+	for (auto facetInfo : facetEntitiesInfo)
+	{
+		facetIDtoVersionMap[facetInfo.getEntityID()] = facetInfo.getEntityVersion();
+	}
+
+	std::list<ot::EntityInformation> materialEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(materialNames, materialEntitiesInfo);
+
+	// Read all facet entities
+	DataBase::instance().prefetchDocumentsFromStorage(facetEntitiesInfo);
+
+	// Read all relevant material entities
+	DataBase::instance().prefetchDocumentsFromStorage(materialEntitiesInfo);
+
+	// Create the materials one-by-one and add the corresponding objects (write the stl files and add them to the solver script)
+	std::list<EntityMaterial*> materialEntities;
+	std::list<EntityFacetData*> facetEntities;
+	int materialCount = 1;
+
+	// Determine the shape priorities (we store them as doubles combined for material and shape priorities. OpenEMS needs them as an integer)
+	std::map<std::string, double> shapeNameToPriorityMap;
+	for (auto material : materialEntitiesInfo)
+	{
+		EntityMaterial* materialEntity = dynamic_cast<EntityMaterial*>(ot::EntityAPI::readEntityFromEntityIDandVersion(material.getEntityID(), material.getEntityVersion()));
+		if (materialEntity == nullptr)
+		{
+			throw(std::string("Unable to load material: ") + material.getEntityName());
+		}
+
+		materialEntities.push_back(materialEntity);
+
+		EntityPropertiesDouble* meshPriority = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Mesh priority"));
+		double materialPriority = meshPriority != nullptr ? meshPriority->getValue() : 0.0;
+
+		for (auto geomEntity : materialToGeometryMap[materialEntity->getName()])
+		{
+			EntityPropertiesDouble* shapePriorityProperty = dynamic_cast<EntityPropertiesDouble*>(geomEntity->getProperties().getProperty("Mesh priority"));
+			double shapePriority = shapePriorityProperty != nullptr ? shapePriorityProperty->getValue() : 0.0;
+
+			shapeNameToPriorityMap[geomEntity->getName()] = shapePriority + materialPriority;
+		}
+	}
+
+	std::map<std::string, int> shapeNameToPriorityIntMap = createIntegerPriorities(shapeNameToPriorityMap);
+
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Define material and shapes\n";
+	runCommand << "#=================================================================================\n";
+
+	// Loop for all materials and store all shapes belonging to this material
+	for (auto materialEntity : materialEntities)
+	{
+		EntityPropertiesSelection* materialType = dynamic_cast<EntityPropertiesSelection*>(materialEntity->getProperties().getProperty("Material type"));
+
+		std::string openEMSMaterialName = "material" + std::to_string(materialCount);
+
+		double minPriority = DBL_MAX;
+
+		if (materialType->getValue() == "PEC")
+		{
+			runCommand << openEMSMaterialName << " = CSX.AddMetal(\"" << openEMSMaterialName << "\")\n";
+		}
+		else if (materialType->getValue() == "Volumetric")
+		{
+			EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Permittivity (relative)"));
+			EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Permeability (relative)"));
+			EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Conductivity"));
+
+			double epsilon = permittivity != nullptr ? permittivity->getValue() : 1.0;
+			double mue     = permeability != nullptr ? permeability->getValue() : 1.0;
+			double kappa   = conductivity != nullptr ? conductivity->getValue() : 0.0;
+
+			runCommand << openEMSMaterialName << " = CSX.AddMaterial(\"" << openEMSMaterialName << "\", epsilon=" << epsilon << ", mue=" << mue << ", kappa=" << kappa << ", sigma=0.0)\n";
+		}
+		else
+		{
+			assert(0); // Unknown material type
+		}
+
+		// Now add all shapes for this material
+		int shapeCount = 1;
+		for (auto geomEntity : materialToGeometryMap[materialEntity->getName()])
+		{
+			std::string stlFileName = tempDirPath + "\\shape" + std::to_string(materialCount) + "_" + std::to_string(shapeCount) + ".stl";
+
+			// Load the facets
+			EntityFacetData* facetData = dynamic_cast<EntityFacetData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(geomEntity->getFacetsStorageObjectID(), facetIDtoVersionMap[geomEntity->getFacetsStorageObjectID()]));
+			if (facetData == nullptr)
+			{
+				throw(std::string("Unable to load facets for shape: ") + geomEntity->getName());
+			}
+
+			facetEntities.push_back(facetData);
+
+			if (!storeSTLGeometry(facetData, stlFileName))
+			{
+				throw(std::string("Unable to write facets as STL file: ") + stlFileName);
+			}
+
+			runCommand << "stl" << materialCount << "_" << shapeCount << " = " << openEMSMaterialName << ".AddPolyhedronReader(\"" << escapeBackslashes(stlFileName) << "\", priority = " << shapeNameToPriorityIntMap[geomEntity->getName()] << ")\n";
+			runCommand << "stl" << materialCount << "_" << shapeCount << ".ReadFile()\n";
+
+			shapeCount++;
+		}
+
+		materialCount++;
+	}
+
+	// Clean up facet entities
+	for (auto facets : facetEntities)
+	{
+		delete facets;
+	}
+
+	// Clean up material entities
+	for (auto material : materialEntities)
+	{
+		delete material;
+	}
+
+	// Clean up geometry entities
+	for (auto geom : geometryEntities)
+	{
+		delete geom;
+	}
+
+	// Handle the background material
+	addBackgroundMaterial(runCommand);
+}
+
+void FDTDSolver::addBackgroundMaterial(std::stringstream& runCommand)
+{
+	EntityPropertiesSelection* backgroundMode = dynamic_cast<EntityPropertiesSelection*>(meshEntity->getProperties().getProperty("Background mode"));
+	EntityPropertiesEntityList* backgroundMaterial = dynamic_cast<EntityPropertiesEntityList*>(meshEntity->getProperties().getProperty("Background material"));
+
+	bool isPECBackground = false;
+	double epsilon       = 1.0;
+	double mue           = 1.0;
+	double kappa         = 0.0;
+
+	if (backgroundMode != nullptr)
+	{
+		if (backgroundMode->getValue() == "Field free")
+		{
+			isPECBackground = true;
+		}
+		else
+		{
+			if (backgroundMaterial != nullptr)
+			{
+				ot::EntityInformation backgroundInfo;
+				ot::ModelServiceAPI::getEntityInformation(backgroundMaterial->getValueName(), backgroundInfo);
+
+				EntityMaterial* materialEntity = dynamic_cast<EntityMaterial*>(ot::EntityAPI::readEntityFromEntityIDandVersion(backgroundInfo.getEntityID(), backgroundInfo.getEntityVersion()));
+				if (materialEntity == nullptr)
+				{
+					throw(std::string("Unable to load background material: ") + backgroundMaterial->getValueName());
+				}
+
+				EntityPropertiesSelection* materialType = dynamic_cast<EntityPropertiesSelection*>(materialEntity->getProperties().getProperty("Material type"));
+
+				if (materialType->getValue() == "PEC")
+				{
+					isPECBackground = true;
+				}
+				else if (materialType->getValue() == "Volumetric")
+				{
+					isPECBackground = false;
+
+					EntityPropertiesDouble* permittivity = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Permittivity (relative)"));
+					EntityPropertiesDouble* permeability = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Permeability (relative)"));
+					EntityPropertiesDouble* conductivity = dynamic_cast<EntityPropertiesDouble*>(materialEntity->getProperties().getProperty("Conductivity"));
+
+					epsilon = permittivity != nullptr ? permittivity->getValue() : 1.0;
+					mue     = permeability != nullptr ? permeability->getValue() : 1.0;
+					kappa   = conductivity != nullptr ? conductivity->getValue() : 0.0;
+				}
+			}
+			else
+			{
+				isPECBackground = false;
+			}
+		}
+	}
+
+	if (isPECBackground)
+	{
+		runCommand << "background = CSX.AddMetal(\"background\")\n";
+	}
+	else
+	{
+		runCommand << "background = CSX.AddMaterial(\"background\", epsilon=" << epsilon << ", mue=" << mue << ", kappa=" << kappa << ", sigma=0.0)\n";
+	}
+
+	runCommand << "background.AddBox(start = [" << xLines.front() << ", " << yLines.front() << ", " << zLines.front() << "], "
+		                            "stop = [" << xLines.back() << ", " << yLines.back() << ", " << zLines.back() << "], priority = 0)\n";
+}
+
+std::map<std::string, int> FDTDSolver::createIntegerPriorities(const std::map<std::string, double>& shapeNameToPriorityMap, double tolerance)
+{
+	std::vector<std::pair<std::string, double>> sortedPriorities(
+		shapeNameToPriorityMap.begin(),
+		shapeNameToPriorityMap.end()
+	);
+
+	// Sort by double priority in ascending order
+	std::sort(
+		sortedPriorities.begin(),
+		sortedPriorities.end(),
+		[](const auto& a, const auto& b)
+		{
+			return a.second < b.second;
+		}
+	);
+
+	std::map<std::string, int> result;
+
+	if (sortedPriorities.empty()) {
+		return result;
+	}
+
+	int integerPriority = 1;
+	double groupPriority = sortedPriorities.front().second;
+
+	for (const auto& [name, priority] : sortedPriorities) {
+		// Start a new group if the priority differs by more than the tolerance
+		if (std::abs(priority - groupPriority) > tolerance) {
+			++integerPriority;
+			groupPriority = priority;
+		}
+
+		result[name] = integerPriority;
+	}
+
+	return result;
+}
+
+bool FDTDSolver::storeSTLGeometry(EntityFacetData* facetData, const std::string &stlFileName)
+{
+	auto& nodes = facetData->getNodeVector();
+	auto& triangles = facetData->getTriangleList();
+
+	std::ofstream file(stlFileName);
+	if (!file) {
+		return false;
+	}
+
+	file << std::scientific << std::setprecision(9);
+	file << "solid shape\n";
+
+	for (auto& triangle : triangles) {
+		const std::size_t i0 =
+			static_cast<std::size_t>(triangle.getNode(0));
+		const std::size_t i1 =
+			static_cast<std::size_t>(triangle.getNode(1));
+		const std::size_t i2 =
+			static_cast<std::size_t>(triangle.getNode(2));
+
+		if (i0 >= nodes.size() ||
+			i1 >= nodes.size() ||
+			i2 >= nodes.size()) {
+			return false;
+		}
+
+		auto& p0 = nodes[i0];
+		auto& p1 = nodes[i1];
+		auto& p2 = nodes[i2];
+
+		const double ux = p1.getCoord(0) - p0.getCoord(0);
+		const double uy = p1.getCoord(1) - p0.getCoord(1);
+		const double uz = p1.getCoord(2) - p0.getCoord(2);
+
+		const double vx = p2.getCoord(0) - p0.getCoord(0);
+		const double vy = p2.getCoord(1) - p0.getCoord(1);
+		const double vz = p2.getCoord(2) - p0.getCoord(2);
+
+		double nx = uy * vz - uz * vy;
+		double ny = uz * vx - ux * vz;
+		double nz = ux * vy - uy * vx;
+
+		const double length = std::sqrt(nx * nx + ny * ny + nz * nz);
+
+		if (length > 0.0) {
+			nx /= length;
+			ny /= length;
+			nz /= length;
+		}
+
+		file << "  facet normal " << nx << ' ' << ny << ' ' << nz << '\n';
+		file << "    outer loop\n";
+
+		file << "      vertex "
+			<< p0.getCoord(0) << ' '
+			<< p0.getCoord(1) << ' '
+			<< p0.getCoord(2) << '\n';
+
+		file << "      vertex "
+			<< p1.getCoord(0) << ' '
+			<< p1.getCoord(1) << ' '
+			<< p1.getCoord(2) << '\n';
+
+		file << "      vertex "
+			<< p2.getCoord(0) << ' '
+			<< p2.getCoord(1) << ' '
+			<< p2.getCoord(2) << '\n';
+
+		file << "    endloop\n";
+		file << "  endfacet\n";
+	}
+
+	file << "endsolid mesh\n";
+
+	return file.good();
 }
 
 void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
@@ -175,7 +577,13 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	double centerFreq    = 0.5 * (fMin + fMax) * entityUnits->getScaleToSIFrequency();
 	double halfBandwidth = 0.5 * (fMax - fMin) * entityUnits->getScaleToSIFrequency();
 
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Setup solver and define frequency ranges\n";
+	runCommand << "#=================================================================================\n";
+
+	runCommand << "CSX = ContinuousStructure()\n";
 	runCommand << "FDTD = openEMS(NrTS=" << maxTimesteps << ", EndCriteria=" << energyStopLevel << ")\n";
+	runCommand << "FDTD.SetCSX(CSX)\n";
 
 	if (excitationType == "Gaussian")
 	{
@@ -187,10 +595,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	{
 		assert(0); // Unknown excitation type
 	}
-}
 
-void FDTDSolver::addBoundaries(std::stringstream& runCommand)
-{
 	EntityPropertiesSelection* xminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Xmin"));
 	EntityPropertiesSelection* xmaxBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Xmax"));
 	EntityPropertiesSelection* yminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Ymin"));
@@ -205,12 +610,16 @@ void FDTDSolver::addBoundaries(std::stringstream& runCommand)
 	std::string zminBoundary = (zminBoundaryProperty != nullptr) ? zminBoundaryProperty->getValue() : "PEC";
 	std::string zmaxBoundary = (zmaxBoundaryProperty != nullptr) ? zmaxBoundaryProperty->getValue() : "PEC";
 
-	runCommand << "FDTD.SetBoundaryCond(['" << xminBoundary << "', '" 
-											<< xmaxBoundary << "', '" 
-											<< yminBoundary << "', '" 
-											<< ymaxBoundary << "', '" 
-											<< zminBoundary << "', '" 
-											<< zmaxBoundary << "'])\n";
+	runCommand << "FDTD.SetBoundaryCond(['" << xminBoundary << "', '"
+		<< xmaxBoundary << "', '"
+		<< yminBoundary << "', '"
+		<< ymaxBoundary << "', '"
+		<< zminBoundary << "', '"
+		<< zmaxBoundary << "'])\n";
+
+	runCommand << "f_start = " << fMin * entityUnits->getScaleToSIFrequency() << "\n";
+	runCommand << "f_stop  = " << fMax * entityUnits->getScaleToSIFrequency() << "\n";
+	runCommand << "f_samples = 201\n";
 }
 
 void FDTDSolver::addSolverRun(std::stringstream& runCommand)
@@ -220,6 +629,10 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 
 	bool debugFlag = false;
 	if (debug != nullptr) debugFlag = debug->getValue();
+
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Run FDTD solver\n";
+	runCommand << "#=================================================================================\n";
 
 	if (debugFlag)
 	{
@@ -232,6 +645,10 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 
 void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 {
+	runCommand << "#=================================================================================\n";
+	runCommand << "# Define post-processing\n";
+	runCommand << "#=================================================================================\n";
+
 	// Define export function
 	runCommand << "\n"
 	"def save_xy_data(x, y, filename) :\n"
@@ -245,7 +662,7 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 
 	runCommand <<
 		"### Postprocessing & plotting\n"
-		"freq = np.linspace(f_start,f_stop,201)\n"
+		"freq = np.linspace(f_start,f_stop,f_samples)\n"
 		"for port in ports :\n"
 		"	port.CalcPort(Sim_Path, freq)\n"
 		"\n"

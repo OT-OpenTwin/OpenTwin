@@ -14,6 +14,7 @@ ot_add_dependency(OpenEMSService
     OTGuiAPI
     OTServiceFoundation
     OTModelEntities
+    OTCADEntities
     OTDataStorage
     OTModelAPI
     OTResultDataAccess
@@ -24,6 +25,7 @@ ot_add_dependency(OpenEMSService
     MONGO_BOOST
     QtCore
     QtNetwork
+    OCCT
 )
 
 ot_finalize_lib(OpenEMSService)
