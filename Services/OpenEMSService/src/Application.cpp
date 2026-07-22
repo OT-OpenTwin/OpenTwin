@@ -71,6 +71,10 @@ Application::Application()
 	m_runSolverButton = ot::ToolBarButtonCfg("OpenEMS", "Solver", "Run Solver", "Default/RunSolver");
 	m_runSolverButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_runSolverButton, this, &Application::handleRunSolver);
+
+	m_addWaveguidePortButton = ot::ToolBarButtonCfg("OpenEMS", "Ports", "Add Waveguide Port", "Default/FaceSelect");
+	m_addWaveguidePortButton.setButtonLockFlags(ot::LockType::ModelWrite);
+	connectToolBarButton(m_addWaveguidePortButton, this, &Application::handleAddWaveguidePort);
 }
 
 Application::~Application()
@@ -124,10 +128,12 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuPage("OpenEMS");
 
 	_ui->addMenuGroup("OpenEMS", "Solver");
+	_ui->addMenuGroup("OpenEMS", "Ports");
 	//	_ui->addMenuGroup("OpenEMS", "Sources");
 
 	_ui->addMenuButton(m_addSolverButton);
 	_ui->addMenuButton(m_runSolverButton);
+	_ui->addMenuButton(m_addWaveguidePortButton);
 
 	modelSelectionChanged();
 
@@ -203,9 +209,6 @@ void Application::handleAddSolver()
 	// First get a list of all folder items of the Solvers folder
 	std::list<std::string> solverItems = ot::ModelServiceAPI::getListOfFolderItems("Solvers");
 
-	// Now get a new entity ID for creating the new item
-	ot::UID entityID = this->getModelComponent()->createEntityUID();
-
 	// Create a unique name for the new solver item
 	int count = 1;
 	std::string solverName;
@@ -222,7 +225,7 @@ void Application::handleAddSolver()
 	ot::ModelServiceAPI::getAvailableMeshes(meshFolderName, meshFolderID, meshName, meshID);
 
 	// Create the new solver item and store it in the data base
-	EntitySolverOpenEMS* solverEntity = new EntitySolverOpenEMS(entityID, nullptr, nullptr, nullptr);
+	EntitySolverOpenEMS* solverEntity = new EntitySolverOpenEMS(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	solverEntity->setName(solverName);
 	solverEntity->setTreeItemEditable(true);
 	solverEntity->createProperties(meshFolderName, meshFolderID, meshName, meshID);
@@ -235,10 +238,25 @@ void Application::handleAddSolver()
 
 	solverEntity->storeToDataBase();
 
+	// Create a port item below the solver
+	EntityContainer* portEntity = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	portEntity->setName(solverName + "/Ports");
+	portEntity->setTreeItemEditable(false);
+	portEntity->setVisibleTreeItemIcon("Default/SettingsVisible");
+	portEntity->setHiddenTreeItemIcon("Default/SettingsHidden");
+	portEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
+
+	portEntity->storeToDataBase();
+
 	// Register the new solver item in the model
-	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID() };
-	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion() };
-	std::list<bool> topologyEntityForceVisible = { false };
+	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), portEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion(), portEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false, false };
 	std::list<ot::UID> dataEntityIDList;
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
@@ -326,6 +344,41 @@ void Application::handleRunSolver()
 	workerThread.detach();
 
 	//solverThread(solverInfo, meshInfo, solverMap);
+}
+
+void Application::handleAddWaveguidePort()
+{
+	// Determine currently selected solver
+	std::set<std::string> solverSet;
+	for (auto& entity : this->getSelectedEntityInfos())
+	{
+		if (entity.getEntityType() == "EntitySolverOpenEMS")
+		{
+			solverSet.emplace(entity.getEntityName());
+		}
+	}
+	if (solverSet.size() != 1)
+	{
+		this->getUiComponent()->displayMessage("\nERROR: Please select a single OpenEMS solver item.\n");
+		return;
+	}
+
+	std::string currentSolver = *solverSet.begin();
+
+	// Initiate the face picking operation to define the waveguide ports geometry
+	std::map<std::string, std::string> options;
+	options.insert_or_assign("colorR", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("PHREEC", "Port color", 0, 255)));
+	options.insert_or_assign("colorG", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("PHREEC", "Port color", 1, 171)));
+	options.insert_or_assign("colorB", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("PHREEC", "Port color", 2, 0)));
+	options.insert_or_assign("BaseName", currentSolver + "/Ports/");
+	options.insert_or_assign("ModelStateName", "create waveguide port");
+
+	ot::ServiceBase* receiver = getConnectedServiceByName("Model");
+
+	if (receiver != nullptr)
+	{
+		this->getUiComponent()->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new waveguide port", options, receiver->getServiceID());
+	}
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {
@@ -489,7 +542,7 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	}
 
 	// Store the log text in a result item
-	EntityResultText* text = this->getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Output", logFileText);
+	EntityResultText* text = this->getModelComponent()->addResultTextEntity(solver.getEntityName() + "/Results/Output", logFileText);
 
 	getModelComponent()->addNewTopologyEntity(text->getEntityID(), text->getEntityStorageVersion(), false);
 	getModelComponent()->addNewDataEntity(text->getTextDataStorageId(), text->getTextDataStorageVersion(), text->getEntityID());
@@ -506,7 +559,6 @@ void Application::deleteSingleSolverResults(EntityBase* solverEntity)
 {
 	std::list<std::string> entityNameList;
 	entityNameList.push_back(solverEntity->getName() + "/Results");
-	entityNameList.push_back(solverEntity->getName() + "/Output");
 
 	ot::ModelServiceAPI::deleteEntitiesFromModel(entityNameList, false);
 }

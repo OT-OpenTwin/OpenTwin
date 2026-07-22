@@ -732,7 +732,7 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	convertAndStoreFrequencyDomainDump("E-Field Complex", "E-Field", "V/m");
 	convertAndStoreTimeDomainDump("E-Field Time", "E-Field", "V/m");
 
-	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getName());
+	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getName() + "/Results");
 
 	convert1DTimeSignal("Energy/E-Field", "et", "E-Field Energy", result1D);
 	convert1DTimeSignal("Energy/H-Field", "ht", "H-Field Energy", result1D);
@@ -894,7 +894,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeComplex* visualizationEntity = new EntityVisVtkVectorVolumeComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
@@ -975,7 +975,7 @@ void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& res
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeTime* visualizationEntity = new EntityVisVtkVectorVolumeTime(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/" + resultName);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
