@@ -43,10 +43,11 @@ void EntitySolverOpenEMS::createProperties(std::string& _meshFolderName, ot::UID
 	std::list<std::string> excitationTypes{ "Gaussian" };
 	
 	EntityPropertiesSelection::createProperty("Excitation", "Type", excitationTypes, "Gaussian", "OpenEMSSolver", getProperties());
-	EntityPropertiesDouble::createProperty("Excitation", "Fmin", 0, "OpenEMSSolver", getProperties());
-	EntityPropertiesDouble::createProperty("Excitation", "Fmax", 0, "OpenEMSSolver", getProperties());
+	EntityPropertiesDouble::createProperty("Excitation", "Fmin", 0, "OpenEMSSolver", getProperties())->setToolTip("Minimum excitation frequency");
+	EntityPropertiesDouble::createProperty("Excitation", "Fmax", 0, "OpenEMSSolver", getProperties())->setToolTip("Maximum excitation frequency");
+	EntityPropertiesInteger::createProperty("Excitation", "Fsamples", 201, "OpenEMSSolver", getProperties())->setToolTip("Number of frequency samples");
 
-	EntityPropertiesInteger::createProperty("Simulation", "Max. timesteps", 1000000, "OpenEMSSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Simulation", "Max. timesteps", 1000000, "OpenEMSSolver", getProperties())->setToolTip("Maximum number of time steps");
 	EntityPropertiesDouble::createProperty("Simulation", "Energy stop level", 1e-5, "OpenEMSSolver", getProperties());
 
 	EntityPropertiesSelection::createProperty("Boundaries", "Xmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());

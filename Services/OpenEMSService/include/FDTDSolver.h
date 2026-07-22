@@ -42,6 +42,7 @@ public:
 	void convertAndStoreResults(const std::string &logFileText);
 
 private:
+	void checkCartesianMesh(std::stringstream& runCommand);
 	void addPreparationData(std::stringstream& runCommand);
 	void addSolverSetup(std::stringstream& runCommand);
 	void addMesh(std::stringstream& runCommand);

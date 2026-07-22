@@ -60,11 +60,12 @@ FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, Ent
 	assert(!_tempDirPath.empty());
 }
 
-
 std::string FDTDSolver::generateRunCommand()
 {
 	std::stringstream runCommand;
 	runCommand << std::defaultfloat << std::setprecision(12);
+
+	checkCartesianMesh(runCommand);
 
 	addPreparationData(runCommand);
 	addUnits(runCommand);
@@ -108,6 +109,50 @@ std::string FDTDSolver::generateRunCommand()
 	addPostprocessing(runCommand);
 
 	return runCommand.str();
+}
+
+void FDTDSolver::checkCartesianMesh(std::stringstream& runCommand)
+{
+	if (!meshEntity->getMeshValid())
+	{
+		// The mesh is invalid
+		throw std::string("The specified cartesian mesh is invalid");
+	}
+
+	EntityPropertiesSelection* problemTypeProperty = dynamic_cast<EntityPropertiesSelection*>(meshEntity->getProperties().getProperty("Problem type"));
+	if (problemTypeProperty == nullptr)
+	{
+		runCommand << "print(\"WARNING: The mesh problem type has not been set. The mesh should be of type Electromagnetics (HF).\\n\")\n";
+	}
+	else
+	{
+		if (problemTypeProperty->getValue() != "Electromagnetics (HF)")
+		{
+			runCommand << "print(\"WARNING: The mesh problem type should be set to Electromagnetics (HF) to ensure a proper discretization.\\n\")\n";
+		}
+		else
+		{
+			EntityPropertiesDouble* maximumFrequencyProperty = dynamic_cast<EntityPropertiesDouble*>(meshEntity->getProperties().getProperty("Maximum frequency"));
+			if (maximumFrequencyProperty == nullptr)
+			{
+				runCommand << "print(\"WARNING: The maximum frequency has not been defined for the mesh.\\n\")\n";
+			}
+			else
+			{
+				EntityPropertiesDouble* fMaxProperty = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Fmax"));
+				double fMax = (fMaxProperty != nullptr) ? fMaxProperty->getValue() : 0.0;
+
+				double tolerance = 1e-5 * std::max(maximumFrequencyProperty->getValue(), fMax);
+				if (tolerance == 0.0) tolerance = 1e-5;
+
+				if (fMax - maximumFrequencyProperty->getValue() > tolerance)
+				{
+					runCommand << "print(\"WARNING: The maximum frequency for the mesh is lower than the maximum solver frequency. The mesh might be too coarse.\\n\")\n";
+				}
+			}
+		}
+	}
+
 }
 
 void FDTDSolver::readMeshLineInformation()
@@ -565,12 +610,15 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	EntityPropertiesSelection* excitationTypeProperty  = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Type"));
 	EntityPropertiesDouble*    fMinProperty            = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Fmin"));
 	EntityPropertiesDouble*    fMaxProperty            = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Fmax"));
+	EntityPropertiesInteger*   fStepsProperty          = dynamic_cast<EntityPropertiesInteger*>(solverEntity->getProperties().getProperty("Fsamples"));
+
 	EntityPropertiesInteger*   maxTimestepsProperty    = dynamic_cast<EntityPropertiesInteger*>(solverEntity->getProperties().getProperty("Max. timesteps"));
 	EntityPropertiesDouble*    energyStopLevelProperty = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Energy stop level"));
 
 	std::string excitationType = (excitationTypeProperty != nullptr) ? excitationTypeProperty->getValue() : "Gaussian";
 	double fMin                = (fMinProperty != nullptr) ? fMinProperty->getValue() : 0.0;
 	double fMax                = (fMaxProperty != nullptr) ? fMaxProperty->getValue() : 0.0;
+	long long fSteps           = (fStepsProperty != nullptr) ? fStepsProperty->getValue() : 201;
 	long long maxTimesteps     = (maxTimestepsProperty != nullptr) ? maxTimestepsProperty->getValue() : 1000000;
 	double energyStopLevel     = (energyStopLevelProperty != nullptr) ? energyStopLevelProperty->getValue() : 1e-5;
 
@@ -619,7 +667,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 
 	runCommand << "f_start = " << fMin * entityUnits->getScaleToSIFrequency() << "\n";
 	runCommand << "f_stop  = " << fMax * entityUnits->getScaleToSIFrequency() << "\n";
-	runCommand << "f_samples = 201\n";
+	runCommand << "f_samples = " << fSteps << "\n";
 }
 
 void FDTDSolver::addSolverRun(std::stringstream& runCommand)

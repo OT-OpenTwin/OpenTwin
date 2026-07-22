@@ -1165,3 +1165,31 @@ void EntityGeometry::removeGroupProperties()
 		getProperties().deleteProperty(groupProperty->getName(), groupProperty->getGroup());
 	}
 }
+
+void EntityGeometry::removeTransformationProperties()
+{
+	std::list<EntityPropertiesBase*> propertyList = getProperties().getListOfAllProperties();
+
+	for (auto prop : propertyList)
+	{
+		if (prop->getGroup() == "Transformation")
+		{
+			// We do have a property belonging to the transformation group
+			getProperties().deleteProperty(prop->getName(), prop->getGroup());
+		}
+	}
+}
+
+void EntityGeometry::removeNonStandardProperties()
+{
+	std::list<EntityPropertiesBase*> propertyList = getProperties().getListOfAllProperties();
+
+	for (auto prop : propertyList)
+	{
+		if (prop->getGroup() != "Appearance" && prop->getGroup() != "Transformation" && prop->getGroup() != "Solver" && prop->getGroup() != "Mesh" && prop->getGroup() != "Mesh refinement" && prop->getGroup() != "Group")
+		{
+			// We do have a property belonging to a non-standard group
+			getProperties().deleteProperty(prop->getName(), prop->getGroup());
+		}
+	}
+}

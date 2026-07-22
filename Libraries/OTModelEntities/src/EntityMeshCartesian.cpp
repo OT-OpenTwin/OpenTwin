@@ -94,7 +94,6 @@ void EntityMeshCartesian::createProperties(const std::string materialsFolder, ot
 	EntityPropertiesDouble::createProperty("Mesh lines", "Mesh equilibration ratio", 2.0, "Cartesian Meshing", getProperties());
 
 	// Algorithm
-	EntityPropertiesBoolean::createProperty("Algorithm", "Store geometry", false, "Cartesian Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Algorithm", "Conformal meshing", false, "Cartesian Meshing", getProperties());
 	EntityPropertiesBoolean::createProperty("Algorithm", "Visualize matrices", false, "Cartesian Meshing", getProperties());
 

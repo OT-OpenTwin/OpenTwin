@@ -82,7 +82,9 @@ public:
 	void createMaterialPropertiesOnly(int colorR, int colorG, int colorB, const std::string &materialsFolder, ot::UID materialsFolderID);
 	void createNonMaterialProperties(void);
 
+	void removeNonStandardProperties();
 	void removeGroupProperties();
+	void removeTransformationProperties();
 
 	void facetEntity(bool isHidden);
 

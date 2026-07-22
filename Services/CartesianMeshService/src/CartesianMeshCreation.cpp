@@ -143,7 +143,6 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 		EntityPropertiesDouble* stepsPerWavelengthProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Steps per wavelength"));
 		EntityPropertiesDouble* meshStepRatioProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Smallest mesh step ratio"));
 		EntityPropertiesDouble* meshEquilibrationRatioProperty = dynamic_cast<EntityPropertiesDouble*>(getEntityMesh()->getProperties().getProperty("Mesh equilibration ratio"));
-		EntityPropertiesBoolean* storeGeometryProperty = dynamic_cast<EntityPropertiesBoolean*>(getEntityMesh()->getProperties().getProperty("Store geometry"));
 
 		double maximumEdgeLength = maximumEdgeLengthProperty->getValue();
 		double stepsAlongDiagonal = stepsAlongDiagonalProperty->getValue();
@@ -154,8 +153,6 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 
 		double meshStepRatio = (meshStepRatioProperty != nullptr) ? meshStepRatioProperty->getValue() : 10.0;
 		double meshEquilibrationRatio = (meshEquilibrationRatioProperty != nullptr) ? meshEquilibrationRatioProperty->getValue() : 2.0;
-
-		bool storeGeometry = (storeGeometryProperty != nullptr) ? storeGeometryProperty->getValue() : true;
 
 		ProblemType* problemType = nullptr;
 
@@ -194,6 +191,7 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 			if (geom == nullptr)
 			{
 				std::string error = "ERROR: Unable to load geometry entity (" + std::to_string(entityID) + ", " + std::to_string(entityVersion) + ")\n\n";
+				deleteMesh();
 				throw error;
 			}
 			else
@@ -207,7 +205,11 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 
 		// Now load the material information for each geometry object
 		std::string error = readMaterialInformation(geometryEntities, inputDependencyList);
-		if (!error.empty()) throw error;
+		if (!error.empty())
+		{
+			deleteMesh();
+			throw error;
+		}
 
 		// In the following we need the Brep description for each object.
 		// Now loop through every geometry entitity and check which data base objects will need to be loaded for pre-fetching
@@ -370,16 +372,14 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 
 		// Set the new mesh data object as data entity for the cartesian mesh
 		getEntityMesh()->setMeshDataID(meshData->getEntityID());
+		getEntityMesh()->setMeshValid(true);
 
 		getEntityMesh()->storeToDataBase();
 
 		meshData->storeToDataBase();
 
 		// Copy the geometry Entities
-		if (storeGeometry)
-		{
-			copyGeometryEntities(geometryEntities, entityList, getEntityMesh()->getName());
-		}
+		copyGeometryEntities(geometryEntities, entityList, getEntityMesh()->getName());
 
 		// Now add the visualization for all matrices, if this debug option is turned on
 		if (visualizeMatrices && getDsMatrix() != nullptr)
@@ -527,6 +527,13 @@ void CartesianMeshCreation::copyGeometryEntities(std::list<EntityGeometry*>& geo
 
 		geomEntity->setInitiallyHidden(true);
 		geomEntity->getProperties().setAllPropertiesReadOnly();
+
+		geomEntity->setVisibleTreeItemIcon("Default/ModelVisible");
+		geomEntity->setHiddenTreeItemIcon("Default/ModelHidden");
+
+		geomEntity->removeNonStandardProperties();
+		geomEntity->removeGroupProperties();
+		geomEntity->removeTransformationProperties();
 
 		geomEntity->storeToDataBase();
 

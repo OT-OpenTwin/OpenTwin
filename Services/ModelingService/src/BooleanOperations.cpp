@@ -260,7 +260,7 @@ void BooleanOperations::perfromOperationForSelectedEntities(const std::string &s
 
 		geometryEntity->getProperties() = baseEntity->getProperties();
 
-		deleteNonStandardProperties(geometryEntity);
+		geometryEntity->removeNonStandardProperties();
 
 		geometryEntity->resetTransformation();
 
