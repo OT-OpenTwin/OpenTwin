@@ -41,6 +41,7 @@
 #include "OTModelEntities/EntityAPI.h"
 
 #include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/EntityWaveguidePort.h"
 
 #include <fstream>
 #include <filesystem>
@@ -49,6 +50,12 @@
 #include <vector>
 #include <charconv>
 #include <regex>
+#include <cctype>
+#include <map>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <utility>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr), timeStepWidth(0.0)
@@ -60,10 +67,21 @@ FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, Ent
 	assert(!_tempDirPath.empty());
 }
 
+FDTDSolver::~FDTDSolver()
+{
+	for (auto port : waveguidePortList)
+	{
+		delete port;
+	}
+}
+
 std::string FDTDSolver::generateRunCommand()
 {
 	std::stringstream runCommand;
 	runCommand << std::defaultfloat << std::setprecision(12);
+
+	readPorts();
+	readExcitation();
 
 	checkCartesianMesh(runCommand);
 
@@ -109,6 +127,82 @@ std::string FDTDSolver::generateRunCommand()
 	addPostprocessing(runCommand);
 
 	return runCommand.str();
+}
+
+void FDTDSolver::readPorts()
+{
+	std::list<std::string> portEntityNames = ot::ModelServiceAPI::getListOfFolderItems(solverEntity->getName() + "/Ports", false);
+	if (portEntityNames.empty()) throw(std::string("No ports defined"));
+
+	std::list<ot::EntityInformation> portEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(portEntityNames, portEntitiesInfo);
+
+	// Read all geometry entities
+	DataBase::instance().prefetchDocumentsFromStorage(portEntitiesInfo);
+
+	for (auto port : portEntitiesInfo)
+	{
+		EntityBase* portEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(port.getEntityID(), port.getEntityVersion());
+
+		EntityWaveguidePort* waveguidePort = dynamic_cast<EntityWaveguidePort*>(portEntity);
+		if (waveguidePort != nullptr)
+		{
+			waveguidePortList.push_back(waveguidePort);
+			portEntity = nullptr;
+
+			int portNumber = 0;
+
+			if (parsePortNumber(waveguidePort->getName(), portNumber))
+			{
+				if (portList.count(portNumber) != 0)
+				{
+					throw std::string("Port number " + std::to_string(portNumber) + " has been multiply defined");
+				}
+
+				portList.emplace(portNumber);
+			}
+			else
+			{
+				throw std::string("Invalid port name " + waveguidePort->getName());
+			}
+		}
+
+		if (portEntity != nullptr)
+		{
+			std::string error = "The port named " + portEntity->getName() + " is not a supported type";
+			delete portEntity;
+
+			throw error;
+		}
+	}
+}
+
+void FDTDSolver::readExcitation()
+{
+	// Parse the excitation string
+	excitationList.clear();
+
+	EntityPropertiesString* excitationTypeProperty = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Ports"));
+	if (excitationTypeProperty == nullptr)
+	{
+		throw std::string("No port excitation specified");
+	}
+
+	std::string excitationString = excitationTypeProperty->getValue();
+
+	excitationList = FDTDSolver::parseExcitations(excitationString);
+
+	// Check, whether all ports in the excitation string exist
+	for (auto& excitation : excitationList)
+	{
+		for (auto& port : excitation)
+		{
+			if (portList.count(port.first) == 0)
+			{
+				throw std::string("The excitation port " + std::to_string(port.first) + " does not exist");
+			}
+		}
+	}
 }
 
 void FDTDSolver::checkCartesianMesh(std::stringstream& runCommand)
@@ -1179,4 +1273,175 @@ std::string FDTDSolver::doubleToString(double value) {
 	}
 
 	return std::string(buffer, result.ptr);
+}
+
+std::list<std::map<int, double>> FDTDSolver::parseExcitations(std::string_view input)
+{
+	std::list<std::map<int, double>> excitationList;
+	std::size_t pos = 0;
+
+	const auto skipWhitespace = [&]()
+		{
+			while (pos < input.size() &&
+				std::isspace(static_cast<unsigned char>(input[pos])))
+			{
+				++pos;
+			}
+		};
+
+	const auto fail = [&](const std::string& message)
+		{
+			throw std::string("Incorrect excitation port setting; " + message + " at position " + std::to_string(pos));
+		};
+
+	skipWhitespace();
+
+	if (pos == input.size())
+		fail("Excitation string is empty");
+
+	while (pos < input.size())
+	{
+		std::map<int, double> excitation;
+
+		while (true)
+		{
+			skipWhitespace();
+
+			// Parse the port number
+			const std::size_t portBegin = pos;
+
+			while (pos < input.size() &&
+				std::isdigit(static_cast<unsigned char>(input[pos])))
+			{
+				++pos;
+			}
+
+			if (portBegin == pos)
+				fail("Expected a positive port number");
+
+			int portNumber = 0;
+
+			const auto portResult = std::from_chars(
+				input.data() + portBegin,
+				input.data() + pos,
+				portNumber);
+
+			if (portResult.ec != std::errc{} || portNumber < 1)
+				fail("Invalid port number");
+
+			skipWhitespace();
+
+			// The default excitation amplitude is 1.0
+			double amplitude = 1.0;
+
+			if (pos < input.size() && input[pos] == '(')
+			{
+				++pos;
+				skipWhitespace();
+
+				const std::size_t amplitudeBegin = pos;
+				const std::size_t closingBracket = input.find(')', pos);
+
+				if (closingBracket == std::string_view::npos)
+					fail("Missing closing bracket");
+
+				std::size_t amplitudeEnd = closingBracket;
+
+				while (amplitudeEnd > amplitudeBegin &&
+					std::isspace(static_cast<unsigned char>(
+						input[amplitudeEnd - 1])))
+				{
+					--amplitudeEnd;
+				}
+
+				if (amplitudeBegin == amplitudeEnd)
+					fail("Excitation amplitude is empty");
+
+				const char* first = input.data() + amplitudeBegin;
+				const char* last = input.data() + amplitudeEnd;
+
+				// std::from_chars does not necessarily accept a leading '+'
+				if (first != last && *first == '+')
+					++first;
+
+				if (first == last)
+					fail("Invalid excitation amplitude");
+
+				const auto amplitudeResult = std::from_chars(
+					first,
+					last,
+					amplitude,
+					std::chars_format::general);
+
+				if (amplitudeResult.ec != std::errc{} ||
+					amplitudeResult.ptr != last)
+				{
+					fail("Invalid excitation amplitude");
+				}
+
+				pos = closingBracket + 1;
+			}
+
+			if (!excitation.emplace(portNumber, amplitude).second)
+			{
+				fail(
+					"Port " + std::to_string(portNumber) +
+					" occurs more than once in one excitation");
+			}
+
+			skipWhitespace();
+
+			if (pos == input.size() || input[pos] == ',')
+				break;
+
+			if (input[pos] != '+')
+				fail("Expected '+', ',' or end of string");
+
+			++pos;
+			skipWhitespace();
+
+			if (pos == input.size() ||
+				input[pos] == '+' ||
+				input[pos] == ',')
+			{
+				fail("Expected a port number after '+'");
+			}
+		}
+
+		excitationList.push_back(std::move(excitation));
+
+		if (pos == input.size())
+			break;
+
+		// Skip the comma between solver runs
+		++pos;
+		skipWhitespace();
+
+		if (pos == input.size())
+			fail("Trailing comma");
+	}
+
+	return excitationList;
+}
+
+bool FDTDSolver::parsePortNumber(const std::string& name, int& portNumber)
+{
+	const std::size_t slashPos = name.find_last_of('/');
+
+	const std::string portName =
+		slashPos == std::string::npos
+		? name
+		: name.substr(slashPos + 1);
+
+	if (portName.empty())
+		return false;
+
+	const char* begin = portName.data();
+	const char* end = begin + portName.size();
+
+	const auto result = std::from_chars(begin, end, portNumber);
+
+	return result.ec == std::errc{} &&
+		result.ptr == end &&
+		portNumber >= 1;
 }

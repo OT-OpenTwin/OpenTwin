@@ -46,6 +46,12 @@ void EntitySolverOpenEMS::createProperties(std::string& _meshFolderName, ot::UID
 	EntityPropertiesDouble::createProperty("Excitation", "Fmin", 0, "OpenEMSSolver", getProperties())->setToolTip("Minimum excitation frequency");
 	EntityPropertiesDouble::createProperty("Excitation", "Fmax", 0, "OpenEMSSolver", getProperties())->setToolTip("Maximum excitation frequency");
 	EntityPropertiesInteger::createProperty("Excitation", "Fsamples", 201, "OpenEMSSolver", getProperties())->setToolTip("Number of frequency samples");
+	EntityPropertiesString::createProperty("Excitation", "Ports", "", "OpenEMSSolver", getProperties())->setToolTip("List of excitation ports.\n"
+																													"Use comma (,) to separate multiple excitations.\n"
+																													"Use plus (+) to specify simulatenously excited ports.\n"
+																													"Excitation amplitude can be specied in brackets () after the port number.\n"
+																													"Default excitation amplitude is 1.0\n"
+																													"Example: 1, 1+2(0.5)");
 
 	EntityPropertiesInteger::createProperty("Simulation", "Max. timesteps", 1000000, "OpenEMSSolver", getProperties())->setToolTip("Maximum number of time steps");
 	EntityPropertiesDouble::createProperty("Simulation", "Energy stop level", 1e-5, "OpenEMSSolver", getProperties());

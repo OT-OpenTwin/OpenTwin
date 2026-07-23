@@ -23,6 +23,7 @@
 #include <vector>
 #include <list>
 #include <map>
+#include <set>
 
 class Application;
 
@@ -31,12 +32,13 @@ class EntityMeshCartesian;
 class EntityUnits;
 class EntityFacetData;
 class ResultManager;
+class EntityWaveguidePort;
 
 class FDTDSolver
 {
 public:
 	FDTDSolver(Application *_application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string &_openEMSPath, const std::string& _tempDirPath);
-	virtual ~FDTDSolver() {};
+	virtual ~FDTDSolver();
 
 	std::string generateRunCommand();
 	void convertAndStoreResults(const std::string &logFileText);
@@ -69,6 +71,10 @@ private:
 	void addBackgroundMaterial(std::stringstream& runCommand);
 	void readMeshLineInformation();
 	void writeLinesArray(const std::string& direction, const std::vector<double>& linesArray, std::stringstream& runCommand);
+	void readExcitation();
+	std::list<std::map<int, double>> parseExcitations(std::string_view input);
+	void readPorts();
+	bool parsePortNumber(const std::string& name, int& portNumber);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -78,6 +84,9 @@ private:
 	double timeStepWidth;
 
 	std::vector<double> xLines, yLines, zLines;
+	std::list<std::map<int, double>> excitationList;
+	std::list<EntityWaveguidePort*> waveguidePortList;
+	std::set<int> portList;
 
 	EntityUnits* entityUnits;
 };
