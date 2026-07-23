@@ -1,0 +1,4 @@
+@ECHO OFF
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\set_python.bat"
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\build.py" CIRCUIT_EXECUTION %1 %2
+IF ERRORLEVEL 1 pause
