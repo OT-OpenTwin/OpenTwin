@@ -372,6 +372,7 @@ void Application::handleAddWaveguidePort()
 	options.insert_or_assign("colorB", std::to_string(TemplateDefaultManager::getTemplateDefaultManager()->getDefaultColor("PHREEC", "Port color", 2, 0)));
 	options.insert_or_assign("BaseName", currentSolver + "/Ports/");
 	options.insert_or_assign("ModelStateName", "create waveguide port");
+	options.insert_or_assign("EntityType", "EntityWaveguidePort");
 
 	ot::ServiceBase* receiver = getConnectedServiceByName("Model");
 

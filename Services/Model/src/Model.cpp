@@ -3506,7 +3506,7 @@ void Model::entitiesSelected(const std::string &selectionAction, const std::stri
 			int valueG = std::stoi(options["colorG"].c_str());
 			int valueB = std::stoi(options["colorB"].c_str());
 
-			createFaceAnnotation(annotations, valueR / 255.0, valueG / 255.0, valueB / 255.0, options["BaseName"]);
+			createFaceAnnotation(annotations, valueR / 255.0, valueG / 255.0, valueB / 255.0, options["BaseName"], options["EntityType"]);
 			modelChangeOperationCompleted(options["ModelStateName"]);
 		}
 	}
@@ -3516,7 +3516,7 @@ void Model::entitiesSelected(const std::string &selectionAction, const std::stri
 	}
 }
 
-void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName)
+void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName, std::string entityType)
 {		
 	std::string annotationName;
 	std::map<std::string, ot::UID> entityNameToIDMap = getEntityNameToIDMap();
@@ -3529,7 +3529,15 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 
 	} while (entityNameToIDMap[annotationName]);
 
-	EntityFaceAnnotation *annotationEntity = new EntityFaceAnnotation(0, nullptr, nullptr, nullptr);
+	
+	if (entityType.empty()) entityType = "EntityFaceAnnotation";
+	EntityFaceAnnotation *annotationEntity = dynamic_cast<EntityFaceAnnotation *>(EntityFactory::instance().create(entityType));
+	if (annotationEntity == nullptr)
+	{
+		assert(0);
+		OT_LOG_E("Entity type " + entityType +" is not a sub-class of EntityFaceAnnotation");
+		return;
+	}
 
 	annotationEntity->setName(annotationName);
 	annotationEntity->setColor(r, g, b);

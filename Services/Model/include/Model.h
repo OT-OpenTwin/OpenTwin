@@ -274,7 +274,7 @@ private:
 	bool anyMeshItemSelected(std::list<ot::UID> &selectedEntityID);
 	bool anyMaterialItemSelected(std::list<ot::UID> &selectedEntityID);
 	void getFaceCurvatureRadius(const TopoDS_Shape *shape, std::list<double> &faceCurvatureRadius);
-	void createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName);
+	void createFaceAnnotation(const std::list<EntityFaceAnnotationData> &annotations, double r, double g, double b, const std::string &baseName, std::string entityType);
 	void updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity);
 	std::string findMostRecentModelInStorage();
 	void performSpecialUpdates(EntityBase *entity);
