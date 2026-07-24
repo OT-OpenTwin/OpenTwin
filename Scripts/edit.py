@@ -1,10 +1,10 @@
 import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ot_dev import build_env, resolve_root, launch_devenv
+from ot_commands import build_env, resolve_root, launch_devenv
 
 def main(argv):
     if len(argv) != 1:
-        raise SystemExit("usage: edit.py <SERVICE_KEY>")
+        raise SystemExit("usage: edit.py <PROJECT>")
 
     env = build_env()
     target = resolve_root(env, argv[0])

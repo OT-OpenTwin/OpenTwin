@@ -49,7 +49,6 @@ LIBRARIES = {
     "OT_BLOCKENTITIES_ROOT": "OTBlockEntities",
     "OT_COMMUNICATION_ROOT": "OTCommunication",
     "OT_CORE_ROOT": "OTCore",
-    "OT_RANDOM_ROOT": "OTRandom",
     "OT_FOUNDATION_ROOT": "OTServiceFoundation",
     "OT_SYSTEM_ROOT": "OTSystem",
     "OT_MODELAPI_ROOT": "OTModelAPI",
