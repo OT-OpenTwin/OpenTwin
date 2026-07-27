@@ -7,6 +7,13 @@ CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
 CMAKE_SUBPATH = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin" / "cmake.exe"
 BUILD_ENV = {"windows": {"VSLANG": "1033"}, "linux": {}}
 
+DEFAULT_EDITOR = "VS"
+EDITORS = {
+    "VS": ("DEVENV_ROOT_2022", "devenv.exe"),
+    "CODE": (None, "code"),
+    "NVIM": (None, "nvim"),
+}
+
 
 def project_roots():
     return {var.removeprefix("OT_").removesuffix("_ROOT"): var
@@ -21,16 +28,29 @@ def resolve_root(env, key):
     return env[var]
 
 
-def launch_devenv(env, target):
-    devenv = Path(env["DEVENV_ROOT_2022"]) / "devenv.exe"
-    if not devenv.is_file():
-        raise SystemExit(f"devenv.exe not found: {devenv}")
+def launch_editor(env, target, editor=None):
+    key = (editor or DEFAULT_EDITOR).upper()
+    if key not in EDITORS:
+        raise SystemExit(f"Unknown editor '{editor}'. Known: " + ", ".join(sorted(EDITORS)))
+    root_var, exe = EDITORS[key]
     if not Path(target).exists():
         raise SystemExit(f"path does not exist: {target}")
 
-    print("Launching development environment")
-    subprocess.Popen([str(devenv), target], env=env)
-    return 0
+    if root_var:
+        command = str(Path(env[root_var]) / exe)
+        if not Path(command).is_file():
+            raise SystemExit(f"{exe} not found: {command}")
+        subprocess.Popen([command, target], env=env)
+        return 0
+
+    command = shutil.which(exe)
+    if not command:
+        raise SystemExit(f"{exe} not found on PATH")
+    args = [command, target]
+    if os.name == "nt" and command.lower().endswith((".cmd", ".bat")):
+        args = ["cmd", "/c"] + args
+    print(f"Launching {key}")
+    return subprocess.run(args, env=env).returncode
 
 
 def build_project(env, target, configs, rebuild):
