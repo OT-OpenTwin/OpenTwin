@@ -133,8 +133,12 @@ def _expand(env, value):
     return _VAR.sub(lambda m: _get(env, m.group(1)), value)
 
 
-def _load(name, path):
+def _load(name: str, path: str):
     spec = importlib.util.spec_from_file_location(name, path)
+
+    if spec is None or spec.loader is None:
+        raise ImportError(f"Cannot load module {name!r} from {path!r}")
+
     mod = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(mod)
     return mod
