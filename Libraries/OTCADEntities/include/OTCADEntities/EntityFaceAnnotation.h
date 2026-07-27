@@ -86,6 +86,8 @@ public:
 	EntityFacetData *getFacets(void) { return facets; };
 	BoundingBox &getBoundingBox(void) { return boundingBox; };
 
+	long long getFacetsStorageID(void) { return facetsStorageID; };
+
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;

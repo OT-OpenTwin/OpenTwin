@@ -56,6 +56,7 @@
 #include <string>
 #include <string_view>
 #include <utility>
+#include <cmath>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr), timeStepWidth(0.0)
@@ -90,25 +91,8 @@ std::string FDTDSolver::generateRunCommand()
 	addSolverSetup(runCommand);
 	addMesh(runCommand);
 	addGeometry(runCommand);
-	// addPorts
+	addPorts(runCommand);
 	// addMonitors
-
-	runCommand << "## Apply the waveguide port\n"
-				  "# waveguide dimensions\n"
-				  "# WR42\n"
-				  "a = 10.7;   #waveguide width\n"
-				  "b = 4.3;    #waveguide height\n"
-				  "length = 50.0;\n"
-				  "#waveguide TE-mode definition\n"
-				  "TE_mode = 'TE10';\n"
-				  "ports = []\n"
-				  "start=[0, 0, " << zLines[10] << "];\n"
-				  "stop =[a, b, " << zLines[15] << "];\n"
-				  "ports.append(FDTD.AddRectWaveGuidePort( 0, start, stop, 'z', a*gunit, b*gunit, TE_mode, 1))\n"
-				  "\n"
-				  "start=[0, 0, " << zLines[zLines.size() - 12] << "];\n"
-				  "stop =[a, b, " << zLines[zLines.size() - 17] << "];\n"
-				  "ports.append(FDTD.AddRectWaveGuidePort( 1, start, stop, 'z', a*gunit, b*gunit, TE_mode))\n";
 
 	std::string text =
 		"### Define dump box...\n"
@@ -116,7 +100,7 @@ std::string FDTDSolver::generateRunCommand()
 		"Ef = CSX.AddDump('E-Field Complex', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
 		"Et = CSX.AddDump('E-Field Time', dump_type=0, dump_mode=3, file_type=0, sub_sampling=[2,2,2])\n"
 		"start = [0, 0, 0];\n"
-		"stop  = [a, b, length];\n"
+		"stop  = [10.7, 4.3, 50.0];\n"
 		"Ef.AddBox(start, stop);\n"
 		"Et.AddBox(start, stop);\n"
 		"\n";
@@ -127,6 +111,101 @@ std::string FDTDSolver::generateRunCommand()
 	addPostprocessing(runCommand);
 
 	return runCommand.str();
+}
+
+void FDTDSolver::addPorts(std::stringstream& runCommand)
+{
+	if (waveguidePortList.empty()) return;
+
+	// Here we create all ports first with excitation set on (this will be updated to the actual values in the solver run part).
+	// This is necessary to create the excitation data structures.
+	ot::UIDList facetIDList;
+	for (auto port : waveguidePortList)
+	{
+		facetIDList.push_back(port->getFacetsStorageID());
+	}
+
+	std::list<ot::EntityInformation> facetEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(facetIDList, facetEntitiesInfo);
+
+	// Read all facet entities
+	DataBase::instance().prefetchDocumentsFromStorage(facetEntitiesInfo);
+
+	runCommand << "ports = {}\n";
+
+	int portCount = 1;
+
+	for (auto port : waveguidePortList)
+	{
+		EntityFacetData* facetEntity = dynamic_cast<EntityFacetData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetEntitiesInfo.front().getEntityID(), facetEntitiesInfo.front().getEntityVersion()));
+		facetEntitiesInfo.pop_front();
+		if (facetEntity != nullptr)
+		{
+			EntityPropertiesSelection* modeProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Mode"));
+			if (modeProperty == nullptr)
+			{
+				throw std::string("Invalid mode setting for port: " + port->getName());
+			}
+
+			std::string mode = modeProperty->getValue();
+
+			// Determine the exact port bounding box and the average port normal
+			double nx = 0.0, ny = 0.0, nz = 0.0;
+			BoundingBox box;
+
+			for (auto& node : facetEntity->getNodeVector())
+			{
+				box.extend(node.getCoord(0), node.getCoord(1), node.getCoord(2));
+				nx += node.getNormal(0);
+				ny += node.getNormal(1);
+				nz += node.getNormal(2);
+			}
+
+			nx /= -1.0 * facetEntity->getNodeVector().size();  // -, since the port face is pointing outward of the waveguide
+			ny /= -1.0 * facetEntity->getNodeVector().size();
+			nz /= -1.0 * facetEntity->getNodeVector().size();
+
+			double tolerance = 1e-4;
+
+			if (fabs(ny) < tolerance && fabs(nz) < tolerance && fabs(fabs(nx) - 1.0) < tolerance)
+			{
+				// Port normal +/- x direction (u = y, v = z)
+				double from = 0.0, to = 0.0;
+				findPortRange(0.5 * (box.getXmin() + box.getXmax()), xLines, xminBoundary, xmaxBoundary, nx, from, to);
+
+				runCommand << "start=[" << from << ", " << box.getYmin() << ", " << box.getZmin() << "];\n";
+				runCommand << "stop =[" << to << ", " << box.getYmax() << ", " << box.getZmax() << "];\n";
+				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'x', " << box.getYmax() - box.getYmin() << "*gunit, " << box.getZmax() - box.getZmin() << "*gunit, '" << mode << "', 1)\n";
+
+			}
+			else if (fabs(nx) < tolerance && fabs(nz) < tolerance && fabs(fabs(ny) - 1.0) < tolerance)
+			{
+				// Port normal +/- y direction (u = z, v = x)
+				double from = 0.0, to = 0.0;
+				findPortRange(0.5 * (box.getYmin() + box.getYmax()), yLines, yminBoundary, ymaxBoundary, ny, from, to);
+
+				runCommand << "start=[" << box.getXmin() << ", " << from << ", " << box.getZmin() << "];\n";
+				runCommand << "stop =[" << box.getXmax() << ", " << to << ", " << box.getZmax() << "];\n";
+				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'y', " << box.getZmax() - box.getZmin() << "*gunit, " << box.getXmax() - box.getXmin() << "*gunit, '" << mode << "', 1)\n";
+
+			}
+			else if (fabs(nx) < tolerance && fabs(ny) < tolerance && fabs(fabs(nz) - 1.0) < tolerance)
+			{
+				// Port normal +/- z direction (u = x, v = y)
+				double from = 0.0, to = 0.0;
+				findPortRange(0.5 * (box.getZmin() + box.getZmax()), zLines, zminBoundary, zmaxBoundary, nz, from, to);
+
+				runCommand << "start=[" << box.getXmin() << ", " << box.getYmin() << ", " << from << "];\n";
+				runCommand << "stop =[" << box.getXmax() << ", " << box.getYmax() << ", " << to << "];\n";
+				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'z', " << box.getXmax() - box.getXmin() << "*gunit, " << box.getYmax() - box.getYmin() << "*gunit, '" << mode << "', 1)\n";
+			}
+
+			portCount++;
+
+			delete facetEntity;
+			facetEntity = nullptr;
+		}
+	}
 }
 
 void FDTDSolver::readPorts()
@@ -310,6 +389,16 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 	runCommand << "from openEMS.physical_constants import *\n";
 	runCommand << "from pathlib import Path\n";
 	runCommand << "Sim_Path = str(Path(\"" << escapeBackslashes(tempDirPath) << "\").resolve())\n";
+
+	runCommand << "\n"
+		"def save_xy_data(x, y, filename) :\n"
+		"		full_path = os.path.join(Sim_Path, filename)\n"
+		"		with open(full_path, 'w', encoding = 'utf-8') as f :\n"
+		"			for xi, yi in zip(x, y) :\n"
+		"				if isinstance(yi, complex) :\n"
+		"					f.write(f'{xi}\t{yi.real}\t{yi.imag}\\n')\n"
+		"				else :\n"
+		"					f.write(f'{xi}\t{yi}\\n')\n\n";
 }
 
 void FDTDSolver::addUnits(std::stringstream& runCommand)
@@ -745,12 +834,12 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	EntityPropertiesSelection* zminBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Zmin"));
 	EntityPropertiesSelection* zmaxBoundaryProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Zmax"));
 
-	std::string xminBoundary = (xminBoundaryProperty != nullptr) ? xminBoundaryProperty->getValue() : "PEC";
-	std::string xmaxBoundary = (xmaxBoundaryProperty != nullptr) ? xmaxBoundaryProperty->getValue() : "PEC";
-	std::string yminBoundary = (yminBoundaryProperty != nullptr) ? yminBoundaryProperty->getValue() : "PEC";
-	std::string ymaxBoundary = (ymaxBoundaryProperty != nullptr) ? ymaxBoundaryProperty->getValue() : "PEC";
-	std::string zminBoundary = (zminBoundaryProperty != nullptr) ? zminBoundaryProperty->getValue() : "PEC";
-	std::string zmaxBoundary = (zmaxBoundaryProperty != nullptr) ? zmaxBoundaryProperty->getValue() : "PEC";
+	xminBoundary = (xminBoundaryProperty != nullptr) ? xminBoundaryProperty->getValue() : "PEC";
+	xmaxBoundary = (xmaxBoundaryProperty != nullptr) ? xmaxBoundaryProperty->getValue() : "PEC";
+	yminBoundary = (yminBoundaryProperty != nullptr) ? yminBoundaryProperty->getValue() : "PEC";
+	ymaxBoundary = (ymaxBoundaryProperty != nullptr) ? ymaxBoundaryProperty->getValue() : "PEC";
+	zminBoundary = (zminBoundaryProperty != nullptr) ? zminBoundaryProperty->getValue() : "PEC";
+	zmaxBoundary = (zmaxBoundaryProperty != nullptr) ? zmaxBoundaryProperty->getValue() : "PEC";
 
 	runCommand << "FDTD.SetBoundaryCond(['" << xminBoundary << "', '"
 		<< xmaxBoundary << "', '"
@@ -776,13 +865,106 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 	runCommand << "# Run FDTD solver\n";
 	runCommand << "#=================================================================================\n";
 
-	if (debugFlag)
+	runCommand <<
+		"# Store the excitation properties and their original vectors\n"
+		"port_excitations = {}\n"
+		"\n"
+		"for port_number in ports:\n"
+		"    properties = CSX.GetPropertiesByName(\n"
+		"        f\"port_excite_{port_number}\"\n"
+		"    )\n"
+		"\n"
+		"    if len(properties) != 1:\n"
+		"        raise RuntimeError(\n"
+		"            f\"Excitation property for port {port_number} not found\"\n"
+		"        )\n"
+		"\n"
+		"    excitation_property = properties[0]\n"
+		"\n"
+		"    port_excitations[port_number] = {\n"
+		"        \"property\": excitation_property,\n"
+		"        \"base_vector\": np.array(\n"
+		"            excitation_property.GetExcitation(),\n"
+		"            dtype=float\n"
+		"        )\n"
+		"    }\n"
+		"\n";
+
+	runCommand << "excitation_list = [\n";
+
+	for (const auto& excitation : excitationList)
 	{
-		runCommand << "CSX_file = os.path.join(Sim_Path, 'input.xml')\n";
-		runCommand << "CSX.Write2XML(CSX_file)\n";
+		runCommand << "    {";
+
+		bool firstEntry = true;
+
+		for (const auto& [portNumber, amplitude] : excitation)
+		{
+			if (!firstEntry)
+				runCommand << ", ";
+
+			runCommand << portNumber << ": " << amplitude;
+			firstEntry = false;
+		}
+
+		runCommand << "},\n";
 	}
 
-	runCommand << "FDTD.Run(Sim_Path, cleanup=False)\n";
+	runCommand << 
+		"]\n"
+		"\n"
+		"for run_index, excitation_settings in enumerate(\n"
+		"    excitation_list,\n"
+		"    start=1\n"
+		"):\n"
+		"    for port_number, data in port_excitations.items():\n"
+		"        amplitude = excitation_settings.get(\n"
+		"            port_number,\n"
+		"            0.0\n"
+		"        )\n"
+		"\n"
+		"        data[\"property\"].SetExcitation(\n"
+		"            amplitude * data[\"base_vector\"]\n"
+		"        )\n"
+		"\n"
+		"    run_path = os.path.join(\n"
+		"        Sim_Path,\n"
+		"        f\"run_{run_index}\"\n"
+		"    )\n"
+		"\n"
+		"    os.makedirs(run_path, exist_ok=True)\n";
+
+	if (debugFlag)
+	{
+		runCommand <<
+			"    CSX.Write2XML(\n"
+			"        os.path.join(run_path, \"input.xml\")\n"
+			"    )\n"
+			"\n";
+	}
+
+	runCommand <<
+		"    excitation_text = \", \".join(\n"
+		"        f\"port {port_number}\"\n"
+		"        if np.isclose(amplitude, 1.0)\n"
+		"        else f\"port {port_number}: {amplitude}\"\n"
+		"        for port_number, amplitude in excitation_settings.items()\n"
+		"    )\n"
+		"\n"
+		"    print(\n"
+		"        f\"=================================================================================\\n\"\n"
+		"        f\"Starting solver run {run_index} of \"\n"
+		"        f\"{len(excitation_list)}: excitation {excitation_text}\\n\"\n"
+		"        f\"=================================================================================\\n\"\n"
+		"    )\n"
+		"\n";
+
+	runCommand <<
+		"    FDTD.Run(\n"
+		"        run_path,\n"
+		"        cleanup=False\n"
+		"    )\n"
+		"\n";
 }
 
 void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
@@ -791,30 +973,56 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 	runCommand << "# Define post-processing\n";
 	runCommand << "#=================================================================================\n";
 
-	// Define export function
-	runCommand << "\n"
-	"def save_xy_data(x, y, filename) :\n"
-		"		full_path = os.path.join(Sim_Path, filename)\n"
-		"		with open(full_path, 'w', encoding = 'utf-8') as f :\n"
-		"			for xi, yi in zip(x, y) :\n"
-		"				if isinstance(yi, complex) :\n"
-		"					f.write(f'{xi}\t{yi.real}\t{yi.imag}\\n')\n"
-		"				else :\n"
-		"					f.write(f'{xi}\t{yi}\\n')\n\n";
-
 	runCommand <<
-		"### Postprocessing & plotting\n"
-		"freq = np.linspace(f_start,f_stop,f_samples)\n"
-		"for port in ports :\n"
-		"	port.CalcPort(Sim_Path, freq)\n"
+		"### S-parameter postprocessing\n"
+		"freq = np.linspace(f_start, f_stop, f_samples)\n"
 		"\n"
-		"s11 = ports[0].uf_ref / ports[0].uf_inc\n"
-		"s21 = ports[1].uf_ref / ports[0].uf_inc\n"
-		"ZL  = ports[0].uf_tot / ports[0].if_tot\n"
-		"ZL_a = ports[0].ZL # analytic waveguide impedance\n"
-		"save_xy_data(freq, s11, 's11')\n"
-		"save_xy_data(freq, s21, 's21')\n"
-		"save_xy_data(freq, ZL, 'Zl')\n"
+		"for run_index, excitation_settings in enumerate(excitation_list, start=1):\n"
+		"    active_ports = [\n"
+		"        port_number\n"
+		"        for port_number, amplitude in excitation_settings.items()\n"
+		"        if amplitude != 0.0\n"
+		"    ]\n"
+		"\n"
+		"    # Ignore simultaneous port excitations for S-parameter evaluation\n"
+		"    if len(active_ports) != 1:\n"
+		"        continue\n"
+		"\n"
+		"    input_port = active_ports[0]\n"
+		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
+		"\n"
+		"    for port in ports.values():\n"
+		"        port.CalcPort(run_path, freq)\n"
+		"\n"
+		"    incident_wave = ports[input_port].uf_inc\n"
+		"\n"
+		"    for output_port in sorted(ports.keys()):\n"
+		"        s_parameter = (\n"
+		"            ports[output_port].uf_ref / incident_wave\n"
+		"        )\n"
+		"\n"
+		"        save_xy_data(\n"
+		"            freq,\n"
+		"            s_parameter,\n"
+		"            f's{output_port},{input_port}'\n"
+		"        )\n"
+		"\n"
+		"    input_impedance = (\n"
+		"        ports[input_port].uf_tot /\n"
+		"        ports[input_port].if_tot\n"
+		"    )\n"
+		"\n"
+		"    save_xy_data(\n"
+		"        freq,\n"
+		"        input_impedance,\n"
+		"        f'Zin{input_port}'\n"
+		"    )\n"
+		"\n"
+		"    save_xy_data(\n"
+		"        freq,\n"
+		"        ports[input_port].ZL,\n"
+		"        f'ZL_analytic_{input_port}'\n"
+		"    )\n"
 		"\n";
 }
 
@@ -823,23 +1031,102 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	timeStepWidth = readTimeStepWidthFromLogText(logFileText);
 	if (timeStepWidth == 0.0) throw(std::string("Unable to determine time step width."));
 
-	convertAndStoreFrequencyDomainDump("E-Field Complex", "E-Field", "V/m");
-	convertAndStoreTimeDomainDump("E-Field Time", "E-Field", "V/m");
-
 	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getName() + "/Results");
 
-	convert1DTimeSignal("Energy/E-Field", "et", "E-Field Energy", result1D);
-	convert1DTimeSignal("Energy/H-Field", "ht", "H-Field Energy", result1D);
+	std::size_t runIndex = 1;
 
-	convert1DTimeSignal("Ports/Currents/I1", "port_it_0", "Port 1 Current", result1D, 1);
-	convert1DTimeSignal("Ports/Currents/I2", "port_it_1", "Port 2 Current", result1D, 1);
-	convert1DTimeSignal("Ports/Voltages/V1", "port_ut_0", "Port 1 Voltage", result1D, 1);
-	convert1DTimeSignal("Ports/Voltages/V2", "port_ut_1", "Port 2 Voltage", result1D, 1);
+	for (const auto& excitation : excitationList)
+	{
+		std::ostringstream stream;
+		stream.imbue(std::locale::classic());
+		stream << std::defaultfloat << std::setprecision(6);
 
-	convert1DFrequencySpectrum("S-Parameter/S1,1", "s11", "S1,1", result1D);
-	convert1DFrequencySpectrum("S-Parameter/S2,1", "s21", "S2,1", result1D);
+		bool firstPort = true;
+
+		for (const auto& [portNumber, amplitude] : excitation)
+		{
+			if (!firstPort)
+				stream << '+';
+
+			stream << portNumber;
+
+			if (amplitude != 1.0)
+				stream << '(' << amplitude << ')';
+
+			firstPort = false;
+		}
+
+		const std::string excitationString = " (" + stream.str() + ")";
+
+		// Process the current run here
+		std::string resultFolderName = "run_" + std::to_string(runIndex) + "\\";
+
+		// Convert the excitation signals
+		convert1DTimeSignal("Excitation/E-Field" + excitationString, resultFolderName + "et", "E-Field Excitation", result1D);
+		convert1DTimeSignal("Excitation/H-Field" + excitationString, resultFolderName + "ht", "H-Field Excitation", result1D);
+
+		// Convert the port voltages and currents
+		for (int port : portList)
+		{
+			std::string portName = std::to_string(port);
+
+			convert1DTimeSignal("Ports/Currents/I" + portName + excitationString, resultFolderName + "port_it_" + portName, "Port " + portName + " Current", result1D, 1);
+			convert1DTimeSignal("Ports/Voltages/V" + portName + excitationString, resultFolderName + "port_ut_" + portName, "Port " + portName + " Voltage", result1D, 1);
+		}
+
+		// Convert the field dumps
+		convertAndStoreFrequencyDomainDump(resultFolderName, "E-Field Complex", "E-Field", excitationString, "V/m");
+		convertAndStoreTimeDomainDump(resultFolderName, "E-Field Time", "E-Field", excitationString, "V/m");
+
+		++runIndex;
+	}
+
+	// Convert the S-parameters
+	convertAndStoreSParameters(result1D);
 
 	result1D.storeResults();
+}
+
+void FDTDSolver::convertAndStoreSParameters(ResultManager &result1D)
+{
+	std::set<int> processedInputPorts;
+
+	for (const auto& excitation : excitationList)
+	{
+		int inputPort = 0;
+		std::size_t activePortCount = 0;
+
+		for (const auto& [portNumber, amplitude] : excitation)
+		{
+			if (amplitude != 0.0)
+			{
+				inputPort = portNumber;
+				++activePortCount;
+			}
+		}
+
+		// Only process single-port excitations.
+		if (activePortCount != 1)
+			continue;
+
+		// Avoid converting the same S-parameters more than once.
+		if (!processedInputPorts.insert(inputPort).second)
+			continue;
+
+		for (const int outputPort : portList)
+		{
+			const std::string indices =
+				std::to_string(outputPort) +
+				"," +
+				std::to_string(inputPort);
+
+			convert1DFrequencySpectrum(
+				"S-Parameter/S" + indices,
+				"s" + indices,
+				"S" + indices,
+				result1D);
+		}
+	}
 }
 
 double FDTDSolver::readTimeStepWidthFromLogText(const std::string& logFileText)
@@ -883,7 +1170,7 @@ void FDTDSolver::convert1DFrequencySpectrum(const std::string& resultName, const
 	result1D.convert1D(resultName, fileName, quantityName, "", "Frequency", entityUnits->getFrequencyUnit(), entityUnits->getScaleToSIFrequency());
 }
 
-void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit)
+void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
 {
 	// Search for files of the form resultName_00010.vtr
 
@@ -893,7 +1180,7 @@ void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultName, co
 
 	std::list<std::string> resultFileList;
 
-	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath)) {
+	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath + "\\" + resultFolder)) {
 		if (entry.is_regular_file()) {
 			std::string name = toLower(entry.path().filename().string());
 
@@ -911,11 +1198,11 @@ void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultName, co
 
 	if (!resultFileList.empty())
 	{
-		convertAndStoreSingleTimeDomainDump(resultFileList, resultName, fieldType, unit);
+		convertAndStoreSingleTimeDomainDump(resultFileList, resultName, fieldType, postfix, unit);
 	}
 }
 
-void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string &resultName, const std::string& fieldType, const std::string& unit)
+void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string &resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
 {
 	// Search for files of the form resultName_f=20000.000_abs.vtr
 
@@ -923,7 +1210,7 @@ void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string &resultNam
 		return std::regex_replace(s, std::regex(R"([.^$|()\\[*+?{\]])"), R"(\$&)");
 	};
 
-	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath)) {
+	for (const auto& entry : std::filesystem::directory_iterator(tempDirPath + "\\" + resultFolder)) {
 		if (entry.is_regular_file()) {
 			std::string name = toLower(entry.path().filename().string());
 
@@ -942,14 +1229,14 @@ void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string &resultNam
 
 				if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
 				{
-					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, unit);
+					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, postfix, unit);
 				}
 			}
 		}
 	}
 }
 
-void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string &unit)
+void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit)
 {
 	// Extract result folder name from result file name
 	std::string resultName = parseComplexResultFileName(absFileName);
@@ -988,7 +1275,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeComplex* visualizationEntity = new EntityVisVtkVectorVolumeComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName + postfix);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
@@ -1018,7 +1305,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	vtkResult = nullptr;
 }
 
-void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& unit)
+void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
 {
 	// First, write binary data items for all result data files
 	std::list<std::pair<ot::UID, ot::UID>> dataEntityList;
@@ -1069,7 +1356,7 @@ void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& res
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeTime* visualizationEntity = new EntityVisVtkVectorVolumeTime(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
-	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName);
+	visualizationEntity->setName(solverEntity->getName() + "/Results/3D Results/" + resultName + postfix);
 	visualizationEntity->setResultType(EntityResultBase::CARTESIAN_NODE);
 	visualizationEntity->setTreeItemEditable(true);
 	visualizationEntity->setInitiallyHidden(true);
@@ -1444,4 +1731,113 @@ bool FDTDSolver::parsePortNumber(const std::string& name, int& portNumber)
 	return result.ec == std::errc{} &&
 		result.ptr == end &&
 		portNumber >= 1;
+}
+
+void FDTDSolver::findPortRange(
+	double position,
+	const std::vector<double>& gridLines,
+	const std::string& minBoundary,
+	const std::string& maxBoundary,
+	double nx,
+	double &from,
+	double &to)
+{
+	constexpr std::size_t portIntervals = 5;
+	constexpr std::size_t pmlOffset = 10;
+
+	if (gridLines.size() <= portIntervals)
+		throw std::string("Not enough grid lines for the port.");
+
+	if (!std::isfinite(position))
+		throw std::string("The port position is not finite.");
+
+	if (!std::isfinite(nx) || nx == 0.0)
+		throw std::string("The port normal component must not be zero.");
+
+	// Grid lines must be strictly increasing.
+	for (std::size_t i = 1; i < gridLines.size(); ++i)
+	{
+		if (gridLines[i] <= gridLines[i - 1])
+		{
+			throw std::string("Grid lines must be strictly increasing.");
+		}
+	}
+
+	if (position < gridLines.front() || position > gridLines.back())
+	{
+		throw std::string("The port position is outside the grid.");
+	}
+
+	const auto isPML = [](const std::string& boundary)
+		{
+			return boundary.rfind("PML", 0) == 0;
+		};
+
+	// Find the grid line closest to the requested position.
+	const auto upper = std::lower_bound(
+		gridLines.begin(),
+		gridLines.end(),
+		position);
+
+	std::size_t fromIndex;
+
+	if (upper == gridLines.begin())
+	{
+		fromIndex = 0;
+	}
+	else if (upper == gridLines.end())
+	{
+		fromIndex = gridLines.size() - 1;
+	}
+	else
+	{
+		const std::size_t upperIndex =
+			static_cast<std::size_t>(upper - gridLines.begin());
+
+		const std::size_t lowerIndex = upperIndex - 1;
+
+		fromIndex =
+			std::abs(gridLines[upperIndex] - position) <
+			std::abs(position - gridLines[lowerIndex])
+			? upperIndex
+			: lowerIndex;
+	}
+
+	if (nx > 0.0)
+	{
+		// The wave propagates from the minimum boundary towards + direction.
+		if (isPML(minBoundary))
+			fromIndex = std::max(fromIndex, pmlOffset);
+
+		if (fromIndex + portIntervals >= gridLines.size())
+		{
+			throw std::string("Not enough grid lines behind the port in positive direction.");
+		}
+
+		from = gridLines[fromIndex];
+		to = gridLines[fromIndex + portIntervals];
+
+		return;
+	}
+
+	// The wave propagates from the maximum boundary towards - direction.
+	if (isPML(maxBoundary))
+	{
+		if (gridLines.size() <= pmlOffset)
+		{
+			throw std::string("Not enough grid lines for the requested PML distance.");
+		}
+
+		fromIndex = std::min(
+			fromIndex,
+			gridLines.size() - 1 - pmlOffset);
+	}
+
+	if (fromIndex < portIntervals)
+	{
+		throw std::string("Not enough grid lines behind the port in negative direction.");
+	}
+
+	from = gridLines[fromIndex];
+	to = gridLines[fromIndex - portIntervals];
 }

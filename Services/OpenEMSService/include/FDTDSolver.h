@@ -52,11 +52,12 @@ private:
 	void addSolverRun(std::stringstream& runCommand);
 	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
+	void addPorts(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
-	void convertAndStoreFrequencyDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit);
-	void convertAndStoreTimeDomainDump(const std::string& resultName, const std::string& fieldType, const std::string& unit);
-	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& unit);
-	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& unit);
+	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
+	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
+	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
+	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
 	std::string toLower(std::string s);
 	std::vector<char> readFile(const std::string& filename);
 	std::string parseComplexResultFileName(const std::string& input);
@@ -75,6 +76,8 @@ private:
 	std::list<std::map<int, double>> parseExcitations(std::string_view input);
 	void readPorts();
 	bool parsePortNumber(const std::string& name, int& portNumber);
+	void findPortRange(double position, const std::vector<double>& gridLines, const std::string& minBoundary, const std::string& maxBoundary, double nx, double& from, double& to);
+	void convertAndStoreSParameters(ResultManager& result1D);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -87,6 +90,13 @@ private:
 	std::list<std::map<int, double>> excitationList;
 	std::list<EntityWaveguidePort*> waveguidePortList;
 	std::set<int> portList;
+
+	std::string xminBoundary;
+	std::string xmaxBoundary;
+	std::string yminBoundary;
+	std::string ymaxBoundary;
+	std::string zminBoundary;
+	std::string zmaxBoundary;
 
 	EntityUnits* entityUnits;
 };
