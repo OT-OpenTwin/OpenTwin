@@ -43,6 +43,7 @@
 #include "OTModelEntities/EntityVisUnstructuredVectorSurface.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
 #include "OTSystem/OperatingSystem.h"
+#include "OTCADEntities/EntityFieldDump.h"
 
 #include <fstream>
 #include <direct.h>
@@ -75,6 +76,10 @@ Application::Application()
 	m_addWaveguidePortButton = ot::ToolBarButtonCfg("OpenEMS", "Ports", "Add Waveguide Port", "Default/FaceSelect");
 	m_addWaveguidePortButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_addWaveguidePortButton, this, &Application::handleAddWaveguidePort);
+
+	m_addFieldDumpButton = ot::ToolBarButtonCfg("OpenEMS", "Field Dumps", "Add Field Dump", "Default/FieldDumpVisible");
+	m_addFieldDumpButton.setButtonLockFlags(ot::LockType::ModelWrite);
+	connectToolBarButton(m_addFieldDumpButton, this, &Application::handleAddFieldDump);
 }
 
 Application::~Application()
@@ -129,11 +134,13 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 
 	_ui->addMenuGroup("OpenEMS", "Solver");
 	_ui->addMenuGroup("OpenEMS", "Ports");
+	_ui->addMenuGroup("OpenEMS", "Field Dumps");
 	//	_ui->addMenuGroup("OpenEMS", "Sources");
 
 	_ui->addMenuButton(m_addSolverButton);
 	_ui->addMenuButton(m_runSolverButton);
 	_ui->addMenuButton(m_addWaveguidePortButton);
+	_ui->addMenuButton(m_addFieldDumpButton);
 
 	modelSelectionChanged();
 
@@ -253,9 +260,24 @@ void Application::handleAddSolver()
 
 	portEntity->storeToDataBase();
 
+	// Create a field dump item below the solver
+	EntityContainer* fieldDumpEntity = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	fieldDumpEntity->setName(solverName + "/Field Dumps");
+	fieldDumpEntity->setTreeItemEditable(false);
+	fieldDumpEntity->setVisibleTreeItemIcon("Default/SettingsVisible");
+	fieldDumpEntity->setHiddenTreeItemIcon("Default/SettingsHidden");
+	fieldDumpEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
+
+	fieldDumpEntity->storeToDataBase();
+
 	// Register the new solver item in the model
-	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), portEntity->getEntityID() };
-	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion(), portEntity->getEntityStorageVersion() };
+	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), portEntity->getEntityID(), fieldDumpEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion(), portEntity->getEntityStorageVersion(), fieldDumpEntity->getEntityStorageVersion() };
 	std::list<bool> topologyEntityForceVisible = { false, false };
 	std::list<ot::UID> dataEntityIDList;
 	std::list<ot::UID> dataEntityVersionList;
@@ -380,6 +402,61 @@ void Application::handleAddWaveguidePort()
 	{
 		this->getUiComponent()->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new waveguide port", options, receiver->getServiceID());
 	}
+}
+
+void Application::handleAddFieldDump(void)
+{
+	// Determine currently selected solver
+	std::set<std::string> solverSet;
+	for (auto& entity : this->getSelectedEntityInfos())
+	{
+		if (entity.getEntityType() == "EntitySolverOpenEMS")
+		{
+			solverSet.emplace(entity.getEntityName());
+		}
+	}
+	if (solverSet.size() != 1)
+	{
+		this->getUiComponent()->displayMessage("\nERROR: Please select a single OpenEMS solver item.\n");
+		return;
+	}
+
+	std::string currentSolver = *solverSet.begin();
+
+	// First get a list of all folder items of the Field Dumps folder
+	std::list<std::string> fieldDumpItems = ot::ModelServiceAPI::getListOfFolderItems(currentSolver + "/Field Dumps");
+
+	// Create a unique name for the new solver item
+	int count = 1;
+	std::string fieldDumpName;
+	do
+	{
+		fieldDumpName = currentSolver + "/Field Dumps/field dump " + std::to_string(count);
+		count++;
+	} while (std::find(fieldDumpItems.begin(), fieldDumpItems.end(), fieldDumpName) != fieldDumpItems.end());
+
+	// Create a field dump item below the solver
+	EntityFieldDump* fieldDumpEntity = new EntityFieldDump(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	fieldDumpEntity->setName(fieldDumpName);
+	fieldDumpEntity->setTreeItemEditable(true);
+	fieldDumpEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
+
+	fieldDumpEntity->storeToDataBase();
+
+	// Register the new solver item in the model
+	std::list<ot::UID> topologyEntityIDList = { fieldDumpEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { fieldDumpEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false, false };
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataEntityVersionList;
+	std::list<ot::UID> dataEntityParentList;
+
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {
