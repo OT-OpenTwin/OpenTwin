@@ -1,41 +1,37 @@
 import importlib.util, os, re
 from pathlib import Path
 
-# ===== Services (exposed as OT_<KEY>_SERVICE_ROOT) =====
+# ===== Services =====
 SERVICES = {
-    "AUTHORISATION": "AuthorisationService",
-    "MODEL": "Model",
-    "GLOBAL_SESSION": "GlobalSessionService",
-    "LOCAL_SESSION": "LocalSessionService",
-    "GLOBAL_DIRECTORY": "GlobalDirectoryService",
-    "LOCAL_DIRECTORY": "LocalDirectoryService",
-    "RELAY": "RelayService",
-    "LOGGER": "LoggerService",
-    "PHREEC": "PHREECService",
-    "KRIGING": "KrigingService",
-    "MODELING": "ModelingService",
-    "VISUALIZATION": "VisualizationService",
-    "FITTD": "FITTDService",
-    "CARTESIAN_MESH": "CartesianMeshService",
-    "TET_MESH": "TetMeshService",
-    "IMPORT_PARAMETERIZED_DATA": "ImportParameterizedData",
-    "GETDP": "GetDPService",
-    "ELMERFEM": "ElmerFEMService",
-    "STUDIOSUITE": "StudioSuiteService",
-    "LTSPICE": "LTSpiceService",
-    "UI": "uiService",
-    "PYTHON_EXECUTION": "PythonExecutionService",
-    "DATA_PROCESSING": "DataProcessingService",
-    "CIRCUIT_SIMULATOR": "CircuitSimulatorService",
-    "PYRIT": "PyritService",
-    "OPENEMS": "OpenEMSService",
-    "LIBRARY_MANAGEMENT": "LibraryManagementService",
-    "HIERARCHICAL_PROJECT": "HierarchicalProjectService",
-    "FILEMANAGEMENT_PROJECT": "FileManagementProjectService",
-}
-
-# ===== Services (explicit names that break the *_SERVICE_ROOT rule) =====
-SERVICES_EXTRA = {
+    "OT_AUTHORISATION_SERVICE_ROOT": "AuthorisationService",
+    "OT_MODEL_SERVICE_ROOT": "Model",
+    "OT_GLOBAL_SESSION_SERVICE_ROOT": "GlobalSessionService",
+    "OT_LOCAL_SESSION_SERVICE_ROOT": "LocalSessionService",
+    "OT_GLOBAL_DIRECTORY_SERVICE_ROOT": "GlobalDirectoryService",
+    "OT_LOCAL_DIRECTORY_SERVICE_ROOT": "LocalDirectoryService",
+    "OT_RELAY_SERVICE_ROOT": "RelayService",
+    "OT_LOGGER_SERVICE_ROOT": "LoggerService",
+    "OT_PHREEC_SERVICE_ROOT": "PHREECService",
+    "OT_KRIGING_SERVICE_ROOT": "KrigingService",
+    "OT_MODELING_SERVICE_ROOT": "ModelingService",
+    "OT_VISUALIZATION_SERVICE_ROOT": "VisualizationService",
+    "OT_FITTD_SERVICE_ROOT": "FITTDService",
+    "OT_CARTESIAN_MESH_SERVICE_ROOT": "CartesianMeshService",
+    "OT_TET_MESH_SERVICE_ROOT": "TetMeshService",
+    "OT_IMPORT_PARAMETERIZED_DATA_SERVICE_ROOT": "ImportParameterizedData",
+    "OT_GETDP_SERVICE_ROOT": "GetDPService",
+    "OT_ELMERFEM_SERVICE_ROOT": "ElmerFEMService",
+    "OT_STUDIOSUITE_SERVICE_ROOT": "StudioSuiteService",
+    "OT_LTSPICE_SERVICE_ROOT": "LTSpiceService",
+    "OT_UI_SERVICE_ROOT": "uiService",
+    "OT_PYTHON_EXECUTION_SERVICE_ROOT": "PythonExecutionService",
+    "OT_DATA_PROCESSING_SERVICE_ROOT": "DataProcessingService",
+    "OT_CIRCUIT_SIMULATOR_SERVICE_ROOT": "CircuitSimulatorService",
+    "OT_PYRIT_SERVICE_ROOT": "PyritService",
+    "OT_OPENEMS_SERVICE_ROOT": "OpenEMSService",
+    "OT_LIBRARY_MANAGEMENT_SERVICE_ROOT": "LibraryManagementService",
+    "OT_HIERARCHICAL_PROJECT_SERVICE_ROOT": "HierarchicalProjectService",
+    "OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT": "FileManagementProjectService",
     "OT_PYTHON_EXECUTION_ROOT": "PythonExecution",
     "OT_CIRCUIT_EXECUTION_ROOT": "CircuitExecution",
     "OT_DEBUGSERVICE_ROOT": "DebugService",
@@ -100,7 +96,7 @@ RELATIVE = {
     "OT_LIBTESTR": r"\x64\ReleaseTest",
 }
 
-# ===== Composite search paths (expanded against everything above) =====
+# ===== Composite search paths =====
 COMPOSITES = {
     "OT_DEFAULT_SERVICE_INCD": r"%OT_CORE_ROOT%\%OT_INC%;%OT_SYSTEM_ROOT%\%OT_INC%;%OT_GUI_ROOT%\%OT_INC%;%OT_COMMUNICATION_ROOT%\%OT_INC%;%OT_GUIAPI_ROOT%\%OT_INC%;%OT_FOUNDATION_ROOT%\%OT_INC%;%OT_MODELENTITIES_ROOT%\%OT_INC%;%OT_DATASTORAGE_ROOT%\%OT_INC%;%OT_MODELAPI_ROOT%\%OT_INC%;%R_JSON_INCD%;%CURL_INCD%;%MONGO_C_INC%;%MONGO_CXX_INC%;%MONGO_BOOST_INCD%",
     "OT_DEFAULT_SERVICE_INCR": r"%OT_CORE_ROOT%\%OT_INC%;%OT_SYSTEM_ROOT%\%OT_INC%;%OT_GUI_ROOT%\%OT_INC%;%OT_COMMUNICATION_ROOT%\%OT_INC%;%OT_GUIAPI_ROOT%\%OT_INC%;%OT_FOUNDATION_ROOT%\%OT_INC%;%OT_MODELENTITIES_ROOT%\%OT_INC%;%OT_DATASTORAGE_ROOT%\%OT_INC%;%OT_MODELAPI_ROOT%\%OT_INC%;%R_JSON_INCR%;%CURL_INCR%;%MONGO_C_INC%;%MONGO_CXX_INC%;%MONGO_BOOST_INCR%",
@@ -154,12 +150,10 @@ def build_env(base=None):
     # ThirdParty environment
     _load("ot_thirdparty_env", str(third / "SetupEnvironment.py")).apply(env)
 
-    # OpenTwin roots and relative fragments
+    # OpenTwin roots
     env["OT_ENCRYPTIONKEY_ROOT"] = str(dev / "Certificates" / "Generated")
     env.update(RELATIVE)
-    for key, folder in SERVICES.items():
-        env[f"OT_{key}_SERVICE_ROOT"] = str(dev / "Services" / folder)
-    for group, sub in ((SERVICES_EXTRA, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools")):
+    for group, sub in ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools")):
         for var, folder in group.items():
             env[var] = str(dev / sub / folder)
     env["OT_DOCUMENTATION_ROOT"] = str(dev / "Documentation" / "Developer")
@@ -171,11 +165,10 @@ def build_env(base=None):
     env["OPEN_TWIN_SERVER_CERT"] = str(certs / "server.pem")
     env["OPEN_TWIN_SERVER_CERT_KEY"] = str(certs / "server-key.pem")
 
-    # Composite search paths
     for name, template in COMPOSITES.items():
         env[name] = _expand(env, template)
 
-    # Service arguments (ports, addresses, logging)
+    # Service arguments
     _load("ot_service_args", str(dev / "Scripts" / "Launcher" / "OpenTwin_set_up_service_args.py")).apply(env)
 
     # Finalize

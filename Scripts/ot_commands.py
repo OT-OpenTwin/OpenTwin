@@ -1,7 +1,7 @@
 import os, shutil, subprocess
 from pathlib import Path
 
-from SetupEnvironment import build_env, LIBRARIES, SERVICES, SERVICES_EXTRA, TOOLS
+from SetupEnvironment import build_env, LIBRARIES, SERVICES, TOOLS
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
 CMAKE_SUBPATH = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin" / "cmake.exe"
@@ -9,13 +9,8 @@ BUILD_ENV = {"windows": {"VSLANG": "1033"}, "linux": {}}
 
 
 def project_roots():
-    explicit = {}
-    for group in (SERVICES_EXTRA, LIBRARIES, TOOLS):
-        explicit.update({var.removeprefix("OT_").removesuffix("_ROOT"): var for var in group})
-    roots = dict(explicit)
-    for key in SERVICES:
-        roots[f"{key}_SERVICE" if key in explicit else key] = f"OT_{key}_SERVICE_ROOT"
-    return roots
+    return {var.removeprefix("OT_").removesuffix("_ROOT"): var
+            for group in (SERVICES, LIBRARIES, TOOLS) for var in group}
 
 
 def resolve_root(env, key):
