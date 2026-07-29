@@ -89,6 +89,7 @@ private:
 	bool checkFileOrDirExists(const std::string& path);
 	bool deleteDirectory(const std::string& pathName);
 	std::string getOpenEMSDir();
+	std::list<std::string> getSelectedOpenEMSSolvers();
 
 	SubprocessManager*	 m_subprocessManager;
 	ot::ToolBarButtonCfg m_addSolverButton;

@@ -295,39 +295,7 @@ void Application::handleRunSolver()
 		return;
 	}
 
-	if (this->getSelectedEntities().empty())
-	{
-		if (this->getUiComponent() == nullptr) { assert(0); throw std::exception("UI is not connected"); }
-		this->getUiComponent()->displayMessage("\nERROR: No solver item has been selected.\n");
-		return;
-	}
-
-	// Here we first need to check which solvers are selected and then run them one by one.
-	std::map<std::string, bool> solverRunMap;
-	for (auto& entity : this->getSelectedEntityInfos())
-	{
-		if (entity.getEntityType() == "EntitySolverOpenEMS")
-		{
-			if (entity.getEntityName().substr(0, 8) == "Solvers/")
-			{
-				size_t index = entity.getEntityName().find('/', 8);
-				if (index != std::string::npos)
-				{
-					solverRunMap[entity.getEntityName().substr(0, index - 1)] = true;
-				}
-				else
-				{
-					solverRunMap[entity.getEntityName()] = true;
-				}
-			}
-		}
-	}
-
-	std::list<std::string> solverRunList;
-	for (auto solver : solverRunMap)
-	{
-		solverRunList.push_back(solver.first);
-	}
+	std::list<std::string> solverRunList = getSelectedOpenEMSSolvers();
 
 	if (solverRunList.empty())
 	{
@@ -369,24 +337,54 @@ void Application::handleRunSolver()
 	//solverThread(solverInfo, meshInfo, solverMap);
 }
 
-void Application::handleAddWaveguidePort()
+std::list<std::string> Application::getSelectedOpenEMSSolvers()
 {
 	// Determine currently selected solver
+	std::list<ot::EntityInformation> selectionInfo;
+	ot::ModelServiceAPI::getSelectedEntityInformation(selectionInfo);
+
 	std::set<std::string> solverSet;
-	for (auto& entity : this->getSelectedEntityInfos())
+	for (auto& entity : selectionInfo)
 	{
-		if (entity.getEntityType() == "EntitySolverOpenEMS")
+		// Extract solver name from entity name
+		std::string solverName = entity.getEntityName();
+
+		const std::string prefix = "Solvers/";
+
+		if (solverName.compare(0, prefix.size(), prefix) == 0)
 		{
-			solverSet.emplace(entity.getEntityName());
+			const std::size_t start = prefix.size();
+			const std::size_t end = solverName.find('/', start);
+
+			solverSet.emplace(solverName.substr(0, end));
 		}
 	}
-	if (solverSet.size() != 1)
+
+	// Now we remove all entities from the set which are not openEMS solvers
+	std::list<std::string> solverList(solverSet.begin(), solverSet.end());
+
+	std::list<ot::EntityInformation> solverInfo;
+	ot::ModelServiceAPI::getEntityInformation(solverList, solverInfo);
+
+	std::list<std::string> selectedSolvers;
+
+	for (auto solver : solverInfo)
 	{
-		this->getUiComponent()->displayMessage("\nERROR: Please select a single OpenEMS solver item.\n");
-		return;
+		if (solver.getEntityType() == "EntitySolverOpenEMS")
+		{
+			selectedSolvers.push_back(solver.getEntityName());
+		}
 	}
 
-	std::string currentSolver = *solverSet.begin();
+	return selectedSolvers;
+}
+
+void Application::handleAddWaveguidePort()
+{
+	std::list<std::string> selectedSolvers = getSelectedOpenEMSSolvers();
+	if (selectedSolvers.size() != 1) return;
+
+	std::string currentSolver = selectedSolvers.front();
 
 	// Initiate the face picking operation to define the waveguide ports geometry
 	std::map<std::string, std::string> options;
@@ -407,22 +405,10 @@ void Application::handleAddWaveguidePort()
 
 void Application::handleAddFieldDump(void)
 {
-	// Determine currently selected solver
-	std::set<std::string> solverSet;
-	for (auto& entity : this->getSelectedEntityInfos())
-	{
-		if (entity.getEntityType() == "EntitySolverOpenEMS")
-		{
-			solverSet.emplace(entity.getEntityName());
-		}
-	}
-	if (solverSet.size() != 1)
-	{
-		this->getUiComponent()->displayMessage("\nERROR: Please select a single OpenEMS solver item.\n");
-		return;
-	}
+	std::list<std::string> selectedSolvers = getSelectedOpenEMSSolvers();
+	if (selectedSolvers.size() != 1) return;
 
-	std::string currentSolver = *solverSet.begin();
+	std::string currentSolver = selectedSolvers.front();
 
 	// First get a list of all folder items of the Field Dumps folder
 	std::list<std::string> fieldDumpItems = ot::ModelServiceAPI::getListOfFolderItems(currentSolver + "/Field Dumps");
