@@ -48,6 +48,7 @@
 #include <fstream>
 #include <direct.h>
 #include <windows.h>
+#include <filesystem>
 
 Application * g_instance{ nullptr };
 
@@ -739,38 +740,13 @@ bool Application::checkFileOrDirExists(const std::string& path)
 
 bool Application::deleteDirectory(const std::string& pathName)
 {
-	// First delete all files in the directoy
-	WIN32_FIND_DATAA FindFileData;
-	HANDLE hFind;
+	std::error_code error;
+	
+	std::filesystem::remove_all(pathName, error);
 
-	std::string fileNamePattern = pathName + "\\*";
+	if (error) return false;
 
-	hFind = FindFirstFileA(fileNamePattern.c_str(), &FindFileData);
-	if (hFind != INVALID_HANDLE_VALUE)
-	{
-		std::string fileName = FindFileData.cFileName;
-		if (fileName != "." && fileName != "..")
-		{
-			fileName = pathName + "\\" + fileName;
-			if (!DeleteFileA(fileName.c_str())) std::cout << "ERROR: Unable to delete file: " << fileName << std::endl;
-		}
-
-		while (FindNextFileA(hFind, &FindFileData))
-		{
-			std::string fileName = FindFileData.cFileName;
-			if (fileName != "." && fileName != "..")
-			{
-				fileName = pathName + "\\" + fileName;
-				if (!DeleteFileA(fileName.c_str())) std::cout << "ERROR: Unable to delete file: " << fileName << std::endl;
-			}
-		}
-
-		FindClose(hFind);
-	}
-
-	// Now remove the empty directory
-	bool success = RemoveDirectoryA(pathName.c_str());
-	return success;
+	return true;
 }
 
 std::string Application::getOpenEMSDir()

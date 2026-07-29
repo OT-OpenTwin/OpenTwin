@@ -42,6 +42,7 @@
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/EntityWaveguidePort.h"
+#include "OTCADEntities/EntityFieldDump.h"
 
 #include <fstream>
 #include <filesystem>
@@ -74,6 +75,11 @@ FDTDSolver::~FDTDSolver()
 	{
 		delete port;
 	}
+
+	for (auto fieldDump : fieldDumpList)
+	{
+		delete fieldDump;
+	}
 }
 
 std::string FDTDSolver::generateRunCommand()
@@ -83,6 +89,7 @@ std::string FDTDSolver::generateRunCommand()
 
 	readPorts();
 	readExcitation();
+	readFieldDumps();
 
 	checkCartesianMesh(runCommand);
 
@@ -92,25 +99,370 @@ std::string FDTDSolver::generateRunCommand()
 	addMesh(runCommand);
 	addGeometry(runCommand);
 	addPorts(runCommand);
-	// addMonitors
-
-	std::string text =
-		"### Define dump box...\n"
-		"#Et = CSX.AddDump('E-Field', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop], sub_sampling=[2,2,2])\n"
-		"Ef = CSX.AddDump('E-Field Complex', dump_type=10, dump_mode=3, file_type=0, frequency=[f_start, 0.5*(f_start+f_stop), f_stop])\n"
-		"Et = CSX.AddDump('E-Field Time', dump_type=0, dump_mode=3, file_type=0, sub_sampling=[2,2,2])\n"
-		"start = [0, 0, 0];\n"
-		"stop  = [10.7, 4.3, 50.0];\n"
-		"Ef.AddBox(start, stop);\n"
-		"Et.AddBox(start, stop);\n"
-		"\n";
-
-	runCommand << text;
-
+	addFieldDumps(runCommand);
 	addSolverRun(runCommand);
 	addPostprocessing(runCommand);
 
 	return runCommand.str();
+}
+
+void FDTDSolver::addFieldDumps(std::stringstream& runCommand)
+{
+	int count = 1;
+
+	for (auto fieldDump : fieldDumpList)
+	{
+		int dumpType = 0, dumpMode = 0;
+		if (!getFieldDumpTypeAndMode(fieldDump, dumpType, dumpMode))
+		{
+			throw std::string("Unknown field type for field dump: " + fieldDump->getName());
+		}
+		else
+		{
+			std::string frequencyString;
+			
+			if (isFrequencyDump(fieldDump))
+			{
+				frequencyString = getFrequencyString(fieldDump);
+				if (frequencyString.empty())
+				{
+					throw std::string("Invalid frequencies list for field dump: " + fieldDump->getName());
+				}
+			}
+			
+			std::string subSamplingString = getSubsamplingString(fieldDump);
+			std::string resulutionString = getResolutionString(fieldDump);
+			std::string fieldDumpName = getFieldDumpName(fieldDump);
+			std::string startStopString = getStartStopString(fieldDump);
+
+			runCommand << "dump" << count << " = CSX.AddDump('" << fieldDumpName << "', dump_type=" << dumpType << ", dump_mode=" << dumpMode << ", file_type=0";
+
+			if (!frequencyString.empty())
+			{
+				runCommand << ", frequency=[" << frequencyString << "]";
+			}
+
+			if (!subSamplingString.empty())
+			{
+				runCommand << ", sub_sampling=[" << subSamplingString << "]";
+			}
+
+			if (!subSamplingString.empty())
+			{
+				runCommand << ", resolution=[" << resulutionString << "]";
+			}
+
+			runCommand << ")\n";
+
+			runCommand << startStopString << "dump" << count << ".AddBox(start, stop)\n";
+
+			count++;
+		}
+	}
+}
+
+bool FDTDSolver::getFieldDumpTypeAndMode(EntityFieldDump *fieldDump, int &dumpType, int &dumpMode)
+{
+	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Type"));
+	if (typeProperty == nullptr) return false;
+
+	if (typeProperty->getValue() == "Electric Field (Frequency Domain)")
+	{
+		dumpType = 10;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Magnetic Field (Frequency Domain)")
+	{
+		dumpType = 11;
+		dumpMode = 1;
+	}
+	else if (typeProperty->getValue() == "Electric Current Density (Frequency Domain)")
+	{
+		dumpType = 12;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Total Current Density (Frequency Domain)")
+	{
+		dumpType = 13;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Electric Field (Time Domain)")
+	{
+		dumpType = 0;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Magnetic Field (Time Domain)")
+	{
+		dumpType = 1;
+		dumpMode = 1;
+	}
+	else if (typeProperty->getValue() == "Electric Current Density (Time Domain)")
+	{
+		dumpType = 2;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Total Current Density (Time Domain)")
+	{
+		dumpType = 3;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "Local SAR (Frequency Domain)")
+	{
+		dumpType = 20;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "1 g Averaged SAR (Frequency Domain)")
+	{
+		dumpType = 21;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "10 g Averaged SAR (Frequency Domain)")
+	{
+		dumpType = 22;
+		dumpMode = 2;
+	}
+	else if (typeProperty->getValue() == "SAR Raw Data (Frequency Domain)")
+	{
+		dumpType = 29;
+		dumpMode = 2;
+	}
+	else
+	{
+		assert(0); // Unknown field type
+		return false;
+	}
+
+	return true;
+}
+
+bool FDTDSolver::getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string& fieldType, std::string& unit)
+{
+	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Type"));
+	if (typeProperty == nullptr) return false;
+
+	if (typeProperty->getValue() == "Electric Field (Frequency Domain)")
+	{
+		fieldType = "E-Field";
+		unit = "V/m";
+	}
+	else if (typeProperty->getValue() == "Magnetic Field (Frequency Domain)")
+	{
+		fieldType = "H-Field";
+		unit = "A/m";
+	}
+	else if (typeProperty->getValue() == "Electric Current Density (Frequency Domain)")
+	{
+		fieldType = "J-Field";
+		unit = "A/m^2";
+	}
+	else if (typeProperty->getValue() == "Total Current Density (Frequency Domain)")
+	{
+		fieldType = "Jtot-Field";
+		unit = "A/m^2";
+	}
+	else if (typeProperty->getValue() == "Electric Field (Time Domain)")
+	{
+		fieldType = "E-Field";
+		unit = "V/m";
+	}
+	else if (typeProperty->getValue() == "Magnetic Field (Time Domain)")
+	{
+		fieldType = "H-Field";
+		unit = "A/m";
+	}
+	else if (typeProperty->getValue() == "Electric Current Density (Time Domain)")
+	{
+		fieldType = "J-Field";
+		unit = "A/m^2";
+	}
+	else if (typeProperty->getValue() == "Total Current Density (Time Domain)")
+	{
+		fieldType = "Jtot-Field";
+		unit = "A/m^2";
+	}
+	else if (typeProperty->getValue() == "Local SAR (Frequency Domain)")
+	{
+		fieldType = "SAR";
+		unit = "W/kg";
+	}
+	else if (typeProperty->getValue() == "1 g Averaged SAR (Frequency Domain)")
+	{
+		fieldType = "SAR-1g";
+		unit = "W/kg";
+	}
+	else if (typeProperty->getValue() == "10 g Averaged SAR (Frequency Domain)")
+	{
+		fieldType = "SAR-10g";
+		unit = "W/kg";
+	}
+	else if (typeProperty->getValue() == "SAR Raw Data (Frequency Domain)")
+	{
+		fieldType = "SAR-Raw";
+		unit = "";
+	}
+	else
+	{
+		assert(0); // Unknown field type
+		return false;
+	}
+
+	return true;
+}
+
+bool FDTDSolver::isFrequencyDump(EntityFieldDump* fieldDump)
+{
+	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Type"));
+	if (typeProperty == nullptr) return false;
+
+	bool isFrequencyDomain = typeProperty->getValue().find("(Frequency Domain)") != std::string::npos;
+
+	return isFrequencyDomain;
+}
+
+std::string FDTDSolver::getFrequencyString(EntityFieldDump* fieldDump)
+{
+	EntityPropertiesString* frequencyProperty = dynamic_cast<EntityPropertiesString*>(fieldDump->getProperties().getProperty("Frequencies"));
+	if (frequencyProperty == nullptr) return "";
+
+	std::list<double> values;
+	std::istringstream stream(frequencyProperty->getValue());
+	std::string item;
+
+	while (std::getline(stream, item, ','))
+	{
+		if (item.empty()) return ""; // Empty value in frquency list
+
+		std::size_t parsedCharacters = 0;
+		const double value = std::stod(item, &parsedCharacters);
+
+		// Allow whitespace after the number, but no other characters.
+		if (item.find_first_not_of(
+			" \t\r\n",
+			parsedCharacters) != std::string::npos)
+		{
+			return ""; // Invalid double value
+		}
+
+		values.push_back(value);
+	}
+
+	std::stringstream result;
+	result << std::defaultfloat << std::setprecision(6);
+
+	bool isFirst = true;
+	for (double value : values)
+	{
+		if (!isFirst) result << ", ";
+		isFirst = false;
+
+		result << value * entityUnits->getScaleToSIFrequency();
+	}
+
+	return result.str();
+}
+
+std::string FDTDSolver::getSubsamplingString(EntityFieldDump* fieldDump)
+{
+	EntityPropertiesSelection* subsamplingProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Mode"));
+	if (subsamplingProperty == nullptr) return "";
+
+	if (subsamplingProperty->getValue() != "Index based") return "";
+
+	EntityPropertiesInteger* xProperty = dynamic_cast<EntityPropertiesInteger*>(fieldDump->getProperties().getProperty("Step x"));
+	EntityPropertiesInteger* yProperty = dynamic_cast<EntityPropertiesInteger*>(fieldDump->getProperties().getProperty("Step y"));
+	EntityPropertiesInteger* zProperty = dynamic_cast<EntityPropertiesInteger*>(fieldDump->getProperties().getProperty("Step z"));
+
+	if (xProperty == nullptr || yProperty == nullptr || zProperty == nullptr)
+	{
+		assert(0);
+		return "";
+	}
+
+	std::stringstream result;
+	result << xProperty->getValue() << ", " << yProperty->getValue() << ", " << zProperty->getValue();
+
+	return result.str();
+}
+
+std::string FDTDSolver::getResolutionString(EntityFieldDump* fieldDump)
+{
+	EntityPropertiesSelection* subsamplingProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Mode"));
+	if (subsamplingProperty == nullptr) return "";
+
+	if (subsamplingProperty->getValue() != "Resolution based") return "";
+
+	EntityPropertiesDouble* xProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Resolution x"));
+	EntityPropertiesDouble* yProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Resolution y"));
+	EntityPropertiesDouble* zProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Resolution z"));
+
+	if (xProperty == nullptr || yProperty == nullptr || zProperty == nullptr)
+	{
+		assert(0);
+		return "";
+	}
+
+	std::stringstream result;
+	result << std::defaultfloat << std::setprecision(6);
+	result << xProperty->getValue() * entityUnits->getScaleToSIDimension() << ", " << yProperty->getValue() * entityUnits->getScaleToSIDimension() << ", " << zProperty->getValue() * entityUnits->getScaleToSIDimension();
+
+	return result.str();
+}
+
+std::string FDTDSolver::getFieldDumpName(EntityFieldDump* fieldDump)
+{
+	std::string prefix = solverEntity->getName() + "/Field Dumps/";
+
+	std::string name = fieldDump->getName();
+
+	if (name.starts_with(prefix)) name.erase(0, prefix.size());
+
+	return name;
+}
+
+std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
+{
+	double xMin = xLines.front();
+	double xMax = xLines.back();
+	double yMin = yLines.front();
+	double yMax = yLines.back();
+	double zMin = zLines.front();
+	double zMax = zLines.back();
+
+	EntityPropertiesBoolean* subrangeProperty = dynamic_cast<EntityPropertiesBoolean*>(fieldDump->getProperties().getProperty("Subrange"));
+	
+	if (subrangeProperty != nullptr)
+	{
+		if (subrangeProperty->getValue())
+		{
+			EntityPropertiesDouble* xminProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Xmin"));
+			EntityPropertiesDouble* xmaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Xmax"));
+			EntityPropertiesDouble* yminProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Ymin"));
+			EntityPropertiesDouble* ymaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Ymax"));
+			EntityPropertiesDouble* zminProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Zmin"));
+			EntityPropertiesDouble* zmaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Zmax"));
+
+			if (xminProperty != nullptr && xmaxProperty != nullptr && yminProperty != nullptr && ymaxProperty != nullptr && zminProperty != nullptr && zmaxProperty != nullptr)
+			{
+				xMin = xminProperty->getValue();
+				xMax = xmaxProperty->getValue();
+				yMin = yminProperty->getValue();
+				yMax = ymaxProperty->getValue();
+				zMin = zminProperty->getValue();
+				zMax = zmaxProperty->getValue();
+			}
+			else
+			{
+				assert(0); // Property missing
+			}
+		}
+	}
+
+	std::stringstream result;
+	result << std::defaultfloat << std::setprecision(6);
+	result << "start = [" << xMin << ", " << yMin << ", " << zMin << "]\n";
+	result << "stop  = [" << xMax << ", " << yMax << ", " << zMax << "]\n";
+
+	return result.str();
 }
 
 void FDTDSolver::addPorts(std::stringstream& runCommand)
@@ -280,6 +632,36 @@ void FDTDSolver::readExcitation()
 			{
 				throw std::string("The excitation port " + std::to_string(port.first) + " does not exist");
 			}
+		}
+	}
+}
+
+void FDTDSolver::readFieldDumps()
+{
+	std::list<std::string> fieldDumpEntityNames = ot::ModelServiceAPI::getListOfFolderItems(solverEntity->getName() + "/Field Dumps", false);
+	if (fieldDumpEntityNames.empty()) return;
+
+	std::list<ot::EntityInformation> fieldDumpEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(fieldDumpEntityNames, fieldDumpEntitiesInfo);
+
+	// Read all geometry entities
+	DataBase::instance().prefetchDocumentsFromStorage(fieldDumpEntitiesInfo);
+
+	for (auto dump : fieldDumpEntitiesInfo)
+	{
+		EntityBase* fieldDumpEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(dump.getEntityID(), dump.getEntityVersion());
+
+		EntityFieldDump* fieldDump = dynamic_cast<EntityFieldDump*>(fieldDumpEntity);
+		if (fieldDump != nullptr)
+		{
+			fieldDumpList.push_back(fieldDump);
+		}
+		else if (fieldDumpEntity != nullptr)
+		{
+			std::string error = "The field dump named " + fieldDumpEntity->getName() + " is not a supported type";
+			delete fieldDumpEntity;
+
+			throw error;
 		}
 	}
 }
@@ -797,6 +1179,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 
 	EntityPropertiesInteger*   maxTimestepsProperty    = dynamic_cast<EntityPropertiesInteger*>(solverEntity->getProperties().getProperty("Max. timesteps"));
 	EntityPropertiesDouble*    energyStopLevelProperty = dynamic_cast<EntityPropertiesDouble*>(solverEntity->getProperties().getProperty("Energy stop level"));
+	EntityPropertiesInteger*   oversamplingProperty    = dynamic_cast<EntityPropertiesInteger*>(solverEntity->getProperties().getProperty("Oversampling"));
 
 	std::string excitationType = (excitationTypeProperty != nullptr) ? excitationTypeProperty->getValue() : "Gaussian";
 	double fMin                = (fMinProperty != nullptr) ? fMinProperty->getValue() : 0.0;
@@ -804,6 +1187,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	long long fSteps           = (fStepsProperty != nullptr) ? fStepsProperty->getValue() : 201;
 	long long maxTimesteps     = (maxTimestepsProperty != nullptr) ? maxTimestepsProperty->getValue() : 1000000;
 	double energyStopLevel     = (energyStopLevelProperty != nullptr) ? energyStopLevelProperty->getValue() : 1e-5;
+	int oversamplingFactor     = (oversamplingProperty != nullptr) ? oversamplingProperty->getValue() : 4;
 
 	double centerFreq    = 0.5 * (fMin + fMax) * entityUnits->getScaleToSIFrequency();
 	double halfBandwidth = 0.5 * (fMax - fMin) * entityUnits->getScaleToSIFrequency();
@@ -813,7 +1197,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	runCommand << "#=================================================================================\n";
 
 	runCommand << "CSX = ContinuousStructure()\n";
-	runCommand << "FDTD = openEMS(NrTS=" << maxTimesteps << ", EndCriteria=" << energyStopLevel << ")\n";
+	runCommand << "FDTD = openEMS(NrTS=" << maxTimesteps << ", EndCriteria=" << energyStopLevel << ", OverSampling=" << oversamplingFactor << ")\n";
 	runCommand << "FDTD.SetCSX(CSX)\n";
 
 	if (excitationType == "Gaussian")
@@ -1075,8 +1459,7 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		}
 
 		// Convert the field dumps
-		convertAndStoreFrequencyDomainDump(resultFolderName, "E-Field Complex", "E-Field", excitationString, "V/m");
-		convertAndStoreTimeDomainDump(resultFolderName, "E-Field Time", "E-Field", excitationString, "V/m");
+		convertAndStoreFieldDumps(resultFolderName, excitationString);
 
 		++runIndex;
 	}
@@ -1085,6 +1468,26 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	convertAndStoreSParameters(result1D);
 
 	result1D.storeResults();
+}
+
+void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, const std::string &excitationString)
+{
+	for (auto fieldDump : fieldDumpList)
+	{
+		std::string fieldDumpName = getFieldDumpName(fieldDump);
+
+		std::string fieldType, unit;
+		getFieldTypeAndUnit(fieldDump, fieldType, unit);
+
+		if (isFrequencyDump(fieldDump))
+		{
+			convertAndStoreFrequencyDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit);
+		}
+		else
+		{
+			convertAndStoreTimeDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit);
+		}
+	}
 }
 
 void FDTDSolver::convertAndStoreSParameters(ResultManager &result1D)

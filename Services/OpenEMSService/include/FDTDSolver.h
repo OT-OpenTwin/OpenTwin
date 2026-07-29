@@ -33,6 +33,7 @@ class EntityUnits;
 class EntityFacetData;
 class ResultManager;
 class EntityWaveguidePort;
+class EntityFieldDump;
 
 class FDTDSolver
 {
@@ -53,6 +54,7 @@ private:
 	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
 	void addPorts(std::stringstream& runCommand);
+	void addFieldDumps(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
 	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
@@ -73,11 +75,21 @@ private:
 	void readMeshLineInformation();
 	void writeLinesArray(const std::string& direction, const std::vector<double>& linesArray, std::stringstream& runCommand);
 	void readExcitation();
+	void readFieldDumps();
 	std::list<std::map<int, double>> parseExcitations(std::string_view input);
 	void readPorts();
 	bool parsePortNumber(const std::string& name, int& portNumber);
 	void findPortRange(double position, const std::vector<double>& gridLines, const std::string& minBoundary, const std::string& maxBoundary, double nx, double& from, double& to);
 	void convertAndStoreSParameters(ResultManager& result1D);
+	void convertAndStoreFieldDumps(const std::string& resultFolderName, const std::string& excitationString);
+	bool getFieldDumpTypeAndMode(EntityFieldDump* fieldDump, int& dumpType, int& dumpMode);
+	bool getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string &fieldType, std::string &unit);
+	std::string getFrequencyString(EntityFieldDump* fieldDump);
+	std::string getSubsamplingString(EntityFieldDump* fieldDump);
+	std::string getResolutionString(EntityFieldDump* fieldDump);
+	std::string getFieldDumpName(EntityFieldDump* fieldDump);
+	std::string getStartStopString(EntityFieldDump* fieldDump);
+	bool isFrequencyDump(EntityFieldDump* fieldDump);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -89,6 +101,7 @@ private:
 	std::vector<double> xLines, yLines, zLines;
 	std::list<std::map<int, double>> excitationList;
 	std::list<EntityWaveguidePort*> waveguidePortList;
+	std::list<EntityFieldDump*> fieldDumpList;
 	std::set<int> portList;
 
 	std::string xminBoundary;

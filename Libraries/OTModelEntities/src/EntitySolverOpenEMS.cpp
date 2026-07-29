@@ -55,6 +55,7 @@ void EntitySolverOpenEMS::createProperties(std::string& _meshFolderName, ot::UID
 
 	EntityPropertiesInteger::createProperty("Simulation", "Max. timesteps", 1000000, "OpenEMSSolver", getProperties())->setToolTip("Maximum number of time steps");
 	EntityPropertiesDouble::createProperty("Simulation", "Energy stop level", 1e-5, "OpenEMSSolver", getProperties());
+	EntityPropertiesInteger::createProperty("Simulation", "Oversampling", 4, "OpenEMSSolver", getProperties())->setToolTip("Oversampling factor for time-domain field dumps. Higher values produce more time frames and larger output files without changing the FDTD time step."); ;
 
 	EntityPropertiesSelection::createProperty("Boundaries", "Xmin", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
 	EntityPropertiesSelection::createProperty("Boundaries", "Xmax", boundaryValues, "PEC", "OpenEMSSolver", getProperties());
