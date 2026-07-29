@@ -3552,6 +3552,8 @@ void Model::createFaceAnnotation(const std::list<EntityFaceAnnotationData> &anno
 	addEntityToModel(annotationEntity->getName(), annotationEntity, m_entityRoot, true, allNewEntities);
 
 	updateAnnotationGeometry(annotationEntity);
+
+	Application::instance()->getNotifier()->selectObject(m_visualizationModelID, annotationEntity->getEntityID());
 }
 
 void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)

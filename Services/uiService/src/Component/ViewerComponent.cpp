@@ -860,6 +860,18 @@ void ViewerComponent::refreshSelection(ViewerUIDtype visualizationModelID) {
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to refresh selection.", _e.what()); }
 }
 
+void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, const std::string &name) {
+	try {
+		try {
+			ViewerAPI::selectObject(visualizationModelID, name);
+		}
+		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::selectObject()"); }
+		catch (const std::exception& e) { throw ak::aException(e.what(), "ViewerComponent::selectObject()"); }
+		catch (...) { throw ak::aException("Unknown error", "ViewerComponent::selectObject()"); }
+	}
+	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to select object.", _e.what()); }
+}
+
 void ViewerComponent::selectObject(ModelUIDtype visualizationModelID, ot::UID entityID) {
 	try {
 		try {

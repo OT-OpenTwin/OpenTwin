@@ -423,6 +423,7 @@ namespace ot {
 			void refreshAllViews(UID visualizationModelID);
 			void sendUpdatedControlState(void);
 			void setControlState(const std::string controlName, bool enabled);
+			void selectEntity(UID _visualizationModelUID, const std::string& _entityName);
 
 			bool sendMessage(bool _queue, JsonDocument& _doc, std::string& _response);
 

@@ -67,6 +67,7 @@ public:
 	void refreshAllViews();
 	void clearSelection();
 	void refreshSelection();
+	void selectObject(const std::string &name);
 	void selectObject(unsigned long long modelEntityID);
 	void selectObjects(const std::list<ot::UID>& modelEntityIDList);
 

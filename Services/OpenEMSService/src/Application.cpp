@@ -399,6 +399,7 @@ void Application::handleAddWaveguidePort()
 
 	if (receiver != nullptr)
 	{
+		this->getUiComponent()->selectEntity(ot::ModelServiceAPI::getCurrentVisualizationModelID(), "Geometry");
 		this->getUiComponent()->enterEntitySelectionMode(ot::ModelServiceAPI::getCurrentVisualizationModelID(), ot::components::UiComponent::FACE, true, "", ot::components::UiComponent::PORT, "create a new waveguide port", options, receiver->getServiceID());
 	}
 }
@@ -444,6 +445,7 @@ void Application::handleAddFieldDump(void)
 	std::list<ot::UID> dataEntityParentList;
 
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
+	this->getUiComponent()->selectEntity(ot::ModelServiceAPI::getCurrentVisualizationModelID(), fieldDumpName);
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {

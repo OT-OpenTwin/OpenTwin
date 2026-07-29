@@ -802,6 +802,17 @@ void ot::components::UiComponent::refreshSelection(UID _visualizationModelUID)
 	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
+void ot::components::UiComponent::selectEntity(UID _visualizationModelUID, const std::string& _entityName)
+{
+	JsonDocument cmdDoc;
+	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_VIEW_SelectObject, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityName, JsonString(_entityName, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
+	cmdDoc.AddMember(OT_ACTION_PARAM_MODEL_ID, _visualizationModelUID, cmdDoc.GetAllocator());
+
+	std::string response;
+	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
+}
+
 void ot::components::UiComponent::refreshAllViews(UID _visualizationModelUID)
 {
 	JsonDocument cmdDoc;

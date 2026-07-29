@@ -184,6 +184,7 @@ public:
 	void refreshAllViews(ViewerUIDtype visualizationModelID);
 	void clearSelection(ViewerUIDtype visualizationModelID);
 	void refreshSelection(ViewerUIDtype visualizationModelID);
+	void selectObject(ModelUIDtype visualizationModelID, const std::string& name);
 	void selectObject(ModelUIDtype visualizationModelID, ot::UID entityID);
 	void selectObjects(ModelUIDtype visualizationModelID, const std::list<ot::UID> &entityIDList);
 

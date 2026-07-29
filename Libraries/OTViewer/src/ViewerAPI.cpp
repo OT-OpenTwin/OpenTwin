@@ -234,6 +234,11 @@ void ViewerAPI::refreshSelection(ot::UID osgModelID)
 	getModelFromID(osgModelID)->refreshSelection();
 }
 
+void ViewerAPI::selectObject(ot::UID osgModelID, const std::string &name)
+{
+	getModelFromID(osgModelID)->selectObject(name);
+}
+
 void ViewerAPI::selectObject(ot::UID osgModelID, ot::UID enttiyID)
 {
 	getModelFromID(osgModelID)->selectObject(enttiyID);

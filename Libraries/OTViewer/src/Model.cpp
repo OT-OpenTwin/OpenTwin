@@ -420,6 +420,18 @@ void Model::refreshSelection()
 	}
 }
 
+void Model::selectObject(const std::string &name)
+{
+	SceneNodeBase* entity = nullptr;
+
+	if (m_nameToSceneNodesMap.count(name) != 0)
+	{
+		entity = m_nameToSceneNodesMap[name];
+	}
+
+	selectSceneNode(entity, false);
+}
+
 void Model::selectObject(unsigned long long modelEntityID)
 {
 	SceneNodeBase *entity = nullptr;

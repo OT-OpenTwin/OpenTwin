@@ -2900,9 +2900,17 @@ void ExternalServicesComponent::handleRefreshSelection(ot::JsonDocument& _docume
 void ExternalServicesComponent::handleSelectObject(ot::JsonDocument& _document)
 {
 	ot::UID visualizationModelID = _document[OT_ACTION_PARAM_MODEL_ID].GetUint64();
-	ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
 
-	AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, entityID);
+	if (_document.HasMember(OT_ACTION_PARAM_MODEL_EntityID))
+	{
+		ot::UID entityID = _document[OT_ACTION_PARAM_MODEL_EntityID].GetUint64();
+		AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, entityID);
+	}
+	else if (_document.HasMember(OT_ACTION_PARAM_MODEL_EntityName))
+	{
+		std::string name = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_EntityName);
+		AppBase::instance()->getViewerComponent()->selectObject(visualizationModelID, name);
+	}
 }
 
 void ExternalServicesComponent::handleSelectObjects(ot::JsonDocument& _document)
