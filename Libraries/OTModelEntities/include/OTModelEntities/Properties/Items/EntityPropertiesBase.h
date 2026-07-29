@@ -59,22 +59,22 @@ public:
 	virtual void addToJsonObject(ot::JsonObject& _jsonObject, ot::JsonAllocator& _allocator, EntityBase* root);
 	virtual void readFromJsonObject(const ot::ConstJsonObject& object, EntityBase* root);
 
-	void setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; };
+	EntityPropertiesBase* setToolTip(const std::string& _toolTip) { m_toolTip = _toolTip; return this; };
 	const std::string& getToolTip() const { return m_toolTip; };
 
-	void setReadOnly(bool _flag) { m_readOnly = _flag; };
+	EntityPropertiesBase* setReadOnly(bool _flag) { m_readOnly = _flag; ; return this; };
 	bool getReadOnly() const { return m_readOnly; };
 
-	void setProtected(bool _flag) { m_protectedProperty = _flag; };
+	EntityPropertiesBase* setProtected(bool _flag) { m_protectedProperty = _flag; return this; };
 	bool getProtected() const { return m_protectedProperty; };
 
-	void setVisible(bool _flag) { m_visible = _flag; };
+	EntityPropertiesBase* setVisible(bool _flag) { m_visible = _flag; return this; };
 	bool getVisible() const { return m_visible; };
 
-	void setErrorState(bool _flag) { m_errorState = _flag; };
+	EntityPropertiesBase* setErrorState(bool _flag) { m_errorState = _flag; return this; };
 	bool getErrorState() const { return m_errorState; };
 
-	void setGroupChanges(bool _flag) { m_groupChanges = _flag; };
+	EntityPropertiesBase* setGroupChanges(bool _flag) { m_groupChanges = _flag; return this; };
 	bool getGroupChanges() const { return m_groupChanges; };
 
 	virtual void copySettings(EntityPropertiesBase* other, EntityBase* root);

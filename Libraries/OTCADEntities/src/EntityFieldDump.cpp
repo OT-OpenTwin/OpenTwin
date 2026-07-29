@@ -67,20 +67,20 @@ void EntityFieldDump::createProperties()
 	EntityPropertiesString::createProperty("General", "Frequencies", "", "FieldDump", getProperties())->setToolTip("Comma separated list of dump frequencies.\nExample: 10, 12");
 
 	EntityPropertiesBoolean::createProperty("Range", "Subrange", false, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Xmin", 0.0, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Xmax", 0.0, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Ymin", 0.0, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Ymax", 0.0, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Zmin", 0.0, "FieldDump", getProperties());
-	EntityPropertiesDouble::createProperty("Range", "Zmax", 0.0, "FieldDump", getProperties());
+	EntityPropertiesDouble::createProperty("Range", "Xmin", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Range", "Xmax", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Range", "Ymin", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Range", "Ymax", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Range", "Zmin", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Range", "Zmax", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
 
 	EntityPropertiesSelection::createProperty("Subsampling", "Mode", { "None", "Index based", "Resolution based" }, "None", "FieldDump", getProperties());
-	EntityPropertiesInteger::createProperty("Subsampling", "Step x", 1, "FieldDump", getProperties())->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
-	EntityPropertiesInteger::createProperty("Subsampling", "Step y", 1, "FieldDump", getProperties())->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
-	EntityPropertiesInteger::createProperty("Subsampling", "Step z", 1, "FieldDump", getProperties())->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
-	EntityPropertiesDouble::createProperty("Subsampling", "Resolution x", 0.0, "FieldDump", getProperties())->setToolTip("Specify spatial resolution for recording.");
-	EntityPropertiesDouble::createProperty("Subsampling", "Resolution y", 0.0, "FieldDump", getProperties())->setToolTip("Specify spatial resolution for recording.");
-	EntityPropertiesDouble::createProperty("Subsampling", "Resolution z", 0.0, "FieldDump", getProperties())->setToolTip("Specify spatial resolution for recording.");
+	EntityPropertiesInteger::createProperty("Subsampling", "Step x", 1, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
+	EntityPropertiesInteger::createProperty("Subsampling", "Step y", 1, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
+	EntityPropertiesInteger::createProperty("Subsampling", "Step z", 1, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify index based stepwidth for recording.\nExamples: 1 means full resolution, 2 means every second sample");
+	EntityPropertiesDouble::createProperty("Subsampling", "Resolution x", 0.0, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify spatial resolution for recording.");
+	EntityPropertiesDouble::createProperty("Subsampling", "Resolution y", 0.0, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify spatial resolution for recording.");
+	EntityPropertiesDouble::createProperty("Subsampling", "Resolution z", 0.0, "FieldDump", getProperties())->setGroupChanges(true)->setToolTip("Specify spatial resolution for recording.");
 
 	updatePropertyVisibilities();
 }
