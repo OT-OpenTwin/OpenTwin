@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: EntityResult1DCurve.cpp
 // 
 // License:
@@ -28,7 +28,9 @@
 #include "OTModelEntities/EntityResult1DCurve.h"
 #include "OTModelEntities/Properties/PropertyHelper.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
-
+#include "OTGui/CopyInformation.h"
+#include "OTModelEntities/Properties/Items/EntityPropertiesProjectList.h"
+#include <bsoncxx/json.hpp>
 static EntityFactoryRegistrar<EntityResult1DCurve> registrar("EntityResult1DCurve");
 
 ot::Plot1DCurveCfg EntityResult1DCurve::createDefaultConfig(const std::string& _plotName, const std::string& _curveName, DefaultCurveStyle _style)
@@ -708,3 +710,48 @@ ot::DataPointDecoder EntityResult1DCurve::deserialise(bsoncxx::v_noabi::document
 	return quantityContainerEntryDescription;
 }
 
+std::string EntityResult1DCurve::serialiseAsJSON()
+{
+	auto docCurve = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocCurve = bsoncxx::to_json(docCurve);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocCurve);
+
+	return entireDoc.toJson();
+}
+
+bool EntityResult1DCurve::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try
+	{
+		const std::string serialisationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialisationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+		setEntityID(createEntityUID());
+
+		std::string currentProject = m_queryProperties.getSelectedProject(this);
+		if (currentProject == EntityPropertiesProjectList::getCurrentProjectPlaceholder())
+		{
+			if (_copyInformation.getOriginProjectName() != _copyInformation.getDestinationProjectName())
+			{
+				EntityPropertiesProjectList* projectProp = PropertyHelper::getEntityProjectListProperty(this, "Project name", "Dataset");
+				if (projectProp)
+				{
+					projectProp->setValue(_copyInformation.getOriginProjectName());
+				}
+			}
+		}
+
+		_entityMap[getEntityID()] = this;
+
+		return true;
+	}
+	catch (std::exception _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
+}

@@ -104,7 +104,7 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 
 	for (auto& newEntityByName : _newEntitiesByName)
 	{
-		if (newEntityByName.second->getClassName() == "EntityContainer")
+		if (dynamic_cast<EntityContainer*>(newEntityByName.second) != nullptr)
 		{
 			EntityBase* newEntity = newEntityByName.second;
 			const std::string oldName = newEntity->getName();
@@ -226,7 +226,32 @@ std::string CopyPasteHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& 
 	
 	Model* model = Application::instance()->getModel();
 
+	std::set<ot::UID> entitiesToCopy(selectedEntities.begin(), selectedEntities.end());
+
+	// Add parent plots and child curves implicitly
 	for (ot::UID uid : selectedEntities) {
+		EntityBase* entity = model->getEntityByID(uid);
+		if (!entity) continue;
+
+		if (entity->getClassName() == "EntityResult1DCurve") {
+			EntityBase* parent = entity->getParent();
+			if (parent && parent->getClassName() == "EntityResult1DPlot") {
+				entitiesToCopy.insert(parent->getEntityID());
+			}
+		}
+		else if (entity->getClassName() == "EntityResult1DPlot") {
+			EntityContainer* container = dynamic_cast<EntityContainer*>(entity);
+			if (container) {
+				for (EntityBase* child : container->getChildrenList()) {
+					if (child->getClassName() == "EntityResult1DCurve") {
+						entitiesToCopy.insert(child->getEntityID());
+					}
+				}
+			}
+		}
+	}
+
+	for (ot::UID uid : entitiesToCopy) {
 		// Find entity
 		EntityBase* entity = model->getEntityByID(uid);
 		OTAssertNullptr(entity);

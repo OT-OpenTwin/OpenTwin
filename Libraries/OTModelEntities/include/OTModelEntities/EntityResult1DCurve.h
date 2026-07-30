@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: EntityResult1DCurve.h
 // 
 // License:
@@ -70,6 +70,9 @@ public:
 
 	static std::string className() { return "EntityResult1DCurve"; }
 	virtual std::string getClassName() const override { return EntityResult1DCurve::className(); };
+
+	virtual std::string serialiseAsJSON() override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept override;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

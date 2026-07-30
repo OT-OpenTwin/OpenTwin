@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: PlotBase.cpp
 // 
 // License:
@@ -42,6 +42,7 @@
 // Qt header
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qlayout.h>
+#include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qapplication.h>
 
 // std header
@@ -90,6 +91,24 @@ ot::PlotBase::PlotBase(QWidget* _parent) :
 	legendContainerLayout->addWidget(m_legend->getQWidget(), 1);
 
 	connect(&GlobalColorStyle::instance(), &GlobalColorStyle::currentStyleChanged, this, &PlotBase::slotColorStyleChanged);
+
+	QShortcut* copyShortcut = new QShortcut(QKeySequence("Ctrl+C"), this);
+	copyShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	this->connect(copyShortcut, &QShortcut::activated, this, &PlotBase::slotCopy);
+
+	QShortcut* pasteShortcut = new QShortcut(QKeySequence("Ctrl+V"), this);
+	pasteShortcut->setContext(Qt::WidgetWithChildrenShortcut);
+	this->connect(pasteShortcut, &QShortcut::activated, this, &PlotBase::slotPaste);
+}
+
+void ot::PlotBase::slotCopy() {
+	ot::CopyInformation info;
+	Q_EMIT copyRequested(info);
+}
+
+void ot::PlotBase::slotPaste() {
+	ot::CopyInformation info;
+	Q_EMIT pasteRequested(info);
 }
 
 ot::PlotBase::~PlotBase() {

@@ -89,6 +89,9 @@ namespace ot {
 		void setOriginProjectName(const std::string& _projectName) { m_originProjectName = _projectName; };
 		const std::string& getOriginProjectName(void) const { return m_originProjectName; };
 
+		void setDestinationProjectName(const std::string& _projectName) { m_destinationProjectName = _projectName; };
+		const std::string& getDestinationProjectName(void) const { return m_destinationProjectName; };
+
 		void setOriginViewInfo(const WidgetViewBase& _info) { m_originViewInfo = _info; };
 		const WidgetViewBase& getOriginViewInfo(void) const { return m_originViewInfo; };
 
@@ -111,6 +114,7 @@ namespace ot {
 		std::string m_rawData;
 
 		std::string m_originProjectName;
+		std::string m_destinationProjectName;
 		
 		WidgetViewBase m_originViewInfo;
 		WidgetViewBase m_destinationViewInfo;

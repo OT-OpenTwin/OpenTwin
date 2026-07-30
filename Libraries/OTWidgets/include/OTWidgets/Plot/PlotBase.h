@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/DatasetDependencyInfo.h"
+#include "OTGui/CopyInformation.h"
 #include "OTGui/Plot/Plot1DCfg.h"
 #include "OTGui/Plot/Plot1DDataBaseCfg.h"
 #include "OTWidgets/Plot/AbstractPlot.h"
@@ -176,6 +177,8 @@ namespace ot {
 	Q_SIGNALS:
 		void resetItemSelectionRequest();
 		void curveDoubleClicked(PlotDataset* _dataset, bool _hasControlModifier);
+		void copyRequested(ot::CopyInformation& _info);
+		void pasteRequested(ot::CopyInformation& _info);
 
 	public Q_SLOTS:
 		//! @brief Applies the current configuration to the plot, updating its appearance and behavior accordingly.
@@ -196,6 +199,8 @@ namespace ot {
 
 	private Q_SLOTS:
 		void slotColorStyleChanged();
+		void slotCopy();
+		void slotPaste();
 
 	private:
 		struct PreferredDatasetNameInfo

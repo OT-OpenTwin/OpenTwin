@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: AppBase.cpp
 // 
 // License:
@@ -137,6 +137,7 @@
 #include <QtGui/qclipboard.h>
 #include <QtWidgets/qmenu.h>
 #include <QtWidgets/qstatusbar.h>
+#include <QtWidgets/qshortcut.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
@@ -2050,7 +2051,8 @@ ot::PlotView* AppBase::createNewPlot(const ot::Plot1DCfg& _config, const ot::Wid
 
 	this->connect(newPlot->getPlot(), &ot::Plot::resetItemSelectionRequest, this, &AppBase::slotPlotResetItemSelectionRequest);
 	this->connect(newPlot->getPlot(), &ot::Plot::curveDoubleClicked, this, &AppBase::slotPlotCurveDoubleClicked);
-
+	this->connect(newPlot->getPlot(), &ot::Plot::copyRequested, this, &AppBase::slotCopyRequested);
+	this->connect(newPlot->getPlot(), &ot::Plot::pasteRequested, this, &AppBase::slotPasteRequested);
 	ot::GlobalWidgetViewManager::instance().addView(modelInfo, newPlot, _viewInsertFlags);
 	
 	OT_LOG_D("Plot created { \"Plot.Name\": \"" + _config.getEntityName() + "\" }");
@@ -2256,6 +2258,7 @@ void AppBase::slotPasteRequested(const ot::CopyInformation& _info) {
 		info.setDestinationScenePos(_info.getDestinationScenePos());
 	}
 	info.setDestinationViewInfo(_info.getDestinationViewInfo());
+	info.setDestinationProjectName(m_currentProjectInfo.getProjectName());
 
 	// Create request
 	ot::JsonDocument doc;

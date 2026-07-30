@@ -67,7 +67,7 @@ ot::CopyInformation::CopyInformation(const ConstJsonObject& _jsonObject)
 }
 
 ot::CopyInformation::CopyInformation(const CopyInformation& _other) :
-	m_rawData(_other.m_rawData), m_originProjectName(_other.m_originProjectName), m_originViewInfo(_other.m_originViewInfo),
+	m_rawData(_other.m_rawData), m_originProjectName(_other.m_originProjectName), m_destinationProjectName(_other.m_destinationProjectName), m_originViewInfo(_other.m_originViewInfo),
 	m_destinationViewInfo(_other.m_destinationViewInfo), m_destinationScenePos(_other.m_destinationScenePos), 
 	m_destinationScenePosSet(_other.m_destinationScenePosSet), m_entities(_other.m_entities)
 {
@@ -75,7 +75,7 @@ ot::CopyInformation::CopyInformation(const CopyInformation& _other) :
 }
 
 ot::CopyInformation::CopyInformation(CopyInformation&& _other) noexcept :
-	m_rawData(std::move(_other.m_rawData)), m_originProjectName(std::move(_other.m_originProjectName)),
+	m_rawData(std::move(_other.m_rawData)), m_originProjectName(std::move(_other.m_originProjectName)), m_destinationProjectName(std::move(_other.m_destinationProjectName)),
 	m_originViewInfo(std::move(_other.m_originViewInfo)), m_destinationViewInfo(std::move(_other.m_destinationViewInfo)),
 	m_destinationScenePos(std::move(_other.m_destinationScenePos)), m_destinationScenePosSet(std::move(_other.m_destinationScenePosSet)),
 	m_entities(std::move(_other.m_entities))
@@ -92,6 +92,7 @@ ot::CopyInformation& ot::CopyInformation::operator=(const CopyInformation& _othe
 		m_rawData = _other.m_rawData;
 
 		m_originProjectName = _other.m_originProjectName;
+		m_destinationProjectName = _other.m_destinationProjectName;
 
 		m_originViewInfo = _other.m_originViewInfo;
 		m_destinationViewInfo = _other.m_destinationViewInfo;
@@ -109,6 +110,7 @@ ot::CopyInformation& ot::CopyInformation::operator=(CopyInformation&& _other) no
 		m_rawData = std::move(_other.m_rawData);
 
 		m_originProjectName = std::move(_other.m_originProjectName);
+		m_destinationProjectName = std::move(_other.m_destinationProjectName);
 
 		m_originViewInfo = std::move(_other.m_originViewInfo);
 		m_destinationViewInfo = std::move(_other.m_destinationViewInfo);
@@ -131,6 +133,7 @@ void ot::CopyInformation::addToJsonObject(ot::JsonValue& _object, ot::JsonAlloca
 	_object.AddMember("Raw", JsonString(m_rawData, _allocator), _allocator);
 
 	_object.AddMember("OriginProject", JsonString(m_originProjectName, _allocator), _allocator);
+	_object.AddMember("DestinationProject", JsonString(m_destinationProjectName, _allocator), _allocator);
 
 	JsonObject originViewObj;
 	m_originViewInfo.addToJsonObject(originViewObj, _allocator);
@@ -162,6 +165,8 @@ void ot::CopyInformation::setFromJsonObject(const ot::ConstJsonObject& _object) 
 	m_rawData = json::getString(_object, "Raw");
 
 	m_originProjectName = json::getString(_object, "OriginProject");
+	if (json::exists(_object, "DestinationProject")) m_destinationProjectName = json::getString(_object, "DestinationProject");
+	else m_destinationProjectName = "";
 
 	m_originViewInfo.setFromJsonObject(json::getObject(_object, "OriginView"));
 	m_destinationViewInfo.setFromJsonObject(json::getObject(_object, "DestinationView"));
