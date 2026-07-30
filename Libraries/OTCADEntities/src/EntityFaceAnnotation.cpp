@@ -190,6 +190,14 @@ void EntityFaceAnnotation::updateVisualization(bool isHidden)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, false, doc.GetAllocator());
 
+	if (!textString.empty())
+	{
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextString, ot::JsonString(textString, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextPosition, ot::JsonArray(textPosition, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextNormal, ot::JsonArray(textNormal, doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextDirU, ot::JsonArray(textDirU, doc.GetAllocator()), doc.GetAllocator());
+	}
+
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));
 
@@ -258,7 +266,17 @@ void EntityFaceAnnotation::addStorageData(bsoncxx::builder::basic::document &sto
 
 	storage.append(
 		bsoncxx::builder::basic::kvp("BoundingBox", boundingBox.getBSON()),
-		bsoncxx::builder::basic::kvp("Facets",      facetsStorageID)
+		bsoncxx::builder::basic::kvp("Facets", facetsStorageID),
+		bsoncxx::builder::basic::kvp("TextString", textString),
+		bsoncxx::builder::basic::kvp("TextPosX", textPosition[0]),
+		bsoncxx::builder::basic::kvp("TextPosY", textPosition[1]),
+		bsoncxx::builder::basic::kvp("TextPosZ", textPosition[2]),
+		bsoncxx::builder::basic::kvp("TextNormalX", textNormal[0]),
+		bsoncxx::builder::basic::kvp("TextNormalY", textNormal[1]),
+		bsoncxx::builder::basic::kvp("TextNormalZ", textNormal[2]),
+		bsoncxx::builder::basic::kvp("TextDirUX", textDirU[0]),
+		bsoncxx::builder::basic::kvp("TextDirUY", textDirU[1]),
+		bsoncxx::builder::basic::kvp("TextDirUZ", textDirU[2])
 	);
 }
 
@@ -296,6 +314,15 @@ void EntityFaceAnnotation::readSpecificDataFromDataBase(const bsoncxx::document:
 	// Now we read the information about the Brep and Facet objects
 	facetsStorageID = doc_view["Facets"].get_int64();
 	boundingBox.setFromBSON(doc_view["BoundingBox"].get_document().value);
+
+	clearText();
+	if (doc_view["TextString"])
+	{
+		textString   = doc_view["TextString"].get_string();
+		textPosition = { doc_view["TextPosX"].get_double(), doc_view["TextPosY"].get_double(), doc_view["TextPosZ"].get_double() };
+		textNormal   = { doc_view["TextNormalX"].get_double(), doc_view["TextNormalY"].get_double(), doc_view["TextNormalZ"].get_double() };
+		textDirU     = { doc_view["TextDirUX"].get_double(), doc_view["TextDirUY"].get_double(), doc_view["TextDirUZ"].get_double() };
+	}
 
 	// Clean the objects from memory -> will be loaded on demand
 	delete facets;
@@ -343,7 +370,6 @@ void EntityFaceAnnotation::renewFacets(void)
 void EntityFaceAnnotation::storeUpdatedFacets(void)
 {
 	storeFacets();
-	releaseFacets();
 
 	updateVisualization(false);
 
@@ -352,4 +378,20 @@ void EntityFaceAnnotation::storeUpdatedFacets(void)
 	getProperties().checkWhetherUpdateNecessary();
 
 	setModified();
+}
+
+void EntityFaceAnnotation::setText(const std::string& string, double px, double py, double pz, double nx, double ny, double nz, double ux, double uy, double uz)
+{
+	textString = string;
+	textPosition = { px, py, pz };
+	textNormal = { nx, ny, nz };
+	textDirU = { ux, uy, uz };
+}
+
+void EntityFaceAnnotation::clearText(void)
+{
+	textString.clear();
+	textPosition = { 0.0, 0.0, 0.0 };
+	textNormal = { 0.0, 0.0, 0.0 };
+	textDirU = { 0.0, 0.0, 0.0 };
 }

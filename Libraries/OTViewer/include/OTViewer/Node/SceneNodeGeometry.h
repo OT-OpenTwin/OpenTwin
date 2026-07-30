@@ -62,6 +62,7 @@ public:
 	void setMaterialProperties(osg::ref_ptr<osg::Material>& mat,double r , double g, double b);
 	void setTransformation(const std::vector<double>& _transformation);
 	void setHighlightNode(osg::Node* highlight);
+	void setText(const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU);
 
 	virtual bool hasTransformationMatrix() override { return true; }
 	virtual osg::Matrix getTransformationMatrix() override;
@@ -149,6 +150,7 @@ private:
 	void setEdgesColor(const double color[]);
 	void determineFaceTriangles(int faceId, std::list<int>& triangleIndexList);
 	osg::Node* createFaceNodeFromTriangles(int faceId, std::list<int>& triangleIndexList);
+	void attachText(osg::Node* triangleNode);
 
 	osg::Node* m_triangles;
 	osg::Node* m_edges;
@@ -183,5 +185,9 @@ private:
 	osg::ref_ptr<osg::Geometry> m_cutCapGeometryTriangles;
 	osg::ref_ptr<osg::Geometry> m_cutCapGeometryEdges;
 	bool m_enableEdgesDisplay;
+	std::string textString;
+	osg::Vec3d textPosition;
+	osg::Vec3d textNormal;
+	osg::Vec3d textDirU;
 };
 

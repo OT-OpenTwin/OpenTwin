@@ -87,7 +87,8 @@ namespace ViewerAPI {
 													bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected);
 	__declspec(dllexport) void addNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
 														double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
-													    bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation);
+													    bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation,
+														const std::string &_textString, const std::vector<double> &_textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU);
 	
 	__declspec(dllexport) void addVisualizationContainerNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, const ot::VisualisationTypes& _visualisationTypes, bool _requiresGlobalTransformationMatrix);
 	

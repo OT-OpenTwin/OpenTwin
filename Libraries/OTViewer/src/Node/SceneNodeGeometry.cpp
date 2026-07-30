@@ -44,12 +44,14 @@
 #include <osg/Image>
 #include <osg/Texture2D>
 #include <osgDB/ReadFile>
-#include <osg/Texture2D>
 #include <osg/TextureCubeMap>
 #include <osgUtil/HighlightMapGenerator>
 #include <osg/TexGen>
 #include <osg/TexEnvCombine>
 #include <osg/MatrixTransform>
+#include <osg/Group>
+#include <osg/Matrixd>
+#include <osg/Notify>
 
 SceneNodeGeometry::SceneNodeGeometry() :
 	m_triangles(nullptr),
@@ -515,6 +517,9 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	// Create the triangle node
 	osg::Node* triangleNode = createOSGNodeFromTriangles(m_surfaceColorRGB, m_materialType, m_textureType, m_reflective, m_backFaceCulling, m_offsetFactor, nodes, triangles);
 
+	// Attach the text to the triangle node
+	attachText(triangleNode);
+
 	// Create the edges node
 	osg::Node *edgeNode(nullptr), *edgeHighlightedNode(nullptr);
 	osg::Switch *faceEdgesHighlightNode(nullptr);
@@ -563,9 +568,113 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	m_needsInitialization = false;
 }
 
-//void SceneNodeGeometry::assignMaterial(const std::string& materialType) {
-//	this->materialType = materialType;
-//}
+void SceneNodeGeometry::attachText(osg::Node* triangleNode)
+{
+	if (triangleNode == nullptr || textString.empty())
+	{
+		return;
+	}
+
+	constexpr double epsilon = 1.0e-12;
+	constexpr float characterSize = 1.0f;
+	const double surfaceOffset = 1.0e-4;
+
+	osg::Vec3d normal = textNormal;
+
+	if (normal.length2() < epsilon * epsilon)
+	{
+		assert(0); // normal is zero
+		return;
+	}
+
+	normal.normalize();
+
+	// Project the requested text direction onto the text plane.
+	osg::Vec3d directionU =
+		textDirU - normal * (textDirU * normal);
+
+	if (directionU.length2() < epsilon * epsilon)
+	{
+		assert(0); // u direction and normal are parallel
+		return;
+	}
+
+	directionU.normalize();
+
+	// Complete the right-handed orthonormal coordinate system.
+	osg::Vec3d directionV = normal ^ directionU;
+	directionV.normalize();
+
+	// Local text coordinate system:
+	//
+	// X axis -> directionU
+	// Y axis -> directionV
+	// Z axis -> normal
+	//
+	// OSG uses row-vector multiplication for transformations,
+	// therefore the basis vectors are stored in the matrix rows.
+		
+	osg::Matrixd rotationMatrix(
+		directionU.x(), directionU.y(), directionU.z(), 0.0,
+		directionV.x(), directionV.y(), directionV.z(), 0.0,
+		normal.x(), normal.y(), normal.z(), 0.0,
+		0.0, 0.0, 0.0, 1.0);
+
+	osg::ref_ptr<osgText::Text> text = new osgText::Text;
+
+	text->setText(textString);
+	text->setCharacterSize(characterSize);
+	text->setAlignment(osgText::TextBase::CENTER_CENTER);
+	text->setColor(osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
+
+	text->setAxisAlignment(
+		osgText::TextBase::USER_DEFINED_ROTATION);
+
+	text->setRotation(rotationMatrix.getRotate());
+
+	const osg::Vec3d shiftedPosition =
+		textPosition + normal * surfaceOffset;
+
+	text->setPosition(
+		osg::Vec3(
+			static_cast<float>(shiftedPosition.x()),
+			static_cast<float>(shiftedPosition.y()),
+			static_cast<float>(shiftedPosition.z())));
+
+	// Keep the text independent of the lighting and culling state
+	// used by the triangle geometry.
+	osg::StateSet* stateSet = text->getOrCreateStateSet();
+
+	stateSet->setMode(
+		GL_LIGHTING,
+		osg::StateAttribute::OFF |
+		osg::StateAttribute::PROTECTED);
+
+	stateSet->setMode(
+		GL_CULL_FACE,
+		osg::StateAttribute::OFF |
+		osg::StateAttribute::PROTECTED);
+
+	// osgText::Text is a Drawable. It can be attached directly to
+	// a Geode. For a Group, a separate Geode is created.
+
+	if (osg::Geode* geode = triangleNode->asGeode())
+	{
+		geode->addDrawable(text.get());
+	}
+	else if (osg::Group* group = triangleNode->asGroup())
+	{
+		osg::ref_ptr<osg::Geode> textGeode = new osg::Geode;
+		textGeode->setName("TriangleText");
+		textGeode->addDrawable(text.get());
+
+		group->addChild(textGeode.get());
+	}
+	else
+	{
+		assert(0);
+	}
+}
 
 osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective, bool backFaceCulling, double offsetFactor, std::vector<Geometry::Node> &nodes, std::list<Geometry::Triangle> &triangles)
 {
@@ -1347,6 +1456,14 @@ void SceneNodeGeometry::setHighlightNode(osg::Node* highlight)
 		getShapeNode()->addChild(highlight);
 		m_highlightNode = highlight;
 	}
+}
+
+void SceneNodeGeometry::setText(const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU)
+{
+	textString   = _textString;
+	textPosition = osg::Vec3d(_textPosition[0], _textPosition[1], _textPosition[2]);
+	textNormal   = osg::Vec3d(_textNormal[0], _textNormal[1], _textNormal[2]);
+	textDirU     = osg::Vec3d(_textDirU[0], _textDirU[1], _textDirU[2]);
 }
 
 void SceneNodeGeometry::removeSelectedEdge(osg::Node* selected)

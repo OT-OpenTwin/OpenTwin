@@ -66,7 +66,6 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("GetDP");
-	_ui->addMenuPage("Model");
 
 	_ui->addMenuGroup("GetDP", "Solver");
 	_ui->addMenuGroup("GetDP", "Sources");

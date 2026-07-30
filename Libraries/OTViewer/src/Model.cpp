@@ -907,7 +907,8 @@ void Model::addVisualizationAnnotationNodeDataBase(const ot::EntityTreeItem& _tr
 
 void Model::addNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
 	double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
-	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation)
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation,
+	const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU)
 {
 	SceneNodeGeometry *geometryNode = createNewGeometryNode(_treeItem, _isHidden, _manageParentVisibility, _manageChildVisibility);
 
@@ -923,6 +924,7 @@ void Model::addNodeFromFacetDataBase(const ot::EntityTreeItem& _treeItem, bool _
 		geometryNode->setWireframe(m_wireFrameState);
 		geometryNode->setShowWhenSelected(_showWhenSelected);
 		geometryNode->setTransformation(_transformation);
+		geometryNode->setText(_textString, _textPosition, _textNormal, _textDirU);
 
 		//if (isHidden)
 		//{

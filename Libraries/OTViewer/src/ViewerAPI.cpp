@@ -279,14 +279,16 @@ void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeIt
 
 void ViewerAPI::addNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
 	double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
-	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation)
+	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation,
+	const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU)
 {
 	try
 	{
 		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addNodeFromFacetDataBase(_treeItem, _isHidden, _surfaceColorRGB, _edgeColorRGB, _materialType, _textureType, _reflective, _backFaceCulling, _offsetFactor, 
-										_projectName, _dataEntityID, _dataEntityVersion, _manageParentVisibility, _manageChildVisibility, _showWhenSelected, _transformation);
+										_projectName, _dataEntityID, _dataEntityVersion, _manageParentVisibility, _manageChildVisibility, _showWhenSelected, _transformation,
+									    _textString, _textPosition, _textNormal, _textDirU);
 		cancelAllRubberbands(_osgModelID);
 	}
 	catch (std::out_of_range)

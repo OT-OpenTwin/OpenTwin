@@ -85,3 +85,104 @@ void EntityWaveguidePort::readSpecificDataFromDataBase(const bsoncxx::document::
 	resetModified();
 }
 
+void EntityWaveguidePort::postGeometryUpdates(void)
+{
+	clearText();
+	if (facets == nullptr) return;
+
+	// We have just updated the facets. Now we can position our label in the middle of the facets
+	// Determine the port normal and the largest port extension
+
+	double nx = 0.0, ny = 0.0, nz = 0.0;
+	BoundingBox box;
+
+	for (auto& node : facets->getNodeVector())
+	{
+		box.extend(node.getCoord(0), node.getCoord(1), node.getCoord(2));
+		nx += node.getNormal(0);
+		ny += node.getNormal(1);
+		nz += node.getNormal(2);
+	}
+
+	nx /= 1.0 * facets->getNodeVector().size();
+	ny /= 1.0 * facets->getNodeVector().size();
+	nz /= 1.0 * facets->getNodeVector().size();
+
+	double cx = 0.5 * (box.getXmax() + box.getXmin());
+	double cy = 0.5 * (box.getYmax() + box.getYmin());
+	double cz = 0.5 * (box.getZmax() + box.getZmin());
+
+	double dx = box.getXmax() - box.getXmin();
+	double dy = box.getYmax() - box.getYmin();
+	double dz = box.getZmax() - box.getZmin();
+
+	double tolerance = 1e-4;
+
+	textPosition = { cx, cy, cz };
+	textNormal = { nx, ny, nz };
+
+	setTextStringFromName();
+
+	if (fabs(ny) < tolerance && fabs(nz) < tolerance && fabs(fabs(nx) - 1.0) < tolerance)
+	{
+		// Port normal +/- x direction (u = y, v = z)
+		if (dy > dz)
+		{
+			textDirU = { 0.0, 1.0, 0.0 };
+		}
+		else
+		{
+			textDirU = { 0.0, 0.0, 1.0 };
+		}
+	}
+	else if (fabs(nx) < tolerance && fabs(nz) < tolerance && fabs(fabs(ny) - 1.0) < tolerance)
+	{
+		// Port normal +/- y direction (u = z, v = x)
+		if (dz > dx)
+		{
+			textDirU = { 0.0, 0.0, 1.0 };
+		}
+		else
+		{
+			textDirU = { 1.0, 0.0, 0.0 };
+		}
+	}
+	else if (fabs(nx) < tolerance && fabs(ny) < tolerance && fabs(fabs(nz) - 1.0) < tolerance)
+	{
+		// Port normal +/- z direction (u = x, v = y)
+		if (dx > dy)
+		{
+			textDirU = { 1.0, 0.0, 0.0 };
+		}
+		else
+		{
+			textDirU = { 0.0, 1.0, 0.0 };
+		}
+	}
+	else
+	{
+		// The port is not aligned with the coordinate axes
+		clearText();
+	}
+}
+
+void EntityWaveguidePort::setTextStringFromName()
+{
+	std::string name = getName();
+
+	const std::size_t pos = name.find_last_of('/');
+
+	textString = (pos == std::string::npos) ? name : name.substr(pos + 1);
+}
+
+void EntityWaveguidePort::setName(const std::string& _name)
+{
+	EntityFaceAnnotation::setName(_name);
+	
+	if (!textString.empty())
+	{
+		setTextStringFromName();
+		updateVisualization(false);
+	}
+}
+

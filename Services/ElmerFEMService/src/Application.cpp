@@ -67,9 +67,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, true);
 	//_ui->registerForModelEvents();
 	_ui->addMenuPage("ElmerFEM");
-	_ui->addMenuPage("Model");
 
-	//_ui->addMenuGroup("Model", "Sources");
 	_ui->addMenuGroup("ElmerFEM", "Solver");
 	_ui->addMenuGroup("ElmerFEM", "Sources");
 

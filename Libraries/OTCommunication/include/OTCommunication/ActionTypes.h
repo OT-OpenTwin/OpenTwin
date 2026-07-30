@@ -689,6 +689,10 @@
 #define OT_ACTION_PARAM_MODEL_JSON "Model.JSON"
 #define OT_ACTION_PARAM_MODEL_ViewsForProjectType "Model.ViewsForType"
 #define OT_ACTION_PARAM_MODEL_AddCircuitModelToProject "Model.AddCircuitModelToProject"
+#define OT_ACTION_PARAM_MODEL_ITM_TextString "Model.Item.TextString"
+#define OT_ACTION_PARAM_MODEL_ITM_TextPosition "Model.Item.TextPosition"
+#define OT_ACTION_PARAM_MODEL_ITM_TextNormal "Model.Item.TextNormal"
+#define OT_ACTION_PARAM_MODEL_ITM_TextDirU "Model.Item.TextDirU"
 
 #define OT_ACTION_PARAM_MESH_CartesianCoordX "Mesh.Cartesian.X"
 #define OT_ACTION_PARAM_MESH_CartesianCoordY "Mesh.Cartesian.Y"

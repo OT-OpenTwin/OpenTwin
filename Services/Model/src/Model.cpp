@@ -539,7 +539,6 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 
 		_ui->addMenuPage("View");
 
-		//_ui->addMenuGroup("Model", "Database");
 		_ui->addMenuGroup(pageName, "Geometry");
 		_ui->addMenuGroup(pageName, "Material");
 		_ui->addMenuGroup(pageName, "Parameters");
@@ -3606,6 +3605,7 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 		}
 	}
 
+	annotationEntity->postGeometryUpdates();
 	annotationEntity->storeUpdatedFacets();
 }
 

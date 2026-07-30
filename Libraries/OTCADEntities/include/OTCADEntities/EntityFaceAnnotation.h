@@ -79,6 +79,8 @@ public:
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
 	virtual void removeChild(EntityBase *child) override;
 
+	virtual void postGeometryUpdates(void) {};
+
 	void getGeometryNames(std::list <std::string> &names);
 
 	void renewFacets(void);
@@ -87,6 +89,9 @@ public:
 	BoundingBox &getBoundingBox(void) { return boundingBox; };
 
 	long long getFacetsStorageID(void) { return facetsStorageID; };
+
+	void setText(const std::string& string, double px, double py, double pz, double nx, double ny, double nz, double ux, double uy, double uz);
+	void clearText(void);
 
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
@@ -100,6 +105,10 @@ protected:
 	// Persistent data
 	EntityFacetData *facets;
 	long long facetsStorageID;
+	std::vector<double> textPosition = { 0.0, 0.0, 0.0 };
+	std::vector<double> textNormal = { 0.0, 0.0, 0.0 };
+	std::vector<double> textDirU = { 0.0, 0.0, 0.0 };
+	std::string textString;
 
 	BoundingBox boundingBox;
 };

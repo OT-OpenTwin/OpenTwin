@@ -3295,8 +3295,22 @@ void ExternalServicesComponent::handleAddNodeFromDataBase(ot::JsonDocument& _doc
 		transformation[0] = transformation[5] = transformation[10] = transformation[15] = 1.0;
 	}
 
+	std::string textString;
+	std::vector<double> textPosition = { 0.0, 0.0, 0.0 };
+	std::vector<double> textNormal = { 0.0, 0.0, 0.0 };
+	std::vector<double> textDirU = { 0.0, 0.0, 0.0 };
+
+	if (ot::json::exists(_document, OT_ACTION_PARAM_MODEL_ITM_TextString))
+	{
+		textString = ot::json::getString(_document, OT_ACTION_PARAM_MODEL_ITM_TextString);
+		textPosition = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MODEL_ITM_TextPosition);
+		textNormal = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MODEL_ITM_TextNormal);
+		textDirU = ot::json::getDoubleVector(_document, OT_ACTION_PARAM_MODEL_ITM_TextDirU);
+	}
+
 	ViewerAPI::addNodeFromFacetDataBase(visModelID, item, isHidden, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective,
-		backFaceCulling, offsetFactor, collectionName, dataEntityID, dataEntityVersion, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation);
+		backFaceCulling, offsetFactor, collectionName, dataEntityID, dataEntityVersion, manageParentVisibility, manageChildVisibility, showWhenSelected, transformation,
+		textString, textPosition, textNormal, textDirU);
 }
 
 void ExternalServicesComponent::handleAddContainerNode(ot::JsonDocument& _document)
