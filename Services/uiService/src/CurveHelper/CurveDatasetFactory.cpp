@@ -91,8 +91,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	std::list<std::string> secondaryParameter = _plotCfg.getSecondaryParameter();
 
 	DependencyInfoList familyOfCurves;
-	std::map<std::string, std::list<std::string>> parameterValuesByParameterName;
-
+	
 	CurveColourSetter colourSetting(_curveCfg, numberOfQuantities);
 
 	const std::string displayParameterLabel = _plotCfg.getXAxisParameter();
@@ -125,6 +124,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	}
 	
 	ot::JSONToVariableConverter jsonToVariableConverter;
+	int64_t naNCount = 0;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
 	{
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
@@ -183,9 +183,16 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 					auto& additionalParameterEntry = singleMongoDocument[additionalParameter.first.c_str()];
 					const ot::TupleInstance& parameterTuple = additionalParameter.second->getTupleInstance();
 
-					const std::string value = ot::json::toJson(additionalParameterEntry);
-					parameterValuesByParameterName[additionalParameter.first].push_back(value);
-
+					std::string value("");
+					if (additionalParameterEntry.IsNull())
+					{
+						value = "Invalid";
+					}
+					else
+					{
+						value = ot::json::toJson(additionalParameterEntry);
+					}
+					
 					ot::DatasetDependencyInfo additionalParameterInfo;
 					additionalParameterInfo.setLabel(additionalParameter.first);
 					additionalParameterInfo.setValue(value);
@@ -240,12 +247,24 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			
 			// Get parameter value
 			const ot::JsonValue& entryParameterValue = singleMongoDocument[displayParameterLabel.c_str()];
-			double parameterValue = jsonToDouble(entryParameterValue);
-
-			curveDataInfo->dataPoints.m_yData.push_back(quantityValue);
-			curveDataInfo->dataPoints.m_xData.push_back(parameterValue);
-			curveDataInfo->secondaryDependencies.push_back(secondaryParameterDependencies);
+			
+			if (quantityValue.isNotANumber() || entryParameterValue.IsNull())
+			{
+				naNCount++;
+			}
+			else
+			{
+				double parameterValue = jsonToDouble(entryParameterValue);
+				curveDataInfo->dataPoints.m_yData.push_back(quantityValue);
+				curveDataInfo->dataPoints.m_xData.push_back(parameterValue);
+				curveDataInfo->secondaryDependencies.push_back(secondaryParameterDependencies);
+			}
 		}
+	}
+
+	if (naNCount != 0)
+	{
+		OT_USER_LOG_W(std::to_string(naNCount)+ " NaN entries were found among the x/y-axis values. Such entries are not included in the plot and are skipped.");
 	}
 
 	for (auto& curve : familyOfCurves)
@@ -278,18 +297,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 	{
 		const ot::DatasetDependencyInfos& dependencies = curve.first;
 		auto& dataPoints = curve.second.dataPoints;
-
-		// @Alex Here you can get metadata per series. You can turn these metadata as json document into instances of additional dependencies for the naming. 
-		/*auto accessCfg = _curveCfg.getDataAccessConfig();
-		for (auto dep : dependencies.getDependencies())
+		if (dataPoints.m_yData.size() == 0)
 		{
-			bool isSeries;
-			if (isSeries)
-			{
-				auto seriesName = dep.getLabel();
-				const ot::JsonDocument& doc = accessCfg.getSeriesMetadata(seriesName);
-			}
-		}*/
+			continue;
+		}
 
 		ot::PlotDatasetData datasetData;
 		if (dataPoints.m_yData.front().isComplex())
