@@ -4,15 +4,15 @@ from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from opentwin import clean_project, cli
+from opentwin import clean_all, cli, project_roots
 
 
 def main(argv: Sequence[str]) -> int:
-    if len(argv) != 1:
-        raise SystemExit("usage: clean.py <PROJECT>")
+    if argv:
+        raise SystemExit("usage: clean_all.py")
 
-    _, target = cli.prepare(argv[0])
-    return clean_project(target)
+    env = cli.environment()
+    return clean_all(env, sorted(project_roots()))
 
 
 if __name__ == "__main__":

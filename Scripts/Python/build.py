@@ -1,19 +1,20 @@
-import os, sys
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from ot_commands import build_env, resolve_root, build_project
+import sys
+from pathlib import Path
+from typing import Sequence
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from opentwin import build_project, cli
 
 
-def main(argv):
-    if not argv:
+def main(argv: Sequence[str]) -> int:
+    if not 1 <= len(argv) <= 3:
         raise SystemExit("usage: build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]")
 
-    config = (argv[1] if len(argv) > 1 else "BOTH").upper()
-    buildtype = (argv[2] if len(argv) > 2 else "REBUILD").upper()
-    configs = {"DEBUG": ["debug"], "RELEASE": ["release"]}.get(config, ["debug", "release"])
-
-    env = build_env()
-    target = resolve_root(env, argv[0])
-    return build_project(env, target, configs, buildtype != "BUILD")
+    env, target = cli.prepare(argv[0])
+    configurations = cli.configurations(cli.argument(argv, 1))
+    rebuild = cli.build_type(cli.argument(argv, 2))
+    return build_project(env, target, configurations, rebuild)
 
 
 if __name__ == "__main__":

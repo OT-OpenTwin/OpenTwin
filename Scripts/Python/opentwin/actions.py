@@ -1,0 +1,117 @@
+import os
+import shutil
+import subprocess
+from pathlib import Path
+from typing import Mapping, Sequence, TextIO
+
+from .toolchain import apply_toolchain
+
+SYSTEM = "windows" if os.name == "nt" else "linux"
+CMAKE_SUBPATH = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin" / "cmake.exe"
+SYSTEM_VARS: dict[str, dict[str, str]] = {"windows": {"VSLANG": "1033"}, "linux": {}}
+SEPARATOR = "=" * 88
+
+CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
+
+DEFAULT_EDITOR = "VS"
+EDITORS: dict[str, tuple[str | None, str]] = {
+    "VS": ("DEVENV_ROOT_2022", "devenv.exe"),
+    "CODE": (None, "code"),
+    "NVIM": (None, "nvim"),
+}
+
+
+def cmake_executable(env: Mapping[str, str]) -> Path:
+    cmake = Path(env["DEVENV_ROOT_2022"]) / CMAKE_SUBPATH
+    if not cmake.is_file():
+        raise SystemExit(f"cmake.exe not found: {cmake}")
+    return cmake
+
+
+def _build_config(cmake: Path, env: Mapping[str, str], target: str, config: str,
+                  rebuild: bool, parallel: Sequence[str], out: TextIO) -> int:
+    def run(*args: str) -> subprocess.CompletedProcess[bytes]:
+        return subprocess.run([str(cmake), *args], cwd=target, env=env,
+                              stdout=out, stderr=subprocess.STDOUT)
+
+    run("--preset", f"{SYSTEM}-{config}")
+    if rebuild:
+        run("--build", "--preset", f"build-{SYSTEM}-{config}", "--target", "clean")
+    return run("--build", "--preset", f"build-{SYSTEM}-{config}", *parallel).returncode
+
+
+def build_project(env: Mapping[str, str], target: str, configs: Sequence[str],
+                  rebuild: bool, logs: str | Path | None = None) -> int:
+    cmake = cmake_executable(env)
+    env = apply_toolchain(dict(env))
+    env.update(SYSTEM_VARS[SYSTEM])
+    parallel = ["--parallel"] if env.get("OPENTWIN_DEV_PARALLEL_BUILDS") else []
+    logs = Path(logs) if logs else Path.cwd()
+    failed = 0
+
+    print(f"Building Project {target}", flush=True)
+    for config in configs:
+        print(config.upper(), flush=True)
+        with open(logs / f"buildlog_{config.capitalize()}.txt", "a", encoding="utf-8") as out:
+            out.write(f"{SEPARATOR}\nBuilding project: {target}\n{SEPARATOR}\n")
+            out.flush()
+            code = _build_config(cmake, env, target, config, rebuild, parallel, out)
+            out.write(f"--- Build {'successful' if code == 0 else 'failed'}: {target} ---\n")
+        failed = failed or code
+
+    print("---", flush=True)
+    print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+    return failed
+
+
+def clean_project(target: str | Path) -> int:
+    if not Path(target).is_dir():
+        raise SystemExit(f"path does not exist: {target}")
+
+    print(f"Cleaning Project {target}", flush=True)
+    locked: list[str] = []
+    for name in CLEAN_DIRS:
+        path = Path(target) / name
+        if not path.is_dir():
+            continue
+        shutil.rmtree(path, ignore_errors=True)
+        if path.exists():
+            locked.append(name)
+        print(f"{name}{' (locked)' if path.exists() else ''}", flush=True)
+
+    print("---", flush=True)
+    print("FAILED" if locked else "SUCCESS", flush=True)
+    return 1 if locked else 0
+
+
+def _rooted(env: Mapping[str, str], root: str, executable: str, target: str) -> int:
+    command = Path(env[root]) / executable
+    if not command.is_file():
+        raise SystemExit(f"{executable} not found: {command}")
+    subprocess.Popen([str(command), target], env=env)
+    return 0
+
+
+def _on_path(env: Mapping[str, str], executable: str, target: str) -> int:
+    command = shutil.which(executable, path=env.get("PATH"))
+    if not command:
+        raise SystemExit(f"{executable} not found on PATH")
+
+    args = [command, target]
+    if os.name == "nt" and command.lower().endswith((".cmd", ".bat")):
+        args = ["cmd", "/c", *args]
+    return subprocess.run(args, env=env).returncode
+
+
+def launch_editor(env: Mapping[str, str], target: str, editor: str | None = None) -> int:
+    key = (editor or DEFAULT_EDITOR).upper()
+    if key not in EDITORS:
+        raise SystemExit(f"Unknown editor '{editor}'. Known: " + ", ".join(sorted(EDITORS)))
+    if not Path(target).exists():
+        raise SystemExit(f"path does not exist: {target}")
+
+    root, executable = EDITORS[key]
+    print(f"Launching {key}", flush=True)
+    if root:
+        return _rooted(env, root, executable, target)
+    return _on_path(env, executable, target)

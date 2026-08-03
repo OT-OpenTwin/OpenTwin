@@ -1,5 +1,4 @@
-import importlib.util, os, re
-from pathlib import Path
+REQUIRED = ["OPENTWIN_DEV_ROOT", "OPENTWIN_THIRDPARTY_ROOT", "DEVENV_ROOT_2022"]
 
 # ===== Services =====
 SERVICES = {
@@ -79,6 +78,9 @@ TOOLS = {
     "OT_MONGODBUPGRADEMANAGER_ROOT": "MongoDBUpgrader/Upgrader_Exe",
 }
 
+# Each project group is resolved below the given folder of the development root.
+GROUPS = ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools"))
+
 # ===== Relative path fragments =====
 RELATIVE = {
     "OT_INC": "include",
@@ -96,6 +98,23 @@ RELATIVE = {
     "OT_LIBTESTR": r"\x64\ReleaseTest",
 }
 
+# ===== Paths below the development root =====
+DEV_PATHS = {
+    "OT_ENCRYPTIONKEY_ROOT": r"Certificates\Generated",
+    "OT_DOCUMENTATION_ROOT": r"Documentation\Developer",
+    "OT_CMAKE_DIR": r"Scripts\CMake",
+}
+
+# ===== Certificates =====
+CERTIFICATES_OVERRIDE = "OPEN_TWIN_CERTS_PATH"
+CERTIFICATES_ROOT = r"Certificates\Generated"
+CERTIFICATES = {
+    "OPEN_TWIN_CA_CERT": "ca.pem",
+    "OPEN_TWIN_CERT_KEY": "certificateKeyFile.pem",
+    "OPEN_TWIN_SERVER_CERT": "server.pem",
+    "OPEN_TWIN_SERVER_CERT_KEY": "server-key.pem",
+}
+
 # ===== Composite search paths =====
 COMPOSITES = {
     "OT_DEFAULT_SERVICE_INCD": r"%OT_CORE_ROOT%\%OT_INC%;%OT_SYSTEM_ROOT%\%OT_INC%;%OT_GUI_ROOT%\%OT_INC%;%OT_COMMUNICATION_ROOT%\%OT_INC%;%OT_GUIAPI_ROOT%\%OT_INC%;%OT_FOUNDATION_ROOT%\%OT_INC%;%OT_MODELENTITIES_ROOT%\%OT_INC%;%OT_DATASTORAGE_ROOT%\%OT_INC%;%OT_MODELAPI_ROOT%\%OT_INC%;%R_JSON_INCD%;%CURL_INCD%;%MONGO_C_INC%;%MONGO_CXX_INC%;%MONGO_BOOST_INCD%",
@@ -110,75 +129,14 @@ COMPOSITES = {
     "OT_ALL_DLLR": r"%OT_RESULT_DATA_ACCESS_ROOT%\%OT_CDLLR%;%OT_CADMODELENTITIES_ROOT%\%OT_CDLLR%;%OT_DATASTORAGE_ROOT%\%OT_CDLLR%;%OT_MODELAPI_ROOT%\%OT_CDLLR%;%OT_MODELENTITIES_ROOT%\%OT_CDLLR%;%OT_BLOCKENTITIES_ROOT%\%OT_CDLLR%;%OT_COMMUNICATION_ROOT%\%OT_CDLLR%;%OT_CORE_ROOT%\%OT_CDLLR%;%OT_GUI_ROOT%\%OT_CDLLR%;%OT_GUIAPI_ROOT%\%OT_CDLLR%;%OT_FOUNDATION_ROOT%\%OT_CDLLR%;%OT_SYSTEM_ROOT%\%OT_CDLLR%;%OT_WIDGETS_ROOT%\%OT_CDLLR%;%OT_RUBBERBANDAPI_ROOT%\%OT_CDLLR%;%OT_RUBBERBAND_OSG_ROOT%\%OT_CDLLR%;%OT_UICORE_ROOT%\%OT_CDLLR%;%OT_VIEWER_ROOT%\%OT_CDLLR%;%MONGO_C_DLLR%;%MONGO_CXX_DLLR%;%CURL_DLLR%;%ZLIB_DLLPATHR%;%VTK_DLLR%;%OSG_DLLR%;%QT_DLLR%;%QWT_LIB_DLLR%;%QT_TT_DLLR%;%OT_STUDIO_SUITE_CONNECTOR_ROOT%\%OT_CDLLR%;%OT_LTSPICE_CONNECTOR_ROOT%\%OT_CDLLR%;%OT_FRONTEND_CONNECTOR_API_ROOT%\%OT_CDLLR%;%OT_FILE_MANAGER_CONNECTOR_ROOT%\%OT_CDLLR%",
 }
 
-REQUIRED = ["OPENTWIN_DEV_ROOT", "OPENTWIN_THIRDPARTY_ROOT", "DEVENV_ROOT_2022"]
+# Prepended to PATH in order, so the last entry ends up first.
+PATH_PREPEND = [
+    r"%OPENTWIN_DEV_ROOT%\Deployment",
+    r"%ProgramFiles%\MiKTeX\miktex\bin\x64",
+]
 
-_VAR = re.compile(r"%([^%]+)%")
+# ===== Externally provided environment =====
+THIRDPARTY_MODULE = "SetupEnvironment.py"
+SERVICE_ARGS_MODULE = ("Scripts", "Launcher", "OpenTwin_set_up_service_args.py")
 
-
-# ===== Helpers =====
-def check_required():
-    missing = [v for v in REQUIRED if not os.environ.get(v)]
-    if missing:
-        raise SystemExit("Please specify the following environment variables: " + ", ".join(missing))
-
-
-def _get(env, name):
-    if name in env:
-        return env[name]
-    low = name.lower()
-    return next((v for k, v in env.items() if k.lower() == low), "")
-
-
-def _expand(env, value):
-    return _VAR.sub(lambda m: _get(env, m.group(1)), value)
-
-
-def _load(name: str, path: str):
-    spec = importlib.util.spec_from_file_location(name, path)
-
-    if spec is None or spec.loader is None:
-        raise ImportError(f"Cannot load module {name!r} from {path!r}")
-
-    mod = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(mod)
-    return mod
-
-
-# ===== Build =====
-def build_env(base=None):
-    check_required()
-    env = os.environ.copy()
-    dev = Path(base or env["OPENTWIN_DEV_ROOT"])
-    third = Path(env["OPENTWIN_THIRDPARTY_ROOT"])
-
-    # ThirdParty environment
-    _load("ot_thirdparty_env", str(third / "SetupEnvironment.py")).apply(env)
-
-    # OpenTwin roots
-    env["OT_ENCRYPTIONKEY_ROOT"] = str(dev / "Certificates" / "Generated")
-    env.update(RELATIVE)
-    for group, sub in ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools")):
-        for var, folder in group.items():
-            env[var] = str(dev / sub / folder)
-    env["OT_DOCUMENTATION_ROOT"] = str(dev / "Documentation" / "Developer")
-
-    # Certificates
-    certs = Path(env.get("OPEN_TWIN_CERTS_PATH") or dev / "Certificates" / "Generated")
-    env["OPEN_TWIN_CA_CERT"] = str(certs / "ca.pem")
-    env["OPEN_TWIN_CERT_KEY"] = str(certs / "certificateKeyFile.pem")
-    env["OPEN_TWIN_SERVER_CERT"] = str(certs / "server.pem")
-    env["OPEN_TWIN_SERVER_CERT_KEY"] = str(certs / "server-key.pem")
-
-    for name, template in COMPOSITES.items():
-        env[name] = _expand(env, template)
-
-    # Service arguments
-    _load("ot_service_args", str(dev / "Scripts" / "Launcher" / "OpenTwin_set_up_service_args.py")).apply(env)
-
-    # Finalize
-    env["OT_CMAKE_DIR"] = str(dev / "Scripts" / "CMake")
-    env["PATH"] = _expand(env, r"%OPENTWIN_DEV_ROOT%\Deployment;%PATH%")
-    env["PATH"] = _expand(env, r"%ProgramFiles%\MiKTeX\miktex\bin\x64;%PATH%")
-    env["OPENTWIN_DEV_ENV_DEFINED"] = "1"
-    print("OpenTwin Developer environment was set up successfully.")
-    return env
+READY_FLAG = "OPENTWIN_DEV_ENV_DEFINED"
