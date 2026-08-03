@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.20)
-project(Model LANGUAGES CXX)
+project(Model LANGUAGES CXX C)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
