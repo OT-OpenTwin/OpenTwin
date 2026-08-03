@@ -15,8 +15,12 @@
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "OTCore/TimeFormatter.h"
 
+#include "Documentation.h"
+#include "OTModelEntities/EntityResultText.h"
+
 void CSVSchemaImporter::execute()
 {
+	Documentation::INSTANCE()->ClearDocumentation();
 	try
 	{
 		auto startPreprocessing = std::chrono::high_resolution_clock::now();
@@ -139,6 +143,23 @@ void CSVSchemaImporter::execute()
 			modelStateMessageBase = "Files: ";
 		}
 
+		auto createReportOnFailure = [&csvDatasetImporter]()
+			{
+				std::string fullReport = Documentation::INSTANCE()->GetFullDocumentation();
+				EntityResultText report;
+				report.setEntityID(Application::instance()->getModelComponent()->createEntityUID());
+				const std::string reportName = ot::EntityName::getParentPath(csvDatasetImporter->getName()) + "/Refinement report";
+				report.setName(reportName);
+				report.setText(fullReport);
+				report.createProperties();
+				report.storeToDataBase();
+
+				ot::NewModelStateInfo newEntityInfos;
+				newEntityInfos.addTopologyEntity(report);
+				newEntityInfos.addDataEntity(report.getEntityID(), report.getTextDataStorageId(), report.getTextDataStorageVersion());
+				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Added run report");
+			};
+
 		for (auto csvFile = csvFiles.begin(); csvFile != csvFiles.end();)
 		{
 			// First we assemble the information for the newly created series
@@ -180,6 +201,8 @@ void CSVSchemaImporter::execute()
 
 				if (interruptAtWarnings)
 				{
+
+					createReportOnFailure();
 					return;
 				}
 				else
@@ -204,9 +227,11 @@ void CSVSchemaImporter::execute()
 				std::string exceptionMessage = "Failed to store data points, because of following error: " + std::string(e.what()) + "\n"
 					"Creation of series \"" + seriesName + "\" failed.";
 				OT_USER_LOG_E(exceptionMessage);
-				return;
 				bool seriesRemoved = resultCollectionExtender.removeSeries(seriesUID);
 				assert(seriesRemoved); //Otherwise panic!
+				
+				createReportOnFailure();
+				return;
 			}
 
 			if (counter % modelBatchSizes == 0)
@@ -236,20 +261,36 @@ void CSVSchemaImporter::execute()
 		}
 
 		// Now we store the changes on the campaign and the model state
+		std::string modelStateMessage = "Added run report";
 		if (newEntityInfos.hasEntities())
 		{
 			resultCollectionExtender.setSaveModel(false);
 			resultCollectionExtender.storeCampaignChanges();
 			if (csvFiles.size() > modelBatchSizes)
 			{
-				std::string message = "Refined csv data. Files: " + std::to_string((csvFiles.size() / modelBatchSizes) * modelBatchSizes) + "-" + std::to_string(csvFiles.size());
-				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, message);
+				modelStateMessage = "Refined csv data. Files: " + std::to_string((csvFiles.size() / modelBatchSizes) * modelBatchSizes) + "-" + std::to_string(csvFiles.size());
+				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, modelStateMessage);
 			}
 			else
 			{
-				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, "Refined csv data.");
+				modelStateMessage = "Refined csv data.";
+				ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, modelStateMessage,false,false);
 			}
+			newEntityInfos = ot::NewModelStateInfo();
 		}
+
+		std::string fullReport = Documentation::INSTANCE()->GetFullDocumentation();
+		EntityResultText report;
+		report.setEntityID(Application::instance()->getModelComponent()->createEntityUID());
+		const std::string reportName = ot::EntityName::getParentPath(csvDatasetImporter->getName()) + "/Refinement report";
+		report.setName(reportName);
+		report.setText(fullReport);
+		report.createProperties();
+		report.storeToDataBase();
+		
+		newEntityInfos.addDataEntity(report.getEntityID(), report.getTextDataStorageId(), report.getTextDataStorageVersion());
+		newEntityInfos.addTopologyEntity(report);
+		ot::ModelServiceAPI::addEntitiesToModel(newEntityInfos, modelStateMessage);
 
 		OT_USER_LOG_I("Refinement finished.");
 		auto endProcessing = std::chrono::high_resolution_clock::now();
