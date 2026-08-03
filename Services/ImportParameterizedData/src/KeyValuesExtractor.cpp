@@ -112,6 +112,23 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 	//Sort out all ranges associated with the this table
 	std::list<std::shared_ptr<EntityTableSelectedRanges>> relevantSelections = _assemblyData.m_allSelectionRanges;
 
+	// ToDo: Double check if the ranges refer to indexes that are within the table dimensions.
+	std::string defectRanges("");
+	for (const auto& range : relevantSelections)
+	{
+		bool rangeIsValid = isRangeWithinTableDimensions(range, tableContent);
+		if (!rangeIsValid)
+		{
+			defectRanges += range->getName() + ", ";
+		}
+	}
+
+	if (!defectRanges.empty())
+	{
+		std::string message = "Ranges detected that do not match the targeted table: " + defectRanges.substr(0,defectRanges.size() - 2);
+		throw std::exception(message.c_str());
+	}
+
 	//Extract content that is refered by the ranges
 	std::map<std::string, std::map<std::uint32_t, ot::Variable>> allFieldsSorted;
 	std::map<std::string, std::string> rangeTypesByRangeNames;

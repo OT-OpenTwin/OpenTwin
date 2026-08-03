@@ -138,29 +138,55 @@ void CSVSchemaImporter::execute()
 		{
 			modelStateMessageBase = "Files: ";
 		}
+
 		for (auto csvFile = csvFiles.begin(); csvFile != csvFiles.end();)
 		{
 			// First we assemble the information for the newly created series
-			std::list<DatasetDescription> datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
-			std::string seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
-			std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
+			std::list<DatasetDescription> datasetDescriptions;
+			std::string seriesName;
 			ot::UID seriesUID;
-			if (!extractedMetadata.has_value())
+			try
 			{
+				datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
+				seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
+				std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
+				
+				if (!extractedMetadata.has_value())
+				{
+					if (interruptAtWarnings)
+					{
+						return;
+					}
+					else
+					{
+						seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, ot::JsonDocument());
+					}
+				}
+				else
+				{
+					seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, extractedMetadata.value());
+				}
+			}
+			catch (std::exception& _e)
+			{
+				std::string exceptionMessage = "Failed to create series metadata, because of following error: " + std::string(_e.what()) + "\n"
+					"Creation of series for csv file \"" + (*csvFile)->getName() + "\" failed.";
+				OT_USER_LOG_E(exceptionMessage);
+				
+				csvFile = csvFiles.erase(csvFile);
+
+				updater.triggerUpdate(counter);
+				counter++;
+
 				if (interruptAtWarnings)
 				{
 					return;
 				}
 				else
 				{
-					seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, ot::JsonDocument());
+					continue;
 				}
 			}
-			else
-			{
-				seriesUID = resultCollectionExtender.buildSeriesMetadata(datasetDescriptions, seriesName, extractedMetadata.value());
-			}
-
 			// Then we store the data points
 			try
 			{
