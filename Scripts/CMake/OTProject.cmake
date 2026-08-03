@@ -25,6 +25,25 @@ include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 set(_OT_CFG_DEBUG   "$<CONFIG:Debug>")
 set(_OT_CFG_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
 
+function(_ot_reject_build_tree OUT_VAR)
+    set(_roots "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/build")
+    set(_kept "")
+    foreach(_path IN LISTS ARGN)
+        set(_generated FALSE)
+        foreach(_root IN LISTS _roots)
+            cmake_path(IS_PREFIX _root "${_path}" NORMALIZE _inside)
+            if(_inside)
+                set(_generated TRUE)
+                break()
+            endif()
+        endforeach()
+        if(NOT _generated)
+            list(APPEND _kept "${_path}")
+        endif()
+    endforeach()
+    set(${OUT_VAR} "${_kept}" PARENT_SCOPE)
+endfunction()
+
 if(MSVC)
     add_compile_options(
         /Zc:__cplusplus
@@ -409,10 +428,12 @@ function(ot_add_resources TARGET_NAME)
     file(GLOB_RECURSE _rc CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/*.rc"
     )
+    _ot_reject_build_tree(_rc ${_rc})
 
     file(GLOB_RECURSE _ico CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/*.ico"
     )
+    _ot_reject_build_tree(_ico ${_ico})
 
     set(_all_res "")
     list(APPEND _all_res ${_rc} ${_ico})
@@ -495,6 +516,7 @@ function(ot_add_qt_resources TARGET_NAME)
     file(GLOB_RECURSE _qrc CONFIGURE_DEPENDS
         "${CMAKE_CURRENT_SOURCE_DIR}/*.qrc"
     )
+    _ot_reject_build_tree(_qrc ${_qrc})
     if(_qrc)
         set_property(TARGET ${_core} PROPERTY AUTORCC ON)
         target_sources(${_core} PRIVATE ${_qrc})
@@ -735,9 +757,10 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         endif()
 
         get_property(_enabled_langs GLOBAL PROPERTY ENABLED_LANGUAGES)
-        list(FIND _enabled_langs "C" _c_lang_idx)
-        if(_c_lang_idx EQUAL -1)
-            enable_language(C)
+        if(NOT "C" IN_LIST _enabled_langs)
+            message(FATAL_ERROR
+                "EXPREVAL compiles tinyexpr.c as C, but this project does not enable C.\n"
+                "Add C to the project languages: project(<name> LANGUAGES CXX C)")
         endif()
 
         set(_expr_src "$ENV{EXPREVAL_ROOT}/tinyexpr.c")
@@ -1090,7 +1113,10 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
 
     if(DEP STREQUAL "VTK")
         if(VTK_LIB_PATH)
-            target_link_directories("${FINAL_TARGET}" PRIVATE "${VTK_LIB_PATH}")
+            target_link_directories("${FINAL_TARGET}" PRIVATE
+                $<${_OT_CFG_DEBUG}:${VTK_LIB_PATH}/Debug>
+                $<${_OT_CFG_RELEASE}:${VTK_LIB_PATH}/Release>
+            )
         endif()
         if(VTK_LIBLIST_DEBUG_LIST)
             target_link_libraries("${FINAL_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${VTK_LIBLIST_DEBUG_LIST}>)

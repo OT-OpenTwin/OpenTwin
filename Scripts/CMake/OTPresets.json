@@ -9,11 +9,16 @@
     {
       "name": "windows-debug",
       "displayName": "Windows Debug",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/windows-debug",
       "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
+      "warnings": { "unusedCli": false },
       "environment": {
         "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
       }
@@ -21,11 +26,16 @@
     {
       "name": "windows-release",
       "displayName": "Windows Release",
-      "generator": "Visual Studio 17 2022",
+      "generator": "Ninja Multi-Config",
       "binaryDir": "${sourceDir}/build/windows-release",
       "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel"
+        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+        "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+        "CMAKE_CXX_COMPILER": "cl",
+        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
+      "warnings": { "unusedCli": false },
       "environment": {
         "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
       }
