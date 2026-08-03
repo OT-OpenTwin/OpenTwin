@@ -307,14 +307,17 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 		{
 			std::vector<std::complex<double>> complexData = toComplexVector(dataPoints.m_yData);
 			datasetData = ot::PlotDatasetData(std::move(dataPoints.m_xData), std::move(complexData), _plotCfg.getXAxisQuantityComponent(), _plotCfg.getYAxisQuantityComponent());
-		}
+		} 
 		else
 		{
 			std::vector<double> doubleData = toDoubleVector(dataPoints.m_yData);
 			datasetData = ot::PlotDatasetData(std::move(dataPoints.m_xData), std::move(doubleData));
 		}
 
-		ot::PlotDataset* dataset = new ot::PlotDataset(nullptr, _curveCfg, std::move(datasetData));
+		auto localCfg = _curveCfg;
+		curveColourSetter.setPainter(localCfg, dataPoints.m_yData.size() == 1);
+		
+		ot::PlotDataset* dataset = new ot::PlotDataset(nullptr, localCfg, std::move(datasetData));
 		dataset->setXAxisUnit(_xAxisUnit);
 		dataset->setDependencyInfos(dependencies);
 		dataset->setSecondaryDependencyInfos(curve.second.secondaryDependencies);
