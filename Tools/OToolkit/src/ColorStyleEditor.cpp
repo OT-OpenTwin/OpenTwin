@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ColorStyleEditor.cpp
 // 
 // License:
@@ -433,16 +433,17 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(ot::LightGray)));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
 	
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(230, 57, 70))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(255, 140, 66))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(255, 215, 0))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(80, 200, 120))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
+	// Based on the Okabe-Iko colour palette. Yellow was exchanged with gold for better visibility, and two more colours were added for more variety.
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(0, 92, 92)))); // Substitute for black. If a single curve is focused, black is hard to recognise as the other curves are grayed.
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(230, 159, 0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(86, 180, 233))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(0, 158, 115))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(204,153,0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0,114,178))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(213,94,0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(204,121,167))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(106,61,154))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(140,86,75))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
