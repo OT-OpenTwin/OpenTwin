@@ -1,7 +1,3 @@
-import re
-
-_VAR = re.compile(r"%([^%]+)%")
-
 DEFAULTS = {
     "OPEN_TWIN_MONGODB_ADDRESS": "127.0.0.1:27017",
     "OPEN_TWIN_SERVICES_ADDRESS": "127.0.0.1",
@@ -19,10 +15,3 @@ DEFAULTS = {
     "OPEN_TWIN_LOGGING_URL": r"%OPEN_TWIN_SERVICES_ADDRESS%:%OPEN_TWIN_LOG_PORT%",
     "OPEN_TWIN_LOGGING_MODE": '"WARNING_LOG|ERROR_LOG"',
 }
-
-
-def apply(env):
-    for name, template in DEFAULTS.items():
-        if name not in env:
-            env[name] = _VAR.sub(lambda m: env.get(m.group(1), ""), template)
-    return env

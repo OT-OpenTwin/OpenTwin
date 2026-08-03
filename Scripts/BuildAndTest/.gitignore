@@ -3,6 +3,7 @@ buildLog_Release.txt
 buildLog_Debug.txt
 buildLog_Summary.txt
 RUSTbuildLog.txt
+Framework_buildLog.txt
 AdminPanel_buildLog.txt
 Documentation_buildLog.txt
 DoxygenDocumentation_buildLog.txt
