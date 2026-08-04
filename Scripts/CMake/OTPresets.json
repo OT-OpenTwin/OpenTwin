@@ -14,8 +14,8 @@
       "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
         "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
-        "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+        "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "warnings": { "unusedCli": false },
@@ -31,8 +31,8 @@
       "cacheVariables": {
         "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
         "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
-        "CMAKE_CXX_COMPILER": "cl",
-        "CMAKE_C_COMPILER": "cl",
+        "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+        "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "warnings": { "unusedCli": false },
