@@ -8,5 +8,5 @@ IF "%OPENTWIN_DEV_ROOT%" == "" (
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" CIRCUIT_EXECUTION %1 %2
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" GLOBAL_DIRECTORY_SERVICE %1 %2
 IF ERRORLEVEL 1 PAUSE
