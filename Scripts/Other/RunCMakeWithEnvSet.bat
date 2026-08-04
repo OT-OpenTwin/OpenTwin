@@ -27,6 +27,14 @@ IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
 	goto END
 )
 
+REM Setup the native toolchain (required by the Ninja generator)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupToolchain.bat"
+
+REM Ensure that the script finished successfully
+IF NOT "%OT_TOOLCHAIN_READY%" == "1" (
+	goto END
+)
+
 ECHO Launching development enviroment
 
 IF "%1" == "" (
