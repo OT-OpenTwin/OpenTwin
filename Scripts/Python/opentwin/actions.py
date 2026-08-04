@@ -1,31 +1,29 @@
-import os
+# License:
+# Copyright 2026 by OpenTwin
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Mapping, Sequence, TextIO
 
+from .platform import DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS, cmake_executable
 from .toolchain import apply_toolchain
 
-SYSTEM = "windows" if os.name == "nt" else "linux"
-CMAKE_SUBPATH = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin" / "cmake.exe"
-SYSTEM_VARS: dict[str, dict[str, str]] = {"windows": {"VSLANG": "1033"}, "linux": {}}
 SEPARATOR = "=" * 88
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
-
-DEFAULT_EDITOR = "VS"
-EDITORS: dict[str, tuple[str | None, str]] = {
-    "VS": ("DEVENV_ROOT_2022", "devenv.exe"),
-    "CODE": (None, "code"),
-    "NVIM": (None, "nvim"),
-}
-
-
-def cmake_executable(env: Mapping[str, str]) -> Path:
-    cmake = Path(env["DEVENV_ROOT_2022"]) / CMAKE_SUBPATH
-    if not cmake.is_file():
-        raise SystemExit(f"cmake.exe not found: {cmake}")
-    return cmake
 
 
 def _build_config(cmake: Path, env: Mapping[str, str], target: str, config: str,
@@ -44,7 +42,7 @@ def build_project(env: Mapping[str, str], target: str, configs: Sequence[str],
                   rebuild: bool, logs: str | Path | None = None) -> int:
     cmake = cmake_executable(env)
     env = apply_toolchain(dict(env))
-    env.update(SYSTEM_VARS[SYSTEM])
+    env.update(ENV_VARS)
     parallel = ["--parallel"] if env.get("OPENTWIN_DEV_PARALLEL_BUILDS") else []
     logs = Path(logs) if logs else Path.cwd()
     failed = 0
@@ -98,7 +96,7 @@ def _on_path(env: Mapping[str, str], executable: str, target: str) -> int:
         raise SystemExit(f"{executable} not found on PATH")
 
     args = [command, target]
-    if os.name == "nt" and command.lower().endswith((".cmd", ".bat")):
+    if WINDOWS and command.lower().endswith((".cmd", ".bat")):
         args = ["cmd", "/c", *args]
     return subprocess.run(args, env=env).returncode
 
