@@ -23,7 +23,7 @@ IF NOT EXIST "%OT_LCL_VCVARS%" (
 	goto END
 )
 
-CALL "%OT_LCL_VCVARS%" > nul
+CALL "%OT_LCL_VCVARS%" > nul 2>&1
 SET OT_LCL_VCVARS=
 
 IF "%INCLUDE%"=="" (
