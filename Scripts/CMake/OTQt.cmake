@@ -15,6 +15,8 @@
 
 include_guard(GLOBAL)
 
+include("$ENV{OT_CMAKE_DIR}/OTPlatform.cmake")
+
 function(ot_assert_path_under_root PATH_VALUE ROOT_VALUE WHAT)
     if("${PATH_VALUE}" STREQUAL "" OR "${ROOT_VALUE}" STREQUAL "")
         message(FATAL_ERROR "ot_assert_path_under_root: empty path(s) for ${WHAT}")
@@ -79,12 +81,12 @@ function(ot_qt_setup_autogen_tools)
 
     file(TO_CMAKE_PATH "$ENV{QT_DLLR}" _qt_bin)
 
-    set(_moc "${_qt_bin}/moc.exe")
-    set(_uic "${_qt_bin}/uic.exe")
-    set(_rcc "${_qt_bin}/rcc.exe")
+    ot_platform_tool(_moc "${_qt_bin}" "moc")
+    ot_platform_tool(_uic "${_qt_bin}" "uic")
+    ot_platform_tool(_rcc "${_qt_bin}" "rcc")
 
     if(NOT EXISTS "${_moc}")
-        message(FATAL_ERROR "Qt moc.exe not found at: ${_moc}")
+        message(FATAL_ERROR "Qt moc not found at: ${_moc}")
     endif()
 
     if(NOT TARGET Qt6::moc)
@@ -219,7 +221,8 @@ function(ot_import_qt6_module MODULE_NAME LIB_BASENAME)
     _ot_qt_get_libdir_release(_qt_libr)
     ot_assert_path_under_root("${_qt_libr}" "${THIRDPARTY_ROOT_PATH}" "QT_LIBPATH")
 
-    set(_release_lib "${_qt_libr}/${LIB_BASENAME}.lib")
+    ot_platform_qt_lib(_release_name "${LIB_BASENAME}" RELEASE)
+    set(_release_lib "${_qt_libr}/${_release_name}")
     if(NOT EXISTS "${_release_lib}")
         message(FATAL_ERROR
             "Qt library not found: ${_release_lib}\n"
@@ -252,7 +255,8 @@ function(ot_import_qt6_module MODULE_NAME LIB_BASENAME)
     _ot_qt_get_libdir_debug(_qt_libd)
     if(NOT "${_qt_libd}" STREQUAL "")
         ot_assert_path_under_root("${_qt_libd}" "${THIRDPARTY_ROOT_PATH}" "QT_LIBPATH(D)")
-        set(_debug_lib "${_qt_libd}/${LIB_BASENAME}d.lib")
+        ot_platform_qt_lib(_debug_name "${LIB_BASENAME}" DEBUG)
+        set(_debug_lib "${_qt_libd}/${_debug_name}")
         if(EXISTS "${_debug_lib}")
             set_target_properties(Qt6::${MODULE_NAME} PROPERTIES
                 IMPORTED_LOCATION_DEBUG "${_debug_lib}"

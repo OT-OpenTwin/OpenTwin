@@ -19,6 +19,7 @@ include_guard(GLOBAL)
 # Designed for a centralized, environment-variable-driven approach to dependency management.
 # Check documentation for usage details.
 
+include("$ENV{OT_CMAKE_DIR}/OTPlatform.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTEnvironment.cmake")
 include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 
@@ -459,15 +460,16 @@ endfunction()
 # Compiler definitons and options wrappers
 # ------------------------------------------------------------
 function(_ot_apply_compile_option_internal CORE_TARGET OPTION)
-    if(MSVC)
-        if(OPTION MATCHES "^[0-9]+$")
-            target_compile_options(${CORE_TARGET} PRIVATE "/wd${OPTION}")
-        else()
-            target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
+    # A bare number is an MSVC warning ID; anything else is a literal flag.
+    if(OPTION MATCHES "^[0-9]+$")
+        ot_platform_warning_option(_flag "${OPTION}")
+        if(NOT "${_flag}" STREQUAL "")
+            target_compile_options(${CORE_TARGET} PRIVATE "${_flag}")
         endif()
-    else()
-        target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
+        return()
     endif()
+
+    target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
 endfunction()
 
 function(ot_add_compile_options TARGET_NAME)
@@ -1016,36 +1018,19 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
     endif()
 
     if(DEP STREQUAL "OSLibs")
-        if(WIN32)
-            set(_system_libs
-                "userenv"
-                "ws2_32"
-                "advapi32"
-                "shell32"
-                "bcrypt"
-                "secur32"
-                "pdh"
-                "odbc32"
-            )
-            target_link_libraries("${FINAL_TARGET}" PRIVATE ${_system_libs})
+        if(OT_SYSTEM_LIBS)
+            target_link_libraries("${FINAL_TARGET}" PRIVATE ${OT_SYSTEM_LIBS})
         endif()
-        # No UNIX/Linux system libraries are required yet
         return()
     endif()
 
-    # Windows system libs
-    if(WIN32 AND DEP MATCHES "^WINLIB:.+")
-        string(REPLACE "WINLIB:" "" _winlib "${DEP}")
-
-        if("${_winlib}" STREQUAL "")
-            message(FATAL_ERROR "Empty WINLIB token: '${DEP}'")
+    # Consumed on every platform so it is never reported as an unknown token.
+    ot_platform_is_system_lib_token(_is_system_lib "${DEP}")
+    if(_is_system_lib)
+        ot_platform_system_lib(_system_lib "${DEP}")
+        if(NOT "${_system_lib}" STREQUAL "")
+            target_link_libraries("${FINAL_TARGET}" PRIVATE "${_system_lib}")
         endif()
-
-        if(NOT _winlib MATCHES "^[A-Za-z0-9_.-]+$")
-            message(FATAL_ERROR "Invalid WINLIB name '${_winlib}' from token '${DEP}'")
-        endif()
-
-        target_link_libraries("${FINAL_TARGET}" PRIVATE "${_winlib}")
         return()
     endif()
 
