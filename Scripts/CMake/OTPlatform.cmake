@@ -56,6 +56,8 @@ else()
     set(OT_TOOLCHAIN "unknown")
 endif()
 
+message(STATUS "[OT] ${OT_PLATFORM} / ${OT_TOOLCHAIN} ${CMAKE_CXX_COMPILER_VERSION}")
+
 if(OT_PLATFORM_WINDOWS)
     set(OT_EXE_SUFFIX ".exe")
 else()
