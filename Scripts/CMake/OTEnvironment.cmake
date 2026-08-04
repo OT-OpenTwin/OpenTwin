@@ -161,17 +161,11 @@ endif()
 # ============================================================
 ot_get_env_path(OT_INC_PATH                       OT_INC)
 ot_get_env_path(OT_SRC_PATH                       OT_SRC)
-ot_get_env_path(OT_DLLD_PATH                      OT_DLLD)
-ot_get_env_path(OT_DLLR_PATH                      OT_DLLR)
-ot_get_env_path(OT_LIBD_PATH                      OT_LIBD)
-ot_get_env_path(OT_LIBR_PATH                      OT_LIBR)
 ot_get_env_path(OT_CDLLD_PATH                     OT_CDLLD)
 ot_get_env_path(OT_CDLLR_PATH                     OT_CDLLR)
 ot_get_env_path(OT_CLIBD_PATH                     OT_CLIBD)
 ot_get_env_path(OT_CLIBR_PATH                     OT_CLIBR)
 ot_get_env_path(OT_TEST_PATH                      OT_TEST)
-ot_get_env_path(OT_LIBTESTD_PATH                  OT_LIBTESTD)
-ot_get_env_path(OT_LIBTESTR_PATH                  OT_LIBTESTR)
 
 # ============================================================
 # OpenTwin service roots from SetupEnvironment.bat

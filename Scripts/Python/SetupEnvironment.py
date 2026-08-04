@@ -85,17 +85,11 @@ GROUPS = ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools"))
 RELATIVE = {
     "OT_INC": "include",
     "OT_SRC": "src",
-    "OT_DLLD": r"x64\Debug",
-    "OT_DLLR": r"x64\Release",
-    "OT_LIBD": r"x64\Debug",
-    "OT_LIBR": r"x64\Release",
     "OT_CDLLD": r"build\windows-debug\Debug",
     "OT_CDLLR": r"build\windows-release\Release",
     "OT_CLIBD": r"build\windows-debug\Debug",
     "OT_CLIBR": r"build\windows-release\Release",
     "OT_TEST": "test",
-    "OT_LIBTESTD": r"\x64\DebugTest",
-    "OT_LIBTESTR": r"\x64\ReleaseTest",
 }
 
 # ===== Paths below the development root =====

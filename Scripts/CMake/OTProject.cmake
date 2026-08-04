@@ -858,13 +858,6 @@ function(_ot_add_ot_dep_link_dirs FINAL_TARGET ROOT_DIR)
         )
     endif()
 
-    if(OT_LIBD_PATH AND OT_LIBR_PATH)
-        _ot_add_debug_release_link_dirs("${FINAL_TARGET}"
-            "${ROOT_DIR}/${OT_LIBD_PATH}"
-            "${ROOT_DIR}/${OT_LIBR_PATH}"
-        )
-    endif()
-
     if(OT_CDLLD_PATH AND OT_CDLLR_PATH)
         _ot_add_debug_release_link_dirs("${FINAL_TARGET}"
             "${ROOT_DIR}/${OT_CDLLD_PATH}"
