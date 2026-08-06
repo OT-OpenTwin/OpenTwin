@@ -26,25 +26,6 @@ include("$ENV{OT_CMAKE_DIR}/OTQt.cmake")
 set(_OT_CFG_DEBUG   "$<CONFIG:Debug>")
 set(_OT_CFG_RELEASE "$<OR:$<CONFIG:Release>,$<CONFIG:RelWithDebInfo>,$<CONFIG:MinSizeRel>>")
 
-function(_ot_reject_build_tree OUT_VAR)
-    set(_roots "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/build")
-    set(_kept "")
-    foreach(_path IN LISTS ARGN)
-        set(_generated FALSE)
-        foreach(_root IN LISTS _roots)
-            cmake_path(IS_PREFIX _root "${_path}" NORMALIZE _inside)
-            if(_inside)
-                set(_generated TRUE)
-                break()
-            endif()
-        endforeach()
-        if(NOT _generated)
-            list(APPEND _kept "${_path}")
-        endif()
-    endforeach()
-    set(${OUT_VAR} "${_kept}" PARENT_SCOPE)
-endfunction()
-
 if(MSVC)
     add_compile_options(
         /Zc:__cplusplus
@@ -120,6 +101,27 @@ function(_ot_add_debug_release_link_dirs TARGET_NAME DEBUG_DIR RELEASE_DIR)
             $<${_OT_CFG_RELEASE}:${RELEASE_DIR}>
         )
     endif()
+endfunction()
+
+# Drops paths inside a build tree, so CONFIGURE_DEPENDS globs do not pick up
+# generated files.
+function(_ot_reject_build_tree OUT_VAR)
+    set(_roots "${CMAKE_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/build")
+    set(_kept "")
+    foreach(_path IN LISTS ARGN)
+        set(_generated FALSE)
+        foreach(_root IN LISTS _roots)
+            cmake_path(IS_PREFIX _root "${_path}" NORMALIZE _inside)
+            if(_inside)
+                set(_generated TRUE)
+                break()
+            endif()
+        endforeach()
+        if(NOT _generated)
+            list(APPEND _kept "${_path}")
+        endif()
+    endforeach()
+    set(${OUT_VAR} "${_kept}" PARENT_SCOPE)
 endfunction()
 
 # ------------------------------------------------------------
