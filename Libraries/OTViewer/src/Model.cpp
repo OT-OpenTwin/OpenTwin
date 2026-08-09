@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Model.cpp
 // 
 // License:
@@ -23,6 +23,7 @@
 #include "OTCore/Logging/Logger.h"
 
 #include "OTWidgets/Plot/Plot.h"
+#include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/TextEditor.h"
 #include "OTWidgets/WidgetView/PlotView.h"
@@ -85,9 +86,17 @@
 // Qt header
 #include <QtWidgets/qheaderview.h>
 #include <QtWidgets/qfiledialog.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtWidgets/qpushbutton.h>
+#include <QtCore/qpoint.h>
 
 // std header
 #include <fstream>
+#include <sstream>
+#include <vector>
+#include <string>
+#include <iomanip>
+#include <chrono>
 
 Model::Model() :
 	m_osgRootNode(nullptr),
@@ -2040,8 +2049,489 @@ void Model::exportPlotAsPlotly()
 	ot::Plot* plot = view->getPlot();
 	OTAssertNullptr(plot);
 
-	// ...
+	// Prompt user: Standalone HTML file vs Append to existing file
+	QMessageBox msgBox(view->getViewWidget());
+	msgBox.setWindowTitle("Export Plot to Plotly");
+	msgBox.setText("Would you like to save the plot as a new HTML file or append it to an existing Plotly HTML file?");
+	QAbstractButton* btnStandalone = msgBox.addButton("Save to new File", QMessageBox::AcceptRole);
+	QAbstractButton* btnAppend = msgBox.addButton("Append to Existing File", QMessageBox::ActionRole);
+	QAbstractButton* btnCancel = msgBox.addButton("Cancel", QMessageBox::RejectRole);
+	msgBox.setDefaultButton(dynamic_cast<QPushButton*>(btnStandalone));
 
+	msgBox.exec();
+
+	if (msgBox.clickedButton() == btnCancel || msgBox.clickedButton() == nullptr)
+	{
+		return;
+	}
+
+	bool isAppendMode = (msgBox.clickedButton() == btnAppend);
+	QString fileName;
+
+	if (isAppendMode)
+	{
+		fileName = QFileDialog::getOpenFileName(view->getViewWidget(), "Select Plotly HTML File to Append", "", "HTML Files (*.html)");
+	}
+	else
+	{
+		fileName = QFileDialog::getSaveFileName(view->getViewWidget(), "Export Plot to Plotly", "", "HTML Files (*.html)");
+	}
+
+	if (fileName.isEmpty())
+	{
+		return;
+	}
+
+	// Extract title
+	std::string plotTitle = plot->getConfig().getTitle();
+	if (plotTitle.empty())
+	{
+		plotTitle = plot->getConfig().getEntityName();
+		size_t lastSlash = plotTitle.find_last_of('/');
+		if (lastSlash != std::string::npos && lastSlash + 1 < plotTitle.size())
+		{
+			plotTitle = plotTitle.substr(lastSlash + 1);
+		}
+	}
+	if (plotTitle.empty())
+	{
+		plotTitle = "Plotly Export";
+	}
+
+	// Determine plot type: Cartesian vs Polar
+	ot::Plot1DCfg::PlotType plotType = plot->getConfig().getPlotType();
+	bool isPolar = (plotType == ot::Plot1DCfg::Polar);
+
+	// Determine axis labels
+	bool isComplexData = false;
+	std::list<ot::PlotDataset*> datasets = plot->getAllDatasets();
+	for (const ot::PlotDataset* dataset : datasets)
+	{
+		if (dataset && dataset->dataIsComplex())
+		{
+			isComplexData = true;
+		}
+	}
+
+	std::string axisTitleX = plot->getConfig().getXAxisDisplayLabel(isComplexData);
+	std::string axisTitleY = plot->getConfig().getYAxisDisplayLabel(isComplexData);
+
+	auto getPainterColorStr = [](const ot::Painter2D* painter) -> std::string {
+		if (!painter) return "";
+		ot::Color c = painter->getDefaultColor();
+		return "rgba(" + std::to_string(c.r()) + ", " +
+			std::to_string(c.g()) + ", " +
+			std::to_string(c.b()) + ", " +
+			std::to_string(c.a() / 255.0) + ")";
+	};
+
+	// Determine grid settings
+	std::string gridColorStr = getPainterColorStr(plot->getConfig().getGridColor());
+	if (gridColorStr.empty())
+	{
+		gridColorStr = "#e5e7eb";
+	}
+	bool gridVisible = plot->getConfig().getGridVisible();
+	double gridLineWidth = plot->getConfig().getGridLineWidth();
+
+	// Assemble layout JSON
+	std::string layoutJson;
+	if (isPolar)
+	{
+		layoutJson = "{\n"
+			"  \"title\": {\n"
+			"    \"text\": \"" + plotTitle + "\",\n"
+			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"polar\": {\n"
+			"    \"angularaxis\": {\n"
+			"      \"thetaunit\": \"radians\",\n"
+			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
+			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
+			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
+			"      \"title\": { \"text\": \"" + axisTitleX + "\" }\n"
+			"    },\n"
+			"    \"radialaxis\": {\n"
+			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
+			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
+			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
+			"      \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
+			"    }\n"
+			"  },\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"}";
+	}
+	else
+	{
+		layoutJson = "{\n"
+			"  \"title\": {\n"
+			"    \"text\": \"" + plotTitle + "\",\n"
+			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"xaxis\": {\n"
+			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
+			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
+			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
+			"    \"title\": { \"text\": \"" + axisTitleX + "\" }\n"
+			"  },\n"
+			"  \"yaxis\": {\n"
+			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
+			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
+			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
+			"    \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
+			"  },\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"}";
+	}
+
+	// Extract traces and assemble data JSON
+	std::stringstream dataJson;
+	dataJson << "[\n";
+
+	size_t traceIndex = 0;
+	for (ot::PlotDataset* dataset : datasets)
+	{
+		if (!dataset) continue;
+		if (traceIndex > 0)
+		{
+			dataJson << ",\n";
+		}
+		const ot::Plot1DCurveCfg& config = dataset->getConfig();
+
+		// Determine trace name
+		std::string name = config.getTitle();
+		if (name.empty())
+		{
+			name = dataset->getEntityName();
+			size_t lastSlash = name.find_last_of('/');
+			if (lastSlash != std::string::npos && lastSlash + 1 < name.size())
+			{
+				name = name.substr(lastSlash + 1);
+			}
+		}
+
+		// Extract points
+		ot::PlotDatasetData& data = dataset->getPlotData();
+		size_t size = data.getSize();
+		std::vector<double> val1, val2;
+		val1.reserve(size);
+		val2.reserve(size);
+		for (size_t i = 0; i < size; ++i)
+		{
+			QPointF pt = data.getSample<QPointF>(i);
+			val1.push_back(pt.x());
+			val2.push_back(pt.y());
+		}
+
+		// Determine mode (lines, markers, lines+markers)
+		bool hasLine = (config.getLinePen().getStyle() != ot::LineStyle::NoLine);
+		bool hasSymbol = (config.getPointSymbol() != ot::Plot1DCurveCfg::NoSymbol);
+		std::string mode = "lines";
+		if (hasLine && hasSymbol)
+		{
+			mode = "lines+markers";
+		}
+		else if (!hasLine && hasSymbol)
+		{
+			mode = "markers";
+		}
+		else if (hasLine && !hasSymbol)
+		{
+			mode = "lines";
+		}
+		else
+		{
+			mode = "lines";
+		}
+
+		// Determine symbol shape if symbol is active
+		std::string plotlySymbol = "";
+		if (hasSymbol)
+		{
+			switch (config.getPointSymbol())
+			{
+			case ot::Plot1DCurveCfg::Circle: plotlySymbol = "circle"; break;
+			case ot::Plot1DCurveCfg::Square: plotlySymbol = "square"; break;
+			case ot::Plot1DCurveCfg::Diamond: plotlySymbol = "diamond"; break;
+			case ot::Plot1DCurveCfg::TriangleUp: plotlySymbol = "triangle-up"; break;
+			case ot::Plot1DCurveCfg::TriangleDown: plotlySymbol = "triangle-down"; break;
+			case ot::Plot1DCurveCfg::TriangleLeft: plotlySymbol = "triangle-left"; break;
+			case ot::Plot1DCurveCfg::TriangleRight: plotlySymbol = "triangle-right"; break;
+			case ot::Plot1DCurveCfg::Cross: plotlySymbol = "cross"; break;
+			case ot::Plot1DCurveCfg::XCross: plotlySymbol = "x"; break;
+			case ot::Plot1DCurveCfg::HLine: plotlySymbol = "line-ew"; break;
+			case ot::Plot1DCurveCfg::VLine: plotlySymbol = "line-ns"; break;
+			case ot::Plot1DCurveCfg::Star6: plotlySymbol = "star-triangle-up"; break;
+			case ot::Plot1DCurveCfg::Star8: plotlySymbol = "star"; break;
+			case ot::Plot1DCurveCfg::Hexagon: plotlySymbol = "hexagon"; break;
+			default: plotlySymbol = "circle"; break;
+			}
+		}
+
+		// Determine line style
+		std::string plotlyDash = "solid";
+		switch (config.getLinePen().getStyle())
+		{
+		case ot::LineStyle::SolidLine: plotlyDash = "solid"; break;
+		case ot::LineStyle::DashLine: plotlyDash = "dash"; break;
+		case ot::LineStyle::DotLine: plotlyDash = "dot"; break;
+		case ot::LineStyle::DashDotLine: plotlyDash = "dashdot"; break;
+		case ot::LineStyle::DashDotDotLine: plotlyDash = "longdashdot"; break;
+		default: plotlyDash = "solid"; break;
+		}
+
+		// Extract line color and width
+		std::string colorStr = getPainterColorStr(config.getLinePen().getPainter());
+		if (colorStr.empty())
+		{
+			colorStr = "rgba(59, 130, 246, 1.0)";
+		}
+		double width = config.getLinePen().getWidth();
+
+		// Extract marker colors
+		std::string markerFillColorStr = colorStr;
+		std::string markerOutlineColorStr = "";
+		double markerOutlineWidth = config.getPointOutlinePen().getWidth();
+
+		if (!config.getPointColorFromCurve())
+		{
+			std::string fillStr = getPainterColorStr(config.getPointFillPainter());
+			if (!fillStr.empty())
+			{
+				markerFillColorStr = fillStr;
+			}
+			std::string outlineStr = getPainterColorStr(config.getPointOutlinePen().getPainter());
+			if (!outlineStr.empty())
+			{
+				markerOutlineColorStr = outlineStr;
+			}
+		}
+
+		int pointSize = config.getPointSize();
+		if (pointSize <= 0) pointSize = 6;
+
+		// Write trace JSON
+		std::string traceType = isPolar ? "scatterpolar" : "scatter";
+		std::string key1 = isPolar ? "theta" : "x";
+		std::string key2 = isPolar ? "r" : "y";
+
+		dataJson << "  {\n"
+			<< "    \"type\": \"" << traceType << "\",\n";
+		if (isPolar)
+		{
+			dataJson << "    \"thetaunit\": \"radians\",\n";
+		}
+		dataJson << "    \"mode\": \"" << mode << "\",\n"
+			<< "    \"name\": \"" << name << "\",\n"
+			<< "    \"" << key1 << "\": [";
+		for (size_t i = 0; i < val1.size(); ++i)
+		{
+			dataJson << val1[i];
+			if (i + 1 < val1.size()) dataJson << ", ";
+		}
+		dataJson << "],\n"
+			<< "    \"" << key2 << "\": [";
+		for (size_t i = 0; i < val2.size(); ++i)
+		{
+			dataJson << val2[i];
+			if (i + 1 < val2.size()) dataJson << ", ";
+		}
+		dataJson << "]";
+
+		dataJson << ",\n    \"marker\": {";
+		dataJson << " \"color\": \"" << markerFillColorStr << "\",";
+		if (!plotlySymbol.empty())
+		{
+			dataJson << " \"symbol\": \"" << plotlySymbol << "\",";
+		}
+		dataJson << " \"size\": " << pointSize;
+		if (!markerOutlineColorStr.empty())
+		{
+			dataJson << ", \"line\": { \"color\": \"" << markerOutlineColorStr << "\", \"width\": " << markerOutlineWidth << " }";
+		}
+		dataJson << " },\n";
+		dataJson << "    \"line\": { \"color\": \"" << colorStr << "\", \"width\": " << width << ", \"dash\": \"" << plotlyDash << "\" }";
+		dataJson << "\n  }";
+		traceIndex++;
+	}
+	dataJson << "\n]";
+
+	// Generate unique plot ID using timestamp
+	std::string uniqueId = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(
+		std::chrono::system_clock::now().time_since_epoch()).count());
+
+	// Construct plot card HTML snippet
+	std::stringstream cardHtml;
+	cardHtml << "    <div class=\"container\">\n"
+		<< "        <div id=\"plot-div-" << uniqueId << "\" class=\"plot-div\"></div>\n"
+		<< "    </div>\n"
+		<< "    <script>\n"
+		<< "    (function() {\n"
+		<< "        const divId = 'plot-div-" << uniqueId << "';\n"
+		<< "        const data = " << dataJson.str() << ";\n"
+		<< "        const layoutTemplate = " << layoutJson << ";\n"
+		<< "        function renderPlot() {\n"
+		<< "            const layout = {\n"
+		<< "                ...layoutTemplate,\n"
+		<< "                paper_bgcolor: '#ffffff',\n"
+		<< "                plot_bgcolor: '#ffffff',\n"
+		<< "                font: {\n"
+		<< "                    family: 'Outfit, sans-serif',\n"
+		<< "                    color: '#111827'\n"
+		<< "                }\n"
+		<< "            };\n"
+		<< "            if (layoutTemplate.xaxis && layoutTemplate.yaxis) {\n"
+		<< "                layout.xaxis = { zerolinecolor: '#d1d5db', ...layoutTemplate.xaxis };\n"
+		<< "                layout.yaxis = { zerolinecolor: '#d1d5db', ...layoutTemplate.yaxis };\n"
+		<< "            }\n"
+		<< "            if (layoutTemplate.polar) {\n"
+		<< "                layout.polar = {\n"
+		<< "                    bgcolor: '#ffffff',\n"
+		<< "                    ...layoutTemplate.polar,\n"
+		<< "                    angularaxis: { linecolor: '#d1d5db', ...layoutTemplate.polar.angularaxis },\n"
+		<< "                    radialaxis: { linecolor: '#d1d5db', ...layoutTemplate.polar.radialaxis }\n"
+		<< "                };\n"
+		<< "            }\n"
+		<< "            const config = { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['select2d', 'lasso2d'] };\n"
+		<< "            Plotly.newPlot(divId, data, layout, config);\n"
+		<< "        }\n"
+		<< "        renderPlot();\n"
+		<< "    })();\n"
+		<< "    </script>";
+
+	auto replaceAll = [](std::string& str, const std::string& from, const std::string& to) {
+		size_t start_pos = 0;
+		while ((start_pos = str.find(from, start_pos)) != std::string::npos) {
+			str.replace(start_pos, from.length(), to);
+			start_pos += to.length();
+		}
+	};
+
+	if (isAppendMode)
+	{
+		// Read existing file
+		std::ifstream inFile(fileName.toStdString());
+		if (!inFile.is_open())
+		{
+			OT_LOG_E("Could not open existing file for appending: " + fileName.toStdString());
+			return;
+		}
+		std::stringstream buffer;
+		buffer << inFile.rdbuf();
+		inFile.close();
+
+		std::string existingHtml = buffer.str();
+		std::string insertMarker = "<!-- NEXT_PLOT_HERE -->";
+		size_t markerPos = existingHtml.find(insertMarker);
+
+		if (markerPos != std::string::npos)
+		{
+			existingHtml.replace(markerPos, insertMarker.length(), cardHtml.str() + "\n    " + insertMarker);
+		}
+		else
+		{
+			// Fallback: insert before </body>
+			size_t bodyEndPos = existingHtml.find("</body>");
+			if (bodyEndPos != std::string::npos)
+			{
+				existingHtml.insert(bodyEndPos, cardHtml.str() + "\n");
+			}
+			else
+			{
+				existingHtml += "\n" + cardHtml.str();
+			}
+		}
+
+		std::ofstream outFile(fileName.toStdString());
+		if (outFile.is_open())
+		{
+			outFile << existingHtml;
+			outFile.close();
+		}
+	}
+	else
+	{
+		// Standalone file HTML template
+		std::string standaloneHtml = R"HTML(<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>__TITLE__</title>
+    <!-- Modern Typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --card-bg: #ffffff;
+            --text-color: #111827;
+            --text-muted: #6b7280;
+            --accent-color: #2563eb;
+            --border-color: #e5e7eb;
+        }
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            margin-bottom: 20px;
+        }
+        .plot-div {
+            width: 100%;
+            height: 600px;
+        }
+        footer {
+            margin-top: auto;
+            padding: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+            width: 100%;
+            background-color: #ffffff;
+        }
+    </style>
+</head>
+<body>
+    <div id="plots-wrapper" style="width: 100%; display: flex; flex-direction: column; align-items: center;">
+__PLOT_CONTENT__
+        <!-- NEXT_PLOT_HERE -->
+    </div>
+
+    <footer>
+        Generated with OpenTwin Plot Exporter &bull; <span id="timestamp"></span>
+        <script>document.getElementById('timestamp').innerText = new Date().toLocaleString();</script>
+    </footer>
+</body>
+</html>)HTML";
+
+		replaceAll(standaloneHtml, "__TITLE__", plotTitle);
+		replaceAll(standaloneHtml, "__PLOT_CONTENT__", cardHtml.str());
+
+		std::ofstream file(fileName.toStdString());
+		if (file.is_open())
+		{
+			file << standaloneHtml;
+			file.close();
+		}
+	}
 }
 
 void Model::viewerTabChangedToCentral(const ot::WidgetViewBase& _viewInfo) {
