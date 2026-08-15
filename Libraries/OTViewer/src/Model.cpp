@@ -2160,6 +2160,7 @@ void Model::exportPlotAsPlotly()
 	}
 	bool gridVisible = plot->getConfig().getGridVisible();
 	double gridLineWidth = plot->getConfig().getGridLineWidth();
+	bool legendVisible = plot->getConfig().getLegendVisible();
 
 	// Assemble Plotly layout JSON (customized for Cartesian vs Polar coordinates)
 	std::string layoutJson;
@@ -2169,6 +2170,17 @@ void Model::exportPlotAsPlotly()
 			"  \"title\": {\n"
 			"    \"text\": \"" + plotTitle + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
+			"  \"legend\": {\n"
+			"    \"x\": 1.02,\n"
+			"    \"y\": 1,\n"
+			"    \"xanchor\": \"left\",\n"
+			"    \"yanchor\": \"top\",\n"
+			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
+			"    \"bordercolor\": \"#e5e7eb\",\n"
+			"    \"borderwidth\": 1,\n"
+			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
 			"  },\n"
 			"  \"polar\": {\n"
 			"    \"angularaxis\": {\n"
@@ -2185,7 +2197,7 @@ void Model::exportPlotAsPlotly()
 			"      \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
 			"    }\n"
 			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
 			"}";
 	}
 	else
@@ -2194,6 +2206,17 @@ void Model::exportPlotAsPlotly()
 			"  \"title\": {\n"
 			"    \"text\": \"" + plotTitle + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
+			"  \"legend\": {\n"
+			"    \"x\": 1.02,\n"
+			"    \"y\": 1,\n"
+			"    \"xanchor\": \"left\",\n"
+			"    \"yanchor\": \"top\",\n"
+			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
+			"    \"bordercolor\": \"#e5e7eb\",\n"
+			"    \"borderwidth\": 1,\n"
+			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
 			"  },\n"
 			"  \"xaxis\": {\n"
 			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
@@ -2207,7 +2230,7 @@ void Model::exportPlotAsPlotly()
 			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
 			"    \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
 			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
 			"}";
 	}
 
@@ -2363,6 +2386,7 @@ void Model::exportPlotAsPlotly()
 		std::string traceType = isPolar ? "scatterpolar" : "scatter";
 		std::string key1 = isPolar ? "theta" : "x";
 		std::string key2 = isPolar ? "r" : "y";
+		bool isVisible = config.getVisible();
 
 		dataJson << "  {\n"
 			<< "    \"type\": \"" << traceType << "\",\n";
@@ -2372,6 +2396,8 @@ void Model::exportPlotAsPlotly()
 		}
 		dataJson << "    \"mode\": \"" << mode << "\",\n"
 			<< "    \"name\": \"" << name << "\",\n"
+			<< "    \"showlegend\": true,\n"
+			<< "    \"visible\": " << (isVisible ? "true" : "\"legendonly\"") << ",\n"
 			<< "    \"" << key1 << "\": [";
 		for (size_t i = 0; i < val1.size(); ++i)
 		{
