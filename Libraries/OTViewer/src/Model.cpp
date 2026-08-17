@@ -22,8 +22,11 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 
+#include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/Plot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
+#include "OTWidgets/Plot/Cartesian/CartesianPlotCurve.h"
+#include "OTWidgets/Plot/Polar/PolarPlotCurve.h"
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/TextEditor.h"
 #include "OTWidgets/WidgetView/PlotView.h"
@@ -2039,7 +2042,7 @@ void Model::exportPlotAsPlotly()
 		return;
 	}
 
-	// Get plot
+	// Retrieve current view and verify it is a valid plot view
 	ot::PlotView* view = dynamic_cast<ot::PlotView*>(api->getCurrentView());
 	if (!view)
 	{
@@ -2049,7 +2052,7 @@ void Model::exportPlotAsPlotly()
 	ot::Plot* plot = view->getPlot();
 	OTAssertNullptr(plot);
 
-	// Prompt user: Standalone HTML file vs Append to existing file
+	// Prompt user for export mode: create a new file or append to an existing one
 	QMessageBox msgBox(view->getViewWidget());
 	msgBox.setWindowTitle("Export Plot to Plotly");
 	msgBox.setText("Would you like to save the plot as a new HTML file or append it to an existing Plotly HTML file?");
@@ -2068,6 +2071,7 @@ void Model::exportPlotAsPlotly()
 	bool isAppendMode = (msgBox.clickedButton() == btnAppend);
 	QString fileName;
 
+	// Request file path via file dialog
 	if (isAppendMode)
 	{
 		fileName = QFileDialog::getOpenFileName(view->getViewWidget(), "Select Plotly HTML File to Append", "", "HTML Files (*.html)");
@@ -2082,7 +2086,7 @@ void Model::exportPlotAsPlotly()
 		return;
 	}
 
-	// Extract title
+	// Extract plot title from config or entity name
 	std::string plotTitle = plot->getConfig().getTitle();
 	if (plotTitle.empty())
 	{
@@ -2102,7 +2106,7 @@ void Model::exportPlotAsPlotly()
 	ot::Plot1DCfg::PlotType plotType = plot->getConfig().getPlotType();
 	bool isPolar = (plotType == ot::Plot1DCfg::Polar);
 
-	// Determine axis labels
+	// Check for complex data and determine axis display labels
 	bool isComplexData = false;
 	std::list<ot::PlotDataset*> datasets = plot->getAllDatasets();
 	for (const ot::PlotDataset* dataset : datasets)
@@ -2116,8 +2120,22 @@ void Model::exportPlotAsPlotly()
 	std::string axisTitleX = plot->getConfig().getXAxisDisplayLabel(isComplexData);
 	std::string axisTitleY = plot->getConfig().getYAxisDisplayLabel(isComplexData);
 
-	auto getPainterColorStr = [](const ot::Painter2D* painter) -> std::string {
+	// Helper lambdas to resolve QColor, Painter2D and PenFCfg (including color theme references)
+	auto getQColorStr = [](const QColor& c) -> std::string {
+		if (!c.isValid()) return "";
+		return "rgba(" + std::to_string(c.red()) + ", " +
+			std::to_string(c.green()) + ", " +
+			std::to_string(c.blue()) + ", " +
+			std::to_string(c.alphaF()) + ")";
+	};
+
+	auto getPainterColorStr = [&](const ot::Painter2D* painter) -> std::string {
 		if (!painter) return "";
+		QBrush brush = ot::QtFactory::toQBrush(painter);
+		if (brush.color().isValid())
+		{
+			return getQColorStr(brush.color());
+		}
 		ot::Color c = painter->getDefaultColor();
 		return "rgba(" + std::to_string(c.r()) + ", " +
 			std::to_string(c.g()) + ", " +
@@ -2125,7 +2143,16 @@ void Model::exportPlotAsPlotly()
 			std::to_string(c.a() / 255.0) + ")";
 	};
 
-	// Determine grid settings
+	auto getPenColorStr = [&](const ot::PenFCfg& penCfg) -> std::string {
+		QPen qpen = ot::QtFactory::toQPen(penCfg);
+		if (qpen.color().isValid())
+		{
+			return getQColorStr(qpen.color());
+		}
+		return getPainterColorStr(penCfg.getPainter());
+	};
+
+	// Extract grid settings and grid color
 	std::string gridColorStr = getPainterColorStr(plot->getConfig().getGridColor());
 	if (gridColorStr.empty())
 	{
@@ -2133,8 +2160,9 @@ void Model::exportPlotAsPlotly()
 	}
 	bool gridVisible = plot->getConfig().getGridVisible();
 	double gridLineWidth = plot->getConfig().getGridLineWidth();
+	bool legendVisible = plot->getConfig().getLegendVisible();
 
-	// Assemble layout JSON
+	// Assemble Plotly layout JSON (customized for Cartesian vs Polar coordinates)
 	std::string layoutJson;
 	if (isPolar)
 	{
@@ -2142,6 +2170,17 @@ void Model::exportPlotAsPlotly()
 			"  \"title\": {\n"
 			"    \"text\": \"" + plotTitle + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
+			"  \"legend\": {\n"
+			"    \"x\": 1.02,\n"
+			"    \"y\": 1,\n"
+			"    \"xanchor\": \"left\",\n"
+			"    \"yanchor\": \"top\",\n"
+			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
+			"    \"bordercolor\": \"#e5e7eb\",\n"
+			"    \"borderwidth\": 1,\n"
+			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
 			"  },\n"
 			"  \"polar\": {\n"
 			"    \"angularaxis\": {\n"
@@ -2158,7 +2197,7 @@ void Model::exportPlotAsPlotly()
 			"      \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
 			"    }\n"
 			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
 			"}";
 	}
 	else
@@ -2167,6 +2206,17 @@ void Model::exportPlotAsPlotly()
 			"  \"title\": {\n"
 			"    \"text\": \"" + plotTitle + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
+			"  },\n"
+			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
+			"  \"legend\": {\n"
+			"    \"x\": 1.02,\n"
+			"    \"y\": 1,\n"
+			"    \"xanchor\": \"left\",\n"
+			"    \"yanchor\": \"top\",\n"
+			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
+			"    \"bordercolor\": \"#e5e7eb\",\n"
+			"    \"borderwidth\": 1,\n"
+			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
 			"  },\n"
 			"  \"xaxis\": {\n"
 			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
@@ -2180,11 +2230,11 @@ void Model::exportPlotAsPlotly()
 			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
 			"    \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
 			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 40 }\n"
+			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
 			"}";
 	}
 
-	// Extract traces and assemble data JSON
+	// Iterate through all datasets and assemble traces JSON
 	std::stringstream dataJson;
 	dataJson << "[\n";
 
@@ -2198,7 +2248,7 @@ void Model::exportPlotAsPlotly()
 		}
 		const ot::Plot1DCurveCfg& config = dataset->getConfig();
 
-		// Determine trace name
+		// Determine trace name from title or entity name
 		std::string name = config.getTitle();
 		if (name.empty())
 		{
@@ -2210,7 +2260,7 @@ void Model::exportPlotAsPlotly()
 			}
 		}
 
-		// Extract points
+		// Extract coordinates from dataset data
 		ot::PlotDatasetData& data = dataset->getPlotData();
 		size_t size = data.getSize();
 		std::vector<double> val1, val2;
@@ -2223,7 +2273,7 @@ void Model::exportPlotAsPlotly()
 			val2.push_back(pt.y());
 		}
 
-		// Determine mode (lines, markers, lines+markers)
+		// Determine rendering mode (lines, markers, or lines+markers)
 		bool hasLine = (config.getLinePen().getStyle() != ot::LineStyle::NoLine);
 		bool hasSymbol = (config.getPointSymbol() != ot::Plot1DCurveCfg::NoSymbol);
 		std::string mode = "lines";
@@ -2244,7 +2294,7 @@ void Model::exportPlotAsPlotly()
 			mode = "lines";
 		}
 
-		// Determine symbol shape if symbol is active
+		// Map marker symbol shape to Plotly symbol
 		std::string plotlySymbol = "";
 		if (hasSymbol)
 		{
@@ -2268,7 +2318,7 @@ void Model::exportPlotAsPlotly()
 			}
 		}
 
-		// Determine line style
+		// Map line style (solid, dashed, dotted, etc.)
 		std::string plotlyDash = "solid";
 		switch (config.getLinePen().getStyle())
 		{
@@ -2280,15 +2330,37 @@ void Model::exportPlotAsPlotly()
 		default: plotlyDash = "solid"; break;
 		}
 
-		// Extract line color and width
-		std::string colorStr = getPainterColorStr(config.getLinePen().getPainter());
+		// Resolve line color and width (primary from active curve, fallback via configuration/theme)
+		std::string colorStr = "";
+		if (isPolar && dataset->getPolarCurve())
+		{
+			QColor c = dataset->getPolarCurve()->pen().color();
+			if (c.isValid())
+			{
+				colorStr = getQColorStr(c);
+			}
+		}
+		else if (!isPolar && dataset->getCartesianCurve())
+		{
+			QColor c = dataset->getCartesianCurve()->pen().color();
+			if (c.isValid())
+			{
+				colorStr = getQColorStr(c);
+			}
+		}
+
+		if (colorStr.empty())
+		{
+			colorStr = getPenColorStr(config.getLinePen());
+		}
+
 		if (colorStr.empty())
 		{
 			colorStr = "rgba(59, 130, 246, 1.0)";
 		}
 		double width = config.getLinePen().getWidth();
 
-		// Extract marker colors
+		// Determine marker fill and outline colors
 		std::string markerFillColorStr = colorStr;
 		std::string markerOutlineColorStr = "";
 		double markerOutlineWidth = config.getPointOutlinePen().getWidth();
@@ -2300,7 +2372,7 @@ void Model::exportPlotAsPlotly()
 			{
 				markerFillColorStr = fillStr;
 			}
-			std::string outlineStr = getPainterColorStr(config.getPointOutlinePen().getPainter());
+			std::string outlineStr = getPenColorStr(config.getPointOutlinePen());
 			if (!outlineStr.empty())
 			{
 				markerOutlineColorStr = outlineStr;
@@ -2310,10 +2382,11 @@ void Model::exportPlotAsPlotly()
 		int pointSize = config.getPointSize();
 		if (pointSize <= 0) pointSize = 6;
 
-		// Write trace JSON
+		// Write trace JSON (Cartesian: x/y, Polar: theta/r in radians)
 		std::string traceType = isPolar ? "scatterpolar" : "scatter";
 		std::string key1 = isPolar ? "theta" : "x";
 		std::string key2 = isPolar ? "r" : "y";
+		bool isVisible = config.getVisible();
 
 		dataJson << "  {\n"
 			<< "    \"type\": \"" << traceType << "\",\n";
@@ -2323,6 +2396,8 @@ void Model::exportPlotAsPlotly()
 		}
 		dataJson << "    \"mode\": \"" << mode << "\",\n"
 			<< "    \"name\": \"" << name << "\",\n"
+			<< "    \"showlegend\": true,\n"
+			<< "    \"visible\": " << (isVisible ? "true" : "\"legendonly\"") << ",\n"
 			<< "    \"" << key1 << "\": [";
 		for (size_t i = 0; i < val1.size(); ++i)
 		{
@@ -2356,11 +2431,11 @@ void Model::exportPlotAsPlotly()
 	}
 	dataJson << "\n]";
 
-	// Generate unique plot ID using timestamp
+	// Generate a unique ID for the HTML plot container
 	std::string uniqueId = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(
 		std::chrono::system_clock::now().time_since_epoch()).count());
 
-	// Construct plot card HTML snippet
+	// Construct plot card HTML snippet with embedded script
 	std::stringstream cardHtml;
 	cardHtml << "    <div class=\"container\">\n"
 		<< "        <div id=\"plot-div-" << uniqueId << "\" class=\"plot-div\"></div>\n"
@@ -2407,6 +2482,7 @@ void Model::exportPlotAsPlotly()
 		}
 	};
 
+	// Save file: either append to existing HTML or create a new standalone document
 	if (isAppendMode)
 	{
 		// Read existing file
@@ -2424,13 +2500,13 @@ void Model::exportPlotAsPlotly()
 		std::string insertMarker = "<!-- NEXT_PLOT_HERE -->";
 		size_t markerPos = existingHtml.find(insertMarker);
 
+		// Append at marker position or before </body> tag
 		if (markerPos != std::string::npos)
 		{
 			existingHtml.replace(markerPos, insertMarker.length(), cardHtml.str() + "\n    " + insertMarker);
 		}
 		else
 		{
-			// Fallback: insert before </body>
 			size_t bodyEndPos = existingHtml.find("</body>");
 			if (bodyEndPos != std::string::npos)
 			{
@@ -2451,9 +2527,9 @@ void Model::exportPlotAsPlotly()
 	}
 	else
 	{
-		// Standalone file HTML template
+		// Standalone HTML template with styling and Plotly.js CDN
 		std::string standaloneHtml = R"HTML(<!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
