@@ -57,7 +57,9 @@ namespace ot {
 		GradientSpread getSpread(void) const { return m_spread; };
 
 	protected:
+		void addStopsToCss(std::string& _targetString) const;
 		void addStopsAndSpreadToQss(std::string& _targetString) const;
+		std::string getCssGradientType(const std::string& _normalType, const std::string& _repeatingType) const;
 
 	private:
 		std::vector<GradientPainterStop2D> m_stops;

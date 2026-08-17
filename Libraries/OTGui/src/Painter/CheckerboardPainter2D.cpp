@@ -88,6 +88,12 @@ void ot::CheckerboardPainter2D::setFromJsonObject(const ConstJsonObject& _object
 	m_cellSize.setFromJsonObject(json::getObject(_object, "CellSize"));
 }
 
+std::string ot::CheckerboardPainter2D::generateCss() const
+{
+	OT_LOG_W("Checkboard can not be exported to css. Returning primary painter css.");
+	return m_primary->generateCss();
+}
+
 std::string ot::CheckerboardPainter2D::generateQss(void) const {
 	OT_LOG_W("Checkboard can not be exported to qss. Returning primary painter qss.");
 	return m_primary->generateQss();

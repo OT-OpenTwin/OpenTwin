@@ -55,6 +55,8 @@ namespace ot {
 		//! @brief Returns the key that is used to create an instance of this class in the simple factory
 		virtual std::string getFactoryKey() const override { return std::string(OT_FactoryKey_StyleRefPainter2D); };
 
+		virtual std::string generateCss() const override;
+
 		virtual std::string generateQss() const override;
 
 		virtual std::string generateSvgColorString(const std::string& _id) const override;

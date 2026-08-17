@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Math.h"
 #include "OTCore/String.h"
 #include "OTGui/Painter/Painter2DFactory.h"
 #include "OTGui/Painter/LinearGradientPainter2D.h"
@@ -56,6 +57,23 @@ void ot::LinearGradientPainter2D::setFromJsonObject(const ConstJsonObject& _obje
 	ot::GradientPainter2D::setFromJsonObject(_object);
 	m_start.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_Start));
 	m_finalStop.setFromJsonObject(json::getObject(_object, OT_JSON_MEMBER_FinalStop));
+}
+
+std::string ot::LinearGradientPainter2D::generateCss() const
+{
+	const double dx = m_finalStop.getX() - m_start.getX();
+	const double dy = m_finalStop.getY() - m_start.getY();
+
+	const double angle = std::atan2(dx, -dy) * 180.0 / ot::Math::pi();
+	
+	std::string ret = getCssGradientType("linear-gradient(", "repeating-linear-gradient(");
+
+	ret.append(std::to_string(angle) + "deg");
+
+	this->addStopsToCss(ret);
+	ret.append(")");
+
+	return ret;
 }
 
 std::string ot::LinearGradientPainter2D::generateQss() const {

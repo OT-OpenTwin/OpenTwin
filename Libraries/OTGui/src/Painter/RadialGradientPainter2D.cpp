@@ -67,6 +67,25 @@ void ot::RadialGradientPainter2D::setFocalPoint(const ot::Point2DD& _focal) {
 	m_focalSet = true;
 }
 
+std::string ot::RadialGradientPainter2D::generateCss() const
+{
+	std::string ret = this->getCssGradientType("radial-gradient(", "repeating-radial-gradient(");
+
+	if (m_focalSet) {
+		OT_LOG_W("CSS radial gradients do not support a separate focal point. The focal point will be ignored.");
+	}
+
+	ret.append("circle " +
+		std::to_string(m_centerRadius * 100.0) + "% at " +
+		std::to_string(m_center.getX() * 100.0) + "% " +
+		std::to_string(m_center.getY() * 100.0) + "%");
+
+	this->addStopsToCss(ret);
+	ret.append(")");
+
+	return ret;
+}
+
 std::string ot::RadialGradientPainter2D::generateQss() const {
 	std::string ret = "qradialgradient(cx: " + std::to_string(m_center.getX()) +
 						", cy: " + std::to_string(m_center.getY()) +

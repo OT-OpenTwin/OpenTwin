@@ -38,7 +38,7 @@ void ot::GradientPainter2D::addToJsonObject(JsonValue& _object, JsonAllocator& _
 	ot::Painter2D::addToJsonObject(_object, _allocator);
 	OTAssert(!m_stops.empty(), "Exporting empty linear gradient painter 2D");
 	JsonArray stepArr;
-	for (auto s : m_stops) {
+	for (const auto& s : m_stops) {
 		JsonObject stepObj;
 		s.addToJsonObject(stepObj, _allocator);
 		stepArr.PushBack(stepObj, _allocator);
@@ -52,7 +52,7 @@ void ot::GradientPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	
 	std::list<ConstJsonObject> stepArr = json::getObjectList(_object, OT_JSON_MEMBER_Stops);
 	m_stops.clear();
-	for (auto stepObj : stepArr) {
+	for (const auto& stepObj : stepArr) {
 		GradientPainterStop2D newStep;
 		newStep.setFromJsonObject(stepObj);
 		m_stops.push_back(newStep);
@@ -82,7 +82,23 @@ void ot::GradientPainter2D::addStop(const GradientPainterStop2D& _stop) {
 }
 
 void ot::GradientPainter2D::addStops(const std::vector<GradientPainterStop2D>& _stops) {
-	for (auto s : _stops) m_stops.push_back(s);
+	for (const auto& s : _stops) m_stops.push_back(s);
+}
+
+void ot::GradientPainter2D::addStopsToCss(std::string& _targetString) const
+{
+	for (const GradientPainterStop2D& s : m_stops) {
+		const auto& color = s.getColor();
+
+		const double alpha = static_cast<double>(color.a()) / 255.0;
+
+		_targetString.append(", rgba(" +
+			std::to_string(color.r()) +
+			", " + std::to_string(color.g()) +
+			", " + std::to_string(color.b()) +
+			", " + std::to_string(alpha) +
+			") " + std::to_string(s.getPos() * 100.0) + "%");
+	}
 }
 
 void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) const {
@@ -101,5 +117,24 @@ void ot::GradientPainter2D::addStopsAndSpreadToQss(std::string& _targetString) c
 			", " + std::to_string(s.getColor().g()) +
 			", " + std::to_string(s.getColor().b()) +
 			", " + std::to_string(s.getColor().a()) + ")");
+	}
+}
+
+std::string ot::GradientPainter2D::getCssGradientType(const std::string& _normalType, const std::string& _repeatingType) const
+{
+	switch (m_spread) {
+	case GradientSpread::Pad:
+		return _normalType;
+
+	case GradientSpread::Repeat:
+		return _repeatingType;
+
+	case GradientSpread::Reflect:
+		OT_LOG_W("CSS does not directly support reflect gradient spread. Falling back to pad.");
+		return _normalType;
+
+	default:
+		OT_LOG_E("Unknown spread");
+		return _normalType;
 	}
 }

@@ -49,6 +49,11 @@ void ot::FillPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	m_color.setFromJsonObject(json::getObject(_object, "Color"));
 }
 
+std::string ot::FillPainter2D::generateCss() const
+{
+	return "rgba(" + std::to_string(m_color.r()) + "," + std::to_string(m_color.g()) + "," + std::to_string(m_color.b()) + "," + std::to_string(m_color.a() / 255.) + ")";
+}
+
 std::string ot::FillPainter2D::generateQss(void) const {
 	return "rgba(" + std::to_string(m_color.r()) + "," + std::to_string(m_color.g()) + "," + std::to_string(m_color.b()) + "," + std::to_string(m_color.a()) + ")";
 }

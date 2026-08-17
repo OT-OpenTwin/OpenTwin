@@ -37,6 +37,12 @@ void ot::StyleRefPainter2D::setFromJsonObject(const ConstJsonObject& _object) {
 	m_reference = stringToColorStyleValueEntry(json::getString(_object, "Ref"));
 }
 
+std::string ot::StyleRefPainter2D::generateCss() const
+{
+	OT_LOG_E("StyleRefPainter2D can not be used to generate Css.");
+	return "/*<referencing style value \"" + toString(m_reference) + "\">*/";
+}
+
 std::string ot::StyleRefPainter2D::generateQss(void) const {
 	OT_LOG_E("StyleRefPainter2D can not be used to generate Qss.");
 	return "/*<referencing style value \"" + toString(m_reference) + "\">*/";

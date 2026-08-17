@@ -46,6 +46,8 @@ namespace ot {
 		//! @throw Will throw an exception if the provided object is not valid (members missing or invalid types)
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
+		virtual std::string generateCss() const = 0;
+
 		virtual std::string generateQss() const = 0;
 
 		//! @brief Generates an SVG paint server with the specified ID.
