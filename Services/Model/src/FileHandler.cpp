@@ -58,6 +58,8 @@
 
 #include "OTGuiAPI/Frontend.h"
 
+#include <mdf/mdfreader.h>
+
 // std header
 #include <assert.h>
 #include <filesystem>
@@ -65,6 +67,8 @@
 FileHandler::FileHandler() {
 	const std::string pageName = Application::getToolBarPageName();
 
+	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import File", "Default/Import");
+	m_buttonFileImport.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonPythonImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Python Script", "Default/python");
 	m_buttonPythonImport.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Text File", "Default/TextVisible");
@@ -74,11 +78,13 @@ FileHandler::FileHandler() {
 	m_buttonExportToUserLibrary = ot::ToolBarButtonCfg(pageName, c_groupName, "Export to User Library", "Default/Export");
 	m_buttonExportToUserLibrary.setButtonLockFlags(ot::LockType::ModelWrite);
 
+	m_buttonHandler.connectToolBarButton(m_buttonImportMDF4, this, &FileHandler::handleImportMDF4Button);
 	m_buttonHandler.connectToolBarButton(m_buttonFileImport, this, &FileHandler::handleImportTextFileButton);
 	m_buttonHandler.connectToolBarButton(m_buttonPythonImport, this, &FileHandler::handleImportPythonScriptButton);
 	m_buttonHandler.connectToolBarButton(m_buttonExportFileToLibrary, this, &FileHandler::handleExportFilesToLibrary);
 	m_buttonHandler.connectToolBarButton(m_buttonExportToUserLibrary, this, &FileHandler::handleExportToUserLibrary);
 
+	m_actionHandler.connectAction(OT_ACTION_CMD_ImportFile, this, &FileHandler::handleImportMDF4);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportTextFile, this, &FileHandler::handleImportTextFile);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
 
@@ -93,6 +99,7 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 
 	_uiComponent->addMenuGroup(pageName, c_groupName);
 
+	_uiComponent->addMenuButton(m_buttonImportMDF4);
 	_uiComponent->addMenuButton(m_buttonPythonImport);
 	_uiComponent->addMenuButton(m_buttonFileImport);
 	_uiComponent->addMenuButton(m_buttonExportToUserLibrary);
@@ -117,6 +124,14 @@ void FileHandler::handleImportPythonScriptButton() {
 	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
 	const std::string fileDialogTitle = "Import Python Script";
 	const std::string subsequentFunction = OT_ACTION_CMD_ImportPyhtonScript;
+	importFile(fileMask, fileDialogTitle, subsequentFunction);
+}
+
+void FileHandler::handleImportMDF4Button()
+{
+	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::MDF4, ot::FileExtension::AllFiles });
+	const std::string fileDialogTitle = "Import MDF4 File";
+	const std::string subsequentFunction = OT_ACTION_CMD_ImportMDF4;
 	importFile(fileMask, fileDialogTitle, subsequentFunction);
 }
 
@@ -210,6 +225,11 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action Handler
+
+void FileHandler::handleImportMDF4(ot::JsonDocument& _document)
+{
+	//mdf::MdfReader reader("");
+}
 
 void FileHandler::handleImportTextFile(ot::JsonDocument& _document) {
 	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::FilesFolder));

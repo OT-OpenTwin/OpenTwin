@@ -84,9 +84,11 @@
 #define OT_ACTION_CMD_GetAllLogs "Logger.GetAllLogs"
 #define OT_ACTION_CMD_GetUserLogs "Logger.GetUserLogs"
 
+#define OT_ACTION_CMD_ImportFile "Import.File"
 #define OT_ACTION_CMD_ImportTextFile "Import.TextFile"
 #define OT_ACTION_CMD_ImportTableFile "Import.TableFile"
 #define OT_ACTION_CMD_ImportPyhtonScript "Import.PythonScript"
+#define OT_ACTION_CMD_ImportMDF4 "Import.MDF4"
 
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"

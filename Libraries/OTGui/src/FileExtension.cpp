@@ -114,6 +114,7 @@ std::string ot::FileExtension::toFilterString(DefaultFileExtension _extension) {
 	case FileExtension::Mat: return "MATLAB Data Files (*.mat)";
 	case FileExtension::Mdl: return "Simulink Model (*.mdl)";
 	case FileExtension::Touchstone: return "Touchstone files (*.s*p)";
+	case FileExtension::MDF4: return "MDF 4 (*.mf4)";
 
 		// CST Studio Suite
 	case FileExtension::CST: return "CST Project (*.cst)";
@@ -222,6 +223,7 @@ std::string ot::FileExtension::toString(DefaultFileExtension _extension) {
 	case Touchstone: 
 		OT_LOG_W("Touchstone file extension is ambiguous");
 		return "s*p";
+	case MDF4: return "mf4";
 
 		// Studio Suite / Simulation (CST-specific)
 

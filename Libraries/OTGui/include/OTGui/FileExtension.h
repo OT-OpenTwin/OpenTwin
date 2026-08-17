@@ -103,6 +103,7 @@ namespace ot {
 			Mat,              // .mat (MATLAB data)
 			Mdl,              // .mdl (Simulink models)
 			Touchstone,       // .snp
+			MDF4,             // .mf4
 
 			// Studio Suite / Simulation (CST-specific)
 			CST,              // .cst

@@ -43,6 +43,8 @@ private:
 	const std::string m_environmentUserCollectionName = "Environments_User";
 	ot::ToolBarButtonCfg m_buttonFileImport;
 	ot::ToolBarButtonCfg m_buttonPythonImport;
+	ot::ToolBarButtonCfg m_buttonImportMDF4;
+
 	ot::ToolBarButtonCfg m_buttonExportFileToLibrary;
 	ot::ToolBarButtonCfg m_buttonExportToUserLibrary;
 
@@ -59,6 +61,7 @@ private:
 	ot::ButtonHandler m_buttonHandler;
 	void handleImportTextFileButton();
 	void handleImportPythonScriptButton();
+	void handleImportMDF4Button();
 	void handleExportFilesToLibrary();
 	void handleExportToUserLibrary();
 
@@ -72,6 +75,7 @@ private:
 	ot::ActionHandler m_actionHandler;
 	void handleImportTextFile(ot::JsonDocument& _document);
 	void handleImportPythonScript(ot::JsonDocument& _document);
+	void handleImportMDF4(ot::JsonDocument& _document);
 	virtual ot::ReturnMessage textEditorSaveRequested(const std::string& _entityName, const std::string& _text, size_t _nextChunkStartIndex) override;
 	virtual ot::ReturnMessage tableSaveRequested(const ot::TableCfg& _cfg) override;
 	virtual ot::ReturnMessage tableColumnFilterChanged(const ot::TableFilterChangeEvent& _event) override;

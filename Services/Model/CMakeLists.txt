@@ -30,6 +30,8 @@ ot_add_dependency(Model
     ZLIB
     BASE64
     EXPREVAL
+    EXPAT
+    MDFLIB
 )
 
 ot_finalize_lib(Model)
