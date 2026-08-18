@@ -28,6 +28,7 @@
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
+#include "OTSystem/DateTime.h"
 
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
@@ -58,13 +59,25 @@
 
 #include "OTGuiAPI/Frontend.h"
 
+// MDF lib
 #include <mdf/mdfreader.h>
+#include <mdf/mdflogstream.h>
 
 // std header
 #include <assert.h>
 #include <filesystem>
 
-FileHandler::FileHandler() {
+std::string FileHandler::storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize)
+{
+	std::string tmpFileName = DataBase::instance().getTmpFileName();
+
+
+
+	return tmpFileName;
+}
+
+FileHandler::FileHandler()
+{
 	const std::string pageName = Application::getToolBarPageName();
 
 	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import File", "Default/Import");
@@ -104,7 +117,8 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 	_uiComponent->addMenuButton(m_buttonFileImport);
 	_uiComponent->addMenuButton(m_buttonExportToUserLibrary);
 
-	if (!ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT").empty()) {
+	if (!ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT").empty())
+	{
 		_uiComponent->addMenuButton(m_buttonExportFileToLibrary);
 	}
 }
@@ -113,14 +127,16 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 
 // Button Handler
 
-void FileHandler::handleImportTextFileButton() {
+void FileHandler::handleImportTextFileButton()
+{
 	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Text, ot::FileExtension::CSV, ot::FileExtension::AllFiles });
 	const std::string fileDialogTitle = "Import Text File";
 	const std::string subsequentFunction = OT_ACTION_CMD_ImportTextFile;
 	importFile(fileMask, fileDialogTitle, subsequentFunction);
 }
 
-void FileHandler::handleImportPythonScriptButton() {
+void FileHandler::handleImportPythonScriptButton()
+{
 	const std::string fileMask = ot::FileExtension::toFilterString({ ot::FileExtension::Python, ot::FileExtension::AllFiles });
 	const std::string fileDialogTitle = "Import Python Script";
 	const std::string subsequentFunction = OT_ACTION_CMD_ImportPyhtonScript;
@@ -135,19 +151,22 @@ void FileHandler::handleImportMDF4Button()
 	importFile(fileMask, fileDialogTitle, subsequentFunction);
 }
 
-void FileHandler::handleExportFilesToLibrary() {
+void FileHandler::handleExportFilesToLibrary()
+{
 	// This is the local export, show metadata file lists
 	showExportDialog("Export to Library", OT_ACTION_CMD_ExportFilesToLibrary, true);
 	//Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
-void FileHandler::handleExportToUserLibrary() {
+void FileHandler::handleExportToUserLibrary()
+{
 	// This is the user export, show additional info fields
 	showExportDialog("Export to User Library", OT_ACTION_CMD_ExportFileToUserLibrary, false);
 	//Application::instance()->getUiComponent()->displayInformationPrompt("This functionality is currently disabled");
 }
 
-void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction, bool _isLocalExport) {
+void FileHandler::showExportDialog(const std::string& _title, const std::string& _callbackAction, bool _isLocalExport)
+{
 	Model* model = Application::instance()->getModel();
 
 	// Get Entities from respective folders
@@ -176,7 +195,8 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 	circuitModelGroup->addProperty(circuitModelsProp);
 	pythonScriptGroup->addProperty(pythonScriptProp);
 
-	if (_isLocalExport) {
+	if (_isLocalExport)
+	{
 		// Local Export: Show dropdowns for all metadata files
 		ot::PropertyStringList* circuitModelMetaProp = new ot::PropertyStringList("Circuit Model Metadata File", "", metaFiles);
 		ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
@@ -188,7 +208,8 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 		pythonScriptGroup->addProperty(pythonMetaProp);
 		pythonScriptGroup->addProperty(manifestMetaProp);
 	}
-	else {
+	else
+	{
 		// User Export: Show manifest selection and text fields for additional info
 		ot::PropertyStringList* pythonManifestProp = new ot::PropertyStringList("Python Manifest", "", manifestFiles);
 		ot::PropertyString* circuitAdditionalInfoProp = new ot::PropertyString("Circuit Model Additional Info", "");
@@ -226,18 +247,21 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 
 // Action Handler
 
-void FileHandler::handleImportMDF4(ot::JsonDocument& _document)
+void FileHandler::handleImportTextFile(ot::JsonDocument& _document)
 {
-	//mdf::MdfReader reader("");
-}
-
-void FileHandler::handleImportTextFile(ot::JsonDocument& _document) {
 	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::FilesFolder));
 	worker.detach();
 }
 
-void FileHandler::handleImportPythonScript(ot::JsonDocument& _document) {
+void FileHandler::handleImportPythonScript(ot::JsonDocument& _document)
+{
 	std::thread worker(&FileHandler::storeTextFile, this, std::move(_document), std::ref(ot::FolderNames::PythonScriptFolder));
+	worker.detach();
+}
+
+void FileHandler::handleImportMDF4(ot::JsonDocument& _document)
+{
+	std::thread worker(&FileHandler::parseMDF4FileWorker, this, std::move(_document));
 	worker.detach();
 }
 
@@ -505,7 +529,8 @@ void FileHandler::storeTextFile(ot::JsonDocument&& _document, const std::string&
 	auto uiComponent = Application::instance()->getUiComponent();
 	ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
 	std::list<ot::GridFSFileInfo> fileInfos;
-	for (const ot::ConstJsonObject& fileInfoObj : ot::json::getObjectList(_document, OT_ACTION_PARAM_FILE_Content)) {
+	for (const ot::ConstJsonObject& fileInfoObj : ot::json::getObjectList(_document, OT_ACTION_PARAM_FILE_Content))
+	{
 		fileInfos.push_back(ot::GridFSFileInfo(fileInfoObj));
 	}
 	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
@@ -572,12 +597,14 @@ void FileHandler::storeChangedText(ot::IVisualisationText* _entity, const std::s
 	assert(model != nullptr);
 	assert(_entity != nullptr);
 
-	if (_nextChunkStartIndex > 0) {
+	if (_nextChunkStartIndex > 0)
+	{
 		std::string existingTextEnd = _entity->getText().substr(_nextChunkStartIndex);
 		std::string newText = _text + existingTextEnd;
 		_entity->setText(newText);
 	}
-	else {
+	else
+	{
 		_entity->setText(_text);
 	}
 
@@ -719,7 +746,120 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	m_forceVisible.push_back(false);
 }
 
-FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg, bool _isUserExport) {
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// MDF4 parser
+
+void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
+{
+	Application* app = Application::instance();
+	OTAssertNullptr(app);
+	auto uiComponent = app->getUiComponent();
+	OTAssertNullptr(uiComponent);
+	auto model = app->getModel();
+	OTAssertNullptr(model);
+
+	ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
+	std::list<ot::GridFSFileInfo> fileInfos;
+	for (const ot::ConstJsonObject& fileInfoObj : ot::json::getObjectList(_document, OT_ACTION_PARAM_FILE_Content))
+	{
+		fileInfos.push_back(ot::GridFSFileInfo(fileInfoObj));
+	}
+	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+
+	ot::NewModelStateInfo newEntityInfos;
+
+	assert(fileInfos.size() == fileNames.size());
+	{
+		//QueuingDatabaseWritingRAII queueDatabase;
+		auto info = fileInfos.begin();
+
+		ProgressUpdater updater(uiComponent, "Importing MDF4 files");
+		updater.setTotalNumberOfSteps(fileNames.size());
+		uint32_t counter(0);
+
+		if (updater.getTotalNumberOfSteps() == 1)
+		{
+			uiComponent->displayMessage("Processing MDF4 file...");
+		}
+		else
+		{
+			uiComponent->displayMessage("Processing MDF4 files...");
+		}
+
+		auto startTime = ot::DateTime::msSinceEpoch();
+
+		for (const std::string& fileName : fileNames)
+		{
+			counter++;
+			std::string compressedData;
+			{
+				// Read file from GridFS and delete it afterwards to free up space
+				DataStorageAPI::DocumentAPI api;
+				bsoncxx::oid oid_obj{ info->getDocumentId() };
+				bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
+				std::vector<uint8_t> dataBuffer;
+				api.GetDocumentUsingGridFs(id, info->getCollectionName(), dataBuffer);
+				api.DeleteGridFSData(id, info->getCollectionName());
+				compressedData = std::string(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
+			}
+
+			uint64_t dataLen = static_cast<uint64_t>(info->getUncompressedSize());
+			std::unique_ptr<uint8_t[]> data(ot::String::decompressBase64(compressedData.c_str(), dataLen));
+			info++;
+
+			// Parse the file
+			parseMDF4File(fileName, fileFilter, std::move(data), dataLen, newEntityInfos);
+
+			updater.triggerUpdate(counter);
+		}
+
+		auto endTime = ot::DateTime::msSinceEpoch();
+		auto elapsedTime = endTime - startTime;
+		uiComponent->displayMessage("MDF4 file processing completed in " + ot::DateTime::intervalToString(elapsedTime) + "\n");
+
+	}
+
+	if (newEntityInfos.hasEntities())
+	{
+		model->addEntitiesToModel(newEntityInfos, "Imported MDF4 file", true, true, true);
+	}
+}
+
+void FileHandler::parseMDF4File(const std::string& _fileName, const std::string& _fileFilter, std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize, ot::NewModelStateInfo& _newEntityInfos)
+{
+	std::string tmpFilePath = storeTemporaryFile(std::move(_rawData), _dataSize);
+	OT_LOG_T("Temporary MDF4 file stored at: " + tmpFilePath);
+
+	mdf::MdfReader reader(tmpFilePath);
+
+	if (!reader.IsOk())
+	{
+		OT_USER_LOG_E("Failed to initialize MDF4 file reader: " + _fileName);
+		return;
+	}
+
+	const mdf::MdfFile* readerFile = reader.GetFile();
+	if (!readerFile)
+	{
+		OT_USER_LOG_E("Failed to get MDF4 file object: " + _fileName);
+		return;
+	}
+
+	if (!reader.ReadEverythingButData())
+	{
+		OT_USER_LOG_E("Failed to read MDF4 file: " + _fileName);
+		return;
+	}
+
+	
+
+
+}
+
+FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg, bool _isUserExport)
+{
 	Model* model = Application::instance()->getModel();
 	DialogExportEntities entities;
 
@@ -735,27 +875,33 @@ FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::Prop
 	entities.isPythonExport = (pythonScriptProperty != nullptr && !pythonScriptProperty->getCurrent().empty());
 	entities.isCircuitExport = (circuitModelProperty != nullptr && !circuitModelProperty->getCurrent().empty());
 
-	if (!entities.isPythonExport && !entities.isCircuitExport) {
+	if (!entities.isPythonExport && !entities.isCircuitExport)
+	{
 		OT_LOG_D("No items selected for export.");
 		return entities;
 	}
 
-	if (_isUserExport) {
+	if (_isUserExport)
+	{
 		// User Library Export: Load entities and additional info from text fields
-		if (entities.isCircuitExport) {
+		if (entities.isCircuitExport)
+		{
 			entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelProperty->getCurrent(), "Circuit model"));
 			// For user export, meta file is not selected, so we can't load it here.
 			// The additional info is handled during the creation of the UserLibraryElement.
 		}
-		if (entities.isPythonExport) {
+		if (entities.isPythonExport)
+		{
 			entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptProperty->getCurrent(), "Python script"));
-			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty()) {
+			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty())
+			{
 				entities.pythonManifest = dynamic_cast<EntityPythonManifest*>(loadEntityByPath(pythonManifestProperty->getCurrent(), "Python manifest"));
 			}
 			// Meta files are not selected in this dialog.
 		}
 	}
-	else {
+	else
+	{
 		// Local Library Export: Load entities and their corresponding metadata files
 		const ot::PropertyStringList* circuitModelMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
 			_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Metadata File"));
@@ -764,25 +910,32 @@ FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::Prop
 		const ot::PropertyStringList* manifestMetaProperty = dynamic_cast<const ot::PropertyStringList*>(
 			_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Metadata File"));
 
-		if (entities.isCircuitExport) {
+		if (entities.isCircuitExport)
+		{
 			entities.circuitModel = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelProperty->getCurrent(), "Circuit model"));
 			entities.circuitMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(circuitModelMetaProperty->getCurrent(), "Circuit model metadata"));
-			if (!entities.circuitModel || !entities.circuitMetaFile || !validateMetaDataFile(entities.circuitMetaFile)) {
+			if (!entities.circuitModel || !entities.circuitMetaFile || !validateMetaDataFile(entities.circuitMetaFile))
+			{
 				entities.isCircuitExport = false;
 			}
 		}
-		if (entities.isPythonExport) {
+		if (entities.isPythonExport)
+		{
 			entities.pythonScript = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonScriptProperty->getCurrent(), "Python script"));
 			entities.pythonMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(pythonMetaProperty->getCurrent(), "Python metadata"));
-			if (!entities.pythonScript || !entities.pythonMetaFile || !validateMetaDataFile(entities.pythonMetaFile)) {
+			if (!entities.pythonScript || !entities.pythonMetaFile || !validateMetaDataFile(entities.pythonMetaFile))
+			{
 				entities.isPythonExport = false;
 			}
 
-			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty()) {
+			if (pythonManifestProperty && !pythonManifestProperty->getCurrent().empty())
+			{
 				entities.pythonManifest = dynamic_cast<EntityPythonManifest*>(loadEntityByPath(pythonManifestProperty->getCurrent(), "Python manifest"));
-				if (manifestMetaProperty && !manifestMetaProperty->getCurrent().empty()) {
+				if (manifestMetaProperty && !manifestMetaProperty->getCurrent().empty())
+				{
 					entities.manifestMetaFile = dynamic_cast<EntityFileText*>(loadEntityByPath(manifestMetaProperty->getCurrent(), "Manifest metadata"));
-					if (!entities.pythonManifest || !entities.manifestMetaFile || !validateMetaDataFile(entities.manifestMetaFile)) {
+					if (!entities.pythonManifest || !entities.manifestMetaFile || !validateMetaDataFile(entities.manifestMetaFile))
+					{
 						entities.pythonManifest = nullptr;
 						entities.manifestMetaFile = nullptr;
 					}
@@ -794,8 +947,10 @@ FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::Prop
 	return entities;
 }
 
-EntityBase* FileHandler::loadEntityByPath(const std::string& _entityPath, const std::string& _description) {
-	if (_entityPath.empty()) {
+EntityBase* FileHandler::loadEntityByPath(const std::string& _entityPath, const std::string& _description)
+{
+	if (_entityPath.empty())
+	{
 		OT_LOG_E(_description + " path is empty.");
 		return nullptr;
 	}
@@ -803,7 +958,8 @@ EntityBase* FileHandler::loadEntityByPath(const std::string& _entityPath, const 
 	Model* model = Application::instance()->getModel();
 	EntityBase* entity = model->findEntityFromName(_entityPath);
 
-	if (!entity) {
+	if (!entity)
+	{
 		OT_LOG_E(_description + " entity not found for path: " + _entityPath);
 		return nullptr;
 	}
@@ -811,52 +967,65 @@ EntityBase* FileHandler::loadEntityByPath(const std::string& _entityPath, const 
 	return entity;
 }
 
-void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg) {
-	if (_exportToUserLibrary) {
-		try {
+void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg)
+{
+	if (_exportToUserLibrary)
+	{
+		try
+		{
 			std::list<ot::UserLibraryElement> elementsToExport;
 			createLibraryElementsForCircuitModel(_entities.circuitModel, _dialogCfg, elementsToExport);
 			exportLibraryElementsToUserLibrary(elementsToExport);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OT_LOG_E(std::string("Circuit model export to user library failed: ") + _e.what());
 			Application::instance()->getModel()->reportError("Circuit model export failed: " + std::string(_e.what()));
 		}
 	}
-	else {
+	else
+	{
 		// Export to Library (async)
-		std::thread worker([this, circuitModel = _entities.circuitModel, circuitMetaFile = _entities.circuitMetaFile]() {
-			try {
-				auto uiComponent = Application::instance()->getUiComponent();
-				ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
+		std::thread worker([this, circuitModel = _entities.circuitModel, circuitMetaFile = _entities.circuitMetaFile]()
+			{
+				try
+				{
+					auto uiComponent = Application::instance()->getUiComponent();
+					ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
 
-				ProgressUpdater updater(uiComponent, "Exporting circuit model to library", false);
-				updater.setTotalNumberOfSteps(1);
+					ProgressUpdater updater(uiComponent, "Exporting circuit model to library", false);
+					updater.setTotalNumberOfSteps(1);
 
-				std::string libDataPath = getLibraryDataPath();
-				if (!libDataPath.empty()) {
-					exportCircuitModel(circuitModel, circuitMetaFile, libDataPath);
-					updater.triggerUpdate(1);
-					uiComponent->displayMessage("Circuit model successfully exported to library.\n");
+					std::string libDataPath = getLibraryDataPath();
+					if (!libDataPath.empty())
+					{
+						exportCircuitModel(circuitModel, circuitMetaFile, libDataPath);
+						updater.triggerUpdate(1);
+						uiComponent->displayMessage("Circuit model successfully exported to library.\n");
+					}
 				}
-			}
-			catch (const std::exception& _e) {
-				OT_LOG_E(std::string("Circuit model export failed: ") + _e.what());
-			}
+				catch (const std::exception& _e)
+				{
+					OT_LOG_E(std::string("Circuit model export failed: ") + _e.what());
+				}
 			});
 		worker.detach();
 	}
 }
 
 
-void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg) {
+void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg)
+{
 	bool hasFullPythonExport = (_entities.pythonManifest != nullptr);
 
-	if (_exportToUserLibrary) {
-		try {
+	if (_exportToUserLibrary)
+	{
+		try
+		{
 			std::list<ot::UserLibraryElement> elementsToExport;
 
-			if (hasFullPythonExport) {
+			if (hasFullPythonExport)
+			{
 				createLibraryElementsForPythonManifest(_entities.pythonManifest, _dialogCfg, elementsToExport);
 			}
 
@@ -865,16 +1034,20 @@ void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool
 
 			exportLibraryElementsToUserLibrary(elementsToExport);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OT_LOG_E(std::string("Python export to user library failed: ") + _e.what());
 			Application::instance()->getModel()->reportError("Python export failed: " + std::string(_e.what()));
 		}
 	}
-	else {
+	else
+	{
 		// Export to Library (async)
 		std::thread worker([this, pythonScript = _entities.pythonScript, pythonManifest = _entities.pythonManifest,
-			pythonMetaFile = _entities.pythonMetaFile, manifestMetaFile = _entities.manifestMetaFile, hasFullPythonExport]() {
-				if (hasFullPythonExport) {
+			pythonMetaFile = _entities.pythonMetaFile, manifestMetaFile = _entities.manifestMetaFile, hasFullPythonExport]()
+			{
+				if (hasFullPythonExport)
+				{
 					exportPythonScriptsToLibrary(
 						pythonScript->getEntityID(),
 						pythonManifest->getEntityID(),
@@ -883,7 +1056,8 @@ void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool
 						pythonManifest->getManifestID()
 					);
 				}
-				else {
+				else
+				{
 					exportPythonScriptsToLibrary(
 						pythonScript->getEntityID(),
 						ot::invalidUID,
@@ -897,10 +1071,12 @@ void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool
 	}
 }
 
-bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
+bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile)
+{
 	Model* model = Application::instance()->getModel();
 
-	if (_metaFile == nullptr) {
+	if (_metaFile == nullptr)
+	{
 		model->reportError("Metadata file is null.");
 		return false;
 	}
@@ -908,10 +1084,12 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 	std::string metaContent = _metaFile->getText();
 	ot::JsonDocument metaDoc;
 
-	try {
+	try
+	{
 		metaDoc.fromJson(metaContent);
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		model->reportError(
 			"Metadata file \"" + _metaFile->getName() + "\" is not valid JSON: " + std::string(_e.what())
 		);
@@ -920,8 +1098,10 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 
 	// Validate mandatory fields
 	std::list<std::string> mandatoryFields = { "MetaData", "AdditionalInfos" };
-	for (const auto& field : mandatoryFields) {
-		if (!ot::json::exists(metaDoc, field)) {
+	for (const auto& field : mandatoryFields)
+	{
+		if (!ot::json::exists(metaDoc, field))
+		{
 			model->reportError(
 				"Metadata file \"" + _metaFile->getName() + "\" is missing mandatory field: \"" + field + "\""
 			);
@@ -929,7 +1109,8 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 		}
 	}
 
-	if (!ot::json::isObject(metaDoc, "MetaData") || !ot::json::isObject(metaDoc, "AdditionalInfos")) {
+	if (!ot::json::isObject(metaDoc, "MetaData") || !ot::json::isObject(metaDoc, "AdditionalInfos"))
+	{
 		model->reportError(
 			"Metadata file \"" + _metaFile->getName() + "\" has invalid field types. 'MetaData' and 'AdditionalInfos' must be objects."
 		);
@@ -939,7 +1120,8 @@ bool FileHandler::validateMetaDataFile(EntityFileText* _metaFile) {
 	return true;
 }
 
-std::string FileHandler::getLibraryDataPath() const {
+std::string FileHandler::getLibraryDataPath() const
+{
 	std::string path = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
 
 	if (!path.empty())
@@ -950,46 +1132,57 @@ std::string FileHandler::getLibraryDataPath() const {
 	return path;
 }
 
-bool FileHandler::ensureDirectoryExists(const std::string& _path) const {
-	try {
+bool FileHandler::ensureDirectoryExists(const std::string& _path) const
+{
+	try
+	{
 		std::filesystem::create_directories(_path);
 		return true;
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		OT_LOG_E("Failed to create directory \"" + _path + "\": " + _e.what());
 		return false;
 	}
 }
 
-void FileHandler::writeFileToPath(const std::string& _filePath, const std::string& _content) const {
+void FileHandler::writeFileToPath(const std::string& _filePath, const std::string& _content) const
+{
 	std::ofstream outFile(_filePath, std::ios::binary);
-	if (!outFile.is_open()) {
+	if (!outFile.is_open())
+	{
 		throw std::runtime_error("Could not open file for writing: " + _filePath);
 	}
 
 	outFile.write(_content.data(), _content.size());
-	if (!outFile) {
+	if (!outFile)
+	{
 		throw std::runtime_error("Error writing to file: " + _filePath);
 	}
 
 	outFile.close();
 }
 
-std::string FileHandler::ensureFileExtension(const std::string& _fileName, const std::string& _extension) const {
-	if (_fileName.size() >= _extension.size()) {
+std::string FileHandler::ensureFileExtension(const std::string& _fileName, const std::string& _extension) const
+{
+	if (_fileName.size() >= _extension.size())
+	{
 		std::string fileEnd = _fileName.substr(_fileName.size() - _extension.size());
-		if (fileEnd == _extension) {
+		if (fileEnd == _extension)
+		{
 			return _fileName;
 		}
 	}
 	return _fileName + _extension;
 }
 
-void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID) {
+void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manifestID, ot::UID _pythonMetaID, ot::UID _manifestMetaID, ot::UID _environmentID)
+{
 	auto uiComponent = Application::instance()->getUiComponent();
 	ot::UILockWrapper uiLock(uiComponent, ot::LockType::ModelWrite);
 
-	try {
+	try
+	{
 		Model* model = Application::instance()->getModel();
 		assert(model != nullptr);
 
@@ -997,7 +1190,8 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 		EntityBase* scriptEntityBase = model->getEntityByID(_scriptID);
 		EntityBase* pythonMetaEntityBase = model->getEntityByID(_pythonMetaID);
 
-		if (scriptEntityBase == nullptr || pythonMetaEntityBase == nullptr) {
+		if (scriptEntityBase == nullptr || pythonMetaEntityBase == nullptr)
+		{
 			OT_LOG_E("Error: Python script or metadata entity could not be retrieved.");
 			return;
 		}
@@ -1005,7 +1199,8 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 		EntityFileText* scriptEntity = dynamic_cast<EntityFileText*>(scriptEntityBase);
 		EntityFileText* pythonMetaEntity = dynamic_cast<EntityFileText*>(pythonMetaEntityBase);
 
-		if (scriptEntity == nullptr || pythonMetaEntity == nullptr) {
+		if (scriptEntity == nullptr || pythonMetaEntity == nullptr)
+		{
 			OT_LOG_E("Error: Failed to cast script or metadata entity.");
 			return;
 		}
@@ -1014,30 +1209,36 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 		EntityPythonManifest* manifestEntity = nullptr;
 		EntityFileText* manifestMetaEntity = nullptr;
 
-		if (_manifestID != ot::invalidUID) {
+		if (_manifestID != ot::invalidUID)
+		{
 			EntityBase* manifestEntityBase = model->getEntityByID(_manifestID);
-			if (manifestEntityBase != nullptr) {
+			if (manifestEntityBase != nullptr)
+			{
 				manifestEntity = dynamic_cast<EntityPythonManifest*>(manifestEntityBase);
 			}
 		}
 
-		if (_manifestMetaID != ot::invalidUID) {
+		if (_manifestMetaID != ot::invalidUID)
+		{
 			EntityBase* manifestMetaEntityBase = model->getEntityByID(_manifestMetaID);
-			if (manifestMetaEntityBase != nullptr) {
+			if (manifestMetaEntityBase != nullptr)
+			{
 				manifestMetaEntity = dynamic_cast<EntityFileText*>(manifestMetaEntityBase);
 			}
 		}
 
 		// Get base export path
 		std::string libDataPath = getLibraryDataPath();
-		if (libDataPath.empty()) {
+		if (libDataPath.empty())
+		{
 			OT_LOG_E("Error: Could not determine OpenTwinDevRoot path.");
 			return;
 		}
 
 		// Determine number of steps based on what we're exporting
 		int totalSteps = 1; // At minimum, we export the script
-		if (manifestEntity != nullptr && manifestMetaEntity != nullptr) {
+		if (manifestEntity != nullptr && manifestMetaEntity != nullptr)
+		{
 			totalSteps = 2; // Export both manifest and script
 		}
 
@@ -1047,19 +1248,23 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 		ot::UID scriptDependencyID = _environmentID;
 
 		// Export manifest if available (manifest must be processed first to determine DependencyID for script)
-		if (manifestEntity != nullptr && manifestMetaEntity != nullptr) {
+		if (manifestEntity != nullptr && manifestMetaEntity != nullptr)
+		{
 			ExportResult manifestResult = exportPythonManifest(manifestEntity, manifestMetaEntity, libDataPath, _environmentID);
 
-			if (manifestResult.status == FileOverwriteStatus::PromptUser) {
+			if (manifestResult.status == FileOverwriteStatus::PromptUser)
+			{
 				// Manifest needs user prompt - defer script export until prompt is answered
 				PendingScriptExport scriptExport = prepareScriptExportData(scriptEntity, pythonMetaEntity, libDataPath, _environmentID);
 
 				auto pendingIt = m_pendingFileOverwrites.find(manifestResult.contentFilePath);
-				if (pendingIt != m_pendingFileOverwrites.end()) {
+				if (pendingIt != m_pendingFileOverwrites.end())
+				{
 					pendingIt->second.hasLinkedScriptExport = true;
 					pendingIt->second.linkedScriptExport = scriptExport;
 				}
-				else {
+				else
+				{
 					OT_LOG_E("Failed to find pending manifest overwrite for \"" + manifestResult.contentFilePath + "\"");
 				}
 
@@ -1079,16 +1284,19 @@ void FileHandler::exportPythonScriptsToLibrary(ot::UID _scriptID, ot::UID _manif
 
 		uiComponent->displayMessage("Files successfully exported to library.\n");
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		OT_LOG_E(std::string("Export failed: ") + _e.what());
 	}
 }
 
-FileHandler::ExistingMetaInfo FileHandler::readExistingMetaInfo(const std::string& _metaFilePath) const {
+FileHandler::ExistingMetaInfo FileHandler::readExistingMetaInfo(const std::string& _metaFilePath) const
+{
 	ExistingMetaInfo info;
 
 	std::ifstream file(_metaFilePath);
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		// No existing meta file -> this is a fresh export, defaults (exists = false) are correct.
 		return info;
 	}
@@ -1096,35 +1304,41 @@ FileHandler::ExistingMetaInfo FileHandler::readExistingMetaInfo(const std::strin
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	file.close();
 
-	try {
+	try
+	{
 		ot::JsonDocument doc;
 		doc.fromJson(content);
 
-		if (doc.HasMember("LibraryElementID")) {
+		if (doc.HasMember("LibraryElementID"))
+		{
 			const auto& val = doc["LibraryElementID"];
 			if (val.IsUint64()) info.libraryElementID = val.GetUint64();
 			else if (val.IsInt64()) info.libraryElementID = static_cast<ot::UID>(val.GetInt64());
 		}
 
-		if (ot::json::exists(doc, "Version") && ot::json::isInt(doc, "Version")) {
+		if (ot::json::exists(doc, "Version") && ot::json::isInt(doc, "Version"))
+		{
 			info.version = ot::json::getInt(doc, "Version");
 		}
 
 		info.exists = true;
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		OT_LOG_E("Failed to read existing meta file \"" + _metaFilePath + "\": " + _e.what());
 	}
 
 	return info;
 }
 
-FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID) {
+FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest* _manifestEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID)
+{
 	assert(_manifestEntity != nullptr && _metaEntity != nullptr);
 
 	// Create PythonEnvironments directory
 	std::string environmentPath = _basePath + "/PythonEnvironments";
-	if (!ensureDirectoryExists(environmentPath)) {
+	if (!ensureDirectoryExists(environmentPath))
+	{
 		throw std::runtime_error("Could not create PythonEnvironments directory");
 	}
 
@@ -1206,19 +1420,23 @@ FileHandler::ExportResult FileHandler::exportPythonManifest(EntityPythonManifest
 	return { FileOverwriteStatus::Skip, ot::invalidUID, manifestFileName };
 }
 
-void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID) {
+void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID)
+{
 	assert(_scriptEntity != nullptr && _metaEntity != nullptr);
 
 	PendingScriptExport prepared = prepareScriptExportData(_scriptEntity, _metaEntity, _basePath, _environmentID);
 
-	if (prepared.status == FileOverwriteStatus::Write) {
+	if (prepared.status == FileOverwriteStatus::Write)
+	{
 		writeFileToPath(prepared.contentFilePath, prepared.contentData);
 		writeFileToPath(prepared.metaFilePath, prepared.metaContent);
 	}
-	else if (prepared.status == FileOverwriteStatus::PromptUser) {
+	else if (prepared.status == FileOverwriteStatus::PromptUser)
+	{
 		promptUserForOverwrite(prepared.contentFilePath, prepared.metaFilePath, prepared.contentData, prepared.metaContent);
 	}
-	else if (prepared.status == FileOverwriteStatus::Skip) {
+	else if (prepared.status == FileOverwriteStatus::Skip)
+	{
 		// Content and compared metadata are identical, but the DependencyID is intentionally excluded
 		// from that comparison (see checkAndHandleFileOverwrite) and may be stale if the environment
 		// was newly created or received a new LibraryElementID. Fix it up on disk even though the
@@ -1228,12 +1446,14 @@ void FileHandler::exportPythonScript(EntityFileText* _scriptEntity, EntityFileTe
 	}
 }
 
-void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath) {
+void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileText* _metaEntity, const std::string& _basePath)
+{
 	assert(_modelEntity != nullptr && _metaEntity != nullptr);
 
 	// Create CircuitData directory
 	std::string modelPath = _basePath + "/CircuitData";
-	if (!ensureDirectoryExists(modelPath)) {
+	if (!ensureDirectoryExists(modelPath))
+	{
 		throw std::runtime_error("Could not create CircuitData directory");
 	}
 
@@ -1260,7 +1480,8 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 	int version = existingInfo.exists ? existingInfo.version : 1;
 
 	// Check if files exist and if content changed (only checks, no prompt yet!)
-	if (status == FileOverwriteStatus::Write) {
+	if (status == FileOverwriteStatus::Write)
+	{
 		// File check passed - NOW add the dynamic parameters
 		metaDoc.RemoveMember("LibraryElementID");
 		metaDoc.AddMember("LibraryElementID", ot::JsonValue(libraryElementID), metaDoc.GetAllocator());
@@ -1279,7 +1500,8 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 		writeFileToPath(modelFileName, modelContent);
 		writeFileToPath(metaFileName, metaJson);
 	}
-	else if (status == FileOverwriteStatus::PromptUser) {
+	else if (status == FileOverwriteStatus::PromptUser)
+	{
 		// File check indicated changes - NOW add dynamic parameters and prompt.
 		// LibraryElementID and Version reflect the existing file on disk; handleOverwriteResponse
 		// will keep the LibraryElementID and increment the Version from this current value.
@@ -1300,13 +1522,15 @@ void FileHandler::exportCircuitModel(EntityFileText* _modelEntity, EntityFileTex
 		// NOW prompt with the updated content
 		promptUserForOverwrite(modelFileName, metaFileName, modelContent, metaJson);
 	}
-	else if (status == FileOverwriteStatus::Skip) {
+	else if (status == FileOverwriteStatus::Skip)
+	{
 		Application::instance()->getUiComponent()->displayMessage("Element already exists. Export skipped for \"" + _modelEntity->getNameOnly() + "\".\n");
 		return;
 	}
 }
 
-void FileHandler::clearBuffer() {
+void FileHandler::clearBuffer()
+{
 	m_entityVersionsData.clear();
 	m_entityVersionsTopo.clear();
 	m_entityIDsData.clear();
@@ -1315,7 +1539,8 @@ void FileHandler::clearBuffer() {
 }
 
 FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const std::string& _filePath, const std::string& _newContent,
-	const std::string& _metaFilePath, const std::string& _metaNewContent) const {
+	const std::string& _metaFilePath, const std::string& _metaNewContent) const
+{
 
 	// Check if content file exists
 	std::ifstream contentFile(_filePath, std::ios::binary | std::ios::ate);
@@ -1329,29 +1554,35 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 	bool metaChanged = false;
 
 	// Check if content has changed
-	if (contentFileExists) {
+	if (contentFileExists)
+	{
 		std::ifstream::pos_type fileSize = contentFile.tellg();
 		contentFile.seekg(0, std::ios::beg);
 
-		if (static_cast<size_t>(fileSize) != _newContent.size()) {
+		if (static_cast<size_t>(fileSize) != _newContent.size())
+		{
 			contentChanged = true;
 		}
-		else {
+		else
+		{
 			std::vector<char> fileContent(fileSize);
 			contentFile.read(fileContent.data(), fileSize);
 			contentFile.close();
 
-			if (!std::equal(fileContent.begin(), fileContent.end(), _newContent.begin())) {
+			if (!std::equal(fileContent.begin(), fileContent.end(), _newContent.begin()))
+			{
 				contentChanged = true;
 			}
 		}
 	}
-	else {
+	else
+	{
 		contentChanged = false;
 	}
 
 	// Check if metadata has changed - ONLY compare MetaData and AdditionalInfos
-	if (metaFileExists) {
+	if (metaFileExists)
+	{
 		std::ifstream::pos_type metaSize = metaFile.tellg();
 		metaFile.seekg(0, std::ios::beg);
 
@@ -1365,19 +1596,23 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 		ot::JsonDocument newMetaDoc;
 		ot::JsonDocument existingMetaDoc;
 
-		try {
+		try
+		{
 			newMetaDoc.fromJson(_metaNewContent);
 			existingMetaDoc.fromJson(existingMetaContent);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OT_LOG_W("Failed to parse metadata JSON for comparison: " + std::string(_e.what()));
 			// If parsing fails, fall back to full content comparison
 			metaChanged = !std::equal(metaFileContent.begin(), metaFileContent.end(), _metaNewContent.begin());
 		}
 
 		// Extract and compare only MetaData and AdditionalInfos
-		if (!metaChanged) {
-			try {
+		if (!metaChanged)
+		{
+			try
+			{
 				// Extract MetaData objects and convert directly to JSON strings
 				std::string newMetaDataStr = ot::json::toJson(ot::json::getObject(newMetaDoc, "MetaData"));
 				std::string existingMetaDataStr = ot::json::toJson(ot::json::getObject(existingMetaDoc, "MetaData"));
@@ -1391,9 +1626,11 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 				ot::JsonDocument existingAdditionalInfosClean;
 
 				// Copy all fields except DependencyID and DependencyCollection
-				for (auto it = newAdditionalInfos.MemberBegin(); it != newAdditionalInfos.MemberEnd(); ++it) {
+				for (auto it = newAdditionalInfos.MemberBegin(); it != newAdditionalInfos.MemberEnd(); ++it)
+				{
 					const std::string memberName = it->name.GetString();
-					if (memberName != "DependencyID" && memberName != "DependencyCollection") {
+					if (memberName != "DependencyID" && memberName != "DependencyCollection")
+					{
 						newAdditionalInfosClean.AddMember(
 							ot::JsonString(memberName, newAdditionalInfosClean.GetAllocator()),
 							ot::JsonValue(it->value, newAdditionalInfosClean.GetAllocator()),
@@ -1402,9 +1639,11 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 					}
 				}
 
-				for (auto it = existingAdditionalInfos.MemberBegin(); it != existingAdditionalInfos.MemberEnd(); ++it) {
+				for (auto it = existingAdditionalInfos.MemberBegin(); it != existingAdditionalInfos.MemberEnd(); ++it)
+				{
 					const std::string memberName = it->name.GetString();
-					if (memberName != "DependencyID" && memberName != "DependencyCollection") {
+					if (memberName != "DependencyID" && memberName != "DependencyCollection")
+					{
 						existingAdditionalInfosClean.AddMember(
 							ot::JsonString(memberName, existingAdditionalInfosClean.GetAllocator()),
 							ot::JsonValue(it->value, existingAdditionalInfosClean.GetAllocator()),
@@ -1420,31 +1659,36 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 				// Only consider metadata changed if MetaData or AdditionalInfos differ
 				metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr);
 			}
-			catch (const std::exception& _e) {
+			catch (const std::exception& _e)
+			{
 				OT_LOG_W("Failed to extract MetaData or AdditionalInfos for comparison: " + std::string(_e.what()));
 				// If extraction fails, fall back to full content comparison
 				metaChanged = !std::equal(metaFileContent.begin(), metaFileContent.end(), _metaNewContent.begin());
 			}
 		}
 	}
-	else {
+	else
+	{
 		metaChanged = false;
 	}
 
 	// If neither file exists, write both files
-	if (!contentFileExists && !metaFileExists) {
+	if (!contentFileExists && !metaFileExists)
+	{
 		OT_LOG_D("Creating new files: \"" + _filePath + "\" and \"" + _metaFilePath + "\"");
 		return FileOverwriteStatus::Write;
 	}
 
 	// Both files exist and content is identical - skip without any action
-	if (contentFileExists && metaFileExists && !contentChanged && !metaChanged) {
+	if (contentFileExists && metaFileExists && !contentChanged && !metaChanged)
+	{
 		OT_LOG_D("Skipping file export: content and metadata are identical for \"" + _filePath + "\"");
 		return FileOverwriteStatus::Skip;
 	}
 
 	// If either has changed, prompt user
-	if (contentChanged || metaChanged) {
+	if (contentChanged || metaChanged)
+	{
 		OT_LOG_D("File changes detected - prompt required for \"" + _filePath + "\"");
 		return FileOverwriteStatus::PromptUser;
 	}
@@ -1455,7 +1699,8 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 }
 
 void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, const std::string& _metaFilePath,
-	const std::string& _contentNewContent, const std::string& _metaNewContent) const {
+	const std::string& _contentNewContent, const std::string& _metaNewContent) const
+{
 
 	// Store the pending file overwrites (both content and meta together)
 	const_cast<FileHandler*>(this)->m_pendingFileOverwrites[_contentFilePath] = {
@@ -1478,7 +1723,8 @@ void FileHandler::promptUserForOverwrite(const std::string& _contentFilePath, co
 	}
 }
 
-std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
+std::string FileHandler::createIncrementedPath(const std::string& _filePath)
+{
 	size_t lastSlash = _filePath.find_last_of("/\\");
 
 	std::string directory = (lastSlash != std::string::npos) ? _filePath.substr(0, lastSlash + 1) : "";
@@ -1488,19 +1734,23 @@ std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
 	std::string extension;
 
 	size_t dotInFilename = filename.find_last_of('.');
-	if (dotInFilename != std::string::npos) {
+	if (dotInFilename != std::string::npos)
+	{
 		baseName = filename.substr(0, dotInFilename);
 		extension = filename.substr(dotInFilename);
 	}
-	else {
+	else
+	{
 		baseName = filename;
 		extension = "";
 	}
 
 	// Special handling for .otmeta.json files - put counter before .otmeta.json
-	if (extension == ".json" && baseName.size() >= 6) {
+	if (extension == ".json" && baseName.size() >= 6)
+	{
 		std::string baseSuffix = baseName.substr(baseName.size() - 6);
-		if (baseSuffix == ".otmeta") {
+		if (baseSuffix == ".otmeta")
+		{
 			baseName = baseName.substr(0, baseName.size() - 6); // Remove ".otmeta"
 			extension = ".otmeta.json";
 		}
@@ -1509,7 +1759,8 @@ std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
 	// Find a unique filename with counter
 	std::string newFilePath;
 	int counter = 1;
-	do {
+	do
+	{
 		newFilePath = directory + baseName + "_" + std::to_string(counter) + extension;
 		counter++;
 	} while (std::filesystem::exists(newFilePath));
@@ -1517,9 +1768,11 @@ std::string FileHandler::createIncrementedPath(const std::string& _filePath) {
 	return newFilePath;
 }
 
-void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _overwrite) {
+void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _overwrite)
+{
 	auto it = m_pendingFileOverwrites.find(_filePath);
-	if (it == m_pendingFileOverwrites.end()) {
+	if (it == m_pendingFileOverwrites.end())
+	{
 		OT_LOG_E("No pending file overwrite found for \"" + _filePath + "\"");
 		return;
 	}
@@ -1527,17 +1780,20 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 	const PendingFileOverwrite& pending = it->second;
 	ot::UID finalLibraryElementID = ot::invalidUID;
 
-	if (_overwrite) {
+	if (_overwrite)
+	{
 		// Parse the metadata JSON to increment the version
 		std::string metaContent = pending.metaNewContent;
 		ot::JsonDocument metaDoc;
-		try {
+		try
+		{
 			metaDoc.fromJson(metaContent);
 
 			// Read existing LibraryElementID (kept stable - it already reflects what is on disk,
 			// since prepareScriptExportData / exportPythonManifest / exportCircuitModel read it
 			// from the existing meta file before building this pending entry)
-			if (metaDoc.HasMember("LibraryElementID")) {
+			if (metaDoc.HasMember("LibraryElementID"))
+			{
 				const auto& val = metaDoc["LibraryElementID"];
 				if (val.IsUint64()) finalLibraryElementID = val.GetUint64();
 				else if (val.IsInt64()) finalLibraryElementID = static_cast<ot::UID>(val.GetInt64());
@@ -1546,7 +1802,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 			// Increment the version starting from the actual current version stored in pending
 			// (which itself was read from the existing file on disk, not hardcoded to 1)
 			int currentVersion = 1;
-			if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version")) {
+			if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version"))
+			{
 				currentVersion = ot::json::getInt(metaDoc, "Version");
 			}
 
@@ -1557,7 +1814,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 			// Update metaContent with the new version
 			metaContent = ot::json::toJson(metaDoc);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OT_LOG_W("Failed to increment version in metadata: " + std::string(_e.what()));
 			// Continue with original metadata if version increment fails
 		}
@@ -1566,7 +1824,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 		writeFileToPath(pending.metaFilePath, metaContent);
 		OT_LOG_D("Files overwritten with incremented version: \"" + pending.contentFilePath + "\" and \"" + pending.metaFilePath + "\"");
 	}
-	else {
+	else
+	{
 		// Don't overwrite - add counter to both filenames and generate new LibraryElementID
 		std::string newContentPath = createIncrementedPath(pending.contentFilePath);
 		std::string newMetaPath = createIncrementedPath(pending.metaFilePath);
@@ -1578,7 +1837,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 		std::string newBaseName = std::filesystem::path(newContentPath).stem().string();
 
 		std::string metaContent = pending.metaNewContent;
-		try {
+		try
+		{
 			ot::JsonDocument metaDoc;
 			metaDoc.fromJson(metaContent);
 
@@ -1600,7 +1860,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 
 			metaContent = ot::json::toJson(metaDoc);
 		}
-		catch (const std::exception& _e) {
+		catch (const std::exception& _e)
+		{
 			OT_LOG_W("Failed to update metadata for incremented file: " + std::string(_e.what()));
 		}
 
@@ -1611,7 +1872,8 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 	}
 
 	// Process linked script export if present (manifest prompt answered - now handle the deferred script)
-	if (pending.hasLinkedScriptExport) {
+	if (pending.hasLinkedScriptExport)
+	{
 		processLinkedScriptExport(pending.linkedScriptExport, finalLibraryElementID);
 	}
 
@@ -1622,19 +1884,23 @@ void FileHandler::handleOverwriteResponse(const std::string& _filePath, bool _ov
 void FileHandler::handleExportFileDialog(const ot::PropertyDialogCfg& _dialogCfg, bool _exportToUserLibrary)
 {
 	DialogExportEntities entities = loadDialogEntities(_dialogCfg, _exportToUserLibrary);
-	if (!entities.isCircuitExport && !entities.isPythonExport) {
+	if (!entities.isCircuitExport && !entities.isPythonExport)
+	{
 		return;
 	}
 
-	if (entities.isCircuitExport) {
+	if (entities.isCircuitExport)
+	{
 		handleCircuitExport(entities, _exportToUserLibrary, _dialogCfg);
 	}
-	else if (entities.isPythonExport) {
+	else if (entities.isPythonExport)
+	{
 		handlePythonExport(entities, _exportToUserLibrary, _dialogCfg);
 	}
 }
 
-void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport)
+{
 	assert(_modelEntity != nullptr);
 
 	// Create LibraryElement
@@ -1653,17 +1919,20 @@ void FileHandler::createLibraryElementsForCircuitModel(EntityFileText* _modelEnt
 	const ot::PropertyString* circuitDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_circuitModelDialogGroup + "/Circuit Model Description"));
 
-	if (circuitAdditionalInfoProp && !circuitAdditionalInfoProp->getValue().empty()) {
+	if (circuitAdditionalInfoProp && !circuitAdditionalInfoProp->getValue().empty())
+	{
 		libraryElement.addAdditionalInfo("Info", circuitAdditionalInfoProp->getValue());
 	}
-	if (circuitDescriptionProp && !circuitDescriptionProp->getValue().empty()) {
+	if (circuitDescriptionProp && !circuitDescriptionProp->getValue().empty())
+	{
 		libraryElement.addMetaData("Description", circuitDescriptionProp->getValue());
 	}
 
 	_elementsToExport.push_back(libraryElement);
 }
 
-void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEntity, ot::UID _environmentID, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEntity, ot::UID _environmentID, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport)
+{
 	assert(_scriptEntity != nullptr);
 
 	// Create LibraryElement
@@ -1682,15 +1951,18 @@ void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEn
 	const ot::PropertyString* pythonDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Python Script Description"));
 
-	if (pythonAdditionalInfoProp && !pythonAdditionalInfoProp->getValue().empty()) {
+	if (pythonAdditionalInfoProp && !pythonAdditionalInfoProp->getValue().empty())
+	{
 		libraryElement.addAdditionalInfo("Info", pythonAdditionalInfoProp->getValue());
 	}
-	if (pythonDescriptionProp && !pythonDescriptionProp->getValue().empty()) {
+	if (pythonDescriptionProp && !pythonDescriptionProp->getValue().empty())
+	{
 		libraryElement.addMetaData("Description", pythonDescriptionProp->getValue());
 	}
 
 	// Add DependencyID and DependencyCollection if environment ID is valid
-	if (_environmentID != ot::invalidUID) {
+	if (_environmentID != ot::invalidUID)
+	{
 		libraryElement.addAdditionalInfo("DependencyID", std::to_string(_environmentID));
 		libraryElement.addAdditionalInfo("DependencyCollection", m_environmentUserCollectionName);
 	}
@@ -1698,7 +1970,8 @@ void FileHandler::createLibraryElementsForPythonScript(EntityFileText* _scriptEn
 	_elementsToExport.push_back(libraryElement);
 }
 
-void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _manifestEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport) {
+void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _manifestEntity, const ot::PropertyDialogCfg& _dialogCfg, std::list<ot::UserLibraryElement>& _elementsToExport)
+{
 	assert(_manifestEntity != nullptr);
 
 	// Create LibraryElement
@@ -1717,17 +1990,20 @@ void FileHandler::createLibraryElementsForPythonManifest(EntityPythonManifest* _
 	const ot::PropertyString* manifestDescriptionProp = dynamic_cast<const ot::PropertyString*>(
 		_dialogCfg.getGridConfig().findPropertyByPath(m_pythonScriptDialogGroup + "/Manifest Description"));
 
-	if (manifestAdditionalInfoProp && !manifestAdditionalInfoProp->getValue().empty()) {
+	if (manifestAdditionalInfoProp && !manifestAdditionalInfoProp->getValue().empty())
+	{
 		libraryElement.addAdditionalInfo("Info", manifestAdditionalInfoProp->getValue());
 	}
-	if (manifestDescriptionProp && !manifestDescriptionProp->getValue().empty()) {
+	if (manifestDescriptionProp && !manifestDescriptionProp->getValue().empty())
+	{
 		libraryElement.addMetaData("Description", manifestDescriptionProp->getValue());
 	}
 
 	_elementsToExport.push_back(libraryElement);
 }
 
-void FileHandler::exportLibraryElementsToUserLibrary(const std::list<ot::UserLibraryElement>& _elementsToExport) {
+void FileHandler::exportLibraryElementsToUserLibrary(const std::list<ot::UserLibraryElement>& _elementsToExport)
+{
 
 	// Create message to send to LMS with list of LibraryElements
 	ot::JsonDocument doc;
@@ -1735,7 +2011,8 @@ void FileHandler::exportLibraryElementsToUserLibrary(const std::list<ot::UserLib
 
 	// Serialize all LibraryElements to JSON array
 	ot::JsonArray elementsArray;
-	for (const ot::UserLibraryElement& element : _elementsToExport) {
+	for (const ot::UserLibraryElement& element : _elementsToExport)
+	{
 		ot::JsonObject elementObj;
 		element.addToJsonObject(elementObj, doc.GetAllocator());
 		elementsArray.PushBack(elementObj, doc.GetAllocator());
@@ -1752,9 +2029,11 @@ void FileHandler::exportLibraryElementsToUserLibrary(const std::list<ot::UserLib
 	std::string response = Application::instance()->getLibraryManagementWrapper().requestCreateConfig(doc);
 }
 
-ot::UID FileHandler::readLibraryElementIDFromMetaFile(const std::string& _metaFilePath) const {
+ot::UID FileHandler::readLibraryElementIDFromMetaFile(const std::string& _metaFilePath) const
+{
 	std::ifstream file(_metaFilePath);
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		OT_LOG_E("Could not open meta file for LibraryElementID reading: " + _metaFilePath);
 		return ot::invalidUID;
 	}
@@ -1762,29 +2041,34 @@ ot::UID FileHandler::readLibraryElementIDFromMetaFile(const std::string& _metaFi
 	std::string content((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
 	file.close();
 
-	try {
+	try
+	{
 		ot::JsonDocument doc;
 		doc.fromJson(content);
 
-		if (doc.HasMember("LibraryElementID")) {
+		if (doc.HasMember("LibraryElementID"))
+		{
 			const auto& val = doc["LibraryElementID"];
 			if (val.IsUint64()) return val.GetUint64();
 			if (val.IsInt64()) return static_cast<ot::UID>(val.GetInt64());
 		}
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		OT_LOG_E("Failed to read LibraryElementID from \"" + _metaFilePath + "\": " + _e.what());
 	}
 
 	return ot::invalidUID;
 }
 
-FileHandler::PendingScriptExport FileHandler::prepareScriptExportData(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID) {
+FileHandler::PendingScriptExport FileHandler::prepareScriptExportData(EntityFileText* _scriptEntity, EntityFileText* _metaEntity, const std::string& _basePath, ot::UID _environmentID)
+{
 	PendingScriptExport result;
 
 	// Create PythonScripts directory
 	std::string scriptPath = _basePath + "/PythonScripts";
-	if (!ensureDirectoryExists(scriptPath)) {
+	if (!ensureDirectoryExists(scriptPath))
+	{
 		throw std::runtime_error("Could not create PythonScripts directory");
 	}
 
@@ -1823,7 +2107,8 @@ FileHandler::PendingScriptExport FileHandler::prepareScriptExportData(EntityFile
 	metaDoc.AddMember("FileName", ot::JsonString(ensureFileExtension(_scriptEntity->getNameOnly(), ".py"), metaDoc.GetAllocator()), metaDoc.GetAllocator());
 
 	// Add DependencyID and DependencyCollection
-	if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
+	if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject())
+	{
 		metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
 		metaDoc["AdditionalInfos"].RemoveMember("DependencyCollection");
 		metaDoc["AdditionalInfos"].AddMember("DependencyID", ot::JsonString(std::to_string(_environmentID), metaDoc.GetAllocator()), metaDoc.GetAllocator());
@@ -1835,32 +2120,39 @@ FileHandler::PendingScriptExport FileHandler::prepareScriptExportData(EntityFile
 	return result;
 }
 
-void FileHandler::processLinkedScriptExport(const PendingScriptExport& _scriptExport, ot::UID _manifestLibraryElementID) {
+void FileHandler::processLinkedScriptExport(const PendingScriptExport& _scriptExport, ot::UID _manifestLibraryElementID)
+{
 	// Update DependencyID in script metadata to point to manifest's final LibraryElementID
 	std::string updatedMeta = updateDependencyIDInMetaContent(_scriptExport.metaContent, _manifestLibraryElementID);
 
-	if (_scriptExport.status == FileOverwriteStatus::Write) {
+	if (_scriptExport.status == FileOverwriteStatus::Write)
+	{
 		writeFileToPath(_scriptExport.contentFilePath, _scriptExport.contentData);
 		writeFileToPath(_scriptExport.metaFilePath, updatedMeta);
 		OT_LOG_D("Linked script export written: \"" + _scriptExport.contentFilePath + "\"");
 	}
-	else if (_scriptExport.status == FileOverwriteStatus::PromptUser) {
+	else if (_scriptExport.status == FileOverwriteStatus::PromptUser)
+	{
 		// Script also has changes - prompt user (DependencyID is already updated in meta)
 		promptUserForOverwrite(_scriptExport.contentFilePath, _scriptExport.metaFilePath, _scriptExport.contentData, updatedMeta);
 	}
-	else if (_scriptExport.status == FileOverwriteStatus::Skip) {
+	else if (_scriptExport.status == FileOverwriteStatus::Skip)
+	{
 		// Script content is identical, but DependencyID may have changed due to manifest getting a new LibraryElementID
 		updateExistingMetaFileDependencyID(_scriptExport.metaFilePath, _manifestLibraryElementID);
 		Application::instance()->getUiComponent()->displayMessage("Script DependencyID updated for existing element.\n");
 	}
 }
 
-std::string FileHandler::updateDependencyIDInMetaContent(const std::string& _metaContent, ot::UID _newDependencyID) {
-	try {
+std::string FileHandler::updateDependencyIDInMetaContent(const std::string& _metaContent, ot::UID _newDependencyID)
+{
+	try
+	{
 		ot::JsonDocument metaDoc;
 		metaDoc.fromJson(_metaContent);
 
-		if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject()) {
+		if (metaDoc.HasMember("AdditionalInfos") && metaDoc["AdditionalInfos"].IsObject())
+		{
 			metaDoc["AdditionalInfos"].RemoveMember("DependencyID");
 			metaDoc["AdditionalInfos"].AddMember("DependencyID",
 				ot::JsonString(std::to_string(_newDependencyID), metaDoc.GetAllocator()),
@@ -1868,7 +2160,8 @@ std::string FileHandler::updateDependencyIDInMetaContent(const std::string& _met
 		}
 
 		// Increment version when dependency is updated
-		if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version")) {
+		if (ot::json::exists(metaDoc, "Version") && ot::json::isInt(metaDoc, "Version"))
+		{
 			int currentVersion = ot::json::getInt(metaDoc, "Version");
 			metaDoc.RemoveMember("Version");
 			metaDoc.AddMember("Version", ot::JsonValue(currentVersion + 1), metaDoc.GetAllocator());
@@ -1876,15 +2169,18 @@ std::string FileHandler::updateDependencyIDInMetaContent(const std::string& _met
 
 		return ot::json::toJson(metaDoc);
 	}
-	catch (const std::exception& _e) {
+	catch (const std::exception& _e)
+	{
 		OT_LOG_E("Failed to update DependencyID in metadata: " + std::string(_e.what()));
 		return _metaContent;
 	}
 }
 
-void FileHandler::updateExistingMetaFileDependencyID(const std::string& _metaFilePath, ot::UID _newDependencyID) {
+void FileHandler::updateExistingMetaFileDependencyID(const std::string& _metaFilePath, ot::UID _newDependencyID)
+{
 	std::ifstream file(_metaFilePath);
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		OT_LOG_E("Could not open meta file for DependencyID update: " + _metaFilePath);
 		return;
 	}
@@ -1893,7 +2189,8 @@ void FileHandler::updateExistingMetaFileDependencyID(const std::string& _metaFil
 	file.close();
 
 	std::string updated = updateDependencyIDInMetaContent(content, _newDependencyID);
-	if (updated != content) {
+	if (updated != content)
+	{
 		writeFileToPath(_metaFilePath, updated);
 		OT_LOG_D("Updated DependencyID in existing meta file: \"" + _metaFilePath + "\"");
 	}

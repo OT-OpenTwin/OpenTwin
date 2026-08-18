@@ -23,6 +23,8 @@ class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHand
 	OT_DECL_NOCOPY(FileHandler)
 		OT_DECL_NOMOVE(FileHandler)
 public:
+	static std::string storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize);
+
 	FileHandler();
 	virtual ~FileHandler() = default;
 
@@ -101,6 +103,15 @@ private:
 
 	void NotifyOwnerAsync(ot::JsonDocument&& _doc, const std::string _owner);
 	void storeFileInDataBase(const std::string& _text, const std::string& _fileName, std::list<std::string>& _folderContent, const std::string& _folderName, const std::string& _fileFilter);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// MDF4 parser
+
+
+
+	void parseMDF4FileWorker(ot::JsonDocument&& _document);
+	void parseMDF4File(const std::string& _fileName, const std::string& _fileFilter, std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize, ot::NewModelStateInfo& _newEntityInfos);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
