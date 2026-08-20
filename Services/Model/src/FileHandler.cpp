@@ -80,20 +80,21 @@ FileHandler::FileHandler()
 {
 	const std::string pageName = Application::getToolBarPageName();
 
-	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import File", "Default/Import");
+	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Text File", "Default/TextVisible");
 	m_buttonFileImport.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonPythonImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Python Script", "Default/python");
 	m_buttonPythonImport.setButtonLockFlags(ot::LockType::ModelWrite);
-	m_buttonFileImport = ot::ToolBarButtonCfg(pageName, c_groupName, "Import Text File", "Default/TextVisible");
-	m_buttonFileImport.setButtonLockFlags(ot::LockType::ModelWrite);
+	m_buttonImportMDF4 = ot::ToolBarButtonCfg(pageName, c_groupName, "Import MDF4", "Default/Import");
+	m_buttonImportMDF4.setButtonLockFlags(ot::LockType::ModelWrite);
+
 	m_buttonExportFileToLibrary = ot::ToolBarButtonCfg(pageName, c_groupName, "Export File to Library ", "Default/Export");
 	m_buttonExportFileToLibrary.setButtonLockFlags(ot::LockType::ModelWrite);
 	m_buttonExportToUserLibrary = ot::ToolBarButtonCfg(pageName, c_groupName, "Export to User Library", "Default/Export");
 	m_buttonExportToUserLibrary.setButtonLockFlags(ot::LockType::ModelWrite);
 
-	m_buttonHandler.connectToolBarButton(m_buttonImportMDF4, this, &FileHandler::handleImportMDF4Button);
 	m_buttonHandler.connectToolBarButton(m_buttonFileImport, this, &FileHandler::handleImportTextFileButton);
 	m_buttonHandler.connectToolBarButton(m_buttonPythonImport, this, &FileHandler::handleImportPythonScriptButton);
+	m_buttonHandler.connectToolBarButton(m_buttonImportMDF4, this, &FileHandler::handleImportMDF4Button);
 	m_buttonHandler.connectToolBarButton(m_buttonExportFileToLibrary, this, &FileHandler::handleExportFilesToLibrary);
 	m_buttonHandler.connectToolBarButton(m_buttonExportToUserLibrary, this, &FileHandler::handleExportToUserLibrary);
 
@@ -112,9 +113,9 @@ void FileHandler::addButtons(ot::components::UiComponent* _uiComponent)
 
 	_uiComponent->addMenuGroup(pageName, c_groupName);
 
-	_uiComponent->addMenuButton(m_buttonImportMDF4);
-	_uiComponent->addMenuButton(m_buttonPythonImport);
 	_uiComponent->addMenuButton(m_buttonFileImport);
+	_uiComponent->addMenuButton(m_buttonPythonImport);
+	_uiComponent->addMenuButton(m_buttonImportMDF4);
 	_uiComponent->addMenuButton(m_buttonExportToUserLibrary);
 
 	if (!ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT").empty())
