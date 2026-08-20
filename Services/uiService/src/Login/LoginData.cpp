@@ -60,8 +60,7 @@ bool LoginData::isValid(void) const {
 	}
 	else
 	{
-		valid &= !m_userPassword.empty() &&
-			!m_encryptedUserPassword.empty();
+		valid &= !m_encryptedUserPassword.empty();
 	}
 	return valid;
 }

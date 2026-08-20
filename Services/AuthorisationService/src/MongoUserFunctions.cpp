@@ -124,7 +124,7 @@ namespace MongoUserFunctions
 		}
 
 		originalUserName = username;
-
+		
 		auto userCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 
 		value userFilter = document{}

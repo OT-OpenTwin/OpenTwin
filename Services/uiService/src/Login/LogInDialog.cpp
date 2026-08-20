@@ -1151,7 +1151,7 @@ LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userMan
 
 LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserManagement& _userManager) {
 	// Check the username, password combination
-	std::string sessionUser, sessionPassword, validPassword, validEncryptedPassword;
+	std::string sessionUser, sessionPassword, validEncryptedPassword;
 
 	std::string currentPassword = m_password->text().toStdString();
 	bool isCurrentPasswordEncrypted = false;
@@ -1162,12 +1162,11 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	}
 
 	std::string currentUserName = m_username->text().toStdString();
-	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validPassword, validEncryptedPassword)) {
+	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validEncryptedPassword)) {
 		return WorkerError::InvalidCreadentials;
 	}
 
 	m_loginData.setUserName(currentUserName);
-	m_loginData.setUserPassword(validPassword);
 	m_loginData.setEncryptedUserPassword(validEncryptedPassword);
 	m_loginData.setSessionUser(sessionUser);
 	m_loginData.setSessionPassword(sessionPassword);

@@ -49,7 +49,7 @@ public:
 	//bool changePassword(const std::string &oldPassword, const std::string &newPassword);
 
 	bool checkUserName(const std::string &userName) const;
-	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const;
+	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validEncryptedPassword) const;
 
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);

@@ -267,7 +267,7 @@ bool UserManagement::checkUserName(const std::string &userName) const {
 	}
 }
 
-bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validPassword, std::string &validEncryptedPassword) const {
+bool UserManagement::checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string &sessionUser, std::string& sessionPassword, std::string &validEncryptedPassword) const {
 	assert(!m_authServerURL.empty());
 
 	// Here we check whether a user exists by getting its data from the authorization service
@@ -295,8 +295,7 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 		// Login attempt successful -> get encrypted and unencrypted passwords
 		sessionUser            = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
 		sessionPassword        = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
-		validPassword          = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
-		validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
+		validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
 
 		return true; // Successful
 	}

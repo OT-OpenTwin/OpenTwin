@@ -167,7 +167,8 @@ void ot::Authentication::addAuthenticationData(const LoginData& _loginData, ot::
 	}
 	else
 	{
-		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
+		_doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, true, _doc.GetAllocator());
+		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getEncryptedUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
 	}
 }
 

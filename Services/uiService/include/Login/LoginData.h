@@ -39,35 +39,35 @@ public:
 	void setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject);
 
 	void setGss(const LogInGSSEntry& _gss) { m_gss = _gss; };
-	const LogInGSSEntry& getGss(void) const { return m_gss; };
+	const LogInGSSEntry& getGss() const { return m_gss; };
 
 	void setDatabaseUrl(const std::string& _url) { m_databaseUrl = _url; };
-	const std::string& getDatabaseUrl(void) const { return m_databaseUrl; };
+	const std::string& getDatabaseUrl() const { return m_databaseUrl; };
 
 	void setAuthorizationUrl(const std::string& _url) { m_authorizationUrl = _url; };
-	const std::string& getAuthorizationUrl(void) const { return m_authorizationUrl; };
+	const std::string& getAuthorizationUrl() const { return m_authorizationUrl; };
 
 	void setUserName(const std::string& _name) { m_username = _name; };
-	const std::string getUserName(void) const { return m_username; };
+	const std::string getUserName() const { return m_username; };
 
 	void setUserPassword(const std::string& _clearPassword) { m_userPassword = _clearPassword; };
-	const std::string& getUserPassword(void) const { return m_userPassword; };
+	const std::string& getUserPassword() const { return m_userPassword; };
 
 	void setEncryptedUserPassword(const std::string& _encryptedPassword) { m_encryptedUserPassword = _encryptedPassword; };
-	const std::string& getEncryptedUserPassword(void) const { return m_encryptedUserPassword; };
+	const std::string& getEncryptedUserPassword() const { return m_encryptedUserPassword; };
 
 	void setSessionUser(const std::string& _sessionUser) { m_sessionUser = _sessionUser; };
-	const std::string& getSessionUser(void) const { return m_sessionUser; };
+	const std::string& getSessionUser() const { return m_sessionUser; };
 
 	void setSessionPassword(const std::string& _sessionPassword) { m_sessionPassword = _sessionPassword; };
-	const std::string& getSessionPassword(void) const { return m_sessionPassword; };
+	const std::string& getSessionPassword() const { return m_sessionPassword; };
 
 	void setSSOSessionToken(const std::string& _token) { m_sessionToken = _token; }
 	const std::string& getSSOSessionToken() const { return m_sessionToken; }
 
-	void clear(void);
+	void clear();
 
-	bool isValid(void) const;
+	bool isValid() const;
 
 	bool loggedInViaSSO() const;
 private:

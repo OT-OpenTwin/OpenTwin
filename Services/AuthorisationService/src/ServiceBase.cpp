@@ -141,6 +141,18 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	if (passWordAuthentication)
 	{
 		loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+
+		// Check whether the provided password is encrypted and decrypt it if needed
+		bool pwEncrypted = false;
+		if (_actionDocument.HasMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD))
+		{
+			pwEncrypted = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
+		}
+
+		if (pwEncrypted)
+		{
+			loggedInUserPassword = ot::UserCredentials::decryptString(loggedInUserPassword);
+		}
 	}
 	else
 	{
@@ -255,7 +267,7 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 
 	if (successful)
 	{
-		json.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
+		json.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), json.GetAllocator()), json.GetAllocator());
 	}
 
 	return json.toJson();
@@ -326,8 +338,7 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		if (usePSW)
 		{
 			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successfulMongoAuthenticate, returnDoc.GetAllocator());
-			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(password, returnDoc.GetAllocator()), returnDoc.GetAllocator());
-			returnDoc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
 		// else is a sso login and there everything neccessary was already added by the handleRequest method
 	}
