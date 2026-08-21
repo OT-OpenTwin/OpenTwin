@@ -18,15 +18,19 @@
 // @otlicense-end
 
 #include <stdafx.h>
-#include "CopyPasteHandler.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCore/Logging/Logger.h"
-#include "OTGui/CopyInformation.h"
-#include "Application.h"
+
+// Service header
 #include "Model.h"
-#include "OTBlockEntities/EntityBlock.h"
+#include "Application.h"
+#include "Handler/SelectionHandler.h"
+#include "Handler/CopyPasteHandler.h"
+
+// OpenTwin header
+#include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
-#include "SelectionHandler.h"
+#include "OTGui/CopyInformation.h"
+#include "OTCommunication/ActionTypes.h"
+#include "OTBlockEntities/EntityBlock.h"
 
 #pragma warning(disable:4996)
 

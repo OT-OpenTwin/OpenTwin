@@ -1,10 +1,13 @@
 // @otlicense
 
-// OpenTwin header
 #include <stdafx.h>
+
+// Service header
 #include "Model.h"
 #include "Application.h"
-#include "ContextActionHandler.h"
+#include "Handler/ContextActionHandler.h"
+
+// OpenTwin header
 #include "OTGui/Menu/MenuCfg.h"
 #include "OTGui/Event/MenuRequestEvent.h"
 #include "OTGui/Event/GraphicsMenuRequestData.h"

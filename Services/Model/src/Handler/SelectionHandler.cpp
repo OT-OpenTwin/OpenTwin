@@ -18,11 +18,15 @@
 // @otlicense-end
 
 #include "stdafx.h"
-#include "SelectionHandler.h"
-#include "OTModelEntities/EntityMaterial.h"
-#include "QueuingHttpRequestsRAII.h"
-#include "Application.h"
+
+// Service header
 #include "Model.h"
+#include "Application.h"
+#include "QueuingHttpRequestsRAII.h"
+#include "Handler/SelectionHandler.h"
+
+// OpenTwin header
+#include "OTModelEntities/EntityMaterial.h"
 
 SelectionHandler::SelectionHandler() :
 	m_needNotifyOwner(false), m_ownerNotifyThread(nullptr), m_notifyOwnerThreadRunning(true)

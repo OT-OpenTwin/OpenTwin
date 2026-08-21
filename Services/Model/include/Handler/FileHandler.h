@@ -1,3 +1,5 @@
+// @otlicense
+
 #pragma once
 
 // OpenTwin header
@@ -21,7 +23,7 @@
 class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
 	OT_DECL_NOCOPY(FileHandler)
-		OT_DECL_NOMOVE(FileHandler)
+	OT_DECL_NOMOVE(FileHandler)
 public:
 	static std::string storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize);
 

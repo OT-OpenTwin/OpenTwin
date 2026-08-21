@@ -17,14 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
-// std header
 #include <stdafx.h>
-#include <queue>
 
 // Service header
 #include "Model.h"
 #include "Application.h"
-#include "BlockHandler.h"
+#include "Handler/BlockHandler.h"
 
 // OpenTwin header
 #include "OTCore/String.h"
@@ -42,6 +40,9 @@
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitConnector.h"
+
+// std header
+#include <queue>
 
 BlockHandler::BlockHandler()
 {

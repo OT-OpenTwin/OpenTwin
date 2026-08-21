@@ -21,10 +21,10 @@
 
 // Service header
 #include "Model.h"
-#include "FileHandler.h"
 #include "Application.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
+#include "Handler/FileHandler.h"
 
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
@@ -64,7 +64,6 @@
 #include <mdf/mdflogstream.h>
 
 // std header
-#include <assert.h>
 #include <filesystem>
 
 std::string FileHandler::storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize)

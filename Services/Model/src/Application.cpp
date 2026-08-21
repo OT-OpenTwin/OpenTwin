@@ -25,24 +25,26 @@
 #include "MicroserviceNotifier.h"
 #include "UiNotifier.h"
 #include "ModelNotifier.h"
-#include "base64.h"
-#include "zlib.h"
-#include "FileHandler.h"
 #include "CrossCollectionDatabaseWrapper.h"
+#include "Handler/FileHandler.h"
 
 // OpenTwin header
-#include "OTModelEntities/DataBase.h"
-#include "OTCADEntities/EntityGeometry.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTGuiAPI/Frontend.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
-#include "OTGuiAPI/Frontend.h"
 #include "OTServiceFoundation/UiComponent.h"
 #include "OTServiceFoundation/Encryption.h"
+#include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTCADEntities/EntityGeometry.h"
+
+// Third party header
+#include <zlib.h>
+#include <base64.h>
 
 // std header
 #include <thread>

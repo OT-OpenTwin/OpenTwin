@@ -19,6 +19,10 @@
 
 #pragma once
 
+// Service header
+#include "Handler/MetadataHandler.h"
+#include "Handler/ProjectInfoHandler.h"
+
 // OpenTwin header
 #include "OTCore/FolderNames.h"
 #include "OTGui/GuiTypes.h"
@@ -34,14 +38,12 @@
 #include "OTModelEntities/NewModelStateInfo.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTModelEntities/Lms/LibraryElementSelectionCfg.h"
-#include "MetadataHandler.h"
 #include "OTModelEntities/Lms/LibraryElementRequest.h"
-#include "ProjectInfoHandler.h"
 
 // std header
-#include <string>
 #include <map>
 #include <list>
+#include <string>
 #include <atomic>
 
 class EntityMesh;

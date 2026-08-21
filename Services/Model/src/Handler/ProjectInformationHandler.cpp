@@ -19,10 +19,12 @@
 
 #include <stdafx.h>
 
-// OpenTwin header
+// Service header
 #include "Model.h"
 #include "Application.h"
-#include "ProjectInformationHandler.h"
+#include "Handler/ProjectInformationHandler.h"
+
+// OpenTwin header
 #include "OTGui/ExtendedProjectInformation.h"
 
 ProjectInformationHandler::ProjectInformationHandler(ot::ActionDispatcher* _dispatcher) :

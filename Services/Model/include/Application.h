@@ -19,18 +19,20 @@
 
 #pragma once
 
+// Service header
+#include "LibraryManagementWrapper.h"
+#include "Handler/FileHandler.h"
+#include "Handler/PlotHandler.h"
+#include "Handler/BlockHandler.h"
+#include "Handler/MaterialHandler.h"
+#include "Handler/SelectionHandler.h"
+#include "Handler/CopyPasteHandler.h"
+#include "Handler/ContextActionHandler.h"
+#include "Handler/ViewVisualisationHandler.h"
+#include "Handler/ProjectInformationHandler.h"
+
 // OpenTwin header
 #include "OTServiceFoundation/ApplicationBase.h"
-#include "FileHandler.h"
-#include "PlotHandler.h"
-#include "BlockHandler.h"
-#include "MaterialHandler.h"
-#include "SelectionHandler.h"
-#include "CopyPasteHandler.h"
-#include "ContextActionHandler.h"
-#include "ViewVisualisationHandler.h"
-#include "LibraryManagementWrapper.h"
-#include "ProjectInformationHandler.h"
 
 // std header
 #include <list>

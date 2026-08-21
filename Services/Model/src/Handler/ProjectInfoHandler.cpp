@@ -1,9 +1,14 @@
-﻿#include <stdafx.h>
+﻿// @otlicense
 
-#include "ProjectInfoHandler.h"
+#include <stdafx.h>
+
+// Service header
+#include "Application.h"
+#include "Handler/ProjectInfoHandler.h"
+
+// OpenTwin header
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
-#include "Application.h"
 
 std::optional<std::string> ProjectInfoHandler::getCollectionName(const std::string& _projectName)
 {
@@ -51,6 +56,7 @@ void ProjectInfoHandler::requestProjectInformation(const std::string& _projectNa
 		ot::JsonDocument responseDoc;
 		responseDoc.fromJson(returnMsg);
 		auto allProjects = ot::json::getArray(responseDoc, OT_ACTION_PARAM_List);
+
 		// The request just applies the name as a filter. Thus other projects that contain the project name will also be returned
 		bool projectFound = false;
 		for (uint32_t i = 0; i < allProjects.Size(); i++)

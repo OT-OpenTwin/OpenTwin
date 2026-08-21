@@ -18,9 +18,14 @@
 // @otlicense-end
 
 #include <stdafx.h>
-#include "ViewVisualisationHandler.h"
-#include "Application.h"
+
+// Service header
 #include "Model.h"
+#include "Application.h"
+#include "Handler/ViewVisualisationHandler.h"
+
+// OpenTwin header
+#include "OTCore/RuntimeTests.h"
 #include "OTModelEntities/Visualization/IVisualisationText.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/Visualization/IVisualisationPlot1D.h"
@@ -28,8 +33,6 @@
 #include "OTModelEntities/Visualization/IVisualisationGraphicsView.h"
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
-#include "OTCore/RuntimeTests.h"
-
 
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled

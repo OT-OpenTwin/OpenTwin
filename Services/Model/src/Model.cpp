@@ -21,8 +21,14 @@
 //
 
 #include "stdafx.h"
+
+// Model header
 #include "Model.h"
 #include "Application.h"
+#include "TableReader.h"
+#include "ProgressReport.h"
+#include "ProjectTypeManager.h"
+#include "MicroserviceNotifier.h"
 
 // OpenTwin header
 #include "OTCore/String.h"
@@ -68,12 +74,10 @@
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
-#include "OTBlockEntities/EntityBlockConnection.h"
 
-#include "MicroserviceNotifier.h"
-#include "TableReader.h"
-#include "ProgressReport.h"
-#include "ProjectTypeManager.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTModelEntities/MetadataEntityInterface.h"
 
 #include "rapidjson/document.h"
 #include "rapidjson/stringbuffer.h"
@@ -107,11 +111,7 @@
 #include <set>
 #include <memory>
 
-#include "tinyexpr.h"
-
-#include "OTBlockEntities/EntityBlock.h"
-#include "OTModelEntities/MetadataEntityInterface.h"
-#include "ProjectInfoHandler.h"
+#include <tinyexpr.h>
 
 // Observer
 void Model::entityRemoved(EntityBase *entity) 

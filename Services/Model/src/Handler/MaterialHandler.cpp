@@ -18,13 +18,17 @@
 // @otlicense-end
 
 #include "stdafx.h"
-#include "MaterialHandler.h"
-#include "OTCADEntities/EntityGeometry.h"
-#include "OTCADEntities/GeometryOperations.h"
+
+// Service header
 #include "Model.h"
 #include "Application.h"
 #include "MicroserviceNotifier.h"
 #include "QueuingHttpRequestsRAII.h"
+#include "Handler/MaterialHandler.h"
+
+// OpenTwin header
+#include "OTCADEntities/EntityGeometry.h"
+#include "OTCADEntities/GeometryOperations.h"
 
 MaterialHandler::MaterialHandler() {
 	const std::string pageName = Application::getToolBarPageName();

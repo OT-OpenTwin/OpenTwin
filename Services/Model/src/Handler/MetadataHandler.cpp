@@ -1,11 +1,19 @@
-﻿#include "stdafx.h"
-#include "MetadataHandler.h"
+﻿// @otlicense
+
+#include "stdafx.h"
+
+// Service header
 #include "Application.h"
-#include "OTModelEntities/DataBase.h"
 #include "CrossCollectionDatabaseWrapper.h"
+#include "Handler/MetadataHandler.h"
+
+// OpenTwin header
+#include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTResultDataAccess/DataLakeAccessor.h"
+
+// std header
 #include <chrono>
 
 MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
