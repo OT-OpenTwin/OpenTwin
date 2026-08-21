@@ -4422,10 +4422,9 @@ void Model::requestVisualisationIfNeeded(ot::UID _entityID)
 
 std::optional<std::string> Model::getCollectionName(const std::string& _projectName)
 {
-	std::optional<std::string> collectionName = m_projectInfoHandler.getCollectionName(_projectName);
-	return collectionName;
+	auto& projInfoHandler = Application::instance()->getProjectInformationHandler();
+	return projInfoHandler.getCollectionName(_projectName);
 }
-
 
 std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _projectName, std::string& _collectionName)
 {
@@ -4436,7 +4435,6 @@ std::optional<MetadataCampaign> Model::getMetadataCampaign(const std::string& _p
 	}
 	return m_metadataHandler.getMetadataCampaign(projectName,_collectionName);
 }
-
 
 ot::DataLakeAccessCfg Model::createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg)
 {

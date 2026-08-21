@@ -20,9 +20,14 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/ProjectInformation.h"
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
+
+// std header
+#include <map>
+#include <optional>
 
 class ProjectInformationHandler : public ot::ActionHandler, public ot::ButtonHandler {
 	OT_DECL_NOCOPY(ProjectInformationHandler)
@@ -33,13 +38,29 @@ public:
 
 	void addButtons(ot::components::UiComponent* _ui);
 
-	// ##################################################################################################################################################################################################################
-
-	// Action and Button handler
+	std::optional<std::string> getCollectionName(const std::string& _projectName);
 
 private:
+
+	// ##################################################################################################################################################################################################################
+
+	// Action handler
+
 	ot::ReturnMessage applyProjectInformation(ot::JsonDocument& _document);
+
+	// ##################################################################################################################################################################################################################
+
+	// Button handler
+
 	void requestUploadProjectPreviewImage();
 
+	// ##################################################################################################################################################################################################################
+
+	// Helper
+
+	void requestProjectInformation(const std::string& _projectName);
+	void loadAuthorisationURL();
+
 	ot::ToolBarButtonCfg m_editButton;
+	std::map<std::string, ot::ProjectInformation> m_projectInfoCacheByName;
 };

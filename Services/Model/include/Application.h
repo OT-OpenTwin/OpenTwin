@@ -237,6 +237,7 @@ public:
 	Model* getModel() const { return m_model; };
 	MicroserviceNotifier* getNotifier() const { return m_notifier; };
 	FileHandler& getFileHandler() { return m_fileHandler; };
+	ProjectInformationHandler& getProjectInformationHandler() { return m_projectInformationHandler; };
 
 	std::string getEntityInformation(std::list<ot::UID>& _entityIDList) const;
 

@@ -21,7 +21,6 @@
 
 // Service header
 #include "Handler/MetadataHandler.h"
-#include "Handler/ProjectInfoHandler.h"
 
 // OpenTwin header
 #include "OTCore/FolderNames.h"
@@ -354,7 +353,6 @@ private:
 	void handleShowDatasetInformation();
 
 	MetadataHandler m_metadataHandler;
-	ProjectInfoHandler m_projectInfoHandler;
 
 	// Persistent attributes (need to be stored in data base)
 	EntityContainer*               m_entityRoot;
