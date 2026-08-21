@@ -79,7 +79,7 @@ CALL "%OT_FRONTEND_CONNECTOR_API_ROOT%\Clean.bat"
 ECHO ===============================================================
 ECHO Clean Library: OTGui
 ECHO ===============================================================
-CALL "%OT_GUI_ROOT%\Clean.bat" 
+CALL "%OT_GUI_ROOT%\clean.bat" 
 
 ECHO ===============================================================
 ECHO Clean Library: OTGuiAPI
@@ -326,6 +326,47 @@ ECHO ===============================================================
 ECHO Clean Executable: FileHeaderUpdater
 ECHO ===============================================================
 CALL "%OPENTWIN_DEV_ROOT%\Tools\FileHeaderUpdater\Clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: KeyGenerator
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\KeyGenerator\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: SystemInformationTool
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\OTSystemInformationTool\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: ConfigMongoDBNoAuth
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBNoAuth\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: ConfigMongoDBWithAuth
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\ConfigMongoDBWithAuth\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: EndpointDocParser
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\EndpointDocParser\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: PasswordEncryption
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\PasswordEncryption\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: SetPermissions
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\SetPermissions\clean.bat" 
+
+ECHO ===============================================================
+ECHO Clean Executable: WindowsSSO
+ECHO ===============================================================
+CALL "%OPENTWIN_DEV_ROOT%\Tools\WindowsSSO\clean.bat" 
+
 
 GOTO END
 
