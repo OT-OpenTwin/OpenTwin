@@ -264,6 +264,22 @@ namespace ot {
 
 		constexpr Flags operator ~() const noexcept { return Flags{ ~m_data }; };
 
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Shift operators
+
+		template<typename U, std::enable_if_t<std::is_integral_v<U>, int> = 0>
+		constexpr Flags operator << (U _shift) const noexcept { return Flags{ m_data << _shift }; };
+
+		template<typename U, std::enable_if_t<std::is_integral_v<U>, int> = 0>
+		constexpr Flags operator >> (U _shift) const noexcept { return Flags{ m_data >> _shift }; };
+
+		template<typename U, std::enable_if_t<std::is_integral_v<U>, int> = 0>
+		inline Flags& operator <<= (U _shift) noexcept { m_data <<= _shift; return *this; };
+
+		template<typename U, std::enable_if_t<std::is_integral_v<U>, int> = 0>
+		inline Flags& operator >>= (U _shift) noexcept { m_data >>= _shift; return *this; };
+
 	};
 
 }
