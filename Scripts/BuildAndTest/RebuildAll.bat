@@ -431,12 +431,20 @@ ECHO Build Executable: FileHeaderUpdater
 ECHO ===============================================================
 CALL "%OT_FILEHEADERUPDATER_ROOT%\build.bat" %1 %2
 
+IF "%2"=="BUILD"  (
+	IF "%OT_SKIP_ADMIN_PANEL_ON_BUILD%"=="true" (
+		GOTO SKIP_ADMIN_PANEL_BUILD
+	)
+)
+
 ECHO ====================================================================
 ECHO Build Admin Panel
 ECHO ====================================================================
 PUSHD "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel"
 CALL "%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build.bat" > "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\AdminPanel_buildLog.txt"
 POPD
+
+:SKIP_ADMIN_PANEL_BUILD
 
 REM ====================================================================
 REM Create the buildlog summary
