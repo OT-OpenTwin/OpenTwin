@@ -20,19 +20,25 @@
 #undef max
 #undef min
 
-#include "OTModelEntities/ModelState.h"
+// OpenTwin header
 #include "OTCore/Logging/Logger.h"
-
 #include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/ModelState.h"
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityFileImage.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 
-#include <fstream>
+void ModelStateEntity::addToJsonObject(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const
+{
+	_object.AddMember("Version", static_cast<uint64_t>(m_entityVersion), _allocator);
+	_object.AddMember("ParentID", static_cast<uint64_t>(m_parentEntityID), _allocator);
+	_object.AddMember("Type", ot::JsonString((m_entityType == TOPOLOGY ? "Topology" : "Data"), _allocator), _allocator);
+}
 
-ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
+ModelState::ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _readOnly) :
+	m_readOnly(_readOnly),
 	m_stateModified(false),
 	m_maxNumberArrayEntitiesPerState(250000),
 	m_previewImageUID(ot::invalidUID),
@@ -47,7 +53,7 @@ ModelState::ModelState(unsigned int sessionID, unsigned int serviceID) :
 	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
 	if (uidGenerator == nullptr)
 	{
-		uidGenerator = new DataStorageAPI::UniqueUIDGenerator(sessionID, serviceID);
+		uidGenerator = new DataStorageAPI::UniqueUIDGenerator(_sessionID, _serviceID);
 	}
 
 	m_uniqueUIDGenerator = uidGenerator;
@@ -494,7 +500,7 @@ ot::UID ModelState::getCurrentEntityParent(ot::UID entityID)
 	return m_entities[entityID].getParentEntityID();
 }
 
-void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities)
+void ModelState::getListOfTopologyEntities(std::list<unsigned long long>& _topologyEntityIDs)
 {
 	// Loop through all entities and add the topology entities to the list
 	for (const auto& entity : m_entities)
@@ -502,7 +508,20 @@ void ModelState::getListOfTopologyEntites(std::list<unsigned long long> &topolog
 		if (entity.second.getEntityType() == ModelStateEntity::tEntityType::TOPOLOGY)
 		{
 			// This entity is a topology entits, so add its id to the list
-			topologyEntities.push_back(entity.first);
+			_topologyEntityIDs.push_back(entity.first);
+		}
+	}
+}
+
+void ModelState::getListOfTopologyEntities(std::list<std::pair<ot::UID, ModelStateEntity>>& _topologyEntities)
+{
+	// Loop through all entities and add the topology entities to the list
+	for (const std::pair<ot::UID, ModelStateEntity>& entity : m_entities)
+	{
+		if (entity.second.getEntityType() == ModelStateEntity::tEntityType::TOPOLOGY)
+		{
+			// This entity is a topology entits, so add its id to the list
+			_topologyEntities.push_back(entity);
 		}
 	}
 }

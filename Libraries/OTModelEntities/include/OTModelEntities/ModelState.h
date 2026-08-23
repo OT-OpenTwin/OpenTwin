@@ -19,31 +19,37 @@
 
 #pragma once
 
-#include <map>
-#include <string>
-#include <list>
-#include "OTDataStorage/UniqueUIDGenerator.h"
+// OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTGui/GuiTypes.h"
 #include "OTGui/VersionGraphCfg.h"
+#include "OTDataStorage/UniqueUIDGenerator.h"
+#include "OTModelEntities/ModelEntitiesAPIExport.h"
 
+// MongoDB header
 #include <mongocxx/cursor.hpp>
 #include <bsoncxx/document/view.hpp>
 #include <bsoncxx/types.hpp>
 #include <bsoncxx/builder/basic/array.hpp>
 
+// std header
+#include <map>
+#include <list>
+#include <string>
+
 #pragma warning(disable : 4251)
 
 class EntityBase;
 
-class __declspec(dllexport) ModelStateEntity
+class OT_MODELENTITIES_API_EXPORT ModelStateEntity
 {
+	OT_DECL_DEFCOPY(ModelStateEntity)
+	OT_DECL_DEFMOVE(ModelStateEntity)
 public:
-
 	enum tEntityType { TOPOLOGY, DATA };
 
-	ModelStateEntity() : m_entityVersion(0), m_parentEntityID(0), m_entityType(tEntityType::DATA) {};
-	~ModelStateEntity() {};
+	explicit ModelStateEntity() = default;
+	~ModelStateEntity() = default;
 
 	void setParentEntityID(ot::UID id) { m_parentEntityID = id; };
 	void setVersion(ot::UID version) { m_entityVersion = version; };
@@ -53,20 +59,18 @@ public:
 	ot::UID getEntityVersion() const { return m_entityVersion; };
 	tEntityType getEntityType() const { return m_entityType; };
 
-	void addToJsonObject(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
-		_object.AddMember("Version", static_cast<uint64_t>(m_entityVersion), _allocator);
-		_object.AddMember("ParentID", static_cast<uint64_t>(m_parentEntityID), _allocator);
-		_object.AddMember("Type", ot::JsonString((m_entityType == TOPOLOGY ? "Topology" : "Data"), _allocator), _allocator);
-	}
+	void addToJsonObject(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 private:
-	ot::UID m_entityVersion;
-	ot::UID m_parentEntityID;
-	tEntityType m_entityType;
+	ot::UID m_entityVersion = 0;
+	ot::UID m_parentEntityID = 0;
+	tEntityType m_entityType = tEntityType::DATA;
 };
 
-class __declspec(dllexport) ModelState
+class OT_MODELENTITIES_API_EXPORT ModelState
 {
+	OT_DECL_NOCOPY(ModelState)
+	OT_DECL_NOMOVE(ModelState)
 	friend class FixtureModelState;
 public:
 	struct VersionInformation
@@ -78,7 +82,7 @@ public:
 	};
 
 	ModelState() = delete;
-	ModelState(unsigned int sessionID, unsigned int serviceID);
+	ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _readOnly = false);
 	~ModelState();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -142,8 +146,11 @@ public:
 	// Determine the parent of an entity
 	ot::UID getCurrentEntityParent(ot::UID entityID);
 
-	// Get a list of all topology entities in the model
-	void getListOfTopologyEntites(std::list<unsigned long long> &topologyEntities);
+	//! @brief Fills the provided list with all topology entity IDs in the model.
+	void getListOfTopologyEntities(std::list<unsigned long long>& _topologyEntityIDs);
+
+	//! @brief Fills the provided list with all topology entities in the model.
+	void getListOfTopologyEntities(std::list<ModelStateEntity>& _topologyEntities);
 
 	// Deactivate the latest model state and reload an earlier state. Returns true if the state could be reverted (needs to have at least one more model state)
 	bool undoLastOperation();
@@ -201,7 +208,7 @@ public:
 	//! @param _format The image format read.
 	//! @return True on success, false if the project has no preview image or an error occurred.
 	static bool readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format);
-
+	
 	//! @brief Adds or updates the project description.
 	//! @param _description The project description to add.
 	bool addProjectDescription(const std::string& _description, ot::DocumentSyntax _syntax);
@@ -367,6 +374,9 @@ private:
 
 	// Information about entity children
 	std::map<ot::UID, std::list<ot::UID>> m_entityChildrenList;
+
+	//! @brief If set the model state is read-only and no modifications in the data base are allowed.
+	bool m_readOnly;
 
 	// A flag which indicates whether the model state has been modified compared to the last stored state.
 	bool m_stateModified;
