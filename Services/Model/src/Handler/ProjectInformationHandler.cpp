@@ -22,13 +22,13 @@
 // Service header
 #include "Model.h"
 #include "Application.h"
-#include "CrossCollectionDatabaseWrapper.h"
 #include "Handler/ProjectInformationHandler.h"
 
 // OpenTwin header
 #include "OTCore/RAII/AtomicResetRAII.h"
 #include "OTGui/ExtendedProjectInformation.h"
 #include "OTModelEntities/ModelState.h"
+#include "OTModelEntities/RAII/CrossCollectionRAII.h"
 #include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 
@@ -142,7 +142,7 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to retrieve collection name for project: " + projectName);
 	}
 
-	CrossCollectionDatabaseWrapper wrapper(collectionName.value());
+	ot::CrossCollectionRAII wrapper(collectionName.value());
 	ModelState state(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
 	state.loadVersionGraph();
 	
@@ -241,16 +241,21 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 		OT_LOG_E("No UI component available");
 		return;
 	}
-
+	if (_config.getTargetProjectName().empty())
+	{
+		OT_LOG_E("No target project name provided for comparison");
+		return;
+	}
+	
 	ot::UILockWrapper lock(ui, ot::LockType::ModelWrite);
 
 	ProgressUpdater progressUpdater(ui, "Comparing projects", false);
 	progressUpdater.setTimeTrigger(std::chrono::seconds(1));
 	progressUpdater.setTotalNumberOfSteps(3);
 	_config.getTargetProjectName();
-	// Fetch project information for the other project
-	std::string flagsString;
 	
+	// Create user output
+	std::string flagsString;
 	for (ot::ProjectCompareConfig::ProjectCompareFlags flag = ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_First; flag.toEnum() <= ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_Last; flag <<= 1)
 	{
 		if (_config.getFlags().has(flag))
@@ -272,7 +277,9 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 		<< flagsString + "\n"
 	);
 
-
+	// Determine target collection and version
+	std::string targetVersion = _config.getTargetProjectVersion();
+	std::string targetCollection = getCollectionName(_config.getTargetProjectName()).value_or("");
 
 }
 

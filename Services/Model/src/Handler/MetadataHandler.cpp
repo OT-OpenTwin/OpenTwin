@@ -4,13 +4,13 @@
 
 // Service header
 #include "Application.h"
-#include "CrossCollectionDatabaseWrapper.h"
 #include "Handler/MetadataHandler.h"
 
 // OpenTwin header
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/MetadataEntityInterface.h"
+#include "OTModelEntities/RAII/CrossCollectionRAII.h"
 #include "OTResultDataAccess/DataLakeAccessor.h"
 
 // std header
@@ -45,7 +45,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			_collectionName = m_projectToCollectionConverter->nameCorrespondingCollection(_projectName,databaseUserName, databaseUserPwd);
 			std::string actualOpenedProject = DataBase::instance().getCollectionName();
 			auto startModelState = std::chrono::high_resolution_clock::now();
-			CrossCollectionDatabaseWrapper wrapper(_collectionName);
+			ot::CrossCollectionRAII wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
 			ModelState::VersionInformation information;
 			secondary.getActiveModelState(information);

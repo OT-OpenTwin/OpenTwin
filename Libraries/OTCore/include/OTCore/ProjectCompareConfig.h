@@ -60,3 +60,5 @@ namespace ot
 	};
 
 }
+
+OT_ADD_FLAG_FUNCTIONS(ot::ProjectCompareConfig::ProjectCompareFlag, ot::ProjectCompareConfig::ProjectCompareFlags)

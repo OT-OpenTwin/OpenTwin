@@ -1,5 +1,5 @@
 // @otlicense
-// File: CrossCollectionDatabaseWrapper.h
+// File: CrossCollectionRAII.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,23 +17,9 @@
 // limitations under the License.
 // @otlicense-end
 
-#pragma once
-
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTModelEntities/RAII/CrossCollectionRAII.h"
 
-// std header
-#include <string>
-
-class CrossCollectionDatabaseWrapper
-{
-	OT_DECL_NOCOPY(CrossCollectionDatabaseWrapper)
-	OT_DECL_NOMOVE(CrossCollectionDatabaseWrapper)
-	OT_DECL_NODEFAULT(CrossCollectionDatabaseWrapper)
-public:
-	explicit CrossCollectionDatabaseWrapper(const std::string& _collectionName);
-	~CrossCollectionDatabaseWrapper();
-
-private:
-	const std::string m_oldCollectionName;
-};
+ot::CrossCollectionRAII::CrossCollectionRAII(const std::string& _collectionName)
+	: m_switcher(_collectionName, ParallelCollectionRAII::SwitchOnConstruction | ParallelCollectionRAII::ResetOnDestruction)
+{}

@@ -25,7 +25,6 @@
 #include "MicroserviceNotifier.h"
 #include "UiNotifier.h"
 #include "ModelNotifier.h"
-#include "CrossCollectionDatabaseWrapper.h"
 #include "Handler/FileHandler.h"
 
 // OpenTwin header
@@ -40,6 +39,7 @@
 #include "OTServiceFoundation/Encryption.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Lms/LibraryElement.h"
+#include "OTModelEntities/RAII/CrossCollectionRAII.h"
 #include "OTCADEntities/EntityGeometry.h"
 
 // Third party header
@@ -683,7 +683,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	bool recursive = ot::json::getBool(_document, OT_ACTION_PARAM_Recursive);
 
 	std::string actualOpenedProject = DataBase::instance().getCollectionName();
-	CrossCollectionDatabaseWrapper wrapper(collectionName);
+	ot::CrossCollectionRAII wrapper(collectionName);
 	
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	ModelState::VersionInformation information;
