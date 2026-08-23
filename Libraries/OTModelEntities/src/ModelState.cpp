@@ -402,6 +402,11 @@ void ModelState::removeEntityFromParent(ot::UID entityID, ot::UID parentID)
 }
 
 bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment) {
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
+	}
 	if (!m_stateModified && !forceSave) {
 		// Nothing to save. The model state has not changed.
 		return true;
@@ -2332,6 +2337,11 @@ void ModelState::storeVersionInModelEntityIfExists(const std::string& _branch, c
 }
 
 void ModelState::storeVersionInModelEntity(const std::string& _branch, const std::string& _version) {
+	if (m_readOnly)
+	{
+		return;
+	}
+
 	if (m_activeVersionInModelEntity != _version || m_activeBranchInModelEntity != _branch) {
 		if (_version.empty()) {
 			OT_LOG_E("Attempting to store empty version { \"Version\": \"" + _version + "\", \"Branch\": \"" + _branch + "\" }");
@@ -2412,6 +2422,10 @@ void ModelState::getAllChildVersions(const ot::VersionGraphVersionCfg* _version,
 }
 
 void ModelState::deleteModelVersion(const std::string &version) {
+	if (m_readOnly)
+	{
+		return;
+	}
 	// We only delete the model state information here and leave it up to the garbage collection to remove the 
 	// unnecessary entities
 

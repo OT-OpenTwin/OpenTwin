@@ -692,7 +692,7 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 
 	// Load entire modelstate
 	std::list<ot::UID> prefetchIds;
-	secondary.getListOfTopologyEntites(prefetchIds);
+	secondary.getListOfTopologyEntities(prefetchIds);
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIdandVersion;
 	for (auto id : prefetchIds)
 	{

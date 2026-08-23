@@ -27,6 +27,7 @@
 // OpenTwin header
 #include "OTCore/RAII/AtomicResetRAII.h"
 #include "OTGui/ExtendedProjectInformation.h"
+#include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/ModelState.h"
 #include "OTModelEntities/RAII/CrossCollectionRAII.h"
 #include "OTServiceFoundation/UILockWrapper.h"
@@ -231,61 +232,143 @@ void ProjectInformationHandler::requestProjectVersionSelectionForComparison()
 
 void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _config)
 {
-	ot::AtomicResetRAII<bool> resetComparisonRunning(m_isComparisonRunning, false);
-	
-	Application* app = Application::instance();
-	auto ui = app->getUiComponent();
+	try
+	{
+		ot::AtomicResetRAII<bool> resetComparisonRunning(m_isComparisonRunning, false);
 
-	if (!ui)
-	{
-		OT_LOG_E("No UI component available");
-		return;
-	}
-	if (_config.getTargetProjectName().empty())
-	{
-		OT_LOG_E("No target project name provided for comparison");
-		return;
-	}
-	
-	ot::UILockWrapper lock(ui, ot::LockType::ModelWrite);
+		Application* app = Application::instance();
 
-	ProgressUpdater progressUpdater(ui, "Comparing projects", false);
-	progressUpdater.setTimeTrigger(std::chrono::seconds(1));
-	progressUpdater.setTotalNumberOfSteps(3);
-	_config.getTargetProjectName();
-	
-	// Create user output
-	std::string flagsString;
-	for (ot::ProjectCompareConfig::ProjectCompareFlags flag = ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_First; flag.toEnum() <= ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_Last; flag <<= 1)
-	{
-		if (_config.getFlags().has(flag))
+		Model* model = app->getModel();
+		if (!model)
 		{
-			if (flagsString.empty())
-			{
-				flagsString = "\nOptions:";
-			}
-			
-			flagsString += "\n\t- " + ot::ProjectCompareConfig::toString(flag.toEnum());
+			OT_LOG_E("No model created yet");
+			return;
 		}
+
+		ot::components::UiComponent* ui = app->getUiComponent();
+		if (!ui)
+		{
+			OT_LOG_E("No UI component available");
+			return;
+		}
+
+		if (_config.getTargetProjectName().empty())
+		{
+			OT_LOG_E("No target project name provided for comparison");
+			return;
+		}
+
+		ot::UILockWrapper lock(ui, ot::LockType::ModelWrite);
+
+		ProgressUpdater progressUpdater(ui, "Comparing projects", false);
+		progressUpdater.setTimeTrigger(std::chrono::seconds(1));
+		progressUpdater.setTotalNumberOfSteps(3);
+		_config.getTargetProjectName();
+
+		// Create user output
+		std::string flagsString;
+		for (ot::ProjectCompareConfig::ProjectCompareFlags flag = ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_First; flag.toEnum() <= ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_Last; flag <<= 1)
+		{
+			if (_config.getFlags().has(flag))
+			{
+				if (flagsString.empty())
+				{
+					flagsString = "\nOptions:";
+				}
+
+				flagsString += "\n\t- " + ot::ProjectCompareConfig::toString(flag.toEnum());
+			}
+		}
+
+		OT_USER_LOG_IS("Comparing"
+			"\tCurrent project version\n"
+			"with:\n"
+			"\t(version "
+			<< _config.getTargetProjectVersion() << ") " << _config.getTargetProjectName()
+			<< flagsString + "\n"
+		);
+
+		// Determine target collection and version
+		std::string targetVersion = _config.getTargetProjectVersion();
+		std::string targetCollection = getCollectionName(_config.getTargetProjectName()).value_or("");
+
+		if (targetCollection.empty())
+		{
+			OT_LOG_E("Failed to determine collection name for project: " + _config.getTargetProjectName());
+			return;
+		}
+
+		// Prepare the collection switch
+		ot::ParallelCollectionRAII collectionSwitch(targetCollection, ot::ParallelCollectionRAII::ResetOnDestruction);
+
+		// Create model states
+		ModelState* leftState = model->getStateManager();
+		if (!leftState)
+		{
+			OT_LOG_E("No model state manager available");
+			return;
+		}
+		
+		// Here we should load the data entities if needed.
+
+		// Switch to the target collection and load the target version
+		collectionSwitch.switchToOther();
+		ModelState rightState(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()), true);
+		
+		ComparisonData data(std::move(_config), std::move(collectionSwitch), leftState, &rightState);
+		data.switchToStep(ComparisonData::StepOpenOtherProject);
+		rightState.loadModelState(targetVersion);
+
+
+
+		comparisonStepEntities(data);
+		comparisonStepDone(data);
 	}
-
-	OT_USER_LOG_IS("Comparing"
-		"\tCurrent project version\n"
-		"with:\n"
-		"\t(version "
-		<< _config.getTargetProjectVersion() << ") " << _config.getTargetProjectName() 
-		<< flagsString + "\n"
-	);
-
-	// Determine target collection and version
-	std::string targetVersion = _config.getTargetProjectVersion();
-	std::string targetCollection = getCollectionName(_config.getTargetProjectName()).value_or("");
-
+	catch (const std::exception& _e)
+	{
+		OT_LOG_E("Exception in comparison worker: " + std::string(_e.what()));
+	}
+	catch (...)
+	{
+		OT_LOG_E("Unknown exception in comparison worker");
+	}
 }
 
 // ##################################################################################################################################################################################################################
 
 // Helper
+
+void ProjectInformationHandler::comparisonStepEntities(ComparisonData& _data)
+{
+	_data.collectionSwitch.switchToInitial();
+
+	std::map<std::string, EntityBase*> leftEntitiesBuffer;
+	std::list<std::pair<ot::UID, ModelStateEntity>> leftEntityInfos;
+	_data.leftState->getListOfTopologyEntities(leftEntityInfos);
+	auto it = leftEntitiesBuffer.find(0);
+	if (it != leftEntitiesBuffer.end())
+	{
+		leftEntitiesBuffer.erase(it);
+	}
+
+
+
+	_data.collectionSwitch.switchToOther();
+
+	std::map<std::string, EntityBase*> rightEntitiesBuffer;
+	std::list<std::pair<ot::UID, ModelStateEntity>> rightEntityInfos;
+	_data.rightState->getListOfTopologyEntities(rightEntityInfos);
+	it = rightEntitiesBuffer.find(0);
+	if (it != rightEntitiesBuffer.end())
+	{
+		rightEntitiesBuffer.erase(it);
+	}
+}
+
+void ProjectInformationHandler::comparisonStepDone(ComparisonData& _data)
+{
+
+}
 
 void ProjectInformationHandler::requestProjectInformation(const std::string& _projectName)
 {
@@ -349,4 +432,23 @@ void ProjectInformationHandler::loadAuthorisationURL()
 	const std::string authURL = response.getWhat();
 	Application::instance()->setAuthorizationURL(authURL);
 
+}
+
+void ProjectInformationHandler::ComparisonData::initializeUpdater(ProgressUpdater* _updater)
+{
+	progressUpdater = _updater;
+	if (progressUpdater)
+	{
+		progressUpdater->setTotalNumberOfSteps(static_cast<uint64_t>(ComparisonStep::StepDone));
+	}
+	switchToStep(step);
+}
+
+void ProjectInformationHandler::ComparisonData::switchToStep(ComparisonStep _step)
+{
+	step = _step;
+	if (progressUpdater)
+	{
+		progressUpdater->triggerUpdate(static_cast<uint64_t>(step));
+	}
 }

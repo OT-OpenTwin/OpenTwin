@@ -3828,7 +3828,7 @@ void Model::projectOpen(const std::string& _customVersion)
 	
 	// Prefetch the topology entries which need to be read in order to build the model
 	std::list<ot::UID> prefetchIds;
-	getStateManager()->getListOfTopologyEntites(prefetchIds);
+	getStateManager()->getListOfTopologyEntities(prefetchIds);
 
 	prefetchDocumentsFromStorage(prefetchIds);
 
@@ -5477,7 +5477,7 @@ void Model::updateModelStateForUndoRedo()
 	{
 		// Load all entities which are new in the model state and not part of the model yet
 		std::list<ot::UID> topologyEntitiesLeft;
-		getStateManager()->getListOfTopologyEntites(topologyEntitiesLeft);
+		getStateManager()->getListOfTopologyEntities(topologyEntitiesLeft);
 
 		// Now we check, which of the entities has not been loaded yet
 		std::list<ot::UID> prefetchIds;
@@ -5814,7 +5814,7 @@ void Model::setStateMangager(ModelState* state)
 	setModelStorageVersion((ot::UID)DataBase::getIntFromView(doc_view, "Version"));
 	
 	std::list<ot::UID> prefetchIds;
-	getStateManager()->getListOfTopologyEntites(prefetchIds);
+	getStateManager()->getListOfTopologyEntities(prefetchIds);
 	OT_LOG_D("Loading entities of model state.");
 	prefetchDocumentsFromStorage(prefetchIds);
 	OT_LOG_D("Building model state.");

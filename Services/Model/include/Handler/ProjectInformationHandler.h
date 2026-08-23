@@ -24,11 +24,15 @@
 #include "OTCore/ProjectCompareConfig.h"
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
+#include "OTModelEntities/RAII/ParallelCollectionRAII.h"
 #include "OTServiceFoundation/UiComponent.h"
 
 // std header
 #include <map>
 #include <optional>
+
+class ModelState;
+class ProgressUpdater;
 
 class ProjectInformationHandler : public ot::ActionHandler, public ot::ButtonHandler {
 	OT_DECL_NOCOPY(ProjectInformationHandler)
@@ -63,6 +67,37 @@ private:
 	// Comparison
 
 	void comparisonWorker(ot::ProjectCompareConfig&& _config);
+
+	struct ComparisonData
+	{
+		enum ComparisonStep {
+			InitialStep,
+			StepOpenOtherProject,
+			StepCompare,
+			StepDone
+		};
+
+		ComparisonData() = delete;
+		ComparisonData(const ComparisonData&) = delete;
+		ComparisonData(ComparisonData&&) = delete;
+		ComparisonData(ot::ProjectCompareConfig&& _config, ot::ParallelCollectionRAII&& _collectionSwitch, ModelState* _leftState, ModelState* _rightState)
+			: config(std::move(_config)), collectionSwitch(std::move(_collectionSwitch)), leftState(_leftState), rightState(_rightState)
+		{};
+
+		void initializeUpdater(ProgressUpdater* _updater);
+		void switchToStep(ComparisonStep _step);
+
+		ot::ProjectCompareConfig config;
+		ot::ParallelCollectionRAII collectionSwitch;
+		ModelState* leftState;
+		ModelState* rightState;
+
+		ComparisonStep step = ComparisonStep::InitialStep;
+		ProgressUpdater* progressUpdater = nullptr;
+	};
+
+	void comparisonStepEntities(ComparisonData& _data);
+	void comparisonStepDone(ComparisonData& _data);
 
 	// ##################################################################################################################################################################################################################
 

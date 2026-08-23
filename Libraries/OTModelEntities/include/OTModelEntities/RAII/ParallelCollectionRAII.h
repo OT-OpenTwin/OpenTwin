@@ -71,8 +71,8 @@ namespace ot
 		OT_ADD_FRIEND_FLAG_FUNCTIONS(StateFlag, State)
 
 		State m_state;
-		const std::string m_initial;
-		const std::string m_other;
+		std::string m_initial;
+		std::string m_other;
 	};
 
 }

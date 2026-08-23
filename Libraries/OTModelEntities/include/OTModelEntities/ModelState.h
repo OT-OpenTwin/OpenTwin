@@ -150,7 +150,7 @@ public:
 	void getListOfTopologyEntities(std::list<unsigned long long>& _topologyEntityIDs);
 
 	//! @brief Fills the provided list with all topology entities in the model.
-	void getListOfTopologyEntities(std::list<ModelStateEntity>& _topologyEntities);
+	void getListOfTopologyEntities(std::list< std::pair<ot::UID, ModelStateEntity>>& _topologyEntities);
 
 	// Deactivate the latest model state and reload an earlier state. Returns true if the state could be reverted (needs to have at least one more model state)
 	bool undoLastOperation();

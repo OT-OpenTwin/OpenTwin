@@ -54,7 +54,7 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 
 			//Load entire modelState
 			std::list<ot::UID> prefetchIds;
-			secondary.getListOfTopologyEntites(prefetchIds);
+			secondary.getListOfTopologyEntities(prefetchIds);
 			std::list<std::pair<ot::UID, ot::UID>> prefetchIdAndVersion;
 			for (auto id : prefetchIds)
 			{
