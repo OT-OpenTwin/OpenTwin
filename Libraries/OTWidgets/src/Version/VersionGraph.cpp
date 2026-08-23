@@ -192,6 +192,24 @@ void ot::VersionGraph::slotCenterOnActiveVersion(void) {
 	m_lastViewportRect = rect;
 }
 
+void ot::VersionGraph::selectVersion(const std::string& _versionName)
+{
+	if ((m_configFlags & VersionGraph::IgnoreSelectionHandlingOnReadOnly) && this->isReadOnly()) {
+		return;
+	}
+	VersionGraphItem* item = this->findVersion(_versionName);
+	if (item) {
+		if (!item->getGraphicsItemSelected())
+		{
+			this->getGraphicsScene()->clearSelection();
+			item->setGraphicsItemSelected(true);
+		}
+	}
+	else {
+		OT_LOG_E("Version not found \"" + _versionName + "\"");
+	}
+}
+
 void ot::VersionGraph::slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item) {
 	if ((m_configFlags & VersionGraph::IgnoreActivateRequestOnReadOnly) && this->isReadOnly()) {
 		return;

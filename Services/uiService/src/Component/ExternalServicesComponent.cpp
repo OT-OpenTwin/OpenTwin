@@ -32,11 +32,12 @@
 #include "Component/ExternalServicesComponent.h"
 #include "CustomWidgets/SelectProjectDialog.h"
 #include "CustomWidgets/SelectEntitiesDialog.h"
+#include "CustomWidgets/ProjectCompareSetupDialog.h"
 #include "CurveHelper/CurveColourSetter.h"
 #include "CurveHelper/CurveDatasetFactory.h"
 #include "Helper/ProgressUpdater.h"
 #include "Helper/StartArgumentParser.h"
-#include "OTCore/TimeFormatter.h"
+
 // OpenTwin System header
 #include "OTSystem/DateTime.h"
 #include "OTSystem/AppExitCodes.h"
@@ -49,6 +50,7 @@
 #include "OTCore/OwnerService.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/RuntimeTests.h"
+#include "OTCore/TimeFormatter.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/OwnerServiceGlobal.h"
@@ -347,6 +349,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_MessageDialog, this, &ExternalServicesComponent::handleMessageDialog);
 	connectAction(OT_ACTION_CMD_UI_ModelDialog, this, &ExternalServicesComponent::handleModelLibraryDialog);
 	connectAction(OT_ACTION_CMD_UI_ProjectSelectDialog, this, &ExternalServicesComponent::handleProjectSelectDialog);
+	connectAction(OT_ACTION_CMD_UI_ProjectCompareSetupDialog, this, &ExternalServicesComponent::handleProjectCompareSetupDialog);
 
 	// Specialized
 	connectAction(OT_ACTION_CMD_OpenNewProject, this, &ExternalServicesComponent::handleOpenNewProject);
@@ -5009,6 +5012,30 @@ void ExternalServicesComponent::handleProjectSelectDialog(ot::JsonDocument& _doc
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	responseDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(projInfo, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+	std::string tmp;
+	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);
+}
+
+void ExternalServicesComponent::handleProjectCompareSetupDialog(ot::JsonDocument& _document)
+{
+	m_actionProfiler.ignoreCurrent();
+
+	ot::DialogCfg cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+	std::string subsequentFunction = ot::json::getString(_document, OT_ACTION_PARAM_CallbackAction);
+	std::string senderUrl = ot::json::getString(_document, OT_ACTION_PARAM_SENDER_URL);
+
+	ProjectCompareSetupDialog dia(cfg, AppBase::instance()->mainWindow());
+
+	if (dia.showDialog() != ot::Dialog::Ok)
+	{
+		return;
+	}
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(subsequentFunction, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(dia.getCompareConfig(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	std::string tmp;
 	this->sendRelayedRequest(EXECUTE, senderUrl, responseDoc, tmp);

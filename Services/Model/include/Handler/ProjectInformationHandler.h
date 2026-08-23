@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
+#include "OTCore/ProjectCompareConfig.h"
 #include "OTCommunication/Handler/ActionHandler.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/UiComponent.h"
@@ -47,12 +48,21 @@ private:
 	// Action handler
 
 	ot::ReturnMessage applyProjectInformation(ot::JsonDocument& _document);
+	ot::ReturnMessage getProjectVersionGraph(ot::JsonDocument& _document);
+	ot::ReturnMessage startComparison(ot::JsonDocument& _document);
 
 	// ##################################################################################################################################################################################################################
 
 	// Button handler
 
 	void requestUploadProjectPreviewImage();
+	void requestProjectVersionSelectionForComparison();
+
+	// ##################################################################################################################################################################################################################
+
+	// Comparison
+
+	void comparisonWorker(ot::ProjectCompareConfig&& _config);
 
 	// ##################################################################################################################################################################################################################
 
@@ -61,6 +71,11 @@ private:
 	void requestProjectInformation(const std::string& _projectName);
 	void loadAuthorisationURL();
 
-	ot::ToolBarButtonCfg m_editButton;
+	ot::ToolBarButtonCfg m_editInfoButton;
+	ot::ToolBarButtonCfg m_compareToButton;
+	
+	std::atomic_bool m_isComparisonRunning{ false };
+	const std::string m_comparisonVersionSelectionResponseAction;
+
 	std::map<std::string, ot::ProjectInformation> m_projectInfoCacheByName;
 };

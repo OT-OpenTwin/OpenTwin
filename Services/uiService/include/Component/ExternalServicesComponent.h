@@ -409,6 +409,7 @@ public:
 	void handleMessageDialog(ot::JsonDocument& _document);
 	void handleModelLibraryDialog(ot::JsonDocument& _document);
 	void handleProjectSelectDialog(ot::JsonDocument& _document);
+	void handleProjectCompareSetupDialog(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

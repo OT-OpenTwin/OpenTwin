@@ -22,19 +22,32 @@
 // Service header
 #include "Model.h"
 #include "Application.h"
+#include "CrossCollectionDatabaseWrapper.h"
 #include "Handler/ProjectInformationHandler.h"
 
 // OpenTwin header
+#include "OTCore/RAII/AtomicResetRAII.h"
 #include "OTGui/ExtendedProjectInformation.h"
+#include "OTModelEntities/ModelState.h"
+#include "OTServiceFoundation/UILockWrapper.h"
+#include "OTServiceFoundation/ProgressUpdater.h"
 
 ProjectInformationHandler::ProjectInformationHandler(ot::ActionDispatcher* _dispatcher) :
-	ot::ActionHandler(_dispatcher), ot::ButtonHandler(_dispatcher)
+	ot::ActionHandler(_dispatcher), ot::ButtonHandler(_dispatcher),
+	m_comparisonVersionSelectionResponseAction("Model.ProjectInformationHandler.ComparisonVersionSelectionResponse")
 {
-	m_editButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Project", "Edit Information", "ToolBar/EditProjectInformation");
-	m_editButton.setButtonLockFlags(ot::LockType::ModelRead | ot::LockType::ModelWrite);
-	connectToolBarButton(m_editButton, this, &ProjectInformationHandler::requestUploadProjectPreviewImage);
+	m_editInfoButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Project", "Edit Information", "ToolBar/EditProjectInformation");
+	m_editInfoButton.setButtonLockFlags(ot::LockType::ModelRead | ot::LockType::ModelWrite);
+	connectToolBarButton(m_editInfoButton, this, &ProjectInformationHandler::requestUploadProjectPreviewImage);
+	
+	m_compareToButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Project", "Compare to", "ToolBar/Compare");
+	m_compareToButton.setButtonLockFlags(ot::LockType::ModelRead | ot::LockType::ModelWrite);
+	m_compareToButton.setButtonToolTip("Compare the current project version with a different version of this or any other project.");
+	connectToolBarButton(m_compareToButton, this, &ProjectInformationHandler::requestProjectVersionSelectionForComparison);
 
 	connectAction(OT_ACTION_CMD_EditProjectInformation, this, &ProjectInformationHandler::applyProjectInformation);
+	connectAction(OT_ACTION_CMD_MODEL_GetVersionGraph, this, &ProjectInformationHandler::getProjectVersionGraph);
+	connectAction(m_comparisonVersionSelectionResponseAction, this, &ProjectInformationHandler::startComparison);
 }
 
 ProjectInformationHandler::~ProjectInformationHandler() {
@@ -44,8 +57,9 @@ ProjectInformationHandler::~ProjectInformationHandler() {
 void ProjectInformationHandler::addButtons(ot::components::UiComponent* _ui) {
 	const std::string pageName = Application::getToolBarPageName();
 	
-	_ui->addMenuGroup(pageName, m_editButton.getGroup());
-	_ui->addMenuButton(m_editButton);
+	_ui->addMenuGroup(pageName, m_editInfoButton.getGroup());
+	_ui->addMenuButton(m_editInfoButton);
+	_ui->addMenuButton(m_compareToButton);
 }
 
 std::optional<std::string> ProjectInformationHandler::getCollectionName(const std::string& _projectName)
@@ -112,6 +126,52 @@ ot::ReturnMessage ProjectInformationHandler::applyProjectInformation(ot::JsonDoc
 	return ot::ReturnMessage::Ok;
 }
 
+ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocument& _document)
+{
+	Application* app = Application::instance();
+	Model* model = app->getModel();
+	if (!model) {
+		OT_LOG_E("No model created yet");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No model created yet");
+	}
+
+	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
+	auto collectionName = getCollectionName(projectName);
+	if (!collectionName.has_value())
+	{
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to retrieve collection name for project: " + projectName);
+	}
+
+	CrossCollectionDatabaseWrapper wrapper(collectionName.value());
+	ModelState state(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
+	state.loadVersionGraph();
+	
+	ot::VersionGraphCfg& graph = state.getVersionGraph();
+
+	ot::ReturnMessage result;
+	result = ot::ReturnMessage::Ok;
+	result = graph.toJson();
+
+	return result;
+}
+
+ot::ReturnMessage ProjectInformationHandler::startComparison(ot::JsonDocument& _document)
+{
+	ot::ProjectCompareConfig config(ot::json::getObject(_document, OT_ACTION_PARAM_Config));
+
+	if (m_isComparisonRunning.exchange(true))
+	{
+		OT_LOG_E("Comparison already running");
+		return ot::ReturnMessage::failed("Comparison already running");
+	}
+	else
+	{
+		std::thread worker(&ProjectInformationHandler::comparisonWorker, this, std::move(config));
+		worker.detach();
+		return ot::ReturnMessage::ok("Comparison worker started");
+	}
+}
+
 // ##################################################################################################################################################################################################################
 
 // Button handler
@@ -138,6 +198,84 @@ void ProjectInformationHandler::requestUploadProjectPreviewImage() {
 	app->getUiComponent()->sendMessage(true, doc, response);
 }
 
+void ProjectInformationHandler::requestProjectVersionSelectionForComparison()
+{
+	Application* app = Application::instance();
+	Model* model = app->getModel();
+	if (!model)
+	{
+		OT_LOG_E("No model created yet");
+		return;
+	}
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_ProjectCompareSetupDialog, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::DialogCfg cfg;
+	cfg.setFlags(ot::DialogCfg::RecenterOnF11);
+	cfg.setInitialSize(800, 600);
+	cfg.setMinSize(600, 400);
+	cfg.setName("Select Project and Version to Compare to");
+	cfg.setTitle("Select Project and Version to Compare to");
+	doc.AddMember(OT_ACTION_PARAM_Config, ot::JsonObject(cfg, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_CallbackAction, ot::JsonString(m_comparisonVersionSelectionResponseAction, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SENDER_URL, ot::JsonString(app->getServiceURL(), doc.GetAllocator()), doc.GetAllocator());
+
+	std::string tmp;
+	app->getUiComponent()->sendMessage(true, doc, tmp);
+}
+
+// ##################################################################################################################################################################################################################
+
+// Comparison
+
+void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _config)
+{
+	ot::AtomicResetRAII<bool> resetComparisonRunning(m_isComparisonRunning, false);
+	
+	Application* app = Application::instance();
+	auto ui = app->getUiComponent();
+
+	if (!ui)
+	{
+		OT_LOG_E("No UI component available");
+		return;
+	}
+
+	ot::UILockWrapper lock(ui, ot::LockType::ModelWrite);
+
+	ProgressUpdater progressUpdater(ui, "Comparing projects", false);
+	progressUpdater.setTimeTrigger(std::chrono::seconds(1));
+	progressUpdater.setTotalNumberOfSteps(3);
+	_config.getTargetProjectName();
+	// Fetch project information for the other project
+	std::string flagsString;
+	
+	for (ot::ProjectCompareConfig::ProjectCompareFlags flag = ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_First; flag.toEnum() <= ot::ProjectCompareConfig::ProjectCompareFlag::Iterator_Last; flag <<= 1)
+	{
+		if (_config.getFlags().has(flag))
+		{
+			if (flagsString.empty())
+			{
+				flagsString = "\nOptions:";
+			}
+			
+			flagsString += "\n\t- " + ot::ProjectCompareConfig::toString(flag.toEnum());
+		}
+	}
+
+	OT_USER_LOG_IS("Comparing"
+		"\tCurrent project version\n"
+		"with:\n"
+		"\t(version "
+		<< _config.getTargetProjectVersion() << ") " << _config.getTargetProjectName() 
+		<< flagsString + "\n"
+	);
+
+
+
+}
+
 // ##################################################################################################################################################################################################################
 
 // Helper
@@ -148,7 +286,6 @@ void ProjectInformationHandler::requestProjectInformation(const std::string& _pr
 	if (authURL.empty())
 	{
 		// This should never happen since the authorization URL is distributed during initialization
-		OT_LOG_W("Authorization url is empty. Requesting it from session service.");
 		loadAuthorisationURL();
 		authURL = Application::instance()->getAuthorizationUrl();
 	}

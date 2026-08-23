@@ -54,14 +54,18 @@ namespace ot {
 		void setVersionGraphConfigFlags(const VersionGraphConfigFlags& _flags) { m_configFlags = _flags; };
 		const VersionGraphConfigFlags& getVersionGraphConfigFlags(void) const { return m_configFlags; };
 
+		const std::string& getActiveVersion() const { return m_activeVersion; };
+		const std::string& getActiveVersionBranch() const { return m_activeVersionBranch; };
+
 	Q_SIGNALS:
-		void versionDeselected(void);
+		void versionDeselected();
 		void versionSelected(const std::string& _versionName);
 		void versionActivateRequest(const std::string& _versionName);
 
 	public Q_SLOTS:
 		void slotSelectionChanged(void);
 		void slotCenterOnActiveVersion(void);
+		void selectVersion(const std::string& _versionName);
 		void slotGraphicsItemDoubleClicked(const ot::GraphicsItem* _item);
 		
 	protected:

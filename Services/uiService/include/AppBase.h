@@ -359,6 +359,9 @@ public:
 
 	ot::VersionGraphManagerView* getVersionGraph() { return m_versionGraph; };
 
+	//! @brief Returns the active project version if available. If no project is active, std::nullopt is returned.
+	std::optional<std::string> getActiveProjectVersion() const;
+
 	void autoCloseUnpinnedViews(bool _ignoreCurrent);
 
 	// ###########################################################################################################################################################################################################################################################################################################################

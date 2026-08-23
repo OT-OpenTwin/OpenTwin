@@ -18,13 +18,22 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+
+// std header
 #include <string>
+
 class CrossCollectionDatabaseWrapper
 {
+	OT_DECL_NOCOPY(CrossCollectionDatabaseWrapper)
+	OT_DECL_NOMOVE(CrossCollectionDatabaseWrapper)
+	OT_DECL_NODEFAULT(CrossCollectionDatabaseWrapper)
 public:
-	CrossCollectionDatabaseWrapper(const std::string& collectionName);
+	explicit CrossCollectionDatabaseWrapper(const std::string& _collectionName);
 	~CrossCollectionDatabaseWrapper();
-private:
-	const std::string _oldCollectionName;
-};
 
+private:
+	const std::string m_oldCollectionName;
+};

@@ -18,18 +18,22 @@
 // @otlicense-end
 
 #include <stdafx.h>
+
+// Model header
 #include "CrossCollectionDatabaseWrapper.h"
+
+// OpenTwin header
 #include "OTModelEntities/DataBase.h"
 
-CrossCollectionDatabaseWrapper::CrossCollectionDatabaseWrapper(const std::string& collectionName)
-	:_oldCollectionName(DataBase::instance().getCollectionName())
+CrossCollectionDatabaseWrapper::CrossCollectionDatabaseWrapper(const std::string& _collectionName)
+	: m_oldCollectionName(DataBase::instance().getCollectionName())
 {
-	DataBase::instance().setCollectionName(collectionName);
+	DataBase::instance().setCollectionName(_collectionName);
 	DataBase::instance().removePrefetchedDocument(0);
 }
 
 CrossCollectionDatabaseWrapper::~CrossCollectionDatabaseWrapper()
 {
-	DataBase::instance().setCollectionName(_oldCollectionName);
+	DataBase::instance().setCollectionName(m_oldCollectionName);
 	DataBase::instance().removePrefetchedDocument(0);
 }

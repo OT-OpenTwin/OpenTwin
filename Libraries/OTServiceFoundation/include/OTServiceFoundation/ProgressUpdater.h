@@ -39,7 +39,7 @@ public:
 	void setTriggerFrequency(uint64_t  _triggerFrequency);
 	
 	//! @brief Mandatory!
-	void setTotalNumberOfSteps(uint64_t  _totalNumberofSteps);
+	void setTotalNumberOfSteps(uint64_t _totalNumberofSteps);
 	void setTotalNumberOfUpdates(uint32_t  _numberOfUpdates, uint64_t _totalNumberofSteps);
 	
 	//! @brief default is set to 2 sec

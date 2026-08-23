@@ -119,8 +119,8 @@ TEST_F(FixtureResultCollectionExtender, AddingParameter_DifferentParameterSameNa
 
 	MetadataParameter existingFrequencyParameter = getFrequencyParameter();
 
-	ASSERT(differentFrequencyParameter != existingFrequencyParameter);
-	ASSERT(differentFrequencyParameter.parameterName == existingFrequencyParameter.parameterName);
+	OTAssert(differentFrequencyParameter != existingFrequencyParameter);
+	OTAssert(differentFrequencyParameter.parameterName == existingFrequencyParameter.parameterName);
 	
 	DatasetDescription newDataset;
 	newDataset.addParameterDescription(std::make_shared<ParameterDescription>(differentFrequencyParameter,true));

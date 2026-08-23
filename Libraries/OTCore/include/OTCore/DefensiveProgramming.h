@@ -18,30 +18,32 @@
 // @otlicense-end
 
 #pragma once
-#include <cassert>
+
+// OpenTwin header
+#include "OTSystem/OTAssert.h"
 
 #ifdef _DEBUG		
-#define ASSERT(condition){	\
-	if (!(condition))		\
-	{						\
-		assert(false);		\
-	}						\
+#define INVARIANT_ASSERT(condition){ \
+	if (!(condition))		         \
+	{						         \
+		OTAssert(false);             \
+	}						         \
 	}						
 #else
-#define ASSERT(condition)
+#define INVARIANT_ASSERT(condition)
 #endif // _DEBUG
 
-	// Checks the invariant method of a class.
-	// Method shall be protected and inline.
-	// Should be executed before and after a method is executed.
-#define INVARIANT ASSERT(invariant())
+//! @brief Check the invariant of a class
+//! The invariant method of a class shall be protected and inline.
+//! It should be executed before and after a method is executed.
+#define INVARIANT INVARIANT_ASSERT(invariant())
 
-#define POST(condition){		\
-	ASSERT(condition);			\
-	INVARIANT;					\
+#define POST(condition){		 \
+	INVARIANT_ASSERT(condition); \
+	INVARIANT;					 \
 }								
 
-#define PRE(condition){			\
-	INVARIANT;					\
-	ASSERT(condition);			\
+#define PRE(condition){			 \
+	INVARIANT;					 \
+	INVARIANT_ASSERT(condition); \
 }
