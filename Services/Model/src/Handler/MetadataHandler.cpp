@@ -47,9 +47,18 @@ MetadataCampaign MetadataHandler::getMetadataCampaign(const std::string& _projec
 			auto startModelState = std::chrono::high_resolution_clock::now();
 			ot::CrossCollectionRAII wrapper(_collectionName);
 			ModelState secondary(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
+
 			ModelState::VersionInformation information;
-			secondary.getActiveModelState(information);
-			secondary.loadModelState(information.version, false);
+			if (!secondary.getActiveModelState(information))
+			{
+				OT_LOG_E("Failed to retrieve current version information for project: " + _projectName);
+			}
+
+			if (!secondary.loadModelState(information.version, false))
+			{
+				OT_LOG_E("Failed to load model state for project: " + _projectName + " with version: " + information.version);
+			}
+
 			auto modelStateLoaded = std::chrono::high_resolution_clock::now();
 
 			//Load entire modelState

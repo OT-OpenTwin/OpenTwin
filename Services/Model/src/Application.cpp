@@ -687,8 +687,17 @@ std::string Application::handleGetEntitiesFromAnotherCollection(ot::JsonDocument
 	
 	ModelState secondary(m_model->getSessionCount(), static_cast<unsigned int>(m_model->getServiceID()));
 	ModelState::VersionInformation information;
-	secondary.getActiveModelState(information);
-	secondary.loadModelState(information.version, false);
+	if (!secondary.getActiveModelState(information))
+	{
+		OT_LOG_E("Could not get active model state for collection " + collectionName);
+		throw ot::Exception::General("Could not get active modelstate for collection " + collectionName);
+	}
+	
+	if (!secondary.loadModelState(information.version, false))
+	{
+		OT_LOG_E("Could not load model state for collection " + collectionName);
+		throw ot::Exception::General("Could not load modelstate for collection " + collectionName);
+	}
 
 	// Load entire modelstate
 	std::list<ot::UID> prefetchIds;

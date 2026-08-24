@@ -129,6 +129,8 @@ ot::ReturnMessage ProjectInformationHandler::applyProjectInformation(ot::JsonDoc
 
 ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocument& _document)
 {
+	ot::ReturnMessage result;
+
 	Application* app = Application::instance();
 	Model* model = app->getModel();
 	if (!model) {
@@ -137,21 +139,66 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 	}
 
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
-	auto collectionName = getCollectionName(projectName);
-	if (!collectionName.has_value())
+
+	if (projectName == app->getProjectName())
 	{
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to retrieve collection name for project: " + projectName);
+		// Get information from current model state (same project)
+
+		ot::JsonDocument resultDoc;
+		ModelState* state = model->getStateManager();
+		ModelState::VersionInformation currentVersionInfo;
+		if (!state->getActiveModelState(currentVersionInfo).has_value())
+		{
+			OT_LOG_E("Failed to retrieve current version information for project: " + projectName);
+		}
+		else
+		{
+			resultDoc.AddMember(OT_ACTION_PARAM_Version, ot::JsonString(currentVersionInfo.version, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+			resultDoc.AddMember(OT_ACTION_PARAM_Branch, ot::JsonString(currentVersionInfo.branch, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+		}
+
+		resultDoc.AddMember(OT_ACTION_PARAM_Graph, ot::JsonObject(state->getVersionGraph(), resultDoc.GetAllocator()), resultDoc.GetAllocator());
+
+		result = ot::ReturnMessage::Ok;
+		result = resultDoc.toJson();
 	}
+	else
+	{
+		// Get information from other project (cross collection access)
 
-	ot::CrossCollectionRAII wrapper(collectionName.value());
-	ModelState state(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
-	state.loadVersionGraph();
-	
-	ot::VersionGraphCfg& graph = state.getVersionGraph();
+		auto collectionName = getCollectionName(projectName);
+		if (!collectionName.has_value())
+		{
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to retrieve collection name for project: " + projectName);
+		}
 
-	ot::ReturnMessage result;
-	result = ot::ReturnMessage::Ok;
-	result = graph.toJson();
+		ot::JsonDocument resultDoc;
+
+		// Cross collection access
+		ot::CrossCollectionRAII wrapper(collectionName.value());
+		ModelState state(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
+
+		// Version graph
+		state.loadVersionGraph();
+		const ot::VersionGraphCfg& graph = state.getVersionGraph();
+		resultDoc.AddMember(OT_ACTION_PARAM_Graph, ot::JsonObject(graph, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+
+		// Active version information
+		ModelState::VersionInformation currentVersionInfo;
+		if (!state.getActiveModelState(currentVersionInfo).has_value())
+		{
+			OT_LOG_E("Failed to retrieve current version information for project: " + projectName);
+		}
+		else
+		{
+			resultDoc.AddMember(OT_ACTION_PARAM_Version, ot::JsonString(currentVersionInfo.version, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+			resultDoc.AddMember(OT_ACTION_PARAM_Branch, ot::JsonString(currentVersionInfo.branch, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+		}
+
+		// Return result
+		result = ot::ReturnMessage::Ok;
+		result = resultDoc.toJson();
+	}
 
 	return result;
 }

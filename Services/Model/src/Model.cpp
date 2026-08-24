@@ -3981,7 +3981,11 @@ void Model::projectSave(const std::string &comment, bool silentlyCreateBranch)
 	}
 
 	// Save the model state for the latest version
-	getStateManager()->saveModelState(false, false, comment);
+	if (!getStateManager()->saveModelState(false, false, comment))
+	{
+		OT_LOG_E("Failed to save model state");
+		return;
+	}
 
 	// Disable write caching to database (this will also flush all pending writes)
 	DataBase::instance().setWritingQueueEnabled(false);
@@ -5795,7 +5799,10 @@ void Model::setStateMangager(ModelState* state)
 	m_entityMap.clear();
 
 	m_stateManager = state;
-	m_stateManager->openProject();
+	if (!m_stateManager->openProject())
+	{
+		OT_LOG_E("Failed to open project in model state manager");
+	}
 
 	auto doc = bsoncxx::builder::basic::document{};
 
