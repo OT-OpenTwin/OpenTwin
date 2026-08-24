@@ -30,6 +30,42 @@
 #include "OTDataStorage/Document/DocumentAccessBase.h"
 #include "OTDataStorage/Helper/QueryBuilder.h"
 
+namespace ot
+{
+	namespace intern
+	{
+		int64_t findDigitOfLevel(const std::string& _digit, uint64_t _level)
+		{
+			std::string::size_type pos = 0;
+
+			// Find the nth dot
+			for (int i = 0; i < _level; ++i)
+			{
+				pos = _digit.find('.', pos);
+				if (pos == std::string::npos)
+				{
+					assert(false); // fewer than n dots
+					return -1;
+				}
+				if (i < _level - 1)
+				{
+					++pos; // advance past current dot for next search
+				}
+			}
+
+			// pos is now at the nth dot; token starts one after
+			std::string::size_type start = 0;
+			if (_level != 0)
+			{
+				start = pos + 1;
+			}
+			std::string::size_type end = _digit.find('.', start); // next dot, or npos
+			std::string digitAsString = _digit.substr(start, end == std::string::npos ? std::string::npos : end - start);
+			return std::stoll(digitAsString);
+		}
+	}
+}
+
 void ModelStateEntity::addToJsonObject(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const
 {
 	_object.AddMember("Version", static_cast<uint64_t>(m_entityVersion), _allocator);
@@ -37,8 +73,8 @@ void ModelStateEntity::addToJsonObject(ot::JsonObject& _object, ot::JsonAllocato
 	_object.AddMember("Type", ot::JsonString((m_entityType == TOPOLOGY ? "Topology" : "Data"), _allocator), _allocator);
 }
 
-ModelState::ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _readOnly) :
-	m_readOnly(_readOnly),
+ModelState::ModelState()
+	: m_readOnly(true),
 	m_stateModified(false),
 	m_maxNumberArrayEntitiesPerState(250000),
 	m_previewImageUID(ot::invalidUID),
@@ -50,15 +86,17 @@ ModelState::ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _r
 	m_relativeModelStateCount(0),
 	m_maximualRelativeModelStateCount(30),
 	m_uniqueUIDGenerator(nullptr)
+{}
+
+ModelState::ModelState(unsigned int _sessionID, unsigned int _serviceID) 
+	: ModelState()
 {
-	if (!m_readOnly)
+	m_readOnly = false;
+	m_uniqueUIDGenerator = EntityBase::getUidGenerator();
+	if (m_uniqueUIDGenerator == nullptr)
 	{
-		m_uniqueUIDGenerator = EntityBase::getUidGenerator();
-		if (m_uniqueUIDGenerator == nullptr)
-		{
-			m_uniqueUIDGenerator = new ot::UniqueUIDGenerator(_sessionID, _serviceID);
-			EntityBase::setUidGenerator(m_uniqueUIDGenerator);
-		}
+		m_uniqueUIDGenerator = new ot::UniqueUIDGenerator(_sessionID, _serviceID);
+		EntityBase::setUidGenerator(m_uniqueUIDGenerator);
 	}
 }
 
@@ -84,6 +122,20 @@ void ModelState::reset()
 
 	m_relativeModelStateCount = 0;
 	m_stateModified = false;
+}
+
+ot::UID ModelState::createEntityUID()
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Cannot create entity UID in read-only model state");
+		return ot::invalidUID;
+	}
+	else
+	{
+		OTAssert(m_uniqueUIDGenerator != nullptr, "Unique UID generator is not initialized");
+		return m_uniqueUIDGenerator->getUID();
+	}
 }
 
 std::optional<bsoncxx::v_noabi::document::value> ModelState::getActiveModelState(VersionInformation& _information) const
@@ -138,7 +190,7 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	m_originalInitialVersion.isEndOfBranch = m_graphCfg.versionIsEndOfBranch(activeVersion);
 	m_originalInitialVersion.isOriginalBranch = true;
 
-	// Load the preview image if set
+	// Load the additional project information IDs (preview image, description, etc.)
 	readAdditionalProjectInformation(result->view());
 	
 	// If a specific version was requested we try to open it instead.
@@ -177,23 +229,209 @@ bool ModelState::openProject(const std::string& _customVersion) {
 	return loadModelState(activeVersion);
 }
 
-// ###########################################################################################################################################################################################################################################################################################################################
+bool ModelState::loadModelState(const std::string& _version, bool _loadFromGraph)
+{
+	OT_LOG_D("Loading model state { \"Version\": \"" + _version + "\" }");
 
-// Entity handling
+	if (!isVersionInActiveBranch(_version))
+	{
+		activateBranch(_version);
+	}
 
-ot::UID ModelState::createEntityUID()
+	// Now we search for an entity with SchemaType "ModelState" and the given version
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc = bsoncxx::builder::basic::document{};
+	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
+	queryDoc.append(bsoncxx::builder::basic::kvp("Version", _version));
+
+	auto filterDoc = bsoncxx::builder::basic::document{};
+
+	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+	if (!result)
+	{
+		OT_LOG_E("Model state not found { \"Version\": \"" + _version + "\" }");
+		return false; // Model state not found
+	}
+
+	clearChildrenInformation();
+
+	if (!loadModelFromDocument(result->view(), _loadFromGraph))
+	{
+		// The model state could not be loaded
+		OT_LOG_E("Failed to load model state { \"Version\": \"" + _version + "\" }");
+		return false;
+	}
+
+	buildChildrenInformation();
+
+	if (!m_readOnly)
+	{
+		storeCurrentVersionInModelEntity();
+	}
+
+	return true;
+}
+
+bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const std::string& saveComment)
 {
 	if (m_readOnly)
 	{
-		OT_LOG_E("Cannot create entity UID in read-only model state");
-		return ot::invalidUID;
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
+	}
+	if (!m_stateModified && !forceSave)
+	{
+		// Nothing to save. The model state has not changed.
+		return true;
+	}
+
+	// Store the current version as the parent version
+	std::string parentVersion = m_graphCfg.getActiveVersionName();
+
+	// Remove all entities which are newer than the current model state, but older than the last inactive model state or model
+	// state extension. Such entries appear after a previous undo operation.
+	if (canRedo())
+	{
+		// We have redo information available. To avoid conflicts, we need to create a new branch
+		createAndActivateNewBranch();
+	}
+
+	size_t numberArrayEntitiesAbsolute = 3 * m_entities.size();
+	size_t numberArrayEntitiesRelative = 3 * m_addedOrModifiedEntities.size() + m_removedEntities.size();
+
+	// We perform a relative save if the size of the relative state is five times less than the size of the absolute state
+	bool saveAbsolute = (numberArrayEntitiesRelative * 5 > numberArrayEntitiesAbsolute);
+
+	if (numberArrayEntitiesRelative > m_maxNumberArrayEntitiesPerState)
+	{
+		// In case that we need to store extension documents, we store an absolute state
+		saveAbsolute = true;
+	}
+
+	if (forceAbsoluteState)
+	{
+		// We force saving as an absolute state
+		saveAbsolute = true;
+	}
+
+	if (m_relativeModelStateCount >= m_maximualRelativeModelStateCount)
+	{
+		// We have reached the maximum number of relative model states. For performance reasons (open, undo, redo) we now write an absolute state
+		saveAbsolute = true;
+	}
+
+	if (m_currentModelBaseStateVersion.empty())
+	{
+		// We can not save a relative state without having the base state
+		saveAbsolute = true;
+	}
+
+	// Now we need to increment our version counter
+	m_graphCfg.incrementActiveVersion();
+
+	// Now add the new state to the graph
+	m_graphCfg.insertVersion(m_graphCfg.getActiveVersionName(), parentVersion, "", saveComment);
+
+	// Finally we store an absolute or relative state 
+	if (saveAbsolute)
+	{
+		m_relativeModelStateCount = 0;
+		if (!saveAbsoluteState(saveComment))
+		{
+			return false;
+		}
 	}
 	else
 	{
-		OTAssert(m_uniqueUIDGenerator != nullptr, "Unique UID generator is not initialized");
-		return m_uniqueUIDGenerator->getUID();
+		m_relativeModelStateCount++;
+		if (!saveIncrementalState(saveComment))
+		{
+			return false;
+		}
+	}
+
+	// The document is up-to-date
+	m_stateModified = false;
+
+	// We need to remove the modification information
+	m_addedOrModifiedEntities.clear();
+	m_removedEntities.clear();
+
+	this->storeCurrentVersionInModelEntity();
+
+	return true;
+}
+
+void ModelState::loadVersionGraph()
+{
+	m_graphCfg.clear();
+
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	auto array_builder = bsoncxx::builder::basic::array{};
+	array_builder.append("ModelState");
+	array_builder.append("ModelStateInactive");
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << bsoncxx::builder::stream::open_document
+		<< "$in" << array_builder
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	DataStorageAPI::QueryBuilder filter;
+	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version", "ParentVersion", "Description", "Label" }, false);
+
+	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
+
+	for (const auto& result : results)
+	{
+		std::string version = result["Version"].get_utf8().value.data();
+		std::string parentVersion = result["ParentVersion"].get_utf8().value.data();
+
+		std::string label;
+		std::string description;
+
+		auto labelIt = result.find("Label");
+		if (labelIt != result.end())
+		{
+			label = labelIt->get_utf8().value.data();
+		}
+
+		auto descIt = result.find("Description");
+		if (descIt != result.end())
+		{
+			description = descIt->get_utf8().value.data();
+		}
+
+		m_graphCfg.insertVersion(version, parentVersion, label, description);
 	}
 }
+
+void ModelState::checkAndUpgradeDataBaseSchema()
+{
+	// Get the schema version of the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc = bsoncxx::builder::basic::document{};
+	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "Model"));
+
+	auto filterDoc = bsoncxx::builder::basic::document{};
+
+	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
+	if (!result) return; // Model state not found
+
+	long long schemaVersion = result->view()["SchemaVersion_Model"].get_int64();
+
+	if (schemaVersion == 1)
+	{
+		// We need to perform a schema upgrade from version 1 to 2.
+		updateSchema_1_2();
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Entity handling
 
 void ModelState::storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType)
 {
@@ -332,51 +570,218 @@ void ModelState::removeEntity(ot::UID entityID, bool considerChildren)
 	}
 }
 
-bool ModelState::loadModelState(const std::string& _version, bool _loadFromGraph)
+bool ModelState::undoLastOperation()
 {
-	OT_LOG_D("Loading model state { \"Version\": \"" + _version + "\" }");
+	// Determine the parent version
+	std::string parentVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
 
-	if (!isVersionInActiveBranch(_version))
+	if (parentVersion.empty())
 	{
-		activateBranch(_version);
+		// We are already at the first state
+		return false;
 	}
 
-	// Now we search for an entity with SchemaType "ModelState" and the given version
+	// Load the parent model state
+	return loadModelState(parentVersion);
+}
+
+bool ModelState::redoNextOperation()
+{
+	// Determine the next version in the current branch
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
+
+	if (nextVersion.empty())
+	{
+		// We are already at the last state
+		return false;
+	}
+
+	// Load the parent model state
+	return loadModelState(nextVersion);
+}
+
+void ModelState::removeDanglingModelEntities()
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to modify read-only model state");
+		return;
+	}
+
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	// First of all, we search for the last model state type entry from the back
+
+	auto array_builder = bsoncxx::builder::basic::array{};
+	array_builder.append("ModelState");
+	array_builder.append("ModelStateExtension");
+	array_builder.append("ModelStateInactive");
+	array_builder.append("ModelStateExtensionInactive");
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << bsoncxx::builder::stream::open_document
+		<< "$in" << array_builder
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	DataStorageAPI::QueryBuilder filter;
+	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType" }, true);
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(filterDoc), std::move(sortDoc.extract()));
+	if (!result)
+	{
+		// We did not find a model state, remove the entire content of the project
+		assert(0);
+		return;
+	}
+
+	//std::string propertiesJSON = bsoncxx::to_json(result->view());
+	auto lastModelStateID = result->view()["_id"].get_oid();
+
+	// We round down the model state Id such that we surely get all entities younger than this entity, even if they
+	// have a potentially smaller oid due to the randomness part in the oid.
+
+	std::string oid = result->view()["_id"].get_oid().value.to_string();
+	std::string timePart = oid.substr(0, 8);
+	std::string loweroid = timePart + "0000000000000000";
+	bsoncxx::oid searchOid(loweroid);
+
+	//std::string test = searchOid.to_string();
+
+	// Now we get the oid of the last model state and get a list of all entries which are older than this state
+
+	queryDoc = bsoncxx::builder::stream::document{}
+		<< "_id" << bsoncxx::builder::stream::open_document << "$gte" << searchOid
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	filterDoc = filter.GenerateSelectQuery({ "SchemaType", "EntityID", "Version" }, true);
+
+	sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto resultList = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), std::move(sortDoc.extract()), 0);
+
+	// We now take all entries until the first model state and put them into the delete list
+
+	auto deleteEntities = bsoncxx::builder::basic::array();
+
+	if (getDanglingEntities(resultList, deleteEntities))
+	{
+		// If we have entities to delete, we will send the delete call with the list of entities to be deleted to the database server
+		auto deleteDoc = bsoncxx::builder::stream::document{}
+			<< "_id" << bsoncxx::builder::stream::open_document
+			<< "$in" << deleteEntities
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+		docBase.DeleteDocuments(std::move(deleteDoc));
+	}
+
+	// Now we should not have dangling entities in the project anymore
+}
+
+std::list<std::string> ModelState::removeRedoModelStates()
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to modify read-only model state");
+		return std::list<std::string>();
+	}
+
+	// Find a list of all model State version which follow the current one
+	std::list<std::string> futureVersions;
+	getAllChildVersions(m_graphCfg.getActiveVersionName(), futureVersions);
+
+	std::list<std::string> removedVersions;
+
+	for (const auto& version : futureVersions)
+	{
+		// Now we need to delete the given model state together with all its newly created entities
+		deleteModelVersion(version);
+
+		// Remove the version from the version graph
+		removeVersionGraphItem(version);
+
+		// And add it to the list of removed versions
+		removedVersions.push_back(version);
+	}
+
+	// Now it can be that the current branch no longer exists
+	// Since we are adding a new version after the current model state, it is best to activate this branch
+	activateBranch(m_graphCfg.getActiveVersionName());
+
+	// We need to update the model entity with the new information
+	storeCurrentVersionInModelEntity();
+
+	return removedVersions;
+}
+
+void ModelState::updateVersionEntity(const std::string& _version)
+{
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (!version)
+	{
+		OT_LOG_E("Version not found \"" + _version + "\"");
+		return;
+	}
+
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
 
 	auto queryDoc = bsoncxx::builder::basic::document{};
 	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
 	queryDoc.append(bsoncxx::builder::basic::kvp("Version", _version));
 
-	auto filterDoc = bsoncxx::builder::basic::document{};
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "Description" << version->getDescription()
+		<< "Label" << version->getLabel()
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
 
-	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-	if (!result) {
-		OT_LOG_E("Model state not found { \"Version\": \"" + _version + "\" }");
-		return false; // Model state not found
-	}
-
-	clearChildrenInformation();
-
-	if (!loadModelFromDocument(result->view(), _loadFromGraph))
-	{
-		// The model state could not be loaded
-		OT_LOG_E("Failed to load model state { \"Version\": \"" + _version + "\" }");
-		return false;
-	}
-
-	storeCurrentVersionInModelEntity();
-
-	buildChildrenInformation();
-
-	storeCurrentVersionInModelEntity();
-
-	return true;
+	collection.update_one(queryDoc.view(), modifyDoc.view());
 }
 
-void ModelState::clearChildrenInformation()
+void ModelState::restoreOriginalVersionIfNeeded()
 {
-	m_entityChildrenList.clear();
+	if (m_customInitialVersion.version.empty())
+	{
+		// No custom version set, ignore
+		return;
+	}
+
+	// Check if the custom version was part of the original branch
+	if (!m_customInitialVersion.isOriginalBranch)
+	{
+		// The custom version is not part of the original branch, try to restore the original branch and version
+		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		return;
+	}
+
+	// Ensure that the initial version is end of branch version
+	if (!m_originalInitialVersion.isEndOfBranch || !m_customInitialVersion.isEndOfBranch)
+	{
+		// The initial version is not an end of branch version, try to restore original branch and version
+		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		return;
+	}
+
+	// Here we know that both versions are end of branch versions and that the custom version is part of the original branch
+
+	// Check if we have switched to a different branch while the project was opened
+	if (m_customInitialVersion.branch != m_activeBranchInModelEntity)
+	{
+		// Check if the actual branch is a child branch of the initial branch
+		if (m_activeBranchInModelEntity.find(m_customInitialVersion.branch) != 0)
+		{
+			// We have switched to a different branch, which is not a child branch of the initial branch, try to restore original branch and version
+			return;
+			storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
+		}
+	}
+
+	// Here we know that we are in the same branch (or a child branch) of the initial version and that the project was opened at the end of a branch
+
+	// We can skip restoring
 }
 
 void ModelState::buildChildrenInformation()
@@ -389,110 +794,436 @@ void ModelState::buildChildrenInformation()
 	}
 }
 
-void ModelState::addEntityToParent(ot::UID entityID, ot::UID parentID)
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Project preview image and description
+
+bool ModelState::readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format)
 {
-	if (m_entityChildrenList.count(parentID) > 0)
+	try
 	{
-		m_entityChildrenList.find(parentID)->second.push_back(entityID);
-	}
-	else
-	{
-		std::list<ot::UID> childList;
-		childList.push_back(entityID);
+		// Load the model entity
+		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
+		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "Model"
+			<< bsoncxx::builder::stream::finalize;
 
-		m_entityChildrenList[parentID] = childList;
-	}
-}
+		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
 
-void ModelState::removeEntityFromParent(ot::UID entityID, ot::UID parentID)
-{
-	if (m_entityChildrenList.count(parentID) > 0)
-	{
-		m_entityChildrenList.find(parentID)->second.remove(entityID);
-	}
-}
+		auto sortDoc = bsoncxx::builder::basic::document{};
+		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
-bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment) {
-	if (m_readOnly)
-	{
-		OT_LOG_E("Attempting to save read-only model state");
-		return false;
-	}
-	if (!m_stateModified && !forceSave) {
-		// Nothing to save. The model state has not changed.
+		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
+		if (!zeroDoc)
+		{
+			OT_LOG_E("No model entity found");
+			return false;  // No model entity found
+		}
+
+		// Now check if we already have an image
+		auto idIt = zeroDoc->view().find("PreviewImageUID");
+		if (idIt == zeroDoc->view().end() || idIt->get_int64() == static_cast<int64_t>(ot::invalidUID))
+		{
+			// The project has no preview image
+			return false;
+		}
+
+		auto verIt = zeroDoc->view().find("PreviewImageVersion");
+		if (verIt == zeroDoc->view().end())
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+			return false;
+		}
+		if (verIt->get_int64() == static_cast<int64_t>(ot::invalidUID))
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
+			return false;
+		}
+		auto typeIt = zeroDoc->view().find("PreviewImageType");
+		if (typeIt == zeroDoc->view().end())
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
+			return false;
+		}
+
+		_format = ot::stringToImageFileFormat(typeIt->get_utf8().value.data());
+
+		// Read the image data
+
+		auto imageQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << EntityBinaryData::className()
+			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
+			<< "Version" << static_cast<int64_t>(verIt->get_int64())
+			<< bsoncxx::builder::stream::finalize;
+
+		auto imageEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+		auto imageDoc = docBase.GetDocument(std::move(imageQueryDoc), std::move(imageEmptyFilterDoc.extract()));
+		if (!imageDoc)
+		{
+			OT_LOG_E("Preview image entity not found");
+			return false;
+		}
+
+		std::map<ot::UID, EntityBase*> tmp;
+
+		EntityBinaryData imageData;
+		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
+		_imageData = imageData.getData();
+
 		return true;
 	}
-
-	// Store the current version as the parent version
-	std::string parentVersion = m_graphCfg.getActiveVersionName();
-
-	// Remove all entities which are newer than the current model state, but older than the last inactive model state or model
-	// state extension. Such entries appear after a previous undo operation.
-	if (canRedo()) {
-		// We have redo information available. To avoid conflicts, we need to create a new branch
-		createAndActivateNewBranch();
-	}
-
-	size_t numberArrayEntitiesAbsolute = 3 * m_entities.size();
-	size_t numberArrayEntitiesRelative = 3 * m_addedOrModifiedEntities.size() + m_removedEntities.size();
-
-	// We perform a relative save if the size of the relative state is five times less than the size of the absolute state
-	bool saveAbsolute = (numberArrayEntitiesRelative * 5 > numberArrayEntitiesAbsolute);
-
-	if (numberArrayEntitiesRelative > m_maxNumberArrayEntitiesPerState) {
-		// In case that we need to store extension documents, we store an absolute state
-		saveAbsolute = true;
-	}
-
-	if (forceAbsoluteState) {
-		// We force saving as an absolute state
-		saveAbsolute = true;
-	}
-
-	if (m_relativeModelStateCount >= m_maximualRelativeModelStateCount)
+	catch (const std::exception& _e)
 	{
-		// We have reached the maximum number of relative model states. For performance reasons (open, undo, redo) we now write an absolute state
-		saveAbsolute = true;
+		OT_LOG_E(_e.what());
+		return false;
 	}
+}
 
-	if (m_currentModelBaseStateVersion.empty()) {
-		// We can not save a relative state without having the base state
-		saveAbsolute = true;
-	}
+bool ModelState::readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax)
+{
+	try
+	{
+		// Load the model entity
+		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
+		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "Model"
+			<< bsoncxx::builder::stream::finalize;
 
-	// Now we need to increment our version counter
-	m_graphCfg.incrementActiveVersion();
+		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
 
-	// Now add the new state to the graph
-	m_graphCfg.insertVersion(m_graphCfg.getActiveVersionName(), parentVersion, "", saveComment);
+		auto sortDoc = bsoncxx::builder::basic::document{};
+		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
-	// Finally we store an absolute or relative state 
-	if (saveAbsolute) {
-		m_relativeModelStateCount = 0;
-		if (!saveAbsoluteState(saveComment)) {
+		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
+		if (!zeroDoc)
+		{
+			OT_LOG_E("No model entity found");
+			return false;  // No model entity found
+		}
+
+		// Now check if we already have an image
+		auto idIt = zeroDoc->view().find("DescriptionUID");
+		if (idIt == zeroDoc->view().end())
+		{
+			// The project has no preview image
 			return false;
 		}
-	}
-	else {
-		m_relativeModelStateCount++;
-		if (!saveIncrementalState(saveComment)) {
+		if (idIt->get_int64() == ot::invalidUID)
+		{
+			// The project has no preview image
 			return false;
 		}
+
+		auto verIt = zeroDoc->view().find("DescriptionVersion");
+		if (verIt == zeroDoc->view().end())
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+			return false;
+		}
+		if (verIt->get_int64() == ot::invalidUID)
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
+			return false;
+		}
+		auto syntaxIt = zeroDoc->view().find("DescriptionSyntax");
+		if (syntaxIt == zeroDoc->view().end())
+		{
+			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
+			return false;
+		}
+
+		_syntax = ot::stringToDocumentSyntax(syntaxIt->get_utf8().value.data());
+
+		// Read the image data
+
+		auto textQueryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << EntityBinaryData::className()
+			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
+			<< "Version" << static_cast<int64_t>(verIt->get_int64())
+			<< bsoncxx::builder::stream::finalize;
+
+		auto textEmptyFilterDoc = bsoncxx::builder::basic::document{};
+
+		auto imageDoc = docBase.GetDocument(std::move(textQueryDoc), std::move(textEmptyFilterDoc.extract()));
+		if (!imageDoc)
+		{
+			OT_LOG_E("Description entity not found");
+			return false;
+		}
+
+		std::map<ot::UID, EntityBase*> tmp;
+
+		EntityBinaryData imageData;
+		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
+		_description = std::string(imageData.getData().data());
+
+		return true;
+	}
+	catch (const std::exception& _e)
+	{
+		OT_LOG_E(_e.what());
+		return false;
+	}
+}
+
+bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format)
+{
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result)
+	{
+		OT_LOG_E("No model entity found");
+		return false;  // No model entity found
 	}
 
-	// The document is up-to-date
-	m_stateModified = false;
+	// Removed existing preview image (if any)
+	removePreviewImage();
 
-	// We need to remove the modification information
-	m_addedOrModifiedEntities.clear();
-	m_removedEntities.clear();
+	EntityBinaryData newImageData;
+	newImageData.setEntityID(this->createEntityUID());
+	newImageData.setData(std::move(_imageData));
+	newImageData.storeToDataBase();
 
-	this->storeCurrentVersionInModelEntity();
+	std::string imageFormatStr = ot::toString(_format);
+
+	// Now update the model entity with the new image information
+	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+
+	// Finally, update the model entity
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc2 = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "PreviewImageUID" << static_cast<int64_t>(newImageData.getEntityID())
+		<< "PreviewImageVersion" << static_cast<int64_t>(newImageData.getEntityStorageVersion())
+		<< "PreviewImageType" << imageFormatStr
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	m_previewImageUID = newImageData.getEntityID();
+	m_previewImageVersion = newImageData.getEntityStorageVersion();
+	m_previewImageFormat = _format;
 
 	return true;
 }
 
-ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
+void ModelState::removePreviewImage()
+{
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result)
+	{
+		OT_LOG_E("No model entity found");
+		return;  // No model entity found
+	}
+
+	// Now check if we already have an image
+	auto idIt = result->view().find("PreviewImageUID");
+	if (idIt == result->view().end())
+	{
+		return;
+	}
+
+	auto verIt = result->view().find("PreviewImageVersion");
+	if (verIt == result->view().end())
+	{
+		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
+		return;
+	}
+
+	// Delete the existing image data entity
+	auto deleteDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << EntityBinaryData::className()
+		<< "EntityID" << idIt->get_int64()
+		<< "Version" << verIt->get_int64()
+		<< bsoncxx::builder::stream::finalize;
+	docBase.DeleteDocuments(std::move(deleteDoc));
+
+	removeEntity(idIt->get_int64());
+
+	// Finally, update the model entity
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc2 = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "PreviewImageUID" << static_cast<int64_t>(ot::invalidUID)
+		<< "PreviewImageVersion" << static_cast<int64_t>(ot::invalidUID)
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	m_previewImageUID = ot::invalidUID;
+	m_previewImageVersion = ot::invalidUID;
+}
+
+bool ModelState::addProjectDescription(const std::string& _description, ot::DocumentSyntax _syntax)
+{
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result)
+	{
+		OT_LOG_E("No model entity found");
+		return false;  // No model entity found
+	}
+
+	// Removed existing description (if any)
+	removeProjectDescription();
+
+	EntityBinaryData newImageData;
+	newImageData.setEntityID(this->createEntityUID());
+	newImageData.setData(_description.c_str(), _description.length() + 1);
+	newImageData.storeToDataBase();
+
+	// Now update the model entity with the new image information
+	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
+
+	// Finally, update the model entity
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc2 = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "DescriptionUID" << static_cast<int64_t>(newImageData.getEntityID())
+		<< "DescriptionVersion" << static_cast<int64_t>(newImageData.getEntityStorageVersion())
+		<< "DescriptionSyntax" << ot::toString(_syntax)
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	m_descriptionUID = newImageData.getEntityID();
+	m_descriptionVersion = newImageData.getEntityStorageVersion();
+	m_descriptionSyntax = _syntax;
+
+	return true;
+}
+
+void ModelState::removeProjectDescription()
+{
+	// Load the model entity
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< bsoncxx::builder::stream::finalize;
+
+	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+	auto sortDoc = bsoncxx::builder::basic::document{};
+	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+	if (!result)
+	{
+		OT_LOG_E("No model entity found");
+		return;  // No model entity found
+	}
+
+	// Now check if we already have an image
+	auto idIt = result->view().find("DescriptionUID");
+	if (idIt == result->view().end())
+	{
+		return;
+	}
+
+	auto verIt = result->view().find("DescriptionVersion");
+	if (verIt == result->view().end())
+	{
+		OT_LOG_E("Inconsistent model entity: DescriptionUID without DescriptionVersion");
+		return;
+	}
+
+	// Delete the existing description data entity
+	auto deleteDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << EntityBinaryData::className()
+		<< "EntityID" << idIt->get_int64()
+		<< "Version" << verIt->get_int64()
+		<< bsoncxx::builder::stream::finalize;
+	docBase.DeleteDocuments(std::move(deleteDoc));
+
+	removeEntity(idIt->get_int64());
+
+	// Finally, update the model entity
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+	auto queryDoc2 = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "DescriptionUID" << static_cast<int64_t>(ot::invalidUID)
+		<< "DescriptionVersion" << static_cast<int64_t>(ot::invalidUID)
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc2.view(), modifyDoc.view());
+
+	m_descriptionUID = ot::invalidUID;
+	m_descriptionVersion = ot::invalidUID;
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Getter
+
+ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID) const
 {
 	// If the entity is not part of the current state, return invalid UID
 	ot::UID entityVersion = ot::invalidUID;
@@ -507,7 +1238,7 @@ ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 	return entityVersion;
 }
 
-ot::UID ModelState::getCurrentEntityParent(ot::UID _entityID)
+ot::UID ModelState::getCurrentEntityParent(ot::UID _entityID) const
 {
 	ot::UID parentID = ot::invalidUID;
 
@@ -526,7 +1257,7 @@ ot::UID ModelState::getCurrentEntityParent(ot::UID _entityID)
 	return parentID;
 }
 
-void ModelState::getListOfTopologyEntities(ot::UIDList& _topologyEntityIDs)
+void ModelState::getListOfTopologyEntities(ot::UIDList& _topologyEntityIDs) const
 {
 	// Loop through all entities and add the topology entities to the list
 	for (const auto& entity : m_entities)
@@ -539,7 +1270,7 @@ void ModelState::getListOfTopologyEntities(ot::UIDList& _topologyEntityIDs)
 	}
 }
 
-void ModelState::getListOfTopologyEntities(std::list<std::pair<ot::UID, ModelStateEntity>>& _topologyEntities)
+void ModelState::getListOfTopologyEntities(std::list<std::pair<ot::UID, ModelStateEntity>>& _topologyEntities) const
 {
 	// Loop through all entities and add the topology entities to the list
 	for (const std::pair<ot::UID, ModelStateEntity>& entity : m_entities)
@@ -549,6 +1280,312 @@ void ModelState::getListOfTopologyEntities(std::list<std::pair<ot::UID, ModelSta
 			// This entity is a topology entits, so add its id to the list
 			_topologyEntities.push_back(entity);
 		}
+	}
+}
+
+bool ModelState::isVersionInActiveBranch(const std::string& version) const
+{
+	return isVersionInBranch(version, m_graphCfg.getActiveBranchName());
+}
+
+bool ModelState::hasNextVersion(const std::string& _version) const
+{
+	return !m_graphCfg.versionIsEndOfBranch(_version);
+}
+
+std::string ModelState::getNextVersion(const std::string& _version) const
+{
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findNextVersion(_version);
+	if (version)
+	{
+		return version->getName();
+	}
+	else
+	{
+		return std::string();
+	}
+}
+
+std::string ModelState::getPreviousVersion(const std::string& _version) const
+{
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findPreviousVersion(_version);
+	if (version)
+	{
+		return version->getName();
+	}
+	else
+	{
+		return std::string();
+	}
+}
+
+std::string ModelState::getPrecedingVersion(const std::string& _version) const
+{
+	size_t lastSeparator = _version.find_last_of('.');
+	if (lastSeparator == std::string::npos)
+	{
+		//Main branch
+		int64_t version = std::stoll(_version);
+		if (version != 1)
+		{
+			version--;
+			return std::to_string(version);
+		}
+		else
+		{
+			// Version 1  is the first, there is none before
+			throw std::exception("Internal error. Model state switch to version 0 intended.");
+		}
+	}
+	else
+	{
+		int64_t version = std::stoll(_version.substr(lastSeparator + 1));
+		if (version == 1)
+		{
+			// This is the end of the branch, we need to switch down to the origin of the branch. With each new branch two numbers are added .<branchID>.<ActiveState>
+			auto secondLast = _version.rfind('.', lastSeparator - 1);
+			if (secondLast == std::string::npos)
+			{
+				throw  std::exception("Internal error. Switch to Model state version not possible because of unexpected format.");
+			}
+			const std::string versionString = _version.substr(0, secondLast);
+			return versionString;
+		}
+		else
+		{
+			version--;
+			std::string versionBase = _version.substr(0, lastSeparator);
+			return  versionBase += "." + std::to_string(version);
+		}
+	}
+}
+
+std::string ModelState::getProceedingVersion(const std::string& _currentVersion, const std::string& _targetVersion) const
+{
+	size_t lastSeparator = _currentVersion.find_last_of('.');
+	size_t currentLvl = std::count(_currentVersion.begin(), _currentVersion.end(), '.');
+	int64_t currentLastDigit;
+	std::string versionBase;
+	if (lastSeparator == std::string::npos)
+	{
+		//Main branch
+		currentLastDigit = std::stoll(_currentVersion);
+		versionBase = "";
+	}
+	else
+	{
+		currentLastDigit = std::stoll(_currentVersion.substr(lastSeparator + 1));
+		versionBase = _currentVersion.substr(0, lastSeparator);
+	}
+
+	int64_t targetDigitOfSameLvl = ot::intern::findDigitOfLevel(_targetVersion, currentLvl);
+
+	std::string newVersion;
+	if (currentLastDigit < targetDigitOfSameLvl)
+	{
+		currentLastDigit++;
+		if (versionBase.empty())
+		{
+			newVersion = std::to_string(currentLastDigit);
+		}
+		else
+		{
+			newVersion = versionBase + "." + std::to_string(currentLastDigit);
+		}
+	}
+	else
+	{
+		assert(currentLastDigit == targetDigitOfSameLvl);
+		if (_currentVersion == _targetVersion)
+		{
+			//assert(false); // Should not happen, since the loop on the outside should run until the versions are equal.
+			return _currentVersion;
+		}
+		// In this case we need to switch the branch.
+		int64_t branchID = ot::intern::findDigitOfLevel(_targetVersion, currentLvl + 1);
+		newVersion = _currentVersion + "." + std::to_string(branchID) + ".1";
+	}
+	return newVersion;
+}
+
+std::string ModelState::getVersionDescription(const std::string& _version) const
+{
+	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
+	if (version)
+	{
+		return version->getDescription();
+	}
+	else
+	{
+		OT_LOG_E("Version \"" + _version + "\" does not exist");
+		return std::string();
+	}
+}
+
+bool ModelState::canUndo() const
+{
+	std::string previousVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
+
+	return !previousVersion.empty();
+}
+
+bool ModelState::canRedo() const
+{
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
+
+	return !nextVersion.empty();
+}
+
+std::string ModelState::getCurrentModelStateDescription() const
+{
+	return getVersionDescription(m_graphCfg.getActiveVersionName());
+}
+
+std::string ModelState::getRedoModelStateDescription() const
+{
+	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
+	if (nextVersion.empty()) return "";
+
+	return getVersionDescription(nextVersion);
+}
+
+void ModelState::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const
+{
+	using namespace ot;
+
+	_object.AddMember("CurrentModelBaseStateVersion", JsonString(m_currentModelBaseStateVersion, _allocator), _allocator);
+
+	JsonArray entitiesArr;
+	for (const auto& it : m_entities)
+	{
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		entitiesArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("Entities", entitiesArr, _allocator);
+
+	JsonArray addedOrModifiedArr;
+	for (const auto& it : m_addedOrModifiedEntities)
+	{
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		addedOrModifiedArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("AddedOrModifiedEntities", addedOrModifiedArr, _allocator);
+
+	JsonArray removedArr;
+	for (const auto& it : m_removedEntities)
+	{
+		JsonObject entityObj;
+		entityObj.AddMember("ID", it.first, _allocator);
+		JsonObject infoObj;
+		it.second.addToJsonObject(infoObj, _allocator);
+		entityObj.AddMember("Info", infoObj, _allocator);
+		removedArr.PushBack(entityObj, _allocator);
+	}
+	_object.AddMember("RemovedEntities", removedArr, _allocator);
+
+	JsonArray childrenListArr;
+	for (const auto& it : m_entityChildrenList)
+	{
+		JsonObject childObj;
+		childObj.AddMember("ID", it.first, _allocator);
+		JsonArray childArr;
+		for (const auto& child : it.second)
+		{
+			childArr.PushBack(child, _allocator);
+		}
+		childObj.AddMember("Childs", childArr, _allocator);
+		childrenListArr.PushBack(childObj, _allocator);
+	}
+	_object.AddMember("EntityChildrenList", childrenListArr, _allocator);
+
+	_object.AddMember("StateModified", m_stateModified, _allocator);
+	_object.AddMember("MaxNumberArrayEntitiesPerState", m_maxNumberArrayEntitiesPerState, _allocator);
+
+	_object.AddMember("ActiveBranchInModelEntity", JsonString(m_activeBranchInModelEntity, _allocator), _allocator);
+	_object.AddMember("ActiveVersionInModelEntity", JsonString(m_activeVersionInModelEntity, _allocator), _allocator);
+
+	_object.AddMember("PreviewImageUID", m_previewImageUID, _allocator);
+	_object.AddMember("PreviewImageVersion", m_previewImageVersion, _allocator);
+	_object.AddMember("PreviewImageFormat", JsonString(ot::toString(m_previewImageFormat), _allocator), _allocator);
+
+	_object.AddMember("DescriptionUID", m_descriptionUID, _allocator);
+	_object.AddMember("DescriptionVersion", m_descriptionVersion, _allocator);
+	_object.AddMember("DescriptionSyntax", JsonString(ot::toString(m_descriptionSyntax), _allocator), _allocator);
+
+	auto AddVersionInfoDebugInfo = [](const VersionInformation& _info, JsonObject& _obj, JsonAllocator& _allocator)
+		{
+			_obj.AddMember("Branch", JsonString(_info.branch, _allocator), _allocator);
+			_obj.AddMember("Version", JsonString(_info.version, _allocator), _allocator);
+			_obj.AddMember("IsOriginalBranch", _info.isOriginalBranch, _allocator);
+			_obj.AddMember("IsEndOfBranch", _info.isEndOfBranch, _allocator);
+		};
+
+	JsonObject versionGraphObj;
+	m_graphCfg.addToJsonObject(versionGraphObj, _allocator);
+	_object.AddMember("VersionGraph", versionGraphObj, _allocator);
+
+	JsonObject originalInitialVersionObj;
+	AddVersionInfoDebugInfo(m_originalInitialVersion, originalInitialVersionObj, _allocator);
+	_object.AddMember("OriginalInitialVersion", originalInitialVersionObj, _allocator);
+
+	JsonObject customInitialVersionObj;
+	AddVersionInfoDebugInfo(m_customInitialVersion, customInitialVersionObj, _allocator);
+	_object.AddMember("CustomInitialVersion", customInitialVersionObj, _allocator);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper: Clear
+
+void ModelState::clearModelState()
+{
+	m_graphCfg.setActiveVersionName("");
+
+	m_entities.clear();
+
+	m_addedOrModifiedEntities.clear();
+	m_removedEntities.clear();
+
+	m_relativeModelStateCount = 0;
+
+	m_stateModified = false;
+}
+
+void ModelState::clearChildrenInformation()
+{
+	m_entityChildrenList.clear();
+}
+
+void ModelState::removeEntityFromParent(ot::UID entityID, ot::UID parentID)
+{
+	if (m_entityChildrenList.count(parentID) > 0)
+	{
+		m_entityChildrenList.find(parentID)->second.remove(entityID);
+	}
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper: Load
+
+void ModelState::addEntityToParent(ot::UID entityID, ot::UID parentID)
+{
+	auto it = m_entityChildrenList.find(parentID);
+	if (it == m_entityChildrenList.end())
+	{
+		m_entityChildrenList.insert(std::make_pair(parentID, ot::UIDList({ entityID })));
+	}
+	else
+	{
+		it->second.push_back(entityID);
 	}
 }
 
@@ -653,20 +1690,6 @@ bool ModelState::loadModelFromDocument(bsoncxx::document::view docView, bool _lo
 		OT_LOG_E("Unknown storage type");
 		return false;
 	}
-}
-
-void ModelState::clearModelState()
-{
-	m_graphCfg.setActiveVersionName("");
-
-	m_entities.clear();
-
-	m_addedOrModifiedEntities.clear();
-	m_removedEntities.clear();
-
-	m_relativeModelStateCount = 0;
-
-	m_stateModified = false;
 }
 
 bool ModelState::loadAbsoluteState(bsoncxx::document::view docView)
@@ -831,8 +1854,239 @@ void ModelState::loadStateData(bsoncxx::document::view docView)
 	}
 }
 
-bool ModelState::saveAbsoluteState(const std::string &saveComment)
+bool ModelState::readAdditionalProjectInformation(const bsoncxx::v_noabi::document::view& _documentView)
 {
+	// Reset preview image information
+	m_previewImageUID = ot::invalidUID;
+	m_previewImageVersion = ot::invalidUID;
+	m_descriptionUID = ot::invalidUID;
+	m_descriptionVersion = ot::invalidUID;
+
+	// Check if a preview image is available
+	auto previewUIDIt = _documentView.find("PreviewImageUID");
+	if (previewUIDIt != _documentView.end())
+	{
+		// Ensure that all required information is available
+		auto previewVersionIt = _documentView.find("PreviewImageVersion");
+		auto previewFileType = _documentView.find("PreviewImageType");
+
+		if (previewVersionIt == _documentView.end() || previewFileType == _documentView.end())
+		{
+			OT_LOG_E("Corrupted model entity: Incomplete preview image information");
+			return false;
+		}
+
+		// Convert the file type string into an image file format
+		std::string formatStr = previewFileType->get_utf8().value.data();
+
+		m_previewImageFormat = ot::stringToImageFileFormat(formatStr);
+
+		m_previewImageUID = static_cast<ot::UID>(previewUIDIt->get_int64());
+		m_previewImageVersion = static_cast<ot::UID>(previewVersionIt->get_int64());
+	}
+
+	auto descriptionUIDIt = _documentView.find("DescriptionUID");
+	if (descriptionUIDIt != _documentView.end())
+	{
+		// Ensure that all required information is available
+		auto descriptionVersionIt = _documentView.find("DescriptionVersion");
+		auto descriptionSyntaxIt = _documentView.find("DescriptionSyntax");
+		if (descriptionVersionIt == _documentView.end() || descriptionSyntaxIt == _documentView.end())
+		{
+			OT_LOG_E("Corrupted model entity: Incomplete description information");
+			return false;
+		}
+		m_descriptionUID = static_cast<ot::UID>(descriptionUIDIt->get_int64());
+		m_descriptionVersion = static_cast<ot::UID>(descriptionVersionIt->get_int64());
+		m_descriptionSyntax = ot::stringToDocumentSyntax(descriptionSyntaxIt->get_utf8().value.data());
+	}
+
+	return true;
+}
+
+bool ModelState::getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder::basic::array& _entityArray)
+{
+	bool entitiesInList = false;
+
+	for (const auto& item : _cursor)
+	{
+		std::string schemaType = item["SchemaType"].get_utf8().value.data();
+
+		if (schemaType == "ModelState" || schemaType == "ModelStateExtension" || schemaType == "ModelStateInactive" || schemaType == "ModelStateExtensionInactive")
+		{
+			// We found the fist model state. end the search
+			return entitiesInList;
+		}
+		else
+		{
+			const ot::UID entityID = static_cast<ot::UID>(item["EntityID"].get_int64());
+			const ot::UID version = static_cast<ot::UID>(item["Version"].get_int64());
+			if ((!(entityID == m_previewImageUID && version == m_previewImageVersion))
+				&& (!(entityID == m_descriptionUID && version == m_descriptionVersion)))
+			{
+				_entityArray.append(item["_id"].get_oid());
+				entitiesInList = true;
+			}
+		}
+	}
+
+	return entitiesInList;
+}
+
+void ModelState::updateSchema_1_2()
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to update read-only model state");
+		throw ot::Exception::InvalidVersion("Attempting to update read-only model state");
+	}
+
+	// Here we need to perform a schema upgrade from version 1 to version 2. This means adding the ParentVersion for all Model states,
+	// and adding empty data fields for active branch and active version to the model entity. In addition, we also add a model type
+	// Model3D to the model entity
+
+	// First, go through all model states and add their ParentVersions
+	// Read the version graph information
+	std::list<std::pair<std::string, std::string>> versionGraph;
+
+	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+	auto array_builder = bsoncxx::builder::basic::array{};
+	array_builder.append("ModelState");
+	array_builder.append("ModelStateInactive");
+
+	auto queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << bsoncxx::builder::stream::open_document
+		<< "$in" << array_builder
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	DataStorageAPI::QueryBuilder filter;
+	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version" }, false);
+
+	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
+
+	std::string parentVersion;
+	bool hasInactiveModelState = false;
+	for (const auto& result : results)
+	{
+		std::string schemaType = result["SchemaType"].get_utf8().value.data();
+		std::string version = result["Version"].get_utf8().value.data();
+
+		if (schemaType == "ModelStateInactive") hasInactiveModelState = true;
+
+		versionGraph.push_back(std::pair<std::string, std::string>(version, parentVersion));
+		parentVersion = version;
+	}
+
+	std::string activeVersion;
+
+	if (hasInactiveModelState)
+	{
+		// Find the currently active model state
+		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+
+		queryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "ModelState"
+			<< bsoncxx::builder::stream::finalize;
+
+		auto emptyFilterDoc = bsoncxx::builder::basic::document{};
+
+		auto sortDoc = bsoncxx::builder::basic::document{};
+		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
+
+		auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
+
+		if (result)
+		{
+			activeVersion = result->view()["Version"].get_utf8().value.data();
+		}
+
+		// Turn all inactive model states into active (the current version will be tracked in the model)
+		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+		auto doc_find = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "ModelStateInactive"
+			<< bsoncxx::builder::stream::finalize;
+
+		auto doc_modify = bsoncxx::builder::stream::document{}
+			<< "$set" << bsoncxx::builder::stream::open_document
+			<< "SchemaType" << "ModelState"
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+		collection.update_many(doc_find.view(), doc_modify.view());
+
+		doc_find = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << "ModelStateExtensionInactive"
+			<< bsoncxx::builder::stream::finalize;
+
+		doc_modify = bsoncxx::builder::stream::document{}
+			<< "$set" << bsoncxx::builder::stream::open_document
+			<< "SchemaType" << "ModelStateExtension"
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+		collection.update_many(doc_find.view(), doc_modify.view());
+	}
+
+	// Now write the information about the parent version to each model state
+	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
+
+	for (const auto& item : versionGraph)
+	{
+		std::string version = item.first;
+		std::string parentVersion = item.second;
+
+		// add the parent version to the corresponding entry
+
+		auto array_builder = bsoncxx::builder::basic::array{};
+		array_builder.append("ModelState");
+		array_builder.append("ModelStateInactive");
+
+		auto queryDoc = bsoncxx::builder::stream::document{}
+			<< "SchemaType" << bsoncxx::builder::stream::open_document
+			<< "$in" << array_builder
+			<< bsoncxx::builder::stream::close_document
+			<< "Version" << version
+			<< bsoncxx::builder::stream::finalize;
+
+		auto modifyDoc = bsoncxx::builder::stream::document{}
+			<< "$set" << bsoncxx::builder::stream::open_document
+			<< "ParentVersion" << parentVersion
+			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+		collection.update_one(queryDoc.view(), modifyDoc.view());
+	}
+
+	// Finally, upgrade the model entity
+	long long modelVersion = getCurrentModelEntityVersion();
+
+	queryDoc = bsoncxx::builder::stream::document{}
+		<< "SchemaType" << "Model"
+		<< "Version" << modelVersion
+		<< bsoncxx::builder::stream::finalize;
+
+	auto modifyDoc = bsoncxx::builder::stream::document{}
+		<< "$set" << bsoncxx::builder::stream::open_document
+		<< "SchemaVersion_Model" << (long long)2
+		<< "ModelType" << "Parametric3D"
+		<< "ActiveBranch" << ""
+		<< "ActiveVersion" << activeVersion
+		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+
+	collection.update_one(queryDoc.view(), modifyDoc.view());
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Helper: Save
+
+bool ModelState::saveAbsoluteState(const std::string& saveComment)
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
+	}
+
 	// Count entities and check whether we need an extension document
 	size_t numberEntities = 3 * m_entities.size();
 
@@ -921,6 +2175,12 @@ bool ModelState::saveAbsoluteState(const std::string &saveComment)
 
 bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 {
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
+	}
+
 	// Count entities and check whether we need an extension document
 	size_t numberEntities = 3 * m_entities.size();
 
@@ -942,168 +2202,14 @@ bool ModelState::saveAbsoluteStateWithExtension(const std::string &saveComment)
 	return true;
 }
 
-bool ModelState::writeMainDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft, const std::string &saveComment)
+bool ModelState::saveIncrementalState(const std::string& saveComment)
 {
-	// Create a document and write the header information
-	auto doc = bsoncxx::builder::basic::document{};
-
-	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
-	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelState", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
-	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
-	doc.append(bsoncxx::builder::basic::kvp("Type", "absolute"));
-	doc.append(bsoncxx::builder::basic::kvp("Extension", true));
-	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
-
-	size_t numberArrayEntriesWritten = 0;
-
-	// Add the remaining entities (if any)
-	if (!entitiesLeft.empty())
+	if (m_readOnly)
 	{
-		// Store the entities as arrays in the document (id, parent, version)
-
-		auto topo_id = bsoncxx::builder::basic::array();
-		auto topo_parent = bsoncxx::builder::basic::array();
-		auto topo_version = bsoncxx::builder::basic::array();
-
-		auto data_id = bsoncxx::builder::basic::array();
-		auto data_parent = bsoncxx::builder::basic::array();
-		auto data_version = bsoncxx::builder::basic::array();
-
-		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
-
-		bool hasTopoEntities = false;
-		bool hasDataEntities = false;
-
-		for (const auto& entity : m_entities)
-		{
-			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
-
-			entitiesLocal.erase((long long)entity.first);
-
-			switch (entity.second.getEntityType())
-			{
-			case ModelStateEntity::tEntityType::TOPOLOGY:
-				topo_id.append((long long)entity.first);
-				topo_parent.append((long long)entity.second.getParentEntityID());
-				topo_version.append((long long)entity.second.getEntityVersion());
-				hasTopoEntities = true;
-				break;
-			case ModelStateEntity::tEntityType::DATA:
-				data_id.append((long long)entity.first);
-				data_parent.append((long long)entity.second.getParentEntityID());
-				data_version.append((long long)entity.second.getEntityVersion());
-				hasDataEntities = true;
-				break;
-			default:
-				// Unknown type
-				assert(0);
-			}
-
-			numberArrayEntriesWritten += 3;
-		}
-
-		if (hasTopoEntities)
-		{
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Id", topo_id));
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Parent", topo_parent));
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Version", topo_version));
-		}
-
-		if (hasDataEntities)
-		{
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Id", data_id));
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Parent", data_parent));
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Version", data_version));
-		}
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
 	}
 
-	// Store the document in the data base
-	DataBase::instance().storePlainDataItem(doc);
-
-	return true;
-}
-
-bool ModelState::writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft)
-{
-	// Create a document and write the header information
-	auto doc = bsoncxx::builder::basic::document{};
-
-	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelStateExtension"));
-	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelStateExtension", (int)1));
-	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
-
-	size_t numberArrayEntriesWritten = 0;
-
-	// Add the remaining entities (if any)
-	if (!entitiesLeft.empty())
-	{
-		// Store the entities as arrays in the document (id, parent, version)
-
-		auto topo_id = bsoncxx::builder::basic::array();
-		auto topo_parent = bsoncxx::builder::basic::array();
-		auto topo_version = bsoncxx::builder::basic::array();
-
-		auto data_id = bsoncxx::builder::basic::array();
-		auto data_parent = bsoncxx::builder::basic::array();
-		auto data_version = bsoncxx::builder::basic::array();
-
-		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
-
-		bool hasTopoEntities = false;
-		bool hasDataEntities = false;
-
-		for (const auto& entity : entitiesLocal)
-		{
-			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
-
-			entitiesLocal.erase((long long)entity.first);
-
-			switch (entity.second.getEntityType())
-			{
-			case ModelStateEntity::tEntityType::TOPOLOGY:
-				topo_id.append((long long)entity.first);
-				topo_parent.append((long long)entity.second.getParentEntityID());
-				topo_version.append((long long)entity.second.getEntityVersion());
-				hasTopoEntities = true;
-				break;
-			case ModelStateEntity::tEntityType::DATA:
-				data_id.append((long long)entity.first);
-				data_parent.append((long long)entity.second.getParentEntityID());
-				data_version.append((long long)entity.second.getEntityVersion());
-				hasDataEntities = true;
-				break;
-			default:
-				// Unknown type
-				assert(0);
-			}
-
-			numberArrayEntriesWritten += 3;
-		}
-
-		if (hasTopoEntities)
-		{
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Id", topo_id));
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Parent", topo_parent));
-			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Version", topo_version));
-		}
-
-		if (hasDataEntities)
-		{
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Id", data_id));
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Parent", data_parent));
-			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Version", data_version));
-		}
-	}
-
-	// Store the document in the data base
-	DataBase::instance().storePlainDataItem(doc);
-
-	return true;
-}
-
-bool ModelState::saveIncrementalState(const std::string &saveComment)
-{
 	// Count entities and check whether we need an extension document
 	size_t numberEntities = 3 * m_addedOrModifiedEntities.size() + m_removedEntities.size();
 
@@ -1219,213 +2325,183 @@ bool ModelState::saveIncrementalState(const std::string &saveComment)
 	return true;
 }
 
-std::string ModelState::getCurrentModelStateDescription() 
-{ 
-	return getVersionDescription(m_graphCfg.getActiveVersionName());
-}
-
-std::string ModelState::getRedoModelStateDescription() 
-{ 
-	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
-	if (nextVersion.empty()) return "";
-
-	return getVersionDescription(nextVersion); 
-}
-
-bool ModelState::canUndo() {
-	std::string previousVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
-
-	return !previousVersion.empty(); 
-}
-
-bool ModelState::canRedo() 
-{ 
-	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
-
-	return !nextVersion.empty(); 
-}
-
-bool ModelState::undoLastOperation()
+bool ModelState::writeMainDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft, const std::string &saveComment)
 {
-	// Determine the parent version
-	std::string parentVersion = getPreviousVersion(m_graphCfg.getActiveVersionName());
-
-	if (parentVersion.empty())
+	if (m_readOnly)
 	{
-		// We are already at the first state
+		OT_LOG_E("Attempting to save read-only model state");
 		return false;
 	}
 
-	// Load the parent model state
-	return loadModelState(parentVersion);
-}
+	// Create a document and write the header information
+	auto doc = bsoncxx::builder::basic::document{};
 
-bool ModelState::redoNextOperation()
-{
-	// Determine the next version in the current branch
-	std::string nextVersion = getNextVersion(m_graphCfg.getActiveVersionName());
+	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
+	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelState", (int)1));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
+	doc.append(bsoncxx::builder::basic::kvp("ParentVersion", getPreviousVersion(m_graphCfg.getActiveVersionName())));
+	doc.append(bsoncxx::builder::basic::kvp("Type", "absolute"));
+	doc.append(bsoncxx::builder::basic::kvp("Extension", true));
+	doc.append(bsoncxx::builder::basic::kvp("Description", saveComment));
 
-	if (nextVersion.empty())
+	size_t numberArrayEntriesWritten = 0;
+
+	// Add the remaining entities (if any)
+	if (!entitiesLeft.empty())
 	{
-		// We are already at the last state
-		return false;
-	}
+		// Store the entities as arrays in the document (id, parent, version)
 
-	// Load the parent model state
-	return loadModelState(nextVersion);
-}
+		auto topo_id = bsoncxx::builder::basic::array();
+		auto topo_parent = bsoncxx::builder::basic::array();
+		auto topo_version = bsoncxx::builder::basic::array();
 
-void ModelState::removeDanglingModelEntities()
-{
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+		auto data_id = bsoncxx::builder::basic::array();
+		auto data_parent = bsoncxx::builder::basic::array();
+		auto data_version = bsoncxx::builder::basic::array();
 
-	// First of all, we search for the last model state type entry from the back
+		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
 
-	auto array_builder = bsoncxx::builder::basic::array{};
-	array_builder.append("ModelState");
-	array_builder.append("ModelStateExtension");
-	array_builder.append("ModelStateInactive");
-	array_builder.append("ModelStateExtensionInactive");
+		bool hasTopoEntities = false;
+		bool hasDataEntities = false;
 
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << bsoncxx::builder::stream::open_document
-		<< "$in" << array_builder
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
+		for (const auto& entity : m_entities)
+		{
+			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
 
-	DataStorageAPI::QueryBuilder filter;
-	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType" }, true);
+			entitiesLocal.erase((long long)entity.first);
 
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(filterDoc), std::move(sortDoc.extract()));
-	if (!result)
-	{
-		// We did not find a model state, remove the entire content of the project
-		assert(0);
-		return;
-	}
-
-	//std::string propertiesJSON = bsoncxx::to_json(result->view());
-	auto lastModelStateID = result->view()["_id"].get_oid();
-
-	// We round down the model state Id such that we surely get all entities younger than this entity, even if they
-	// have a potentially smaller oid due to the randomness part in the oid.
-
-	std::string oid = result->view()["_id"].get_oid().value.to_string();
-	std::string timePart = oid.substr(0, 8);
-	std::string loweroid = timePart + "0000000000000000";
-	bsoncxx::oid searchOid(loweroid);
-
-	//std::string test = searchOid.to_string();
-
-	// Now we get the oid of the last model state and get a list of all entries which are older than this state
-
-	queryDoc = bsoncxx::builder::stream::document{}
-		<< "_id" << bsoncxx::builder::stream::open_document << "$gte" << searchOid
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	filterDoc = filter.GenerateSelectQuery({ "SchemaType", "EntityID", "Version" }, true);
-
-	sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto resultList = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), std::move(sortDoc.extract()), 0);
-
-	// We now take all entries until the first model state and put them into the delete list
-
-	auto deleteEntities = bsoncxx::builder::basic::array();
-
-	if (getDanglingEntities(resultList, deleteEntities))
-	{
-		// If we have entities to delete, we will send the delete call with the list of entities to be deleted to the database server
-		auto deleteDoc = bsoncxx::builder::stream::document{}
-			<< "_id" << bsoncxx::builder::stream::open_document
-			<< "$in" << deleteEntities
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-		docBase.DeleteDocuments(std::move(deleteDoc));
-	}
-
-	// Now we should not have dangling entities in the project anymore
-}
-
-bool ModelState::getDanglingEntities(mongocxx::cursor& _cursor, bsoncxx::builder::basic::array& _entityArray)
-{
-	bool entitiesInList = false;
-
-	for (const auto& item : _cursor)
-	{
-		std::string schemaType = item["SchemaType"].get_utf8().value.data();
-
-		if (schemaType == "ModelState" || schemaType == "ModelStateExtension" || schemaType == "ModelStateInactive" || schemaType == "ModelStateExtensionInactive") {
-			// We found the fist model state. end the search
-			return entitiesInList;
-		}
-		else {
-			const ot::UID entityID = static_cast<ot::UID>(item["EntityID"].get_int64());
-			const ot::UID version = static_cast<ot::UID>(item["Version"].get_int64());
-			if ((!(entityID == m_previewImageUID && version == m_previewImageVersion)) 
-				&& (!(entityID == m_descriptionUID && version == m_descriptionVersion)))
+			switch (entity.second.getEntityType())
 			{
-				_entityArray.append(item["_id"].get_oid());
-				entitiesInList = true;
+			case ModelStateEntity::tEntityType::TOPOLOGY:
+				topo_id.append((long long)entity.first);
+				topo_parent.append((long long)entity.second.getParentEntityID());
+				topo_version.append((long long)entity.second.getEntityVersion());
+				hasTopoEntities = true;
+				break;
+			case ModelStateEntity::tEntityType::DATA:
+				data_id.append((long long)entity.first);
+				data_parent.append((long long)entity.second.getParentEntityID());
+				data_version.append((long long)entity.second.getEntityVersion());
+				hasDataEntities = true;
+				break;
+			default:
+				// Unknown type
+				assert(0);
 			}
+
+			numberArrayEntriesWritten += 3;
+		}
+
+		if (hasTopoEntities)
+		{
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Id", topo_id));
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Parent", topo_parent));
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Version", topo_version));
+		}
+
+		if (hasDataEntities)
+		{
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Id", data_id));
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Parent", data_parent));
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Version", data_version));
 		}
 	}
 
-	return entitiesInList;
+	// Store the document in the data base
+	DataBase::instance().storePlainDataItem(doc);
+
+	return true;
 }
 
-void ModelState::loadVersionGraph() {
-	m_graphCfg.clear();
-
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	auto array_builder = bsoncxx::builder::basic::array{};
-	array_builder.append("ModelState");
-	array_builder.append("ModelStateInactive");
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << bsoncxx::builder::stream::open_document
-		<< "$in" << array_builder
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	DataStorageAPI::QueryBuilder filter;
-	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version", "ParentVersion", "Description", "Label" }, false);
-
-	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
-
-	for (const auto& result : results) {
-		std::string version = result["Version"].get_utf8().value.data();
-		std::string parentVersion = result["ParentVersion"].get_utf8().value.data();
-
-		std::string label;
-		std::string description;
-		
-		auto labelIt = result.find("Label");
-		if (labelIt != result.end()) {
-			label = labelIt->get_utf8().value.data();
-		}
-
-		auto descIt = result.find("Description");
-		if (descIt != result.end()) {
-			description = descIt->get_utf8().value.data();
-		}
-
-		m_graphCfg.insertVersion(version, parentVersion, label, description);
+bool ModelState::writeExtensionDocument(std::map<ot::UID, ModelStateEntity> &entitiesLeft)
+{
+	if (m_readOnly)
+	{
+		OT_LOG_E("Attempting to save read-only model state");
+		return false;
 	}
+
+	// Create a document and write the header information
+	auto doc = bsoncxx::builder::basic::document{};
+
+	doc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelStateExtension"));
+	doc.append(bsoncxx::builder::basic::kvp("SchemaVersion_ModelStateExtension", (int)1));
+	doc.append(bsoncxx::builder::basic::kvp("Version", m_graphCfg.getActiveVersionName()));
+
+	size_t numberArrayEntriesWritten = 0;
+
+	// Add the remaining entities (if any)
+	if (!entitiesLeft.empty())
+	{
+		// Store the entities as arrays in the document (id, parent, version)
+
+		auto topo_id = bsoncxx::builder::basic::array();
+		auto topo_parent = bsoncxx::builder::basic::array();
+		auto topo_version = bsoncxx::builder::basic::array();
+
+		auto data_id = bsoncxx::builder::basic::array();
+		auto data_parent = bsoncxx::builder::basic::array();
+		auto data_version = bsoncxx::builder::basic::array();
+
+		std::map<ot::UID, ModelStateEntity> entitiesLocal = entitiesLeft;
+
+		bool hasTopoEntities = false;
+		bool hasDataEntities = false;
+
+		for (const auto& entity : entitiesLocal)
+		{
+			if (numberArrayEntriesWritten > m_maxNumberArrayEntitiesPerState) break;
+
+			entitiesLocal.erase((long long)entity.first);
+
+			switch (entity.second.getEntityType())
+			{
+			case ModelStateEntity::tEntityType::TOPOLOGY:
+				topo_id.append((long long)entity.first);
+				topo_parent.append((long long)entity.second.getParentEntityID());
+				topo_version.append((long long)entity.second.getEntityVersion());
+				hasTopoEntities = true;
+				break;
+			case ModelStateEntity::tEntityType::DATA:
+				data_id.append((long long)entity.first);
+				data_parent.append((long long)entity.second.getParentEntityID());
+				data_version.append((long long)entity.second.getEntityVersion());
+				hasDataEntities = true;
+				break;
+			default:
+				// Unknown type
+				assert(0);
+			}
+
+			numberArrayEntriesWritten += 3;
+		}
+
+		if (hasTopoEntities)
+		{
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Id", topo_id));
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Parent", topo_parent));
+			doc.append(bsoncxx::builder::basic::kvp("topoAddEdit_Version", topo_version));
+		}
+
+		if (hasDataEntities)
+		{
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Id", data_id));
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Parent", data_parent));
+			doc.append(bsoncxx::builder::basic::kvp("dataAddEdit_Version", data_version));
+		}
+	}
+
+	// Store the document in the data base
+	DataBase::instance().storePlainDataItem(doc);
+
+	return true;
 }
 
-ot::VersionGraphCfg& ModelState::getVersionGraph() {
-	return m_graphCfg;
-}
+// ###########################################################################################################################################################################################################################################################################################################################
 
-const ot::VersionGraphCfg& ModelState::getVersionGraph() const {
-	return m_graphCfg;
-}
+// Private: Helper
 
-long long ModelState::getCurrentModelEntityVersion()
+long long ModelState::getCurrentModelEntityVersion() const
 {
 	// We search for the last model entity in the database and determine its version
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
@@ -1440,7 +2516,7 @@ long long ModelState::getCurrentModelEntityVersion()
 	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
 	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	
+
 	if (!result)
 	{
 		return 0;  // No model entity found
@@ -1451,179 +2527,31 @@ long long ModelState::getCurrentModelEntityVersion()
 	}
 }
 
-void ModelState::checkAndUpgradeDataBaseSchema()
+int ModelState::countNumberOfDots(const std::string& _text)
 {
-	// Get the schema version of the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
+	int count = 0;
 
-	auto queryDoc = bsoncxx::builder::basic::document{};
-	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "Model"));
-
-	auto filterDoc = bsoncxx::builder::basic::document{};
-
-	auto result = docBase.GetDocument(std::move(queryDoc.extract()), std::move(filterDoc.extract()));
-	if (!result) return; // Model state not found
-
-	long long schemaVersion = result->view()["SchemaVersion_Model"].get_int64();
-
-	if (schemaVersion == 1)
+	for (size_t index = 0; index < _text.size(); index++)
 	{
-		// We need to perform a schema upgrade from version 1 to 2.
-		updateSchema_1_2();
-	}
-}
-
-void ModelState::updateSchema_1_2()
-{
-	// Here we need to perform a schema upgrade from version 1 to version 2. This means adding the ParentVersion for all Model states,
-	// and adding empty data fields for active branch and active version to the model entity. In addition, we also add a model type
-	// Model3D to the model entity
-
-	// First, go through all model states and add their ParentVersions
-	// Read the version graph information
-	std::list<std::pair<std::string, std::string>> versionGraph;
-
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	auto array_builder = bsoncxx::builder::basic::array{};
-	array_builder.append("ModelState");
-	array_builder.append("ModelStateInactive");
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << bsoncxx::builder::stream::open_document
-		<< "$in" << array_builder
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	DataStorageAPI::QueryBuilder filter;
-	auto filterDoc = filter.GenerateSelectQuery({ "SchemaType", "Version" }, false);
-
-	auto results = docBase.GetAllDocument(std::move(queryDoc), std::move(filterDoc), 0);
-
-	std::string parentVersion;
-	bool hasInactiveModelState = false;
-	for (const auto& result : results)
-	{
-		std::string schemaType = result["SchemaType"].get_utf8().value.data();
-		std::string version = result["Version"].get_utf8().value.data();
-
-		if (schemaType == "ModelStateInactive") hasInactiveModelState = true;
-
-		versionGraph.push_back(std::pair<std::string, std::string>(version, parentVersion));
-		parentVersion = version;
-	}
-
-	std::string activeVersion;
-
-	if (hasInactiveModelState)
-	{
-		// Find the currently active model state
-		DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-		queryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << "ModelState"
-			<< bsoncxx::builder::stream::finalize;
-
-		auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-		auto sortDoc = bsoncxx::builder::basic::document{};
-		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-		auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-
-		if (result)
+		if (_text[index] == '.')
 		{
-			activeVersion = result->view()["Version"].get_utf8().value.data();
+			count++;
 		}
-
-		// Turn all inactive model states into active (the current version will be tracked in the model)
-		mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-		auto doc_find = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << "ModelStateInactive"
-			<< bsoncxx::builder::stream::finalize;
-
-		auto doc_modify = bsoncxx::builder::stream::document{}
-			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "SchemaType" << "ModelState"
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-		collection.update_many(doc_find.view(), doc_modify.view());
-
-		doc_find = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << "ModelStateExtensionInactive"
-			<< bsoncxx::builder::stream::finalize;
-
-		doc_modify = bsoncxx::builder::stream::document{}
-			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "SchemaType" << "ModelStateExtension"
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-		collection.update_many(doc_find.view(), doc_modify.view());
 	}
 
-	// Now write the information about the parent version to each model state
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-	for (const auto& item : versionGraph)
-	{
-		std::string version = item.first;
-		std::string parentVersion = item.second;
-
-		// add the parent version to the corresponding entry
-
-		auto array_builder = bsoncxx::builder::basic::array{};
-		array_builder.append("ModelState");
-		array_builder.append("ModelStateInactive");
-
-		auto queryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << bsoncxx::builder::stream::open_document
-			<< "$in" << array_builder
-			<< bsoncxx::builder::stream::close_document
-			<< "Version" << version 
-			<< bsoncxx::builder::stream::finalize;
-
-		auto modifyDoc = bsoncxx::builder::stream::document{}
-			<< "$set" << bsoncxx::builder::stream::open_document
-			<< "ParentVersion" << parentVersion
-			<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-		collection.update_one(queryDoc.view(), modifyDoc.view());
-	}
-
-	// Finally, upgrade the model entity
-	long long modelVersion = getCurrentModelEntityVersion();
-
-	queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< "Version" << modelVersion
-		<< bsoncxx::builder::stream::finalize;
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "SchemaVersion_Model" << (long long) 2
-		<< "ModelType" << "Parametric3D" 
-		<< "ActiveBranch" << ""
-		<< "ActiveVersion" << activeVersion
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc.view(), modifyDoc.view());
+	return count;
 }
 
-bool ModelState::isVersionInActiveBranch(const std::string &version)
+bool ModelState::isVersionInBranch(const std::string& _versionName, const std::string& _branchName) const
 {
-	return isVersionInBranch(version, m_graphCfg.getActiveBranchName());
-}
-
-bool ModelState::isVersionInBranch(const std::string &version, const std::string &branch)
-{
-	assert(!version.empty());
+	OTAssert(!_versionName.empty(), "Version name is empty");
 
 	// We need to count the number of dots in the active branch as well as in the version
 	// Comparing them we can ensure that the version is directly in the branch and not in a child branch
-	int dotsActive = countNumberOfDots(branch);
-	int dotsVersion = countNumberOfDots(version);
+	int dotsActive = countNumberOfDots(_branchName);
+	int dotsVersion = countNumberOfDots(_versionName);
 
-	if (branch.empty())
+	if (_branchName.empty())
 	{
 		// This is the main branch. We expect the version to have no dots
 		return (dotsVersion == 0);
@@ -1635,13 +2563,13 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 		if (dotsVersion > dotsActive + 1) return false;
 
 		// Now we need to check whether the part befeore and including the . is the same
-		std::string filter = branch + ".";
+		std::string filter = _branchName + ".";
 
 		// Here we need to check whether the version starts with the given branch + ".". 
-		if (version.size() > filter.size())
+		if (_versionName.size() > filter.size())
 		{
 			// The version could be a version either in the main branch of the given branch or in a child branch
-			if (version.substr(0, filter.size()) == filter)
+			if (_versionName.substr(0, filter.size()) == filter)
 			{
 				// This version belongs to the specified branch
 				return true;
@@ -1652,15 +2580,15 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 			// The version may be in a parent branch of this active branch
 			// We need to strip off the branch counter after the dot and obtain the version from which 
 			// the branch was created.
-			size_t index = branch.rfind('.');
+			size_t index = _branchName.rfind('.');
 			assert(index != std::string::npos);
 
-			std::string previousVersion = branch.substr(0, index);
+			std::string previousVersion = _branchName.substr(0, index);
 
 			// Now loop through all previous versions and determine whether any of them is the given version
 			while (!previousVersion.empty())
 			{
-				if (previousVersion == version)
+				if (previousVersion == _versionName)
 				{
 					return true; // The version is in the given branch
 				}
@@ -1672,69 +2600,12 @@ bool ModelState::isVersionInBranch(const std::string &version, const std::string
 	return false; // The specified version is not in the active branch
 }
 
-bool ModelState::readAdditionalProjectInformation(const bsoncxx::v_noabi::document::view& _documentView) {
-	// Reset preview image information
-	m_previewImageUID = ot::invalidUID;
-	m_previewImageVersion = ot::invalidUID;
-	m_descriptionUID = ot::invalidUID;
-	m_descriptionVersion = ot::invalidUID;
-
-	// Check if a preview image is available
-	auto previewUIDIt = _documentView.find("PreviewImageUID");
-	if (previewUIDIt != _documentView.end()) {
-		// Ensure that all required information is available
-		auto previewVersionIt = _documentView.find("PreviewImageVersion");
-		auto previewFileType = _documentView.find("PreviewImageType");
-
-		if (previewVersionIt == _documentView.end() || previewFileType == _documentView.end()) {
-			OT_LOG_E("Corrupted model entity: Incomplete preview image information");
-			return false;
-		}
-
-		// Convert the file type string into an image file format
-		std::string formatStr = previewFileType->get_utf8().value.data();
-
-		m_previewImageFormat = ot::stringToImageFileFormat(formatStr);
-
-		m_previewImageUID = static_cast<ot::UID>(previewUIDIt->get_int64());
-		m_previewImageVersion = static_cast<ot::UID>(previewVersionIt->get_int64());
-	}
-
-	auto descriptionUIDIt = _documentView.find("DescriptionUID");
-	if (descriptionUIDIt != _documentView.end()) {
-		// Ensure that all required information is available
-		auto descriptionVersionIt = _documentView.find("DescriptionVersion");
-		auto descriptionSyntaxIt = _documentView.find("DescriptionSyntax");
-		if (descriptionVersionIt == _documentView.end() || descriptionSyntaxIt == _documentView.end()) {
-			OT_LOG_E("Corrupted model entity: Incomplete description information");
-			return false;
-		}
-		m_descriptionUID = static_cast<ot::UID>(descriptionUIDIt->get_int64());
-		m_descriptionVersion = static_cast<ot::UID>(descriptionVersionIt->get_int64());
-		m_descriptionSyntax = ot::stringToDocumentSyntax(descriptionSyntaxIt->get_utf8().value.data());
-	}
-
-	return true;
-}
-
-std::string ModelState::getParentBranch(const std::string &branch)
+std::string ModelState::getParentBranch(const std::string& branch)
 {
 	size_t index = branch.rfind('.');
 	assert(index != std::string::npos);
 
 	return branch.substr(0, index);
-}
-
-int ModelState::countNumberOfDots(const std::string& _text)
-{
-	int count = 0;
-
-	for (size_t index = 0; index < _text.size(); index++)
-	{
-		if (_text[index] == '.') count++;
-	}
-
-	return count;
 }
 
 void ModelState::activateBranch(const std::string& _version)
@@ -1755,7 +2626,12 @@ void ModelState::activateBranch(const std::string& _version)
 	}
 }
 
-std::string ModelState::getLastVersionInActiveBranch() {
+void ModelState::removeVersionGraphItem(const std::string& _version)
+{
+	m_graphCfg.removeVersion(_version);
+}
+
+std::string ModelState::getLastVersionInActiveBranch() const {
 	const ot::VersionGraphVersionCfg* version = m_graphCfg.findLastVersion();
 	if (version) {
 		return version->getName();
@@ -1763,571 +2639,6 @@ std::string ModelState::getLastVersionInActiveBranch() {
 	else {
 		return std::string();
 	}
-}
-
-std::list<std::string> ModelState::removeRedoModelStates()
-{
-	// Find a list of all model State version which follow the current one
-	std::list<std::string> futureVersions;
-	getAllChildVersions(m_graphCfg.getActiveVersionName(), futureVersions);
-
-	std::list<std::string> removedVersions;
-
-	for (const auto& version : futureVersions)
-	{
-		// Now we need to delete the given model state together with all its newly created entities
-		deleteModelVersion(version);
-
-		// Remove the version from the version graph
-		removeVersionGraphItem(version);
-
-		// And add it to the list of removed versions
-		removedVersions.push_back(version);
-	}
-
-	// Now it can be that the current branch no longer exists
-	// Since we are adding a new version after the current model state, it is best to activate this branch
-	activateBranch(m_graphCfg.getActiveVersionName());
-
-	// We need to update the model entity with the new information
-	storeCurrentVersionInModelEntity();
-
-	return removedVersions;
-}
-
-void ModelState::updateVersionEntity(const std::string& _version) {
-	const ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
-	if (!version) {
-		OT_LOG_E("Version not found \"" + _version + "\"");
-		return;
-	}
-
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-	auto queryDoc = bsoncxx::builder::basic::document{};
-	queryDoc.append(bsoncxx::builder::basic::kvp("SchemaType", "ModelState"));
-	queryDoc.append(bsoncxx::builder::basic::kvp("Version", _version));
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "Description" << version->getDescription()
-		<< "Label" << version->getLabel()
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc.view(), modifyDoc.view());
-}
-
-bool ModelState::addPreviewImage(std::vector<char>&& _imageData, ot::ImageFileFormat _format) {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	long long modelVersion = getCurrentModelEntityVersion();
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
-
-	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) {
-		OT_LOG_E("No model entity found");
-		return false;  // No model entity found
-	}
-
-	// Removed existing preview image (if any)
-	removePreviewImage();
-
-	EntityBinaryData newImageData;
-	newImageData.setEntityID(this->createEntityUID());
-	newImageData.setData(std::move(_imageData));
-	newImageData.storeToDataBase();
-
-	std::string imageFormatStr = ot::toString(_format);
-
-	// Now update the model entity with the new image information
-	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
-	
-	// Finally, update the model entity
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-	
-	auto queryDoc2 = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< "Version" << modelVersion
-		<< bsoncxx::builder::stream::finalize;
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "PreviewImageUID" << static_cast<int64_t>(newImageData.getEntityID())
-		<< "PreviewImageVersion" << static_cast<int64_t>(newImageData.getEntityStorageVersion())
-		<< "PreviewImageType" << imageFormatStr
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc2.view(), modifyDoc.view());
-
-	m_previewImageUID = newImageData.getEntityID();
-	m_previewImageVersion = newImageData.getEntityStorageVersion();
-	m_previewImageFormat = _format;
-
-	return true;
-}
-
-void ModelState::removePreviewImage() {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	long long modelVersion = getCurrentModelEntityVersion();
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
-
-	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) {
-		OT_LOG_E("No model entity found");
-		return;  // No model entity found
-	}
-
-	// Now check if we already have an image
-	auto idIt = result->view().find("PreviewImageUID");
-	if (idIt == result->view().end()) {
-		return;
-	}
-		
-	auto verIt = result->view().find("PreviewImageVersion");
-	if (verIt == result->view().end()) {
-		OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
-		return;
-	}
-
-	// Delete the existing image data entity
-	auto deleteDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << EntityBinaryData::className()
-		<< "EntityID" << idIt->get_int64()
-		<< "Version" << verIt->get_int64()
-		<< bsoncxx::builder::stream::finalize;
-	docBase.DeleteDocuments(std::move(deleteDoc));
-
-	removeEntity(idIt->get_int64());
-
-	// Finally, update the model entity
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-	auto queryDoc2 = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< "Version" << modelVersion
-		<< bsoncxx::builder::stream::finalize;
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "PreviewImageUID" << static_cast<int64_t>(ot::invalidUID)
-		<< "PreviewImageVersion" << static_cast<int64_t>(ot::invalidUID)
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc2.view(), modifyDoc.view());
-
-	m_previewImageUID = ot::invalidUID;
-	m_previewImageVersion = ot::invalidUID;
-}
-
-bool ModelState::readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format) {
-	try {
-		// Load the model entity
-		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
-		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << "Model"
-			<< bsoncxx::builder::stream::finalize;
-
-		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-		auto sortDoc = bsoncxx::builder::basic::document{};
-		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
-		if (!zeroDoc) {
-			OT_LOG_E("No model entity found");
-			return false;  // No model entity found
-		}
-
-		// Now check if we already have an image
-		auto idIt = zeroDoc->view().find("PreviewImageUID");
-		if (idIt == zeroDoc->view().end() || idIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
-			// The project has no preview image
-			return false;
-		}
-
-		auto verIt = zeroDoc->view().find("PreviewImageVersion");
-		if (verIt == zeroDoc->view().end()) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
-			return false;
-		}
-		if (verIt->get_int64() == static_cast<int64_t>(ot::invalidUID)) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
-			return false;
-		}
-		auto typeIt = zeroDoc->view().find("PreviewImageType");
-		if (typeIt == zeroDoc->view().end()) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
-			return false;
-		}
-
-		_format = ot::stringToImageFileFormat(typeIt->get_utf8().value.data());
-
-		// Read the image data
-
-		auto imageQueryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << EntityBinaryData::className()
-			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
-			<< "Version" << static_cast<int64_t>(verIt->get_int64())
-			<< bsoncxx::builder::stream::finalize;
-
-		auto imageEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-		auto imageDoc = docBase.GetDocument(std::move(imageQueryDoc), std::move(imageEmptyFilterDoc.extract()));
-		if (!imageDoc) {
-			OT_LOG_E("Preview image entity not found");
-			return false;
-		}
-
-		std::map<ot::UID, EntityBase*> tmp;
-
-		EntityBinaryData imageData;
-		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
-		_imageData = imageData.getData();
-
-		return true;
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
-		return false;
-	}
-}
-
-bool ModelState::addProjectDescription(const std::string& _description, ot::DocumentSyntax _syntax) {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	long long modelVersion = getCurrentModelEntityVersion();
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
-
-	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) {
-		OT_LOG_E("No model entity found");
-		return false;  // No model entity found
-	}
-
-	// Removed existing description (if any)
-	removeProjectDescription();
-
-	EntityBinaryData newImageData;
-	newImageData.setEntityID(this->createEntityUID());
-	newImageData.setData(_description.c_str(), _description.length() + 1);
-	newImageData.storeToDataBase();
-
-	// Now update the model entity with the new image information
-	addNewEntity(newImageData.getEntityID(), 0, newImageData.getEntityStorageVersion(), ModelStateEntity::tEntityType::DATA);
-
-	// Finally, update the model entity
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-	auto queryDoc2 = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< "Version" << modelVersion
-		<< bsoncxx::builder::stream::finalize;
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "DescriptionUID" << static_cast<int64_t>(newImageData.getEntityID())
-		<< "DescriptionVersion" << static_cast<int64_t>(newImageData.getEntityStorageVersion())
-		<< "DescriptionSyntax" << ot::toString(_syntax)
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc2.view(), modifyDoc.view());
-
-	m_descriptionUID = newImageData.getEntityID();
-	m_descriptionVersion = newImageData.getEntityStorageVersion();
-	m_descriptionSyntax = _syntax;
-
-	return true;
-}
-
-void ModelState::removeProjectDescription() {
-	// Load the model entity
-	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
-
-	long long modelVersion = getCurrentModelEntityVersion();
-
-	auto queryDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< bsoncxx::builder::stream::finalize;
-
-	auto emptyFilterDoc = bsoncxx::builder::basic::document{};
-
-	auto sortDoc = bsoncxx::builder::basic::document{};
-	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) {
-		OT_LOG_E("No model entity found");
-		return;  // No model entity found
-	}
-
-	// Now check if we already have an image
-	auto idIt = result->view().find("DescriptionUID");
-	if (idIt == result->view().end()) {
-		return;
-	}
-
-	auto verIt = result->view().find("DescriptionVersion");
-	if (verIt == result->view().end()) {
-		OT_LOG_E("Inconsistent model entity: DescriptionUID without DescriptionVersion");
-		return;
-	}
-
-	// Delete the existing description data entity
-	auto deleteDoc = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << EntityBinaryData::className()
-		<< "EntityID" << idIt->get_int64()
-		<< "Version" << verIt->get_int64()
-		<< bsoncxx::builder::stream::finalize;
-	docBase.DeleteDocuments(std::move(deleteDoc));
-
-	removeEntity(idIt->get_int64());
-
-	// Finally, update the model entity
-	mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("Projects", DataBase::instance().getCollectionName());
-
-	auto queryDoc2 = bsoncxx::builder::stream::document{}
-		<< "SchemaType" << "Model"
-		<< "Version" << modelVersion
-		<< bsoncxx::builder::stream::finalize;
-
-	auto modifyDoc = bsoncxx::builder::stream::document{}
-		<< "$set" << bsoncxx::builder::stream::open_document
-		<< "DescriptionUID" << static_cast<int64_t>(ot::invalidUID)
-		<< "DescriptionVersion" << static_cast<int64_t>(ot::invalidUID)
-		<< bsoncxx::builder::stream::close_document << bsoncxx::builder::stream::finalize;
-
-	collection.update_one(queryDoc2.view(), modifyDoc.view());
-
-	m_descriptionUID = ot::invalidUID;
-	m_descriptionVersion = ot::invalidUID;
-}
-
-bool ModelState::readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax) {
-	try {
-		// Load the model entity
-		DataStorageAPI::DocumentAccessBase docBase("Projects", _collectionName);
-		auto zeroQueryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << "Model"
-			<< bsoncxx::builder::stream::finalize;
-
-		auto zeroEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-		auto sortDoc = bsoncxx::builder::basic::document{};
-		sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
-
-		auto zeroDoc = docBase.GetDocument(std::move(zeroQueryDoc), std::move(zeroEmptyFilterDoc.extract()), std::move(sortDoc.extract()));
-		if (!zeroDoc) {
-			OT_LOG_E("No model entity found");
-			return false;  // No model entity found
-		}
-
-		// Now check if we already have an image
-		auto idIt = zeroDoc->view().find("DescriptionUID");
-		if (idIt == zeroDoc->view().end()) {
-			// The project has no preview image
-			return false;
-		}
-		if (idIt->get_int64() == ot::invalidUID) {
-			// The project has no preview image
-			return false;
-		}
-
-		auto verIt = zeroDoc->view().find("DescriptionVersion");
-		if (verIt == zeroDoc->view().end()) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageVersion");
-			return false;
-		}
-		if (verIt->get_int64() == ot::invalidUID) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without valid PreviewImageVersion");
-			return false;
-		}
-		auto syntaxIt = zeroDoc->view().find("DescriptionSyntax");
-		if (syntaxIt == zeroDoc->view().end()) {
-			OT_LOG_E("Inconsistent model entity: PreviewImageUID without PreviewImageType");
-			return false;
-		}
-
-		_syntax = ot::stringToDocumentSyntax(syntaxIt->get_utf8().value.data());
-
-		// Read the image data
-
-		auto textQueryDoc = bsoncxx::builder::stream::document{}
-			<< "SchemaType" << EntityBinaryData::className()
-			<< "EntityID" << static_cast<int64_t>(idIt->get_int64())
-			<< "Version" << static_cast<int64_t>(verIt->get_int64())
-			<< bsoncxx::builder::stream::finalize;
-
-		auto textEmptyFilterDoc = bsoncxx::builder::basic::document{};
-
-		auto imageDoc = docBase.GetDocument(std::move(textQueryDoc), std::move(textEmptyFilterDoc.extract()));
-		if (!imageDoc) {
-			OT_LOG_E("Description entity not found");
-			return false;
-		}
-
-		std::map<ot::UID, EntityBase*> tmp;
-
-		EntityBinaryData imageData;
-		imageData.restoreFromDataBase(nullptr, nullptr, nullptr, imageDoc->view(), tmp);
-		_description = std::string(imageData.getData().data());
-
-		return true;
-	}
-	catch (const std::exception& _e) {
-		OT_LOG_E(_e.what());
-		return false;
-	}
-}
-
-void ModelState::restoreOriginalVersionIfNeeded() {
-	if (m_customInitialVersion.version.empty()) {
-		// No custom version set, ignore
-		return;
-	}
-
-	// Check if the custom version was part of the original branch
-	if (!m_customInitialVersion.isOriginalBranch) {
-		// The custom version is not part of the original branch, try to restore the original branch and version
-		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
-		return;
-	}
-
-	// Ensure that the initial version is end of branch version
-	if (!m_originalInitialVersion.isEndOfBranch || !m_customInitialVersion.isEndOfBranch) {
-		// The initial version is not an end of branch version, try to restore original branch and version
-		storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
-		return;
-	}
-
-	// Here we know that both versions are end of branch versions and that the custom version is part of the original branch
-
-	// Check if we have switched to a different branch while the project was opened
-	if (m_customInitialVersion.branch != m_activeBranchInModelEntity) {
-		// Check if the actual branch is a child branch of the initial branch
-		if (m_activeBranchInModelEntity.find(m_customInitialVersion.branch) != 0)
-		{
-			// We have switched to a different branch, which is not a child branch of the initial branch, try to restore original branch and version
-			return;
-			storeVersionInModelEntityIfExists(m_originalInitialVersion.branch, m_originalInitialVersion.version);
-		}
-	}
-
-	// Here we know that we are in the same branch (or a child branch) of the initial version and that the project was opened at the end of a branch
-
-	// We can skip restoring
-}
-
-void ModelState::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
-	using namespace ot;
-
-	_object.AddMember("CurrentModelBaseStateVersion", JsonString(m_currentModelBaseStateVersion, _allocator), _allocator);
-
-	JsonArray entitiesArr;
-	for (const auto& it : m_entities) {
-		JsonObject entityObj;
-		entityObj.AddMember("ID", it.first, _allocator);
-		JsonObject infoObj;
-		it.second.addToJsonObject(infoObj, _allocator);
-		entityObj.AddMember("Info", infoObj, _allocator);
-		entitiesArr.PushBack(entityObj, _allocator);
-	}
-	_object.AddMember("Entities", entitiesArr, _allocator);
-
-	JsonArray addedOrModifiedArr;
-	for (const auto& it : m_addedOrModifiedEntities) {
-		JsonObject entityObj;
-		entityObj.AddMember("ID", it.first, _allocator);
-		JsonObject infoObj;
-		it.second.addToJsonObject(infoObj, _allocator);
-		entityObj.AddMember("Info", infoObj, _allocator);
-		addedOrModifiedArr.PushBack(entityObj, _allocator);
-	}
-	_object.AddMember("AddedOrModifiedEntities", addedOrModifiedArr, _allocator);
-
-	JsonArray removedArr;
-	for (const auto& it : m_removedEntities) {
-		JsonObject entityObj;
-		entityObj.AddMember("ID", it.first, _allocator);
-		JsonObject infoObj;
-		it.second.addToJsonObject(infoObj, _allocator);
-		entityObj.AddMember("Info", infoObj, _allocator);
-		removedArr.PushBack(entityObj, _allocator);
-	}
-	_object.AddMember("RemovedEntities", removedArr, _allocator);
-
-	JsonArray childrenListArr;
-	for (const auto& it : m_entityChildrenList) {
-		JsonObject childObj;
-		childObj.AddMember("ID", it.first, _allocator);
-		JsonArray childArr;
-		for (const auto& child : it.second) {
-			childArr.PushBack(child, _allocator);
-		}
-		childObj.AddMember("Childs", childArr, _allocator);
-		childrenListArr.PushBack(childObj, _allocator);
-	}
-	_object.AddMember("EntityChildrenList", childrenListArr, _allocator);
-
-	_object.AddMember("StateModified", m_stateModified, _allocator);
-	_object.AddMember("MaxNumberArrayEntitiesPerState", m_maxNumberArrayEntitiesPerState, _allocator);
-
-	_object.AddMember("ActiveBranchInModelEntity", JsonString(m_activeBranchInModelEntity, _allocator), _allocator);
-	_object.AddMember("ActiveVersionInModelEntity", JsonString(m_activeVersionInModelEntity, _allocator), _allocator);
-
-	_object.AddMember("PreviewImageUID", m_previewImageUID, _allocator);
-	_object.AddMember("PreviewImageVersion", m_previewImageVersion, _allocator);
-	_object.AddMember("PreviewImageFormat", JsonString(ot::toString(m_previewImageFormat), _allocator), _allocator);
-
-	_object.AddMember("DescriptionUID", m_descriptionUID, _allocator);
-	_object.AddMember("DescriptionVersion", m_descriptionVersion, _allocator);
-	_object.AddMember("DescriptionSyntax", JsonString(ot::toString(m_descriptionSyntax), _allocator), _allocator);
-
-	auto AddVersionInfoDebugInfo = [](const VersionInformation& _info, JsonObject& _obj, JsonAllocator& _allocator) {
-		_obj.AddMember("Branch", JsonString(_info.branch, _allocator), _allocator);
-		_obj.AddMember("Version", JsonString(_info.version, _allocator), _allocator);
-		_obj.AddMember("IsOriginalBranch", _info.isOriginalBranch, _allocator);
-		_obj.AddMember("IsEndOfBranch", _info.isEndOfBranch, _allocator);
-		};
-
-	JsonObject versionGraphObj;
-	m_graphCfg.addToJsonObject(versionGraphObj, _allocator);
-	_object.AddMember("VersionGraph", versionGraphObj, _allocator);
-
-	JsonObject originalInitialVersionObj;
-	AddVersionInfoDebugInfo(m_originalInitialVersion, originalInitialVersionObj, _allocator);
-	_object.AddMember("OriginalInitialVersion", originalInitialVersionObj, _allocator);
-
-	JsonObject customInitialVersionObj;
-	AddVersionInfoDebugInfo(m_customInitialVersion, customInitialVersionObj, _allocator);
-	_object.AddMember("CustomInitialVersion", customInitialVersionObj, _allocator);
 }
 
 void ModelState::createAndActivateNewBranch()
@@ -2347,10 +2658,20 @@ void ModelState::createAndActivateNewBranch()
 }
 
 void ModelState::storeCurrentVersionInModelEntity() {
+	if (m_readOnly)
+	{
+		return;
+	}
+
 	storeVersionInModelEntity(m_graphCfg.getActiveBranchName(), m_graphCfg.getActiveVersionName());
 }
 
 void ModelState::storeVersionInModelEntityIfExists(const std::string& _branch, const std::string& _version) {
+	if (m_readOnly)
+	{
+		return;
+	}
+
 	if (!m_graphCfg.getBranchExists(_branch)) {
 		return;
 	}
@@ -2393,46 +2714,6 @@ void ModelState::storeVersionInModelEntity(const std::string& _branch, const std
 	}
 }
 
-std::string ModelState::getPreviousVersion(const std::string& _version) {
-	const ot::VersionGraphVersionCfg* version = m_graphCfg.findPreviousVersion(_version);
-	if (version) {
-		return version->getName();
-	}
-	else {
-		return std::string();
-	}
-}
-
-std::string ModelState::getVersionDescription(const std::string& _version)
-{
-	ot::VersionGraphVersionCfg* version = m_graphCfg.findVersion(_version);
-	if (version) {
-		return version->getDescription();
-	}
-	else {
-		OT_LOG_E("Version \"" + _version + "\" does not exist");
-		return std::string();
-	}
-}
-
-void ModelState::removeVersionGraphItem(const std::string& _version) {
-	m_graphCfg.removeVersion(_version);
-}
-
-bool ModelState::hasNextVersion(const std::string& _version) {
-	return !m_graphCfg.versionIsEndOfBranch(_version);
-}
-
-std::string ModelState::getNextVersion(const std::string& _version) {
-	const ot::VersionGraphVersionCfg* version = m_graphCfg.findNextVersion(_version);
-	if (version) {
-		return version->getName();
-	}
-	else {
-		return std::string();
-	}
-}
-
 void ModelState::getAllChildVersions(const std::string& _version, std::list<std::string>& _childVersions) {
 	for (const ot::VersionGraphVersionCfg* version : m_graphCfg.findAllNextVersions(_version)) {
 		_childVersions.push_back(version->getName());
@@ -2467,121 +2748,4 @@ void ModelState::deleteModelVersion(const std::string &version) {
 		<< bsoncxx::builder::stream::finalize;
 
 	docBase.DeleteDocuments(std::move(deleteDoc));
-}
-
-std::string ModelState::getPrecedingVersion(const std::string& _version)
-{
-	size_t lastSeparator = _version.find_last_of('.');
-	if (lastSeparator == std::string::npos)
-	{
-		//Main branch
-		int64_t version = std::stoll(_version);
-		if (version != 1)
-		{
-			version--;
-			return std::to_string(version);
-		}
-		else
-		{
-			// Version 1  is the first, there is none before
-			throw std::exception("Internal error. Model state switch to version 0 intended.");
-		}
-	}
-	else
-	{
-		int64_t version = std::stoll(_version.substr(lastSeparator+1));
-		if (version == 1)
-		{
-			// This is the end of the branch, we need to switch down to the origin of the branch. With each new branch two numbers are added .<branchID>.<ActiveState>
-			auto secondLast = _version.rfind('.', lastSeparator - 1);
-			if (secondLast == std::string::npos)
-			{
-				throw  std::exception("Internal error. Switch to Model state version not possible because of unexpected format.");
-			}
-			const std::string versionString = _version.substr(0, secondLast);
-			return versionString;
-		}
-		else
-		{
-			version--;
-			std::string versionBase = _version.substr(0, lastSeparator);
-			return  versionBase += "." + std::to_string(version);
-		}
-	}
-}
-
-int64_t findDigitOfLevel(const std::string& _digit, uint64_t _level) {
-	std::string::size_type pos = 0;
-
-	// Find the nth dot
-	for (int i = 0; i < _level; ++i) {
-		pos = _digit.find('.', pos);
-		if (pos == std::string::npos)
-		{
-			assert(false); // fewer than n dots
-			return -1;
-		}
-		if (i < _level - 1)
-		{
-			++pos; // advance past current dot for next search
-		}
-	}
-
-	// pos is now at the nth dot; token starts one after
-	std::string::size_type start = 0;
-	if (_level != 0)
-	{
-		start = pos + 1;
-	}
-	std::string::size_type end = _digit.find('.', start); // next dot, or npos
-	std::string digitAsString = _digit.substr(start, end == std::string::npos ? std::string::npos : end - start);
-	return std::stoll(digitAsString);
-}
-
-std::string ModelState::getProceedingVersion(const std::string& _currentVersion, const std::string& _targetVersion)
-{
-	size_t lastSeparator = _currentVersion.find_last_of('.');
-	size_t currentLvl = std::count(_currentVersion.begin(), _currentVersion.end(), '.');
-	int64_t currentLastDigit;
-	std::string versionBase;
-	if (lastSeparator == std::string::npos)
-	{
-		//Main branch
-		currentLastDigit = std::stoll(_currentVersion);
-		versionBase = "";
-	}
-	else
-	{
-		currentLastDigit = std::stoll(_currentVersion.substr(lastSeparator + 1));
-		versionBase = _currentVersion.substr(0, lastSeparator);
-	}
-
-	int64_t targetDigitOfSameLvl = findDigitOfLevel(_targetVersion, currentLvl);
-	
-	std::string newVersion;
-	if (currentLastDigit < targetDigitOfSameLvl)
-	{
-		currentLastDigit++;
-		if (versionBase.empty())
-		{
-			newVersion = std::to_string(currentLastDigit);
-		}
-		else
-		{
-			newVersion = versionBase + "." + std::to_string(currentLastDigit);
-		}
-	}
-	else
-	{
-		assert(currentLastDigit == targetDigitOfSameLvl);
-		if (_currentVersion == _targetVersion)
-		{
-			//assert(false); // Should not happen, since the loop on the outside should run until the versions are equal.
-			return _currentVersion;
-		}
-		// In this case we need to switch the branch.
-		int64_t branchID =	findDigitOfLevel(_targetVersion, currentLvl + 1);
-		newVersion = _currentVersion + "." + std::to_string(branchID) + ".1";
-	}
-	return newVersion;
 }

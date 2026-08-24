@@ -36,6 +36,8 @@ namespace ot {
 	class VersionGraphCfg;
 
 	class OT_GUI_API_EXPORT VersionGraphVersionCfg : public Serializable {
+		OT_DECL_DEFCOPY(VersionGraphVersionCfg)
+		OT_DECL_DEFMOVE(VersionGraphVersionCfg)
 	public:
 #ifdef OT_OS_64Bit
 		typedef long long VersionNumberType;
@@ -49,12 +51,7 @@ namespace ot {
 		//! @brief Assignment constructor.
 		//! @ref ot::VersionGraphVersionCfg::getName
 		VersionGraphVersionCfg(const std::string& _versionName, const std::string& _label = std::string(), const std::string& _description = std::string());
-		VersionGraphVersionCfg(const VersionGraphVersionCfg& _other);
-		VersionGraphVersionCfg(VersionGraphVersionCfg&& _other) noexcept;
-		virtual ~VersionGraphVersionCfg();
-
-		VersionGraphVersionCfg& operator = (const VersionGraphVersionCfg& _other);
-		VersionGraphVersionCfg& operator = (VersionGraphVersionCfg&& _other) noexcept;
+		virtual ~VersionGraphVersionCfg() = default;
 		
 		//! @brief Returns true if the version name is equal to the provided name.
 		bool operator == (const std::string& _name) const;
@@ -78,47 +75,47 @@ namespace ot {
 		//! - <Branch>.<Version> <br>
 		//! - or
 		//! - <Branch>.<Version>.<Branch>.<Version> and so on.
-		const std::string& getName(void) const { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		//! @brief Returns the name of this versions branch.
 		//! @ref getName
-		std::string getBranchName(void) const;
+		std::string getBranchName() const;
 
 		//! @brief Returns the name of the branch node.
 		//! If this version is "2.1.1" the branch node is version "2".
-		std::string getBranchNodeName(void) const;
+		std::string getBranchNodeName() const;
 
 		//! @see getLabel
 		void setLabel(const std::string& _title) { m_label = _title; };
 
 		//! @brief Returns the version label.
 		//! The label will be displayed on the version if it is not empty.
-		const std::string& getLabel(void) const { return m_label; };
+		const std::string& getLabel() const { return m_label; };
 
 		void setDescription(const std::string& _description) { m_description = _description; };
-		const std::string& getDescription(void) const { return m_description; };
+		const std::string& getDescription() const { return m_description; };
 
 		void setParentVersion(const std::string& _version) { m_parentVersion = _version; };
-		const std::string& getParentVersion(void) const { return m_parentVersion; };
+		const std::string& getParentVersion() const { return m_parentVersion; };
 
 		//! @see getDirectParentIsHidden
 		void setDirectParentIsHidden(bool _isHidden) { m_directParentIsHidden = _isHidden; };
 
 		//! @brief If the direct parent is hidden the connection line will be displayed as a dashed line.
-		bool getDirectParentIsHidden(void) const { return m_directParentIsHidden; };
+		bool getDirectParentIsHidden() const { return m_directParentIsHidden; };
 
 		//! @ref getVersionNumber
-		VersionNumberType getVersionNumber(void) const { return VersionGraphVersionCfg::getVersionNumber(m_name); };
+		VersionNumberType getVersionNumber() const { return VersionGraphVersionCfg::getVersionNumber(m_name); };
 
 		//! @brief Returns the number of the version of the versions branch.
 		//! Will only take into account the version number of the last branch. For example: <br>
 		//! "11.22.3" will have the value 3.
 		static VersionNumberType getVersionNumber(const std::string& _version);
 
-		std::vector<VersionNumberType> getVersionNumbers(void) const;
+		std::vector<VersionNumberType> getVersionNumbers() const;
 		static std::vector<VersionNumberType> getVersionNumbers(const std::string& _version);
 
-		bool isValid(void) const;
+		bool isValid() const;
 		
 		//! @brief Returns true if the version name matches the version name syntax.
 		static bool isValid(const std::string& _versionName);

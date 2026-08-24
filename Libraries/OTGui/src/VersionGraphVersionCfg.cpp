@@ -46,45 +46,6 @@ ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const std::string& _versionNa
 
 }
 
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg(const VersionGraphVersionCfg& _other) :
-	m_directParentIsHidden(false)
-{
-	*this = _other;
-}
-
-ot::VersionGraphVersionCfg::VersionGraphVersionCfg(VersionGraphVersionCfg&& _other) noexcept :
-	m_directParentIsHidden(_other.m_directParentIsHidden), m_name(std::move(_other.m_name)), m_label(std::move(_other.m_label)),
-	m_description(std::move(_other.m_description)), m_parentVersion(std::move(_other.m_parentVersion))
-{
-
-}
-
-ot::VersionGraphVersionCfg::~VersionGraphVersionCfg() {
-
-}
-
-ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator = (const VersionGraphVersionCfg& _other) {
-	if (this != &_other) {
-		m_name = _other.m_name;
-		m_label = _other.m_label;
-		m_description = _other.m_description;
-		m_parentVersion = _other.m_parentVersion;
-		m_directParentIsHidden = _other.m_directParentIsHidden;
-	}
-	return *this;
-}
-
-ot::VersionGraphVersionCfg& ot::VersionGraphVersionCfg::operator=(VersionGraphVersionCfg&& _other) noexcept {
-	if (this != &_other) {
-		m_name = std::move(_other.m_name);
-		m_label = std::move(_other.m_label);
-		m_description = std::move(_other.m_description);
-		m_parentVersion = std::move(_other.m_parentVersion);
-		m_directParentIsHidden = _other.m_directParentIsHidden;
-	}
-	return *this;
-}
-
 bool ot::VersionGraphVersionCfg::operator==(const std::string& _name) const {
 	return m_name == _name;
 }

@@ -74,7 +74,8 @@ private:
 			InitialStep,
 			StepOpenOtherProject,
 			StepCompare,
-			StepDone
+			StepDone,
+			StepCount
 		};
 
 		ComparisonData() = delete;

@@ -143,9 +143,9 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 	if (projectName == app->getProjectName())
 	{
 		// Get information from current model state (same project)
-
-		ot::JsonDocument resultDoc;
 		ModelState* state = model->getStateManager();
+		ot::VersionGraphCfg graph = state->getVersionGraph();
+
 		ModelState::VersionInformation currentVersionInfo;
 		if (!state->getActiveModelState(currentVersionInfo).has_value())
 		{
@@ -153,14 +153,12 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 		}
 		else
 		{
-			resultDoc.AddMember(OT_ACTION_PARAM_Version, ot::JsonString(currentVersionInfo.version, resultDoc.GetAllocator()), resultDoc.GetAllocator());
-			resultDoc.AddMember(OT_ACTION_PARAM_Branch, ot::JsonString(currentVersionInfo.branch, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+			graph.setActiveBranchName(currentVersionInfo.branch);
+			graph.setActiveVersionName(currentVersionInfo.version);
 		}
 
-		resultDoc.AddMember(OT_ACTION_PARAM_Graph, ot::JsonObject(state->getVersionGraph(), resultDoc.GetAllocator()), resultDoc.GetAllocator());
-
 		result = ot::ReturnMessage::Ok;
-		result = resultDoc.toJson();
+		result = graph.toJson();
 	}
 	else
 	{
@@ -172,17 +170,14 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to retrieve collection name for project: " + projectName);
 		}
 
-		ot::JsonDocument resultDoc;
-
 		// Cross collection access
 		ot::CrossCollectionRAII wrapper(collectionName.value());
 		ModelState state(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()));
 
 		// Version graph
 		state.loadVersionGraph();
-		const ot::VersionGraphCfg& graph = state.getVersionGraph();
-		resultDoc.AddMember(OT_ACTION_PARAM_Graph, ot::JsonObject(graph, resultDoc.GetAllocator()), resultDoc.GetAllocator());
-
+		ot::VersionGraphCfg graph = state.getVersionGraph();
+		
 		// Active version information
 		ModelState::VersionInformation currentVersionInfo;
 		if (!state.getActiveModelState(currentVersionInfo).has_value())
@@ -191,13 +186,13 @@ ot::ReturnMessage ProjectInformationHandler::getProjectVersionGraph(ot::JsonDocu
 		}
 		else
 		{
-			resultDoc.AddMember(OT_ACTION_PARAM_Version, ot::JsonString(currentVersionInfo.version, resultDoc.GetAllocator()), resultDoc.GetAllocator());
-			resultDoc.AddMember(OT_ACTION_PARAM_Branch, ot::JsonString(currentVersionInfo.branch, resultDoc.GetAllocator()), resultDoc.GetAllocator());
+			graph.setActiveBranchName(currentVersionInfo.branch);
+			graph.setActiveVersionName(currentVersionInfo.version);
 		}
 
 		// Return result
 		result = ot::ReturnMessage::Ok;
-		result = resultDoc.toJson();
+		result = graph.toJson();
 	}
 
 	return result;
@@ -309,7 +304,7 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 
 		ProgressUpdater progressUpdater(ui, "Comparing projects", false);
 		progressUpdater.setTimeTrigger(std::chrono::seconds(1));
-		progressUpdater.setTotalNumberOfSteps(3);
+		progressUpdater.setTotalNumberOfUpdates(ComparisonData::ComparisonStep::StepCount, ComparisonData::ComparisonStep::StepCount);
 		_config.getTargetProjectName();
 
 		// Create user output
@@ -360,13 +355,15 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 
 		// Switch to the target collection and load the target version
 		collectionSwitch.switchToOther();
-		ModelState rightState(model->getSessionCount(), static_cast<unsigned int>(model->getServiceID()), true);
+		ModelState rightState;
 		
 		ComparisonData data(std::move(_config), std::move(collectionSwitch), leftState, &rightState);
 		data.switchToStep(ComparisonData::StepOpenOtherProject);
-		rightState.loadModelState(targetVersion);
-
-
+		if (!rightState.loadModelState(targetVersion))
+		{
+			OT_LOG_E("Failed to load model state for project: " + _config.getTargetProjectName() + " with version: " + targetVersion);
+			return;
+		}
 
 		comparisonStepEntities(data);
 		comparisonStepDone(data);
@@ -387,6 +384,7 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 
 void ProjectInformationHandler::comparisonStepEntities(ComparisonData& _data)
 {
+	_data.switchToStep(ComparisonData::StepCompare);
 	_data.collectionSwitch.switchToInitial();
 
 	std::map<std::string, EntityBase*> leftEntitiesBuffer;
@@ -414,7 +412,7 @@ void ProjectInformationHandler::comparisonStepEntities(ComparisonData& _data)
 
 void ProjectInformationHandler::comparisonStepDone(ComparisonData& _data)
 {
-
+	_data.switchToStep(ComparisonData::StepDone);
 }
 
 void ProjectInformationHandler::requestProjectInformation(const std::string& _projectName)

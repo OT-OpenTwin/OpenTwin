@@ -28,17 +28,14 @@
 namespace ot {
 
 	class OT_GUI_API_EXPORT VersionGraphCfg : public Serializable {
+		OT_DECL_DEFCOPY(VersionGraphCfg)
+		OT_DECL_DEFMOVE(VersionGraphCfg)
 	public:
 		typedef std::list<VersionGraphVersionCfg> VersionsList;
 		typedef std::list<VersionsList> BranchesList;
 
-		VersionGraphCfg();
-		VersionGraphCfg(const VersionGraphCfg& _other) = delete;
-		VersionGraphCfg(VersionGraphCfg&& _other) noexcept;
-		virtual ~VersionGraphCfg();
-
-		VersionGraphCfg& operator = (const VersionGraphCfg& _other) = delete;
-		VersionGraphCfg& operator = (VersionGraphCfg&& _other) noexcept;
+		VersionGraphCfg() = default;
+		virtual ~VersionGraphCfg() = default;
 
 		//! @brief Add the object contents to the provided JSON object.
 		//! @param _object Json object reference to write the data to.
@@ -55,9 +52,9 @@ namespace ot {
 
 		//! @brief Returns the active version name.
 		//! The active version is the currently active model version.
-		const std::string& getActiveVersionName(void) const { return m_activeVersionName; };
+		const std::string& getActiveVersionName() const { return m_activeVersionName; };
 
-		void incrementActiveVersion(void);
+		void incrementActiveVersion();
 
 		static std::string incrementVersion(const std::string& _version);
 
@@ -67,7 +64,7 @@ namespace ot {
 		//! @brief Returns the active branch name.
 		//! The active branch is the currently active branch.
 		//! All parent versions of this version are in the active branch.
-		const std::string& getActiveBranchName(void) const { return m_activeBranchName; };
+		const std::string& getActiveBranchName() const { return m_activeBranchName; };
 
 		VersionGraphVersionCfg& insertVersion(const std::string& _version, const std::string& _parentVersion, const std::string& _label = std::string(), const std::string& _description = std::string());
 
@@ -84,10 +81,10 @@ namespace ot {
 		const VersionGraphVersionCfg* findVersion(const std::string& _version) const;
 
 		//! @brief Returns the last version in the active branch.
-		const VersionGraphVersionCfg* findLastVersion(void);
+		const VersionGraphVersionCfg* findLastVersion() const;
 
 		//! @brief Returns the last version in the specified branch.
-		const VersionGraphVersionCfg* findLastVersion(const std::string& _branchName);
+		const VersionGraphVersionCfg* findLastVersion(const std::string& _branchName) const;
 
 		//! @brief Returns the previous version to the specified version.
 		const VersionGraphVersionCfg* findPreviousVersion(const std::string& _version) const;
@@ -118,7 +115,7 @@ namespace ot {
 
 		bool getBranchExists(const std::string& _branchName) const;
 
-		const std::list<std::list<VersionGraphVersionCfg>>& getBranches(void) const { return m_branches; };
+		const std::list<std::list<VersionGraphVersionCfg>>& getBranches() const { return m_branches; };
 
 		//! @brief Returns the number of branches that have the specified version as a branch node.
 		int getBranchesCountFromNode(const std::string& _version) const;
@@ -127,7 +124,7 @@ namespace ot {
 		std::list<std::list<VersionGraphVersionCfg>> getBranchesFromNode(const std::string& _version) const;
 
 		//! @breif Clear the version graph.
-		void clear(void);
+		void clear();
 
 	private:
 		//! @brief Finds the next version.

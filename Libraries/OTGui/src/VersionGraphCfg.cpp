@@ -22,30 +22,6 @@
 #include "OTCore/String.h"
 #include "OTGui/VersionGraphCfg.h"
 
-ot::VersionGraphCfg::VersionGraphCfg() {
-
-}
-
-ot::VersionGraphCfg::VersionGraphCfg(VersionGraphCfg&& _other) noexcept :
-	m_activeBranchName(std::move(_other.m_activeBranchName)), m_activeVersionName(std::move(_other.m_activeVersionName)),
-	m_branches(std::move(_other.m_branches))
-{
-
-}
-
-ot::VersionGraphCfg::~VersionGraphCfg() {
-	this->clear();
-}
-
-ot::VersionGraphCfg& ot::VersionGraphCfg::operator=(VersionGraphCfg&& _other) noexcept {
-	if (this != &_other) {
-		m_branches = std::move(_other.m_branches);
-		m_activeVersionName = std::move(_other.m_activeVersionName);
-		m_activeBranchName = std::move(_other.m_activeBranchName);
-	}
-	return *this;
-}
-
 void ot::VersionGraphCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _allocator) const {
 	_object.AddMember("Active", JsonString(m_activeVersionName, _allocator), _allocator);
 	_object.AddMember("ActiveBranch", JsonString(m_activeBranchName, _allocator), _allocator);
@@ -274,11 +250,11 @@ const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findVersion(const std::st
 	return nullptr;
 }
 
-const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findLastVersion(void) {
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findLastVersion(void) const {
 	return this->findLastVersion(m_activeBranchName);
 }
 
-const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findLastVersion(const std::string& _branchName) {
+const ot::VersionGraphVersionCfg* ot::VersionGraphCfg::findLastVersion(const std::string& _branchName) const {
 	const VersionsList* versions = this->findBranch(_branchName);
 	if (versions) {
 		return &versions->back();
