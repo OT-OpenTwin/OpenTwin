@@ -75,15 +75,14 @@ namespace ot {
 			bool updateCartesianMesh(const std::string& meshName);
 
 		private:
-			
 			ApplicationBase * m_application = nullptr;
 
 			ModelComponent() = delete;
 			ModelComponent(const ModelComponent &) = delete;
 			ModelComponent & operator = (const ModelComponent &) = delete;
 
-			DataStorageAPI::UniqueUIDGenerator *uniqueUIDGenerator;
-			DataStorageAPI::UniqueUIDGenerator* getUniqueUIDGenerator(void);
+			ot::UniqueUIDGenerator *uniqueUIDGenerator;
+			ot::UniqueUIDGenerator* getUniqueUIDGenerator();
 
 			std::list<UID> topologyEntityIDList;
 			std::list<UID> topologyEntityVersionList;

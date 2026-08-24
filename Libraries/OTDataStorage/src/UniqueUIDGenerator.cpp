@@ -18,56 +18,57 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTSystem/Exception.h"
+#include "OTCore/Logging/Logger.h"
 #include "OTDataStorage/UniqueUIDGenerator.h"
 
-std::mutex DataStorageAPI::UniqueUIDGenerator::m_generationlock;
-
-long long DataStorageAPI::UniqueUIDGenerator::getUID()
+ot::UniqueUIDGenerator::UniqueUIDGenerator(unsigned int _sessionID, unsigned int _serviceID)
+	: m_sessionID(_sessionID), m_serviceID(_serviceID), m_counter(c_maxCounter), m_lastTime(getTimeSince2020())
 {
-	m_generationlock.lock();
+	if (m_sessionID > c_maxSessionID) {
+		throw Exception::OutOfBounds("Session ID exceeds maximum value for UID generation");
+	}
+	if (m_serviceID > c_maxServiceID) {
+		throw Exception::OutOfBounds("Service ID exceeds maximum value for UID generation");
+	}
+}
 
-	unsigned long long currentTimeInSec = this->getTimeSince2020();
+ot::UID ot::UniqueUIDGenerator::getUID()
+{
+	std::lock_guard<std::mutex> lock(getGenerationLock());
+
+	std::time_t currentTimeInSec = this->getTimeSince2020();
 	
-	//WAIT FOR THE LATER TIME IF MAXIMUM COUNT HAS REACHED 
-	while ((currentTimeInSec <= timeInSec) && (counter == maxCounter)) {
+	// Wait 100us if the maximum generation count has been reached
+	while ((currentTimeInSec <= m_lastTime) && (m_counter >= c_maxCounter)) {
 		std::this_thread::sleep_for(std::chrono::microseconds(100));
 		currentTimeInSec = this->getTimeSince2020();
 	}
-	//IF THE NEW TIME IS LATER THAN PREVIOUS ALLOTTED TIME, RESET COUNTER | ELSE, INCREMENT COUNTER 
-	if (currentTimeInSec > timeInSec) {
-		timeInSec = currentTimeInSec;
-		counter = 0;
+
+	// If this uid generation is taking place at a later second in time, reset the counter, otherwise increment it
+	if (currentTimeInSec > m_lastTime) {
+		m_lastTime = currentTimeInSec;
+		m_counter = 0;
 	}
 	else {
-		counter++;
+		m_counter++;
 	}
-	//64 BITS FOR UID | [36-Creation Time][6-Session ID][8-Service ID][14-Counter]
-	unsigned long long generatedUID = timeInSec;
-	generatedUID <<= 6;
-	generatedUID = generatedUID + sessionID;
-	generatedUID <<= 8;
-	generatedUID = generatedUID + serviceID;
-	generatedUID <<= 14;
-	generatedUID = generatedUID + counter;
 
-	m_generationlock.unlock();
+	//  64bit           36bits                6bits              8bits             14bits
+	//  UID     [63..28 CreationTime] [27..22 SessionID] [21..14 ServiceID] [13..0 Counter]
+	UID generatedUID = static_cast<UID>(m_lastTime);
+	generatedUID <<= c_sessionIDBits;
+	generatedUID = generatedUID + m_sessionID;
+	generatedUID <<= c_serviceIDBits;
+	generatedUID = generatedUID + m_serviceID;
+	generatedUID <<= c_counterBits;
+	generatedUID = generatedUID + m_counter;
 
 	return generatedUID;
 }
 
-void DataStorageAPI::UniqueUIDGenerator::setSessionID(unsigned int sessionID)
+std::mutex& ot::UniqueUIDGenerator::getGenerationLock()
 {
-	assert(sessionID < 64);
-	this->sessionID = sessionID;
-}
-
-void DataStorageAPI::UniqueUIDGenerator::setServiceID(unsigned int serviceID)
-{
-	assert(serviceID < 256);
-	this->serviceID = serviceID;
-}
-
-unsigned long long DataStorageAPI::UniqueUIDGenerator::getTimeSince2020()
-{
-	return time(NULL) - secondsTill2020;
+	static std::mutex g_generationLock;
+	return g_generationLock;
 }

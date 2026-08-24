@@ -568,7 +568,7 @@ void MongoWrapper::addNewDocument(const std::string& _collectionName, const std:
         if (elementId == ot::invalidUID) {
             // Generate unique ID if not set
             // Find solution for this because that does not work properly
-			DataStorageAPI::UniqueUIDGenerator uidGenerator(0, 0);
+			ot::UniqueUIDGenerator uidGenerator(0, 0);
 			elementId = uidGenerator.getUID();
             //elementId = EntityBase::getUidGenerator()->getUID();
            

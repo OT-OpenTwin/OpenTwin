@@ -40,7 +40,7 @@ ot::components::ModelComponent::ModelComponent(const ot::ServiceBase& _serviceIn
 { 
 	assert(m_application); 
 
-	uniqueUIDGenerator = new DataStorageAPI::UniqueUIDGenerator(_application->getSessionCount(), static_cast<unsigned int>(_application->getServiceID()));
+	uniqueUIDGenerator = new ot::UniqueUIDGenerator(_application->getSessionCount(), static_cast<unsigned int>(_application->getServiceID()));
 
 	EntityBase::setUidGenerator(uniqueUIDGenerator);
 }
@@ -100,7 +100,7 @@ ot::UID ot::components::ModelComponent::createEntityUID(void)
 	return getUniqueUIDGenerator()->getUID();
 }
 
-DataStorageAPI::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUIDGenerator(void) 
+ot::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUIDGenerator(void)
 {
 	assert(uniqueUIDGenerator != nullptr);
 

@@ -1,12 +1,19 @@
-﻿#pragma once
-#include "OTDataStorage/DataStorageAPIExport.h"
+﻿// @otlicense
+
+#pragma once
+
+// OpenTwin header
 #include "OTCore/QueryDescription/DataLakeAccessCfg.h"
-#include <mongocxx/options/find.hpp>
 #include "OTDataStorage/DataLakeAPI.h"
+#include "OTDataStorage/DataStorageAPIExport.h"
+
+// MongoDB header
+#include <mongocxx/options/find.hpp>
+
+// std header
 #include <vector>
 
-
-class DATASTORAGE_API DataLakeHelper
+class OT_DATASTORAGE_API_EXPORT DataLakeHelper
 {
 public:
 	static ot::JsonDocument executeQuery(const ot::DataLakeAccessCfg& _config, mongocxx::options::find _options, std::string& _log);

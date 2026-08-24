@@ -18,13 +18,13 @@
 // @otlicense-end
 
 // OpenTwin header
-#include "OTDataStorage/DataStorageAPIExport.h"
 #include "OTCore/Serializable.h"
+#include "OTDataStorage/DataStorageAPIExport.h"
 
 namespace ot {
 
 	//! @brief The GridFSFileInfo class holds information about a file stored in GridFS.
-	class DATASTORAGE_API GridFSFileInfo : public Serializable {
+	class OT_DATASTORAGE_API_EXPORT GridFSFileInfo : public Serializable {
 		OT_DECL_DEFCOPY(GridFSFileInfo)
 		OT_DECL_DEFMOVE(GridFSFileInfo)
 	public:

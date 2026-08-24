@@ -79,7 +79,7 @@ void Application::initialiseUIDGenerator(const int _sessionCount, const int _ser
 		assert(false);
 	}
 
-	m_uidGenerator = new DataStorageAPI::UniqueUIDGenerator(_sessionCount, _serviceID);
+	m_uidGenerator = new ot::UniqueUIDGenerator(_sessionCount, _serviceID);
 	EntityBase::setUidGenerator(m_uidGenerator);
 }
 

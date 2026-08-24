@@ -33,7 +33,7 @@
 #include <psapi.h>
 #endif
 
-_declspec(dllexport) DataStorageAPI::UniqueUIDGenerator* globalUidGenerator = nullptr;
+_declspec(dllexport) ot::UniqueUIDGenerator* globalUidGenerator = nullptr;
 
 EntityBase::EntityBase(ot::UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms) :
 	m_initiallyHidden(false),
@@ -63,7 +63,7 @@ EntityBase::~EntityBase()
 	}
 }
 
-void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator* _uidGenerator)
+void EntityBase::setUidGenerator(ot::UniqueUIDGenerator* _uidGenerator)
 {
 	if (globalUidGenerator == nullptr)
 	{
@@ -75,7 +75,7 @@ void EntityBase::setUidGenerator(DataStorageAPI::UniqueUIDGenerator* _uidGenerat
 	}
 }
 
-DataStorageAPI::UniqueUIDGenerator* EntityBase::getUidGenerator(void)
+ot::UniqueUIDGenerator* EntityBase::getUidGenerator()
 {
 	return globalUidGenerator;
 }

@@ -107,8 +107,8 @@ public:
 
 	// Setter / Getter
 
-	static void setUidGenerator(DataStorageAPI::UniqueUIDGenerator *_uidGenerator);
-	static DataStorageAPI::UniqueUIDGenerator *getUidGenerator();
+	static void setUidGenerator(ot::UniqueUIDGenerator *_uidGenerator);
+	static ot::UniqueUIDGenerator *getUidGenerator();
 
 	virtual void setName(const std::string& _name);
 	std::string getName() const { return m_treeItem.getEntityName(); };

@@ -32,7 +32,7 @@ class FixturePythonAPI : public testing::Test
 public:
 	FixturePythonAPI()
 	{
-		EntityBase::setUidGenerator(new DataStorageAPI::UniqueUIDGenerator(123, 456));
+		EntityBase::setUidGenerator(new ot::UniqueUIDGenerator(123, 456));
 	}
 	CPythonObjectNew CreateParameterSet(std::list<ot::Variable>& parameterSet) 
 	{ 

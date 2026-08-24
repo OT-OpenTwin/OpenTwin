@@ -71,7 +71,10 @@ class OT_MODELENTITIES_API_EXPORT ModelState
 {
 	OT_DECL_NOCOPY(ModelState)
 	OT_DECL_NOMOVE(ModelState)
+	OT_DECL_NODEFAULT(ModelState)
+
 	friend class FixtureModelState;
+
 public:
 	struct VersionInformation
 	{
@@ -81,7 +84,10 @@ public:
 		bool isOriginalBranch = false; //! @brief Whether this version is part of the original branch.
 	};
 
-	ModelState() = delete;
+	//! @brief Constructor for the ModelState class.
+	//! @param _sessionID The session ID for the model state.
+	//! @param _serviceID The service ID for the model state.
+	//! @param _readOnly Whether the model state is read-only in the database. A read-only model state can be modified in memory but the "write to database" methods won't work. Default is false.
 	ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _readOnly = false);
 	~ModelState();
 
@@ -96,19 +102,22 @@ public:
 	bool isModified() const { return m_stateModified; };
 
 	// Open a project, load the version grap and the currently active version
-	bool openProject(const std::string& _customVersion = std::string());
+	OT_DECL_NODISCARD bool openProject(const std::string& _customVersion = std::string());
 
-	std::optional<bsoncxx::v_noabi::document::value> getActiveModelState(VersionInformation& _information);
+	//! @brief Get the currently active model state from the database.
+	//! @param _information A reference to a VersionInformation object that will be filled with the information of the active model state if it exists.
+	//! @return An optional containing the BSON document of the active model state if it exists, or std::nullopt if it does not exist.
+	OT_DECL_NODISCARD std::optional<bsoncxx::v_noabi::document::value> getActiveModelState(VersionInformation& _information) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Entity handling
 
 	// Create and return a new entity ID (this will increate the maximum entity ID and mark the model state as modified
-	unsigned long long createEntityUID();
+	OT_DECL_NODISCARD ot::UID createEntityUID();
 
 	// Load a model state with a particular version
-	bool loadModelState(const std::string& _version, bool _loadFromGraph = true);
+	OT_DECL_NODISCARD bool loadModelState(const std::string& _version, bool _loadFromGraph = true);
 
 	// Store an entity to the data base (it will be automatically determine whetehr the entity is new or modified)
 	void storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType);
@@ -138,7 +147,7 @@ public:
 	const std::string& getActiveBranch() const { return m_graphCfg.getActiveBranchName(); }
 
 	// Save the current modified model state. The version counter is incremented automatically in the last digit (e.g. 1.2.1 -> 1.2.2)
-	bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
+	OT_DECL_NODISCARD bool saveModelState(bool forceSave, bool forceAbsoluteState, const std::string &saveComment);
 
 	// Determine the current version of an entity
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
@@ -147,10 +156,10 @@ public:
 	ot::UID getCurrentEntityParent(ot::UID entityID);
 
 	//! @brief Fills the provided list with all topology entity IDs in the model.
-	void getListOfTopologyEntities(std::list<unsigned long long>& _topologyEntityIDs);
+	void getListOfTopologyEntities(ot::UIDList& _topologyEntityIDs);
 
 	//! @brief Fills the provided list with all topology entities in the model.
-	void getListOfTopologyEntities(std::list< std::pair<ot::UID, ModelStateEntity>>& _topologyEntities);
+	void getListOfTopologyEntities(std::list<std::pair<ot::UID, ModelStateEntity>>& _topologyEntities);
 
 	// Deactivate the latest model state and reload an earlier state. Returns true if the state could be reverted (needs to have at least one more model state)
 	bool undoLastOperation();
@@ -186,7 +195,7 @@ public:
 	void checkAndUpgradeDataBaseSchema();
 
 	// Remove all redo model states and the items belonging to them 
-	std::list<std::string> removeRedoModelStates();
+	OT_DECL_NODISCARD std::list<std::string> removeRedoModelStates();
 	
 	// Write the version information to the entity in the data base
 	void updateVersionEntity(const std::string& _version);
@@ -207,7 +216,7 @@ public:
 	//! @param _imageData The image data read.
 	//! @param _format The image format read.
 	//! @return True on success, false if the project has no preview image or an error occurred.
-	static bool readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format);
+	OT_DECL_NODISCARD static bool readProjectPreviewImage(const std::string& _collectionName, std::vector<char>& _imageData, ot::ImageFileFormat _format);
 	
 	//! @brief Adds or updates the project description.
 	//! @param _description The project description to add.
@@ -220,7 +229,7 @@ public:
 	//! @param _collectionName The name of the project collection to read the description from.
 	//! @param _description The project description read.
 	//! @return True on success, false if no description is found or an error occurred.
-	static bool readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax);
+	OT_DECL_NODISCARD static bool readProjectDescription(const std::string& _collectionName, std::string& _description, ot::DocumentSyntax& _syntax);
 
 	//! @brief Restore the orginal version if needed.
 	//! Will only modify the model entity without loading the model state.
@@ -415,7 +424,7 @@ private:
 	ot::DocumentSyntax m_descriptionSyntax;
 
 	// The member for creation of Unique IDs
-	DataStorageAPI::UniqueUIDGenerator* m_uniqueUIDGenerator;
+	ot::UniqueUIDGenerator* m_uniqueUIDGenerator;
 
 	// The version graph (for each version: version, parentVersion, description).
 	// The version graph needs to be loaded when the project is opened and will then be kept up to date

@@ -48,16 +48,18 @@ ModelState::ModelState(unsigned int _sessionID, unsigned int _serviceID, bool _r
 	m_descriptionVersion(ot::invalidUID),
 	m_descriptionSyntax(ot::DocumentSyntax::PlainText),
 	m_relativeModelStateCount(0),
-	m_maximualRelativeModelStateCount(30)
+	m_maximualRelativeModelStateCount(30),
+	m_uniqueUIDGenerator(nullptr)
 {
-	DataStorageAPI::UniqueUIDGenerator *uidGenerator = EntityBase::getUidGenerator();
-	if (uidGenerator == nullptr)
+	if (!m_readOnly)
 	{
-		uidGenerator = new DataStorageAPI::UniqueUIDGenerator(_sessionID, _serviceID);
+		m_uniqueUIDGenerator = EntityBase::getUidGenerator();
+		if (m_uniqueUIDGenerator == nullptr)
+		{
+			m_uniqueUIDGenerator = new ot::UniqueUIDGenerator(_sessionID, _serviceID);
+			EntityBase::setUidGenerator(m_uniqueUIDGenerator);
+		}
 	}
-
-	m_uniqueUIDGenerator = uidGenerator;
-	EntityBase::setUidGenerator(m_uniqueUIDGenerator);
 }
 
 ModelState::~ModelState()
@@ -84,7 +86,7 @@ void ModelState::reset()
 	m_stateModified = false;
 }
 
-std::optional<bsoncxx::v_noabi::document::value> ModelState::getActiveModelState(VersionInformation& _information)
+std::optional<bsoncxx::v_noabi::document::value> ModelState::getActiveModelState(VersionInformation& _information) const
 {
 	DataStorageAPI::DocumentAccessBase docBase("Projects", DataBase::instance().getCollectionName());
 
@@ -179,9 +181,18 @@ bool ModelState::openProject(const std::string& _customVersion) {
 
 // Entity handling
 
-unsigned long long ModelState::createEntityUID()
+ot::UID ModelState::createEntityUID()
 {
-	return m_uniqueUIDGenerator->getUID();
+	if (m_readOnly)
+	{
+		OT_LOG_E("Cannot create entity UID in read-only model state");
+		return ot::invalidUID;
+	}
+	else
+	{
+		OTAssert(m_uniqueUIDGenerator != nullptr, "Unique UID generator is not initialized");
+		return m_uniqueUIDGenerator->getUID();
+	}
 }
 
 void ModelState::storeEntity(ot::UID entityID, ot::UID parentEntityID, ot::UID entityVersion, ModelStateEntity::tEntityType entityType)
@@ -484,28 +495,38 @@ bool ModelState::saveModelState(bool forceSave, bool forceAbsoluteState, const s
 ot::UID ModelState::getCurrentEntityVersion(ot::UID entityID)
 {
 	// If the entity is not part of the current state, return invalid UID
-	if (m_entities.count(entityID) == 0)
+	ot::UID entityVersion = ot::invalidUID;
+
+	const auto it = m_entities.find(entityID);
+
+	if (it != m_entities.end())
 	{
-		return ot::invalidUID;
+		entityVersion = it->second.getEntityVersion();
 	}
 
-	// Ensure that the entity exists
-	OTAssert(m_entities.find(entityID) != m_entities.end(), "Entity does not exist");
-
-	// Now return the current version of the entity
-	return m_entities[entityID].getEntityVersion();
+	return entityVersion;
 }
 
-ot::UID ModelState::getCurrentEntityParent(ot::UID entityID)
+ot::UID ModelState::getCurrentEntityParent(ot::UID _entityID)
 {
-	// Ensure that the entity exists
-	OTAssert(m_entities.find(entityID) != m_entities.end(), "Entity does not exist");
+	ot::UID parentID = ot::invalidUID;
 
-	// Now return the current version of the entity
-	return m_entities[entityID].getParentEntityID();
+	const auto it = m_entities.find(_entityID);
+
+	if (it != m_entities.end())
+	{
+		parentID = it->second.getParentEntityID();
+	}
+	else
+	{
+		OTAssert(0, "Entity not found in model state while getting parent entity");
+		OT_LOG_E("Entity not found in model state while getting parent entity id { \"EntityID\": " + std::to_string(_entityID) + " }");
+	}
+
+	return parentID;
 }
 
-void ModelState::getListOfTopologyEntities(std::list<unsigned long long>& _topologyEntityIDs)
+void ModelState::getListOfTopologyEntities(ot::UIDList& _topologyEntityIDs)
 {
 	// Loop through all entities and add the topology entities to the list
 	for (const auto& entity : m_entities)
@@ -1236,9 +1257,7 @@ bool ModelState::undoLastOperation()
 	}
 
 	// Load the parent model state
-	loadModelState(parentVersion);
-
-	return true;
+	return loadModelState(parentVersion);
 }
 
 bool ModelState::redoNextOperation()
@@ -1253,9 +1272,7 @@ bool ModelState::redoNextOperation()
 	}
 
 	// Load the parent model state
-	loadModelState(nextVersion);
-
-	return true;
+	return loadModelState(nextVersion);
 }
 
 void ModelState::removeDanglingModelEntities()
@@ -1423,9 +1440,15 @@ long long ModelState::getCurrentModelEntityVersion()
 	sortDoc.append(bsoncxx::builder::basic::kvp("$natural", -1));
 
 	auto result = docBase.GetDocument(std::move(queryDoc), std::move(emptyFilterDoc.extract()), std::move(sortDoc.extract()));
-	if (!result) return 0;  // No model entity found
-
-	return result->view()["Version"].get_int64();
+	
+	if (!result)
+	{
+		return 0;  // No model entity found
+	}
+	else
+	{
+		return result->view()["Version"].get_int64();
+	}
 }
 
 void ModelState::checkAndUpgradeDataBaseSchema()

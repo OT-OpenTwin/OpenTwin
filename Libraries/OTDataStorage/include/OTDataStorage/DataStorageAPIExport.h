@@ -18,7 +18,7 @@
 // @otlicense-end
 
 #ifdef DATASTORAGE_EXPORTS
-#define DATASTORAGE_API __declspec(dllexport)
+#define OT_DATASTORAGE_API_EXPORT __declspec(dllexport)
 #else
-#define DATASTORAGE_API __declspec(dllimport)
+#define OT_DATASTORAGE_API_EXPORT __declspec(dllimport)
 #endif
