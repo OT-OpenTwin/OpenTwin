@@ -23,7 +23,7 @@ from .platform import (DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS,
                        cmake_executable, ctest_executable)
 from .toolchain import apply_toolchain
 
-SEPARATOR = "=" * 88
+SEPARATOR = "=" * 90
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
 

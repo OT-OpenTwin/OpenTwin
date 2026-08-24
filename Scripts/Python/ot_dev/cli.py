@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Mapping, Sequence, TypeVar
+from typing import Callable, Mapping, Sequence, TypeVar
 
 from .environment import build_env
 from .projects import resolve_root
@@ -57,3 +57,19 @@ def build_type(value: str | None) -> bool:
 
 def argument(argv: Sequence[str], index: int) -> str | None:
     return argv[index] if len(argv) > index else None
+
+
+def run(entry: Callable[[Sequence[str]], int], argv: Sequence[str]) -> int:
+    try:
+        return entry(argv)
+    except KeyboardInterrupt:
+        print("\nAborted.", flush=True)
+        return 130
+
+
+def terminate_requested() -> bool:
+    try:
+        answer = input("\n[OT] Interrupted. Stop the run (Y/N)? ").strip().lower()
+    except (EOFError, KeyboardInterrupt):
+        return True
+    return not answer.startswith("n")

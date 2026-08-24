@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
 from .actions import SEPARATOR, build_project, clean_project, test_project
+from .cli import terminate_requested
 from .projects import project_roots, resolve_root
 from .toolchain import apply_toolchain
 
@@ -38,6 +39,16 @@ def _summary(path: Path, configs: Sequence[str], logs: Path, started: datetime,
         lines.append("")
     lines += [SEPARATOR, "Failed projects: " + (", ".join(failed) if failed else "NONE"), SEPARATOR]
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _run_step(name: str, action: Callable[[], int], failed: list[str]) -> bool:
+    try:
+        if action():
+            failed.append(name)
+    except KeyboardInterrupt:
+        failed.append(name)
+        return terminate_requested()
+    return False
 
 
 def _cmake_step(key: str, target: str, overrides: Overrides) -> Step:
@@ -72,15 +83,19 @@ def build_all(env: dict[str, str], order: Sequence[str], overrides: Overrides,
 
     started = datetime.now()
     failed: list[str] = []
+    aborted = False
     for index, (name, run) in enumerate(steps, start=1):
         print(f"\n=== [{index}/{len(steps)}] {name} ===", flush=True)
-        if run(env, configs, rebuild, logs):
-            failed.append(name)
+        if _run_step(name, lambda: run(env, configs, rebuild, logs), failed):
+            aborted = True
+            break
 
     finished = datetime.now()
     _summary(logs / summary, configs, logs, started, finished, failed)
 
     print(f"\n{SEPARATOR}", flush=True)
+    if aborted:
+        print("Aborted.", flush=True)
     print(f"Built {len(steps)} steps in {finished - started}", flush=True)
     print(f"Summary: {logs / summary}", flush=True)
     print("SUCCESS" if not failed else "FAILED: " + ", ".join(failed), flush=True)
@@ -107,16 +122,20 @@ def test_all(env: Mapping[str, str], projects: Sequence[str], configs: Sequence[
 
     started = datetime.now()
     failed: list[str] = []
+    aborted = False
     for index, key in enumerate(projects, start=1):
         target = resolve_root(env, key)
         name = Path(target).name
         print(f"\n=== [{index}/{len(projects)}] {name} ===", flush=True)
-        if test_project(env, target, configs, logs):
-            failed.append(name)
+        if _run_step(name, lambda: test_project(env, target, configs, logs), failed):
+            aborted = True
+            break
 
     finished = datetime.now()
 
     print(f"\n{SEPARATOR}", flush=True)
+    if aborted:
+        print("Aborted.", flush=True)
     print(f"Tested {len(projects)} projects in {finished - started}", flush=True)
     print("SUCCESS" if not failed else "FAILED: " + ", ".join(failed), flush=True)
     return 1 if failed else 0
@@ -124,13 +143,17 @@ def test_all(env: Mapping[str, str], projects: Sequence[str], configs: Sequence[
 
 def clean_all(env: Mapping[str, str], projects: Sequence[str]) -> int:
     failed: list[str] = []
+    aborted = False
     for index, key in enumerate(projects, start=1):
         target = resolve_root(env, key)
         name = Path(target).name
         print(f"\n=== [{index}/{len(projects)}] {name} ===", flush=True)
-        if clean_project(target):
-            failed.append(name)
+        if _run_step(name, lambda: clean_project(target), failed):
+            aborted = True
+            break
 
     print("\n---", flush=True)
+    if aborted:
+        print("Aborted.", flush=True)
     print("SUCCESS" if not failed else "FAILED: " + ", ".join(failed), flush=True)
     return 1 if failed else 0
