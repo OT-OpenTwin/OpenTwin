@@ -110,7 +110,7 @@ namespace ot {
 	public:
 		//! @brief Default constructor.
 		//! Initializes the data with 0.
-		constexpr Flags() noexcept : m_data{ 0 } {};
+		explicit constexpr Flags() noexcept : m_data{ 0 } {};
 
 		//! @brief Assignment constructor.
 		//! @param _initialData Initial data.
