@@ -19,7 +19,7 @@ from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from ot_build import cli, test_all, testable_projects
+from ot_dev import cli, test_all, testable_projects
 
 LOG_DIR = ("Scripts", "BuildAndTest")
 

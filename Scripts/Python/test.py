@@ -19,7 +19,7 @@ from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from ot_build import cli, test_project
+from ot_dev import cli, test_project
 
 
 def main(argv: Sequence[str]) -> int:
