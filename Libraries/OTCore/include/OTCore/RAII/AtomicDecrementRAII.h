@@ -20,43 +20,50 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
 // std header
 #include <atomic>
 
-namespace ot {
+namespace ot
+{
 
-    //! @class AtomicDecrementRAII
-    //! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
-    //! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
-    template <typename T> class AtomicDecrementRAII {
-        OT_DECL_NOCOPY(AtomicDecrementRAII)
-        OT_DECL_NOMOVE(AtomicDecrementRAII)
-        OT_DECL_NODEFAULT(AtomicDecrementRAII)
+	//! @class AtomicDecrementRAII
+	//! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
+	//! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
+	template <typename T> class AtomicDecrementRAII : public RAIIBase
+	{
+		OT_DECL_NOCOPY(AtomicDecrementRAII)
+		OT_DECL_NOMOVE(AtomicDecrementRAII)
+		OT_DECL_NODEFAULT(AtomicDecrementRAII)
 
-        static_assert(
-            std::is_arithmetic_v<T>,
-            "T must be an arithmetic type"
-        );
+		static_assert(
+			std::is_arithmetic_v<T>,
+			"T must be an arithmetic type"
+			);
 
-    public:
-        //! @brief Constructor.
-        //! Increments the value by one. The value will be decremented on destruction.
-        //! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
-        explicit AtomicDecrementRAII(std::atomic<T>& _value, std::memory_order _order = std::memory_order_seq_cst) : m_value(_value), m_order(_order) {
-            m_value.store(m_value.load() - static_cast<T>(1), m_order);
-        }
+	public:
+		//! @brief Constructor.
+		//! Increments the value by one. The value will be decremented on destruction.
+		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
+		explicit AtomicDecrementRAII(std::atomic<T>& _value, std::memory_order _order = std::memory_order_seq_cst) : m_value(&_value), m_order(_order)
+		{
+			m_value->store(m_value->load() - static_cast<T>(1), m_order);
+		}
 
-        //! @brief Destructor.
-        //! Decrements the value by one.
-        ~AtomicDecrementRAII() {
-            m_value.store(m_value.load() + static_cast<T>(1), m_order);
-        }
+		//! @brief Destructor.
+		//! Decrements the value by one.
+		virtual ~AtomicDecrementRAII()
+		{
+			if (this->isValid())
+			{
+				m_value->store(m_value->load() + static_cast<T>(1), m_order);
+			}
+		}
 
-    private:
-        std::atomic<T>& m_value;
-        std::memory_order m_order;
-    };
+	private:
+		std::atomic<T>* m_value;
+		std::memory_order m_order;
+	};
 
 }

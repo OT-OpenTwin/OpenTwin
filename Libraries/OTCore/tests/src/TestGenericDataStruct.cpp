@@ -135,7 +135,7 @@ TEST(GenericDataStruct, TypeDetectionVector)
 
 	std::unique_ptr<ot::GenericDataStruct> dataStruct;
 	EXPECT_NO_THROW(dataStruct.reset(ot::GenericDataStruct::fromJson(serActualVector)));
-	EXPECT_EQ(dataStruct->getClassName(), ot::GenericDataStructVector::className());
+EXPECT_EQ(dataStruct->getClassName(), ot::GenericDataStructVector::className());
 }
 
 TEST(GenericDataStruct, TypeDetectionMatrix)

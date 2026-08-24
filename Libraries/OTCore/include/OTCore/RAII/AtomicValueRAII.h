@@ -20,15 +20,17 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
 // std header
 #include <atomic>
 
-namespace ot {
+namespace ot
+{
 
 	template <typename T>
-	class AtomicValueRAII {
+	class AtomicValueRAII : public RAIIBase
+	{
 		OT_DECL_NOCOPY(AtomicValueRAII)
 		OT_DECL_NOMOVE(AtomicValueRAII)
 		OT_DECL_NODEFAULT(AtomicValueRAII)
@@ -36,19 +38,24 @@ namespace ot {
 		//! @brief Constructor.
 		//! Sets the atomic value to _set and restores the previous value on destruction.
 		explicit AtomicValueRAII(std::atomic<T>& _value, T _set, std::memory_order _order = std::memory_order_seq_cst)
-			: m_value(_value), m_reset(_value.exchange(_set, _order)), m_order(_order) {
-		}
+			: m_value(_value), m_reset(_value.exchange(_set, _order)), m_order(_order)
+		{}
 
 		//! @brief Constructor.
 		//! Sets the atomic value to _set and restores _reset on destruction.
 		explicit AtomicValueRAII(std::atomic<T>& _value, T _set, T _reset, std::memory_order _order = std::memory_order_seq_cst)
-			: m_value(_value), m_reset(_reset), m_order(_order) {
+			: m_value(_value), m_reset(_reset), m_order(_order)
+		{
 			m_value.store(_set, _order);
 		}
 
 		//! @brief Destructor.
-		~AtomicValueRAII() {
-			m_value.store(m_reset, m_order);
+		virtual ~AtomicValueRAII()
+		{
+			if (this->isValid())
+			{
+				m_value.store(m_reset, m_order);
+			}
 		}
 
 	private:

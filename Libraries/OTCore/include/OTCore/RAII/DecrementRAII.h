@@ -20,40 +20,69 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
-namespace ot {
+namespace ot
+{
 
-    //! @class DecrementRAII
-    //! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
-    //! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
-    template <typename T> class DecrementRAII {
-        OT_DECL_NOCOPY(DecrementRAII)
-        OT_DECL_NOMOVE(DecrementRAII)
-        OT_DECL_NODEFAULT(DecrementRAII)
+	//! @class DecrementRAII
+	//! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
+	//! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
+	template <typename T> class DecrementRAII : public RAIIBase
+	{
+		OT_DECL_NOCOPY(DecrementRAII)
+		OT_DECL_NODEFAULT(DecrementRAII)
 
-        static_assert(
-            std::is_same<decltype(std::declval<T&>() += static_cast<T>(1)), T&>::value&&
-            std::is_same<decltype(std::declval<T&>() -= static_cast<T>(1)), T&>::value,
-            "T must support += and -= with value 1"
-        );
+		static_assert(
+			std::is_same<decltype(std::declval<T&>() += static_cast<T>(1)), T&>::value&&
+			std::is_same<decltype(std::declval<T&>() -= static_cast<T>(1)), T&>::value,
+			"T must support += and -= with value 1"
+			);
 
-    public:
-        //! @brief Constructor.
-        //! Increments the value by one. The value will be decremented on destruction.
-        //! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
-        explicit DecrementRAII(T& _value) : m_value(_value) {
-            m_value -= static_cast<T>(1);
-        }
+	public:
+		//! @brief Constructor.
+		//! Increments the value by one. The value will be decremented on destruction.
+		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
+		explicit DecrementRAII(T& _value) : m_value(&_value)
+		{
+			*m_value = (*m_value - static_cast<T>(1));
+		}
 
-        //! @brief Destructor.
-        //! Decrements the value by one.
-        ~DecrementRAII() {
-            m_value += static_cast<T>(1);
-        }
+		DecrementRAII(DecrementRAII&& _other) noexcept
+			: RAIIBase(std::move(_other)), m_value(_other.m_value)
+		{
+			_other.m_value = nullptr;
+		}
 
-    private:
-        T& m_value;
-    };
+		//! @brief Destructor.
+		//! Decrements the value by one.
+		virtual ~DecrementRAII()
+		{
+			if (m_value && this->isValid())
+			{
+				*m_value = (*m_value) + static_cast<T>(1);
+			}
+		}
+
+		DecrementRAII& operator=(DecrementRAII&& _other) noexcept
+		{
+			if (this != &_other)
+			{
+				RAIIBase::operator=(std::move(_other));
+				m_value = _other.m_value;
+				_other.m_value = nullptr;
+			}
+			return *this;
+		}
+
+	protected:
+		void invalidate() override {
+			RAIIBase::invalidate();
+			m_value = nullptr;
+		}
+
+	private:
+		T* m_value;
+	};
 
 }

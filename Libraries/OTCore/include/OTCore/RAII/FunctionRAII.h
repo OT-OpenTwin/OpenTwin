@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
 // std header
 #include <functional>
@@ -52,9 +52,9 @@ namespace ot {
     //!     ...
     //! }
     //! @endcode
-    class FunctionRAII {
+    class FunctionRAII : public RAIIBase
+    {
         OT_DECL_NOCOPY(FunctionRAII)
-        OT_DECL_NOMOVE(FunctionRAII)
         OT_DECL_NODEFAULT(FunctionRAII)
     public:
         //! @brief Constructor.
@@ -69,15 +69,52 @@ namespace ot {
             }
         }
 
+        FunctionRAII(FunctionRAII&& _other) noexcept
+            : RAIIBase(std::move(_other)), m_onDelete(std::move(_other.m_onDelete))
+        {
+            _other.m_onDelete = nullptr;
+		}
+
         //! @brief Destructor.
         //! If the FunctionRAII#m_onDelete function was set it will be called.
-        ~FunctionRAII() {
-            if (m_onDelete) {
+        virtual ~FunctionRAII() {
+            if (static_cast<bool>(m_onDelete) && this->isValid()) {
                 m_onDelete();
             }
         }
 
+        FunctionRAII& operator=(FunctionRAII&& _other) noexcept
+        {
+            if (this != &_other)
+            {
+                RAIIBase::operator=(std::move(_other));
+                m_onDelete = std::move(_other.m_onDelete);
+                _other.m_onDelete = nullptr;
+            }
+            return *this;
+		}
+
+        void dismiss()
+        {
+            this->invalidate();
+        }
+
+        void execute()
+        {
+            if (static_cast<bool>(m_onDelete) && this->isValid())
+            {
+                m_onDelete();
+                this->invalidate();
+            }
+		}
+
         constexpr inline const std::function<void()>& getOnDeleteFunction() const { return m_onDelete; };
+
+    protected:
+        void invalidate() override {
+            RAIIBase::invalidate();
+            m_onDelete = nullptr;
+        }
 
     private:
         std::function<void()> m_onDelete; //! @brief Function that will be called in the destructor.

@@ -20,37 +20,79 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"	
+#include "OTCore/RAII/RAIIBase.h"	
 
-namespace ot {
+namespace ot
+{
 
 	//! @brief Basic lifecycle management for a value that should be set on wrapper creation and reset when leaving the scope.
 	//! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
-	template <typename T> class ValueRAII {
+	template <typename T> class ValueRAII : public RAIIBase
+	{
 		OT_DECL_NOCOPY(ValueRAII)
-		OT_DECL_NOMOVE(ValueRAII)
 		OT_DECL_NODEFAULT(ValueRAII)
 	public:
 		//! @brief Constructor.
 		//! The referenced value will be set to _set on creation and reset to its initial value on destruction.
 		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
 		//! @param _set The _set value will be applied to the referenced _value.
-		ValueRAII(T& _value, T _set) : ValueRAII(_value, _set, _value) {};
+		explicit ValueRAII(T& _value, T _set) : ValueRAII(_value, _set, _value) {};
 
 		//! @brief Constructor.
 		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
 		//! @param _set The _set value will be applied to the referenced _value.
 		//! @param _reset A copy of _reset will be stored and applied to the _value upon destruction of the wrapper.
-		ValueRAII(T& _value, T _set, T _reset) : m_value(_value = _set), m_reset(_reset) {}
+		explicit ValueRAII(T& _value, T _set, T _reset) : m_value(&_value), m_reset(_reset) { *m_value = _set; };
+
+		ValueRAII(ValueRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_value(_other.m_value), m_reset(std::move(_other.m_reset))
+		{
+			_other.m_value = nullptr;
+		}
 
 		//! @brief Destructor.
 		//! Will apply the reset value to the referenced value.
-		~ValueRAII() {
-			m_value = m_reset;
+		virtual ~ValueRAII()
+		{
+			this->execute();
+		}
+
+		ValueRAII& operator=(ValueRAII&& _other) noexcept
+		{
+			if (this != &_other)
+			{
+				RAIIBase::operator=(std::move(_other));
+
+				m_value = _other.m_value;
+				m_reset = std::move(_other.m_reset);
+
+				_other.m_value = nullptr;
+			}
+			return *this;
+		}
+
+		void dismiss()
+		{
+			this->invalidate();
+		}
+
+		void execute()
+		{
+			if (m_value && this->isValid())
+			{
+				*m_value = m_reset;
+				this->invalidate();
+			}
+		}
+
+	protected:
+		void invalidate() override
+		{
+			RAIIBase::invalidate();
+			m_value = nullptr;
 		}
 
 	private:
-		T& m_value; //! @brief Value reference.
+		T* m_value; //! @brief Value reference.
 		T m_reset; //! @brief Reset value to apply in the destructor.
 	};
 }

@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
 // std header
 #include <atomic>
@@ -29,7 +29,7 @@ namespace ot
 {
 
 	template <typename T>
-	class AtomicResetRAII
+	class AtomicResetRAII : public RAIIBase
 	{
 		OT_DECL_NOCOPY(AtomicResetRAII)
 		OT_DECL_NOMOVE(AtomicResetRAII)
@@ -42,9 +42,12 @@ namespace ot
 		{}
 
 		//! @brief Destructor.
-		~AtomicResetRAII()
+		virtual ~AtomicResetRAII()
 		{
-			m_value.store(m_reset, m_order);
+			if (this->isValid())
+			{
+				m_value.store(m_reset, m_order);
+			}
 		}
 
 	private:

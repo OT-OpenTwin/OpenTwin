@@ -20,40 +20,71 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/CoreTypes.h"
+#include "OTCore/RAII/RAIIBase.h"
 
-namespace ot {
+namespace ot
+{
 
-    //! @class IncrementRAII
-    //! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
-    //! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
-    template <typename T> class IncrementRAII {
-        OT_DECL_NOCOPY(IncrementRAII)
-        OT_DECL_NOMOVE(IncrementRAII)
-        OT_DECL_NODEFAULT(IncrementRAII)
+	//! @class IncrementRAII
+	//! @brief Wrapper increments a value on creation and decrements the value when the instance is destroyed.
+	//! Based on the <a href="https://en.cppreference.com/w/cpp/language/raii">RAII pattern</a>.
+	template <typename T> class IncrementRAII : public RAIIBase
+	{
+		OT_DECL_NOCOPY(IncrementRAII)
+		OT_DECL_NODEFAULT(IncrementRAII)
 
-        static_assert(
-            std::is_same<decltype(std::declval<T&>() += static_cast<T>(1)), T&>::value &&
-            std::is_same<decltype(std::declval<T&>() -= static_cast<T>(1)), T&>::value,
-            "T must support += and -= with value 1"
-        );
-
-    public:
-        //! @brief Constructor.
+	public:
+		//! @brief Constructor.
 		//! Increments the value by one. The value will be decremented on destruction.
-        //! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
-        explicit IncrementRAII(T& _value) : m_value(_value) {
-			m_value += static_cast<T>(1);
-        }
+		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
+		explicit IncrementRAII(T& _value) : m_value(&_value)
+		{
+			*m_value = (*m_value + static_cast<T>(1));
+		}
+
+		IncrementRAII(IncrementRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_value(_other.m_value)
+		{
+			_other.m_value = nullptr;
+		}
 
 		//! @brief Destructor.
 		//! Decrements the value by one.
-        ~IncrementRAII() {
-            m_value -= static_cast<T>(1);
-        }
+		virtual ~IncrementRAII()
+		{
+			this->execute();
+		}
 
-    private:
-		T& m_value;
-    };
+		IncrementRAII& operator=(IncrementRAII&& _other) noexcept
+		{
+			if (this != &_other)
+			{
+				RAIIBase::operator=(std::move(_other));
+				m_value = _other.m_value;
+				_other.m_value = nullptr;
+			}
+			return *this;
+		}
+
+		void dismiss() {
+			this->invalidate();
+		}
+
+		void execute() {
+			if (m_value && this->isValid())
+			{
+				*m_value = (*m_value - static_cast<T>(1));
+				this->invalidate();
+			}
+		}
+
+	protected:
+		void invalidate() override {
+			RAIIBase::invalidate();
+			m_value = nullptr;
+		}
+
+	private:
+		T* m_value;
+	};
 
 }

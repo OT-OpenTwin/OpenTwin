@@ -148,9 +148,9 @@ TEST(EntityNameTest, RemoveMatchingParentsTest)
 	std::list<std::string> result2 = ot::EntityName::removeMatchingParentPaths(names2);
 	EXPECT_EQ(result2.size(), 3);
 	auto resultIt2 = result2.begin();
-	EXPECT_EQ(*resultIt2, "Entity1");
+	EXPECT_EQ(*resultIt2, "Parent/Entity1");
 	++resultIt2;
-	EXPECT_EQ(*resultIt2, "Entity2");
+	EXPECT_EQ(*resultIt2, "OtherParent/Entity2");
 	++resultIt2;
-	EXPECT_EQ(*resultIt2, "Entity3");
+	EXPECT_EQ(*resultIt2, "Parent/Entity3");
 }
