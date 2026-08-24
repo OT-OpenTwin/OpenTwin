@@ -14,6 +14,7 @@
 # limitations under the License.
 
 import os
+import re
 import shutil
 import subprocess
 from pathlib import Path
@@ -66,17 +67,37 @@ def build_project(env: Mapping[str, str], target: str, configs: Sequence[str],
     return failed
 
 
+_PASSED = re.compile(r"\[  PASSED  \] (\d+) test")
+_FAILED = re.compile(r"\[  FAILED  \] ([A-Za-z_][\w/]*\.[\w/]+)")
+_NO_RUN = re.compile(r"(Exit code 0x[0-9a-fA-F]+|Subprocess aborted|Timeout)")
+
+def _test_summary(output: str) -> str:
+    passed = sum(int(n) for n in _PASSED.findall(output))
+    failed = list(dict.fromkeys(_FAILED.findall(output)))
+
+    if not passed and not failed:
+        stopped = _NO_RUN.search(output)
+        return f"  did not run ({stopped.group(1)})" if stopped else "  no tests reported"
+
+    counts = f"  {passed} passed" + (f", {len(failed)} failed" if failed else "")
+    return "\n".join([counts] + [f"    {name}" for name in failed])
+
+
 def _test_config(ctest: Path, env: Mapping[str, str], target: str, config: str,
                  out: TextIO) -> int | None:
-    """Runs one configuration. None means there was nothing to run."""
     tests = Path(target) / "build" / f"{SYSTEM}-{config}" / "tests"
     if not tests.is_dir():
         out.write(f"--- Not built, nothing to test: {tests} ---\n")
         return None
 
-    return subprocess.run(
+    result = subprocess.run(
         [str(ctest), "-C", config.capitalize(), "--test-dir", str(tests), "-V"],
-        cwd=target, env=env, stdout=out, stderr=subprocess.STDOUT).returncode
+        cwd=target, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        text=True, errors="replace")
+
+    out.write(result.stdout)
+    print(_test_summary(result.stdout), flush=True)
+    return result.returncode
 
 
 def test_project(env: Mapping[str, str], target: str, configs: Sequence[str],
