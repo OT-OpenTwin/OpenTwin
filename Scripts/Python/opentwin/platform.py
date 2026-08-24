@@ -46,22 +46,39 @@ EDITORS: dict[str, tuple[str | None, str]] = {
     "NVIM": (None, "nvim"),
 }
 
-_CMAKE_SUBPATH = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin" / "cmake.exe"
+_CMAKE_BIN = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin"
+
+
+def _devenv_tool(env: Mapping[str, str], name: str) -> Path:
+    root = env.get("DEVENV_ROOT_2022")
+    if not root:
+        raise SystemExit("DEVENV_ROOT_2022 is not set")
+    tool = Path(root) / _CMAKE_BIN / name
+    if not tool.is_file():
+        raise SystemExit(f"{name} not found: {tool}")
+    return tool
 
 
 def cmake_executable(env: Mapping[str, str]) -> Path:
     """Locate cmake. Windows uses the copy shipped with Visual Studio."""
     if WINDOWS:
-        root = env.get("DEVENV_ROOT_2022")
-        if not root:
-            raise SystemExit("DEVENV_ROOT_2022 is not set")
-        cmake = Path(root) / _CMAKE_SUBPATH
-        if not cmake.is_file():
-            raise SystemExit(f"cmake.exe not found: {cmake}")
-        return cmake
+        return _devenv_tool(env, "cmake.exe")
 
     # TODO(linux): no VS-bundled copy, so take cmake from PATH.
     found = shutil.which("cmake", path=env.get("PATH"))
     if not found:
         raise SystemExit("cmake not found on PATH")
+    return Path(found)
+
+
+def ctest_executable(env: Mapping[str, str]) -> Path:
+    """Locate ctest, from the same bundle as cmake_executable. A bare ctest on
+    PATH can resolve to an unrelated standalone CMake install."""
+    if WINDOWS:
+        return _devenv_tool(env, "ctest.exe")
+
+    # TODO(linux): no VS-bundled copy, so take ctest from PATH.
+    found = shutil.which("ctest", path=env.get("PATH"))
+    if not found:
+        raise SystemExit("ctest not found on PATH")
     return Path(found)

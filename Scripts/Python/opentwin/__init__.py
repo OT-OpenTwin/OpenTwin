@@ -20,9 +20,9 @@ _ROOT = str(Path(__file__).resolve().parent.parent)
 if _ROOT not in sys.path:
     sys.path.insert(0, _ROOT)
 
-from .actions import build_project, clean_project, launch_editor
+from .actions import build_project, clean_project, launch_editor, test_project
 from .admin_panel import build_admin_panel
-from .batch import build_all, clean_all
+from .batch import build_all, clean_all, test_all, testable_projects
 from .environment import build_env, check_required
 from .framework import build_framework
 from .projects import project_roots, resolve_root
@@ -41,4 +41,7 @@ __all__ = [
     "launch_editor",
     "project_roots",
     "resolve_root",
+    "test_all",
+    "test_project",
+    "testable_projects",
 ]

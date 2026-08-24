@@ -10,6 +10,10 @@ DoxygenDocumentation_buildLog.txt
 buildLog_Nightly.txt
 buildLog_Continuous.txt
 
+# Test Logs
+testlog_Debug.txt
+testlog_Release.txt
+
 # Report Directories
 Reports
 TestReports

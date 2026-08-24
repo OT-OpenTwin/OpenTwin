@@ -13,17 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
 from typing import Mapping, Sequence, TextIO
 
-from .platform import DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS, cmake_executable
+from .platform import (DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS,
+                       cmake_executable, ctest_executable)
 from .toolchain import apply_toolchain
 
 SEPARATOR = "=" * 88
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
+
+TEST_DLL_PATHS = {"debug": "OT_ALL_DLLD", "release": "OT_ALL_DLLR"}
 
 
 def _build_config(cmake: Path, env: Mapping[str, str], target: str, config: str,
@@ -59,6 +63,54 @@ def build_project(env: Mapping[str, str], target: str, configs: Sequence[str],
 
     print("---", flush=True)
     print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+    return failed
+
+
+def _test_config(ctest: Path, env: Mapping[str, str], target: str, config: str,
+                 out: TextIO) -> int | None:
+    """Runs one configuration. None means there was nothing to run."""
+    tests = Path(target) / "build" / f"{SYSTEM}-{config}" / "tests"
+    if not tests.is_dir():
+        out.write(f"--- Not built, nothing to test: {tests} ---\n")
+        return None
+
+    return subprocess.run(
+        [str(ctest), "-C", config.capitalize(), "--test-dir", str(tests), "-V"],
+        cwd=target, env=env, stdout=out, stderr=subprocess.STDOUT).returncode
+
+
+def test_project(env: Mapping[str, str], target: str, configs: Sequence[str],
+                 logs: str | Path | None = None) -> int:
+    ctest = ctest_executable(env)
+    logs = Path(logs) if logs else Path.cwd()
+    failed = 0
+    ran = 0
+
+    print(f"Testing Project {target}", flush=True)
+    for config in configs:
+        print(config.upper(), flush=True)
+
+        step = dict(env)
+        dlls = step.get(TEST_DLL_PATHS[config], "")
+        if dlls:
+            step["PATH"] = dlls + os.pathsep + step.get("PATH", "")
+
+        with open(logs / f"testlog_{config.capitalize()}.txt", "a", encoding="utf-8") as out:
+            out.write(f"{SEPARATOR}\nTesting project: {target}\n{SEPARATOR}\n")
+            out.flush()
+            code = _test_config(ctest, step, target, config, out)
+            if code is None:
+                out.write(f"--- Test skipped: {target} ---\n")
+            else:
+                ran += 1
+                out.write(f"--- Test {'successful' if code == 0 else 'failed'}: {target} ---\n")
+                failed = failed or code
+
+    print("---", flush=True)
+    if not ran:
+        print("SKIPPED (not built)", flush=True)
+    else:
+        print("SUCCESS" if failed == 0 else "FAILED", flush=True)
     return failed
 
 

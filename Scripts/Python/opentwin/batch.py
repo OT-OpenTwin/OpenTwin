@@ -17,8 +17,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
-from .actions import SEPARATOR, build_project, clean_project
-from .projects import resolve_root
+from .actions import SEPARATOR, build_project, clean_project, test_project
+from .projects import project_roots, resolve_root
 from .toolchain import apply_toolchain
 
 Step = Callable[[dict[str, str], Sequence[str], bool, Path], int]
@@ -83,6 +83,41 @@ def build_all(env: dict[str, str], order: Sequence[str], overrides: Overrides,
     print(f"\n{SEPARATOR}", flush=True)
     print(f"Built {len(steps)} steps in {finished - started}", flush=True)
     print(f"Summary: {logs / summary}", flush=True)
+    print("SUCCESS" if not failed else "FAILED: " + ", ".join(failed), flush=True)
+    return 1 if failed else 0
+
+
+def testable_projects(env: Mapping[str, str]) -> list[str]:
+    """Project tokens that have tests, derived rather than listed. A project is
+    testable exactly when ot_add_test() would add its tests/ subdirectory."""
+    found = []
+    for key in sorted(project_roots()):
+        root = env.get(project_roots()[key])
+        if root and (Path(root) / "tests" / "CMakeLists.txt").is_file():
+            found.append(key)
+    return found
+
+
+def test_all(env: Mapping[str, str], projects: Sequence[str], configs: Sequence[str],
+             logs: str | Path) -> int:
+    logs = Path(logs)
+    logs.mkdir(parents=True, exist_ok=True)
+    for config in configs:
+        (logs / f"testlog_{config.capitalize()}.txt").unlink(missing_ok=True)
+
+    started = datetime.now()
+    failed: list[str] = []
+    for index, key in enumerate(projects, start=1):
+        target = resolve_root(env, key)
+        name = Path(target).name
+        print(f"\n=== [{index}/{len(projects)}] {name} ===", flush=True)
+        if test_project(env, target, configs, logs):
+            failed.append(name)
+
+    finished = datetime.now()
+
+    print(f"\n{SEPARATOR}", flush=True)
+    print(f"Tested {len(projects)} projects in {finished - started}", flush=True)
     print("SUCCESS" if not failed else "FAILED: " + ", ".join(failed), flush=True)
     return 1 if failed else 0
 
