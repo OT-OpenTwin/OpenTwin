@@ -19,8 +19,8 @@ from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from opentwin import build_admin_panel, build_all, build_framework, cli
-from opentwin.batch import Step
+from ot_build import build_admin_panel, build_all, build_framework, cli
+from ot_build.batch import Step
 
 # Dependency order, mirroring Scripts\BuildAndTest\RebuildAll.bat
 BUILD_ORDER: list[str] = [
