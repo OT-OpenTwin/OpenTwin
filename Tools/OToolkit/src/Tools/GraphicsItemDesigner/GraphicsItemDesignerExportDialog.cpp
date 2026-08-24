@@ -1,0 +1,158 @@
+// @otlicense
+// File: GraphicsItemDesignerExportDialog.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+// OToolkit header
+#include "Tools/GraphicsItemDesigner/GraphicsItemDesigner.h"
+#include "Tools/GraphicsItemDesigner/GraphicsItemDesignerNavigation.h"
+#include "Tools/GraphicsItemDesigner/GraphicsItemDesignerExportDialog.h"
+
+// OpenTwin header
+#include "OTCore/Logging/Logger.h"
+#include "OTGui/Graphics/GraphicsItemCfg.h"
+#include "OTWidgets/Style/IconManager.h"
+#include "OTWidgets/Widgets/Label.h"
+#include "OTWidgets/Widgets/LineEdit.h"
+#include "OTWidgets/Widgets/CheckBox.h"
+#include "OTWidgets/Widgets/PushButton.h"
+#include "OTWidgets/Widgets/PathBrowseEdit.h"
+
+// Qt header
+#include <QtCore/qfile.h>
+#include <QtWidgets/qlayout.h>
+#include <QtWidgets/qmessagebox.h>
+
+GraphicsItemDesignerExportDialog::GraphicsItemDesignerExportDialog(GraphicsItemDesigner* _designer, QWidget* _parent)
+	: ot::Dialog(_parent), m_designer(_designer)
+{
+	OTAssertNullptr(m_designer);
+
+	// Create layouts
+	QVBoxLayout* rootLayout = new QVBoxLayout(this);
+	QGridLayout* inputLayout = new QGridLayout;
+	QHBoxLayout* buttonLayout = new QHBoxLayout;
+
+	// Create controls
+	ot::Label* fileNameLabel = new ot::Label("File Name:", this);
+	m_fileInput = new ot::PathBrowseEdit(ot::PathBrowseMode::WriteFile, this);
+	m_fileInput->setBrowseTitle("Select GraphicsItem Export");
+	m_fileInput->setFileFilter("GraphicsItem Files (*.ot.json)");
+	m_fileInput->getLineEdit()->setToolTip("File export location.");
+
+	ot::Label* autoAlignLabel = new ot::Label("Auto Align Item:", this);
+	m_autoAlignInput = new ot::CheckBox(this);
+	m_autoAlignInput->setToolTip("If enabled the item will be moved to (x: 0; y: 0) during export.\nThis should be enabled.");
+
+	ot::PushButton* buttonExport = new ot::PushButton("Export", this);
+	ot::PushButton* buttonCancel = new ot::PushButton("Cancel", this);
+
+	// Initialize data
+	m_autoAlignInput->setChecked(m_designer->getExportConfig().getExportConfigFlags() & GraphicsItemDesignerExportConfig::AutoAlign);
+
+	// Initialize name and path
+	m_fileInput->setPath(m_designer->getExportConfig().getFileName());
+	
+	// Setup layouts
+	rootLayout->addLayout(inputLayout, 1);
+	rootLayout->addLayout(buttonLayout);
+
+	inputLayout->addWidget(fileNameLabel, 0, 0);
+	inputLayout->addWidget(m_fileInput->getQWidget(), 0, 1);
+	inputLayout->addWidget(autoAlignLabel, 1, 0);
+	inputLayout->addWidget(m_autoAlignInput, 1, 1);
+	inputLayout->setColumnStretch(1, 1);
+
+	buttonLayout->addStretch(1);
+	buttonLayout->addWidget(buttonExport);
+	buttonLayout->addWidget(buttonCancel);
+
+	// Initialize window
+	this->setWindowTitle("Export As GraphicsItem");
+	this->setWindowIcon(ot::IconManager::getApplicationIcon());
+	this->setMinimumSize(500, 100);
+
+	// Connect signals
+	this->connect(buttonExport, &ot::PushButton::clicked, this, &GraphicsItemDesignerExportDialog::slotExport);
+	this->connect(buttonCancel, &ot::PushButton::clicked, this, &GraphicsItemDesignerExportDialog::slotCancel);
+}
+
+GraphicsItemDesignerExportDialog::~GraphicsItemDesignerExportDialog() {}
+
+GraphicsItemDesignerExportConfig GraphicsItemDesignerExportDialog::createExportConfig(void) const {
+	GraphicsItemDesignerExportConfig newExportConfig;
+
+	newExportConfig.setFileName(m_fileInput->getPath());
+	newExportConfig.setExportConfigFlag(GraphicsItemDesignerExportConfig::AutoAlign, m_autoAlignInput->isChecked());
+
+	return newExportConfig;
+}
+
+void GraphicsItemDesignerExportDialog::showEvent(QShowEvent* _event) {
+	ot::Dialog::showEvent(_event);
+	m_fileInput->getLineEdit()->setFocus();
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private slots
+
+void GraphicsItemDesignerExportDialog::slotExport(void) {
+	// Check user inputs
+	if (m_fileInput->getPath().isEmpty()) {
+		OT_LOG_E("No file path set");
+		return;
+	}
+
+	// Create export config
+	GraphicsItemDesignerExportConfig exportConfig = this->createExportConfig();
+	
+	// Generate config
+	ot::GraphicsItemCfg* config = m_designer->getNavigation()->generateConfig(exportConfig);
+	if (!config) {
+		return;
+	}
+
+	// Export config
+	ot::JsonDocument configDoc;
+	config->addToJsonObject(configDoc, configDoc.GetAllocator());
+	delete config;
+	config = nullptr;
+
+	QFile file(exportConfig.getFileName());
+
+	if (file.exists()) {
+		QMessageBox msgBox(QMessageBox::NoIcon, "Item Exists", "The file \"" + exportConfig.getFileName() + "\" already exists. Do you want to replace it?", QMessageBox::Yes | QMessageBox::No, this);
+		if (msgBox.exec() != QMessageBox::Yes) return;
+	}
+
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
+		OT_LOG_E("Failed to open file for writing \"" + m_fileInput->getPath().toStdString() + "\"");
+		return;
+	}
+
+	file.write(QByteArray::fromStdString(configDoc.toJson()));
+	file.close();
+
+	OT_LOG_D("Graphics Item exported \"" + m_fileInput->getPath().toStdString() + "\"");
+
+	this->closeDialog(ot::Dialog::Ok);
+}
+
+void GraphicsItemDesignerExportDialog::slotCancel(void) {
+	this->closeDialog(ot::Dialog::Cancel);
+}

@@ -18,8 +18,8 @@
 // @otlicense-end
 
 // OToolkit header
-#include "AppBase.h"
-#include "StatusManager.h"
+#include "General/AppBase.h"
+#include "General/StatusManager.h"
 
 // OToolkitAPI header
 #include "OToolkitAPI/OToolkitAPI.h"
