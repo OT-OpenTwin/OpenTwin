@@ -21,7 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 
 #include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
@@ -242,13 +242,13 @@ void WidgetTest::slotVersionActivatRequest(const std::string& _versionName) {
 }
 
 void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version) {
-	OT_TEST_Interval(totalTest, "UpdateVersion", "Total time");
+	ot::RuntimeIntervalTestLog  totalTest("[UpdateVersion] Total time");
 
 	ot::VersionGraphCfg cfg;
 	cfg.setActiveVersionName(_version.getName());
 	cfg.setActiveBranchName(_version.getBranchName());
 	{
-		OT_TEST_Interval(test, "UpdateVersion", "Create config");
+		ot::RuntimeIntervalTestLog  test("[UpdateVersion] Create config");
 
 		std::list<ot::VersionGraphVersionCfg> currentBranch;
 		
@@ -349,7 +349,7 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 	// Serialize
 	std::string jsonString;
 	{
-		OT_TEST_Interval(test, "UpdateVersion", "Serialize");
+		ot::RuntimeIntervalTestLog serializeTest("[UpdateVersion] Serialize");
 		ot::JsonDocument doc;
 		cfg.addToJsonObject(doc, doc.GetAllocator());
 
@@ -358,15 +358,14 @@ void WidgetTest::updateVersionConfig(const ot::VersionGraphVersionCfg& _version)
 	
 	ot::VersionGraphCfg newCfg;
 	{
-		OT_TEST_Interval(test, "UpdateVersion", "Deserialize");
-
+		ot::RuntimeIntervalTestLog deserializeTest("[UpdateVersion] Deserialize");
 		ot::JsonDocument newDoc;
 		newDoc.fromJson(jsonString);
 		newCfg.setFromJsonObject(newDoc.getConstObject());
 	}
 
 	{
-		OT_TEST_Interval(test, "UpdateVersion", "Setup graph");
+		ot::RuntimeIntervalTestLog deserializeTest("[UpdateVersion] Setup graph");
 		m_versionGraph->setupConfig(std::move(newCfg));
 	}
 }

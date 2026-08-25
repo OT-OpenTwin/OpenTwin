@@ -27,7 +27,7 @@
 #include "OTCore/String.h"
 #include "OTCore/TypeNames.h"
 #include "OTCore/EntityName.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/ContainerHelper.h"
 
 #include "OTGui/Painter/PainterRainbowIterator.h"

@@ -50,7 +50,7 @@
 #include "OTViewer/ClipPlaneManipulator.h"
 #include "OTViewer/TransformManipulator.h"
 #include "OTViewer/ViewerObjectSelectionHandler.h"
-#include "OTViewer/Private/ViewerDebug.h"
+#include "OTViewer/Intern/ViewerDebug.h"
 #include "OTViewer/ColorRamp.h"
 
 // Qt header
@@ -120,7 +120,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 	freezeWorkingPlane(false),
 	osgOverlayCamera(nullptr)
 {
-	OT_VIEWER_MEM_DBG(this, "Viewer created");
+	OT_VIEWER_DBG_PTR(this, "Viewer created");
 
 	model = ViewerAPI::getModelFromID(modelID);
 	assert(model != nullptr);
@@ -270,7 +270,7 @@ Viewer::Viewer(ot::UID modelID, ot::UID viewerID, double sw, double sh, int back
 }
 
 Viewer::~Viewer() {
-	OT_VIEWER_MEM_DBG(this, "Viewer destroyed");
+	OT_VIEWER_DBG_PTR(this, "Viewer destroyed");
 
 	if (model != nullptr) {
 		model->detachViewer(this);

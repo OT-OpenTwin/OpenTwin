@@ -22,13 +22,13 @@
 #include "Component/ExternalServicesComponent.h"
 #include "AppBase.h"
 #include "ToolBar.h"
-#include "UITestLogs.h"
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
+#include "Debugging/UIViewSelectionDebug.h"
 
 #include "OTSystem/OTAssert.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTWidgets/Plot/PlotDataset.h"
 #include "OTWidgets/Graphics/GraphicsView.h"
@@ -294,7 +294,7 @@ void ViewerComponent::removeTreeItems(std::list<ot::UID> treeItemIDList) {
 void ViewerComponent::selectTreeItem(ot::UID treeItemID) {
 	try {
 		try {
-			OT_SLECTION_TEST_LOG("Select item from viewer");
+			OT_UI_VIEWSEL_DBG("Select item from viewer");
 			AppBase::instance()->setNavigationTreeItemSelected(treeItemID, true);
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::selectTreeItem()"); }
@@ -307,7 +307,7 @@ void ViewerComponent::selectTreeItem(ot::UID treeItemID) {
 void ViewerComponent::selectSingleTreeItem(ot::UID treeItemID) {
 	try {
 		try {
-			OT_SLECTION_TEST_LOG("Select single item from viewer");
+			OT_UI_VIEWSEL_DBG("Select single item from viewer");
 			AppBase::instance()->setSingleNavigationTreeItemSelected(treeItemID, true);
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::selectSingleTreeItem()"); }
@@ -342,7 +342,7 @@ bool ViewerComponent::isTreeItemExpanded(ot::UID treeItemID) {
 void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerChilds) {
 	try {
 		try {
-			OT_SLECTION_TEST_LOG("Toggle item selection from viewer");
+			OT_UI_VIEWSEL_DBG("Toggle item selection from viewer");
 			AppBase::instance()->toggleNavigationTreeItemSelection(treeItemID, considerChilds);
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::toggleTreeItemSelection()"); }
@@ -355,7 +355,7 @@ void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerC
 void ViewerComponent::clearTreeSelection(void) {
 	try {
 		try {
-			OT_SLECTION_TEST_LOG("Clear item selection from viewer");
+			OT_UI_VIEWSEL_DBG("Clear item selection from viewer");
 			AppBase::instance()->clearNavigationTreeSelection();
 		}
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::clearTreeSelection()"); }
@@ -753,11 +753,11 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::Se
 
 	if (processingGroupCounter > 0) {
 		treeSelectionReceived = true;
-		OT_SLECTION_TEST_LOG("Skipping selection changed");
+		OT_UI_VIEWSEL_DBG("Skipping selection changed");
 		return result;
 	}
 
-	OT_SLECTION_TEST_LOG(std::string("Handling selection changed. Modifier pressed: ") + (_selectionData.getKeyboardModifiers() & Qt::ControlModifier ? "true" : "false"));
+	OT_UI_VIEWSEL_DBG(std::string("Handling selection changed. Modifier pressed: ") + (_selectionData.getKeyboardModifiers() & Qt::ControlModifier ? "true" : "false"));
 
 	// Send the selection changed notification to the viewer component and the model component
 	std::list<ot::UID> selectedModelItems, selectedVisibleModelItems;
@@ -769,7 +769,7 @@ ot::SelectionHandlingResult ViewerComponent::handleSelectionChanged(const ot::Se
 		AppBase::instance()->getExternalServicesComponent()->modelSelectionChangedNotification(activeModel, selectedModelItems, selectedVisibleModelItems);
 	}
 
-	OT_SLECTION_TEST_LOG(">> Handle selection change completed");
+	OT_UI_VIEWSEL_DBG(">> Handle selection change completed");
 
 	return result;
 }

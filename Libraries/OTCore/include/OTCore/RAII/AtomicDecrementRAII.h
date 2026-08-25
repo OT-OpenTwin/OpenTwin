@@ -46,23 +46,26 @@ namespace ot
 		//! @brief Constructor.
 		//! Increments the value by one. The value will be decremented on destruction.
 		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
-		explicit AtomicDecrementRAII(std::atomic<T>& _value, std::memory_order _order = std::memory_order_seq_cst) : m_value(&_value), m_order(_order)
+		explicit AtomicDecrementRAII(std::atomic<T>& _value, std::memory_order _order = std::memory_order_seq_cst) : m_value(_value), m_order(_order)
 		{
-			m_value->store(m_value->load() - static_cast<T>(1), m_order);
+			m_value.store(m_value.load() - static_cast<T>(1), m_order);
 		}
 
 		//! @brief Destructor.
 		//! Decrements the value by one.
 		virtual ~AtomicDecrementRAII()
 		{
-			if (this->isValid())
-			{
-				m_value->store(m_value->load() + static_cast<T>(1), m_order);
-			}
+			this->finalize();
+		}
+
+	protected:
+		virtual void execute() override
+		{
+			m_value.store(m_value.load() + static_cast<T>(1), m_order);
 		}
 
 	private:
-		std::atomic<T>* m_value;
+		std::atomic<T>& m_value;
 		std::memory_order m_order;
 	};
 

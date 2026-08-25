@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTGui/Widgets/TextEditorCfg.h"
 
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true

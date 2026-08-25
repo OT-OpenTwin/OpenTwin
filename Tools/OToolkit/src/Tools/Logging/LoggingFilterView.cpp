@@ -368,7 +368,7 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	this->updateIntervalColor();
 	this->updateAutoRemovalColor();
 
-	stateRaii.execute();
+	stateRaii.finalize();
 
 	Q_EMIT filterChanged();
 	Q_EMIT messageLimitChanged(this->getMessageLimit());
@@ -462,7 +462,7 @@ void LoggingFilterView::slotSelectAllServices() {
 	{
 		m_serviceFilter->item(i)->setCheckState(Qt::Checked);
 	}
-	stateRaii.execute();
+	stateRaii.finalize();
 	
 	this->slotFilterChanged();
 }
@@ -473,7 +473,7 @@ void LoggingFilterView::slotDeselectAllServices() {
 	{
 		m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
 	}
-	stateRaii.execute();
+	stateRaii.finalize();
 	
 	this->slotFilterChanged();
 }

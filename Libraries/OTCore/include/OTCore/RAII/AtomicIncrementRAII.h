@@ -55,10 +55,13 @@ namespace ot
 		//! Decrements the value by one.
 		virtual ~AtomicIncrementRAII()
 		{
-			if (this->isValid())
-			{
-				m_value.store(m_value.load() - static_cast<T>(1), m_order);
-			}
+			this->finalize();
+		}
+
+	protected:
+		virtual void execute() override
+		{
+			m_value.store(m_value.load() - static_cast<T>(1), m_order);
 		}
 
 	private:

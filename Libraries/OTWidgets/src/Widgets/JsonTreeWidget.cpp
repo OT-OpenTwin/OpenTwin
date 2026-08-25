@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTWidgets/Widgets/JsonTreeWidget.h"
 
 // Qt header
@@ -67,9 +68,28 @@ ot::JsonDocument ot::JsonTreeWidget::toJsonDocument() const {
     return JsonDocument();
 }
 
+void ot::JsonTreeWidget::countItems(uint64_t& _totalItems, uint64_t& _hiddenItems) const
+{
+	_totalItems = m_model->countItems();
+    if (_totalItems > 0)
+    {
+        _hiddenItems = m_filterModel->countHiddenRows();
+    }
+    else
+    {
+		_hiddenItems = 0;
+    }
+}
+
 void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
     OTAssertNullptr(m_model);
-    m_filterModel->setFilterText(_filterText);
+    {
+        m_filterModel->setFilterText(_filterText);
+    }
+    
+	bool wasUpdatesEnabled = updatesEnabled();
+	QSignalBlocker blocker(this);
+	setUpdatesEnabled(false);
 
     if (_filterText.isEmpty()) {
         // Show full tree again
@@ -78,6 +98,9 @@ void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
     else {
         expandAll();
     }
+
+	setUpdatesEnabled(wasUpdatesEnabled);
+	viewport()->update();
 }
 
 bool ot::JsonTreeWidget::edit(const QModelIndex& _index, QAbstractItemView::EditTrigger _trigger, QEvent* _event) {
@@ -102,6 +125,16 @@ void ot::JsonTreeWidget::slotDoubleClicked(const QModelIndex& _index) {
 	Q_EMIT nodeDoubleClicked(_index.column(), node);
 }
 
+void ot::JsonTreeWidget::expandHeader()
+{
+    auto initialSize = header()->sectionSize(JsonTreeWidgetModel::ColumnKey);
+    resizeColumnToContents(JsonTreeWidgetModel::ColumnKey);
+    if (header()->sectionSize(JsonTreeWidgetModel::ColumnKey) < initialSize)
+    {
+        header()->resizeSection(JsonTreeWidgetModel::ColumnKey, initialSize);
+    }
+}
+
 void ot::JsonTreeWidget::slotItemExpanded(const QModelIndex& _index) {
     OTAssertNullptr(m_model);
 	OTAssert(_index.isValid(), "Invalid index");
@@ -122,10 +155,6 @@ void ot::JsonTreeWidget::slotItemExpanded(const QModelIndex& _index) {
             }
         }
         
-		auto initialSize = header()->sectionSize(JsonTreeWidgetModel::ColumnKey);
-		resizeColumnToContents(JsonTreeWidgetModel::ColumnKey);
-        if (header()->sectionSize(JsonTreeWidgetModel::ColumnKey) < initialSize) {
-            header()->resizeSection(JsonTreeWidgetModel::ColumnKey, initialSize);
-        }
+        expandHeader();
     }
 }

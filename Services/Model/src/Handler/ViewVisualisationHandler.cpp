@@ -25,7 +25,7 @@
 #include "Handler/ViewVisualisationHandler.h"
 
 // OpenTwin header
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTModelEntities/Visualization/IVisualisationText.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/Visualization/IVisualisationPlot1D.h"

@@ -50,48 +50,32 @@ namespace ot
 
 		ValueRAII(ValueRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_value(_other.m_value), m_reset(std::move(_other.m_reset))
 		{
-			_other.m_value = nullptr;
+			_other.dismiss();
 		}
 
 		//! @brief Destructor.
 		//! Will apply the reset value to the referenced value.
 		virtual ~ValueRAII()
 		{
-			this->execute();
+			this->finalize();
 		}
 
-		ValueRAII& operator=(ValueRAII&& _other) noexcept
-		{
-			if (this != &_other)
-			{
-				RAIIBase::operator=(std::move(_other));
-
-				m_value = _other.m_value;
-				m_reset = std::move(_other.m_reset);
-
-				_other.m_value = nullptr;
-			}
-			return *this;
-		}
+		ValueRAII& operator=(ValueRAII&&) noexcept = delete;
 
 		T* get() { return m_value; };
 
-		void dismiss()
+		virtual bool isValid() const override
 		{
-			this->invalidate();
-		}
-
-		void execute()
-		{
-			if (m_value && this->isValid())
-			{
-				*m_value = m_reset;
-				this->invalidate();
-			}
+			return (m_value != nullptr) && RAIIBase::isValid();
 		}
 
 	protected:
-		void invalidate() override
+		virtual void execute() override
+		{
+			*m_value = m_reset;
+		}
+
+		virtual void invalidate() override
 		{
 			RAIIBase::invalidate();
 			m_value = nullptr;

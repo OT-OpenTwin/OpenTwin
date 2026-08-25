@@ -19,48 +19,34 @@ namespace ot
 
         CheckpointRAII(CheckpointRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_value(_other.m_value), m_reset(std::move(_other.m_reset))
         {
-			_other.m_value = nullptr;
+            _other.dismiss();
 		}
 
         //! @brief Destructor.
         //! Decrements the value by one.
         virtual ~CheckpointRAII()
         {
-            this->execute();
+            this->finalize();
         }
 
-        CheckpointRAII& operator=(CheckpointRAII&& _other) noexcept
+        CheckpointRAII& operator=(CheckpointRAII&&) noexcept = delete;
+
+        virtual bool isValid() const override
         {
-            if (this != &_other)
-            {
-                RAIIBase::operator=(std::move(_other));
+            return (m_value != nullptr) && RAIIBase::isValid();
+		}
 
-                m_value = _other.m_value;
-                m_reset = std::move(_other.m_reset);
-
-                _other.m_value = nullptr;
-            }
-
-            return *this;
+    protected:
+        virtual void execute() override
+        {
+            *m_value = m_reset;
         }
 
-        void dismiss() {
-            this->invalidate();
-		}
-
-        void execute() {
-            if (m_value && this->isValid())
-            {
-                *m_value = m_reset;
-                this->invalidate();
-            }
-		}
-
-	protected:
-        void invalidate() override {
-            RAIIBase::invalidate();
-            m_value = nullptr;
-		}
+        virtual void invalidate() override
+        {
+			RAIIBase::invalidate();
+			m_value = nullptr;
+        }
 
     private:
         T* m_value;

@@ -61,47 +61,43 @@ namespace ot
 		CounterRAII(CounterRAII&& _other) noexcept
 			: RAIIBase(std::move(_other)), m_value(_other.m_value), m_otherValue(std::move(_other.m_otherValue)), m_countOption(_other.m_countOption)
 		{
-			_other.m_value = nullptr;
+			_other.dismiss();
 		}
 
 		//! @brief Destructor.
 		//! Decrements the value by one.
 		virtual ~CounterRAII()
 		{
-			if (m_value && this->isValid())
-			{
-				switch (m_countOption)
-				{
-				case IncrementOnCreate:
-					this->decrementValue();
-					break;
-				case DecrementOnCreate:
-					this->incrementValue();
-					break;
-				default:
-					OTAssert(false, "Invalid CountOption");
-					break;
-				}
-			}
+			this->finalize();
 		}
 
-		CounterRAII& operator=(CounterRAII&& _other) noexcept
+		CounterRAII& operator=(CounterRAII&&) noexcept = delete;
+
+		virtual bool isValid() const override
 		{
-			if (this != &_other)
-			{
-				RAIIBase::operator=(std::move(_other));
-
-				m_value = _other.m_value;
-				m_otherValue = std::move(_other.m_otherValue);
-				m_countOption = _other.m_countOption;
-
-				_other.m_value = nullptr;
-			}
-			return *this;
+			return (m_value != nullptr) && RAIIBase::isValid();
 		}
 
 	protected:
-		inline void invalidate() override {
+		virtual void execute() override
+		{
+			OTAssertNullptr(m_value);
+			switch (m_countOption)
+			{
+			case IncrementOnCreate:
+				this->decrementValue();
+				break;
+			case DecrementOnCreate:
+				this->incrementValue();
+				break;
+			default:
+				OTAssert(false, "Invalid CountOption");
+				break;
+			}
+		}
+
+		virtual void invalidate() override
+		{
 			RAIIBase::invalidate();
 			m_value = nullptr;
 		}

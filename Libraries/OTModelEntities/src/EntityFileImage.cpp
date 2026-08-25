@@ -24,7 +24,7 @@
 #include "OTModelEntities/DataBase.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/EncodingGuesser.h"
 #include "OTCore/EncodingConverter_UTF16ToUTF8.h"
 #include "OTCore/EncodingConverter_ISO88591ToUTF8.h"

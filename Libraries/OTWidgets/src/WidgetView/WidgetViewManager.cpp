@@ -22,7 +22,7 @@
 #include "OTCore/String.h"
 #include "OTCore/EntityName.h"
 #include "OTCore/ContainerHelper.h"
-#include "OTWidgets/Private/WidgetDebug.h"
+#include "OTWidgets/Intern/WidgetDebug.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/WidgetView/WidgetView.h"
 #include "OTWidgets/WidgetView/WidgetViewTab.h"

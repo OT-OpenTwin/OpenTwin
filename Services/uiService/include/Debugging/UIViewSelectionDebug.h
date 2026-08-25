@@ -20,12 +20,12 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/Logger.h"
+#include "OTViewer/Intern/ViewerDebug.h"
 
-#define OT_SELECTION_TEST_LOGS_ENABLED false
-
-#if OT_SELECTION_TEST_LOGS_ENABLED==true
-#define OT_SLECTION_TEST_LOG(___text) OT_LOG_T(___text)
+#if OT_VIEWER_VIEWSEL_DBG_ENABLED==true
+#define OT_UI_VIEWSEL_DBG(___text)             OT_BASE_DEBUG_LOG("VIEWSEL][UI", ___text)
+#define OT_UI_VIEWSEL_DBG_PTR(___ptr, ___text) OT_BASE_DEBUG_PTR("VIEWSEL][UI", ___ptr, ___text)
 #else
-#define OT_SLECTION_TEST_LOG(___text)
+#define OT_UI_VIEWSEL_DBG(___text)
+#define OT_UI_VIEWSEL_DBG_PTR(___ptr, ___text)
 #endif

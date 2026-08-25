@@ -15,19 +15,21 @@ namespace ot
 		explicit RAIIBase(RAIIBase&& _other) noexcept : m_isValid(_other.m_isValid) { _other.m_isValid = false; };
 		virtual ~RAIIBase() = default;
 
-		RAIIBase& operator=(RAIIBase&& _other) noexcept {
-			if (this != &_other) {
-				m_isValid = _other.m_isValid;
-				_other.m_isValid = false;
-			}
-			return *this;
-		}
+		RAIIBase& operator=(RAIIBase&& _other) noexcept = delete;
 
 	public:
-		inline bool isValid() const { return m_isValid; };
+
+		//! @brief Apply and invalidate.
+		void finalize();
+
+		//! @brief Invalidate.
+		void dismiss();
+
+		virtual bool isValid() const { return m_isValid; };
 
 	protected:
-		virtual void invalidate() { m_isValid = false; };
+		virtual void execute() = 0;
+		virtual void invalidate() {};
 		
 	private:
 		bool m_isValid;

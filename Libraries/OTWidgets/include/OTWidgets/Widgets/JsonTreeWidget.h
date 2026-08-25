@@ -45,6 +45,8 @@ namespace ot {
         void setReadOnly(bool _readOnly) { m_readOnly = _readOnly; };
 		bool isReadOnly() const { return m_readOnly; };
 
+		void countItems(uint64_t& _totalItems, uint64_t& _hiddenItems) const;
+
     Q_SIGNALS:
 		void nodeDoubleClicked(int _column, ot::JsonTreeWidgetNode* _node);
 
@@ -59,6 +61,8 @@ namespace ot {
 		void slotDoubleClicked(const QModelIndex& _index);
 
     private:
+        void expandHeader();
+
         JsonTreeWidgetModel* m_model;
         JsonTreeWidgetFilterModel* m_filterModel;
         bool m_readOnly;

@@ -35,6 +35,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCore/Debugging/DebugLogBase.h"
 
 // SSL
 #include <QtCore/qfile.h>
@@ -43,16 +44,18 @@
 
 #define WEBSOCKET_MEMORY_DEBUG_ENABLED false
 #if WEBSOCKET_MEMORY_DEBUG_ENABLED==true
-#define WEBSOCKET_MEMERY_LOG(___ptr, ___message) OT_LOG_MEM(___ptr, ___message)
+#define OT_WEBSOCK_DBG(___text)             OT_BASE_DEBUG_LOG("WEBSOCK", ___text)
+#define OT_WEBSOCK_DBG_PTR(___ptr, ___text) OT_BASE_DEBUG_PTR("WEBSOCK", ___ptr, ___text)
 #else
-#define WEBSOCKET_MEMERY_LOG(___ptr, ___message)
+#define OT_WEBSOCK_DBG(___text)
+#define OT_WEBSOCK_DBG_PTR(___ptr, ___text)
 #endif
 
 WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 	QObject(nullptr), m_isConnected(false), m_currentlyProcessingQueuedMessage(false), 
 	m_sessionIsClosing(false), m_unexpectedDisconnect(false), m_bufferHandlingRequested(false)
 {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Created");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Created");
 
 	std::string wsUrl = "wss://" + _socketUrl;
 	wsUrl = ot::String::replace(wsUrl, "127.0.0.1", "localhost");
@@ -111,7 +114,7 @@ WebsocketClient::WebsocketClient(const std::string& _socketUrl) :
 
 WebsocketClient::~WebsocketClient()
 {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Deleting");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Deleting");
 
 	m_sessionIsClosing = true;
 	m_currentlyProcessingQueuedMessage = true;
@@ -124,11 +127,11 @@ WebsocketClient::~WebsocketClient()
 	QEventLoop eventLoop;
 	eventLoop.processEvents(QEventLoop::ExcludeUserInputEvents | QEventLoop::WaitForMoreEvents);
 
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Deleted");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Deleted");
 }
 
 bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, const std::string& _receiverUrl, const std::string& _message, std::string& _response) {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Sending message");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Sending message");
 
 	// Make sure we are connected
 	if (!this->ensureConnection()) {
@@ -205,7 +208,7 @@ bool WebsocketClient::sendMessage(ot::RelayedMessageHandler::MessageType _type, 
 }
 
 void WebsocketClient::prepareSessionClosing() {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Preparing session closing");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Preparing session closing");
 
 	// Mark the session as closing, this will avoid processing any new queued messages
 	m_sessionIsClosing = true;
@@ -249,7 +252,7 @@ void WebsocketClient::updateLogFlags(const ot::LogFlags& _flags) {
 // Private Slots
 
 void WebsocketClient::slotConnected() {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Connected");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Connected");
 
 	OT_LOG_D("Connected to server");
 
@@ -263,7 +266,7 @@ void WebsocketClient::slotConnected() {
 }
 
 void WebsocketClient::slotMessageReceived(const QString& _message) {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Message received");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Message received");
 
 	ot::RelayedMessageHandler::Request request = m_messageHandler.requestReceived(_message.toStdString());
 
@@ -299,7 +302,7 @@ void WebsocketClient::slotMessageReceived(const QString& _message) {
 }
 
 void WebsocketClient::slotSocketDisconnected() {
-	WEBSOCKET_MEMERY_LOG(this, "Websocket: Disconnected");
+	OT_WEBSOCK_DBG_PTR(this, "Websocket: Disconnected");
 
 	if (!m_isConnected) {
 		// This message might be sent on an unsuccessful connection attempt (when the relay server is not yet ready).
@@ -396,7 +399,7 @@ void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _
 	ExternalServicesComponent* ext = AppBase::instance()->getExternalServicesComponent();
 
 	try {
-		WEBSOCKET_MEMERY_LOG(this, "Websocket: Processing queued message");
+		OT_WEBSOCK_DBG_PTR(this, "Websocket: Processing queued message");
 
 		m_currentlyProcessingQueuedMessage = true;
 
@@ -405,7 +408,7 @@ void WebsocketClient::dispatchQueueRequest(ot::RelayedMessageHandler::Request& _
 
 		// Now dispatch all remaining actions in the buffer
 		while (!m_currentRequests.empty() && m_isConnected && !m_sessionIsClosing) {
-			WEBSOCKET_MEMERY_LOG(this, "Websocket: Processing queued message from buffer");
+			OT_WEBSOCK_DBG_PTR(this, "Websocket: Processing queued message from buffer");
 
 			ot::RelayedMessageHandler::Request bufferedRequest = std::move(m_currentRequests.front());
 			m_currentRequests.pop_front();
@@ -456,7 +459,7 @@ bool WebsocketClient::ensureConnection() {
 
 void WebsocketClient::queueBufferProcessingIfNeeded() {
 	if (!m_bufferHandlingRequested && !m_sessionIsClosing && m_isConnected && (!m_newRequests.empty() || !m_currentRequests.empty())) {
-		WEBSOCKET_MEMERY_LOG(this, "Websocket: Queueing buffer processing");
+		OT_WEBSOCK_DBG_PTR(this, "Websocket: Queueing buffer processing");
 		m_bufferHandlingRequested = true;
 		QMetaObject::invokeMethod(this, &WebsocketClient::slotProcessMessageQueue, Qt::QueuedConnection);
 	}

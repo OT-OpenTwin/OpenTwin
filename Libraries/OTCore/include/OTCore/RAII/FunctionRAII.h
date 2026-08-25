@@ -72,7 +72,7 @@ namespace ot {
         FunctionRAII(FunctionRAII&& _other) noexcept
             : RAIIBase(std::move(_other)), m_onDelete(std::move(_other.m_onDelete))
         {
-            _other.m_onDelete = nullptr;
+            _other.dismiss();
 		}
 
         //! @brief Destructor.
@@ -83,38 +83,26 @@ namespace ot {
             }
         }
 
-        FunctionRAII& operator=(FunctionRAII&& _other) noexcept
-        {
-            if (this != &_other)
-            {
-                RAIIBase::operator=(std::move(_other));
-                m_onDelete = std::move(_other.m_onDelete);
-                _other.m_onDelete = nullptr;
-            }
-            return *this;
-		}
+        FunctionRAII& operator=(FunctionRAII&&) noexcept = delete;
 
-        void dismiss()
+        virtual bool isValid() const override
         {
-            this->invalidate();
+            return (m_onDelete != nullptr) && RAIIBase::isValid();
         }
 
-        void execute()
-        {
-            if (static_cast<bool>(m_onDelete) && this->isValid())
-            {
-                m_onDelete();
-                this->invalidate();
-            }
-		}
-
-        constexpr inline const std::function<void()>& getOnDeleteFunction() const { return m_onDelete; };
-
     protected:
-        void invalidate() override {
+        virtual void execute() override
+        {
+            m_onDelete();
+        }
+
+        virtual void invalidate() override
+        {
             RAIIBase::invalidate();
             m_onDelete = nullptr;
         }
+
+        constexpr inline const std::function<void()>& getOnDeleteFunction() const { return m_onDelete; };
 
     private:
         std::function<void()> m_onDelete; //! @brief Function that will be called in the destructor.

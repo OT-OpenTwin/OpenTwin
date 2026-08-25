@@ -20,7 +20,7 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/EntityFileCSV.h"
 #include "OTModelEntities/CSVToTableTransformer.h"

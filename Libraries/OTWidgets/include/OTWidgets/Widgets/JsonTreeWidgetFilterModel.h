@@ -25,6 +25,8 @@
 // Qt header
 #include <QtCore/qsortfilterproxymodel.h>
 
+class QAbstractItemModel;
+
 namespace ot {
 	
 	class OT_WIDGETS_API_EXPORT JsonTreeWidgetFilterModel : public QSortFilterProxyModel {
@@ -36,11 +38,15 @@ namespace ot {
 
         void setFilterText(const QString& _text);
 
+        uint64_t countHiddenRows() const;
+
     protected:
         bool filterAcceptsRow(int _sourceRow, const QModelIndex& _sourceParent) const override;
 
     private:
         QString m_filterText;
+
+		inline void countHiddenRowsRecursive(QAbstractItemModel* _model, const QModelIndex& _parent, uint64_t& _hiddenRows) const;
 
         bool rowMatches(const QModelIndex& _index) const;
 

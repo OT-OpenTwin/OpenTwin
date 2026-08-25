@@ -32,7 +32,7 @@
 #include "OTViewer/ViewerToolBar.h"
 #include "OTViewer/GlobalFontPath.h"
 #include "OTViewer/PlotManagerView.h"
-#include "OTViewer/Private/ViewerDebug.h"
+#include "OTViewer/Intern/ViewerDebug.h"
 
 namespace ViewerAPI {
 	namespace intern {
@@ -152,7 +152,7 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 
 	for (auto viewer : viewerList)
 	{
-		OT_VIEWER_MEM_DBG(viewer, "Deleting viewer with ID " + std::to_string(viewer->getViewerID()));
+		OT_VIEWER_DBG_PTR(viewer, "Deleting viewer with ID " + std::to_string(viewer->getViewerID()));
 
 		delete viewer;
 		viewer = nullptr;

@@ -24,7 +24,7 @@
 #include "OTSystem/OperatingSystem.h"
 
 #include "OTCore/FolderNames.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 #include "OTCore/ThisComputerInfo.h"
@@ -821,7 +821,7 @@ void Application::sendTableWorker(int _rows, int _columns) {
 	}
 
 	// Check interval
-	RuntimeIntervalTest intervalTest;
+	RuntimeIntervalTestLog intervalTest;
 
 	// Display start info
 	StyledTextBuilder startInfo;
@@ -853,7 +853,8 @@ void Application::sendTableWorker(int _rows, int _columns) {
 
 	// Display end info
 	StyledTextBuilder endInfo;
-	endInfo << "Table test finished at " << StyledText::TimeHHMMSSZZZZ << " (user computer time). Debug service needed " + intervalTest.currentIntervalString() + " to handle the button event.";
+	endInfo << "Table test finished at " << StyledText::TimeHHMMSSZZZZ << " (user computer time). Debug service needed " + intervalTest.currentRuntimeString() + " to handle the button event.";
+	intervalTest.dismiss();
 	ui->displayStyledMessage(endInfo);
 }
 
@@ -928,8 +929,7 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 	progress.setTotalNumberOfSteps(static_cast<uint64_t>(_numberOfCurves));
 	progress.setTriggerFrequency(1);
 
-	ot::RuntimeIntervalTest testGlob;
-	testGlob.logOnDelete("Application::createManyCurvesPlot(Curves: " + std::to_string(_numberOfCurves) + "; PtsPerCurve: " + std::to_string(_numberOfPoints) + ")");
+	ot::RuntimeIntervalTestLog testGlob("Application::createManyCurvesPlot(Curves: " + std::to_string(_numberOfCurves) + "; PtsPerCurve: " + std::to_string(_numberOfPoints) + ") took ");
 
 	ot::PainterRainbowIterator rainbowPainterIt;
 
@@ -971,10 +971,9 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(_plotName);
 
-	ot::RuntimeIntervalTest testBuild;
+	ot::RuntimeIntervalTestLog testBuild("\"Application::createManyCurvesPlot - Build plot\" took ");
 	plotCfg.setXAxisParameter("Frequency");
 	builder.buildPlot(plotCfg);
-	testBuild.logCurrentInterval("Application::createManyCurvesPlot - Build plot");
 
 	getUiComponent()->unlockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
 }

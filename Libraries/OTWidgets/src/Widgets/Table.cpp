@@ -19,7 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Delegate/TableItemDelegate.h"
 #include "OTWidgets/Header/TableHeader.h"

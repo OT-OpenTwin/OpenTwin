@@ -25,7 +25,7 @@
 
 // OpenTwin header
 #include "OTCore/EntityName.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTGui/TableIndexSchemata.h"
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"

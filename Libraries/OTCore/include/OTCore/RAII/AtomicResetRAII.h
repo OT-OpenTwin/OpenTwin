@@ -44,10 +44,13 @@ namespace ot
 		//! @brief Destructor.
 		virtual ~AtomicResetRAII()
 		{
-			if (this->isValid())
-			{
-				m_value.store(m_reset, m_order);
-			}
+			this->finalize();
+		}
+
+	protected:
+		virtual void execute() override
+		{
+			m_value.store(m_reset, m_order);
 		}
 
 	private:

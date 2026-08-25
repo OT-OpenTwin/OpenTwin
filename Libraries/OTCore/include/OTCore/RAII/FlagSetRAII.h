@@ -27,49 +27,35 @@ namespace ot
 
         FlagSetRAII(FlagSetRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_flags(_other.m_flags), m_reset(std::move(_other.m_reset))
         {
-			_other.m_flags = nullptr;
+            _other.dismiss();
 		}
 
         //! @brief Destructor.
         //! Decrements the value by one.
         virtual ~FlagSetRAII()
         {
-            execute();
+            this->finalize();
         }
 
-        FlagSetRAII& operator=(FlagSetRAII&& _other) noexcept
-        {
-            if (this != &_other)
-            {
-                RAIIBase::operator=(std::move(_other));
-                m_flags = _other.m_flags;
-				m_reset = std::move(_other.m_reset);
-                _other.m_flags = nullptr;
-            }
-            return *this;
-		}
+        FlagSetRAII& operator=(FlagSetRAII&&) noexcept = delete;
 
-        void dismiss()
+        virtual bool isValid() const override
         {
-            invalidate();
-		}
-
-        void execute()
-        {
-            if (m_flags && this->isValid())
-            {
-                m_flags->remove(m_reset);
-                invalidate();
-			}
+            return (m_flags != nullptr) && RAIIBase::isValid();
         }
 
     protected:
-        void invalidate() override
+        virtual void execute() override
+        {
+            m_flags->remove(m_reset);
+        }
+
+        virtual void invalidate() override
         {
             RAIIBase::invalidate();
             m_flags = nullptr;
-		}
-
+        }
+        
     private:
         Flags<T>* m_flags;
 		Flags<T> m_reset;

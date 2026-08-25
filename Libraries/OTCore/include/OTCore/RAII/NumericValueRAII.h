@@ -12,21 +12,20 @@ namespace ot
 	template <typename T> class NumericValueRAII : public ValueRAII<T>
 	{
 		OT_DECL_NOCOPY(NumericValueRAII)
-		OT_DECL_DEFMOVE(NumericValueRAII)
 		OT_DECL_NODEFAULT(NumericValueRAII)
 	public:
 		//! @brief Constructor.
 		explicit NumericValueRAII(T& _value) : ValueRAII<T>(_value) {};
 		explicit NumericValueRAII(T& _value, T _set) : ValueRAII<T>(_value, _set) {};
 		explicit NumericValueRAII(T& _value, T _set, T _reset) : ValueRAII<T>(_value, _set, _reset) {};
-		
+		NumericValueRAII(NumericValueRAII&& _other) noexcept : ValueRAII<T>(std::move(_other)) {};
 		virtual ~NumericValueRAII() = default;
+		NumericValueRAII& operator=(NumericValueRAII&& _other) noexcept = delete;
 
 		void add(T _value) { if (this->isValid()) { *this->get() = (*this->get() + _value); } };
 		void subtract(T _value) { if (this->isValid()) { *this->get() = (*this->get() - _value); } };
 		
 		void increment() { this->add(static_cast<T>(1)); };
 		void decrement() { this->subtract(static_cast<T>(1)); };
-
 	};
 }

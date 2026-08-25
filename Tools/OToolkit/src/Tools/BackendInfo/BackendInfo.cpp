@@ -24,6 +24,7 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/LineEdit.h"
@@ -38,6 +39,8 @@
 #include "OTCommunication/ActionTypes.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
+#include <QtCore/qstringbuilder.h>
 #include <QtCore/qjsonparseerror.h>
 #include <QtGui/qclipboard.h>
 #include <QtWidgets/qlayout.h>
@@ -56,15 +59,19 @@
 namespace intern {
 
 	class CustomJsonTree : public QWidget {
+		OT_DECL_NOCOPY(CustomJsonTree)
+		OT_DECL_NOMOVE(CustomJsonTree)
+		OT_DECL_NODEFAULT(CustomJsonTree)
 	public:
 		CustomJsonTree(QWidget* _parent)
-			: QWidget(_parent)
+			: QWidget(_parent), m_filterTimer(this)
 		{
 			QVBoxLayout* layout = new QVBoxLayout(this);
 			QScrollArea* serviceArea = new QScrollArea(this);
 			layout->addWidget(serviceArea, 1);
 			serviceArea->setWidgetResizable(true);
 			m_tree = new ot::JsonTreeWidget(serviceArea);
+			m_tree->setReadOnly(true);
 			serviceArea->setWidget(m_tree);
 			connect(m_tree, &ot::JsonTreeWidget::nodeDoubleClicked, this, &CustomJsonTree::slotNodeDoubleClicked);
 
@@ -84,16 +91,42 @@ namespace intern {
 			filterEdit->setPlaceholderText("Filter...");
 			filterEdit->setMinimumWidth(150);
 			controlLayout->addWidget(filterEdit);
-			connect(filterEdit, &ot::LineEdit::textChanged, m_tree, &ot::JsonTreeWidget::filterItems);
+			connect(filterEdit, &ot::LineEdit::textChanged, [this]()
+				{
+					m_filterTimer.stop();
+					m_filterTimer.start();
+				}
+			);
+
+			m_statusLabel = new ot::Label(this);
+			controlLayout->addWidget(m_statusLabel);
 
 			controlLayout->addStretch(1);
 
 			ot::PushButton* exportButton = new ot::PushButton("Export", this);
 			controlLayout->addWidget(exportButton);
 			connect(exportButton, &ot::PushButton::clicked, this, &CustomJsonTree::slotExport);
-		}
 
-		ot::JsonTreeWidget* getTree() const { return m_tree; };
+			m_filterTimer.setInterval(500);
+			m_filterTimer.setSingleShot(true);
+			connect(&m_filterTimer, &QTimer::timeout, [this, filterEdit]() {
+				m_tree->filterItems(filterEdit->text());
+				}
+			);
+		}
+		
+		void setFromJsonDocument(const ot::JsonDocument& _doc) {
+			{
+				ot::RuntimeIntervalTestLog test("Importing configuration");
+				m_tree->setFromJsonDocument(_doc);
+			}
+			{
+				ot::RuntimeIntervalTestLog test("Counting items");
+				m_tree->countItems(m_status.numberOfItems, m_status.numberOfHiddenItems);
+			}
+			
+			updateStatus();
+		}
 
 	private Q_SLOTS:
 		void slotExport() {
@@ -132,7 +165,49 @@ namespace intern {
 		}
 
 	private:
+		QTimer m_filterTimer;
 		ot::JsonTreeWidget* m_tree;
+		
+		ot::Label* m_statusLabel;
+
+		struct Status
+		{
+			uint64_t numberOfItems = 0;
+			uint64_t numberOfHiddenItems = 0;
+		};
+		Status m_status;
+		Status m_lastStatus;
+
+		bool statesDiffer() const
+		{
+			return 
+				m_status.numberOfItems != m_lastStatus.numberOfItems || 
+				m_status.numberOfHiddenItems != m_lastStatus.numberOfHiddenItems;
+		}
+		
+		void updateStatus()
+		{
+			if (!statesDiffer())
+			{
+				return;
+			}
+
+			const int visItems = m_status.numberOfItems - m_status.numberOfHiddenItems;
+			QString statusText;
+
+			if (visItems == m_status.numberOfItems)
+			{
+				statusText = QString::number(m_status.numberOfItems) + (m_status.numberOfItems == 1 ? QString(" item") : QString(" items"));
+			}
+			else
+			{
+				statusText = QString::number(visItems) % QString(" (of ") % QString::number(m_status.numberOfItems) % QString(") items");
+			}
+
+			m_statusLabel->setText(statusText);
+
+			m_lastStatus = m_status;
+		}
 	};
 
 }
@@ -854,8 +929,7 @@ void BackendInfo::slotAddService(const std::string& _serviceName, const std::str
 	// Create widget
 	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
 	intern::CustomJsonTree* tree = new intern::CustomJsonTree(serviceExpander);
-	tree->getTree()->setReadOnly(true);
-	tree->getTree()->setFromJsonDocument(doc);
+	tree->setFromJsonDocument(doc);
 	serviceExpander->setWidget(tree);
 
 	m_sectionsLayout->addWidget(serviceExpander);

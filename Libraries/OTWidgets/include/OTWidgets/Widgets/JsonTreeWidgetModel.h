@@ -47,6 +47,8 @@ namespace ot {
 
         void setFromJsonDocument(const JsonDocument& _doc);
         
+        uint64_t countItems() const;
+
         // Required overrides
         QModelIndex index(int _row, int _column, const QModelIndex& _parent = QModelIndex()) const override;
 
@@ -65,6 +67,8 @@ namespace ot {
         bool setData(const QModelIndex& _index, const QVariant& _value, int _role = Qt::EditRole) override;
 
     private:
+        void countItems(const JsonTreeWidgetNode* _node, uint64_t& _count) const;
+
         JsonTreeWidgetNode* m_rootNode;
 
     };

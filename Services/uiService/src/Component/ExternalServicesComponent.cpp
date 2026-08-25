@@ -49,7 +49,7 @@
 #include "OTCore/ThisService.h"
 #include "OTCore/OwnerService.h"
 #include "OTCore/EntityName.h"
-#include "OTCore/RuntimeTests.h"
+#include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/TimeFormatter.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
@@ -4258,6 +4258,7 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 
 void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document)
 {
+	OT_LOG_T("Plot");
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
@@ -4332,6 +4333,7 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document)
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document)
 {
+	OT_LOG_T("Curve");
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	ot::VisualisationCfg visualisationCfg;

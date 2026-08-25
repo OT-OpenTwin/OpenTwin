@@ -151,7 +151,7 @@ TEST(RAIITests, CheckpointRAII)
 
 		EXPECT_EQ(15, intValue);
 
-		raii1.execute();
+		raii1.finalize();
 
 		EXPECT_EQ(0, intValue);
 
@@ -229,7 +229,7 @@ TEST(RAIITests, FlagSetRAII)
 				EXPECT_TRUE(flags.has(RAIITestFlag::Two));
 				EXPECT_TRUE(flags.has(RAIITestFlag::Four));
 
-				raii3.execute();
+				raii3.finalize();
 
 				EXPECT_TRUE(flags.has(RAIITestFlag::One));
 				EXPECT_FALSE(flags.has(RAIITestFlag::Two));
@@ -285,7 +285,7 @@ TEST(RAIITests, NumericValueRAII)
 				EXPECT_EQ(20, intValue);
 				raii3.decrement();
 				EXPECT_EQ(19, intValue);
-				raii3.execute();
+				raii3.finalize();
 				EXPECT_EQ(15, intValue);
 			}
 			EXPECT_EQ(15, intValue);
