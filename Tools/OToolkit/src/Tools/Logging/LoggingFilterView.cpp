@@ -21,6 +21,8 @@
 #include "Tools/Logging/LoggingFilterView.h"
 
 // OpenTwin header
+#include "OTCore/RAII/ValueRAII.h"
+#include "OTCore/RAII/FlagSetRAII.h"
 #include "OTWidgets/Widgets/SpinBox.h"
 #include "OTWidgets/Widgets/CheckBox.h"
 
@@ -41,7 +43,7 @@
 #define LFV_Filter_AllNames "< All >"
 
 LoggingFilterView::LoggingFilterView() 
-	: m_filterTimer(nullptr), m_filterLock(true)
+	: m_state(State::None), m_autoRemovalTimer(this), m_autoRemovalActive(false)
 {
 	// Create layouts
 	QScrollArea* scrollArea = new QScrollArea;
@@ -162,31 +164,48 @@ LoggingFilterView::LoggingFilterView()
 	m_messageLimitEnabled = new ot::CheckBox("Enable Message Limit", settingsBox);
 	m_messageLimitEnabled->setToolTip("If enabled, only the specified number of messages will be kept in the log. Older messages will be removed.");
 	this->connect(m_messageLimitEnabled, &QCheckBox::stateChanged, this, &LoggingFilterView::slotMessageLimitChanged);
+	settingsLayout->addWidget(m_messageLimitEnabled);
 
 	QHBoxLayout* messageLimitLayout = new QHBoxLayout;
 	messageLimitLayout->setContentsMargins(0, 0, 0, 0);
+	messageLimitLayout->addWidget(new QLabel("Limit:"));
 	m_messageLimit = new ot::SpinBox(100, std::numeric_limits<int>::max(), 20000, settingsBox);
 	m_messageLimit->setToolTip("Maximum number of messages that will be kept in the log.");
-	messageLimitLayout->addWidget(new QLabel("Limit:"));
 	messageLimitLayout->addWidget(m_messageLimit, 1);
-	settingsLayout->addWidget(m_messageLimitEnabled);
 	settingsLayout->addLayout(messageLimitLayout);
 	this->connect(m_messageLimit, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotMessageLimitChanged);
 
 	m_useInterval = new ot::CheckBox("Use Interval", settingsBox);
 	m_useInterval->setToolTip("If enabled, the log will be updated only in the specified intervals. This can help to reduce the load on the GUI when a lot of messages are incoming.");
 	this->connect(m_useInterval, &QCheckBox::stateChanged, this, &LoggingFilterView::slotIntervalChanged);
+	settingsLayout->addWidget(m_useInterval);
 
 	QHBoxLayout* intervalLayout = new QHBoxLayout;
 	intervalLayout->setContentsMargins(0, 0, 0, 0);
+	intervalLayout->addWidget(new QLabel("Interval:"));
 	m_intervalMilliseconds = new ot::SpinBox(10, 10000, 1000, settingsBox);
 	m_intervalMilliseconds->setToolTip("Interval in milliseconds that will be used to update the log view.");
 	m_intervalMilliseconds->setSuffix(" ms");
-	intervalLayout->addWidget(new QLabel("Interval:"));
 	intervalLayout->addWidget(m_intervalMilliseconds, 1);
-	settingsLayout->addWidget(m_useInterval);
 	settingsLayout->addLayout(intervalLayout);
 	this->connect(m_intervalMilliseconds, &ot::SpinBox::valueChangeCompleted, this, &LoggingFilterView::slotIntervalChanged);
+
+	m_useAutoRemoval = new ot::CheckBox("Auto Remove", settingsBox);
+	m_useAutoRemoval->setToolTip("If enabled, messages will be automatically removed from the log when the message limit is reached.");
+	this->connect(m_useAutoRemoval, &QCheckBox::stateChanged, this, &LoggingFilterView::slotAutoRemovalActiveChanged);
+	settingsLayout->addWidget(m_useAutoRemoval);
+
+	QHBoxLayout* autoRemovalLayout = new QHBoxLayout;
+	autoRemovalLayout->setContentsMargins(0, 0, 0, 0);
+	autoRemovalLayout->addWidget(new QLabel("Remove after:"));
+	m_autoRemovalInterval = new ot::SpinBox(1, 3600, 60, settingsBox);
+	m_autoRemovalInterval->setToolTip("Interval in seconds after which messages will be removed from the log when auto removal is enabled.");
+	m_autoRemovalInterval->setSuffix(" s");
+	autoRemovalLayout->addWidget(m_autoRemovalInterval, 1);
+	settingsLayout->addLayout(autoRemovalLayout);
+
+	m_autoRemovalTimer.setInterval(1000);
+	this->connect(&m_autoRemovalTimer, &QTimer::timeout, this, &LoggingFilterView::slotRemoveOutdatedLogs);
 
 	// Initialize colors
 	slotUpdateCheckboxColors();
@@ -213,14 +232,13 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 	}
 
 	if (!found) {
-		bool tmp = m_filterLock;
-		m_filterLock = true;
+		ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
+
 		QListWidgetItem* itm = new QListWidgetItem(serviceName);
 		itm->setFlags(itm->flags() | Qt::ItemIsUserCheckable);
 		itm->setCheckState(Qt::Checked);
 		m_serviceFilter->addItem(itm);
 		m_serviceFilter->sortItems(Qt::SortOrder::AscendingOrder);
-		m_filterLock = tmp;
 	}
 
 	// Check User Name exists
@@ -235,9 +253,8 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 		}
 
 		if (!found) {
-			m_filterLock = true;
+			ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
 			m_userFilter->addItem(userName);
-			m_filterLock = false;
 		}
 	}
 
@@ -253,9 +270,8 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 		}
 
 		if (!found) {
-			m_filterLock = true;
+			ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
 			m_sessionFilter->addItem(projectName);
-			m_filterLock = false;
 		}
 	}
 
@@ -306,6 +322,8 @@ bool LoggingFilterView::filterMessage(const ot::LogMessage& _msg) {
 }
 
 void LoggingFilterView::restoreSettings(QSettings& _settings) {
+	ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
+
 	m_msgTypeFilterDetailed->setChecked(_settings.value("LoggingFilterView.FilterActive.Detailed", true).toBool());
 	m_msgTypeFilterInfo->setChecked(_settings.value("LoggingFilterView.FilterActive.Info", true).toBool());
 	m_msgTypeFilterWarning->setChecked(_settings.value("LoggingFilterView.FilterActive.Warning", true).toBool());
@@ -318,6 +336,8 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	m_messageLimit->setValue(_settings.value("LoggingFilterView.MessageLimit", 20000).toInt());
 	m_useInterval->setChecked(_settings.value("LoggingFilterView.IntervalActive", false).toBool());
 	m_intervalMilliseconds->setValue(_settings.value("LoggingFilterView.IntervalMilliseconds", 1000).toInt());
+	m_useAutoRemoval->setChecked(_settings.value("LoggingFilterView.AutoRemovalActive", false).toBool());
+	m_autoRemovalInterval->setValue(_settings.value("LoggingFilterView.AutoRemovalInterval", 10).toInt());
 
 	QByteArray serviceFilter = _settings.value("LoggingFilterView.ServiceFilter.List", QByteArray()).toByteArray();
 	if (!serviceFilter.isEmpty()) {
@@ -346,6 +366,9 @@ void LoggingFilterView::restoreSettings(QSettings& _settings) {
 	this->slotUpdateCheckboxColors();
 	this->updateMessageLimitColor();
 	this->updateIntervalColor();
+	this->updateAutoRemovalColor();
+
+	stateRaii.execute();
 
 	Q_EMIT filterChanged();
 	Q_EMIT messageLimitChanged(this->getMessageLimit());
@@ -365,6 +388,8 @@ void LoggingFilterView::saveSettings(QSettings& _settings) {
 	_settings.setValue("LoggingFilterView.MessageLimit", m_messageLimit->value());
 	_settings.setValue("LoggingFilterView.IntervalActive", m_useInterval->isChecked());
 	_settings.setValue("LoggingFilterView.IntervalMilliseconds", m_intervalMilliseconds->value());
+	_settings.setValue("LoggingFilterView.AutoRemovalActive", m_useAutoRemoval->isChecked());
+	_settings.setValue("LoggingFilterView.AutoRemovalInterval", m_autoRemovalInterval->value());
 
 	QJsonArray serviceFilterArr;
 	for (int i = 0; i < m_serviceFilter->count(); i++) {
@@ -393,6 +418,13 @@ int LoggingFilterView::getIntervalMilliseconds() const {
 	return m_intervalMilliseconds->value();
 }
 
+ot::CheckpointRAII<LoggingFilterView::StateFlags> LoggingFilterView::startModification()
+{
+	ot::CheckpointRAII<LoggingFilterView::StateFlags> raii(m_state);
+	m_state.set(State::Modifying);
+	return raii;
+}
+
 void LoggingFilterView::slotUpdateCheckboxColors() {
 	m_msgTypeFilterDetailed->setSuccessForeground(m_msgTypeFilterDetailed->isChecked());
 	m_msgTypeFilterDetailed->setErrorForeground(!m_msgTypeFilterDetailed->isChecked());
@@ -417,21 +449,32 @@ void LoggingFilterView::slotUpdateCheckboxColors() {
 }
 
 void LoggingFilterView::slotFilterChanged() {
-	if (m_filterLock) return;
+	if (m_state.has(State::Modifying))
+	{
+		return;
+	}
 	Q_EMIT filterChanged();
 }
 
 void LoggingFilterView::slotSelectAllServices() {
-	m_filterLock = true;
-	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Checked);
-	m_filterLock = false;
+	ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
+	for (int i = 0; i < m_serviceFilter->count(); i++)
+	{
+		m_serviceFilter->item(i)->setCheckState(Qt::Checked);
+	}
+	stateRaii.execute();
+	
 	this->slotFilterChanged();
 }
 
 void LoggingFilterView::slotDeselectAllServices() {
-	m_filterLock = true;
-	for (int i = 0; i < m_serviceFilter->count(); i++) m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
-	m_filterLock = false;
+	ot::FlagSetRAII<State> stateRaii(m_state, State::Modifying);
+	for (int i = 0; i < m_serviceFilter->count(); i++)
+	{
+		m_serviceFilter->item(i)->setCheckState(Qt::Unchecked);
+	}
+	stateRaii.execute();
+	
 	this->slotFilterChanged();
 }
 
@@ -445,6 +488,31 @@ void LoggingFilterView::slotIntervalChanged() {
 	Q_EMIT useIntervalChaged();
 }
 
+void LoggingFilterView::slotAutoRemovalActiveChanged()
+{
+	if (m_autoRemovalActive != m_useAutoRemoval->isChecked())
+	{
+		m_autoRemovalActive = m_useAutoRemoval->isChecked();
+
+		if (m_autoRemovalActive)
+		{
+			m_autoRemovalTimer.start();
+		}
+		else
+		{
+			m_autoRemovalTimer.stop();
+		}
+		
+	}
+
+	this->updateAutoRemovalColor();
+}
+
+void LoggingFilterView::slotRemoveOutdatedLogs()
+{
+	Q_EMIT removeOutdatedLogs(m_autoRemovalInterval->value() * 1000);
+}
+
 void LoggingFilterView::updateMessageLimitColor() {
 	m_messageLimitEnabled->setSuccessForeground(m_messageLimitEnabled->isChecked());
 	m_messageLimitEnabled->setErrorForeground(!m_messageLimitEnabled->isChecked());
@@ -453,4 +521,10 @@ void LoggingFilterView::updateMessageLimitColor() {
 void LoggingFilterView::updateIntervalColor() {
 	m_useInterval->setSuccessForeground(m_useInterval->isChecked());
 	m_useInterval->setErrorForeground(!m_useInterval->isChecked());
+}
+
+void LoggingFilterView::updateAutoRemovalColor()
+{
+	m_useAutoRemoval->setSuccessForeground(m_useAutoRemoval->isChecked());
+	m_useAutoRemoval->setErrorForeground(!m_useAutoRemoval->isChecked());
 }

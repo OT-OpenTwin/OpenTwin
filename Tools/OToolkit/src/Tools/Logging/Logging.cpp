@@ -206,6 +206,7 @@ bool Logging::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	this->connect(m_filterView, &LoggingFilterView::filterChanged, this, &Logging::slotFilterChanged);
 	this->connect(m_filterView, &LoggingFilterView::messageLimitChanged, this, &Logging::slotMessageLimitChanged);
 	this->connect(m_filterView, &LoggingFilterView::useIntervalChaged, this, &Logging::slotUseIntervalChanged);
+	this->connect(m_filterView, &LoggingFilterView::removeOutdatedLogs, this, &Logging::slotRemoveOutdated);
 
 	// Connect checkbox color signals
 	connect(m_convertToLocalTime, &QCheckBox::stateChanged, this, &Logging::slotUpdateCheckboxColors);
@@ -434,6 +435,7 @@ void Logging::slotRefillData() {
 void Logging::slotClear() {
 	m_table->setRowCount(0);
 	m_messages.clear();
+	m_messageTimestamps.clear();
 	m_errorCount = 0;
 	m_warningCount = 0;
 	this->updateCountLabels();
@@ -491,7 +493,7 @@ void Logging::slotToggleAutoConnect() {
 
 void Logging::slotViewCellContent(QTableWidgetItem* _itm) {
 	size_t i = 0;
-	for (auto itm : m_messages) {
+	for (const auto& itm : m_messages) {
 		if (i++ == _itm->row()) {
 			LogVisualizationItemViewDialog dia(itm, i, m_table);
 			dia.showDialog();
@@ -605,6 +607,8 @@ void Logging::slotMessageLimitChanged(int _limit) {
 			m_errorCount--;
 		}
 		m_messages.pop_front();
+		OTAssert(!m_messageTimestamps.empty(), "");
+		m_messageTimestamps.pop_front();
 	}
 	this->updateCountLabels();
 }
@@ -634,6 +638,40 @@ void Logging::slotIntervalTimeout() {
 	}
 }
 
+void Logging::slotRemoveOutdated(int _msSinceLog)
+{
+	while (!m_messages.empty()) {
+		const ot::LogMessage& msg = m_messages.front();
+		OTAssert(!m_messageTimestamps.empty());
+
+		const auto messageTimeout = m_messageTimestamps.front() + _msSinceLog;
+		const auto currentTime = ot::DateTime::msSinceEpoch();
+
+		const auto m = messageTimeout - 1787620476725ul;
+		const auto c = currentTime - 1787620476725ul;
+
+		if (messageTimeout < currentTime) {
+			if (m_table->rowCount() > 0) {
+				m_table->removeRow(0);
+			}
+			if (msg.getFlags() & ot::WARNING_LOG) {
+				m_warningCount--;
+			}
+			else if (msg.getFlags() & ot::ERROR_LOG) {
+				m_errorCount--;
+			}
+
+			m_messages.pop_front();
+			m_messageTimestamps.pop_front();
+		}
+		else {
+			break;
+		}
+	}
+
+	updateCountLabels();
+}
+
 void Logging::appendLogMessage(ot::LogMessage&& _msg) {
 	if (m_serviceDebugInfo && _msg.getText().find(ot::DebugHelper::getSetupCompletedMessagePrefix()) == 0) {
 		ot::JsonDocument debugInfoDoc;
@@ -649,7 +687,7 @@ void Logging::appendLogMessage(ot::LogMessage&& _msg) {
 		return;
 	}
 
-	m_filterView->setFilterLock(true);
+	auto filterLock = m_filterView->startModification();
 
 	// Check if we reached the message limit
 	if (m_messages.size() >= m_filterView->getMessageLimit()) {
@@ -663,6 +701,8 @@ void Logging::appendLogMessage(ot::LogMessage&& _msg) {
 			m_errorCount--;
 		}
 		m_messages.pop_front();
+		OTAssert(!m_messageTimestamps.empty());
+		m_messageTimestamps.pop_front();
 	}
 
 	int r = m_table->rowCount();
@@ -709,12 +749,10 @@ void Logging::appendLogMessage(ot::LogMessage&& _msg) {
 
 	// Store message
 	m_messages.push_back(std::move(_msg));
+	m_messageTimestamps.push_back(ot::DateTime::msSinceEpoch());
 
 	// If required scroll to the last entry in the table
 	if (m_autoScrollToBottom->isChecked()) m_table->scrollToBottom();
-
-	// Check if the service name is in the service name list
-	m_filterView->setFilterLock(false);
 
 	// Update status labels (warnings and errors were increased while checking the typeString)
 	this->updateCountLabels();

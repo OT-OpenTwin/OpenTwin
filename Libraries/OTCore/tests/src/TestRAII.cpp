@@ -23,10 +23,10 @@
 #include "OTCore/RAII/AtomicResetRAII.h"
 #include "OTCore/RAII/AtomicValueRAII.h"
 #include "OTCore/RAII/CheckpointRAII.h"
-#include "OTCore/RAII/DecrementRAII.h"
+#include "OTCore/RAII/CounterRAII.h"
 #include "OTCore/RAII/FlagSetRAII.h"
 #include "OTCore/RAII/FunctionRAII.h"
-#include "OTCore/RAII/IncrementRAII.h"
+#include "OTCore/RAII/NumericValueRAII.h"
 #include "OTCore/RAII/ValueRAII.h"
 
 namespace ot::intern::testing
@@ -164,16 +164,16 @@ TEST(RAIITests, CheckpointRAII)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Decrement
+// Counter
 
-TEST(RAIITests, DecrementRAII_Int)
+TEST(RAIITests, CounterRAII_Decrement_Int)
 {
 	int intValue = 10;
 	{
-		ot::DecrementRAII<int> raii(intValue);
+		auto raii = ot::raii::makeDecrementCounterRAII(intValue);
 		EXPECT_EQ(9, intValue);
 		{
-			ot::DecrementRAII<int> raii2(intValue);
+			auto raii2 = ot::raii::makeDecrementCounterRAII(intValue);
 			EXPECT_EQ(8, intValue);
 		}
 		EXPECT_EQ(9, intValue);
@@ -181,6 +181,32 @@ TEST(RAIITests, DecrementRAII_Int)
 	}
 	EXPECT_EQ(5, intValue);
 }
+
+
+TEST(RAIITests, CounterRAII_Increment_Int)
+{
+	int intValue = 0;
+	{
+		auto raii = ot::raii::makeIncrementCounterRAII(intValue);
+		EXPECT_EQ(1, intValue);
+
+		{
+			auto raii2 = ot::raii::makeIncrementCounterRAII(intValue);
+			EXPECT_EQ(2, intValue);
+			{
+				auto raii3(std::move(raii2));
+				EXPECT_FALSE(raii2.isValid());
+				EXPECT_EQ(2, intValue);
+			}
+			EXPECT_EQ(1, intValue);
+		}
+		EXPECT_EQ(1, intValue);
+		intValue += 5;
+		EXPECT_EQ(6, intValue);
+	}
+	EXPECT_EQ(5, intValue);
+}
+
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -191,19 +217,35 @@ TEST(RAIITests, FlagSetRAII)
 	using namespace ot::intern::testing;
 	RAIITestFlags flags(RAIITestFlag::Zero);
 	{
-		ot::FlagSetRAII<RAIITestFlag> raii(flags, RAIITestFlag::One, RAIITestFlag::Two);
+		ot::FlagSetRAII<RAIITestFlag> raii1(flags, RAIITestFlag::One);
 		{
-			ot::FlagSetRAII<RAIITestFlag> raii(flags, RAIITestFlag::Four);
+			ot::FlagSetRAII<RAIITestFlag> raii2(flags, RAIITestFlag::Four);
+			EXPECT_TRUE(flags.has(RAIITestFlag::One));
+			EXPECT_FALSE(flags.has(RAIITestFlag::Two));
+			EXPECT_TRUE(flags.has(RAIITestFlag::Four));
+			{
+				ot::FlagSetRAII<RAIITestFlag> raii3(flags, RAIITestFlag::Two);
+				EXPECT_TRUE(flags.has(RAIITestFlag::One));
+				EXPECT_TRUE(flags.has(RAIITestFlag::Two));
+				EXPECT_TRUE(flags.has(RAIITestFlag::Four));
 
+				raii3.execute();
+
+				EXPECT_TRUE(flags.has(RAIITestFlag::One));
+				EXPECT_FALSE(flags.has(RAIITestFlag::Two));
+				EXPECT_TRUE(flags.has(RAIITestFlag::Four));
+			}
 			EXPECT_TRUE(flags.has(RAIITestFlag::One));
 			EXPECT_FALSE(flags.has(RAIITestFlag::Two));
 			EXPECT_TRUE(flags.has(RAIITestFlag::Four));
 		}
 
 		EXPECT_EQ(RAIITestFlag::One, flags.toEnum());
+
+		raii1.dismiss();
 	}
 
-	EXPECT_EQ(RAIITestFlag::Two, flags.toEnum());
+	EXPECT_EQ(RAIITestFlag::One, flags.toEnum());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -225,23 +267,35 @@ TEST(RAIITests, FunctionRAII)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-// Increment
+// NumericValue
 
-TEST(RAIITests, IncrementRAII_Int)
+TEST(RAIITests, NumericValueRAII)
 {
 	int intValue = 0;
 	{
-		ot::IncrementRAII<int> raii(intValue);
-		EXPECT_EQ(1, intValue);
+		auto raii1 = ot::NumericValueRAII<int>(intValue);
+		EXPECT_EQ(0, intValue);
+		raii1.add(5);
+		EXPECT_EQ(5, intValue);
 		{
-			ot::IncrementRAII<int> raii2(intValue);
-			EXPECT_EQ(2, intValue);
+			auto raii2 = ot::NumericValueRAII<int>(intValue, 10);
+			EXPECT_EQ(10, intValue);
+			{
+				auto raii3 = ot::NumericValueRAII<int>(intValue, 20, 15);
+				EXPECT_EQ(20, intValue);
+				raii3.decrement();
+				EXPECT_EQ(19, intValue);
+				raii3.execute();
+				EXPECT_EQ(15, intValue);
+			}
+			EXPECT_EQ(15, intValue);
+			raii2.dismiss();
 		}
-		EXPECT_EQ(1, intValue);
-		intValue += 5;
-		EXPECT_EQ(6, intValue);
+		EXPECT_EQ(15, intValue);
+		raii1.subtract(5);
+		EXPECT_EQ(10, intValue);
 	}
-	EXPECT_EQ(5, intValue);
+	EXPECT_EQ(0, intValue);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

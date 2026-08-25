@@ -118,6 +118,7 @@ public Q_SLOTS:
 	void slotUseIntervalChanged();
 
 	void slotIntervalTimeout();
+	void slotRemoveOutdated(int _msSinceLog);
 
 private:
 	void handleNewLog(ot::JsonDocument& _doc);
@@ -139,6 +140,7 @@ private:
 	LogServiceDebugInfo* m_serviceDebugInfo;
 
 	std::list<ot::LogMessage>	m_messages;
+	std::list<int64_t>          m_messageTimestamps;
 	int							m_errorCount;
 	int							m_warningCount;
 

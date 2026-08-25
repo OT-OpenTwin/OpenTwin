@@ -21,8 +21,10 @@
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
+#include "OTCore/RAII/CheckpointRAII.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
 #include <QtCore/qsettings.h>
 
@@ -37,13 +39,22 @@ namespace ot { class CheckBox; }
 
 class LoggingFilterView : public QObject {
 	Q_OBJECT
+	OT_DECL_NOCOPY(LoggingFilterView)
+	OT_DECL_NOMOVE(LoggingFilterView)
 public:
+	enum class State
+	{
+		None = 0 << 0,
+		Modifying = 1 << 0
+	};
+	typedef ot::Flags<State> StateFlags;
+
 	LoggingFilterView();
 	virtual ~LoggingFilterView();
 
-	QWidget* getRootWidget(void) const { return m_root; };
+	QWidget* getRootWidget() const { return m_root; };
 
-	void reset(void);
+	void reset();
 
 	//! \brief Updates the service name list and returns true if the message should be displayed.
 	bool filterMessage(const ot::LogMessage& _msg);
@@ -51,22 +62,22 @@ public:
 	void restoreSettings(QSettings& _settings);
 	void saveSettings(QSettings& _settings);
 
-	void setFilterLock(bool _active) { m_filterLock = _active; };
-	bool getFilterLock(void) const { return m_filterLock; };
-
 	int getMessageLimit() const;
 
 	bool getUseInterval() const;
 
 	int getIntervalMilliseconds() const;
 	
+	OT_DECL_NODISCARD ot::CheckpointRAII<StateFlags> startModification();
+
 Q_SIGNALS:
 	void filterChanged();
 	void messageLimitChanged(int _limit);
 	void useIntervalChaged();
+	void removeOutdatedLogs(int _msSinceLog);
 
 public Q_SLOTS:
-	void slotUpdateCheckboxColors(void);
+	void slotUpdateCheckboxColors();
 
 private Q_SLOTS:
 	void slotFilterChanged();
@@ -74,15 +85,18 @@ private Q_SLOTS:
 	void slotDeselectAllServices();
 	void slotMessageLimitChanged();
 	void slotIntervalChanged();
+	void slotAutoRemovalActiveChanged();
+
+	void slotRemoveOutdatedLogs();
 
 private:
 	void updateMessageLimitColor();
 	void updateIntervalColor();
+	void updateAutoRemovalColor();
+
+	StateFlags m_state;
 
 	QWidget* m_root;
-
-	bool m_filterLock;
-	QTimer* m_filterTimer;
 
 	ot::CheckBox* m_msgTypeFilterDetailed;
 	ot::CheckBox* m_msgTypeFilterInfo;
@@ -98,10 +112,17 @@ private:
 	ot::CheckBox* m_useInterval;
 	ot::SpinBox* m_intervalMilliseconds;
 
+	QTimer m_autoRemovalTimer;
+	bool m_autoRemovalActive;
+	ot::CheckBox* m_useAutoRemoval;
+	ot::SpinBox* m_autoRemovalInterval;
+
 	QComboBox* m_userFilter;
 	QComboBox* m_sessionFilter;
 
 	QListWidget* m_serviceFilter;
-
+	
 	QLineEdit* m_messageFilter;
 };
+
+OT_ADD_FLAG_FUNCTIONS(LoggingFilterView::State, LoggingFilterView::StateFlags)

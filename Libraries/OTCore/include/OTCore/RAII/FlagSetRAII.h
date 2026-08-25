@@ -20,16 +20,7 @@ namespace ot
 		//! @brief Constructor.
 		//! @param _flags Flags reference will be stored and has to remain valid while the wrapper instance is not destroyed.
 		//! @param _set Flags to set on creation.
-        explicit FlagSetRAII(Flags<T>& _flags, const Flags<T>& _set) : m_flags(&_flags), m_reset(_flags)
-        {
-            m_flags->set(_set);
-        }
-
-		//! @brief Constructor.
-		//! @param _flags Flags reference will be stored and has to remain valid while the wrapper instance is not destroyed.
-		//! @param _set Flags to set on creation         (<intial> + _set).
-		//! @param _resetSet Flags to set on destruction (<intial> + _resetSet).
-        explicit FlagSetRAII(Flags<T>& _flags, const Flags<T>& _set, const Flags<T>& _resetSet) : m_flags(&_flags), m_reset(_flags | _resetSet)
+        explicit FlagSetRAII(Flags<T>& _flags, const Flags<T>& _set) : m_flags(&_flags), m_reset(_set)
         {
             m_flags->set(_set);
         }
@@ -67,7 +58,7 @@ namespace ot
         {
             if (m_flags && this->isValid())
             {
-                m_flags->operator=(m_reset);
+                m_flags->remove(m_reset);
                 invalidate();
 			}
         }

@@ -33,16 +33,20 @@ namespace ot
 		OT_DECL_NODEFAULT(ValueRAII)
 	public:
 		//! @brief Constructor.
+		//! The referenced value will be reset to its initial value on destruction.
+		explicit ValueRAII(T& _value) : m_value(&_value), m_reset(_value) {};
+
+		//! @brief Constructor.
 		//! The referenced value will be set to _set on creation and reset to its initial value on destruction.
 		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
 		//! @param _set The _set value will be applied to the referenced _value.
-		explicit ValueRAII(T& _value, T _set) : ValueRAII(_value, _set, _value) {};
+		explicit ValueRAII(T& _value, const T& _set) : ValueRAII(_value, _set, _value) {};
 
 		//! @brief Constructor.
 		//! @param _value Value reference will be stored and has to remain valid while the wrapper instance is not destroyed.
 		//! @param _set The _set value will be applied to the referenced _value.
 		//! @param _reset A copy of _reset will be stored and applied to the _value upon destruction of the wrapper.
-		explicit ValueRAII(T& _value, T _set, T _reset) : m_value(&_value), m_reset(_reset) { *m_value = _set; };
+		explicit ValueRAII(T& _value, const T& _set, const T& _reset) : m_value(&_value), m_reset(_reset) { *m_value = _set; };
 
 		ValueRAII(ValueRAII&& _other) noexcept : RAIIBase(std::move(_other)), m_value(_other.m_value), m_reset(std::move(_other.m_reset))
 		{
@@ -69,6 +73,8 @@ namespace ot
 			}
 			return *this;
 		}
+
+		T* get() { return m_value; };
 
 		void dismiss()
 		{
