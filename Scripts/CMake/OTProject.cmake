@@ -1111,7 +1111,7 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         if(OT_PYTHON_LIBPATH_PATH)
             target_link_directories("${FINAL_TARGET}" PRIVATE "${OT_PYTHON_LIBPATH_PATH}/Release")
         endif()
-        target_link_libraries("${FINAL_TARGET}" PRIVATE python311.lib)
+        target_link_libraries("${FINAL_TARGET}" PRIVATE "$ENV{OT_PYTHON_BIN_NAME}.lib")
         return()
     endif()
 

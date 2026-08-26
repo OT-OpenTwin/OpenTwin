@@ -209,8 +209,8 @@ XCOPY /S "%ELMERFEM_BIN%\*.*" "%OT_DEPLOYMENT_DIR%\ElmerFEM"
 
 REM PYTHON
 COPY "%OT_PYTHON_BIN%\Release\python.exe" "%OT_DEPLOYMENT_DIR%"
-COPY "%OT_PYTHON_BIN%\Release\python311_release._pth" "%OT_DEPLOYMENT_DIR%\python311._pth"
-COPY "%OT_PYTHON_BIN%\Release\python311.dll" "%OT_DEPLOYMENT_DIR%"
+COPY "%OT_PYTHON_BIN%\Release\%OT_PYTHON_BIN_NAME%_release._pth" "%OT_DEPLOYMENT_DIR%\%OT_PYTHON_BIN_NAME%._pth"
+COPY "%OT_PYTHON_BIN%\Release\%OT_PYTHON_BIN_NAME%.dll" "%OT_DEPLOYMENT_DIR%"
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\PyritEnvironment\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PyritEnvironment\" 
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\OpenEMSEnvironment\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\OpenEMSEnvironment\" 
 XCOPY /S "%OT_PYTHON_ROOT%\Environments\PythonBuildTools\*.*" "%OT_DEPLOYMENT_DIR%\PythonEnvironments\PythonBuildTools\" 
