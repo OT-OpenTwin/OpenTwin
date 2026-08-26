@@ -36,23 +36,11 @@ namespace ot {
     public:
         JsonTreeWidgetFilterModel(QObject* _parent);
 
-        void setFilterText(const QString& _text);
-
-        uint64_t countHiddenRows() const;
+		void setTextFilter(const QString& _text);
 
     protected:
         bool filterAcceptsRow(int _sourceRow, const QModelIndex& _sourceParent) const override;
 
-    private:
-        QString m_filterText;
-
-		inline void countHiddenRowsRecursive(QAbstractItemModel* _model, const QModelIndex& _parent, uint64_t& _hiddenRows) const;
-
-        bool rowMatches(const QModelIndex& _index) const;
-
-        bool hasMatchingParent(QModelIndex _parent) const;
-
-        bool hasMatchingChildren(const QModelIndex& _parent) const;
 	};
 
 }

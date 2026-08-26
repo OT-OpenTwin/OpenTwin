@@ -56,7 +56,7 @@ void ot::JsonTreeWidget::setFromJsonDocument(const JsonDocument& _doc) {
 
     m_model->setFromJsonDocument(_doc);
 
-    setModel(m_model);
+    setModel(m_filterModel);
 
     expandToDepth(0);
     resizeColumnToContents(JsonTreeWidgetModel::ColumnKey);
@@ -73,7 +73,7 @@ void ot::JsonTreeWidget::countItems(uint64_t& _totalItems, uint64_t& _hiddenItem
 	_totalItems = m_model->countItems();
     if (_totalItems > 0)
     {
-        _hiddenItems = m_filterModel->countHiddenRows();
+        //_hiddenItems = m_filterModel->countHiddenRows();
     }
     else
     {
@@ -82,24 +82,27 @@ void ot::JsonTreeWidget::countItems(uint64_t& _totalItems, uint64_t& _hiddenItem
 }
 
 void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
-    OTAssertNullptr(m_model);
-    {
-        m_filterModel->setFilterText(_filterText);
-    }
-    
-	bool wasUpdatesEnabled = updatesEnabled();
+    OTAssertNullptr(m_filterModel);
+
 	QSignalBlocker blocker(this);
+	bool wasUpdatesEnabled = updatesEnabled();
 	setUpdatesEnabled(false);
 
-    if (_filterText.isEmpty()) {
-        // Show full tree again
-        expandToDepth(0);
+	m_filterModel->setTextFilter(_filterText);
+    
+    if (_filterText.isEmpty())
+    {
+		expandToDepth(0);
     }
-    else {
+    else
+    {
         expandAll();
     }
+    
+    expandHeader();
 
 	setUpdatesEnabled(wasUpdatesEnabled);
+
 	viewport()->update();
 }
 

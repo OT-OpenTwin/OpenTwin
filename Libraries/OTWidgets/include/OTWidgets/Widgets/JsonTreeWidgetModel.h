@@ -68,6 +68,7 @@ namespace ot {
 
     private:
         void countItems(const JsonTreeWidgetNode* _node, uint64_t& _count) const;
+        JsonTreeWidgetNode* nodeFromIndex(const QModelIndex& _index) const;
 
         JsonTreeWidgetNode* m_rootNode;
 

@@ -18,6 +18,8 @@
 // @otlicense-end
 
 #include "Tools/WidgetTest/WidgetTest.h"
+#include "Tools/WidgetTest/TestToolBar.h"
+#include "Widgets/AdvancedJsonTree.h"
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
@@ -46,58 +48,107 @@
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qtablewidget.h>
 
-class TestToolBar : public QToolBar {
-public:
-	TestToolBar(WidgetTest* _owner) :
-		m_owner(_owner), m_window(nullptr), m_centralWidgetManager(nullptr), m_toolBarManager(nullptr)
+namespace intern
+{
+	namespace testdata
 	{
 
-	}
+		static ot::JsonDocument createTestJsonDocument()
+		{
+			using namespace ot;
 
-public Q_SLOTS:
-	void slotTest(void) {
-		using namespace ot;
+			JsonDocument doc;
+			JsonAllocator& alloc = doc.GetAllocator();
 
-		QString fileName = QFileDialog::getSaveFileName(m_window, "Select file to save", "", "All Files (*.*)");
-		if (fileName.isEmpty()) return;
+			JsonObject obj1;
+			obj1.AddMember("1.1", JsonString("111", alloc), alloc);
+			obj1.AddMember("1.2", JsonString("222", alloc), alloc);
+			obj1.AddMember("1.3", std::numeric_limits<size_t>::max() - 1, alloc);
+			obj1.AddMember("1.4", true, alloc);
 
-		QFile file(fileName);
-		if (!file.open(QIODevice::WriteOnly)) {
-			QMessageBox::critical(m_window, "Error", "Could not open file for writing: " + file.errorString());
-			return;
+			JsonArray arr15;
+			arr15.PushBack(JsonString("1.5.1", alloc), alloc);
+			arr15.PushBack(JsonString("1.5.2", alloc), alloc);
+			arr15.PushBack(JsonString("1.5.3", alloc), alloc);
+			obj1.AddMember("1.5", arr15, alloc);
+			doc.AddMember("1", obj1, alloc);
+
+			JsonObject objA;
+			JsonArray arrAa;
+			
+			JsonObject objAaA;
+			objAaA.AddMember("A.A.A.A", JsonString("A.A.A.A.A", alloc), alloc);
+			objAaA.AddMember("A.A.A.B", JsonString("A.A.A.B.A", alloc), alloc);
+			arrAa.PushBack(objAaA, alloc);
+
+			objA.AddMember("A.A", arrAa, alloc);
+			objA.AddMember("A.B", JsonString("A.B.A", alloc), alloc);
+			objA.AddMember("A.C", false, alloc);
+
+			JsonArray arrAD;
+			for (char i = 'A'; i <= 'H'; i++)
+			{
+				std::string ix = { 'A', '.', 'D', '.', i };
+
+				JsonArray arrNest;
+				for (char j = 'A'; j <= 'Z'; j++)
+				{
+					std::string name(ix);
+					name.append({ '.', j });
+
+					arrNest.PushBack(JsonString(name, alloc), alloc);
+				}
+				arrAD.PushBack(arrNest, alloc);
+			}
+
+			objA.AddMember("A.D", arrAD, alloc);
+			objA.AddMember("A.E", 3.14159, alloc);
+			objA.AddMember("A.F", std::numeric_limits<int>::lowest(), alloc);
+			objA.AddMember("A.G", std::numeric_limits<int>::max(), alloc);
+			doc.AddMember("A", objA, alloc);
+
+			JsonObject objB;
+			for (int i = 1; i <= 3; i++)
+			{
+				std::string nameB1 = "B.";
+				nameB1.append(std::to_string(i));
+				
+				JsonArray arrB1;
+				for (char j = 'a'; j <= 'z'; j++)
+				{
+					std::string nameB1A(nameB1);
+					nameB1A.append(".");
+					nameB1A.push_back(j);
+
+					JsonObject objB1A;
+					for (char k = 'A'; k <= 'Z'; k++)
+					{
+						std::string nameB1A1(nameB1A);
+						nameB1A1.append(".");
+						nameB1A1.push_back(k);
+						JsonArray arrB1A1;
+						for (char l = '1'; l < '4'; l++)
+						{
+							std::string nameB1A1i(nameB1A1);
+							nameB1A1i.append(".");
+							nameB1A1i.append(5, l);
+							arrB1A1.PushBack(JsonString(nameB1A1i, alloc), alloc);
+						}
+						objB1A.AddMember(JsonString(nameB1A1, alloc), arrB1A1, alloc);
+
+					}
+					arrB1.PushBack(objB1A, alloc);
+				}
+				
+				objB.AddMember(JsonString(nameB1, alloc), arrB1, alloc);
+			}
+			doc.AddMember("B", objB, alloc);
+
+			return doc;
 		}
 
-		for (int i = 0; i < 10000; i++) {
-			QByteArray prefix = "Test_" + QByteArray::number(i) + "_";
-			file.write(
-				"// @seq dia name = \"" + prefix + "Test\"  func = \"" + prefix +"Func 1\"\n"
-				"// @seq func life=\"" + prefix + "Life 1\" name=\"" + prefix + "Func 1\" default=\"Call\"\n"
-				"// @seq call " + prefix + "Func 2\n"
-				"// @seq func life=\"" + prefix + "Life 2\" name=\"" + prefix + "Func 2\" default=\"Call 2\"\n"
-				"// @seq call func=\"" + prefix + "Func 3\" text=\"Calling Func 3\"\n"
-				"// @seq return Nothing\n"
-				"// @seq func life=\"" + prefix + "Life 2\" name=\"" + prefix + "Func 2.1\" default=\"Call 3\"\n"
-				"// @seq call " + prefix + "Func 4\n"
-				"// @seq func life=\"" + prefix + "Life 3\" name=\"" + prefix + "Func 3\"\n"
-				"// @seq call func=\"" + prefix + "Func 2.1\" text=\"" + prefix + "Calling Func 2.1\"\n"
-				"// @seq return Nothing\n"
-				"// @seq func life=\"" + prefix + "Life 4\" name=\"" + prefix + "Func 4\" default=\"Call 4\"\n"
-				"// @seq call " + prefix + "Func 5\n"
-				"// @seq func life=\"" + prefix + "Life 4\" name=\"" + prefix + "Func 5\" default=\"Call 5\"\n"
-				"// @seq func life=\"" + prefix + "Life X\" name=\"" + prefix + "Func 6\" default=\"Call Unexist\"\n"
-				"// @seq call " + prefix + "Func Unexist\n"
-			);
-		}
-		file.close();
 	}
-
-private:
-	WidgetTest* m_owner;
-
-	ot::MainWindow* m_window;
-	ot::CentralWidgetManager* m_centralWidgetManager;
-	ot::TabToolBar* m_toolBarManager;
-};
+}
 
 bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 	using namespace ot;
@@ -188,35 +239,17 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		_content.addView(this->createCentralWidgetView(man->getDockManager(), "Test Container"));
 	}
 
-	if (true) {
+	if (true)
+	{
+		AdvancedJsonTree* advJsonTree = new AdvancedJsonTree(nullptr);
+		_content.addView(this->createCentralWidgetView(advJsonTree, "Test Advanced JSON Tree"));
+		advJsonTree->setFromJsonDocument(intern::testdata::createTestJsonDocument());
+	}
+
+	if (false) {
 		JsonTreeWidget* jsonTree = new JsonTreeWidget(nullptr);
 		_content.addView(this->createCentralWidgetView(jsonTree, "Test JSON Tree"));
-
-		JsonDocument doc;
-		JsonAllocator& alloc = doc.GetAllocator();
-
-		JsonObject obj1;
-		obj1.AddMember("Key1", JsonString("Value1", alloc), alloc);
-		obj1.AddMember("Key2", JsonString("Value2", alloc), alloc);
-		obj1.AddMember("Key3", std::numeric_limits<size_t>::max() - 1, alloc);
-		obj1.AddMember("Key4", true, alloc);
-
-		JsonArray arr1;
-		arr1.PushBack(JsonString("ArrayValue1", alloc), alloc);
-		arr1.PushBack(JsonString("ArrayValue2", alloc), alloc);
-		arr1.PushBack(JsonString("ArrayValue3", alloc), alloc);
-		obj1.AddMember("Key5", arr1, alloc);
-		doc.AddMember("Object1", obj1, alloc);
-
-		JsonObject obj2;
-		obj2.AddMember("AnotherKey1", JsonString("AnotherValue1", alloc), alloc);
-		obj2.AddMember("AnotherKey2", false, alloc);
-		obj2.AddMember("AnotherKey3", 3.14159, alloc);
-		obj2.AddMember("AnotherKey4", std::numeric_limits<int>::lowest(), alloc);
-		obj2.AddMember("AnotherKey5", std::numeric_limits<int>::max(), alloc);
-		doc.AddMember("Object2", obj2, alloc);
-
-		jsonTree->setFromJsonDocument(doc);
+		jsonTree->setFromJsonDocument(intern::testdata::createTestJsonDocument());
 	}
 
 	TestToolBar* test = new TestToolBar(this);

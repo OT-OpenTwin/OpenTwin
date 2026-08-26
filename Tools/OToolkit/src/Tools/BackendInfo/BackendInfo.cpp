@@ -21,6 +21,7 @@
 #include "OToolkitAPI/OToolkitAPI.h"
 #include "General/AppBase.h"
 #include "Tools/BackendInfo/BackendInfo.h"
+#include "Widgets/AdvancedJsonTree.h"
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
@@ -55,162 +56,6 @@
 #define BACKINFO_LOG(___message) OTOOLKIT_LOG("Backend Info", ___message)
 #define BACKINFO_LOGW(___message) OTOOLKIT_LOGW("Backend Info", ___message)
 #define BACKINFO_LOGE(___message) OTOOLKIT_LOGE("Backend Info", ___message)
-
-namespace intern {
-
-	class CustomJsonTree : public QWidget {
-		OT_DECL_NOCOPY(CustomJsonTree)
-		OT_DECL_NOMOVE(CustomJsonTree)
-		OT_DECL_NODEFAULT(CustomJsonTree)
-	public:
-		CustomJsonTree(QWidget* _parent)
-			: QWidget(_parent), m_filterTimer(this)
-		{
-			QVBoxLayout* layout = new QVBoxLayout(this);
-			QScrollArea* serviceArea = new QScrollArea(this);
-			layout->addWidget(serviceArea, 1);
-			serviceArea->setWidgetResizable(true);
-			m_tree = new ot::JsonTreeWidget(serviceArea);
-			m_tree->setReadOnly(true);
-			serviceArea->setWidget(m_tree);
-			connect(m_tree, &ot::JsonTreeWidget::nodeDoubleClicked, this, &CustomJsonTree::slotNodeDoubleClicked);
-
-			QHBoxLayout* controlLayout = new QHBoxLayout;
-			layout->addLayout(controlLayout);
-
-			ot::PushButton* expandButton = new ot::PushButton("Expand All", this);
-			controlLayout->addWidget(expandButton);
-			connect(expandButton, &ot::PushButton::clicked, m_tree, &ot::JsonTreeWidget::expandAll);
-
-			ot::PushButton* collapseButton = new ot::PushButton("Collapse All", this);
-			controlLayout->addWidget(collapseButton);
-			connect(collapseButton, &ot::PushButton::clicked, m_tree, &ot::JsonTreeWidget::collapseAll);
-
-			controlLayout->addWidget(new ot::Label("Filter:", this));
-			ot::LineEdit* filterEdit = new ot::LineEdit(this);
-			filterEdit->setPlaceholderText("Filter...");
-			filterEdit->setMinimumWidth(150);
-			controlLayout->addWidget(filterEdit);
-			connect(filterEdit, &ot::LineEdit::textChanged, [this]()
-				{
-					m_filterTimer.stop();
-					m_filterTimer.start();
-				}
-			);
-
-			m_statusLabel = new ot::Label(this);
-			controlLayout->addWidget(m_statusLabel);
-
-			controlLayout->addStretch(1);
-
-			ot::PushButton* exportButton = new ot::PushButton("Export", this);
-			controlLayout->addWidget(exportButton);
-			connect(exportButton, &ot::PushButton::clicked, this, &CustomJsonTree::slotExport);
-
-			m_filterTimer.setInterval(500);
-			m_filterTimer.setSingleShot(true);
-			connect(&m_filterTimer, &QTimer::timeout, [this, filterEdit]() {
-				m_tree->filterItems(filterEdit->text());
-				}
-			);
-		}
-		
-		void setFromJsonDocument(const ot::JsonDocument& _doc) {
-			{
-				ot::RuntimeIntervalTestLog test("Importing configuration");
-				m_tree->setFromJsonDocument(_doc);
-			}
-			{
-				ot::RuntimeIntervalTestLog test("Counting items");
-				m_tree->countItems(m_status.numberOfItems, m_status.numberOfHiddenItems);
-			}
-			
-			updateStatus();
-		}
-
-	private Q_SLOTS:
-		void slotExport() {
-			ot::JsonDocument doc = m_tree->toJsonDocument();
-			QByteArray jsonString = QByteArray::fromStdString(doc.toJson());
-			if (jsonString.length() < 3) {
-				BACKINFO_LOGW("No data to export");
-				return;
-			}
-
-			QString fileName = QFileDialog::getSaveFileName(this, "Export Debug Info", "", "JSON Files (*.json);;All Files (*)");
-			if (fileName.isEmpty()) {
-				return;
-			}
-
-			QFile file(fileName);
-			if (!file.open(QIODevice::WriteOnly)) {
-				BACKINFO_LOGE("Could not open file for writing: " + fileName);
-				return;
-			}
-
-			file.write(jsonString);
-			file.close();
-		}
-
-		void slotNodeDoubleClicked(int _column, ot::JsonTreeWidgetNode* _node) {
-			switch (_column) {
-			case ot::JsonTreeWidgetModel::ColumnValue:
-				QApplication::clipboard()->setText(_node->getValue());
-				BACKINFO_LOG("Copied value to clipboard: " + _node->getValue());
-				break;
-
-			default:
-				break;
-			}
-		}
-
-	private:
-		QTimer m_filterTimer;
-		ot::JsonTreeWidget* m_tree;
-		
-		ot::Label* m_statusLabel;
-
-		struct Status
-		{
-			uint64_t numberOfItems = 0;
-			uint64_t numberOfHiddenItems = 0;
-		};
-		Status m_status;
-		Status m_lastStatus;
-
-		bool statesDiffer() const
-		{
-			return 
-				m_status.numberOfItems != m_lastStatus.numberOfItems || 
-				m_status.numberOfHiddenItems != m_lastStatus.numberOfHiddenItems;
-		}
-		
-		void updateStatus()
-		{
-			if (!statesDiffer())
-			{
-				return;
-			}
-
-			const int visItems = m_status.numberOfItems - m_status.numberOfHiddenItems;
-			QString statusText;
-
-			if (visItems == m_status.numberOfItems)
-			{
-				statusText = QString::number(m_status.numberOfItems) + (m_status.numberOfItems == 1 ? QString(" item") : QString(" items"));
-			}
-			else
-			{
-				statusText = QString::number(visItems) % QString(" (of ") % QString::number(m_status.numberOfItems) % QString(") items");
-			}
-
-			m_statusLabel->setText(statusText);
-
-			m_lastStatus = m_status;
-		}
-	};
-
-}
 
 BackendInfo::BackendInfo() 
 	: m_sectionsLayout(nullptr), m_loadButton(nullptr), m_cancelButton(nullptr),
@@ -928,7 +773,7 @@ void BackendInfo::slotAddService(const std::string& _serviceName, const std::str
 
 	// Create widget
 	ot::ExpanderWidget* serviceExpander = new ot::ExpanderWidget(QString::fromStdString("Service { \"Name\": \"" + _serviceName + "\", \"ID\": \"" + _serviceId + "\", \"Url\": \"" + _serviceUrl + "\" }"), m_sectionsLayout->widget());
-	intern::CustomJsonTree* tree = new intern::CustomJsonTree(serviceExpander);
+	ot::AdvancedJsonTree* tree = new ot::AdvancedJsonTree(serviceExpander);
 	tree->setFromJsonDocument(doc);
 	serviceExpander->setWidget(tree);
 

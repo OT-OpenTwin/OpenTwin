@@ -56,7 +56,7 @@ void ot::JsonTreeWidgetModel::setFromJsonDocument(const JsonDocument& _doc)
 	{
 		m_rootNode = new JsonTreeWidgetNode("", _doc);
 	}
-
+	
 	endResetModel();
 }
 
@@ -72,20 +72,20 @@ uint64_t ot::JsonTreeWidgetModel::countItems() const
 
 QModelIndex ot::JsonTreeWidgetModel::index(int _row, int _column, const QModelIndex& _parent) const
 {
-	if (!hasIndex(_row, _column, _parent))
+	if (_column < 0 || _row < 0 || _column >= 3)
 	{
 		return QModelIndex();
 	}
-	JsonTreeWidgetNode* parentNode = _parent.isValid() ? static_cast<JsonTreeWidgetNode*>(_parent.internalPointer()) : m_rootNode;
+
+	JsonTreeWidgetNode* parentNode = nodeFromIndex(_parent);
+
+	if (_row >= parentNode->getChildCount())
+	{
+		return QModelIndex();
+	}
+
 	JsonTreeWidgetNode* childNode = parentNode->getChild(_row);
-	if (childNode)
-	{
-		return createIndex(_row, _column, childNode);
-	}
-	else
-	{
-		return QModelIndex();
-	}
+	return createIndex(_row, _column, childNode);
 }
 
 QModelIndex ot::JsonTreeWidgetModel::parent(const QModelIndex& _index) const
@@ -94,21 +94,31 @@ QModelIndex ot::JsonTreeWidgetModel::parent(const QModelIndex& _index) const
 	{
 		return QModelIndex();
 	}
-	JsonTreeWidgetNode* node = static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
-	if (!node->getParent() || node->getParent() == m_rootNode)
+	JsonTreeWidgetNode* node = nodeFromIndex(_index);
+	JsonTreeWidgetNode* parentNode = node->getParent();
+	
+	// The root node has no visible parent.
+	if (parentNode == nullptr || parentNode == m_rootNode)
 	{
 		return QModelIndex();
 	}
 	else
 	{
-		return createIndex(node->getParent()->getRow(), 0, node->getParent());
+		return createIndex(parentNode->getRow(), 0, parentNode);
 	}
 }
 
 int ot::JsonTreeWidgetModel::rowCount(const QModelIndex& _parent) const
 {
-	JsonTreeWidgetNode* parentNode = _parent.isValid() ? static_cast<JsonTreeWidgetNode*>(_parent.internalPointer()) : m_rootNode;
-	return parentNode->getChildCount();
+	if (_parent.isValid() && _parent.column() != 0)
+	{
+		return 0;
+	}
+	else
+	{
+		JsonTreeWidgetNode* parentNode = nodeFromIndex(_parent);
+		return parentNode->getChildCount();
+	}
 }
 
 int ot::JsonTreeWidgetModel::columnCount(const QModelIndex& _parent) const
@@ -123,7 +133,7 @@ QVariant ot::JsonTreeWidgetModel::data(const QModelIndex& _index, int _role) con
 	{
 		return {};
 	}
-	JsonTreeWidgetNode* node = static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
+	JsonTreeWidgetNode* node = nodeFromIndex(_index);
 
 	if (_role == Qt::DisplayRole)
 	{
@@ -241,4 +251,14 @@ void ot::JsonTreeWidgetModel::countItems(const JsonTreeWidgetNode* _node, uint64
 	{
 		countItems(child, _count);
 	}
+}
+
+ot::JsonTreeWidgetNode* ot::JsonTreeWidgetModel::nodeFromIndex(const QModelIndex& _index) const
+{
+	if (_index.isValid())
+	{
+		return static_cast<JsonTreeWidgetNode*>(_index.internalPointer());
+	}
+
+	return m_rootNode;
 }
