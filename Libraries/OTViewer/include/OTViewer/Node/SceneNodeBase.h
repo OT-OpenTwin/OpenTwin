@@ -40,7 +40,10 @@ class Model;
 
 class SceneNodeBase
 {
+	OT_DECL_NOCOPY(SceneNodeBase)
+	OT_DECL_NOMOVE(SceneNodeBase)
 public:
+	SceneNodeBase();
 	virtual ~SceneNodeBase();
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
@@ -51,7 +54,7 @@ public:
 	void setTreeItem(const ot::EntityTreeItem& _treeItem) { m_treeItem = _treeItem; };
 	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
 	
-	void setName(const std::string& name) { m_treeItem.setEntityName(name); };
+	void setName(const std::string& _name);
 	const std::string& getName() const { return m_treeItem.getEntityName(); };
 	ot::UID getModelEntityID() const { return m_treeItem.getEntityID(); };
 	bool getTreeItemEditable() const { return m_treeItem.getIsEditable(); };
@@ -60,7 +63,7 @@ public:
 	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
 	osg::Switch *getShapeNode() const { return m_shapeNode; };
 
-	void setTreeItemID(ot::UID iD) { m_treeItemID = iD; };
+	void setTreeItemID(ot::UID _iD);
 	ot::UID getTreeItemID() const { return m_treeItemID; };
 
 	bool isVisible() const { return m_visible; };

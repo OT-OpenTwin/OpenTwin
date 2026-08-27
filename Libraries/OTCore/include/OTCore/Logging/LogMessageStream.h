@@ -97,6 +97,8 @@ namespace ot {
 
 	};
 
+	typedef LogMessageStream::Pointer LogMsgPtr;
+
 }
 
 #include "OTCore/Logging/LogMessageStream.hpp"

@@ -81,6 +81,28 @@ void ot::JsonTreeWidget::countItems(uint64_t& _totalItems, uint64_t& _hiddenItem
     }
 }
 
+int ot::JsonTreeWidget::getSelectionDepth() const
+{
+    OTAssertNullptr(m_model);
+    QModelIndexList selectedIndexes = selectionModel()->selectedIndexes();
+    if (selectedIndexes.isEmpty()) {
+        return -1; // No selection
+    }
+    int minDepth = std::numeric_limits<int>::max();
+    
+    for (const QModelIndex& index : selectedIndexes) {
+        int depth = 0;
+        QModelIndex currentIndex = index;
+        while (currentIndex.isValid()) {
+            depth++;
+            currentIndex = currentIndex.parent();
+        }
+        minDepth = std::min(minDepth, depth);
+    }
+
+	return minDepth;
+}
+
 void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
     OTAssertNullptr(m_filterModel);
 
@@ -92,7 +114,7 @@ void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
     
     if (_filterText.isEmpty())
     {
-		expandToDepth(0);
+		expandToDepth(std::max(0, getSelectionDepth()));
     }
     else
     {
@@ -104,6 +126,8 @@ void ot::JsonTreeWidget::filterItems(const QString& _filterText) {
 	setUpdatesEnabled(wasUpdatesEnabled);
 
 	viewport()->update();
+
+	scrollTo(selectionModel()->currentIndex(), QAbstractItemView::PositionAtCenter);
 }
 
 bool ot::JsonTreeWidget::edit(const QModelIndex& _index, QAbstractItemView::EditTrigger _trigger, QEvent* _event) {

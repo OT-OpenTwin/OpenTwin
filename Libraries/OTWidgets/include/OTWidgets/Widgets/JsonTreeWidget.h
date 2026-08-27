@@ -47,6 +47,8 @@ namespace ot {
 
 		void countItems(uint64_t& _totalItems, uint64_t& _hiddenItems) const;
 
+		int getSelectionDepth() const;
+
     Q_SIGNALS:
 		void nodeDoubleClicked(int _column, ot::JsonTreeWidgetNode* _node);
 

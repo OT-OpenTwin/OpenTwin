@@ -88,8 +88,14 @@
 //! @brief Log a memory pointer address along with a message.
 //! The memory address will be logged as 16 digit hexadecimal value with leading zeros and "0x" prefix.
 //! @param ___ptr Pointer to log.
-//! @param ___message Message to log.
-#define OT_LOG_MEM(___ptr, ___message) OT_LOG_T(___message + std::string(" 0x") + ot::String::ptrToHexString(___ptr))
+//! @param ___message Message to append.
+#define OT_LOG_MEM(___ptr, ___prefix, ___suffix) OT_LOG_T(___prefix + std::string("0x") + ot::String::ptrToHexString(___ptr) + ___suffix)
+
+//! @brief Log a memory pointer address along with a message using the LogMessageStream.
+//! The memory address will be logged as 16 digit hexadecimal value with leading zeros and "0x" prefix.
+//! @param ___ptr Pointer to log.
+//! @param ___message Message to append.
+#define OT_LOG_MEMS(___ptr, ___prefix, ___suffix) OT_LOG_TS(___prefix << ot::LogMessageStream::Pointer(___ptr) << ___suffix)
 
 // ###########################################################################################################################################################################################################################################################################################################################
 

@@ -19,6 +19,7 @@
 
 #include "OTCore/Logging/Logger.h"
 #include "OTViewer/FrontendAPI.h"
+#include "OTViewer/Intern/ViewerDebug.h"
 #include "OTViewer/Node/SceneNodeBase.h"
 #include "OTViewer/Visualizer/TextVisualiser.h"
 #include "OTViewer/Visualizer/PlotVisualiser.h"
@@ -27,7 +28,15 @@
 
 #include <osg/Switch>
 
-SceneNodeBase::~SceneNodeBase() {
+SceneNodeBase::SceneNodeBase()
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Creating scene node");
+}
+
+SceneNodeBase::~SceneNodeBase() 
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Destroying scene node");
+
 	// Remove visualiser before deleting to avoid access to visualiser during deletion
 	std::list<Visualiser*> visualisers = std::move(m_visualiser);
 	m_visualiser.clear();
@@ -62,6 +71,8 @@ SceneNodeBase::~SceneNodeBase() {
 		// Now the shape node is invalid, since it might have been deleted by removing it from its parent
 		m_shapeNode = nullptr;
 	}
+
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Scene node destroyed");
 }
 
 void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
@@ -102,11 +113,31 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("Visualizers", visualizersArr, _allocator);
 }
 
+void SceneNodeBase::setName(const std::string& _name)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Setting scene node name: \"" << _name << "\"");
+	m_treeItem.setEntityName(_name);
+}
+
+void SceneNodeBase::setTreeItemID(ot::UID _iD)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Setting scene node tree id: " << _iD);
+	m_treeItemID = _iD;
+}
+
 ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot::SelectionData& _selectionData, bool _singleSelection, const std::list<SceneNodeBase*>& _selectedNodes, ot::VisualiserInfo& _visualisersInfo)
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
 	if (m_selected != _selected) {
+
+		OT_VIEWER_SCENENODE_DBG_PTR(this, ": Updating scene node selection { \"WasSelected\": " << m_selected 
+			<< ", \"IsSelected\": " << _selected 
+			<< ", \"IsSingleSelection\": " << _singleSelection 
+			<< ", \"SelectedItems\": " << _selectionData.getSelectedTreeItems() 
+			<< ", \"SlectionOrigin\": \"" << ot::toString(_selectionData.getSelectionOrigin())
+			<< "\" }");
+
 		m_selected = _selected;
 
 		const std::list<Visualiser*>& visualisers = getVisualiser();
@@ -214,8 +245,12 @@ ot::UIDList SceneNodeBase::getVisualisedEntities() const {
 
 void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": View state change { \"State\": " << static_cast<int>(_state) << ", \"ViewType\": \"" << ot::WidgetViewBase::toString(_viewType) << "\" }");
+
 	// Here we switch the view state changes
-	if (_state == ot::ViewChangedStates::changesSaved)
+	switch (_state)
+	{
+	case ot::ViewChangedStates::changesSaved:
 	{
 		const std::list<Visualiser*>& allVisualiser = getVisualiser();
 		// We initiated a model state change from the ui. Now we request a new visualisation for every visualiser which is not the one that initiated the 
@@ -230,20 +265,28 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 			// Per visualiser info
 			ot::VisualiserInfo info;
 
-			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen()) {
+			if (visualiser->getViewType() != _viewType && visualiser->getViewIsOpen())
+			{
 				visualiser->requestVisualization(state, info);
 			}
 		}
 	}
-	else
+	case ot::ViewChangedStates::viewOpened: OT_FALLTHROUGH
+	case ot::ViewChangedStates::viewClosed:
 	{
 		//Here we set/unset the viewer state isOpen for the opened visualisation.
 		const bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
-		for (Visualiser* visualiser : getVisualiser()) {
-			if (visualiser->getViewType() == _viewType) {
+		for (Visualiser* visualiser : getVisualiser())
+		{
+			if (visualiser->getViewType() == _viewType)
+			{
 				visualiser->setViewIsOpen(viewIsOpen);
 			}
 		}
+	}
+	default:
+		OT_LOG_E("Unknown view state change");
+		break;
 	}
 }
 
@@ -253,6 +296,8 @@ void SceneNodeBase::requestVisualizationIfNeeded()
 	for (Visualiser* visualiser : allVisualiser)
 	{
 		if (visualiser->getViewIsOpen()) {
+			OT_VIEWER_SCENENODE_DBG_PTR(this, ": Requesting visualization (1) for visualiser: " << ot::LogMsgPtr(visualiser));
+
 			VisualiserState state;
 			state.selected = m_selected;
 			state.singleSelection = true;
