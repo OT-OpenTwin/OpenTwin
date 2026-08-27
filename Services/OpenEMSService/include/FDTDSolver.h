@@ -35,6 +35,8 @@ class ResultManager;
 class EntityWaveguidePort;
 class EntityFieldDump;
 
+#include "OTModelEntities/Geometry.h"
+
 class FDTDSolver
 {
 public:
@@ -90,6 +92,7 @@ private:
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
 	std::string getStartStopString(EntityFieldDump* fieldDump);
 	bool isFrequencyDump(EntityFieldDump* fieldDump);
+	std::size_t mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance);
 
 	Application* application;
 	EntityBase *solverEntity;

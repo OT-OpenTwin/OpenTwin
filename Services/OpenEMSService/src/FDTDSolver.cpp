@@ -58,6 +58,10 @@
 #include <string_view>
 #include <utility>
 #include <cmath>
+#include <array>
+#include <cstddef>
+#include <cstdint>
+#include <numeric>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr), timeStepWidth(0.0)
@@ -1094,7 +1098,10 @@ std::map<std::string, int> FDTDSolver::createIntegerPriorities(const std::map<st
 
 bool FDTDSolver::storeSTLGeometry(EntityFacetData* facetData, const std::string &stlFileName)
 {
-	auto& nodes = facetData->getNodeVector();
+	// We copy the node vector, since we want to make sure that all close points are snapped together
+	auto nodes = facetData->getNodeVector();
+	mergeCloseNodes(nodes, 1e-9);
+
 	auto& triangles = facetData->getTriangleList();
 
 	std::ofstream file(stlFileName);
@@ -2243,4 +2250,105 @@ void FDTDSolver::findPortRange(
 
 	from = gridLines[fromIndex];
 	to = gridLines[fromIndex - portIntervals];
+}
+
+// C++17. Include the header defining Geometry::Node BEFORE this header.
+// Uses getCoord(int) and setCoords(double, double, double).
+// The getters do not need to be const. Normals and UV parameters are preserved.
+// Merge connected components of the ORIGINAL point-distance graph:
+// each pair at Euclidean distance <= tolerance belongs to the same component.
+// All component members receive the original coordinates of its first point.
+// Connectivity is transitive: long chains can move a point by more than tolerance.
+// No entries are removed or reordered; existing triangle indices remain valid.
+// Return the number of non-representative points, including exact duplicates.
+// Use on export coordinates before float conversion and STL serialization.
+// Afterward check triangles for collapsed edges/zero area and check closure.
+std::size_t FDTDSolver::mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance)
+{
+	if (!std::isfinite(tolerance) || tolerance <= 0.0)
+		throw std::invalid_argument("Invalid merge tolerance");
+
+	for (auto& node : nodes)
+		for (int axis = 0; axis < 3; ++axis)
+			if (!std::isfinite(node.getCoord(axis)))
+				throw std::invalid_argument("Non-finite node coordinate");
+
+	const std::size_t count = nodes.size();
+	if (count < 2)
+		return 0;
+
+	using Cell = std::array<std::int64_t, 3>;
+	std::map<Cell, std::vector<std::size_t>> grid;
+	std::vector<std::size_t> parent(count);
+	std::iota(parent.begin(), parent.end(), std::size_t{ 0 });
+
+	auto findRoot = [&](std::size_t index) {
+		while (parent[index] != index) {
+			parent[index] = parent[parent[index]];
+			index = parent[index];
+		}
+		return index;
+		};
+
+	// Subtract a local origin to avoid large absolute spatial-index coordinates.
+	const std::array<long double, 3> origin = {
+		nodes[0].getCoord(0), nodes[0].getCoord(1), nodes[0].getCoord(2) };
+
+	for (std::size_t i = 0; i < count; ++i) {
+		Cell cell;
+		for (std::size_t axis = 0; axis < 3; ++axis) {
+			// Cell width 2*tolerance leaves a margin for division rounding.
+			const long double scaled =
+				((static_cast<long double>(nodes[i].getCoord(static_cast<int>(axis)))
+					- origin[axis])
+					/ static_cast<long double>(tolerance)) * 0.5L;
+
+			// Also safe when long double has only double precision (MSVC).
+			if (!std::isfinite(scaled) || std::abs(scaled) > 1.0e14L)
+				throw std::out_of_range("Coordinate span too large for tolerance");
+			cell[axis] = static_cast<std::int64_t>(std::floor(scaled));
+		}
+
+		// Include neighboring cells, not just points with the same rounded key.
+		for (int dx = -1; dx <= 1; ++dx)
+			for (int dy = -1; dy <= 1; ++dy)
+				for (int dz = -1; dz <= 1; ++dz) {
+					const Cell neighbor = { cell[0] + dx, cell[1] + dy, cell[2] + dz };
+					const auto bucket = grid.find(neighbor);
+					if (bucket == grid.end())
+						continue;
+
+					for (std::size_t j : bucket->second) {
+						std::size_t a = findRoot(i);
+						std::size_t b = findRoot(j);
+						if (a == b)
+							continue;
+
+						const double distance = std::hypot(
+							nodes[i].getCoord(0) - nodes[j].getCoord(0),
+							nodes[i].getCoord(1) - nodes[j].getCoord(1),
+							nodes[i].getCoord(2) - nodes[j].getCoord(2));
+
+						if (distance <= tolerance) {
+							if (a > b)
+								std::swap(a, b);
+							parent[b] = a; // Keep the first point as representative.
+						}
+					}
+				}
+		grid[cell].push_back(i);
+	}
+
+	// Only now modify coordinates: all searches above used original positions.
+	std::size_t merged = 0;
+	for (std::size_t i = 0; i < count; ++i) {
+		const std::size_t representative = findRoot(i);
+		if (i == representative)
+			continue;
+		nodes[i].setCoords(nodes[representative].getCoord(0),
+			nodes[representative].getCoord(1),
+			nodes[representative].getCoord(2));
+		++merged;
+	}
+	return merged;
 }
