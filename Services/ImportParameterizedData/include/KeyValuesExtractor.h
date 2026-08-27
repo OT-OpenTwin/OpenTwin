@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: KeyValuesExtractor.h
 // 
 // License:
@@ -18,16 +18,38 @@
 // @otlicense-end
 
 #pragma once
+
+// OpenTwin header
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "OTModelEntities/Visualization/IVisualisationTable.h"
 #include "OTModelEntities/EntityFileCSV.h"
+#include "OTCore/Variable/StringToVariableConverter.h"
+#include "OTGui/TableIndexSchemata.h"
+#include "OTCore/Variable/Variable.h"
+#include "MetadataAssemblyData.h"
 
+// std header
 #include <map>
 #include <list>
 #include <memory>
 #include <stdint.h>
-#include "OTCore/Variable/Variable.h"
-#include "MetadataAssemblyData.h"
+#include <optional>
+#include <string>
+
+struct DataDefinitionOverride
+{
+	std::optional<std::string> m_Name;
+	std::optional<std::string> m_dataType;
+	std::optional<std::string> m_unit;
+};
+
+struct TableOverrides
+{
+	std::map<uint32_t, DataDefinitionOverride> m_columns;
+	std::map<uint32_t, DataDefinitionOverride> m_rows;
+	bool m_hasColumnDefintions = false;
+	bool m_hasRowDefintions = false;
+};
 
 class KeyValuesExtractor
 {
@@ -41,8 +63,8 @@ public:
 
 	//! @brief Tries to transforms the selections into the selected data types.
 	//! @throws If a failure accures in the data transformation
-	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName);
-	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, EntityFileCSV* _table);
+	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName, const TableOverrides& _overrides = {});
+	void loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, EntityFileCSV* _table, const TableOverrides& _overrides = {});
 
 
 	std::map<std::string, std::list<ot::Variable>>* getFields() { return &m_fields; };
@@ -56,7 +78,7 @@ private:
 	//! @brief Extracts the selected ranges from the table. All cell values are string values. 
 	//! They are sorted by a key value, which is the corresponding value in either the first row or collumn of the table.range 
 	//! Each is contained in a map with its index (row or column) as key. 
-	std::vector<std::string> extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields);
+	std::vector<std::string> extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields, std::map<std::string, std::string>& _rangeTypesByRangeNames, const TableOverrides& _overrides);
 
 	//! @brief Empties allFields and adds its content after casting the values to the corresponding member attribute.
 	//! @return true, if all conversions were possible. False, if a conversion failed

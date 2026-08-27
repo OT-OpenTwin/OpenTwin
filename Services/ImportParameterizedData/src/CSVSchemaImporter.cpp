@@ -1,4 +1,4 @@
-﻿#include "CSVSchemaImporter.h"
+#include "CSVSchemaImporter.h"
 #include "Application.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
@@ -164,11 +164,49 @@ void CSVSchemaImporter::execute()
 		{
 			// First we assemble the information for the newly created series
 			std::list<DatasetDescription> datasetDescriptions;
-			std::string seriesName;
+			std::string seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
+			std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
+			
+			TableOverrides overrides;
+			if (extractedMetadata.has_value()) {
+				parseOverrides(extractedMetadata.value(), overrides);
+				if (extractedMetadata.value().HasMember("$ColumnDefinitions$")) {
+					extractedMetadata.value().RemoveMember("$ColumnDefinitions$");
+				}
+				if (extractedMetadata.value().HasMember("$RowDefinitions$")) {
+					extractedMetadata.value().RemoveMember("$RowDefinitions$");
+				}
+			}
+			
+			if (overrides.m_hasColumnDefintions || overrides.m_hasRowDefintions) {
+				bool usesHorizontal = false;
+				bool usesVertical = false;
+				auto checkRanges = [&](MetadataAssemblyData* data) {
+					if (!data) return;
+					for (auto& range : data->m_allSelectionRanges) {
+						if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal) usesHorizontal = true;
+						if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Vertical) usesVertical = true;
+					}
+				};
+				checkRanges(&seriesMetadataAssemblyData);
+				checkRanges(parameter);
+				checkRanges(quantity);
+				
+				if (overrides.m_hasColumnDefintions && usesVertical) {
+					OT_USER_LOG_W("JSON metadata contains $ColumnDefinitions$ but table selection uses Row orientation (Vertical).");
+					if (interruptAtWarnings) return;
+				}
+				if (overrides.m_hasRowDefintions && usesHorizontal) {
+					OT_USER_LOG_W("JSON metadata contains $RowDefinitions$ but table selection uses Column orientation (Horizontal).");
+					if (interruptAtWarnings) return;
+				}
+			}
+
+			
 			ot::UID seriesUID;
 			try
 			{
-				datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get());
+				datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get(), overrides);
 				seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
 				std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
 				
@@ -482,18 +520,18 @@ MetadataAssemblyData CSVSchemaImporter::extractMetadataAssembly(std::string _ser
 	return series;
 }
 
-std::list<DatasetDescription>  CSVSchemaImporter::createDatasetDescription(MetadataAssemblyData& _seriesMetadataAssemblyData, EntityFileCSV* _table)
+std::list<DatasetDescription>  CSVSchemaImporter::createDatasetDescription(MetadataAssemblyData& _seriesMetadataAssemblyData, EntityFileCSV* _table, const TableOverrides& _overrides)
 {
 	MetadataAssemblyData* parameter = _seriesMetadataAssemblyData.m_next;
 	MetadataAssemblyData* quantity = parameter->m_next;
 	ot::IVisualisationTable* tableView = dynamic_cast<ot::IVisualisationTable*>(_table);
 	
 	KeyValuesExtractor parameterData;
-	parameterData.loadAllRangeSelectionInformation(*parameter, _table);
+	parameterData.loadAllRangeSelectionInformation(*parameter, _table, _overrides);
 
 	//Loading quantity information
 	KeyValuesExtractor quantityData;
-	quantityData.loadAllRangeSelectionInformation(*quantity, _table);
+	quantityData.loadAllRangeSelectionInformation(*quantity, _table, _overrides);
 	
 	std::list<DatasetDescription> datasetDescriptions;
 	std::list<std::shared_ptr<ParameterDescription>> sharedParameter;
@@ -596,4 +634,43 @@ std::optional<ot::JsonDocument> CSVSchemaImporter::createSeriesMetadata(EntityDa
 		assert(false);
 		return ot::JsonDocument();
 	}
+}
+
+void CSVSchemaImporter::parseOverrides(ot::JsonDocument& _doc, TableOverrides& _overrides)
+{
+	auto parseSection = [](ot::JsonDocument& doc, const char* sectionName, std::map<uint32_t, DataDefinitionOverride>& overridesMap, bool& hasDefinitions) {
+		if (doc.HasMember(sectionName) && doc[sectionName].IsObject()) {
+			hasDefinitions = true;
+			auto& defs = doc[sectionName];
+			for (auto it = defs.MemberBegin(); it != defs.MemberEnd(); ++it) {
+				std::string key = it->name.GetString();
+				DataDefinitionOverride def;
+				if (it->value.IsObject()) {
+					if (it->value.HasMember("name") && it->value["name"].IsString()) def.m_Name = it->value["name"].GetString();
+					if (it->value.HasMember("dataType") && it->value["dataType"].IsString()) def.m_dataType = it->value["dataType"].GetString();
+					if (it->value.HasMember("unit") && it->value["unit"].IsString()) def.m_unit = it->value["unit"].GetString();
+				}
+				
+				key.erase(std::remove(key.begin(), key.end(), ' '), key.end());
+				size_t dashPos = key.find('-');
+				if (dashPos != std::string::npos) {
+					try {
+						uint32_t start = std::stoul(key.substr(0, dashPos));
+						uint32_t end = std::stoul(key.substr(dashPos + 1));
+						for (uint32_t i = start; i <= end; ++i) {
+							overridesMap[i] = def;
+						}
+					} catch (...) {}
+				} else {
+					try {
+						uint32_t index = std::stoul(key);
+						overridesMap[index] = def;
+					} catch (...) {}
+				}
+			}
+		}
+	};
+	
+	parseSection(_doc, "$ColumnDefinitions$", _overrides.m_columns, _overrides.m_hasColumnDefintions);
+	parseSection(_doc, "$RowDefinitions$", _overrides.m_rows, _overrides.m_hasRowDefintions);
 }

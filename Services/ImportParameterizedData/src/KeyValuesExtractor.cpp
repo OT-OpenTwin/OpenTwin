@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: KeyValuesExtractor.cpp
 // 
 // License:
@@ -25,7 +25,7 @@
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
 
-void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName)
+void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData , std::map<std::string, std::shared_ptr<ot::IVisualisationTable>>& _allTablesByName, const TableOverrides& _overrides)
 {
 	bool allEntriesSuccessfullyTransformed = true;
 	for (auto tableByName : _allTablesByName)
@@ -67,13 +67,7 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 
 		for (const auto& range : relevantSelections)
 		{
-			const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted);
-			const std::string& type = range->getSelectedType();
-			
-			for (const std::string fieldKey : fieldKeys)
-			{
-				rangeTypesByRangeNames[fieldKey] = type;
-			}
+			const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted, rangeTypesByRangeNames, _overrides);
 		}
 		
 		//The values of all selection ranges are now sorted by their index (column or row, depending on header orientation). Now we drop the index information, since only the values are needed.
@@ -102,7 +96,7 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 	}
 }
 
-void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, EntityFileCSV* _table)
+void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssemblyData& _assemblyData, EntityFileCSV* _table, const TableOverrides& _overrides)
 {
 	const std::string& tableName = _table->getName() ;
 	ot::IVisualisationTable* tableView = dynamic_cast<ot::IVisualisationTable*>(_table);
@@ -135,13 +129,7 @@ void KeyValuesExtractor::loadAllRangeSelectionInformation(const MetadataAssembly
 
 	for (const auto& range : relevantSelections)
 	{
-		const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted);
-		const std::string& type = range->getSelectedType();
-
-		for (const std::string fieldKey : fieldKeys)
-		{
-			rangeTypesByRangeNames[fieldKey] = type;
-		}
+		const std::vector<std::string> fieldKeys = extractFieldsFromRange(range, tableContent, allFieldsSorted, rangeTypesByRangeNames, _overrides);
 	}
 
 	//The values of all selection ranges are now sorted by their index (column or row, depending on header orientation). Now we drop the index information, since only the values are needed.
@@ -204,7 +192,7 @@ bool KeyValuesExtractor::isRangeWithinTableDimensions(std::shared_ptr<EntityTabl
 	return selectionIsValid;
 }
 
-std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields)
+std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_ptr<EntityTableSelectedRanges> _range, const ot::GenericDataStructMatrix& _tableData, std::map<std::string, std::map<std::uint32_t, ot::Variable>>& _outAllSortedFields, std::map<std::string, std::string>& _rangeTypesByRangeNames, const TableOverrides& _overrides)
 {
 	std::vector<std::string> fieldKeys;
 	
@@ -262,6 +250,24 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 			assert(entry.isConstCharPtr());
 			std::string fieldKey = entry.getConstCharPtr();
 			cleanFieldKey(fieldKey);
+			
+			std::string type = _range->getSelectedType();
+			uint32_t colIndex = matrixEntry.getColumn();
+			auto it = _overrides.m_columns.find(colIndex);
+			if (it != _overrides.m_columns.end()) {
+				if (it->second.m_Name.has_value()) {
+					fieldKey = it->second.m_Name.value();
+				}
+				if (it->second.m_unit.has_value()) {
+					fieldKey += " [" + it->second.m_unit.value() + "]";
+				}
+				if (it->second.m_dataType.has_value()) {
+					type = it->second.m_dataType.value();
+				}
+			}
+			
+			_rangeTypesByRangeNames[fieldKey] = type;
+			
 			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.setRow(minRow); matrixEntry.getRow() <= maxRow; matrixEntry.moveRow())
 			{
@@ -280,6 +286,24 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 			assert(entry.isConstCharPtr());
 			std::string fieldKey = entry.getConstCharPtr();
 			cleanFieldKey(fieldKey);
+			
+			std::string type = _range->getSelectedType();
+			uint32_t rowIndex = matrixEntry.getRow();
+			auto it = _overrides.m_rows.find(rowIndex);
+			if (it != _overrides.m_rows.end()) {
+				if (it->second.m_Name.has_value()) {
+					fieldKey = it->second.m_Name.value();
+				}
+				if (it->second.m_unit.has_value()) {
+					fieldKey += " [" + it->second.m_unit.value() + "]";
+				}
+				if (it->second.m_dataType.has_value()) {
+					type = it->second.m_dataType.value();
+				}
+			}
+			
+			_rangeTypesByRangeNames[fieldKey] = type;
+			
 			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.setColumn(minColumn); matrixEntry.getColumn() <= maxColumn; matrixEntry.moveColumn())
 			{
