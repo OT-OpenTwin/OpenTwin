@@ -465,6 +465,12 @@ bool BooleanOperations::add(EntityBrep *base, std::list<EntityBrep *> &tools, To
 			return false;
 		}
 
+		aBoolean.SimplifyResult(
+			Standard_True,             // unify edges
+			Standard_True,             // unify faces
+			Precision::Angular()
+		);
+
 		TopoDS_Shape shape2 = aBoolean.Shape();
 
 		resultFaceNames = postOperation(aBoolean, shape2, shape, tool->getBrep());
@@ -506,6 +512,12 @@ bool BooleanOperations::subtract(EntityBrep *base, std::list<EntityBrep *> &tool
 		// ignore this operation (might happen. e.g. if the tool shape is empty).
 		if (!aBoolean.HasErrors())
 		{
+			aBoolean.SimplifyResult(
+				Standard_True,             // unify edges
+				Standard_True,             // unify faces
+				Precision::Angular()
+			);
+
 			shape2 = aBoolean.Shape();
 
 			resultFaceNames = postOperation(aBoolean, shape2, shape, tool->getBrep());
@@ -546,6 +558,12 @@ bool BooleanOperations::intersect(EntityBrep *base, std::list<EntityBrep *> &too
 		{
 			return false;
 		}
+
+		aBoolean.SimplifyResult(
+			Standard_True,             // unify edges
+			Standard_True,             // unify faces
+			Precision::Angular()
+		);
 
 		TopoDS_Shape shape2 = aBoolean.Shape();
 
