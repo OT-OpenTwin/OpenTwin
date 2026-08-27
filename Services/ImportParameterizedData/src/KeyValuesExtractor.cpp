@@ -389,7 +389,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						const bool dataTypeFits = ot::StringToNumericCheck::fitsInFloat(fieldValueStringFixed);
 						if (dataTypeFits)
 						{
-							const double valueOfCastedType = std::stof(fieldValueStringFixed);
+							const float valueOfCastedType = std::stof(fieldValueStringFixed);
 							values.push_back(ot::Variable(valueOfCastedType));
 						}
 						else
@@ -404,7 +404,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						bool dataTypeFits = ot::StringToNumericCheck::fitsInInt32(fieldValueStringFixed);
 						if (dataTypeFits)
 						{
-							const double valueOfCastedType = std::stoi(fieldValueStringFixed);
+							const int32_t valueOfCastedType = std::stoi(fieldValueStringFixed);
 							values.push_back(ot::Variable(valueOfCastedType));
 						}
 						else
