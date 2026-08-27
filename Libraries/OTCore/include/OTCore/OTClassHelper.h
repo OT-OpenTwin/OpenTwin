@@ -78,3 +78,7 @@
 //! @def OT_UNUSED
 //! @brief Avoid "warning C4101: unreferenced local variable".
 #define OT_UNUSED(___unusedVariable) (void)(___unusedVariable);
+
+//! @def OT_FALLTHROUGH
+//! @brief Marks a switch case as fallthrough.
+#define OT_FALLTHROUGH [[fallthrough]];
