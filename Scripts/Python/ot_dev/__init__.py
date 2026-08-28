@@ -26,6 +26,7 @@ from .batch import build_all, clean_all, test_all, testable_projects
 from .environment import build_env, check_required
 from .framework import build_framework
 from .projects import project_roots, resolve_root
+from .services import shutdown_all
 from .toolchain import apply_toolchain
 
 __all__ = [
@@ -41,6 +42,7 @@ __all__ = [
     "launch_editor",
     "project_roots",
     "resolve_root",
+    "shutdown_all",
     "test_all",
     "test_project",
     "testable_projects",
