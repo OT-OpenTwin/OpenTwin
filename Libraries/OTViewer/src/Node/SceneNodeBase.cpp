@@ -113,6 +113,12 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("Visualizers", visualizersArr, _allocator);
 }
 
+void SceneNodeBase::setTreeItem(const ot::EntityTreeItem& _treeItem)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Setting scene node tree item with name: \"" << _treeItem.getEntityName() << "\"");
+	m_treeItem = _treeItem;
+}
+
 void SceneNodeBase::setName(const std::string& _name)
 {
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Setting scene node name: \"" << _name << "\"");
@@ -222,6 +228,21 @@ void SceneNodeBase::setHighlighted(bool _highlight)
 	}
 }
 
+void SceneNodeBase::addChild(SceneNodeBase* child)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Adding child scene node: " << ot::LogMsgPtr(child));
+	OTAssert(std::find(m_children.begin(), m_children.end(), child) == m_children.end(), "Child already in list");
+	m_children.push_back(child);
+	child->setParent(this);
+}
+
+void SceneNodeBase::removeChild(SceneNodeBase* child)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Removing child scene node: " << ot::LogMsgPtr(child));
+	OTAssert(std::find(m_children.begin(), m_children.end(), child) != m_children.end(), "Child not in list");
+	m_children.remove(child);
+}
+
 bool SceneNodeBase::isChildOf(const SceneNodeBase* _parent) const {
 	if (_parent == nullptr) {
 		return false;
@@ -232,6 +253,12 @@ bool SceneNodeBase::isChildOf(const SceneNodeBase* _parent) const {
 	else {
 		return m_parent && m_parent->isChildOf(_parent);
 	}
+}
+
+void SceneNodeBase::addVisualiser(Visualiser* _visualiser)
+{
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Adding visualiser: " << ot::LogMsgPtr(_visualiser));
+	m_visualiser.push_back(_visualiser);
 }
 
 ot::UIDList SceneNodeBase::getVisualisedEntities() const {
@@ -271,6 +298,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 			}
 		}
 	}
+	break;
 	case ot::ViewChangedStates::viewOpened: OT_FALLTHROUGH
 	case ot::ViewChangedStates::viewClosed:
 	{
@@ -284,6 +312,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 			}
 		}
 	}
+	break;
 	default:
 		OT_LOG_E("Unknown view state change");
 		break;
@@ -292,6 +321,7 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 
 void SceneNodeBase::requestVisualizationIfNeeded()
 {
+	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Testing if visualization request is needed");
 	const std::list<Visualiser*>& allVisualiser = getVisualiser();
 	for (Visualiser* visualiser : allVisualiser)
 	{

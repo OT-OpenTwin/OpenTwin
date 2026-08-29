@@ -31,3 +31,12 @@
 #define OT_VIEWER_SCENENODE_DBG(___text)
 #define OT_VIEWER_SCENENODE_DBG_PTR(___ptr, ___text)
 #endif
+
+#define OT_VIEWER_VISUALISER_DBG_ENABLED true
+#if OT_VIEWER_VISUALISER_DBG_ENABLED==true
+#define OT_VIEWER_VISUALISER_DBG(___text)             OT_BASE_DEBUG_LOG("VISUALISER][VIEWER", ___text)
+#define OT_VIEWER_VISUALISER_DBG_PTR(___ptr, ___text) OT_BASE_DEBUG_PTR("VISUALISER][VIEWER", ___ptr, ___text)
+#else
+#define OT_VIEWER_VISUALISER_DBG(___text)
+#define OT_VIEWER_VISUALISER_DBG_PTR(___ptr, ___text)
+#endif

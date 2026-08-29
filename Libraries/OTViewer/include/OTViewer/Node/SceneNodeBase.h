@@ -51,7 +51,7 @@ public:
 	void setModel(Model* model) { m_model = model; };
 	Model* getModel() const { return m_model; };
 
-	void setTreeItem(const ot::EntityTreeItem& _treeItem) { m_treeItem = _treeItem; };
+	void setTreeItem(const ot::EntityTreeItem& _treeItem);
 	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
 	
 	void setName(const std::string& _name);
@@ -103,8 +103,8 @@ public:
 	void setParent(SceneNodeBase *item) { m_parent = item; };
 	SceneNodeBase *getParent() { return m_parent; };
 
-	void addChild(SceneNodeBase *child) { assert(std::find(m_children.begin(), m_children.end(), child) == m_children.end()); m_children.push_back(child); child->setParent(this); };
-	void removeChild(SceneNodeBase *child) { assert(std::find(m_children.begin(), m_children.end(), child) != m_children.end());  m_children.remove(child); };
+	void addChild(SceneNodeBase *child);
+	void removeChild(SceneNodeBase *child);
 	const std::list<SceneNodeBase*>& getChildren() const { return m_children; };
 
 	//! @brief Returns true if this node is a child of the provided parent node.
@@ -116,7 +116,7 @@ public:
 
 	virtual bool isItem3D() const = 0;
 
-	void addVisualiser(Visualiser* _visualiser) { m_visualiser.push_back(_visualiser); }
+	void addVisualiser(Visualiser* _visualiser);
 	const std::list<Visualiser*>& getVisualiser() const { return m_visualiser; }
 
 	//! @brief Returns a list of entities that will be visualized by the visualizers.
