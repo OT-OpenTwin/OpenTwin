@@ -23,6 +23,8 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 
+#include "OTGui/Painter/FillPainter2D.h"
+
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Plot/Plot.h"
 #include "OTWidgets/Plot/PlotDataset.h"
@@ -2136,6 +2138,10 @@ void Model::exportPlotAsPlotly()
 		if (brush.color().isValid())
 		{
 			return getQColorStr(brush.color());
+		}
+		if (painter->getFactoryKey() == OT_FactoryKey_FillPainter2D)
+		{
+			return painter->generateCss();
 		}
 		ot::Color c = painter->getDefaultColor();
 		return "rgba(" + std::to_string(c.r()) + ", " +
