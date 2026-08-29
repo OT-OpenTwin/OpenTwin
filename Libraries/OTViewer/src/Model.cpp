@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
+#include "OTCore/Math.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/Logging/Logger.h"
 
@@ -2162,15 +2163,42 @@ void Model::exportPlotAsPlotly()
 	double gridLineWidth = plot->getConfig().getGridLineWidth();
 	bool legendVisible = plot->getConfig().getLegendVisible();
 
+	auto jsonEscape = [](const std::string& str) -> std::string {
+		std::ostringstream ss;
+		for (char c : str) {
+			switch (c) {
+			case '"': ss << "\\\""; break;
+			case '\\': ss << "\\\\"; break;
+			case '\b': ss << "\\b"; break;
+			case '\f': ss << "\\f"; break;
+			case '\n': ss << "\\n"; break;
+			case '\r': ss << "\\r"; break;
+			case '\t': ss << "\\t"; break;
+			default:
+				if (static_cast<unsigned char>(c) < 0x20) {
+					ss << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(static_cast<unsigned char>(c));
+				}
+				else {
+					ss << c;
+				}
+				break;
+			}
+		}
+		return ss.str();
+	};
+
 	// Assemble Plotly layout JSON (customized for Cartesian vs Polar coordinates)
 	std::string layoutJson;
 	if (isPolar)
 	{
 		layoutJson = "{\n"
 			"  \"title\": {\n"
-			"    \"text\": \"" + plotTitle + "\",\n"
+			"    \"text\": \"" + jsonEscape(plotTitle) + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
 			"  },\n"
+			"  \"hovermode\": \"closest\",\n"
+			"  \"hoverdistance\": 5,\n"
+			"  \"spikedistance\": 5,\n"
 			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
 			"  \"legend\": {\n"
 			"    \"x\": 1.02,\n"
@@ -2188,13 +2216,13 @@ void Model::exportPlotAsPlotly()
 			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
 			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
 			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"      \"title\": { \"text\": \"" + axisTitleX + "\" }\n"
+			"      \"title\": { \"text\": \"" + jsonEscape(axisTitleX) + "\" }\n"
 			"    },\n"
 			"    \"radialaxis\": {\n"
 			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
 			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
 			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"      \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
+			"      \"title\": { \"text\": \"" + jsonEscape(axisTitleY) + "\" }\n"
 			"    }\n"
 			"  },\n"
 			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
@@ -2204,9 +2232,12 @@ void Model::exportPlotAsPlotly()
 	{
 		layoutJson = "{\n"
 			"  \"title\": {\n"
-			"    \"text\": \"" + plotTitle + "\",\n"
+			"    \"text\": \"" + jsonEscape(plotTitle) + "\",\n"
 			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
 			"  },\n"
+			"  \"hovermode\": \"closest\",\n"
+			"  \"hoverdistance\": 5,\n"
+			"  \"spikedistance\": 5,\n"
 			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
 			"  \"legend\": {\n"
 			"    \"x\": 1.02,\n"
@@ -2222,13 +2253,25 @@ void Model::exportPlotAsPlotly()
 			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
 			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
 			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"    \"title\": { \"text\": \"" + axisTitleX + "\" }\n"
+			"    \"title\": { \"text\": \"" + jsonEscape(axisTitleX) + "\" },\n"
+			"    \"showspikes\": true,\n"
+			"    \"spikemode\": \"across\",\n"
+			"    \"spikesnap\": \"cursor\",\n"
+			"    \"spikethickness\": 1,\n"
+			"    \"spikedash\": \"dash\",\n"
+			"    \"spikecolor\": \"#ef4444\"\n"
 			"  },\n"
 			"  \"yaxis\": {\n"
 			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
 			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
 			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"    \"title\": { \"text\": \"" + axisTitleY + "\" }\n"
+			"    \"title\": { \"text\": \"" + jsonEscape(axisTitleY) + "\" },\n"
+			"    \"showspikes\": true,\n"
+			"    \"spikemode\": \"across\",\n"
+			"    \"spikesnap\": \"cursor\",\n"
+			"    \"spikethickness\": 1,\n"
+			"    \"spikedash\": \"dash\",\n"
+			"    \"spikecolor\": \"#ef4444\"\n"
 			"  },\n"
 			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
 			"}";
@@ -2260,17 +2303,96 @@ void Model::exportPlotAsPlotly()
 			}
 		}
 
-		// Extract coordinates from dataset data
+		// Extract coordinates and assemble detailed hover & customdata
 		ot::PlotDatasetData& data = dataset->getPlotData();
 		size_t size = data.getSize();
 		std::vector<double> val1, val2;
+		std::vector<std::string> hoverTextList;
+		std::vector<std::string> customDataList;
 		val1.reserve(size);
 		val2.reserve(size);
+		hoverTextList.reserve(size);
+		customDataList.reserve(size);
+
+		// Format global dataset dependencies
+		std::string globalDepTooltipStr;
+		std::string globalDepStatusStr;
+		for (const auto& dep : dataset->getDependencyInfos().getDependencies())
+		{
+			std::string depStr = dep.getLabel() + " = " + dep.getValue() + (dep.getUnit().empty() ? "" : " " + dep.getUnit());
+			globalDepTooltipStr += "<br>&#8226; " + depStr;
+			if (!globalDepStatusStr.empty()) globalDepStatusStr += ", ";
+			globalDepStatusStr += depStr;
+		}
+
+		const auto& secDepList = dataset->getSecondaryDependencyInfos();
+
 		for (size_t i = 0; i < size; ++i)
 		{
 			QPointF pt = data.getSample<QPointF>(i);
 			val1.push_back(pt.x());
 			val2.push_back(pt.y());
+
+			std::string tooltipHtml = "<b>" + name + "</b>";
+			std::string statusText;
+
+			if (isPolar)
+			{
+				// In polar plots, pt.x() is azimuth in radians, pt.y() is radius r
+				double rVal = pt.y();
+				double azimuthRad = pt.x();
+				double azimuthDeg = ot::Math::radToDeg(azimuthRad);
+
+				std::string rStr = "r = " + plot->getConfig().getXAxis().getValueDisplayString(rVal, plot->getConfig(), isComplexData);
+				std::string phiDegStr = "\xCF\x86 = " + plot->getConfig().getYAxis().getValueDisplayString(azimuthDeg, plot->getConfig(), "deg ", isComplexData);
+				std::string phiRadStr = "\xCF\x86 = " + plot->getConfig().getYAxis().getValueDisplayString(azimuthRad, plot->getConfig(), "rad ", isComplexData);
+
+				tooltipHtml += "<br>" + rStr + "<br>" + phiDegStr + "<br>" + phiRadStr;
+				statusText = rStr + "     " + phiDegStr + "     " + phiRadStr;
+			}
+			else
+			{
+				std::string xStr = "X = " + plot->getConfig().getXAxis().getValueDisplayString(pt.x(), plot->getConfig(), isComplexData);
+				std::string yStr = "Y = " + plot->getConfig().getYAxis().getValueDisplayString(pt.y(), plot->getConfig(), isComplexData);
+
+				tooltipHtml += "<br>" + xStr + "<br>" + yStr;
+				statusText = xStr + "     " + yStr;
+			}
+
+			// Append global dependencies
+			if (!globalDepTooltipStr.empty())
+			{
+				tooltipHtml += globalDepTooltipStr;
+			}
+
+			// Append secondary / per-sample dependencies if present
+			if (i < secDepList.size())
+			{
+				std::string secDepStatusStr;
+				for (const auto& secDep : secDepList[i].getDependencies())
+				{
+					std::string sDepStr = secDep.getLabel() + " = " + secDep.getValue() + (secDep.getUnit().empty() ? "" : " " + secDep.getUnit());
+					tooltipHtml += "<br>&#8226; " + sDepStr;
+					if (!secDepStatusStr.empty()) secDepStatusStr += ", ";
+					secDepStatusStr += sDepStr;
+				}
+				if (!secDepStatusStr.empty())
+				{
+					if (!globalDepStatusStr.empty()) statusText += "   |   " + globalDepStatusStr + ", " + secDepStatusStr;
+					else statusText += "   |   " + secDepStatusStr;
+				}
+				else if (!globalDepStatusStr.empty())
+				{
+					statusText += "   |   " + globalDepStatusStr;
+				}
+			}
+			else if (!globalDepStatusStr.empty())
+			{
+				statusText += "   |   " + globalDepStatusStr;
+			}
+
+			hoverTextList.push_back(tooltipHtml);
+			customDataList.push_back(statusText);
 		}
 
 		// Determine rendering mode (lines, markers, or lines+markers)
@@ -2395,7 +2517,7 @@ void Model::exportPlotAsPlotly()
 			dataJson << "    \"thetaunit\": \"radians\",\n";
 		}
 		dataJson << "    \"mode\": \"" << mode << "\",\n"
-			<< "    \"name\": \"" << name << "\",\n"
+			<< "    \"name\": \"" << jsonEscape(name) << "\",\n"
 			<< "    \"showlegend\": true,\n"
 			<< "    \"visible\": " << (isVisible ? "true" : "\"legendonly\"") << ",\n"
 			<< "    \"" << key1 << "\": [";
@@ -2411,9 +2533,28 @@ void Model::exportPlotAsPlotly()
 			dataJson << val2[i];
 			if (i + 1 < val2.size()) dataJson << ", ";
 		}
-		dataJson << "]";
-
-		dataJson << ",\n    \"marker\": {";
+		dataJson << "],\n"
+			<< "    \"hovertext\": [";
+		for (size_t i = 0; i < hoverTextList.size(); ++i)
+		{
+			dataJson << "\"" << jsonEscape(hoverTextList[i]) << "\"";
+			if (i + 1 < hoverTextList.size()) dataJson << ", ";
+		}
+		dataJson << "],\n"
+			<< "    \"customdata\": [";
+		for (size_t i = 0; i < customDataList.size(); ++i)
+		{
+			dataJson << "\"" << jsonEscape(customDataList[i]) << "\"";
+			if (i + 1 < customDataList.size()) dataJson << ", ";
+		}
+		dataJson << "],\n"
+			<< "    \"hovertemplate\": \"%{hovertext}<extra></extra>\",\n"
+			<< "    \"hoverlabel\": {\n"
+			<< "      \"bgcolor\": \"rgba(255, 255, 255, 0.95)\",\n"
+			<< "      \"bordercolor\": \"#e5e7eb\",\n"
+			<< "      \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
+			<< "    },\n"
+			<< "    \"marker\": {";
 		dataJson << " \"color\": \"" << markerFillColorStr << "\",";
 		if (!plotlySymbol.empty())
 		{
@@ -2439,10 +2580,12 @@ void Model::exportPlotAsPlotly()
 	std::stringstream cardHtml;
 	cardHtml << "    <div class=\"container\">\n"
 		<< "        <div id=\"plot-div-" << uniqueId << "\" class=\"plot-div\"></div>\n"
+		<< "        <div id=\"plot-info-" << uniqueId << "\" class=\"plot-info-bar\">Hover over points or curves to view details</div>\n"
 		<< "    </div>\n"
 		<< "    <script>\n"
 		<< "    (function() {\n"
 		<< "        const divId = 'plot-div-" << uniqueId << "';\n"
+		<< "        const infoId = 'plot-info-" << uniqueId << "';\n"
 		<< "        const data = " << dataJson.str() << ";\n"
 		<< "        const layoutTemplate = " << layoutJson << ";\n"
 		<< "        function renderPlot() {\n"
@@ -2468,7 +2611,20 @@ void Model::exportPlotAsPlotly()
 		<< "                };\n"
 		<< "            }\n"
 		<< "            const config = { responsive: true, displaylogo: false, modeBarButtonsToRemove: ['select2d', 'lasso2d'] };\n"
-		<< "            Plotly.newPlot(divId, data, layout, config);\n"
+		<< "            Plotly.newPlot(divId, data, layout, config).then(function() {\n"
+		<< "                const plotEl = document.getElementById(divId);\n"
+		<< "                const infoEl = document.getElementById(infoId);\n"
+		<< "                if (plotEl && infoEl) {\n"
+		<< "                    plotEl.on('plotly_hover', function(ev) {\n"
+		<< "                        if (ev.points && ev.points.length > 0 && ev.points[0].customdata) {\n"
+		<< "                            infoEl.innerText = ev.points[0].customdata;\n"
+		<< "                        }\n"
+		<< "                    });\n"
+		<< "                    plotEl.on('plotly_unhover', function() {\n"
+		<< "                        infoEl.innerText = 'Hover over points or curves to view details';\n"
+		<< "                    });\n"
+		<< "                }\n"
+		<< "            });\n"
 		<< "        }\n"
 		<< "        renderPlot();\n"
 		<< "    })();\n"
@@ -2527,6 +2683,7 @@ void Model::exportPlotAsPlotly()
 	}
 	else
 	{
+		//TODO: replace script src
 		// Standalone HTML template with styling and Plotly.js CDN
 		std::string standaloneHtml = R"HTML(<!DOCTYPE html>
 <html lang="en">
@@ -2572,6 +2729,18 @@ void Model::exportPlotAsPlotly()
         .plot-div {
             width: 100%;
             height: 600px;
+        }
+        .plot-info-bar {
+            margin-top: 10px;
+            padding: 8px 14px;
+            font-size: 0.85rem;
+            font-family: 'Consolas', 'Courier New', monospace;
+            background-color: #f9fafb;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            min-height: 20px;
+            transition: background-color 0.15s ease;
         }
         footer {
             margin-top: auto;
