@@ -20,7 +20,7 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/OTObject.h"
+#include "OTCore/Object/OTObject.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTWidgets/Widgets/WidgetBase.h"
 
@@ -38,7 +38,7 @@ namespace ot {
 		// Setter / Getter
 
 		void setWidgetOwner(const BasicServiceInformation& _owner) { m_owner = _owner; };
-		const BasicServiceInformation& getWidgetOwner(void) const { return m_owner; };
+		const BasicServiceInformation& getWidgetOwner() const { return m_owner; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -47,13 +47,13 @@ namespace ot {
 		void setWidgetEnabled(bool _enabled, int _counter = 1);
 
 		//! @brief Resets the disabled counter back to 0. (like no disabled was called)
-		void resetWidgetDisabledCounter(void);
+		void resetWidgetDisabledCounter();
 
 		void lockWidget(const LockTypes& _flags, int _lockCount = 1);
 
 		void unlockWidget(const LockTypes& _flags, int _unlockCount = 1);
 
-		void resetWidgetLockCounter(void);
+		void resetWidgetLockCounter();
 
 	protected:
 		//! @brief This method is called whenever the enabled state should be updated (e.g. setEnabled or setReadOnly).
@@ -63,7 +63,7 @@ namespace ot {
 		void lockWidgetFlag(LockType _flag, int _lockCount);
 		void unlockWidgetFlag(LockType _flag, int _unlockCount);
 
-		void evaluateEnabledState(void);
+		void evaluateEnabledState();
 		int& getLockCounter(LockType _flag);
 
 		BasicServiceInformation m_owner;
