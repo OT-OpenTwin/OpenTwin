@@ -267,6 +267,7 @@ void Model::resetToNew()
 		entityCircuit->setSceneFlags(EntityGraphicsScene::DefaultFlags | EntityGraphicsScene::AllowConnectionsOnConnections);
 		entityCircuit->setVisibleTreeItemIcon("Tree/Circuit");
 		entityCircuit->setHiddenTreeItemIcon("Tree/Circuit");
+		entityCircuit->setTreeItemEditable(true);
 		entityCircuit->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection |
@@ -356,6 +357,7 @@ void Model::resetToNew()
 		entityPipeline->setSceneFlags(EntityGraphicsScene::DefaultFlags);
 		entityPipeline->setVisibleTreeItemIcon("Tree/DataPipeline");
 		entityPipeline->setHiddenTreeItemIcon("Tree/DataPipeline");
+		entityPipeline->setTreeItemEditable(true);
 		entityPipeline->registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |
 			ot::EntityCallbackBase::Callback::Selection,
