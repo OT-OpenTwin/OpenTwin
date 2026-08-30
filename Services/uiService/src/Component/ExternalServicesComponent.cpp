@@ -2352,6 +2352,8 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document)
 {
 	m_actionProfiler.ignoreCurrent();
 
+	auto queueHandleRaii = AppBase::instance()->getQueueableObjectHandler().block(QueueableObjectHandler::CompoundMessage);
+
 	std::string projectName = ot::json::getString(_document, OT_ACTION_PARAM_PROJECT_NAME);
 	rapidjson::Value documents = _document[OT_ACTION_PARAM_PREFETCH_Documents].GetArray();
 	rapidjson::Value prefetchID = _document[OT_ACTION_PARAM_PREFETCH_ID].GetArray();

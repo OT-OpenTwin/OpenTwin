@@ -5,6 +5,7 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/RAII/FunctionRAII.h"
+#include "OTCore/Object/ObjectDestroyNotifier.h"
 
 // std header
 #include <mutex>
@@ -103,6 +104,7 @@ namespace ot
 		OT_DECL_NODISCARD bool hasAnyState(const StateFlags& _state);
 
 	private:
+		friend class BasicQueueObject;
 		typedef std::list<BasicQueueObject*> QueueType;
 
 		//! @brief Sets the provided stte flag.

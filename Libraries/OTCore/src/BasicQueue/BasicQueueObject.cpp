@@ -11,9 +11,7 @@ ot::BasicQueueObject::BasicQueueObject(InsertOrder _insertOrder)
 }
 
 ot::BasicQueueObject::~BasicQueueObject()
-{
-
-}
+{}
 
 ot::BasicQueueObject* ot::BasicQueueObject::makeQueueUnique(UniqueInsertBahavior _uniqueInsertBehavior)
 {

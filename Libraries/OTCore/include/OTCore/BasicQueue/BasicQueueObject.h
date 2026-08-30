@@ -8,6 +8,8 @@
 namespace ot
 {
 
+	class BasicQueue;
+
 	//! @brief The BasicQueueObject class is the base class for all objects that can be pushed to the BasicQueue.
 	//! The class provides the necessary interface for executing the object and handling its unique properties in the queue.
 	class OT_CORE_API_EXPORT BasicQueueObject
@@ -87,6 +89,8 @@ namespace ot
 		UniqueInsertBahavior getUniqueInsertBehavior() const { return m_uniqueInsertBehavior; };
 
 	private:
+		friend class BasicQueue;
+
 		InsertOrder m_insertOrder;
 		bool m_isUnique;
 		std::string m_customKey;

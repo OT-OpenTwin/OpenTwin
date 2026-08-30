@@ -136,10 +136,13 @@ namespace ot {
 			AssetError                 = 7706, //! @brief Asset error.
 			ComponentError             = 7707, //! @brief Component error.
 			GeneralTimeout		       = 7708, //! @brief General timeout.
+
 			LogInError                 = 7800, //! @brief Log in error.
 			FailedToConvertPort        = 7801, //! @brief Failed to convert port.
 			KeepAliveFailed            = 7802, //! @brief Keep alive failed.
-			InitializationTimeout      = 7803  //! @brief Initialization timeout.
+			InitializationTimeout      = 7803, //! @brief Initialization timeout.
+			RequestBlocked             = 7900, //! @brief Request blocked.
+			QueueExecutionBlocked	   = 7901  //! @brief Queue execution blocked.
 		};
 
 		//! @brief Returns a humanly readable string representation of the given exit code.

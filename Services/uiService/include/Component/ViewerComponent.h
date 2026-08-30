@@ -57,6 +57,8 @@ public:
 
 	// General
 
+	virtual void runOrQueueRequest(ot::BasicQueueObject* _request) override;
+
 	virtual void addKeyShortcut(const std::string& keySequence) override;
 	virtual void lockSelectionAndModification(bool flag) override;
 

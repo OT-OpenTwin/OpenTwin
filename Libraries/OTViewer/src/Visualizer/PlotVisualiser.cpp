@@ -18,10 +18,12 @@
 // @otlicense-end
 
 #include "OTCommunication/ActionTypes.h"
+#include "OTViewer/ViewerAPI.h"
 #include "OTViewer/FrontendAPI.h"
 #include "OTViewer/Node/SceneNodeBase.h"
 #include "OTViewer/Visualizer/PlotVisualiser.h"
 #include "OTViewer/Visualizer/CurveVisualiser.h"
+#include "OTViewer/QueueableRequests/RequestVisIfNeededRequest.h"
 
 PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 	:Visualiser(_sceneNode, ot::WidgetViewBase::View1D)
@@ -130,7 +132,14 @@ void PlotVisualiser::childNodeAdded(SceneNodeBase* _child)
 {
 	if (getViewIsOpen())
 	{
-		//! @todo Add connection to compound queue here
+		auto node = getSceneNode();
+		OTAssertNullptr(node);
+		
+		ot::RequestVisIfNeededRequest::makeRequest(
+			ViewerAPI::getActiveViewerModel(),
+			node->getModelEntityID(),
+			"PlotVisualiser"
+		);
 	}
 }
 

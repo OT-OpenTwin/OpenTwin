@@ -21,9 +21,11 @@
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
+#include "OTCore/BasicQueue/BasicQueueObject.h"
 #include "OTGui/EntityTreeItem.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
+#include "OTViewer/ViewerAPIExport.h"
 
 // Qt header
 #include <QtCore/qstring.h>
@@ -36,7 +38,7 @@
 namespace ot { class WidgetView; };
 namespace ot { class TextEditor; };
 
-class __declspec(dllexport) FrontendAPI {
+class OT_VIEWER_API_EXPORT FrontendAPI {
 public:
 	static void setInstance(FrontendAPI* _api);
 	static FrontendAPI* instance(void);
@@ -47,6 +49,8 @@ public:
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// General
+
+	virtual void runOrQueueRequest(ot::BasicQueueObject* _request) {};
 
 	virtual void addKeyShortcut(const std::string& keySequence) {};
 	virtual void lockSelectionAndModification(bool flag) {};

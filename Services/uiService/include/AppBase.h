@@ -26,6 +26,7 @@
 #include "uiServiceTypes.h"
 #include "NavigationSelectionManager.h"
 #include "Component/UIContextMenuManager.h"
+#include "Component/QueueableObjectHandler.h"
 #include "Login/LoginData.h"
 #include "ProjectOverview/ProjectOverviewWidget.h"
 
@@ -171,6 +172,7 @@ public:
 
 	ViewerComponent* getViewerComponent() const { return m_viewerComponent; };
 	ExternalServicesComponent* getExternalServicesComponent() const { return m_ExternalServicesComponent; };
+	QueueableObjectHandler& getQueueableObjectHandler() { return m_queueableObjectHandler; };
 
 	//! @brief Will set the current project as modified and apply UI changes
 	void setCurrentProjectIsModified(bool _isModified = true);
@@ -815,6 +817,7 @@ private:
 
 	ViewerComponent *			m_viewerComponent;
 	ExternalServicesComponent *	m_ExternalServicesComponent;
+	QueueableObjectHandler      m_queueableObjectHandler;
 
 	WelcomeWidget*      m_welcomeScreen;
 

@@ -79,6 +79,11 @@ ViewerComponent::~ViewerComponent() {}
 
 // General
 
+void ViewerComponent::runOrQueueRequest(ot::BasicQueueObject* _request)
+{
+	AppBase::instance()->getQueueableObjectHandler().runOrQueue(_request);
+}
+
 void ViewerComponent::addKeyShortcut(const std::string& keySequence) {
 	KeyboardCommandHandler* newHandler = new KeyboardCommandHandler(nullptr, AppBase::instance(), keySequence.c_str());
 	newHandler->setAsViewerHandler(true);
