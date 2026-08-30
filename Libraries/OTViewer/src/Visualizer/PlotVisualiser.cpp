@@ -126,6 +126,14 @@ void PlotVisualiser::setViewIsOpen(bool _viewIsOpen)
 	}
 }
 
+void PlotVisualiser::childNodeAdded(SceneNodeBase* _child)
+{
+	if (getViewIsOpen())
+	{
+		//! @todo Add connection to compound queue here
+	}
+}
+
 void PlotVisualiser::forwardViewOpen(SceneNodeBase* _node) {
 	for (Visualiser* vis : _node->getVisualiser()) {
 		CurveVisualiser* curveVis = dynamic_cast<CurveVisualiser*>(vis);

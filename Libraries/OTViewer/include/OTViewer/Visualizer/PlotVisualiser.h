@@ -33,6 +33,8 @@ public:
 
 	void setViewIsOpen(bool _viewIsOpen) override;
 
+	virtual void childNodeAdded(SceneNodeBase* _child) override;
+
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Plot"; };
 

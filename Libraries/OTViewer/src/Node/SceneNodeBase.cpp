@@ -33,7 +33,7 @@ SceneNodeBase::SceneNodeBase()
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Creating scene node");
 }
 
-SceneNodeBase::~SceneNodeBase() 
+SceneNodeBase::~SceneNodeBase()
 {
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Destroying scene node");
 
@@ -41,7 +41,8 @@ SceneNodeBase::~SceneNodeBase()
 	std::list<Visualiser*> visualisers = std::move(m_visualiser);
 	m_visualiser.clear();
 
-	for (Visualiser* visualiser : visualisers) {
+	for (Visualiser* visualiser : visualisers)
+	{
 		delete visualiser;
 		visualiser = nullptr;
 	}
@@ -58,10 +59,12 @@ SceneNodeBase::~SceneNodeBase()
 	m_children.clear();
 
 	// Remove shape node from parent nodes
-	if (getShapeNode() != nullptr) {
+	if (getShapeNode() != nullptr)
+	{
 		unsigned int numParents = getShapeNode()->getNumParents();
 
-		for (unsigned int i = 0; i < numParents; i++) {
+		for (unsigned int i = 0; i < numParents; i++)
+		{
 			osg::Group* parent = getShapeNode()->getParent(i);
 
 			// Remove the child node from the parent (the node itself will then be deleted by reference counting automatically)
@@ -75,7 +78,8 @@ SceneNodeBase::~SceneNodeBase()
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Scene node destroyed");
 }
 
-void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const {
+void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const
+{
 	_object.AddMember("TreeItem", ot::JsonObject(m_treeItem, _allocator), _allocator);
 	_object.AddMember("TreeItemID", m_treeItemID, _allocator);
 	_object.AddMember("Visible", m_visible, _allocator);
@@ -89,15 +93,18 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("ManageVisibilityOfChildren", m_manageVisibilityOfChildren, _allocator);
 	_object.AddMember("SelectionHandled", m_selectionHandled, _allocator);
 	_object.AddMember("Errors", ot::JsonString(m_errors, _allocator), _allocator);
-	if (m_parent) {
+	if (m_parent)
+	{
 		_object.AddMember("ParentName", ot::JsonString(m_parent->getName(), _allocator), _allocator);
 	}
-	else {
+	else
+	{
 		_object.AddMember("ParentName", ot::JsonNullValue(), _allocator);
 	}
 
 	ot::JsonArray childrenArr;
-	for (const SceneNodeBase* child : m_children) {
+	for (const SceneNodeBase* child : m_children)
+	{
 		ot::JsonObject childObj;
 		child->getDebugInformation(childObj, _allocator);
 		childrenArr.PushBack(childObj, _allocator);
@@ -105,7 +112,8 @@ void SceneNodeBase::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocat
 	_object.AddMember("Children", childrenArr, _allocator);
 
 	ot::JsonArray visualizersArr;
-	for (const Visualiser* visualizer : m_visualiser) {
+	for (const Visualiser* visualizer : m_visualiser)
+	{
 		ot::JsonObject visualizerObj;
 		visualizer->getDebugInformation(visualizerObj, _allocator);
 		visualizersArr.PushBack(visualizerObj, _allocator);
@@ -135,12 +143,13 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 {
 	ot::SelectionHandlingResult result = ot::SelectionHandlingEvent::Default;
 
-	if (m_selected != _selected) {
+	if (m_selected != _selected)
+	{
 
-		OT_VIEWER_SCENENODE_DBG_PTR(this, ": Updating scene node selection { \"WasSelected\": " << m_selected 
-			<< ", \"IsSelected\": " << _selected 
-			<< ", \"IsSingleSelection\": " << _singleSelection 
-			<< ", \"SelectedItems\": " << _selectionData.getSelectedTreeItems() 
+		OT_VIEWER_SCENENODE_DBG_PTR(this, ": Updating scene node selection { \"WasSelected\": " << m_selected
+			<< ", \"IsSelected\": " << _selected
+			<< ", \"IsSingleSelection\": " << _singleSelection
+			<< ", \"SelectedItems\": " << _selectionData.getSelectedTreeItems()
 			<< ", \"SlectionOrigin\": \"" << ot::toString(_selectionData.getSelectionOrigin())
 			<< "\" }");
 
@@ -159,50 +168,60 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		skipViewHandling |= _selectionData.isViewHandlingFlagSet(ot::ViewHandlingFlag::SkipViewHandling);
 
 		// Check if any visualiser has focus
-		for (Visualiser* visualiser : visualisers) {
-			if (FrontendAPI::instance()->hasViewFocus(visualiser->getViewEntityName(), visualiser->getViewType())) {
+		for (Visualiser* visualiser : visualisers)
+		{
+			if (FrontendAPI::instance()->hasViewFocus(visualiser->getViewEntityName(), visualiser->getViewType()))
+			{
 				state.anyVisualiserHasFocus = true;
 				break;
 			}
 		}
 
-		for (Visualiser* visualiser : visualisers) {
+		for (Visualiser* visualiser : visualisers)
+		{
 			// We have a valid state change, so we visualise all views, if they are not already opened in a view and the selection origins from a user interaction
 			// In case that properties change, effectively a new entity is created (same ID, different version) and a new scene node is created. 
 			// Therefore it is not necessary to compare the states of scenenode and entity. This algorithm only deals with the state of the view being
 			// open or not.
 
-			if (m_selected) {
+			if (m_selected)
+			{
 				// Entity was selected, so we want to visualise it
 
-				if (visualiser->getViewIsOpen()) {
+				if (visualiser->getViewIsOpen())
+				{
 					// If the view is currently open and the entity is selected, we want to set the focus on the view
 					// We do not want to focus every visualiser, so if any visualiser has focus, we do not set the focus again
-					if (!state.anyVisualiserHasFocus) {
-						if (!skipViewHandling) {
+					if (!state.anyVisualiserHasFocus)
+					{
+						if (!skipViewHandling)
+						{
 							FrontendAPI::instance()->setCurrentVisualizationTabFromEntityName(visualiser->getViewEntityName(), visualiser->getViewType());
 						}
-						
+
 						result |= ot::SelectionHandlingEvent::ActiveViewChanged;
 
 						state.anyVisualiserHasFocus = true;
 					}
-					
+
 					FrontendAPI::instance()->addVisualizingEntityToView(m_treeItemID, visualiser->getViewEntityName(), visualiser->getViewType());
 
 					// The visualizer may want to unhide/un-dim the visualisation
 					visualiser->showVisualisation(state, _visualisersInfo);
 				}
-				else if (visualiser->mayVisualise()) {
+				else if (visualiser->mayVisualise())
+				{
 					// The view is not open and the visualiser is enabled
-					
-					if (visualiser->requestVisualization(state, _visualisersInfo)) {
+
+					if (visualiser->requestVisualization(state, _visualisersInfo))
+					{
 						// Visualisation was requested
 						result |= ot::SelectionHandlingEvent::NewViewRequested;
 					}
 				}
 			}
-			else if (visualiser->getViewIsOpen()) {
+			else if (visualiser->getViewIsOpen())
+			{
 				// Entity was deselected, so we potentially want to hide or dim the visualisation
 				visualiser->hideVisualisation(state, _visualisersInfo);
 			}
@@ -215,16 +234,16 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 
 void SceneNodeBase::setHighlighted(bool _highlight)
 {
-	if (m_highlighted != _highlight) 
+	if (m_highlighted != _highlight)
 	{
 		m_highlighted = _highlight;
-		if (getSelectChildren()) 
-		{ 
+		if (getSelectChildren())
+		{
 			for (auto child : m_children)
 			{
 				child->setHighlighted(_highlight);
 			}
-		} 
+		}
 	}
 }
 
@@ -234,23 +253,38 @@ void SceneNodeBase::addChild(SceneNodeBase* child)
 	OTAssert(std::find(m_children.begin(), m_children.end(), child) == m_children.end(), "Child already in list");
 	m_children.push_back(child);
 	child->setParent(this);
+
+	for (Visualiser* visualiser : m_visualiser)
+	{
+		visualiser->childNodeAdded(child);
+	}
 }
 
 void SceneNodeBase::removeChild(SceneNodeBase* child)
 {
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Removing child scene node: " << ot::LogMsgPtr(child));
 	OTAssert(std::find(m_children.begin(), m_children.end(), child) != m_children.end(), "Child not in list");
+
 	m_children.remove(child);
+
+	for (Visualiser* visualiser : m_visualiser)
+	{
+		visualiser->childNodeRemoved(child);
+	}
 }
 
-bool SceneNodeBase::isChildOf(const SceneNodeBase* _parent) const {
-	if (_parent == nullptr) {
+bool SceneNodeBase::isChildOf(const SceneNodeBase* _parent) const
+{
+	if (_parent == nullptr)
+	{
 		return false;
 	}
-	else if (_parent == m_parent) {
+	else if (_parent == m_parent)
+	{
 		return true;
 	}
-	else {
+	else
+	{
 		return m_parent && m_parent->isChildOf(_parent);
 	}
 }
@@ -261,9 +295,11 @@ void SceneNodeBase::addVisualiser(Visualiser* _visualiser)
 	m_visualiser.push_back(_visualiser);
 }
 
-ot::UIDList SceneNodeBase::getVisualisedEntities() const {
+ot::UIDList SceneNodeBase::getVisualisedEntities() const
+{
 	ot::UIDList entities;
-	for (auto visualiser : m_visualiser) {
+	for (auto visualiser : m_visualiser)
+	{
 		entities.push_back(visualiser->getVisualizationEntity());
 	}
 	entities.unique();
@@ -325,7 +361,8 @@ void SceneNodeBase::requestVisualizationIfNeeded()
 	const std::list<Visualiser*>& allVisualiser = getVisualiser();
 	for (Visualiser* visualiser : allVisualiser)
 	{
-		if (visualiser->getViewIsOpen()) {
+		if (visualiser->getViewIsOpen())
+		{
 			OT_VIEWER_SCENENODE_DBG_PTR(this, ": Requesting visualization (1) for visualiser: " << ot::LogMsgPtr(visualiser));
 
 			VisualiserState state;

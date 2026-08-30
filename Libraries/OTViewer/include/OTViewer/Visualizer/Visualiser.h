@@ -82,20 +82,37 @@ public:
 	//! @brief Is called when the SceneNode visibility changes.
 	virtual void nodeVisibilityChanged(bool _visible) {};
 
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Scene node handling
+
+	SceneNodeBase* getSceneNode() const { return m_node; };
+
+	//! @brief Is called when a child node is added to this visualisers owning scene node.
+	virtual void childNodeAdded(SceneNodeBase* _childNode) {};
+
+	//! @brief Is called when a child node is removed from this visualisers owning scene node.
+	virtual void childNodeRemoved(SceneNodeBase* _childNode) {};
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
+	ot::WidgetViewBase::ViewType getViewType() const { return m_viewType; };
+
+	virtual std::string getViewEntityName() const;
+
+	//! @brief Create a visualiser configuration for this visualiser.
+	//! @param _state The state of the visualisation.
+	//! @param _rootNode Optional root node for the visualisation. If provided only this node and its children will be considered for the visualizing entities.
+	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode = nullptr) const;
+
 	//! @brief Switch for deciding if a data pull is necessary or if a lookup is necessary, if the displayed data may still be up-to date
 	virtual void setViewIsOpen(bool _viewIsOpen) { m_viewIsOpen = _viewIsOpen; };
 	bool getViewIsOpen() const { return m_viewIsOpen; };
 
 	void setCloseViewOnDelete(bool _closeOnDelete) { m_closeViewOnDelete = _closeOnDelete; };
 	bool getCloseViewOnDelete() const { return m_closeViewOnDelete; };
-
-	// ###########################################################################################################################################################################################################################################################################################################################
-
-	// Information
-
-	SceneNodeBase* getSceneNode() const { return m_node; };
-	
-	virtual std::string getViewEntityName() const;
 
 	//! @brief Set the entity that is visualized by this visualiser.
 	//! @param _entity The entity ID of the entity that is visualized by this visualiser.
@@ -105,17 +122,10 @@ public:
 	void setCustomViewFlags(const ot::WidgetViewBase::ViewFlags& _flags) { m_customViewFlags = _flags; };
 	const std::optional<ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
 
-	ot::WidgetViewBase::ViewType getViewType() const { return m_viewType; };
-
-	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
-
-	//! @brief Create a visualiser configuration for this visualiser.
-	//! @param _state The state of the visualisation.
-	//! @param _rootNode Optional root node for the visualisation. If provided only this node and its children will be considered for the visualizing entities.
-	ot::VisualisationCfg createVisualiserConfig(const VisualiserState& _state, SceneNodeBase* _rootNode = nullptr) const;
-
 	void setRequestHandled(bool _handled) { m_requestsHandled = _handled; };
 	bool getRequestHandled() const { return m_requestsHandled; };
+
+	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 protected:
 	virtual std::string getVisualiserTypeString() const = 0;
