@@ -40,7 +40,8 @@ public:
 
 
 	double getRotation() const;
-	std::string getFlip() const;
+	bool getFlipHorizontal() const;
+	bool getFlipVertical() const;
 
 	const ot::Connector getLeftConnectorPos1() const { return m_LeftConnectorPos1; }
 	const ot::Connector getLeftConnectorPos2() const { return m_LeftConnectorPos2; }

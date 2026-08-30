@@ -37,7 +37,8 @@ class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitVoltageSource : public Entit
 		virtual std::string getFolderName() override;
 
 		double getRotation();
-		std::string getFlip();
+		bool getFlipHorizontal() const;
+		bool getFlipVertical() const;
 		std::vector<std::string> getPulseParameters();
 		std::vector<std::string> getSinParameters();
 		std::vector<std::string> getExpParameters();

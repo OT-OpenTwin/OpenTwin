@@ -62,12 +62,18 @@ const double EntityBlockCircuitDiode::getRotation() const {
 	return value;
 }
 
-const std::string EntityBlockCircuitDiode::getFlip() const {
-	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
+bool EntityBlockCircuitDiode::getFlipHorizontal() const {
+	auto propertyBase = getProperties().getProperty("Flip Horizontal");
+	auto propertyFlip = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
 	assert(propertyBase != nullptr);
-	std::string value = propertyFlip->getValue();
-	return value;
+	return propertyFlip->getValue();
+}
+
+bool EntityBlockCircuitDiode::getFlipVertical() const {
+	auto propertyBase = getProperties().getProperty("Flip Vertical");
+	auto propertyFlip = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
+	assert(propertyBase != nullptr);
+	return propertyFlip->getValue();
 }
 
 bool EntityBlockCircuitDiode::updateFromProperties(void)
@@ -97,22 +103,15 @@ ot::GraphicsItemCfg* EntityBlockCircuitDiode::createBlockCfg()
 	std::string name = getNameOnly();
 	newConfig->addStringMapEntry("Name", name);
 
-	//Map of String to Enum
-	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
-	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
-	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
-	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
-
-
-
 	double rotation = getRotation();
-	std::string flip = getFlip();
-	ot::Transform::FlipState flipState(stringFlipMap[flip]);
+	bool flipH = getFlipHorizontal();
+	bool flipV = getFlipVertical();
 
 
 	ot::Transform transform;
 	transform.setRotation(rotation);
-	transform.setFlipState(flipState);
+	transform.setFlipState(ot::Transform::FlipHorizontally, flipH);
+	transform.setFlipState(ot::Transform::FlipVertically, flipV);
 	newConfig->setTransform(transform);
 
 	

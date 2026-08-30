@@ -34,7 +34,8 @@ EntityBlockCircuitElement::EntityBlockCircuitElement(ot::UID ID, EntityBase* par
 void EntityBlockCircuitElement::createProperties()
 {
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
-	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
+	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Horizontal", false, "default", getProperties());
+	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Vertical", false, "default", getProperties());
 	/*EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());*/
 	EntityPropertiesExtendedEntityList* selProp = EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, "default", getProperties());
 	selProp->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
@@ -42,9 +43,10 @@ void EntityBlockCircuitElement::createProperties()
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
 	auto rotationProperty = getProperties().getProperty("Rotation");
-	auto flipProperty = getProperties().getProperty("Flip");
+	auto flipHProperty = getProperties().getProperty("Flip Horizontal");
+	auto flipVProperty = getProperties().getProperty("Flip Vertical");
 
-	if (rotationProperty->needsUpdate() || flipProperty->needsUpdate()) {
+	if (rotationProperty->needsUpdate() || flipHProperty->needsUpdate() || flipVProperty->needsUpdate()) {
 		createBlockItem();
 	}
 

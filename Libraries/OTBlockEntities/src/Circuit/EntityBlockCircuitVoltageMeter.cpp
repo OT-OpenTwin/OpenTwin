@@ -55,7 +55,6 @@ EntityBlockCircuitVoltageMeter::EntityBlockCircuitVoltageMeter(ot::UID ID, Entit
 void EntityBlockCircuitVoltageMeter::createProperties() {
 	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
-	EntityPropertiesSelection::createProperty("Transform-Properties", "Flip", { "NoFlip" , "FlipVertically" , "FlipHorizontally" }, "NoFlip", "default", getProperties());
 }
 
 std::string EntityBlockCircuitVoltageMeter::getTypeAbbreviation() {
@@ -74,12 +73,18 @@ double EntityBlockCircuitVoltageMeter::getRotation() const {
 	return value;
 }
 
-std::string EntityBlockCircuitVoltageMeter::getFlip() const {
-	auto propertyBase = getProperties().getProperty("Flip");
-	auto propertyFlip = dynamic_cast<const EntityPropertiesSelection*>(propertyBase);
+bool EntityBlockCircuitVoltageMeter::getFlipHorizontal() const {
+	auto propertyBase = getProperties().getProperty("Flip Horizontal");
+	auto propertyFlip = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
 	assert(propertyBase != nullptr);
-	std::string value = propertyFlip->getValue();
-	return value;
+	return propertyFlip->getValue();
+}
+
+bool EntityBlockCircuitVoltageMeter::getFlipVertical() const {
+	auto propertyBase = getProperties().getProperty("Flip Vertical");
+	auto propertyFlip = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
+	assert(propertyBase != nullptr);
+	return propertyFlip->getValue();
 }
 
 #define TEST_ITEM_LOADER true
@@ -93,22 +98,15 @@ ot::GraphicsItemCfg* EntityBlockCircuitVoltageMeter::createBlockCfg() {
 	std::string name = getNameOnly();
 	newConfig->addStringMapEntry("Name", name);
 
-	//Map of String to Enum
-	std::map<std::string, ot::Transform::FlipState> stringFlipMap;
-	stringFlipMap.insert_or_assign("NoFlip", ot::Transform::NoFlip);
-	stringFlipMap.insert_or_assign("FlipVertically", ot::Transform::FlipVertically);
-	stringFlipMap.insert_or_assign("FlipHorizontally", ot::Transform::FlipHorizontally);
-
-
-
 	double rotation = getRotation();
-	std::string flip = getFlip();
-	ot::Transform::FlipState flipState(stringFlipMap[flip]);
+	bool flipH = getFlipHorizontal();
+	bool flipV = getFlipVertical();
 
 
 	ot::Transform transform;
 	transform.setRotation(rotation);
-	transform.setFlipState(flipState);
+	transform.setFlipState(ot::Transform::FlipHorizontally, flipH);
+	transform.setFlipState(ot::Transform::FlipVertically, flipV);
 	newConfig->setTransform(transform);
 
 

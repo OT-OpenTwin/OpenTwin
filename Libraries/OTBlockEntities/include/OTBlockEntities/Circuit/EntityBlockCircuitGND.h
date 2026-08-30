@@ -38,7 +38,8 @@ public:
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
 	double getRotation() const;
-	std::string getFlip() const;
+	bool getFlipHorizontal() const;
+	bool getFlipVertical() const;
 	const ot::Connector getLeftConnector() const { return m_LeftConnector; }
 	virtual bool updateFromProperties(void) override;
 private:
