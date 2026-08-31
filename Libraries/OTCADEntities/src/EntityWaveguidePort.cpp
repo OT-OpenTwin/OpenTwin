@@ -121,6 +121,14 @@ void EntityWaveguidePort::postGeometryUpdates(void)
 	textPosition = { cx, cy, cz };
 	textNormal = { nx, ny, nz };
 
+	double uComponent = 1.0;
+
+	if (nx < -tolerance || ny < -tolerance || nz < -tolerance)
+	{
+		// The text direction needs to be inverted
+		uComponent = -1.0;
+	}
+
 	setTextStringFromName();
 
 	if (fabs(ny) < tolerance && fabs(nz) < tolerance && fabs(fabs(nx) - 1.0) < tolerance)
@@ -128,11 +136,11 @@ void EntityWaveguidePort::postGeometryUpdates(void)
 		// Port normal +/- x direction (u = y, v = z)
 		if (dy > dz)
 		{
-			textDirU = { 0.0, 1.0, 0.0 };
+			textDirU = { 0.0, uComponent, 0.0 };
 		}
 		else
 		{
-			textDirU = { 0.0, 0.0, 1.0 };
+			textDirU = { 0.0, 0.0, -uComponent };
 		}
 	}
 	else if (fabs(nx) < tolerance && fabs(nz) < tolerance && fabs(fabs(ny) - 1.0) < tolerance)
@@ -140,11 +148,11 @@ void EntityWaveguidePort::postGeometryUpdates(void)
 		// Port normal +/- y direction (u = z, v = x)
 		if (dz > dx)
 		{
-			textDirU = { 0.0, 0.0, 1.0 };
+			textDirU = { 0.0, 0.0, uComponent };
 		}
 		else
 		{
-			textDirU = { 1.0, 0.0, 0.0 };
+			textDirU = { -uComponent, 0.0, 0.0 };
 		}
 	}
 	else if (fabs(nx) < tolerance && fabs(ny) < tolerance && fabs(fabs(nz) - 1.0) < tolerance)
@@ -152,11 +160,11 @@ void EntityWaveguidePort::postGeometryUpdates(void)
 		// Port normal +/- z direction (u = x, v = y)
 		if (dx > dy)
 		{
-			textDirU = { 1.0, 0.0, 0.0 };
+			textDirU = { uComponent, 0.0, 0.0 };
 		}
 		else
 		{
-			textDirU = { 0.0, 1.0, 0.0 };
+			textDirU = { 0.0, -uComponent, 0.0 };
 		}
 	}
 	else
