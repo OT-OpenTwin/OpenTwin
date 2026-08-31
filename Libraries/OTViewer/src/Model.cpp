@@ -2169,132 +2169,112 @@ void Model::exportPlotAsPlotly()
 	double gridLineWidth = plot->getConfig().getGridLineWidth();
 	bool legendVisible = plot->getConfig().getLegendVisible();
 
-	auto jsonEscape = [](const std::string& str) -> std::string {
-		std::ostringstream ss;
-		for (char c : str) {
-			switch (c) {
-			case '"': ss << "\\\""; break;
-			case '\\': ss << "\\\\"; break;
-			case '\b': ss << "\\b"; break;
-			case '\f': ss << "\\f"; break;
-			case '\n': ss << "\\n"; break;
-			case '\r': ss << "\\r"; break;
-			case '\t': ss << "\\t"; break;
-			default:
-				if (static_cast<unsigned char>(c) < 0x20) {
-					ss << "\\u" << std::hex << std::setw(4) << std::setfill('0') << static_cast<int>(static_cast<unsigned char>(c));
-				}
-				else {
-					ss << c;
-				}
-				break;
-			}
-		}
-		return ss.str();
-	};
+	// Assemble Plotly layout JSON
+	ot::JsonDocument layoutDoc;
+	ot::JsonAllocator& layoutAlloc = layoutDoc.GetAllocator();
 
-	// Assemble Plotly layout JSON (customized for Cartesian vs Polar coordinates)
-	std::string layoutJson;
+	ot::JsonObject titleObj;
+	titleObj.AddMember("text", ot::JsonString(plotTitle, layoutAlloc), layoutAlloc);
+	ot::JsonObject titleFontObj;
+	titleFontObj.AddMember("size", 20, layoutAlloc);
+	titleFontObj.AddMember("weight", "bold", layoutAlloc);
+	titleObj.AddMember("font", titleFontObj, layoutAlloc);
+	layoutDoc.AddMember("title", titleObj, layoutAlloc);
+
+	layoutDoc.AddMember("hovermode", "closest", layoutAlloc);
+	layoutDoc.AddMember("hoverdistance", 5, layoutAlloc);
+	layoutDoc.AddMember("spikedistance", 5, layoutAlloc);
+	layoutDoc.AddMember("showlegend", legendVisible, layoutAlloc);
+
+	ot::JsonObject legendObj;
+	legendObj.AddMember("x", 1.02, layoutAlloc);
+	legendObj.AddMember("y", 1, layoutAlloc);
+	legendObj.AddMember("xanchor", "left", layoutAlloc);
+	legendObj.AddMember("yanchor", "top", layoutAlloc);
+	legendObj.AddMember("bgcolor", "rgba(255, 255, 255, 0.9)", layoutAlloc);
+	legendObj.AddMember("bordercolor", "#e5e7eb", layoutAlloc);
+	legendObj.AddMember("borderwidth", 1, layoutAlloc);
+
+	ot::JsonObject legendFontObj;
+	legendFontObj.AddMember("family", "Outfit, sans-serif", layoutAlloc);
+	legendFontObj.AddMember("size", 12, layoutAlloc);
+	legendFontObj.AddMember("color", "#111827", layoutAlloc);
+	legendObj.AddMember("font", legendFontObj, layoutAlloc);
+
+	layoutDoc.AddMember("legend", legendObj, layoutAlloc);
+
 	if (isPolar)
 	{
-		layoutJson = "{\n"
-			"  \"title\": {\n"
-			"    \"text\": \"" + jsonEscape(plotTitle) + "\",\n"
-			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
-			"  },\n"
-			"  \"hovermode\": \"closest\",\n"
-			"  \"hoverdistance\": 5,\n"
-			"  \"spikedistance\": 5,\n"
-			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
-			"  \"legend\": {\n"
-			"    \"x\": 1.02,\n"
-			"    \"y\": 1,\n"
-			"    \"xanchor\": \"left\",\n"
-			"    \"yanchor\": \"top\",\n"
-			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
-			"    \"bordercolor\": \"#e5e7eb\",\n"
-			"    \"borderwidth\": 1,\n"
-			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
-			"  },\n"
-			"  \"polar\": {\n"
-			"    \"angularaxis\": {\n"
-			"      \"thetaunit\": \"radians\",\n"
-			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
-			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
-			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"      \"title\": { \"text\": \"" + jsonEscape(axisTitleX) + "\" }\n"
-			"    },\n"
-			"    \"radialaxis\": {\n"
-			"      \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
-			"      \"gridcolor\": \"" + gridColorStr + "\",\n"
-			"      \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"      \"title\": { \"text\": \"" + jsonEscape(axisTitleY) + "\" }\n"
-			"    }\n"
-			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
-			"}";
+		ot::JsonObject polarObj;
+
+		ot::JsonObject angularAxisObj;
+		angularAxisObj.AddMember("thetaunit", "radians", layoutAlloc);
+		angularAxisObj.AddMember("showgrid", gridVisible, layoutAlloc);
+		angularAxisObj.AddMember("gridcolor", ot::JsonString(gridColorStr, layoutAlloc), layoutAlloc);
+		angularAxisObj.AddMember("gridwidth", gridLineWidth, layoutAlloc);
+		ot::JsonObject angTitleObj;
+		angTitleObj.AddMember("text", ot::JsonString(axisTitleX, layoutAlloc), layoutAlloc);
+		angularAxisObj.AddMember("title", angTitleObj, layoutAlloc);
+		polarObj.AddMember("angularaxis", angularAxisObj, layoutAlloc);
+
+		ot::JsonObject radialAxisObj;
+		radialAxisObj.AddMember("showgrid", gridVisible, layoutAlloc);
+		radialAxisObj.AddMember("gridcolor", ot::JsonString(gridColorStr, layoutAlloc), layoutAlloc);
+		radialAxisObj.AddMember("gridwidth", gridLineWidth, layoutAlloc);
+		ot::JsonObject radTitleObj;
+		radTitleObj.AddMember("text", ot::JsonString(axisTitleY, layoutAlloc), layoutAlloc);
+		radialAxisObj.AddMember("title", radTitleObj, layoutAlloc);
+		polarObj.AddMember("radialaxis", radialAxisObj, layoutAlloc);
+
+		layoutDoc.AddMember("polar", polarObj, layoutAlloc);
 	}
 	else
 	{
-		layoutJson = "{\n"
-			"  \"title\": {\n"
-			"    \"text\": \"" + jsonEscape(plotTitle) + "\",\n"
-			"    \"font\": { \"size\": 20, \"weight\": \"bold\" }\n"
-			"  },\n"
-			"  \"hovermode\": \"closest\",\n"
-			"  \"hoverdistance\": 5,\n"
-			"  \"spikedistance\": 5,\n"
-			"  \"showlegend\": " + (legendVisible ? "true" : "false") + ",\n"
-			"  \"legend\": {\n"
-			"    \"x\": 1.02,\n"
-			"    \"y\": 1,\n"
-			"    \"xanchor\": \"left\",\n"
-			"    \"yanchor\": \"top\",\n"
-			"    \"bgcolor\": \"rgba(255, 255, 255, 0.9)\",\n"
-			"    \"bordercolor\": \"#e5e7eb\",\n"
-			"    \"borderwidth\": 1,\n"
-			"    \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
-			"  },\n"
-			"  \"xaxis\": {\n"
-			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
-			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
-			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"    \"title\": { \"text\": \"" + jsonEscape(axisTitleX) + "\" },\n"
-			"    \"showspikes\": true,\n"
-			"    \"spikemode\": \"across\",\n"
-			"    \"spikesnap\": \"cursor\",\n"
-			"    \"spikethickness\": 1,\n"
-			"    \"spikedash\": \"dash\",\n"
-			"    \"spikecolor\": \"#ef4444\"\n"
-			"  },\n"
-			"  \"yaxis\": {\n"
-			"    \"showgrid\": " + (gridVisible ? "true" : "false") + ",\n"
-			"    \"gridcolor\": \"" + gridColorStr + "\",\n"
-			"    \"gridwidth\": " + std::to_string(gridLineWidth) + ",\n"
-			"    \"title\": { \"text\": \"" + jsonEscape(axisTitleY) + "\" },\n"
-			"    \"showspikes\": true,\n"
-			"    \"spikemode\": \"across\",\n"
-			"    \"spikesnap\": \"cursor\",\n"
-			"    \"spikethickness\": 1,\n"
-			"    \"spikedash\": \"dash\",\n"
-			"    \"spikecolor\": \"#ef4444\"\n"
-			"  },\n"
-			"  \"margin\": { \"t\": 80, \"b\": 80, \"l\": 80, \"r\": 100 }\n"
-			"}";
+		ot::JsonObject xAxisObj;
+		xAxisObj.AddMember("showgrid", gridVisible, layoutAlloc);
+		xAxisObj.AddMember("gridcolor", ot::JsonString(gridColorStr, layoutAlloc), layoutAlloc);
+		xAxisObj.AddMember("gridwidth", gridLineWidth, layoutAlloc);
+		ot::JsonObject xTitleObj;
+		xTitleObj.AddMember("text", ot::JsonString(axisTitleX, layoutAlloc), layoutAlloc);
+		xAxisObj.AddMember("title", xTitleObj, layoutAlloc);
+		xAxisObj.AddMember("showspikes", true, layoutAlloc);
+		xAxisObj.AddMember("spikemode", "across", layoutAlloc);
+		xAxisObj.AddMember("spikesnap", "cursor", layoutAlloc);
+		xAxisObj.AddMember("spikethickness", 1, layoutAlloc);
+		xAxisObj.AddMember("spikedash", "dash", layoutAlloc);
+		xAxisObj.AddMember("spikecolor", "#ef4444", layoutAlloc);
+		layoutDoc.AddMember("xaxis", xAxisObj, layoutAlloc);
+
+		ot::JsonObject yAxisObj;
+		yAxisObj.AddMember("showgrid", gridVisible, layoutAlloc);
+		yAxisObj.AddMember("gridcolor", ot::JsonString(gridColorStr, layoutAlloc), layoutAlloc);
+		yAxisObj.AddMember("gridwidth", gridLineWidth, layoutAlloc);
+		ot::JsonObject yTitleObj;
+		yTitleObj.AddMember("text", ot::JsonString(axisTitleY, layoutAlloc), layoutAlloc);
+		yAxisObj.AddMember("title", yTitleObj, layoutAlloc);
+		yAxisObj.AddMember("showspikes", true, layoutAlloc);
+		yAxisObj.AddMember("spikemode", "across", layoutAlloc);
+		yAxisObj.AddMember("spikesnap", "cursor", layoutAlloc);
+		yAxisObj.AddMember("spikethickness", 1, layoutAlloc);
+		yAxisObj.AddMember("spikedash", "dash", layoutAlloc);
+		yAxisObj.AddMember("spikecolor", "#ef4444", layoutAlloc);
+		layoutDoc.AddMember("yaxis", yAxisObj, layoutAlloc);
 	}
 
-	// Iterate through all datasets and assemble traces JSON
-	std::stringstream dataJson;
-	dataJson << "[\n";
+	ot::JsonObject marginObj;
+	marginObj.AddMember("t", 80, layoutAlloc);
+	marginObj.AddMember("b", 80, layoutAlloc);
+	marginObj.AddMember("l", 80, layoutAlloc);
+	marginObj.AddMember("r", 100, layoutAlloc);
+	layoutDoc.AddMember("margin", marginObj, layoutAlloc);
 
-	size_t traceIndex = 0;
+	// Iterate through all datasets and assemble traces JSON
+	ot::JsonDocument dataDoc(rapidjson::kArrayType);
+	ot::JsonAllocator& dataAlloc = dataDoc.GetAllocator();
+
 	for (ot::PlotDataset* dataset : datasets)
 	{
 		if (!dataset) continue;
-		if (traceIndex > 0)
-		{
-			dataJson << ",\n";
-		}
 		const ot::Plot1DCurveCfg& config = dataset->getConfig();
 
 		// Determine trace name from title or entity name
@@ -2516,67 +2496,63 @@ void Model::exportPlotAsPlotly()
 		std::string key2 = isPolar ? "r" : "y";
 		bool isVisible = config.getVisible();
 
-		dataJson << "  {\n"
-			<< "    \"type\": \"" << traceType << "\",\n";
+		ot::JsonObject traceObj;
+		traceObj.AddMember("type", ot::JsonString(traceType, dataAlloc), dataAlloc);
 		if (isPolar)
 		{
-			dataJson << "    \"thetaunit\": \"radians\",\n";
+			traceObj.AddMember("thetaunit", "radians", dataAlloc);
 		}
-		dataJson << "    \"mode\": \"" << mode << "\",\n"
-			<< "    \"name\": \"" << jsonEscape(name) << "\",\n"
-			<< "    \"showlegend\": true,\n"
-			<< "    \"visible\": " << (isVisible ? "true" : "\"legendonly\"") << ",\n"
-			<< "    \"" << key1 << "\": [";
-		for (size_t i = 0; i < val1.size(); ++i)
+		traceObj.AddMember("mode", ot::JsonString(mode, dataAlloc), dataAlloc);
+		traceObj.AddMember("name", ot::JsonString(name, dataAlloc), dataAlloc);
+		traceObj.AddMember("showlegend", true, dataAlloc);
+		if (isVisible)
 		{
-			dataJson << val1[i];
-			if (i + 1 < val1.size()) dataJson << ", ";
+			traceObj.AddMember("visible", true, dataAlloc);
 		}
-		dataJson << "],\n"
-			<< "    \"" << key2 << "\": [";
-		for (size_t i = 0; i < val2.size(); ++i)
+		else
 		{
-			dataJson << val2[i];
-			if (i + 1 < val2.size()) dataJson << ", ";
+			traceObj.AddMember("visible", "legendonly", dataAlloc);
 		}
-		dataJson << "],\n"
-			<< "    \"hovertext\": [";
-		for (size_t i = 0; i < hoverTextList.size(); ++i)
-		{
-			dataJson << "\"" << jsonEscape(hoverTextList[i]) << "\"";
-			if (i + 1 < hoverTextList.size()) dataJson << ", ";
-		}
-		dataJson << "],\n"
-			<< "    \"customdata\": [";
-		for (size_t i = 0; i < customDataList.size(); ++i)
-		{
-			dataJson << "\"" << jsonEscape(customDataList[i]) << "\"";
-			if (i + 1 < customDataList.size()) dataJson << ", ";
-		}
-		dataJson << "],\n"
-			<< "    \"hovertemplate\": \"%{hovertext}<extra></extra>\",\n"
-			<< "    \"hoverlabel\": {\n"
-			<< "      \"bgcolor\": \"rgba(255, 255, 255, 0.95)\",\n"
-			<< "      \"bordercolor\": \"#e5e7eb\",\n"
-			<< "      \"font\": { \"family\": \"Outfit, sans-serif\", \"size\": 12, \"color\": \"#111827\" }\n"
-			<< "    },\n"
-			<< "    \"marker\": {";
-		dataJson << " \"color\": \"" << markerFillColorStr << "\",";
+		traceObj.AddMember(ot::JsonString(key1, dataAlloc), ot::JsonArray(val1, dataAlloc), dataAlloc);
+		traceObj.AddMember(ot::JsonString(key2, dataAlloc), ot::JsonArray(val2, dataAlloc), dataAlloc);
+		traceObj.AddMember("hovertext", ot::JsonArray(hoverTextList, dataAlloc), dataAlloc);
+		traceObj.AddMember("customdata", ot::JsonArray(customDataList, dataAlloc), dataAlloc);
+		traceObj.AddMember("hovertemplate", "%{hovertext}<extra></extra>", dataAlloc);
+
+		ot::JsonObject hoverLabelObj;
+		hoverLabelObj.AddMember("bgcolor", "rgba(255, 255, 255, 0.95)", dataAlloc);
+		hoverLabelObj.AddMember("bordercolor", "#e5e7eb", dataAlloc);
+		ot::JsonObject hoverFontObj;
+		hoverFontObj.AddMember("family", "Outfit, sans-serif", dataAlloc);
+		hoverFontObj.AddMember("size", 12, dataAlloc);
+		hoverFontObj.AddMember("color", "#111827", dataAlloc);
+		hoverLabelObj.AddMember("font", hoverFontObj, dataAlloc);
+		traceObj.AddMember("hoverlabel", hoverLabelObj, dataAlloc);
+
+		ot::JsonObject markerObj;
+		markerObj.AddMember("color", ot::JsonString(markerFillColorStr, dataAlloc), dataAlloc);
 		if (!plotlySymbol.empty())
 		{
-			dataJson << " \"symbol\": \"" << plotlySymbol << "\",";
+			markerObj.AddMember("symbol", ot::JsonString(plotlySymbol, dataAlloc), dataAlloc);
 		}
-		dataJson << " \"size\": " << pointSize;
+		markerObj.AddMember("size", pointSize, dataAlloc);
 		if (!markerOutlineColorStr.empty())
 		{
-			dataJson << ", \"line\": { \"color\": \"" << markerOutlineColorStr << "\", \"width\": " << markerOutlineWidth << " }";
+			ot::JsonObject markerLineObj;
+			markerLineObj.AddMember("color", ot::JsonString(markerOutlineColorStr, dataAlloc), dataAlloc);
+			markerLineObj.AddMember("width", markerOutlineWidth, dataAlloc);
+			markerObj.AddMember("line", markerLineObj, dataAlloc);
 		}
-		dataJson << " },\n";
-		dataJson << "    \"line\": { \"color\": \"" << colorStr << "\", \"width\": " << width << ", \"dash\": \"" << plotlyDash << "\" }";
-		dataJson << "\n  }";
-		traceIndex++;
+		traceObj.AddMember("marker", markerObj, dataAlloc);
+
+		ot::JsonObject lineObj;
+		lineObj.AddMember("color", ot::JsonString(colorStr, dataAlloc), dataAlloc);
+		lineObj.AddMember("width", width, dataAlloc);
+		lineObj.AddMember("dash", ot::JsonString(plotlyDash, dataAlloc), dataAlloc);
+		traceObj.AddMember("line", lineObj, dataAlloc);
+
+		dataDoc.PushBack(traceObj, dataAlloc);
 	}
-	dataJson << "\n]";
 
 	// Generate a unique ID for the HTML plot container
 	std::string uniqueId = std::to_string(std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -2592,8 +2568,8 @@ void Model::exportPlotAsPlotly()
 		<< "    (function() {\n"
 		<< "        const divId = 'plot-div-" << uniqueId << "';\n"
 		<< "        const infoId = 'plot-info-" << uniqueId << "';\n"
-		<< "        const data = " << dataJson.str() << ";\n"
-		<< "        const layoutTemplate = " << layoutJson << ";\n"
+		<< "        const data = " << dataDoc.toJson() << ";\n"
+		<< "        const layoutTemplate = " << layoutDoc.toJson() << ";\n"
 		<< "        function renderPlot() {\n"
 		<< "            const layout = {\n"
 		<< "                ...layoutTemplate,\n"
