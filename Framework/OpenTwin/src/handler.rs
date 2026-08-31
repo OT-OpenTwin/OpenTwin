@@ -71,6 +71,66 @@ pub async fn queue(cert: rustls::Certificate, addr: SocketAddr, opts: Value) -> 
     Ok(data)
 }
 
+#[derive(Debug, serde::Deserialize)]
+pub struct OpenQuery
+{
+    pub project: String,
+}
+
+pub async fn open(
+    opts: OpenQuery,
+) -> Result<impl warp::Reply, Infallible>
+{
+    println!("Open project: {}", opts.project);
+
+    // Für die opentwin:// URI URL-encoden
+    let project_url = urlencoding::encode(&opts.project);
+
+    let uri = format!(
+        "opentwin://open?project={}",
+        project_url
+    );
+
+    // Sichere Übergabe des URI-Strings an JavaScript
+    let uri_js = serde_json::to_string(&uri).unwrap();
+
+    // Projektname für HTML escapen
+    let project_html = html_escape::encode_text(&opts.project);
+
+    let html = format!(
+        r##"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>OpenTwin</title>
+</head>
+
+<body>
+    <h2>OpenTwin will be launched ...</h2>
+
+    <p>
+        Opening project: <strong>{project_html}</strong>
+    </p>
+
+    <p>
+        In case OpenTwin does not launch automatically:
+        <a id="open-link" href="#">Launch OpenTwin</a>
+    </p>
+
+    <script>
+        const uri = {uri_js};
+
+        const link = document.getElementById("open-link");
+        link.href = uri;
+
+        window.location.href = uri;
+    </script>
+</body>
+</html>"##
+    );
+
+    Ok(warp::reply::html(html))
+}
 
 pub async fn shutdown(cert: rustls::Certificate, _opts: Value) -> Result<String, Infallible>
 {

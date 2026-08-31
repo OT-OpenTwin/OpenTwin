@@ -120,6 +120,9 @@ QApplication* initializeQt(int &_argc, char* _argv[]) {
 	QLocale::setDefault(QLocale(QLocale::English));
 
 	QApplication* newApp = new QApplication(_argc, _argv);
+
+	QDir::setCurrent(QCoreApplication::applicationDirPath());
+
 	ak::uiAPI::ini(newApp, "OpenTwin", "UserFrontend");
 	
 	ot::GlobalColorStyle::instance().setApplication(newApp);

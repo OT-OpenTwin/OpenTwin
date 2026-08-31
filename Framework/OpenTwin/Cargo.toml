@@ -22,6 +22,8 @@ libloading = "0.5.2"
 hashbrown = "0.14.3"
 state = { version = "0.4.2", features = ["tls"] }
 indexmap = "2.2.5"
+urlencoding = "2"
+html-escape = "0.2"
 
 # mtls related dependencies
 

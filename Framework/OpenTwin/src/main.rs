@@ -163,8 +163,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .and_then(handler::execute_one_way_tls),
     );
 
-
-
     let queue_route = warp::path("queue").and(
         warp::post()
             .and(warp::ext::get::<rustls::Certificate>())
@@ -173,6 +171,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .and_then(handler::queue),
     );
 
+	let open_route = warp::path("open")
+		.and(warp::path::end())
+		.and(warp::get())
+		.and(warp::query::<handler::OpenQuery>())
+		.and_then(handler::open);
 
     // Should the shutdown route also be protected?
     // If so, the certificate has to be added
@@ -183,7 +186,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>>
             .and_then(handler::shutdown),
     );
 
-    let routes = info_route.or(execute_route).or(execute_one_tls_route).or(queue_route).or(shutdown_route);
+    let routes = info_route.or(execute_route).or(execute_one_tls_route).or(queue_route).or(open_route).or(shutdown_route);
 
     // MTLS Part:
     // We want to publish a different ip to other services (usually this is the public ip), than the ip we listen on.

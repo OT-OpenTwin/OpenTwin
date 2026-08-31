@@ -155,6 +155,12 @@ SectionEnd
 Section "Start Menu shortcut"
 	CreateShortcut "$SMPROGRAMS\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
 	CreateShortcut "$DESKTOP\${OPENTWIN_APP_NAME}.lnk" "$InstDir\OpenTwin.exe" "" "${OPENTWIN_APP_ICON}"
+	
+	WriteRegStr HKCU "Software\Classes\OpenTwin" "" "URL:OpenTwin Protocol"
+    WriteRegStr HKCU "Software\Classes\OpenTwin" "URL Protocol" ""
+    WriteRegStr HKCU "Software\Classes\OpenTwin\DefaultIcon" "" '"$InstDir\OpenTwin.exe",0'
+    WriteRegStr HKCU "Software\Classes\OpenTwin\shell\open\command" "" '"$InstDir\OpenTwin.exe" "%1"'
+
 SectionEnd
 
 Section -Uninstall
@@ -164,6 +170,8 @@ Section -Uninstall
 	${UNPINSHORTCUT} "$DESKTOP\${OPENTWIN_APP_NAME}.lnk"
 	Delete "$DESKTOP\${OPENTWIN_APP_NAME}.lnk"
 	
+	DeleteRegKey HKCU "Software\Classes\OpenTwin"
+		
 	RMDir /r "$InstDir"
 
 	DeleteRegKey HKCU "${REGPATH_UNINSTSUBKEY}"
