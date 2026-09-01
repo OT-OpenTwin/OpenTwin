@@ -68,3 +68,31 @@ TEST(BasicQueueTests, UniqueObjects)
 	EXPECT_EQ(myValue, 7);
 	EXPECT_FALSE(queue.hasNext());
 }
+
+TEST(BasicQueueTests, MutiqueueUniqueObjects)
+{
+	using namespace ot;
+	BasicQueue queue;
+
+	int myValue = 0;
+
+	for (int i = 0; i < 10; i++) {
+		myValue = i;
+
+		queue.push(new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 2); return 0; }));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, -1); return 0; }))->makeQueueUnique("A"));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, -1); return 0; }))->makeQueueUnique("B"));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 3); return 0; }))->makeQueueUnique("C"));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, -1); return 0; }))->makeQueueUnique("D"));
+		queue.push(new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 5); return 0; }));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, -1); return 0; }))->makeQueueUnique("C", BasicQueueObject::KeepExisting));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 6); return 0; }))->makeQueueUnique("B", BasicQueueObject::RemoveExisting));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 4); return 0; }))->makeQueueUnique("D", BasicQueueObject::ReplaceExisting));
+		queue.push((new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 1); return 0; }, BasicQueueObject::InsertFront))->makeQueueUnique("A", BasicQueueObject::RemoveExisting));
+		queue.push(new BasicQueueFunctionObject([&]() { myValue++; EXPECT_EQ(myValue, i + 7); return 0; }));
+
+		queue.exec();
+		EXPECT_EQ(myValue, i + 7);
+		EXPECT_FALSE(queue.hasNext());
+	}
+}

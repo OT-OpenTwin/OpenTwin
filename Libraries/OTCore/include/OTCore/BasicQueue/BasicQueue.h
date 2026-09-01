@@ -107,6 +107,8 @@ namespace ot
 		friend class BasicQueueObject;
 		typedef std::list<BasicQueueObject*> QueueType;
 
+		void removeIfUnique(BasicQueueObject* _object);
+
 		//! @brief Sets the provided stte flag.
 		void setState(State _state);
 

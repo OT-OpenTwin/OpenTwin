@@ -107,7 +107,6 @@ int ot::BasicQueue::exec()
 	StateRAII stateRAII(*this, State::ExecutingAll);
 	std::unique_ptr<BasicQueueObject> object(m_queue.front());
 	m_queue.pop_front();
-	
 	m_mutex.unlock();         // UNLOCK
 
 	// Grab the first object from the queue
@@ -118,11 +117,13 @@ int ot::BasicQueue::exec()
 
 		// Set the current object for the duration of its execution
 		m_currentObject = object.get();
+		OTAssertNullptr(m_currentObject);
+		removeIfUnique(m_currentObject);
 		
 		m_mutex.unlock();     // UNLOCK
 
 		int exitCode = this->execObject(object.get());
-
+		
 		m_mutex.lock();       // LOCK
 
 		// Reset the current object after execution
@@ -211,6 +212,15 @@ ot::BasicQueueObject* ot::BasicQueue::pop()
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Protected methods: State
+
+void ot::BasicQueue::removeIfUnique(BasicQueueObject* _object)
+{
+	if (_object && _object->isQueueObjectUnique())
+	{
+		std::string key = _object->getQueueObjectKey();
+		m_uniqueObjects.erase(key);
+	}
+}
 
 void ot::BasicQueue::setState(State _state)
 {
