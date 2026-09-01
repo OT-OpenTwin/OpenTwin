@@ -36,6 +36,7 @@
 #include "OTModelEntities/EntityVisVtkVectorVolumeComplex.h"
 #include "OTModelEntities/EntityVisVtkVectorVolumeTime.h"
 #include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/Properties/PlaneProperties.h"
 
 #include "OTModelAPI/ModelServiceAPI.h"
 #include "OTModelEntities/EntityAPI.h"
@@ -62,6 +63,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <numeric>
+#include <sstream>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr), timeStepWidth(0.0)
@@ -1486,11 +1488,11 @@ void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, 
 
 		if (isFrequencyDump(fieldDump))
 		{
-			convertAndStoreFrequencyDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit);
+			convertAndStoreFrequencyDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit, fieldDump);
 		}
 		else
 		{
-			convertAndStoreTimeDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit);
+			convertAndStoreTimeDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit, fieldDump);
 		}
 	}
 }
@@ -1578,7 +1580,7 @@ void FDTDSolver::convert1DFrequencySpectrum(const std::string& resultName, const
 	result1D.convert1D(resultName, fileName, quantityName, "", "Frequency", entityUnits->getFrequencyUnit(), entityUnits->getScaleToSIFrequency());
 }
 
-void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
+void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump)
 {
 	// Search for files of the form resultName_00010.vtr
 
@@ -1606,11 +1608,11 @@ void FDTDSolver::convertAndStoreTimeDomainDump(const std::string& resultFolder, 
 
 	if (!resultFileList.empty())
 	{
-		convertAndStoreSingleTimeDomainDump(resultFileList, resultName, fieldType, postfix, unit);
+		convertAndStoreSingleTimeDomainDump(resultFileList, resultName, fieldType, postfix, unit, fieldDump);
 	}
 }
 
-void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string &resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
+void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string &resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump *fieldDump)
 {
 	// Search for files of the form resultName_f=20000.000_abs.vtr
 
@@ -1637,14 +1639,14 @@ void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFol
 
 				if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
 				{
-					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, postfix, unit);
+					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, postfix, unit, fieldDump);
 				}
 			}
 		}
 	}
 }
 
-void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit)
+void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit, EntityFieldDump* fieldDump)
 {
 	// Extract result folder name from result file name
 	std::string resultName = parseComplexResultFileName(absFileName);
@@ -1656,6 +1658,9 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 
 	// Load the abs file data and store it as a binary data object
 	std::vector<char> absFileData = readFile(absFileName);
+
+	int gridNx = 0, gridNy = 0, gridNz = 0;
+	getGridDimensions(absFileData, gridNx, gridNy, gridNz);
 
 	EntityBinaryData* vtkAbsData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkAbsData->setData(absFileData.data(), absFileData.size());
@@ -1696,6 +1701,8 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 
 	visualizationEntity->createProperties();
 
+	fixPlanePLocation(gridNx, gridNy, gridNz, visualizationEntity, fieldDump);
+
 	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
 	visualizationEntity->setUnit(unit);
 
@@ -1713,13 +1720,63 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	vtkResult = nullptr;
 }
 
-void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit)
+void FDTDSolver::fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D *visualizationEntity, EntityFieldDump *fieldDump)
+{
+	if (gridNx != 1 && gridNy != 1 && gridNz != 1) return;
+
+	PlaneProperties properties;
+	auto normalProperty = dynamic_cast<EntityPropertiesSelection*>(visualizationEntity->getProperties().getProperty(properties.GetPropertyNameNormal()));
+	assert(normalProperty != nullptr);
+
+	EntityPropertiesDouble* centerXProperty = dynamic_cast<EntityPropertiesDouble*>(visualizationEntity->getProperties().getProperty(properties.GetPropertyNameCenterX()));
+	EntityPropertiesDouble* centerYProperty = dynamic_cast<EntityPropertiesDouble*>(visualizationEntity->getProperties().getProperty(properties.GetPropertyNameCenterY()));
+	EntityPropertiesDouble* centerZProperty = dynamic_cast<EntityPropertiesDouble*>(visualizationEntity->getProperties().getProperty(properties.GetPropertyNameCenterZ()));
+	assert(centerXProperty != nullptr && centerYProperty != nullptr && centerZProperty != nullptr);
+
+	EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Xmin", "Range"));
+	EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Xmax", "Range"));
+	EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Ymin", "Range"));
+	EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Ymax", "Range"));
+	EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Zmin", "Range"));
+	EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(fieldDump->getProperties().getProperty("Zmax", "Range"));
+	assert(xMinProperty != nullptr && xMaxProperty != nullptr && yMinProperty != nullptr && yMaxProperty != nullptr && zMinProperty != nullptr && zMaxProperty != nullptr);
+
+	// We will set a fixed plane in case of a degenerated volume
+	if (gridNz == 1)
+	{
+		normalProperty->setValue("Z");
+		normalProperty->setReadOnly(true);
+
+		centerZProperty->setValue(0.5 * (zMinProperty->getValue() + zMinProperty->getValue()));
+		centerZProperty->setReadOnly(true);
+	}
+	else if (gridNy == 1)
+	{
+		normalProperty->setValue("Y");
+		normalProperty->setReadOnly(true);
+
+		centerYProperty->setValue(0.5 * (yMinProperty->getValue() + yMinProperty->getValue()));
+		centerYProperty->setReadOnly(true);
+	}
+	else if (gridNx == 1)
+	{
+		normalProperty->setValue("X");
+		normalProperty->setReadOnly(true);
+
+		centerXProperty->setValue(0.5 * (xMinProperty->getValue() + xMinProperty->getValue()));
+		centerXProperty->setReadOnly(true);
+	}
+}
+
+
+void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump)
 {
 	// First, write binary data items for all result data files
 	std::list<std::pair<ot::UID, ot::UID>> dataEntityList;
 	std::list<double>  dataEntityTimeList;
 
 	double rangeMax = 0.0;
+	int gridNx = 0, gridNy = 0, gridNz = 0;
 
 	for (auto resultFile : resultFileList)
 	{
@@ -1744,6 +1801,9 @@ void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& res
 		// Determine the max value
 		double dataRangeMax = fabs(extractRangeMax(resultFileData));
 		rangeMax = std::max(rangeMax, dataRangeMax);
+	
+		// Determine the dimensions
+		getGridDimensions(resultFileData, gridNx, gridNy, gridNz);
 
 		EntityBinaryData* vtkData = new EntityBinaryData(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 		vtkData->setData(resultFileData.data(), resultFileData.size());
@@ -1776,6 +1836,8 @@ void FDTDSolver::convertAndStoreSingleTimeDomainDump(std::list<std::string>& res
 	);
 
 	visualizationEntity->createProperties();
+
+	fixPlanePLocation(gridNx, gridNy, gridNz, visualizationEntity, fieldDump);
 
 	visualizationEntity->setSource(vtkResult->getEntityID(), vtkResult->getEntityStorageVersion());
 	visualizationEntity->setUnit(unit);
@@ -2349,4 +2411,72 @@ std::size_t FDTDSolver::mergeCloseNodes(std::vector<Geometry::Node>& nodes, doub
 		++merged;
 	}
 	return merged;
+}
+
+bool FDTDSolver::getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz)
+{
+	if (data.empty())
+	{
+		return false;
+	}
+
+	const std::string_view xml(data.data(), data.size());
+
+	const auto tagBegin = xml.find("<RectilinearGrid");
+	if (tagBegin == std::string_view::npos)
+	{
+		return false;
+	}
+
+	const auto tagEnd = xml.find('>', tagBegin);
+	const auto attribute = xml.find("WholeExtent", tagBegin);
+
+	if (tagEnd == std::string_view::npos ||
+		attribute == std::string_view::npos ||
+		attribute > tagEnd)
+	{
+		return false;
+	}
+
+	const auto quoteBegin = xml.find('"', attribute);
+	const auto quoteEnd = quoteBegin != std::string_view::npos
+		? xml.find('"', quoteBegin + 1)
+		: std::string_view::npos;
+
+	if (quoteBegin == std::string_view::npos ||
+		quoteEnd == std::string_view::npos ||
+		quoteEnd > tagEnd)
+	{
+		return false;
+	}
+
+	std::istringstream stream{
+		std::string(xml.substr(
+			quoteBegin + 1,
+			quoteEnd - quoteBegin - 1))
+	};
+
+	std::array<int, 6> extent;
+
+	for (int& value : extent)
+	{
+		if (!(stream >> value))
+		{
+			return false;
+		}
+	}
+
+	if (extent[1] < extent[0] ||
+		extent[3] < extent[2] ||
+		extent[5] < extent[4])
+	{
+		return false;
+	}
+
+	// Assign output values only after successful validation
+	nx = extent[1] - extent[0] + 1;
+	ny = extent[3] - extent[2] + 1;
+	nz = extent[5] - extent[4] + 1;
+
+	return true;
 }

@@ -309,6 +309,21 @@ void VtkDriverVectorVolumeComplex::prepareComplexData()
 
 vtkAlgorithmOutput * VtkDriverVectorVolumeComplex::ApplyCutplane(osg::Node * parent)
 {	
+	if (getDataDimension(dataConnection) == 2)
+	{
+		// Here we handle the special case that the grid is degenerated, e.h. just a plane. Here we do not cut the plane, but
+		// convert it into poly data right away.
+
+		auto geometryFilter = vtkGeometryFilter::New();
+		objectsToDelete.push_back(geometryFilter);
+
+		geometryFilter->SetInputConnection(dataConnection);
+
+		return dataConnection = geometryFilter->GetOutputPort();
+	}
+
+	// The grid is indeed a volume, so we need to apply a cutplane
+
 	assert(planeData != nullptr);
 	assert(planeData->GetNormalDescription() != PlaneProperties::UNKNOWN);
 	
@@ -665,4 +680,27 @@ void VtkDriverVectorVolumeComplex::setProperties(EntityVis2D3D *visEntity)
 	VtkDriverWithScaling::setProperties(visEntity);
 	planeData = new PropertyBundleDataHandlePlane(visEntity);
 	visData = new PropertyBundleDataHandleVisVectorVolumeComplex(visEntity);
+}
+
+int VtkDriverVectorVolumeComplex::getDataDimension(vtkAlgorithmOutput* connection)
+{
+	if (!connection || !connection->GetProducer())
+	{
+		return -1;
+	}
+
+	vtkAlgorithm* producer = connection->GetProducer();
+	producer->Update();
+
+	vtkDataObject* dataObject =
+		producer->GetOutputDataObject(connection->GetIndex());
+
+	vtkDataSet* dataSet = vtkDataSet::SafeDownCast(dataObject);
+
+	if (!dataSet || dataSet->GetNumberOfCells() == 0)
+	{
+		return -1;
+	}
+
+	return dataSet->GetCell(0)->GetCellDimension();
 }

@@ -62,6 +62,7 @@ private:
 
 	void CheckForModelUpdates();
 	virtual void DeletePropertyData(void) override;
+	int getDataDimension(vtkAlgorithmOutput* connection);
 
 	DataSourceVtkTime* dataSource;
 	vtkAlgorithmOutput* dataConnection;

@@ -34,6 +34,7 @@ class EntityFacetData;
 class ResultManager;
 class EntityWaveguidePort;
 class EntityFieldDump;
+class EntityVis2D3D;
 
 #include "OTModelEntities/Geometry.h"
 
@@ -58,10 +59,10 @@ private:
 	void addPorts(std::stringstream& runCommand);
 	void addFieldDumps(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
-	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
-	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
-	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
-	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit);
+	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
+	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
+	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
+	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
 	std::string toLower(std::string s);
 	std::vector<char> readFile(const std::string& filename);
 	std::string parseComplexResultFileName(const std::string& input);
@@ -93,6 +94,8 @@ private:
 	std::string getStartStopString(EntityFieldDump* fieldDump);
 	bool isFrequencyDump(EntityFieldDump* fieldDump);
 	std::size_t mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance);
+	bool getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz);
+	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
 
 	Application* application;
 	EntityBase *solverEntity;
