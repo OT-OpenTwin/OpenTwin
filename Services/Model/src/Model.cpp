@@ -91,6 +91,9 @@
 #include "Bnd_Box.hxx"
 #include "BRepExtrema_DistShapeShape.hxx"
 #include "BRepBuilderAPI_MakeVertex.hxx"
+#include "BRep_Builder.hxx"
+#include "TopoDS_Compound.hxx"
+#include "TopoDS_Shape.hxx"
 
 #undef min
 #undef max
@@ -3583,26 +3586,40 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 			std::list<TopoDS_Shape> faces;
 			findFacesAtIndexFromShape(annotationEntity, faces, faceIndex, geometryEntity->getBrepEntity());
 
-			for (auto face : faces)
+			if (!faces.empty())
 			{
-				// Now determine its bounding box 
-				Bnd_Box Box;
+				BRep_Builder builder;
+				TopoDS_Compound compound;
+				builder.MakeCompound(compound);
 
-				BRepBndLib::Add(face, Box);
-				double xmin = 0.0, ymin = 0.0, zmin = 0.0, xmax = 0.0, ymax = 0.0, zmax = 0.0;
-				Box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
+				double deflection = DBL_MAX;
 
-				annotationEntity->getBoundingBox().extend(xmin, xmax, ymin, ymax, zmin, zmax);
+				for (auto face : faces)
+				{
+					// Now determine its bounding box 
+					Bnd_Box Box;
 
-				// Now facet the geometry and store the visualization item
+					BRepBndLib::Add(face, Box);
+					double xmin = 0.0, ymin = 0.0, zmin = 0.0, xmax = 0.0, ymax = 0.0, zmax = 0.0;
+					Box.Get(xmin, ymin, zmin, xmax, ymax, zmax);
 
-				std::list<EntityBase *> entity;
-				entity.push_back(geometryEntity);
+					annotationEntity->getBoundingBox().extend(xmin, xmax, ymin, ymax, zmin, zmax);
 
-				double deflection = calculateDeflectionFromListOfEntities(entity);
+					// Now facet the geometry and store the visualization item
+
+					std::list<EntityBase*> entity;
+					entity.push_back(geometryEntity);
+
+					double currentDeflection = calculateDeflectionFromListOfEntities(entity);
+					deflection = std::min(deflection, currentDeflection);
+
+					if (!face.IsNull()) {
+						builder.Add(compound, face);
+					}
+				}
 
 				std::string errors;
-				ot::GeometryOperations::facetEntity(face, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
+				ot::GeometryOperations::facetEntity(compound, nullptr, deflection, annotationEntity->getFacets()->getNodeVector(), annotationEntity->getFacets()->getTriangleList(), annotationEntity->getFacets()->getEdgeList(), annotationEntity->getFacets()->getFaceNameMap(), errors);
 			}
 		}
 	}
@@ -3631,7 +3648,6 @@ void Model::findFacesAtIndexFromShape(EntityFaceAnnotation *annotationEntity, st
 		if (brep->getFaceName(aFace) == faceName->getValue())
 		{
 			facesList.push_back(exp.Current());
-			return;
 		}
 	}
 }
