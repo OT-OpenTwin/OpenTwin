@@ -489,10 +489,10 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 	runCommand << "ports = {}\n";
 
-	int portCount = 1;
-
 	for (auto port : waveguidePortList)
 	{
+		int portNumber = std::stoi(port->getNameOnly());
+
 		EntityFacetData* facetEntity = dynamic_cast<EntityFacetData*>(ot::EntityAPI::readEntityFromEntityIDandVersion(facetEntitiesInfo.front().getEntityID(), facetEntitiesInfo.front().getEntityVersion()));
 		facetEntitiesInfo.pop_front();
 		if (facetEntity != nullptr)
@@ -531,7 +531,7 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 				runCommand << "start=[" << from << ", " << box.getYmin() << ", " << box.getZmin() << "];\n";
 				runCommand << "stop =[" << to << ", " << box.getYmax() << ", " << box.getZmax() << "];\n";
-				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'x', " << box.getYmax() - box.getYmin() << "*gunit, " << box.getZmax() - box.getZmin() << "*gunit, '" << mode << "', 1)\n";
+				runCommand << "ports[" << portNumber << "] = FDTD.AddRectWaveGuidePort( " << portNumber << ", start, stop, 'x', " << box.getYmax() - box.getYmin() << "*gunit, " << box.getZmax() - box.getZmin() << "*gunit, '" << mode << "', 1)\n";
 
 			}
 			else if (fabs(nx) < tolerance && fabs(nz) < tolerance && fabs(fabs(ny) - 1.0) < tolerance)
@@ -542,7 +542,7 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 				runCommand << "start=[" << box.getXmin() << ", " << from << ", " << box.getZmin() << "];\n";
 				runCommand << "stop =[" << box.getXmax() << ", " << to << ", " << box.getZmax() << "];\n";
-				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'y', " << box.getZmax() - box.getZmin() << "*gunit, " << box.getXmax() - box.getXmin() << "*gunit, '" << mode << "', 1)\n";
+				runCommand << "ports[" << portNumber << "] = FDTD.AddRectWaveGuidePort( " << portNumber << ", start, stop, 'y', " << box.getZmax() - box.getZmin() << "*gunit, " << box.getXmax() - box.getXmin() << "*gunit, '" << mode << "', 1)\n";
 
 			}
 			else if (fabs(nx) < tolerance && fabs(ny) < tolerance && fabs(fabs(nz) - 1.0) < tolerance)
@@ -553,10 +553,8 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 				runCommand << "start=[" << box.getXmin() << ", " << box.getYmin() << ", " << from << "];\n";
 				runCommand << "stop =[" << box.getXmax() << ", " << box.getYmax() << ", " << to << "];\n";
-				runCommand << "ports[" << portCount << "] = FDTD.AddRectWaveGuidePort( " << portCount << ", start, stop, 'z', " << box.getXmax() - box.getXmin() << "*gunit, " << box.getYmax() - box.getYmin() << "*gunit, '" << mode << "', 1)\n";
+				runCommand << "ports[" << portNumber << "] = FDTD.AddRectWaveGuidePort( " << portNumber << ", start, stop, 'z', " << box.getXmax() - box.getXmin() << "*gunit, " << box.getYmax() - box.getYmin() << "*gunit, '" << mode << "', 1)\n";
 			}
-
-			portCount++;
 
 			delete facetEntity;
 			facetEntity = nullptr;
