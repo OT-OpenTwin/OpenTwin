@@ -41,6 +41,7 @@ struct DataDefinitionOverride
 	std::optional<std::string> m_Name;
 	std::optional<std::string> m_dataType;
 	std::optional<std::string> m_unit;
+	std::optional<std::string> m_classification;
 };
 
 struct TableOverrides

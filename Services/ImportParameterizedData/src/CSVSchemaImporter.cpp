@@ -71,14 +71,9 @@ void CSVSchemaImporter::execute()
 		MetadataAssemblyData seriesMetadataAssemblyData(extractMetadataAssembly(seriesClassificationName));
 		MetadataAssemblyData* parameter = seriesMetadataAssemblyData.m_next;
 		MetadataAssemblyData* quantity = parameter->m_next;
-		bool quantMissing = quantity->m_allSelectionRanges.size() == 0;
-		bool paramMissing = parameter->m_allSelectionRanges.size() == 0;
-		if (quantMissing || paramMissing)
-		{
-			std::string missingComponent = paramMissing && quantMissing ? "Parameter and quantity" : paramMissing ? "Parameter" : "Quantity";
-			OT_USER_LOG_E(missingComponent + " classification(s) without table ranges in : " + seriesClassificationName);
-			return;
-		}
+		
+		// Check of parameter and quantity selection ranges is moved down to ensure that we consider the json overrides first
+
 
 		std::set<std::string> referencedTableNames;
 		std::set<std::string> referencesWithoutEntireColumnOrRow;
@@ -99,7 +94,7 @@ void CSVSchemaImporter::execute()
 			}
 		}
 
-		if (referencedTableNames.size() != 1)
+		if (referencedTableNames.size() > 1)
 		{
 			std::string allReferencedTableNames;
 			for (const std::string& referencedTableName : referencedTableNames)
@@ -181,16 +176,10 @@ void CSVSchemaImporter::execute()
 			if (overrides.m_hasColumnDefintions || overrides.m_hasRowDefintions) {
 				bool usesHorizontal = false;
 				bool usesVertical = false;
-				auto checkRanges = [&](MetadataAssemblyData* data) {
-					if (!data) return;
-					for (auto& range : data->m_allSelectionRanges) {
-						if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal) usesHorizontal = true;
-						if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Vertical) usesVertical = true;
-					}
-				};
-				checkRanges(&seriesMetadataAssemblyData);
-				checkRanges(parameter);
-				checkRanges(quantity);
+				
+				checkRanges(&seriesMetadataAssemblyData, usesHorizontal, usesVertical);
+				checkRanges(parameter, usesHorizontal, usesVertical);
+				checkRanges(quantity, usesHorizontal, usesVertical);
 				
 				if (overrides.m_hasColumnDefintions && usesVertical) {
 					OT_USER_LOG_W("JSON metadata contains $ColumnDefinitions$ but table selection uses Row orientation (Vertical).");
@@ -202,11 +191,64 @@ void CSVSchemaImporter::execute()
 				}
 			}
 
+			bool paramHasJSON = jsonHasClassification(overrides, "parameter", true) || jsonHasClassification(overrides, "parameter", false);
+			bool quantHasJSON = jsonHasClassification(overrides, "quantity", true) || jsonHasClassification(overrides, "quantity", false);
+
+			bool quantMissing = quantity->m_allSelectionRanges.size() == 0 && !quantHasJSON;
+			bool paramMissing = parameter->m_allSelectionRanges.size() == 0 && !paramHasJSON;
+
+			if (quantMissing || paramMissing)
+			{
+				std::string missingComponent = paramMissing && quantMissing ? "Parameter and quantity" : paramMissing ? "Parameter" : "Quantity";
+				OT_USER_LOG_E(missingComponent + " classification(s) without table ranges or JSON classification.");
+				csvFile = csvFiles.erase(csvFile);
+				updater.triggerUpdate(counter);
+				counter++;
+				if (interruptAtWarnings) {
+					createReportOnFailure();
+					return;
+				} 
+				else 
+				{
+					continue;
+				}
+			}
+
+			MetadataAssemblyData localSeriesMetadataAssemblyData;
+			localSeriesMetadataAssemblyData.m_allSelectionRanges = seriesMetadataAssemblyData.m_allSelectionRanges;
+			localSeriesMetadataAssemblyData.m_dataCategory = seriesMetadataAssemblyData.m_dataCategory;
 			
+			localSeriesMetadataAssemblyData.m_next = new MetadataAssemblyData();
+			localSeriesMetadataAssemblyData.m_next->m_allSelectionRanges = parameter->m_allSelectionRanges;
+			localSeriesMetadataAssemblyData.m_next->m_dataCategory = parameter->m_dataCategory;
+			
+			localSeriesMetadataAssemblyData.m_next->m_next = new MetadataAssemblyData();
+			localSeriesMetadataAssemblyData.m_next->m_next->m_allSelectionRanges = quantity->m_allSelectionRanges;
+			localSeriesMetadataAssemblyData.m_next->m_next->m_dataCategory = quantity->m_dataCategory;
+
+			if (paramHasJSON) {
+				localSeriesMetadataAssemblyData.m_next->m_allSelectionRanges.clear();
+			}
+			if (quantHasJSON) {
+				localSeriesMetadataAssemblyData.m_next->m_next->m_allSelectionRanges.clear();
+			}
+			
+			ot::IVisualisationTable* tableView = dynamic_cast<ot::IVisualisationTable*>((*csvFile).get());
+			ot::GenericDataStructMatrix tableContent = tableView->getTable();
+			uint32_t maxRows = tableContent.getNumberOfRows();
+			uint32_t maxCols = tableContent.getNumberOfColumns();
+
+			if (overrides.m_hasColumnDefintions) {
+				generateRangesOutOfJSON(overrides.m_columns, true, (*csvFile).get(), maxRows, maxCols, *localSeriesMetadataAssemblyData.m_next, *localSeriesMetadataAssemblyData.m_next->m_next);
+			}
+			if (overrides.m_hasRowDefintions) {
+				generateRangesOutOfJSON(overrides.m_rows, false, (*csvFile).get(), maxRows, maxCols, *localSeriesMetadataAssemblyData.m_next, *localSeriesMetadataAssemblyData.m_next->m_next);
+			}
+
 			ot::UID seriesUID;
 			try
 			{
-				datasetDescriptions = createDatasetDescription(seriesMetadataAssemblyData, (*csvFile).get(), overrides);
+				datasetDescriptions = createDatasetDescription(localSeriesMetadataAssemblyData, (*csvFile).get(), overrides);
 				seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
 				std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
 				
@@ -636,41 +678,122 @@ std::optional<ot::JsonDocument> CSVSchemaImporter::createSeriesMetadata(EntityDa
 	}
 }
 
+void CSVSchemaImporter::parseSection(ot::JsonDocument& doc, const char* sectionName, std::map<uint32_t, DataDefinitionOverride>& overridesMap, bool& hasDefinitions)
+{
+	if (doc.HasMember(sectionName) && doc[sectionName].IsObject()) {
+		hasDefinitions = true;
+		auto& defs = doc[sectionName];
+		for (auto it = defs.MemberBegin(); it != defs.MemberEnd(); ++it) {
+			std::string key = it->name.GetString();
+			DataDefinitionOverride def;
+			if (it->value.IsObject()) {
+				if (it->value.HasMember("name") && it->value["name"].IsString()) def.m_Name = it->value["name"].GetString();
+				if (it->value.HasMember("dataType") && it->value["dataType"].IsString()) def.m_dataType = it->value["dataType"].GetString();
+				if (it->value.HasMember("unit") && it->value["unit"].IsString()) def.m_unit = it->value["unit"].GetString();
+				if (it->value.HasMember("classification") && it->value["classification"].IsString()) def.m_classification = it->value["classification"].GetString();
+			}
+			
+			key.erase(std::remove(key.begin(), key.end(), ' '), key.end());
+			size_t dashPos = key.find('-');
+			if (dashPos != std::string::npos) {
+				try {
+					uint32_t start = std::stoul(key.substr(0, dashPos));
+					uint32_t end = std::stoul(key.substr(dashPos + 1));
+					for (uint32_t i = start; i <= end; ++i) {
+						overridesMap[i] = def;
+					}
+				} catch (...) {}
+			} else {
+				try {
+					uint32_t index = std::stoul(key);
+					overridesMap[index] = def;
+				} catch (...) {}
+			}
+		}
+	}
+}
+
 void CSVSchemaImporter::parseOverrides(ot::JsonDocument& _doc, TableOverrides& _overrides)
 {
-	auto parseSection = [](ot::JsonDocument& doc, const char* sectionName, std::map<uint32_t, DataDefinitionOverride>& overridesMap, bool& hasDefinitions) {
-		if (doc.HasMember(sectionName) && doc[sectionName].IsObject()) {
-			hasDefinitions = true;
-			auto& defs = doc[sectionName];
-			for (auto it = defs.MemberBegin(); it != defs.MemberEnd(); ++it) {
-				std::string key = it->name.GetString();
-				DataDefinitionOverride def;
-				if (it->value.IsObject()) {
-					if (it->value.HasMember("name") && it->value["name"].IsString()) def.m_Name = it->value["name"].GetString();
-					if (it->value.HasMember("dataType") && it->value["dataType"].IsString()) def.m_dataType = it->value["dataType"].GetString();
-					if (it->value.HasMember("unit") && it->value["unit"].IsString()) def.m_unit = it->value["unit"].GetString();
-				}
-				
-				key.erase(std::remove(key.begin(), key.end(), ' '), key.end());
-				size_t dashPos = key.find('-');
-				if (dashPos != std::string::npos) {
-					try {
-						uint32_t start = std::stoul(key.substr(0, dashPos));
-						uint32_t end = std::stoul(key.substr(dashPos + 1));
-						for (uint32_t i = start; i <= end; ++i) {
-							overridesMap[i] = def;
-						}
-					} catch (...) {}
-				} else {
-					try {
-						uint32_t index = std::stoul(key);
-						overridesMap[index] = def;
-					} catch (...) {}
+	parseSection(_doc, "$ColumnDefinitions$", _overrides.m_columns, _overrides.m_hasColumnDefintions);
+	parseSection(_doc, "$RowDefinitions$", _overrides.m_rows, _overrides.m_hasRowDefintions);
+}
+
+bool CSVSchemaImporter::jsonHasClassification(TableOverrides& _overrides, const std::string& _classification, bool _isColumn)
+{
+	if (_isColumn) 
+	{
+		if(_overrides.m_hasColumnDefintions)
+		{
+			for (const auto& [index, def] : _overrides.m_columns) 
+			{
+				if (def.m_classification.has_value() && def.m_classification.value() == _classification) 
+				{
+					return true;
 				}
 			}
 		}
-	};
-	
-	parseSection(_doc, "$ColumnDefinitions$", _overrides.m_columns, _overrides.m_hasColumnDefintions);
-	parseSection(_doc, "$RowDefinitions$", _overrides.m_rows, _overrides.m_hasRowDefintions);
+	} 
+	else 
+	{
+		if(_overrides.m_hasRowDefintions) 
+		{
+			for (const auto& [index, def] : _overrides.m_rows) 
+			{
+				if (def.m_classification.has_value() && def.m_classification.value() == _classification) 
+				{
+					return true;
+				} 
+			}
+		}
+	}
+	return false;
+}
+
+void CSVSchemaImporter::generateRangesOutOfJSON(const std::map<uint32_t, DataDefinitionOverride>& _defs, bool _isColumn, EntityFileCSV* _csvFile, uint32_t _maxRows, uint32_t _maxCols, MetadataAssemblyData& _parameterData, MetadataAssemblyData& _quantityData)
+{
+	for (const auto& [index, def] : _defs) {
+		if (def.m_classification.has_value()) {
+			std::string classification = def.m_classification.value();
+			
+			std::shared_ptr<EntityTableSelectedRanges> generatedRange = std::make_shared<EntityTableSelectedRanges>(
+			Application::instance()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+
+			ot::TableCfg::TableHeaderMode mode;
+			if(_isColumn)
+			{
+				mode = ot::TableCfg::TableHeaderMode::Horizontal;
+			}
+			else {
+				mode = ot::TableCfg::TableHeaderMode::Vertical;
+			}
+
+			generatedRange->createProperties("", 0, "", 0, ot::TypeNames::getStringTypeName());
+			generatedRange->setTableProperties(_csvFile->getName(), _csvFile->getEntityID(), ot::TableCfg::toString(mode));
+			generatedRange->setName("JSON_Generated_" + classification + "_" + std::to_string(index));
+			
+			if (_isColumn) {
+				generatedRange->setSelectEntireColumn(true);
+				generatedRange->setRange(ot::TableRange(1, index + 1, _maxRows, index + 1));
+			} else {
+				generatedRange->setSelectEntireRow(true);
+				generatedRange->setRange(ot::TableRange(index + 1, 1, index + 1, _maxCols));
+			}
+
+			if (classification == "parameter") {
+				_parameterData.m_allSelectionRanges.push_back(generatedRange);
+			} else if (classification == "quantity") {
+				_quantityData.m_allSelectionRanges.push_back(generatedRange);
+			}
+		}
+	}
+}
+
+void CSVSchemaImporter::checkRanges(MetadataAssemblyData* _data, bool& _usesHorizontal, bool& _usesVertical)
+{
+	if (!_data) return;
+	for (auto& range : _data->m_allSelectionRanges) {
+		if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Horizontal) _usesHorizontal = true;
+		if (range->getTableHeaderMode() == ot::TableCfg::TableHeaderMode::Vertical) _usesVertical = true;
+	}
 }
