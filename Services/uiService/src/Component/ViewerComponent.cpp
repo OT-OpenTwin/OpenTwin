@@ -25,7 +25,7 @@
 #include "ControlsManager.h"
 #include "ShortcutManager.h"
 #include "UserSettings.h"
-#include "Debugging/UIViewSelectionDebug.h"
+#include "Debugging/UIDebug.h"
 
 #include "OTSystem/OTAssert.h"
 #include "OTCore/Debugging/RuntimeTests.h"

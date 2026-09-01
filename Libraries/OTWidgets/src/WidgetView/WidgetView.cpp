@@ -21,7 +21,7 @@
 #include "OTSystem/OTAssert.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
-#include "OTWidgets/Intern/WidgetDebug.h"
+#include "OTWidgets/Debugging/WidgetDebug.h"
 #include "OTWidgets/WidgetView/WidgetView.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 #include "OTWidgets/WidgetView/WidgetViewManager.h"

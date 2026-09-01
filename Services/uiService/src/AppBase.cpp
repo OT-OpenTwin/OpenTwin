@@ -34,6 +34,7 @@
 #include "StatusBarManager.h"
 #include "ProjectManagement.h"
 #include "NavigationTreeView.h"
+#include "Debugging/UIDebug.h"
 #include "Component/DevLogger.h"
 #include "Component/ExternalServicesComponent.h"
 #include "Component/ViewerComponent.h"
@@ -41,7 +42,6 @@
 #include "CustomWidgets/CopyProjectDialog.h"
 #include "CustomWidgets/EditProjectInformationDialog.h"
 #include "CustomWidgets/WelcomeWidget.h"
-#include "Debugging/UIViewSelectionDebug.h"
 #include "Helper/StartArgumentParser.h"
 #include "Login/LogInDialog.h"
 

@@ -20,6 +20,7 @@
 // App header
 #include "AppBase.h"
 #include "Component/ExternalServicesComponent.h"
+#include "Debugging/UIDebug.h"
 #include "Helper/StartArgumentParser.h"
 
 // OT header
@@ -29,6 +30,7 @@
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Graphics/GraphicsItemLoader.h"
+#include "OTWidgets/Debugging/GlobalEventLogger.h"
 #include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 #include "OTCommunication/ActionTypes.h"
@@ -49,53 +51,56 @@
 // C++ header
 #include <exception>
 
-#define OT_UI_USE_CUSTOM_DELETE true
+namespace ot::intern
+{
+#if OT_UI_USE_CUSTOM_DELETE==true
 
-#if OT_UI_USE_CUSTOM_DELETE == true
+	static std::atomic_bool loggerInitialized = false;
 
-namespace ot {
+	static void notifyCustomDelete()
+	{
+		static std::atomic_bool customDeleteNotified = false;
 
-	namespace intern {
-
-		static std::atomic_bool loggerInitialized = false;
-
-		static void notifyCustomDelete() {
-			static std::atomic_bool customDeleteNotified = false;
-
-			if (!customDeleteNotified && loggerInitialized) {
-				customDeleteNotified = true;
-				OT_LOG_W("Custom delete operators are used!");
-			}
+		if (!customDeleteNotified && loggerInitialized)
+		{
+			customDeleteNotified = true;
+			OT_LOG_W("Custom delete operators are used!");
 		}
-
 	}
+
 }
 
 // Global operator delete override
-void operator delete(void* ptr) noexcept {
+void operator delete(void* ptr) noexcept
+{
 	ot::intern::notifyCustomDelete();
 	std::free(ptr);
 }
 
 // Global operator delete[] override
-void operator delete[](void* ptr) noexcept {
+void operator delete[](void* ptr) noexcept
+{
 	ot::intern::notifyCustomDelete();
 	std::free(ptr);
 }
 
 // Matching sized delete operators (C++ 14+)
-void operator delete(void* ptr, std::size_t) noexcept {
+void operator delete(void* ptr, std::size_t) noexcept
+{
 	ot::intern::notifyCustomDelete();
 	std::free(ptr);
 }
 
 // Matching sized delete operators (C++ 14+)
-void operator delete[](void* ptr, std::size_t) noexcept {
+void operator delete[](void* ptr, std::size_t) noexcept
+{
 	ot::intern::notifyCustomDelete();
 	std::free(ptr);
 }
-
+namespace ot::intern
+{
 #endif
+}
 
 void initializeLogging(void) {
 	// Get logging URL
@@ -270,6 +275,17 @@ bool initializeComponents(void) {
 
 	// Initialize Widget view manager
 	ot::GlobalWidgetViewManager::instance().initialize();
+
+#if OT_UI_USE_GLOBAL_EVENT_DBG==true
+	// Mouse
+	const auto mouseEventTypes = { QEvent::MouseButtonPress, QEvent::MouseButtonDblClick, QEvent::MouseButtonRelease };
+
+	// Keyboard
+	const auto keyEventTypes = { QEvent::KeyPress, QEvent::KeyRelease };
+	
+
+	ot::GlobalEventLogger::install(mouseEventTypes);
+#endif
 
 	return true;
 }
