@@ -1665,7 +1665,7 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	}
 
 	Application::instance()->getVisualisationHandler().handleRenaming(entityID);
-
+	refreshAllViews();
 }
 
 void Model::keySequenceActivated(const std::string &keySequence) {
