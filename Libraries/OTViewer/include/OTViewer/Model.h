@@ -275,7 +275,7 @@ private:
 	void	   updateSelectedFacesHighlight();
 	void	   setSelectedFacesHighlight(SceneNodeGeometry *selectedItem, unsigned long long faceId, bool highlight);
 	void       clearSelectedFacesHighlight();
-	bool       isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId);
+	bool       isFaceSelected(SceneNodeGeometry *selectedItem, const std::string& faceName);
 	void       manageParentVisibility(SceneNodeBase *item);
 	void	   updateWorkingPlaneTransform();
 	void       getTransformationOfSelectedShapes(SceneNodeBase *root, bool &first, bool& useGlobalMatrix, osg::Matrix &matrix);

@@ -94,11 +94,12 @@ public:
 	void updateObjectColor(double surfaceColorRGB[3], const double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective);
 	void updateObjectFacetsFromDataBase(ot::UID _dataEntityID, ot::UID _dataEntityVersion);
 
-	void setEdgeHighlight(unsigned long long faceId, bool h, double thickness);
+	void setEdgeHighlight(const std::string& faceName, bool h, double thickness);
 	unsigned long long getFaceIdFromTriangleIndex(unsigned long long index) { return m_triangleToFaceId[index]; };
 	ot::UID getFaceIdFromEdgePrimitiveIndex(unsigned long long hitIndex);
 
 	std::string getFaceNameFromId(unsigned long long faceId);
+	std::list<ot::UID> getFaceIdFromName(const std::string& faceName);
 
 	std::string getEdgeNameFromFaceIds(unsigned long long faceId1, unsigned long long faceId2);
 
@@ -151,6 +152,7 @@ private:
 	void determineFaceTriangles(int faceId, std::list<int>& triangleIndexList);
 	osg::Node* createFaceNodeFromTriangles(int faceId, std::list<int>& triangleIndexList);
 	void attachText(osg::Node* triangleNode);
+	void setFaceIdToNameMap(std::map<ot::UID, std::string>& map);
 
 	osg::Node* m_triangles;
 	osg::Node* m_edges;
@@ -162,6 +164,7 @@ private:
 	std::map<unsigned long long, osg::Node *> m_faceEdgesHighlight;
 	std::vector<unsigned long long> m_triangleToFaceId;
 	std::map<ot::UID, std::string> m_faceIdToNameMap;
+	std::map<std::string, std::list<ot::UID>> m_faceNameToIdMap;
 	std::vector<unsigned long long> m_edgeStartIndex;
 	std::vector<ot::UID> m_edgeFaceId;
 

@@ -23,7 +23,7 @@
 class FaceSelection
 {
 public:
-	FaceSelection() : modelID(0), selectedItem(nullptr), faceId(0) {}
+	FaceSelection() : modelID(0), selectedItem(nullptr) {}
 	virtual ~FaceSelection() {}
 
 	void setData(unsigned long long _modelID) { modelID = _modelID; }
@@ -33,21 +33,17 @@ public:
 	void setSelectedItem(SceneNodeGeometry* item) { selectedItem = item; }
 	SceneNodeGeometry* getSelectedItem(void) const { return selectedItem; }
 
-	void setFaceId(unsigned long long id) { faceId = id; }
-	unsigned long long getFaceId(void) const { return faceId; }
-
 	void setFaceName(const std::string& name) { faceName = name; }
-	std::string getFaceName(void) { return faceName; }
+	std::string getFaceName(void) const { return faceName; }
 
 	void setIntersectionPoint(osg::Vec3d point) { intersectionPoint = point; }
 	osg::Vec3d getIntersectionPoint(void) { return intersectionPoint; }
 
-	bool operator==(const FaceSelection& other) { return (selectedItem == other.getSelectedItem() && faceId == other.getFaceId()); }
+	bool operator==(const FaceSelection& other) { return (selectedItem == other.getSelectedItem() && faceName == other.getFaceName()); }
 
 private:
 	unsigned long long modelID;
 	SceneNodeGeometry* selectedItem;
-	unsigned long long faceId;
 	std::string faceName;
 	osg::Vec3d intersectionPoint;
 };

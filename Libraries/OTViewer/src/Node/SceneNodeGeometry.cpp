@@ -412,19 +412,23 @@ void SceneNodeGeometry::setHighlighted(bool h)
 	SceneNodeBase::setHighlighted(h);
 }
 
-void SceneNodeGeometry::setEdgeHighlight(unsigned long long faceId, bool h, double thickness)
+void SceneNodeGeometry::setEdgeHighlight(const std::string &faceName, bool h, double thickness)
 {
-//	getFaceEdgesHighlight()->setAllChildrenOff();
-	getFaceEdgesHighlight()->setChildValue(m_faceEdgesHighlight[faceId], h);
-	if (h)
+	std::list<ot::UID> faceIdList = getFaceIdFromName(faceName);
+
+	for (auto faceId : faceIdList)
 	{
-		osg::StateSet *ss = m_faceEdgesHighlight[faceId]->getOrCreateStateSet();
-
-		osg::LineWidth *lineWidthAttribute = dynamic_cast<osg::LineWidth*>(ss->getAttribute(osg::StateAttribute::Type::LINEWIDTH));
-
-		if (lineWidthAttribute != nullptr)
+		getFaceEdgesHighlight()->setChildValue(m_faceEdgesHighlight[faceId], h);
+		if (h)
 		{
-			lineWidthAttribute->setWidth(thickness);
+			osg::StateSet* ss = m_faceEdgesHighlight[faceId]->getOrCreateStateSet();
+
+			osg::LineWidth* lineWidthAttribute = dynamic_cast<osg::LineWidth*>(ss->getAttribute(osg::StateAttribute::Type::LINEWIDTH));
+
+			if (lineWidthAttribute != nullptr)
+			{
+				lineWidthAttribute->setWidth(thickness);
+			}
 		}
 	}
 }
@@ -512,7 +516,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 		m_triangleToFaceId.push_back(t.getFaceId());
 	}
 
-	m_faceIdToNameMap = faceNameMap;
+	setFaceIdToNameMap(faceNameMap);
 
 	// Create the triangle node
 	osg::Node* triangleNode = createOSGNodeFromTriangles(m_surfaceColorRGB, m_materialType, m_textureType, m_reflective, m_backFaceCulling, m_offsetFactor, nodes, triangles);
@@ -1429,6 +1433,16 @@ void SceneNodeGeometry::assignTexture(osg::Geometry *geometry, const std::string
 	}
 }
 
+void SceneNodeGeometry::setFaceIdToNameMap(std::map<ot::UID, std::string> &map)
+{
+	m_faceIdToNameMap = map;
+
+	for (auto face : map)
+	{
+		m_faceNameToIdMap[face.second].push_back(face.first);
+	}
+}
+
 std::string SceneNodeGeometry::getFaceNameFromId(unsigned long long faceId)
 {
 	auto item = m_faceIdToNameMap.find(faceId);
@@ -1439,6 +1453,18 @@ std::string SceneNodeGeometry::getFaceNameFromId(unsigned long long faceId)
 	}
 
 	return "";
+}
+
+std::list<ot::UID> SceneNodeGeometry::getFaceIdFromName(const std::string &faceName)
+{
+	auto item = m_faceNameToIdMap.find(faceName);
+
+	if (item != m_faceNameToIdMap.end())
+	{
+		return item->second;
+	}
+
+	return {};
 }
 
 void SceneNodeGeometry::setHighlightNode(osg::Node* highlight)

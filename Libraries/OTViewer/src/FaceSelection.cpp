@@ -21,5 +21,5 @@
 
 bool operator==(const FaceSelection& left, const FaceSelection& right)
 {
-	return (left.getSelectedItem() == right.getSelectedItem() && left.getFaceId() == right.getFaceId());
+	return (left.getSelectedItem() == right.getSelectedItem() && left.getFaceName() == right.getFaceName());
 }

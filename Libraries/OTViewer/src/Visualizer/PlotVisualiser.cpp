@@ -60,7 +60,7 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::Vis
 					}
 				}
 
-				OTAssertNullptr(targetedPlotNode);
+				//OTAssertNullptr(targetedPlotNode);  This assertion fires in case the node has a visualizer attached which is not a plot visualizer.
 				if (plotNode != targetedPlotNode) {
 					if (plotNode != nullptr) {
 						isSingle = false;

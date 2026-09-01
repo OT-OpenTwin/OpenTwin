@@ -3839,12 +3839,16 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 	bool addFace = true;
 	for (auto face : m_currentFaceSelection)
 	{
-		if (face.getSelectedItem() == selectedItem && face.getFaceId() == faceId)
+		if (face.getSelectedItem() == selectedItem && face.getFaceName() == faceName)
 		{
 			addFace = false;
 			m_currentFaceSelection.remove(face);
 
-			setSelectedFacesHighlight(selectedItem, faceId, false);
+			for (auto id : selectedItem->getFaceIdFromName(faceName))
+			{
+				setSelectedFacesHighlight(selectedItem, id, false);
+			}
+
 			updateSelectedFacesHighlight();
 			refreshAllViews();
 			break;
@@ -3857,13 +3861,15 @@ void Model::faceSelected(unsigned long long modelID, SceneNodeGeometry *selected
 		FaceSelection selection;
 		selection.setData(modelID);
 		selection.setSelectedItem(selectedItem);
-		selection.setFaceId(faceId);
 		selection.setFaceName(faceName);
 		selection.setIntersectionPoint(intersectionPoint);
 
 		m_currentFaceSelection.push_back(selection);
 
-		setSelectedFacesHighlight(selectedItem, faceId, true);
+		for (auto id : selectedItem->getFaceIdFromName(faceName))
+		{
+			setSelectedFacesHighlight(selectedItem, id, true);
+		}
 	}
 
 	// If multiselection is not active, we end the selection mode now
@@ -3954,11 +3960,11 @@ void Model::updateSelectedFacesHighlight()
 	}
 }
 
-bool Model::isFaceSelected(SceneNodeGeometry *selectedItem, unsigned long long faceId)
+bool Model::isFaceSelected(SceneNodeGeometry *selectedItem, const std::string &faceName)
 {
 	for (auto face : m_currentFaceSelection)
 	{
-		if (face.getSelectedItem() == selectedItem && face.getFaceId() == faceId)
+		if (face.getSelectedItem() == selectedItem && face.getFaceName() == faceName)
 		{
 			return true;
 		}
@@ -4039,13 +4045,13 @@ void Model::processHoverView(osgUtil::Intersector *intersector, double sceneRadi
 				{
 					setCursorText(faceName);
 
-					if (isFaceSelected(selectedItem, faceId))
+					if (isFaceSelected(selectedItem, faceName))
 					{
-						selectedItem->setEdgeHighlight(faceId, true, ViewerSettings::instance()->geometryHighlightLineWidth);
+						selectedItem->setEdgeHighlight(faceName, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 					}
 					else
 					{
-						selectedItem->setEdgeHighlight(faceId, true, ViewerSettings::instance()->geometryHighlightLineWidth);
+						selectedItem->setEdgeHighlight(faceName, true, ViewerSettings::instance()->geometryHighlightLineWidth);
 					}
 					m_currentHoverItem = selectedItem;
 				}
