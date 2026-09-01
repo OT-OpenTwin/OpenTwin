@@ -519,6 +519,7 @@ void SceneNodeGeometry::initializeFromFacetData(std::vector<Geometry::Node> &nod
 	setFaceIdToNameMap(faceNameMap);
 
 	// Create the triangle node
+	setOffset(m_offsetFactor);
 	osg::Node* triangleNode = createOSGNodeFromTriangles(m_surfaceColorRGB, m_materialType, m_textureType, m_reflective, m_backFaceCulling, m_offsetFactor, nodes, triangles);
 
 	// Attach the text to the triangle node
@@ -753,7 +754,6 @@ osg::Node * SceneNodeGeometry::createOSGNodeFromTriangles(double colorRGB[3], co
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(p);
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonMode(osg::PolygonMode::FRONT_AND_BACK, osg::PolygonMode::FILL));
 
-	setOffset(offsetFactor);
 	newGeometry->getOrCreateStateSet()->setAttributeAndModes(new osg::PolygonOffset(2.0f * offsetFactor, 2.0f * offsetFactor));
 
 	newGeometry->setVertexArray(vertices);
