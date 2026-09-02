@@ -19,6 +19,7 @@ public:
 	enum BlockReason : int32_t
 	{
 		CompoundMessage,
+		MulticloseViews,
 		//! @brief Minimum value from custom block reasons.
 		//! The custom block reason
 		Custom = 10000

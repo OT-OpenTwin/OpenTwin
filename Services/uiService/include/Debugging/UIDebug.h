@@ -22,9 +22,9 @@
 // OpenTwin header
 #include "OTViewer/Intern/ViewerDebug.h"
 
-#define OT_UI_USE_CUSTOM_DELETE false
-#define OT_UI_USE_GLOBAL_EVENT_DBG false
-
+#define OT_UI_USE_CUSTOM_DELETE              false
+#define OT_UI_USE_GLOBAL_EVENT_DBG           false
+#define OT_UI_PROJECT_NAVIGATION_DBG_ENABLED false
 
 // 
 
@@ -34,4 +34,12 @@
 #else
 #define OT_UI_VIEWSEL_DBG(___text)
 #define OT_UI_VIEWSEL_DBG_PTR(___ptr, ___text)
+#endif
+
+#if OT_UI_PROJECT_NAVIGATION_DBG_ENABLED==true
+#define OT_UI_PROJNAV_DBG(___text)             OT_BASE_DEBUG_LOG("PROJNAV", ___text)
+#define OT_UI_PROJNAV_DBG_PTR(___ptr, ___text) OT_BASE_DEBUG_PTR("PROJNAV", ___ptr, ___text)
+#else
+#define OT_UI_PROJNAV_DBG(___text)
+#define OT_UI_PROJNAV_DBG_PTR(___ptr, ___text)
 #endif

@@ -26,7 +26,7 @@
 #include "OTViewer/QueueableRequests/RequestVisIfNeededRequest.h"
 
 PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
-	:Visualiser(_sceneNode, ot::WidgetViewBase::View1D)
+	: Visualiser(_sceneNode, ot::WidgetViewBase::View1D)
 {
 }
 

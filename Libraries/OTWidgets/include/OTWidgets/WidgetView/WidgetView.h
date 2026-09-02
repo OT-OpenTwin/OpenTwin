@@ -124,6 +124,8 @@ namespace ot {
 
 		virtual void getDebugInformation(JsonObject& _object, JsonAllocator& _allocator) const;
 
+		void detachFromManager();
+
 	Q_SIGNALS:
 		void closeRequested();
 		void viewDataModifiedChanged();

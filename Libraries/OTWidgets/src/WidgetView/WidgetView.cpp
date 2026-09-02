@@ -60,18 +60,7 @@ ot::WidgetView::~WidgetView() {
 		m_manager = nullptr;
 	}
 
-	if (m_dockWidget) {
-		m_dockWidget->takeWidget();
-
-		this->disconnect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
-		this->disconnect(m_dockWidget, &WidgetViewDock::dockPinnedChanged, this, &WidgetView::slotPinnedChanged);
-
-		ads::CDockManager* adsManager = m_dockWidget->dockManager();
-		if (adsManager) {
-			adsManager->removeDockWidget(m_dockWidget);
-		}
-		m_dockWidget = nullptr;
-	}
+	this->detachFromManager();
 
 	OT_WIDGETS_VIEW_DBG_PTR(this, ": View destroyed");
 }
@@ -147,6 +136,24 @@ void ot::WidgetView::getDebugInformation(JsonObject& _object, JsonAllocator& _al
 	_object.AddMember("IsPermanent", m_isPermanent, _allocator);
 	_object.AddMember("IsModified", m_isModified, _allocator);
 	_object.AddMember("VisualizingItems", JsonArray(m_visualizingItems.getSelectedNavigationItems(), _allocator), _allocator);
+}
+
+void ot::WidgetView::detachFromManager()
+{
+	if (m_dockWidget)
+	{
+		m_dockWidget->takeWidget();
+
+		this->disconnect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
+		this->disconnect(m_dockWidget, &WidgetViewDock::dockPinnedChanged, this, &WidgetView::slotPinnedChanged);
+
+		ads::CDockManager* adsManager = m_dockWidget->dockManager();
+		if (adsManager)
+		{
+			adsManager->removeDockWidget(m_dockWidget);
+		}
+		m_dockWidget = nullptr;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

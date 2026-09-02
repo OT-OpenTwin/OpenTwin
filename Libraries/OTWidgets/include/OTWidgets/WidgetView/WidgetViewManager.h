@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTSystem/Flags.h"
 #include "OTCore/JSON/JSON.h"
+#include "OTCore/RAII/FunctionRAII.h"
 #include "OTCore/BasicServiceInformation.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTWidgets/SelectionInformation.h"
@@ -218,6 +219,8 @@ namespace ot {
 		//! @brief Returns true if the content of any of the views is modified.
 		bool getAnyViewContentModified();
 
+		bool isMultiClosingViews() const { return m_state.has(MulticloseViewState); };
+
 		//! @brief Return the dock toggle action
 		QAction* getDockToggleAction() const { return m_dockToggleRoot; };
 
@@ -236,6 +239,8 @@ namespace ot {
 		void viewCloseRequested(WidgetView* _view);
 		void viewTabClicked(WidgetView* _view);
 		void viewDataModifiedChanged(ot::WidgetView* _view);
+		void multiCloseViewsStarted();
+		void multiCloseViewsCompleted();
 		
 	public Q_SLOTS:
 		void slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus);
@@ -278,7 +283,7 @@ namespace ot {
 			bool ignoreCurrent;
 			std::list<WidgetView*> viewsToClose; //! @brief Views that are currently in the process of being closed.
 		};
-
+		
 		bool getViewExists(const ViewNameTypeListEntry& _entry) const;
 
 		WidgetView* findView(const ViewNameTypeListEntry& _entry) const;
@@ -298,6 +303,10 @@ namespace ot {
 		void handleViewCloseRequest(WidgetView* _view);
 
 		void updateCentralViewTitles();
+
+		OT_DECL_NODISCARD ot::FunctionRAII beginMultiClose();
+		void prepareMultiCloseStart();
+		void prepareMultiCloseFinished();
 
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions

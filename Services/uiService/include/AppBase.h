@@ -93,6 +93,7 @@ class ShortcutManager;
 class StatusBarManager;
 class ProjectManagement;
 class ExternalServicesComponent;
+class UIRunUserSelectionHandlingRequest;
 
 // Forward declaration
 class ToolBar;
@@ -600,6 +601,7 @@ public Q_SLOTS:
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);
 	bool focusLastAddedCentralView();
+	void multicloseViewsCompleted();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -780,6 +782,7 @@ private:
 
 	friend class ToolBar;
 	friend class KeyboardCommandHandler;
+	friend class UIRunUserSelectionHandlingRequest;
 
 	//! @brief Constructor
 	AppBase();

@@ -44,6 +44,7 @@
 #include "CustomWidgets/WelcomeWidget.h"
 #include "Helper/StartArgumentParser.h"
 #include "Login/LogInDialog.h"
+#include "QueueableRequests/UIRunUserSelectionHandlingRequest.h"
 
 // uiCore header
 #include "akAPI/uiAPI.h"
@@ -1192,6 +1193,7 @@ void AppBase::createUi()
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewCloseRequested, this, &AppBase::slotViewCloseRequested);
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewTabClicked, this, &AppBase::slotViewTabClicked);
 			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::viewDataModifiedChanged, this, &AppBase::slotViewDataModifiedChanged);
+			this->connect(&ot::GlobalWidgetViewManager::instance(), &ot::WidgetViewManager::multiCloseViewsCompleted, this, &AppBase::multicloseViewsCompleted);
 
 			uiAPI::registerUidNotifier(m_mainWindow, this);
 
@@ -1892,6 +1894,8 @@ std::optional<std::string> AppBase::getActiveProjectVersion() const
 
 void AppBase::autoCloseUnpinnedViews(bool _ignoreCurrent)
 {
+	auto raii = m_queueableObjectHandler.block(QueueableObjectHandler::MulticloseViews);
+
 	OT_UI_VIEWSEL_DBG("Auto close unpinned views");
 
 	ot::GlobalWidgetViewManager::instance().requestCloseUnpinnedViews(
@@ -3540,8 +3544,7 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 	}
 	else
 	{
-
-
+		// no view focused
 	}
 
 	OT_UI_VIEWSEL_DBG(">> View focus changed completed");
@@ -3577,36 +3580,41 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view)
 	ot::UID globalActiveViewModel = -1;
 	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
 
-	OT_UI_VIEWSEL_DBG("+ Deselecting navigation items");
+	auto& manager = ot::GlobalWidgetViewManager::instance();
 
 	// Store current selection and view information
-	ot::WidgetView* lastStoredView = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
+	ot::WidgetView* lastStoredView = manager.getCurrentlyFocusedView();
 
 	// Deselect navigation item if exists
-	const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
+	auto tree = m_projectNavigation->getTree();
 	{
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		m_projectNavigation->getTree()->setItemsSelected(viewSelectionInfo.getSelectedNavigationItems(), false);
+		QSignalBlocker sigBlock(tree);
+		const ot::SelectionInformation& viewSelectionInfo = _view->getVisualizingItems();
+		ot::UIDList toDeselect = viewSelectionInfo.getSelectedNavigationItems();
+		if (!toDeselect.empty())
+		{
+			OT_UI_VIEWSEL_DBG("+ Deselecting navigation items");
+			tree->setItemsSelected(toDeselect, false);
+		}
 	}
-
-	OT_UI_VIEWSEL_DBG("+ Closing actual view");
 
 	// Now close the view
-	ot::GlobalWidgetViewManager::instance().closeView(viewName, _view->getViewData().getViewType());
-
-	// Restore selection if the view did not change during close
-	if (lastStoredView && _view != lastStoredView && ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView() == lastStoredView)
+	OT_UI_VIEWSEL_DBG("+ Closing actual view");
+	manager.closeView(viewName, _view->getViewData().getViewType());
+	
+	if (lastStoredView && _view != lastStoredView && manager.getCurrentlyFocusedView() == lastStoredView)
 	{
+		QSignalBlocker sigBlock(tree);
 		OT_UI_VIEWSEL_DBG("+ Restore view selection");
-
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		m_projectNavigation->getTree()->setItemsSelected(lastStoredView->getVisualizingItems().getSelectedNavigationItems(), true);
+		tree->setItemsSelected(lastStoredView->getVisualizingItems().getSelectedNavigationItems(), true);
 	}
 
-	this->runSelectionHandling(ot::SelectionOrigin::User);
+	if (!manager.isMultiClosingViews())
+	{
+		this->runSelectionHandling(ot::SelectionOrigin::User);
+	}
 
 	OT_UI_VIEWSEL_DBG(">> Closing view request completed");
-
 }
 
 void AppBase::slotViewTabClicked(ot::WidgetView* _view)
@@ -3638,6 +3646,11 @@ bool AppBase::focusLastAddedCentralView()
 	const std::list<ot::WidgetView*> lst({  });
 	//const std::list<ot::WidgetView*> lst({ m_defaultView });
 	return ot::GlobalWidgetViewManager::instance().focusLastAddedCentralView(lst);
+}
+
+void AppBase::multicloseViewsCompleted()
+{
+	UIRunUserSelectionHandlingRequest::makeRequest(true);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -4780,6 +4793,10 @@ void AppBase::addVisualizingEntityInfoToView(ot::WidgetView* _view, const ot::UI
 void AppBase::runSelectionHandling(ot::SelectionOrigin _eventOrigin)
 {
 	OT_UI_VIEWSEL_DBG("Running selection handling { \"EventOrigin\": \"" << ot::toString(_eventOrigin) << "\" }");
+	
+	auto* tree = m_projectNavigation->getTree();
+	ot::UIDList selectedItems = tree->selectedItems();
+	OT_UI_PROJNAV_DBG("Selection handling running with items: " << selectedItems);
 
 	ot::SelectionHandlingResult selectionResult = m_navigationManager.runSelectionHandling(_eventOrigin, m_projectNavigation->getTree()->selectedItems());
 
