@@ -132,6 +132,13 @@ bool EntitySolverCircuitSimulator::updateFromProperties()
 {
 
 	bool refresh = false;
+	
+	// Now we need to update the entity after a property change
+	assert(getProperties().anyPropertyNeedsUpdate());
+
+	// Since there is a change now, we need to set the modified flag
+	setModified();
+
 	auto baseProperty = getProperties().getProperty("Simulation Type");
 	auto selectionProperty = dynamic_cast<EntityPropertiesSelection*>(baseProperty);
 
@@ -168,15 +175,7 @@ bool EntitySolverCircuitSimulator::updateFromProperties()
 
 	}
 
-	
-
-	if (refresh)
-	{
-		getProperties().forceResetUpdateForAllProperties();
-	}
-
-	/*createDCProperties();
-	createTranProperties();*/
+	getProperties().forceResetUpdateForAllProperties();
 
 	
 	return refresh;
