@@ -221,16 +221,32 @@ void SubprocessManager::worker(std::string _projectName) {
 
 }
 
+void SubprocessManager::setEnergyStopLevel(double level)
+{
+	m_progressParser.setStopCondition(10.0 * log10(level));
+}
+
 void SubprocessManager::startLogging()
 {
 	m_logText.clear();
 	m_isLogging = true;
+
+	m_progressParser.clear();
 }
 
 void SubprocessManager::addLogText(const std::string& text, bool sendToGui)
 {
 	if (!m_isLogging) return;
 	m_logText.push_back(text);
+
+	// Now extract the progress information from the text
+	m_progressParser.append(text);
+
+	int progress = 0;
+	if (m_progressParser.getCurrentProgress(progress))
+	{
+		m_app->getUiComponent()->setProgress(progress);
+	}
 
 	if (sendToGui)
 	{

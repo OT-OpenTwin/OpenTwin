@@ -530,6 +530,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	std::string returnMessage;
 	std::string solverCommand;
 
+	this->getUiComponent()->setProgressInformation("Running FDTD Solver", false);
+
 	try
 	{
 		solverCommand = fdtdSolver.generateRunCommand();
@@ -540,6 +542,8 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 			inputCommand << solverCommand;
 			inputCommand.close();
 		}
+
+		m_subprocessManager->setEnergyStopLevel(fdtdSolver.getEnergyStopLevel());
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_PYTHON_EXECUTE_Command, doc.GetAllocator()), doc.GetAllocator());
@@ -557,6 +561,9 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::list<ot::E
 	{
 		returnMessage = ot::ReturnMessage(ot::ReturnMessage::Failed, "Unknown error").toJson();
 	}
+
+	this->getUiComponent()->setProgress(100);
+	this->getUiComponent()->closeProgressInformation();
 
 	ot::ReturnMessage returnValue = ot::ReturnMessage::fromJson(returnMessage);
 	

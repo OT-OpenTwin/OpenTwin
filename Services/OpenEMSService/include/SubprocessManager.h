@@ -21,6 +21,7 @@
 
 // Service header
 #include "DataBaseInfo.h"
+#include "ProgressParser.h"
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
@@ -66,6 +67,8 @@ public:
 
 	bool isConnected();
 	void shutdownSubprocess(void);
+
+	void setEnergyStopLevel(double level);
 private:
 
 	//! @brief Runs the subservice if needed and checks connection with a ping.
@@ -87,5 +90,7 @@ private:
 	SubprocessHandler* m_subprocessHandler;
 	CommunicationHandler* m_communicationHandler;
 	std::list<std::string> m_logText;
+	ProgressParser m_progressParser;
+
 	bool m_isLogging;
 };

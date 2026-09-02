@@ -1193,7 +1193,7 @@ void FDTDSolver::addSolverSetup(std::stringstream& runCommand)
 	double fMax                = (fMaxProperty != nullptr) ? fMaxProperty->getValue() : 0.0;
 	long long fSteps           = (fStepsProperty != nullptr) ? fStepsProperty->getValue() : 201;
 	long long maxTimesteps     = (maxTimestepsProperty != nullptr) ? maxTimestepsProperty->getValue() : 1000000;
-	double energyStopLevel     = (energyStopLevelProperty != nullptr) ? energyStopLevelProperty->getValue() : 1e-5;
+	energyStopLevel            = (energyStopLevelProperty != nullptr) ? energyStopLevelProperty->getValue() : 1e-5;
 	int oversamplingFactor     = (oversamplingProperty != nullptr) ? oversamplingProperty->getValue() : 4;
 
 	double centerFreq    = 0.5 * (fMin + fMax) * entityUnits->getScaleToSIFrequency();

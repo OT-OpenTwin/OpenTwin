@@ -46,6 +46,7 @@ public:
 
 	std::string generateRunCommand();
 	void convertAndStoreResults(const std::string &logFileText);
+	double getEnergyStopLevel() const { return energyStopLevel; };
 
 private:
 	void checkCartesianMesh(std::stringstream& runCommand);
@@ -118,4 +119,6 @@ private:
 	std::string zmaxBoundary;
 
 	EntityUnits* entityUnits;
+
+	double energyStopLevel = 0.0;
 };
