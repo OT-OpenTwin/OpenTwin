@@ -33,6 +33,7 @@ class EntityUnits;
 class EntityFacetData;
 class ResultManager;
 class EntityWaveguidePort;
+class EntityLumpedFDTDPort;
 class EntityFieldDump;
 class EntityVis2D3D;
 
@@ -58,6 +59,8 @@ private:
 	void addPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
 	void addPorts(std::stringstream& runCommand);
+	void addWaveguidePorts(std::stringstream& runCommand);
+	void addLumpedPorts(std::stringstream& runCommand);
 	void addFieldDumps(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
@@ -94,6 +97,7 @@ private:
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
 	std::string getStartStopString(EntityFieldDump* fieldDump);
 	bool isFrequencyDump(EntityFieldDump* fieldDump);
+	std::size_t moveMergedNodesOutward(std::vector<Geometry::Node>& nodes, double mergeTolerance, double clearance);
 	std::size_t mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance);
 	bool getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz);
 	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
@@ -103,11 +107,13 @@ private:
 	EntityMeshCartesian *meshEntity;
 	std::string openEMSPath;
 	std::string tempDirPath;
-	double timeStepWidth;
+	double timeStepWidth = 0.0;
+	double minimumMeshStepWidth = 0.0;
 
 	std::vector<double> xLines, yLines, zLines;
 	std::list<std::map<int, double>> excitationList;
 	std::list<EntityWaveguidePort*> waveguidePortList;
+	std::list<EntityLumpedFDTDPort*> lumpedPortList;
 	std::list<EntityFieldDump*> fieldDumpList;
 	std::set<int> portList;
 

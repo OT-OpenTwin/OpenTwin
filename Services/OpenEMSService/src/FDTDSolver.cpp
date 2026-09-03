@@ -43,6 +43,7 @@
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/EntityWaveguidePort.h"
+#include "OTCADEntities/EntityLumpedFDTDPort.h"
 #include "OTCADEntities/EntityFieldDump.h"
 
 #include <fstream>
@@ -78,6 +79,11 @@ FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, Ent
 FDTDSolver::~FDTDSolver()
 {
 	for (auto port : waveguidePortList)
+	{
+		delete port;
+	}
+
+	for (auto port : lumpedPortList)
 	{
 		delete port;
 	}
@@ -473,6 +479,14 @@ std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
 
 void FDTDSolver::addPorts(std::stringstream& runCommand)
 {
+	runCommand << "ports = {}\n";
+
+	addWaveguidePorts(runCommand);
+	addLumpedPorts(runCommand);
+}
+
+void FDTDSolver::addWaveguidePorts(std::stringstream& runCommand)
+{
 	if (waveguidePortList.empty()) return;
 
 	// Here we create all ports first with excitation set on (this will be updated to the actual values in the solver run part).
@@ -488,8 +502,6 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 	// Read all facet entities
 	DataBase::instance().prefetchDocumentsFromStorage(facetEntitiesInfo);
-
-	runCommand << "ports = {}\n";
 
 	for (auto port : waveguidePortList)
 	{
@@ -564,6 +576,58 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 	}
 }
 
+void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
+{
+	if (lumpedPortList.empty()) return;
+
+	// Here we create all ports first with excitation set on (this will be updated to the actual values in the solver run part).
+	// This is necessary to create the excitation data structures.
+
+	for (auto port : lumpedPortList)
+	{
+		int portNumber = std::stoi(port->getNameOnly());
+
+		EntityPropertiesDouble* impedanceProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Impedance"));
+		EntityPropertiesSelection* directionProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Current direction"));
+
+		EntityPropertiesDouble* xminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmin"));
+		EntityPropertiesDouble* xmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmax"));
+		EntityPropertiesDouble* yminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymin"));
+		EntityPropertiesDouble* ymaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymax"));
+		EntityPropertiesDouble* zminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmin"));
+		EntityPropertiesDouble* zmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmax"));
+
+		assert(impedanceProperty && directionProperty && xminProperty && xmaxProperty && yminProperty && ymaxProperty && zminProperty && zmaxProperty);
+
+		double impedance = impedanceProperty->getValue();
+		std::string direction = directionProperty->getValue();
+		double xmin = xminProperty->getValue();
+		double xmax = xmaxProperty->getValue();
+		double ymin = yminProperty->getValue();
+		double ymax = ymaxProperty->getValue();
+		double zmin = zminProperty->getValue();
+		double zmax = zmaxProperty->getValue();
+
+		std::transform(
+			direction.begin(),
+			direction.end(),
+			direction.begin(),
+			[](unsigned char c) {
+				return static_cast<char>(std::tolower(c));
+			});
+
+		runCommand 
+			<< "ports[" << portNumber << "] = FDTD.AddLumpedPort(\n"
+			<< "    port_nr=" << portNumber << ",\n"
+			<< "    R=" << impedance << ",\n"
+			<< "    start=[" << xmin << ", " << ymin << ", " << zmin << "],\n"
+			<< "    stop=[" << xmax << ", " << ymax << ", " << zmax << "],\n"
+			<< "    p_dir='" << direction << "',\n"
+			<< "    priority = 10,\n"
+			<< "    excite=1\n)\n\n";
+	}
+}
+
 void FDTDSolver::readPorts()
 {
 	std::list<std::string> portEntityNames = ot::ModelServiceAPI::getListOfFolderItems(solverEntity->getName() + "/Ports", false);
@@ -588,6 +652,29 @@ void FDTDSolver::readPorts()
 			int portNumber = 0;
 
 			if (parsePortNumber(waveguidePort->getName(), portNumber))
+			{
+				if (portList.count(portNumber) != 0)
+				{
+					throw std::string("Port number " + std::to_string(portNumber) + " has been multiply defined");
+				}
+
+				portList.emplace(portNumber);
+			}
+			else
+			{
+				throw std::string("Invalid port name " + waveguidePort->getName());
+			}
+		}
+
+		EntityLumpedFDTDPort* lumpedPort = dynamic_cast<EntityLumpedFDTDPort*>(portEntity);
+		if (lumpedPort != nullptr)
+		{
+			lumpedPortList.push_back(lumpedPort);
+			portEntity = nullptr;
+
+			int portNumber = 0;
+
+			if (parsePortNumber(lumpedPort->getName(), portNumber))
 			{
 				if (portList.count(portNumber) != 0)
 				{
@@ -730,6 +817,8 @@ void FDTDSolver::readMeshLineInformation()
 	yLines = meshDataEntity->getMeshLinesY();
 	zLines = meshDataEntity->getMeshLinesZ();
 
+	minimumMeshStepWidth = meshDataEntity->getSmallestStepWidth();
+
 	delete meshDataEntity;
 	meshDataEntity = nullptr;
 }
@@ -835,7 +924,7 @@ void FDTDSolver::addGeometry(std::stringstream& runCommand)
 
 	// Sort the geometry entities by material
 	ot::UIDList facetIdList;
-	std::list<std::string> materialNames;
+	std::set<std::string> materialNamesSet;
 	std::map<std::string, std::list<EntityGeometry*>> materialToGeometryMap;
 
 	for (auto geom : geometryEntities)
@@ -849,10 +938,12 @@ void FDTDSolver::addGeometry(std::stringstream& runCommand)
 		}
 
 		std::string materialName = material->getValueName();
-		materialNames.push_back(materialName);
+		materialNamesSet.emplace(materialName);
 
 		materialToGeometryMap[materialName].push_back(geom);
 	}
+
+	std::list<std::string> materialNames(materialNamesSet.begin(), materialNamesSet.end());
 
 	std::list<ot::EntityInformation> facetEntitiesInfo;
 	ot::ModelServiceAPI::getEntityInformation(facetIdList, facetEntitiesInfo);
@@ -1100,7 +1191,7 @@ bool FDTDSolver::storeSTLGeometry(EntityFacetData* facetData, const std::string 
 {
 	// We copy the node vector, since we want to make sure that all close points are snapped together
 	auto nodes = facetData->getNodeVector();
-	mergeCloseNodes(nodes, 1e-9);
+	moveMergedNodesOutward(nodes, 1e-9, 1e-3 * minimumMeshStepWidth);
 
 	auto& triangles = facetData->getTriangleList();
 
@@ -1353,7 +1444,9 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 	runCommand <<
 		"    FDTD.Run(\n"
 		"        run_path,\n"
-		"        cleanup=False\n"
+		"        cleanup=False,\n"
+		"        verbose = 0,\n"
+		"        debug_pec = " << std::string(debugFlag ? "True" : "False") << "\n"
 		"    )\n"
 		"\n";
 }
@@ -1403,17 +1496,17 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"        ports[input_port].if_tot\n"
 		"    )\n"
 		"\n"
-		"    save_xy_data(\n"
-		"        freq,\n"
-		"        input_impedance,\n"
-		"        f'Zin{input_port}'\n"
-		"    )\n"
-		"\n"
-		"    save_xy_data(\n"
-		"        freq,\n"
-		"        ports[input_port].ZL,\n"
-		"        f'ZL_analytic_{input_port}'\n"
-		"    )\n"
+		//"    save_xy_data(\n"
+		//"        freq,\n"
+		//"        input_impedance,\n"
+		//"        f'Zin{input_port}'\n"
+		//"    )\n"
+		//"\n"
+		//"    save_xy_data(\n"
+		//"        freq,\n"
+		//"        ports[input_port].ZL,\n"
+		//"        f'ZL_analytic_{input_port}'\n"
+		//"    )\n"
 		"\n";
 }
 
@@ -2310,6 +2403,125 @@ void FDTDSolver::findPortRange(
 
 	from = gridLines[fromIndex];
 	to = gridLines[fromIndex - portIntervals];
+}
+
+// Requires Geometry::Node::getNormal(int).
+std::size_t FDTDSolver::moveMergedNodesOutward(
+	std::vector<Geometry::Node>& nodes,
+	double mergeTolerance,
+	double clearance)
+{
+	if (!std::isfinite(clearance) || clearance <= 0.0)
+		throw std::invalid_argument("Invalid PEC clearance");
+
+	mergeCloseNodes(nodes, mergeTolerance);
+
+	using Vector = std::array<double, 3>;
+
+	struct NodeGroup {
+		std::vector<std::size_t> indices;
+		std::vector<Vector> normals;
+	};
+
+	// Coordinates are exactly identical after mergeCloseNodes().
+	std::map<Vector, NodeGroup> groups;
+
+	for (std::size_t i = 0; i < nodes.size(); ++i) {
+		const Vector position = {
+			nodes[i].getCoord(0),
+			nodes[i].getCoord(1),
+			nodes[i].getCoord(2)
+		};
+
+		Vector normal = {
+			nodes[i].getNormal(0),
+			nodes[i].getNormal(1),
+			nodes[i].getNormal(2)
+		};
+
+		const double length = std::hypot(
+			normal[0], normal[1], normal[2]);
+
+		if (!std::isfinite(length) || length <= 1.0e-15)
+			throw std::runtime_error("Invalid node normal");
+
+		for (double& component : normal)
+			component /= length;
+
+		NodeGroup& group = groups[position];
+		group.indices.push_back(i);
+
+		// Avoid weighting identical face normals multiple times.
+		bool alreadyPresent = false;
+
+		for (const Vector& existing : group.normals) {
+			const double dot =
+				normal[0] * existing[0] +
+				normal[1] * existing[1] +
+				normal[2] * existing[2];
+
+			if (dot > 1.0 - 1.0e-10) {
+				alreadyPresent = true;
+				break;
+			}
+		}
+
+		if (!alreadyPresent)
+			group.normals.push_back(normal);
+	}
+
+	for (auto& [position, group] : groups) {
+		Vector direction = { 0.0, 0.0, 0.0 };
+
+		for (const Vector& normal : group.normals)
+			for (int axis = 0; axis < 3; ++axis)
+				direction[axis] += normal[axis];
+
+		const double length = std::hypot(
+			direction[0], direction[1], direction[2]);
+
+		if (!std::isfinite(length) || length <= 1.0e-12)
+			throw std::runtime_error(
+				"Cannot determine outward direction");
+
+		for (double& component : direction)
+			component /= length;
+
+		// Ensure at least 'clearance' in every incident normal direction.
+		double minimumProjection = 1.0;
+
+		for (const Vector& normal : group.normals) {
+			const double projection =
+				direction[0] * normal[0] +
+				direction[1] * normal[1] +
+				direction[2] * normal[2];
+
+			minimumProjection =
+				std::min(minimumProjection, projection);
+		}
+
+		if (minimumProjection <= 1.0e-3)
+			throw std::runtime_error(
+				"Ambiguous outward direction at mesh node");
+
+		const double displacement =
+			clearance / minimumProjection;
+
+		const Vector movedPosition = {
+			position[0] + displacement * direction[0],
+			position[1] + displacement * direction[1],
+			position[2] + displacement * direction[2]
+		};
+
+		for (std::size_t index : group.indices) {
+			nodes[index].setCoords(
+				movedPosition[0],
+				movedPosition[1],
+				movedPosition[2]);
+		}
+	}
+
+	return groups.size();
 }
 
 // C++17. Include the header defining Geometry::Node BEFORE this header.
