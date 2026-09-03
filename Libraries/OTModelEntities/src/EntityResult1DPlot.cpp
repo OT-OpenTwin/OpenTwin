@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: EntityResult1DPlot.cpp
 // 
 // License:
@@ -579,14 +579,14 @@ void EntityResult1DPlot::setPlot(const ot::Plot1DCfg& _config)
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", xAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", xAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", xAxisPropGroup);
-	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", xAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", xAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisLabelAutoDetermine(), this, "Automatic label", xAxisPropGroup);
 
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", yAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", yAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", yAxisPropGroup);
-	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
 	// If there are no options, the plot parameter list is uninitialised. That happens in the propertiesAboutToBeShown method and depends on the curves within the plot
@@ -632,14 +632,14 @@ void EntityResult1DPlot::setStaticCurveQueryOptions(const ot::Plot1DCfg& _config
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisIsAutoScale(), this, "Autoscale", xAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMin(), this, "Min", xAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getXAxisMax(), this, "Max", xAxisPropGroup);
-	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", xAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", xAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getXAxisLabelAutoDetermine(), this, "Automatic label", xAxisPropGroup);
 
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsLogScale(), this, "Logscale", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisIsAutoScale(), this, "Autoscale", yAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMin(), this, "Min", yAxisPropGroup);
 	PropertyHelper::setDoublePropertyValue(_config.getYAxisMax(), this, "Max", yAxisPropGroup);
-	PropertyHelper::setStringPropertyValue(_config.getXAxisLabel(), this, "Label override", yAxisPropGroup);
+	PropertyHelper::setStringPropertyValue(_config.getYAxisLabel(), this, "Label override", yAxisPropGroup);
 	PropertyHelper::setBoolPropertyValue(_config.getYAxisLabelAutoDetermine(), this, "Automatic label", yAxisPropGroup);
 
 	PropertyHelper::setSelectionPropertyValue(std::list<std::string>{_config.getXAxisParameter()}, this, "Parameter", getXAxisPropertyGroupName());
