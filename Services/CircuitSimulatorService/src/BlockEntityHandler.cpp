@@ -280,8 +280,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	}
 
 	const std::string plotFolderPath = solverName + "/" + "Results";
-	const std::string plotNameVoltage = "/" + solverNameShort + "_" + normalizedSimType + "-Voltage";
-	const std::string plotNameCurrent = "/" + solverNameShort + "_" + normalizedSimType + "-Current";
+	const std::string plotNameVoltage = "/" + normalizedSimType + "-Voltage";
+	const std::string plotNameCurrent = "/" + normalizedSimType + "-Current";
 	const std::string fullPlotNameVoltage = plotFolderPath + plotNameVoltage;
 	const std::string fullPlotNameCurrent = plotFolderPath + plotNameCurrent;
 
