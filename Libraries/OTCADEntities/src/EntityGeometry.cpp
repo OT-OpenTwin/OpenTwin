@@ -492,7 +492,7 @@ void EntityGeometry::addVisualizationNodes(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_MaterialType, ot::JsonString(materialType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureType, ot::JsonString(textureType, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextureReflective, this->isTextureReflective(textureType), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, true, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_BACKFACE_Culling, getBackfaceCulling(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_OffsetFactor, 1., doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_IsHidden, this->getInitiallyHidden(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(DataBase::instance().getCollectionName(), doc.GetAllocator()), doc.GetAllocator());

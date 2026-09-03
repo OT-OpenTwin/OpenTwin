@@ -74,6 +74,7 @@
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
+#include "OTCADEntities/EntityLumpedFDTDPort.h"
 
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
@@ -3036,6 +3037,12 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		updateAnnotationGeometry(dynamic_cast<EntityFaceAnnotation*>(entity));
 		return;
 	}
+
+	if (dynamic_cast<EntityLumpedFDTDPort*>(entity) != nullptr)
+	{
+		updateLumpedFDTDPort(dynamic_cast<EntityLumpedFDTDPort*>(entity));
+		return;
+	}
 	
 	if (dynamic_cast<EntityParameter*>(entity) != nullptr)
 	{
@@ -3626,6 +3633,17 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 
 	annotationEntity->postGeometryUpdates();
 	annotationEntity->storeUpdatedFacets();
+}
+
+void Model::updateLumpedFDTDPort(EntityLumpedFDTDPort* portEntity)
+{
+	TopoDS_Shape portShape = portEntity->createShape();
+
+	portEntity->setBrep(portShape);
+	portEntity->facetEntity(false);
+	portEntity->storeToDataBase();
+
+	portEntity->addVisualizationNodes();
 }
 
 void Model::updateCoordinateSystem(EntityCoordinateSystem* csEntity)
