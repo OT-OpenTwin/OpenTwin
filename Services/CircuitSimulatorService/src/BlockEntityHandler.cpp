@@ -240,7 +240,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 
 	MetadataParameter baseParameter;
 	baseParameter.typeName = ot::TypeNames::getDoubleTypeName();
-	baseParameter.parameterName = solverNameShort + "_" + (normalizedSimType == "DC" ? "sweep" : 
+	baseParameter.parameterName = (normalizedSimType == "DC" ? "sweep" : 
 									normalizedSimType == "TRAN" ? "time" : "frequency");
 	baseParameter.parameterLabel = baseParameter.parameterName; 
 	baseParameter.unit = normalizedSimType == "DC" ? "V" : 
@@ -316,14 +316,17 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		std::size_t pos = resultPair.first.find(delimiter);
 		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
 		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
-		std::string curveName = solverNameShort + "_" + displayName + "-" + normalizedSimType;
+		std::string curveName = displayName + "-" + normalizedSimType;
 
-		quantity->setName("Voltage/" + curveName); // Give unique quantity name to avoid duplicate issues
+		quantity->setName(curveName);
 		quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "V");
+
+		// Set the quantity label for Y-axis display (curve name with unit)
+		quantity->getMetadataQuantity().quantityLabel = curveName + " [V]";
 
 		QuantityDescriptionCurve* quantityPtr = quantity.release();
 		dataset.setQuantityDescription(quantityPtr);
-		
+
 		allCurveDescriptions.push_back(std::move(dataset));
 	}
 	
@@ -346,14 +349,17 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		std::size_t pos = resultPair.first.find(delimiter);
 		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
 		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
-		std::string curveName = solverNameShort + "_" + displayName + "-" + normalizedSimType;
+		std::string curveName = displayName + "-" + normalizedSimType;
 
-		quantity->setName("Current/" + curveName); // Give unique quantity name
+		quantity->setName(curveName);
 		quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "A");
+
+		// Set the quantity label for Y-axis display (curve name with unit)
+		quantity->getMetadataQuantity().quantityLabel = curveName + " [I]";
 
 		QuantityDescriptionCurve* quantityPtr = quantity.release();
 		dataset.setQuantityDescription(quantityPtr);
-		
+
 		allCurveDescriptions.push_back(std::move(dataset));
 	}
 
@@ -379,8 +385,9 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	bool hasVoltages = false;
 	bool hasCurrents = false;
 	for (auto& ds : allCurveDescriptions) {
-		if (ds.getQuantityDescription()->getName().find("Voltage/") != std::string::npos) hasVoltages = true;
-		if (ds.getQuantityDescription()->getName().find("Current/") != std::string::npos) hasCurrents = true;
+		const std::string& qName = ds.getQuantityDescription()->getName();
+		if (qName.find("V(") != std::string::npos || qName.find("vd_") != std::string::npos) hasVoltages = true;
+		else hasCurrents = true;
 	}
 
 	auto modelComponent = Application::instance()->getModelComponent();
@@ -389,10 +396,12 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		EntityResult1DPlot newPlotVoltages(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		newPlotVoltages.setName(fullPlotNameVoltage);
 		newPlotVoltages.createProperties();
-		
+
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Voltages");
 		plotCfg.setXAxisParameter(sharedParameterDescr->getMetadataParameter().parameterLabel);
+		plotCfg.setYAxisLabel("Voltage [V]");
+		plotCfg.setYAxisLabelAutoDetermine(false);
 		newPlotVoltages.setStaticCurveQueryOptions(plotCfg);
 		newPlotVoltages.storeToDataBase();
 		modelComponent->addNewTopologyEntity(newPlotVoltages.getEntityID(), newPlotVoltages.getEntityStorageVersion(), false);
@@ -402,10 +411,12 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		EntityResult1DPlot newPlotCurrents(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		newPlotCurrents.setName(fullPlotNameCurrent);
 		newPlotCurrents.createProperties();
-		
+
 		ot::Plot1DCfg plotCfg;
 		plotCfg.setTitle("Currents");
 		plotCfg.setXAxisParameter(sharedParameterDescr->getMetadataParameter().parameterLabel);
+		plotCfg.setYAxisLabel("Current [A]");
+		plotCfg.setYAxisLabelAutoDetermine(false);
 		newPlotCurrents.setStaticCurveQueryOptions(plotCfg);
 		newPlotCurrents.storeToDataBase();
 		modelComponent->addNewTopologyEntity(newPlotCurrents.getEntityID(), newPlotCurrents.getEntityStorageVersion(), false);
@@ -417,15 +428,12 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		extender.processDataPoints(&dataDescription, seriesMetadataIndex);
 
 		std::string fullName = dataDescription.getQuantityDescription()->getName();
-		bool isVoltageCurve = (fullName.find("Voltage/") != std::string::npos);
-		
-		// Re-extract curve name from quantity name
-		std::string curveName = isVoltageCurve ? fullName.substr(8) : fullName.substr(8); 
-		
+		bool isVoltageCurve = (fullName.find("V(") != std::string::npos || fullName.find("vd_") != std::string::npos);
+
 		ot::Plot1DCurveCfg curveConfig;
-		curveConfig.setTitle(curveName);
+		curveConfig.setTitle(fullName);
 		curveConfig.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
-		curveConfig.setEntityName((isVoltageCurve ? fullPlotNameVoltage : fullPlotNameCurrent) + "/" + curveName);
+		curveConfig.setEntityName((isVoltageCurve ? fullPlotNameVoltage : fullPlotNameCurrent) + "/" + fullName);
 
 		CurveFactory::addToConfig(*series, dataDescription.getQuantityDescription()->getMetadataQuantity(), curveConfig, Application::instance(), &extender);
 
