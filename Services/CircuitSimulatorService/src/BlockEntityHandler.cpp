@@ -37,7 +37,10 @@
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
 #include "OTCore/MetadataHandle/MetadataQuantity.h"
-
+#include "OTResultDataAccess/CurveFactory.h"
+#include "OTModelEntities/EntityResult1DPlot.h"
+#include "OTModelEntities/EntityResult1DCurve.h"
+#include "OTCore/FolderNames.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitResistor.h"
@@ -176,8 +179,6 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	OT_LOG_D("ResultVectors size: " + std::to_string(resultVectors.size()));
 
 	ResultCollectionExtender extender(Application::instance());
-	PlotBuilder plotBuilderCurrent(extender, Application::instance());
-	PlotBuilder plotBuilderVoltage(extender, Application::instance());
 
 	// Normalize simulation type to uppercase for comparison
 	std::transform(simulationType.begin(), simulationType.end(), simulationType.begin(), ::tolower);
@@ -279,10 +280,12 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	}
 
 	const std::string plotFolderPath = solverName + "/" + "Results";
-	const std::string plotNameVoltage = "/" + normalizedSimType + "-Voltage";
-	const std::string plotNameCurrent = "/" + normalizedSimType + "-Current";
+	const std::string plotNameVoltage = "/" + solverNameShort + "_" + normalizedSimType + "-Voltage";
+	const std::string plotNameCurrent = "/" + solverNameShort + "_" + normalizedSimType + "-Current";
 	const std::string fullPlotNameVoltage = plotFolderPath + plotNameVoltage;
 	const std::string fullPlotNameCurrent = plotFolderPath + plotNameCurrent;
+
+	ot::ModelServiceAPI::deleteEntitiesFromModel({ fullPlotNameVoltage, fullPlotNameCurrent }, false);
 
 	ot::PainterRainbowIterator rainbowPainterIt;
 	auto& nameMap = Application::instance()->getNGSpice().netlistNameToCustomNameMap;
@@ -290,106 +293,152 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	OT_LOG_D("Starting to create curves. Total result vectors: " + std::to_string(resultVectors.size()));
 
 	std::shared_ptr<ParameterDescription> sharedParameterDescr(new ParameterDescription(baseParameter, false));
-
+	
+	// Collect all dataset descriptions
+	std::list<DatasetDescription> allCurveDescriptions;
+	
+	// Process Voltage Curves
 	for (auto& resultPair : resultVectors) {
-		if (resultPair.second.empty()) {
-			OT_LOG_W("Skipping curve with empty y-values: " + resultPair.first);
-			continue;
-		}
+		if (resultPair.second.empty()) continue;
 
-		OT_LOG_D("Processing curve: " + resultPair.first + " with " + std::to_string(resultPair.second.size()) + " y-values");
+		bool isVoltage = (resultPair.first.find("V(") != std::string::npos || resultPair.first.find("vd_") != std::string::npos);
+		if (!isVoltage) continue;
 
-		std::string curveName;
-		std::string yUnit = "V";
-
-		// Extract base name without branch suffix
-		std::string delimiter = "#branch";
-		std::size_t pos = resultPair.first.find(delimiter);
-		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
-
-		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
-
-		// Set curve name based on simulation type
-		switch (normalizedSimType[0]) {
-		case 'D':
-			curveName = displayName + "-DC";
-			break;
-		case 'T':
-			curveName = displayName + "-TRAN";
-			break;
-		case 'A':
-			curveName = displayName + "-AC";
-			break;
-		default:
-			OT_LOG_E("Unexpected simulation type");
-			continue;
-		}
-
-		// Create and populate quantity with y-values
 		std::unique_ptr<QuantityDescriptionCurve> quantity(new QuantityDescriptionCurve());
-		const std::vector<double>& yValues = resultPair.second;
-		for (const double& value : yValues) {
+		for (const double& value : resultPair.second) {
 			quantity->addDatapoint(ot::Variable(value));
 		}
 
-		// Create dataset and add parameter
 		DatasetDescription dataset;
 		dataset.addParameterDescription(sharedParameterDescr);
 
-		// Configure curve appearance
-		ot::Plot1DCurveCfg curveCfg;
-		curveCfg.setTitle(curveName);
-		auto stylePainter = rainbowPainterIt.getNextPainter();
-		curveCfg.setLinePenPainter(stylePainter.release());
+		std::string delimiter = "#branch";
+		std::size_t pos = resultPair.first.find(delimiter);
+		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
+		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
+		std::string curveName = solverNameShort + "_" + displayName + "-" + normalizedSimType;
 
-		std::string seriesName = solverNameShort + "_" + curveName;
+		quantity->setName("Voltage/" + curveName); // Give unique quantity name to avoid duplicate issues
+		quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "V");
 
-		// Determine if voltage or current curve and configure accordingly
-		bool isVoltage = (resultPair.first.find("V(") != std::string::npos ||
-			resultPair.first.find("vd_") != std::string::npos);
+		QuantityDescriptionCurve* quantityPtr = quantity.release();
+		dataset.setQuantityDescription(quantityPtr);
+		
+		allCurveDescriptions.push_back(std::move(dataset));
+	}
+	
+	// Process Current Curves
+	for (auto& resultPair : resultVectors) {
+		if (resultPair.second.empty()) continue;
 
-		if (isVoltage) {
-			curveCfg.setEntityName(fullPlotNameVoltage + "/" + curveName);
-			quantity->setName("Voltage");
-			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "V");
+		bool isVoltage = (resultPair.first.find("V(") != std::string::npos || resultPair.first.find("vd_") != std::string::npos);
+		if (isVoltage) continue;
 
-			QuantityDescriptionCurve* quantityPtr = quantity.release();
-			dataset.setQuantityDescription(quantityPtr);
-			OT_LOG_D("  Adding voltage curve: " + curveName + " with " + std::to_string(yValues.size()) + " datapoints");
-			plotBuilderVoltage.addCurve(std::move(dataset), curveCfg, seriesName, quantityPtr->getMetadataQuantity());
+		std::unique_ptr<QuantityDescriptionCurve> quantity(new QuantityDescriptionCurve());
+		for (const double& value : resultPair.second) {
+			quantity->addDatapoint(ot::Variable(value));
 		}
-		else {
-			curveCfg.setEntityName(fullPlotNameCurrent + "/" + curveName);
-			quantity->setName("Current");
-			quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "A");
 
-			QuantityDescriptionCurve* quantityPtr = quantity.release();
-			dataset.setQuantityDescription(quantityPtr);
-			OT_LOG_D("  Adding current curve: " + curveName + " with " + std::to_string(yValues.size()) + " datapoints");
-			plotBuilderCurrent.addCurve(std::move(dataset), curveCfg, seriesName, quantityPtr->getMetadataQuantity());
-		}
+		DatasetDescription dataset;
+		dataset.addParameterDescription(sharedParameterDescr);
+
+		std::string delimiter = "#branch";
+		std::size_t pos = resultPair.first.find(delimiter);
+		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
+		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
+		std::string curveName = solverNameShort + "_" + displayName + "-" + normalizedSimType;
+
+		quantity->setName("Current/" + curveName); // Give unique quantity name
+		quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "A");
+
+		QuantityDescriptionCurve* quantityPtr = quantity.release();
+		dataset.setQuantityDescription(quantityPtr);
+		
+		allCurveDescriptions.push_back(std::move(dataset));
 	}
 
-	// Create voltage plot if curves exist
-	if (plotBuilderVoltage.getNumberOfCurves() > 0) {
-		OT_LOG_D("Creating voltage plot with " + std::to_string(plotBuilderVoltage.getNumberOfCurves()) + " curves at " + fullPlotNameVoltage);
+	if (allCurveDescriptions.empty()) {
+		OT_LOG_E("No curves generated.");
+		return;
+	}
+
+	//extender.registerCallbacks(
+	//	ot::EntityCallbackBase::Callback::Properties |
+	//	ot::EntityCallbackBase::Callback::Selection |
+	//	ot::EntityCallbackBase::Callback::DataNotify,
+	//	Application::instance()->getServiceName()
+	//);
+	extender.setSaveModel(false);
+
+	std::string seriesName = ot::FolderNames::DatasetFolder + "/" + solverNameShort;
+	uint64_t seriesMetadataIndex = extender.buildSeriesMetadata(allCurveDescriptions, seriesName);
+	extender.storeCampaignChanges();
+
+	const MetadataSeries* series = extender.findMetadataSeries(seriesMetadataIndex);
+
+	bool hasVoltages = false;
+	bool hasCurrents = false;
+	for (auto& ds : allCurveDescriptions) {
+		if (ds.getQuantityDescription()->getName().find("Voltage/") != std::string::npos) hasVoltages = true;
+		if (ds.getQuantityDescription()->getName().find("Current/") != std::string::npos) hasCurrents = true;
+	}
+
+	auto modelComponent = Application::instance()->getModelComponent();
+
+	if (hasVoltages) {
+		EntityResult1DPlot newPlotVoltages(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newPlotVoltages.setName(fullPlotNameVoltage);
+		newPlotVoltages.createProperties();
+		
 		ot::Plot1DCfg plotCfg;
-		plotCfg.setEntityName(fullPlotNameVoltage);
+		plotCfg.setTitle("Voltages");
 		plotCfg.setXAxisParameter(sharedParameterDescr->getMetadataParameter().parameterLabel);
-		plotBuilderVoltage.buildPlot(plotCfg,false);
+		newPlotVoltages.setStaticCurveQueryOptions(plotCfg);
+		newPlotVoltages.storeToDataBase();
+		modelComponent->addNewTopologyEntity(newPlotVoltages.getEntityID(), newPlotVoltages.getEntityStorageVersion(), false);
+	}
+	
+	if (hasCurrents) {
+		EntityResult1DPlot newPlotCurrents(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newPlotCurrents.setName(fullPlotNameCurrent);
+		newPlotCurrents.createProperties();
+		
+		ot::Plot1DCfg plotCfg;
+		plotCfg.setTitle("Currents");
+		plotCfg.setXAxisParameter(sharedParameterDescr->getMetadataParameter().parameterLabel);
+		newPlotCurrents.setStaticCurveQueryOptions(plotCfg);
+		newPlotCurrents.storeToDataBase();
+		modelComponent->addNewTopologyEntity(newPlotCurrents.getEntityID(), newPlotCurrents.getEntityStorageVersion(), false);
 	}
 
-	// Create current plot if curves exist
-	if (plotBuilderCurrent.getNumberOfCurves() > 0) {
-		OT_LOG_D("Creating current plot with " + std::to_string(plotBuilderCurrent.getNumberOfCurves()) + " curves at " + fullPlotNameCurrent);
-		ot::Plot1DCfg plotCfg;
-		plotCfg.setEntityName(fullPlotNameCurrent);
-		plotCfg.setXAxisParameter(sharedParameterDescr->getMetadataParameter().parameterLabel);
-		plotBuilderCurrent.buildPlot(plotCfg,false);
+	// Create and push curves
+	for (DatasetDescription& dataDescription : allCurveDescriptions)
+	{
+		extender.processDataPoints(&dataDescription, seriesMetadataIndex);
+
+		std::string fullName = dataDescription.getQuantityDescription()->getName();
+		bool isVoltageCurve = (fullName.find("Voltage/") != std::string::npos);
+		
+		// Re-extract curve name from quantity name
+		std::string curveName = isVoltageCurve ? fullName.substr(8) : fullName.substr(8); 
+		
+		ot::Plot1DCurveCfg curveConfig;
+		curveConfig.setTitle(curveName);
+		curveConfig.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
+		curveConfig.setEntityName((isVoltageCurve ? fullPlotNameVoltage : fullPlotNameCurrent) + "/" + curveName);
+
+		CurveFactory::addToConfig(*series, dataDescription.getQuantityDescription()->getMetadataQuantity(), curveConfig, Application::instance(), &extender);
+
+		EntityResult1DCurve newCurve(modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newCurve.setName(curveConfig.getEntityName());
+		newCurve.createProperties();
+		newCurve.setStaticCurveQueryOptions(curveConfig);
+		newCurve.storeToDataBase();
+
+		modelComponent->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);
 	}
-	else {
-		OT_LOG_W("No current curves to plot");
-	}
+
+	modelComponent->storeNewEntities("Created new plots", false);
 
 	OT_LOG_D("=== createResultCurves END ===");
 }
