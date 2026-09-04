@@ -37,8 +37,8 @@ void EntityBlockCircuitElement::createProperties()
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Horizontal", false, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Vertical", false, "default", getProperties());
 	/*EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());*/
-	EntityPropertiesExtendedEntityList* selProp = EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, "default", getProperties());
-	selProp->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
+	//EntityPropertiesExtendedEntityList* selProp = EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, "default", getProperties());
+	//selProp->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
 }
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
