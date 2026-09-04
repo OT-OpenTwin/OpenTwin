@@ -608,6 +608,19 @@ void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
 		double zmin = zminProperty->getValue();
 		double zmax = zmaxProperty->getValue();
 
+		double tolerance = 1e-3 * minimumMeshStepWidth;
+
+		if (fabs(xmax - xmin) < tolerance) xmin = xmax = 0.5 * (xmin + xmax);
+		if (fabs(ymax - ymin) < tolerance) ymin = ymax = 0.5 * (ymin + ymax);
+		if (fabs(zmax - zmin) < tolerance) zmin = zmax = 0.5 * (zmin + zmax);
+
+		xmin = snapToMeshLine(xmin, xLines);
+		xmax = snapToMeshLine(xmax, xLines);
+		ymin = snapToMeshLine(ymin, yLines);
+		ymax = snapToMeshLine(ymax, yLines);
+		zmin = snapToMeshLine(zmin, zLines);
+		zmax = snapToMeshLine(zmax, zLines);
+
 		std::transform(
 			direction.begin(),
 			direction.end(),
@@ -623,7 +636,7 @@ void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
 			<< "    start=[" << xmin << ", " << ymin << ", " << zmin << "],\n"
 			<< "    stop=[" << xmax << ", " << ymax << ", " << zmax << "],\n"
 			<< "    p_dir='" << direction << "',\n"
-			<< "    priority = 10,\n"
+			<< "    priority = " << maximumObjectPriority+1 << ",\n"
 			<< "    excite=1\n)\n\n";
 	}
 }
@@ -1051,6 +1064,8 @@ void FDTDSolver::addGeometry(std::stringstream& runCommand)
 
 			runCommand << "stl" << materialCount << "_" << shapeCount << " = " << openEMSMaterialName << ".AddPolyhedronReader(\"" << escapeBackslashes(stlFileName) << "\", priority = " << shapeNameToPriorityIntMap[geomEntity->getName()] << ")\n";
 			runCommand << "stl" << materialCount << "_" << shapeCount << ".ReadFile()\n";
+
+			maximumObjectPriority = std::max(maximumObjectPriority, shapeNameToPriorityIntMap[geomEntity->getName()]);
 
 			shapeCount++;
 		}
@@ -2691,4 +2706,28 @@ bool FDTDSolver::getGridDimensions(const std::vector<char>& data, int& nx, int& 
 	nz = extent[5] - extent[4] + 1;
 
 	return true;
+}
+
+double FDTDSolver::snapToMeshLine(double coordinate, const std::vector<double>& meshLines)
+{
+	if (meshLines.empty())
+		throw std::invalid_argument("Mesh line vector is empty");
+
+	auto upper = std::lower_bound(
+		meshLines.begin(),
+		meshLines.end(),
+		coordinate);
+
+	if (upper == meshLines.begin())
+		return *upper;
+
+	if (upper == meshLines.end())
+		return meshLines.back();
+
+	const auto lower = std::prev(upper);
+
+	// Prefer the lower mesh line if both distances are equal.
+	return coordinate - *lower <= *upper - coordinate
+		? *lower
+		: *upper;
 }

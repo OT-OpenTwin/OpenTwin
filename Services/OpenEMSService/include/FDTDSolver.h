@@ -101,6 +101,7 @@ private:
 	std::size_t mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance);
 	bool getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz);
 	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
+	double snapToMeshLine(double coordinate, const std::vector<double>& meshLines);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -109,6 +110,7 @@ private:
 	std::string tempDirPath;
 	double timeStepWidth = 0.0;
 	double minimumMeshStepWidth = 0.0;
+	int maximumObjectPriority = 0;
 
 	std::vector<double> xLines, yLines, zLines;
 	std::list<std::map<int, double>> excitationList;
