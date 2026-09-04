@@ -93,8 +93,8 @@ int ot::BasicQueue::exec()
 	if (m_state.hasAny(State::ExectutingStates))
 	{
 		m_mutex.unlock();
-		OT_LOG_E("Queue is already running.");
-		throw Exception::Runtime("Queue is already running.");
+		//OT_LOG_E("Queue is already running.");
+		return AppExitCode::QueueExecutionBlocked;
 	}
 
 	if (m_queue.empty())
