@@ -20,14 +20,18 @@
 // OpenTwin header
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTWidgets/Debugging/WidgetDebug.h"
 #include "OTWidgets/WidgetView/WidgetViewTab.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 
 ot::WidgetViewDock::WidgetViewDock(WidgetView* _view, QWidget* _parent) :
 	ads::CDockWidget(QString(), _parent), m_view(_view), m_tab(nullptr)
 {
+	OT_WIDGETS_VIEW_DBG_PTR(this, ": Creating view dock widget");
+
 	m_tab = dynamic_cast<WidgetViewTab*>(this->tabWidget());
 	if (m_tab) {
+		OT_WIDGETS_VIEW_DBG_PTR(this, ": Tab widget confirmed = " << LogMsgPtr(m_tab));
 		this->connect(m_tab, &WidgetViewTab::viewCloseRequested, this, &WidgetViewDock::slotCloseRequested);
 		this->connect(m_tab, &WidgetViewTab::viewPinnedChanged, this, &WidgetViewDock::slotPinnedChanged);
 	}
@@ -42,6 +46,8 @@ ot::WidgetViewDock::WidgetViewDock(WidgetView* _view, QWidget* _parent) :
 }
 
 ot::WidgetViewDock::~WidgetViewDock() {
+	OT_WIDGETS_VIEW_DBG_PTR(this, ": Destroying view dock widget");
+
 	m_view = nullptr;
 
 	if (m_tab) {
@@ -52,11 +58,11 @@ ot::WidgetViewDock::~WidgetViewDock() {
 	this->disconnect(this, &ads::CDockWidget::closeRequested, this, &WidgetViewDock::slotCloseRequested);
 }
 
-void ot::WidgetViewDock::openView(void) {
+void ot::WidgetViewDock::openView() {
 	this->toggleView(true);
 }
 
-void ot::WidgetViewDock::closeView(void) {
+void ot::WidgetViewDock::closeView() {
 	this->toggleView(false);
 }
 
@@ -75,7 +81,7 @@ void ot::WidgetViewDock::setIsPinned(bool _isPinned) {
 	m_tab->setIsPinned(_isPinned);
 }
 
-bool ot::WidgetViewDock::getIsPinned(void) const {
+bool ot::WidgetViewDock::getIsPinned() const {
 	OTAssertNullptr(m_tab);
 	return m_tab->getIsPinned();
 }
@@ -85,7 +91,7 @@ void ot::WidgetViewDock::resizeEvent(QResizeEvent* _event) {
 	Q_EMIT dockResized(_event->size());
 }
 
-void ot::WidgetViewDock::slotCloseRequested(void) {
+void ot::WidgetViewDock::slotCloseRequested() {
 	Q_EMIT dockCloseRequested();
 }
 

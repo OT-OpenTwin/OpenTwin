@@ -256,18 +256,21 @@ namespace ot {
 		void slotUpdateViewFocus();
 
 	private:
+		friend class WidgetViewFloatingDragPreview;
+		friend class WidgetViewFloatingDockContainer;
+
 		enum ManagerState {
-			DefaultState        = 0 << 0, //! @brief Default manager state.
-			InsertViewState     = 1 << 0, //! @brief View insert in progress.
-			CloseViewState      = 1 << 1, //! @brief View Remove in progress.
-			MulticloseViewState = 1 << 2 //! @brief Multiple views are closed at the same time.
+			DefaultState          = 0 << 0, //! @brief Default manager state.
+			InsertViewState       = 1 << 0, //! @brief View insert in progress.
+			CloseViewState        = 1 << 1, //! @brief View Remove in progress.
+			MulticloseViewState   = 1 << 2, //! @brief Multiple views are closed at the same time.
+			DragFinishHandleState = 1 << 3, //! @brief Drag operation finished is currently being processed.
 		};
 		typedef Flags<ManagerState> ManagerStateFlags;
 
 		struct FocusChangeData {
 			ads::CDockWidget* oldFocus = nullptr;
 			ads::CDockWidget* newFocus = nullptr;
-			bool queued = false;
 		};
 
 		struct FocusInfo {
@@ -308,6 +311,10 @@ namespace ot {
 		void prepareMultiCloseStart();
 		void prepareMultiCloseFinished();
 
+		OT_DECL_NODISCARD ot::FunctionRAII beginDragFinishHandling();
+		void prepareDragFinishHandlingStart();
+		void prepareDragFinishHandlingFinished();
+
 		WidgetViewDockManager* m_dockManager; //! @brief Dock manager managed by this manager
 		QAction*           m_dockToggleRoot; //! @brief Action containing the toggle dock visibility menu and actions
 		
@@ -315,6 +322,12 @@ namespace ot {
 		ManagerConfigFlags m_config;
 		std::string m_initialState;
 		int m_initialStateVersion;
+
+		struct DragInfo
+		{
+			WidgetView* view;
+		};
+		DragInfo m_dragInfo;
 
 		bool m_hasQueuedDelayedFocusUpdate;
 		FocusInfo        m_focusInfo;

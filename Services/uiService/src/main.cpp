@@ -33,6 +33,7 @@
 #include "OTWidgets/Debugging/GlobalEventLogger.h"
 #include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/WidgetViewComponentsFactory.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
@@ -272,6 +273,9 @@ bool initializeAssets() {
 bool initializeComponents(void) {
 	// Initialize Application Settings
 	ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);
+
+	// Initialize Compoment factory
+	ot::WidgetViewComponentsFactory::initialize(&ot::GlobalWidgetViewManager::instance());
 
 	// Initialize Widget view manager
 	ot::GlobalWidgetViewManager::instance().initialize();

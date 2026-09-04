@@ -49,6 +49,8 @@ ot::WidgetViewManager::WidgetViewManager() :
 	m_focusInfo.lastSide = nullptr;
 	m_focusInfo.lastTool = nullptr;
 	m_focusInfo.lastCentral = nullptr;
+
+	m_dragInfo.view = nullptr;
 }
 
 ot::WidgetViewManager::~WidgetViewManager()
@@ -296,7 +298,7 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 				if (activeSel.empty())
 				{
 					// No active selection, ensure view is allowed to close on empty selection
-					if (!(view.second->getViewData().getViewFlags() & WidgetViewBase::ViewCloseOnEmptySelection))
+					if (!view.second->getViewData().getViewFlags().has(WidgetViewBase::ViewCloseOnEmptySelection))
 					{
 						concider = false;
 					}
@@ -387,13 +389,16 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 		this->disconnect(view->getViewDockWidget()->tabWidget(), &ads::CDockWidgetTab::clicked, this, &WidgetViewManager::slotViewTabClicked);
 	}
 
-	// If the view is the current central, set current central to 0
+	// Focus info
 	if (view == m_focusInfo.last) m_focusInfo.last = nullptr;
 	if (view == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
 	if (view == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
 	if (view == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
 	if (view->getViewDockWidget() == m_focusChangeData.newFocus) m_focusChangeData.newFocus = nullptr;
 	if (view->getViewDockWidget() == m_focusChangeData.oldFocus) m_focusChangeData.oldFocus = nullptr;
+
+	// Drag info
+	if (view == m_dragInfo.view) m_dragInfo.view = nullptr;
 
 	// Find name list from owner and erase the view entry
 	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
@@ -828,19 +833,12 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CD
 {
 	m_focusChangeData.newFocus = _newFocus;
 	m_focusChangeData.oldFocus = _oldFocus;
-	if (!m_focusChangeData.queued)
-	{
-		m_focusChangeData.queued = true;
-		this->slotViewFocusedImpl();
-		//QMetaObject::invokeMethod(this, &WidgetViewManager::slotViewFocusedImpl, Qt::QueuedConnection);
-	}
+	this->slotViewFocusedImpl();
 }
 
 void ot::WidgetViewManager::slotViewFocusedImpl()
 {
-	m_focusChangeData.queued = false;
-
-	if (m_state.hasAny(MulticloseViewState | InsertViewState))
+	if (m_state.hasAny(MulticloseViewState | InsertViewState | DragFinishHandleState))
 	{
 		return;
 	}
@@ -970,7 +968,7 @@ void ot::WidgetViewManager::slotViewPinnedChanged(bool _pinned)
 	}
 
 	view->setAsCurrentViewTab();
-	view->getViewDockWidget()->setFocus();
+	m_dockManager->setDockWidgetFocused(view->getViewDockWidget());
 }
 
 void ot::WidgetViewManager::slotUpdateViewFocus()
@@ -1399,4 +1397,33 @@ void ot::WidgetViewManager::prepareMultiCloseFinished()
 {
 	m_state.remove(MulticloseViewState);
 	Q_EMIT multiCloseViewsCompleted();
+}
+
+ot::FunctionRAII ot::WidgetViewManager::beginDragFinishHandling()
+{
+	return ot::FunctionRAII([this]() { this->prepareDragFinishHandlingStart(); }, [this]() { this->prepareDragFinishHandlingFinished(); });
+}
+
+void ot::WidgetViewManager::prepareDragFinishHandlingStart()
+{
+	OT_WIDGETS_VIEW_DBG(": Drag finish - started");
+	m_state.set(DragFinishHandleState);
+	m_dragInfo.view = this->getCurrentlyFocusedView();
+}
+
+void ot::WidgetViewManager::prepareDragFinishHandlingFinished()
+{
+	OT_WIDGETS_VIEW_DBG(": Drag finish - finished");
+
+	// Ensure focus did not change during drop
+	if (m_dragInfo.view && m_dragInfo.view->getViewDockWidget() != m_focusChangeData.newFocus)
+	{
+		m_dragInfo.view->setAsCurrentViewTab();
+		if (m_dragInfo.view->getViewDockWidget())
+		{
+			m_dockManager->setDockWidgetFocused(m_dragInfo.view->getViewDockWidget());
+		}
+	}
+
+	m_state.remove(DragFinishHandleState);
 }

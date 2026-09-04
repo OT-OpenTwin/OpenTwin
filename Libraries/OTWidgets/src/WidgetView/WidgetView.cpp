@@ -47,6 +47,7 @@ ot::WidgetView::WidgetView(WidgetViewBase::ViewType _viewType, QWidget* _parent)
 	OT_WIDGETS_VIEW_DBG_PTR(this, ": View created");
 
 	m_dockWidget = new WidgetViewDock(this, _parent);
+	OT_WIDGETS_VIEW_DBG_PTR(this, ": Dock widget set = " << LogMsgPtr(m_dockWidget));
 
 	this->connect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);
 	this->connect(m_dockWidget, &WidgetViewDock::dockPinnedChanged, this, &WidgetView::slotPinnedChanged);
@@ -142,6 +143,8 @@ void ot::WidgetView::detachFromManager()
 {
 	if (m_dockWidget)
 	{
+		OT_WIDGETS_VIEW_DBG_PTR(this, ": Detaching view from manager: " << LogMsgPtr(m_dockWidget));
+
 		m_dockWidget->takeWidget();
 
 		this->disconnect(m_dockWidget, &WidgetViewDock::dockCloseRequested, this, &WidgetView::slotCloseRequested);

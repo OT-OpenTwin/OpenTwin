@@ -33,6 +33,8 @@
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Properties/ApplicationPropertiesManager.h"
+#include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
+#include "OTWidgets/WidgetView/WidgetViewComponentsFactory.h"
 #include "OTCommunication/actionTypes.h"
 
 // Qt header
@@ -138,6 +140,9 @@ void mainApplicationThread()
 
 		// Initialize settings manager
 		ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);
+
+		// Initialize widget view component factory
+		ot::WidgetViewComponentsFactory::initialize(&ot::GlobalWidgetViewManager::instance());
 
 		// Initialize OToolkit
 		AppBase::instance()->setApplicationInstance(&application);

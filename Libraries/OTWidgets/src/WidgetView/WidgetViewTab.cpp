@@ -145,13 +145,17 @@ void ot::WidgetViewTab::mousePressEvent(QMouseEvent* _event) {
 	}
 	ads::CDockWidgetTab::mousePressEvent(_event);
 }
-
+#include <ads/FloatingDragPreview.h>
 void ot::WidgetViewTab::mouseReleaseEvent(QMouseEvent* _event) {
-	ads::CDockWidgetTab::mouseReleaseEvent(_event);
 	if (_event->button() == Qt::MiddleButton) {
 		if (m_isMiddleButtonPressed && m_closeButton->isVisible()) {
 			Q_EMIT viewCloseRequested();
 		}
 		m_isMiddleButtonPressed = false;
+	}
+	else
+	{
+		
+		ads::CDockWidgetTab::mouseReleaseEvent(_event);
 	}
 }
