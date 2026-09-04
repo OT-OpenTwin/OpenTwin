@@ -1,6 +1,7 @@
 // @otlicense
 
 // OpenTwin header
+#include "OTViewer/Intern/ViewerDebug.h"
 #include "OTViewer/ViewerAPI.h"
 #include "OTViewer/QueueableRequests/RequestVisIfNeededRequest.h"
 
@@ -20,6 +21,8 @@ ot::RequestVisIfNeededRequest::RequestVisIfNeededRequest(UID _viewerID, UID _ent
 
 int ot::RequestVisIfNeededRequest::exec()
 {
-	ViewerAPI::requestVisualizationIfNeeded(m_viewerID, m_entityID);
-	return 0;
+	bool result = ViewerAPI::requestVisualizationIfNeeded(m_viewerID, m_entityID);
+	OT_VIEWER_VIEWSEL_DBG_PTR(this, ": Requesting visualization of entity " << m_entityID << 
+		" in viewer " << m_viewerID << " returned " << (result ? "true" : "false"));
+	return result ? AppExitCode::Success : AppExitCode::ResultFalse;
 }

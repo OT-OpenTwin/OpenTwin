@@ -29,11 +29,7 @@
 #include "OTViewer/ViewChangedStates.h"
 #include "OTViewer/Visualizer/Visualiser.h"
 
-// std header
-#include <string>
-#include <list>
-#include <cassert>
-
+// Osg header
 #include <osg/Switch>
 
 class Model;
@@ -53,15 +49,15 @@ public:
 
 	void setTreeItem(const ot::EntityTreeItem& _treeItem);
 	const ot::EntityTreeItem& getTreeItem() const { return m_treeItem; };
-	
+
 	void setName(const std::string& _name);
 	const std::string& getName() const { return m_treeItem.getEntityName(); };
 	ot::UID getModelEntityID() const { return m_treeItem.getEntityID(); };
 	bool getTreeItemEditable() const { return m_treeItem.getIsEditable(); };
 	bool getSelectChildren() const { return m_treeItem.getSelectChilds(); };
 
-	void setShapeNode(osg::Switch *node) { m_shapeNode = node; };
-	osg::Switch *getShapeNode() const { return m_shapeNode; };
+	void setShapeNode(osg::Switch* node) { m_shapeNode = node; };
+	osg::Switch* getShapeNode() const { return m_shapeNode; };
 
 	void setTreeItemID(ot::UID _iD);
 	ot::UID getTreeItemID() const { return m_treeItemID; };
@@ -73,7 +69,7 @@ public:
 
 	//! \return Returns true if the selection has requested a new view.
 	virtual ot::SelectionHandlingResult setSelected(bool _selected, const ot::SelectionData& _selectionData, bool singleSelection, const std::list<SceneNodeBase*>& _selectedNodes, ot::VisualiserInfo& _visualizersInfo);
-	
+
 	bool isTransparent() const { return m_transparent; };
 	virtual void setTransparent(bool t) { m_transparent = t; };
 	virtual void setTransparency(double value) { m_transparency = value; };
@@ -84,7 +80,7 @@ public:
 	bool isHighlighted() const { return m_highlighted; };
 	virtual void setHighlighted(bool _highlight);
 
-	void setErrors(std::string &e) { m_errors = e; };
+	void setErrors(std::string& e) { m_errors = e; };
 	bool hasErrors() const { return !m_errors.empty(); };
 	std::string getErrors() const { return m_errors; };
 
@@ -100,11 +96,11 @@ public:
 	void setManageVisibilityOfChildren(bool flag) { m_manageVisibilityOfChildren = flag; }
 	bool getManageVisibilityOfChildren() const { return m_manageVisibilityOfChildren; }
 
-	void setParent(SceneNodeBase *item) { m_parent = item; };
-	SceneNodeBase *getParent() { return m_parent; };
+	void setParent(SceneNodeBase* item) { m_parent = item; };
+	SceneNodeBase* getParent() { return m_parent; };
 
-	void addChild(SceneNodeBase *child);
-	void removeChild(SceneNodeBase *child);
+	void addChild(SceneNodeBase* child);
+	void removeChild(SceneNodeBase* child);
 	const std::list<SceneNodeBase*>& getChildren() const { return m_children; };
 
 	//! @brief Returns true if this node is a child of the provided parent node.
@@ -112,7 +108,7 @@ public:
 	//! @param _parent Pointer to the potential parent node.
 	bool isChildOf(const SceneNodeBase* _parent) const;
 
-	virtual void getPrefetch(std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs) {};
+	virtual void getPrefetch(std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>>& prefetchIDs) {};
 
 	virtual bool isItem3D() const = 0;
 
@@ -122,7 +118,7 @@ public:
 	//! @brief Returns a list of entities that will be visualized by the visualizers.
 	ot::UIDList getVisualisedEntities() const;
 
-	void setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
+	void setViewChange(const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType);
 
 	virtual bool hasTransformationMatrix() { return false; }
 	virtual osg::Matrix getTransformationMatrix() { return osg::Matrix().identity(); }
@@ -130,7 +126,9 @@ public:
 
 	void setRequiresGlobalTransformationMatrix(bool flag) { m_requiresGlobalTransformationMatrix = flag; };
 
-	void requestVisualizationIfNeeded();
+	//! @brief Request a new visualization if needed.
+	//! Returns true if any of the visualisers requested a new visualization and returned true, false otherwise.
+	bool requestVisualizationIfNeeded();
 
 protected:
 	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
@@ -153,8 +151,8 @@ private:
 	bool               m_selectionHandled = false;
 	bool			   m_requiresGlobalTransformationMatrix = false;
 	std::string        m_errors = "";
-	SceneNodeBase *    m_parent = nullptr;
+	SceneNodeBase* m_parent = nullptr;
 	std::list<SceneNodeBase*> m_children;
-	
+
 	std::list<Visualiser*> m_visualiser;
 };

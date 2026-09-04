@@ -306,14 +306,14 @@ ot::UIDList SceneNodeBase::getVisualisedEntities() const
 	return entities;
 }
 
-void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+void SceneNodeBase::setViewChange(const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": View state change { \"State\": " << static_cast<int>(_state) << ", \"ViewType\": \"" << ot::WidgetViewBase::toString(_viewType) << "\" }");
 
 	// Here we switch the view state changes
 	switch (_state)
 	{
-	case ot::ViewChangedStates::changesSaved:
+	case ot::ViewChangedState::ChangesSaved:
 	{
 		const std::list<Visualiser*>& allVisualiser = getVisualiser();
 		// We initiated a model state change from the ui. Now we request a new visualisation for every visualiser which is not the one that initiated the 
@@ -335,11 +335,12 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		}
 	}
 	break;
-	case ot::ViewChangedStates::viewOpened: OT_FALLTHROUGH
-	case ot::ViewChangedStates::viewClosed:
+
+	case ot::ViewChangedState::ViewOpened: OT_FALLTHROUGH
+	case ot::ViewChangedState::ViewClosed:
 	{
 		//Here we set/unset the viewer state isOpen for the opened visualisation.
-		const bool viewIsOpen = _state == ot::ViewChangedStates::viewOpened ? true : false;
+		const bool viewIsOpen = _state == ot::ViewChangedState::ViewOpened ? true : false;
 		for (Visualiser* visualiser : getVisualiser())
 		{
 			if (visualiser->getViewType() == _viewType)
@@ -349,14 +350,26 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedStates& _state, const ot:
 		}
 	}
 	break;
+
+	case ot::ViewChangedState::ConfigurationApplied:
+		for (Visualiser* visualiser : getVisualiser())
+		{
+			if (visualiser->getViewType() == _viewType)
+			{
+				visualiser->setVisualisationRequested(false);
+			}
+		}
+	break;
+
 	default:
 		OT_LOG_E("Unknown view state change");
 		break;
 	}
 }
 
-void SceneNodeBase::requestVisualizationIfNeeded()
+bool SceneNodeBase::requestVisualizationIfNeeded()
 {
+	bool result = false;
 	OT_VIEWER_SCENENODE_DBG_PTR(this, ": Testing if visualization request is needed");
 	const std::list<Visualiser*>& allVisualiser = getVisualiser();
 	for (Visualiser* visualiser : allVisualiser)
@@ -370,8 +383,10 @@ void SceneNodeBase::requestVisualizationIfNeeded()
 			state.singleSelection = true;
 			state.selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 			ot::VisualiserInfo info;
-			visualiser->requestVisualization(state, info);
+			result |= visualiser->requestVisualization(state, info);
 		}
 	}
+
+	return result;
 }
 

@@ -148,7 +148,9 @@ public:
 
 	void setActiveColorRamp(ColorRamp *activeColorRamp);
 
-	void requestVisualizationIfNeeded(ot::UID _modelEntityID);
+	//! @brief Request a new visualization if needed.
+	//! Returns true if any of the visualisers requested a new visualization and returned true, false otherwise.
+	bool requestVisualizationIfNeeded(ot::UID _modelEntityID);
 
 private Q_SLOTS:
 	void slotColorStyleChanged(void);

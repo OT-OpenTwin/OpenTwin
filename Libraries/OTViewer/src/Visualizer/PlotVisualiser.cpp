@@ -31,12 +31,12 @@ PlotVisualiser::PlotVisualiser(SceneNodeBase* _sceneNode)
 }
 
 bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	if (getRequestHandled()) {
+	if (getVisualisationRequested()) {
 		// Request already handled
 		return false;
 	}
 
-	setRequestHandled(true);
+	setVisualisationRequested(true);
 	_info.handledVisualisers.push_back(this);
 
 	bool isSingle = _state.singleSelection;
@@ -95,12 +95,12 @@ bool PlotVisualiser::requestVisualization(const VisualiserState& _state, ot::Vis
 }
 
 void PlotVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	if (getRequestHandled()) {
+	if (getVisualisationRequested()) {
 		// Show request already handled
 		return;
 	}
 
-	setRequestHandled(true);
+	setVisualisationRequested(true);
 	_info.handledVisualisers.push_back(this);
 
 	if (!this->getSceneNode()->getSelectionHandled()) {

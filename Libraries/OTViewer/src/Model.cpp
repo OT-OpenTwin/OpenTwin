@@ -1259,7 +1259,7 @@ void Model::resetSelection(SceneNodeBase *root)
 	root->setSelectionHandled(false);
 
 	for (Visualiser* vis : visInfo.handledVisualisers) {
-		vis->setRequestHandled(false);
+		vis->setVisualisationRequested(false);
 	}
 
 	for (auto child : root->getChildren())
@@ -1359,7 +1359,7 @@ ot::SelectionHandlingResult Model::setSelectedTreeItems(const ot::SelectionData&
 	}
 
 	for (Visualiser* vis : visInfo.handledVisualisers) {
-		vis->setRequestHandled(false);
+		vis->setVisualisationRequested(false);
 	}
 
 	// Now update the transparent / opaque mode acoording to the selection
@@ -4133,7 +4133,7 @@ void Model::forgetShapeNode(osg::Node *node)
 	m_osgNodetoSceneNodesMap.erase(node);
 }
 
-void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+void Model::notifySceneNodeAboutViewChange(const std::string& _sceneNodeName, const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
 	auto sceneNodeIt = m_nameToSceneNodesMap.find(_sceneNodeName);
 	if (sceneNodeIt == m_nameToSceneNodesMap.end()) {

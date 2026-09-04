@@ -19,12 +19,15 @@
 
 #pragma once
 #include <stdint.h>
+
 namespace ot
 {
-	enum class ViewChangedStates : uint32_t
+	enum class ViewChangedState : uint32_t
 	{
-		viewClosed,
-		viewOpened,
-		changesSaved
+		ViewClosed,
+		ViewOpened,
+		ChangesSaved,
+		ConfigurationApplied,
+		DataLoaded = ConfigurationApplied
 	};
 }

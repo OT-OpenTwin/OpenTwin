@@ -2249,13 +2249,17 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	osgOverlayCamera->addChild(overlayColorRampNode);
 }
 
-void Viewer::requestVisualizationIfNeeded(ot::UID _modelEntityID)
+bool Viewer::requestVisualizationIfNeeded(ot::UID _modelEntityID)
 {
 	OTAssertNullptr(model);
 	SceneNodeBase* node = model->getSceneNodeByEntityID(_modelEntityID);
 	if (node)
 	{
-		node->requestVisualizationIfNeeded();
+		return node->requestVisualizationIfNeeded();
+	}
+	else
+	{
+		return false;
 	}
 }
 

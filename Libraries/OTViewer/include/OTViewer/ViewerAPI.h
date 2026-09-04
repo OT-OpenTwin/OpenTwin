@@ -115,7 +115,7 @@ namespace ViewerAPI {
 	__declspec(dllexport) void addVisualizationCartesianMeshItemNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, const std::vector<int>& _facesList, double _color[3]);
 	__declspec(dllexport) void visualizationTetMeshNodeTetEdges(ot::UID _osgModelID, ot::UID modelEntityID, bool displayTetEdges);
 	
-	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID _osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
+	__declspec(dllexport) void notifySceneNodeAboutViewChange(ot::UID _osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType);
 	
 	__declspec(dllexport) void setEntityName(ot::UID _modelEntityID, const std::string& _newName);
 	__declspec(dllexport) std::string getEntityName(ot::UID _modelEntityID);
@@ -153,7 +153,7 @@ namespace ViewerAPI {
 
 	__declspec(dllexport) void setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName);
 
-	__declspec(dllexport) void requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID);
+	__declspec(dllexport) bool requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID);
 
 	/********************************************************************************************/
 

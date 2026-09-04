@@ -4260,7 +4260,6 @@ void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument&
 
 void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document)
 {
-	OT_LOG_T("Plot");
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
@@ -4335,7 +4334,6 @@ void ExternalServicesComponent::handleAddPlot1D(ot::JsonDocument& _document)
 
 void ExternalServicesComponent::handleUpdatePlotCurve(ot::JsonDocument& _document)
 {
-	OT_LOG_T("Curve");
 	const std::string plotName = ot::json::getString(_document, OT_ACTION_PARAM_NAME);
 
 	ot::VisualisationCfg visualisationCfg;
@@ -5646,8 +5644,10 @@ void ExternalServicesComponent::slotPlotDataLoadingCompleted(ot::Plot1DCfg _plot
 		AppBase::instance()->setViewHandlingFlag(ot::ViewHandlingFlag::SkipViewHandling, false);
 	}
 	ot::WindowAPI::appendOutputMessage("Loading plot data took " + _loadTime + "\n");
-	
 
+	const ot::UID globalActiveViewModel = -1;
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, plotView->getViewData().getEntityName(), ot::ViewChangedState::DataLoaded, plotView->getViewData().getViewType());
+	
 	// Finally unlock the ui and hide the progress
 	ot::WindowAPI::lockSelectionAndModification(false);
 	ot::WindowAPI::setProgressBarVisibility("", false, false);

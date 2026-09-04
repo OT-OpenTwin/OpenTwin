@@ -122,15 +122,15 @@ public:
 	void setCustomViewFlags(const ot::WidgetViewBase::ViewFlags& _flags) { m_customViewFlags = _flags; };
 	const std::optional<ot::WidgetViewBase::ViewFlags>& getCustomViewFlags() const { return m_customViewFlags; };
 
-	void setRequestHandled(bool _handled) { m_requestsHandled = _handled; };
-	bool getRequestHandled() const { return m_requestsHandled; };
+	void setVisualisationRequested(bool _requested) { m_visualisationRequested = _requested; };
+	bool getVisualisationRequested() const { return m_visualisationRequested; };
 
 	virtual void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 
 protected:
 	virtual std::string getVisualiserTypeString() const = 0;
 
-	bool m_requestsHandled = false;
+	bool m_visualisationRequested = false;
 	ot::UID m_visualizationEntity;
 	SceneNodeBase* m_node = nullptr;
 	bool m_mayVisualise = true;

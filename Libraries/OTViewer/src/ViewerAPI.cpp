@@ -34,31 +34,39 @@
 #include "OTViewer/PlotManagerView.h"
 #include "OTViewer/Intern/ViewerDebug.h"
 
-namespace ViewerAPI {
-	namespace intern {
-		class OsgModelManager {
+namespace ViewerAPI
+{
+	namespace intern
+	{
+		class OsgModelManager
+		{
 			OT_DECL_STATICONLY(OsgModelManager)
 		public:
-			static std::map<ot::UID, Model*>& uidToModelMap() {
+			static std::map<ot::UID, Model*>& uidToModelMap()
+			{
 				static std::map<ot::UID, Model*> g_instance;
 				return g_instance;
 			}
 
-			static ot::UID& modelCount() {
+			static ot::UID& modelCount()
+			{
 				static ot::UID g_instance;
 				return g_instance;
 			}
 		};
 
-		class ViewerManager {
+		class ViewerManager
+		{
 			OT_DECL_STATICONLY(ViewerManager)
 		public:
-			static std::map<ot::UID, ot::ViewerView*>& uidToViewerMap() {
+			static std::map<ot::UID, ot::ViewerView*>& uidToViewerMap()
+			{
 				static std::map<ot::UID, ot::ViewerView*> g_instance;
 				return g_instance;
 			}
 
-			static ot::UID& viewerCount() {
+			static ot::UID& viewerCount()
+			{
 				static ot::UID g_instance;
 				return g_instance;
 			}
@@ -71,13 +79,16 @@ void ViewerAPI::setFontPath(const std::string& _fontPath)
 	GlobalFontPath::instance() = _fontPath;
 }
 
-void ViewerAPI::setFrontendAPI(FrontendAPI* _api) {
+void ViewerAPI::setFrontendAPI(FrontendAPI* _api)
+{
 	FrontendAPI::setInstance(_api);
 }
 
-void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) {
+void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator)
+{
 	ot::JsonArray modelArr;
-	for (const auto& it : intern::OsgModelManager::uidToModelMap()) {
+	for (const auto& it : intern::OsgModelManager::uidToModelMap())
+	{
 		ot::JsonObject modelObj;
 		it.second->getDebugInformation(modelObj, _allocator);
 		modelArr.PushBack(modelObj, _allocator);
@@ -85,7 +96,8 @@ void ViewerAPI::getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& 
 	_object.AddMember("Models", modelArr, _allocator);
 
 	ot::JsonArray viewerArr;
-	for (const auto& it : intern::ViewerManager::uidToViewerMap()) {
+	for (const auto& it : intern::ViewerManager::uidToViewerMap())
+	{
 		ot::JsonObject viewerObj;
 		it.second->getViewer()->getDebugInformation(viewerObj, _allocator);
 		viewerArr.PushBack(viewerObj, _allocator);
@@ -97,11 +109,12 @@ ot::UID ViewerAPI::createModel()
 {
 	intern::OsgModelManager::modelCount()++;
 
-	Model *model = new Model;
+	Model* model = new Model;
 	intern::OsgModelManager::uidToModelMap()[intern::OsgModelManager::modelCount()] = model;
 	model->setID(intern::OsgModelManager::modelCount());
 
-	if (FrontendAPI::instance() != nullptr) {
+	if (FrontendAPI::instance() != nullptr)
+	{
 		FrontendAPI::instance()->createTree();
 	}
 
@@ -110,7 +123,7 @@ ot::UID ViewerAPI::createModel()
 
 void ViewerAPI::activateModel(ot::UID osgModelID)
 {
-	Model *newActiveModel = intern::OsgModelManager::uidToModelMap()[osgModelID];
+	Model* newActiveModel = intern::OsgModelManager::uidToModelMap()[osgModelID];
 	if (newActiveModel == GlobalModel::instance()) return;
 
 	if (GlobalModel::instance() != nullptr) GlobalModel::instance()->deactivateModel();
@@ -132,7 +145,8 @@ void ViewerAPI::deactivateCurrentlyActiveModel()
 void ViewerAPI::deleteModel(ot::UID osgModelID)
 {
 	auto modelIt = intern::OsgModelManager::uidToModelMap().find(osgModelID);
-	if (modelIt == intern::OsgModelManager::uidToModelMap().end()) {
+	if (modelIt == intern::OsgModelManager::uidToModelMap().end())
+	{
 		throw std::exception("The specified model does not exist");
 	}
 
@@ -143,7 +157,8 @@ void ViewerAPI::deleteModel(ot::UID osgModelID)
 	intern::OsgModelManager::uidToModelMap().erase(modelIt);
 
 	// Make sure that the to be deleted model is no longer active
-	if (model == GlobalModel::instance()) {
+	if (model == GlobalModel::instance())
+	{
 		GlobalModel::setInstance(nullptr);
 	}
 
@@ -187,13 +202,16 @@ ot::UID ViewerAPI::createViewer(ot::UID osgModelID, double scaleWidth, double sc
 	return intern::ViewerManager::viewerCount();
 }
 
-void ViewerAPI::viewerDestroyed(ot::UID _viewerID) {
+void ViewerAPI::viewerDestroyed(ot::UID _viewerID)
+{
 	auto viewerIt = intern::ViewerManager::uidToViewerMap().find(_viewerID);
-	if (viewerIt != intern::ViewerManager::uidToViewerMap().end()) {
+	if (viewerIt != intern::ViewerManager::uidToViewerMap().end())
+	{
 		intern::ViewerManager::uidToViewerMap().erase(viewerIt);
 	}
 	FrontendAPI* ui = FrontendAPI::instance();
-	if (ui) {
+	if (ui)
+	{
 		ui->viewerDestroyed(_viewerID);
 	}
 }
@@ -234,7 +252,7 @@ void ViewerAPI::refreshSelection(ot::UID osgModelID)
 	getModelFromID(osgModelID)->refreshSelection();
 }
 
-void ViewerAPI::selectObject(ot::UID osgModelID, const std::string &name)
+void ViewerAPI::selectObject(ot::UID osgModelID, const std::string& name)
 {
 	getModelFromID(osgModelID)->selectObject(name);
 }
@@ -244,7 +262,7 @@ void ViewerAPI::selectObject(ot::UID osgModelID, ot::UID enttiyID)
 	getModelFromID(osgModelID)->selectObject(enttiyID);
 }
 
-void ViewerAPI::selectObjects(ot::UID osgModelID, const std::list<ot::UID> &enttiyIDList)
+void ViewerAPI::selectObjects(ot::UID osgModelID, const std::list<ot::UID>& enttiyIDList)
 {
 	getModelFromID(osgModelID)->selectObjects(enttiyIDList);
 }
@@ -265,10 +283,10 @@ void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeIt
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
-		
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+
 		model->addNodeFromFacetData(_treeItem, false, _surfaceColorRGB, _edgeColorRGB, _backFaceCulling, _offsetFactor, _nodes, _triangles, _edges, _faceNameMap,
-								    _errors, _manageParentVisibility, _manageChildVisibility, _showWhenSelected);
+			_errors, _manageParentVisibility, _manageChildVisibility, _showWhenSelected);
 		cancelAllRubberbands(_osgModelID);
 	}
 	catch (std::out_of_range)
@@ -280,15 +298,15 @@ void ViewerAPI::addNodeFromFacetData(ot::UID _osgModelID, const ot::EntityTreeIt
 void ViewerAPI::addNodeFromFacetDataBase(ot::UID _osgModelID, const ot::EntityTreeItem& _treeItem, bool _isHidden, double _surfaceColorRGB[3], double _edgeColorRGB[3], const std::string& _materialType, const std::string& _textureType, bool _reflective, bool _backFaceCulling,
 	double _offsetFactor, const std::string& _projectName, ot::UID _dataEntityID, ot::UID _dataEntityVersion,
 	bool _manageParentVisibility, bool _manageChildVisibility, bool _showWhenSelected, std::vector<double>& _transformation,
-	const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double> &_textNormal, const std::vector<double> &_textDirU)
+	const std::string& _textString, const std::vector<double>& _textPosition, const std::vector<double>& _textNormal, const std::vector<double>& _textDirU)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
-		model->addNodeFromFacetDataBase(_treeItem, _isHidden, _surfaceColorRGB, _edgeColorRGB, _materialType, _textureType, _reflective, _backFaceCulling, _offsetFactor, 
-										_projectName, _dataEntityID, _dataEntityVersion, _manageParentVisibility, _manageChildVisibility, _showWhenSelected, _transformation,
-									    _textString, _textPosition, _textNormal, _textDirU);
+		model->addNodeFromFacetDataBase(_treeItem, _isHidden, _surfaceColorRGB, _edgeColorRGB, _materialType, _textureType, _reflective, _backFaceCulling, _offsetFactor,
+			_projectName, _dataEntityID, _dataEntityVersion, _manageParentVisibility, _manageChildVisibility, _showWhenSelected, _transformation,
+			_textString, _textPosition, _textNormal, _textDirU);
 		cancelAllRubberbands(_osgModelID);
 	}
 	catch (std::out_of_range)
@@ -301,7 +319,7 @@ void ViewerAPI::addVisualizationContainerNode(ot::UID _osgModelID, const ot::Ent
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationContainerNode(_treeItem, _visualisationTypes, _requiresGlobalTransformationMatrix);
 	}
@@ -357,7 +375,7 @@ void ViewerAPI::addVTKNode(ot::UID _osgModelID, const ot::EntityTreeItem& _treeI
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVTKNode(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 	}
@@ -371,7 +389,7 @@ void ViewerAPI::updateVTKNode(ot::UID _osgModelID, ot::UID _entityID, const std:
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->updateVTKNode(_entityID, _projectName, _dataEntityID, _dataEntityVersion, colorRampData);
 	}
@@ -392,7 +410,7 @@ void ViewerAPI::addVisualizationAnnotationNode(ot::UID _osgModelID, const ot::En
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationAnnotationNode(_treeItem, _isHidden, _edgeColorRGB, _points, _pointsRgb, _triangleP1, _triangleP2, _triangleP3, _triangleRgb);
 	}
@@ -406,7 +424,7 @@ void ViewerAPI::addVisualizationAnnotationNodeDataBase(ot::UID _osgModelID, cons
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationAnnotationNodeDataBase(_treeItem, _isHidden, _projectName, _dataEntityID, _dataEntityVersion);
 	}
@@ -420,7 +438,7 @@ void ViewerAPI::addVisualizationMeshNodeFromFacetDataBase(ot::UID _osgModelID, c
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationMeshNodeFromFacetDataBase(_treeItem, _edgeColorRGB, _displayTetEdges, _projectName, _dataEntityID, _dataEntityVersion);
 	}
@@ -435,7 +453,7 @@ void ViewerAPI::addVisualizationCartesianMeshNode(ot::UID _osgModelID, const ot:
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationCartesianMeshNode(_treeItem, _isHidden, _edgeColorRGB, _meshLineColorRGB, _showMeshLines, _meshCoordsX, _meshCoordsY, _meshCoordsZ, _projectName, _faceListEntityID, _faceListEntityVersion, _nodeListEntityID, _nodeListEntityVersion);
 	}
@@ -449,7 +467,7 @@ void ViewerAPI::visualizationCartesianMeshNodeShowLines(ot::UID osgModelID, unsi
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->visualizationCartesianMeshNodeShowLines(modelEntityID, showMeshLines);
 	}
@@ -463,7 +481,7 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->visualizationTetMeshNodeTetEdges(modelEntityID, displayTetEdges);
 	}
@@ -473,13 +491,13 @@ void ViewerAPI::visualizationTetMeshNodeTetEdges(ot::UID osgModelID, unsigned lo
 	}
 }
 
-void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType)
+void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::string& _sceneNodeName, const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType)
 {
 	try
 	{
 		Model* model = nullptr;
 		if (osgModelID == -1)
-		{ 
+		{
 			model = GlobalModel::instance();
 		}
 		else
@@ -487,7 +505,8 @@ void ViewerAPI::notifySceneNodeAboutViewChange(ot::UID osgModelID, const std::st
 			model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 		}
 
-		if (model) {
+		if (model)
+		{
 			model->notifySceneNodeAboutViewChange(_sceneNodeName, _state, _viewType);
 		}
 	}
@@ -501,7 +520,7 @@ void ViewerAPI::addVisualizationCartesianMeshItemNode(ot::UID _osgModelID, const
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationCartesianMeshItemNode(_treeItem, _isHidden, _facesList, _color);
 	}
@@ -515,7 +534,7 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID _osgModelI
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(_osgModelID);
 
 		model->addVisualizationMeshItemNodeFromFacetDataBase(_treeItem, _isHidden, _projectName, _tetEdgesID, _tetEdgesVersion);
 	}
@@ -526,11 +545,11 @@ void ViewerAPI::addVisualizationMeshItemNodeFromFacetDataBase(ot::UID _osgModelI
 }
 
 
-void ViewerAPI::updateObjectColor(ot::UID osgModelID, unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string &materialType, const std::string &textureType, bool reflective)
+void ViewerAPI::updateObjectColor(ot::UID osgModelID, unsigned long long modelEntityID, double surfaceColorRGB[3], double edgeColorRGB[3], const std::string& materialType, const std::string& textureType, bool reflective)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->updateObjectColor(modelEntityID, surfaceColorRGB, edgeColorRGB, materialType, textureType, reflective);
 	}
@@ -558,7 +577,7 @@ void ViewerAPI::updateObjectFacetsFromDataBase(ot::UID osgModelID, unsigned long
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->updateObjectFacetsFromDataBase(modelEntityID, entityID, entityVersion);
 	}
@@ -568,18 +587,20 @@ void ViewerAPI::updateObjectFacetsFromDataBase(ot::UID osgModelID, unsigned long
 	}
 }
 
-void ViewerAPI::setClearColor(ot::UID viewerID, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB) {
-	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[viewerID];
-	if (v != nullptr) {
+void ViewerAPI::setClearColor(ot::UID viewerID, int backgroundR, int backgroundG, int backgroundB, int overlayTextR, int overlayTextG, int overlayTextB)
+{
+	ot::ViewerView* v = intern::ViewerManager::uidToViewerMap()[viewerID];
+	if (v != nullptr)
+	{
 		v->getViewer()->setClearColorAutomatic(backgroundR, backgroundG, backgroundB, overlayTextR, overlayTextG, overlayTextB);
 	}
 }
 
-Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
+Model* ViewerAPI::getModelFromID(ot::UID osgModelID)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 		return model;
 	}
 	catch (std::out_of_range)
@@ -593,10 +614,11 @@ Model *ViewerAPI::getModelFromID(ot::UID osgModelID)
 ot::SelectionHandlingResult ViewerAPI::setSelectedTreeItems(const ot::SelectionData& _selectionData, std::list<unsigned long long>& _selectedModelItems, std::list<unsigned long long>& _selectedVisibleModelItems)
 {
 	ot::SelectionHandlingResult result;
-	
+
 	Model* model = GlobalModel::instance();
 
-	if (model) {
+	if (model)
+	{
 		result = model->setSelectedTreeItems(_selectionData, _selectedModelItems, _selectedVisibleModelItems);
 	}
 
@@ -624,23 +646,27 @@ void ViewerAPI::setEntityName(unsigned long long _modelEntityID, const std::stri
 	GlobalModel::instance()->setEntityName(_modelEntityID, _newName);
 }
 
-std::string ViewerAPI::getEntityName(ot::UID _modelEntityID) {
-	if (GlobalModel::instance() == nullptr) {
+std::string ViewerAPI::getEntityName(ot::UID _modelEntityID)
+{
+	if (GlobalModel::instance() == nullptr)
+	{
 		return "";
 	}
 
 	return GlobalModel::instance()->getEntityName(_modelEntityID);
 }
 
-ot::UID ViewerAPI::getEntityID(const std::string& _entityName) {
-	if (GlobalModel::instance() == nullptr) {
+ot::UID ViewerAPI::getEntityID(const std::string& _entityName)
+{
+	if (GlobalModel::instance() == nullptr)
+	{
 		return ot::invalidUID;
 	}
 
 	return GlobalModel::instance()->getEntityID(_entityName);
 }
 
-void ViewerAPI::renameEntityPath(const std::string &oldPath, const std::string &newPath)
+void ViewerAPI::renameEntityPath(const std::string& oldPath, const std::string& newPath)
 {
 	if (GlobalModel::instance() == nullptr) return;
 
@@ -651,7 +677,7 @@ void ViewerAPI::setDataModel(ot::UID osgModelID, ot::UID dataModelID)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->setDataModel(dataModelID);
 	}
@@ -661,14 +687,14 @@ void ViewerAPI::setDataModel(ot::UID osgModelID, ot::UID dataModelID)
 	}
 }
 
-void ViewerAPI::getSelectedModelEntityIDs(std::list<unsigned long long> &selected)
+void ViewerAPI::getSelectedModelEntityIDs(std::list<unsigned long long>& selected)
 {
 	if (GlobalModel::instance() == nullptr) return;
 
 	GlobalModel::instance()->getSelectedModelEntityIDs(selected);
 }
 
-void ViewerAPI::getSelectedVisibleModelEntityIDs(std::list<unsigned long long> &selected)
+void ViewerAPI::getSelectedVisibleModelEntityIDs(std::list<unsigned long long>& selected)
 {
 	if (GlobalModel::instance() == nullptr) return;
 
@@ -699,7 +725,8 @@ ot::EntityTreeItem ViewerAPI::getEntityTreeItem(ot::UID _modelEntityID)
 	else
 	{
 		auto node = GlobalModel::instance()->getSceneNodeByEntityID(_modelEntityID);
-		if (!node) {
+		if (!node)
+		{
 			OT_LOG_W("Scene node not found { \"EntityID\": " + std::to_string(_modelEntityID) + " }");
 			return ot::EntityTreeItem();
 		}
@@ -714,7 +741,7 @@ void ViewerAPI::removeShapes(ot::UID osgModelID, std::list<unsigned long long> m
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->removeShapes(modelEntityID);
 	}
@@ -728,7 +755,7 @@ void ViewerAPI::setShapeVisibility(ot::UID osgModelID, std::list<unsigned long l
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->setShapeVisibility(visibleID, hiddenID);
 	}
@@ -742,7 +769,7 @@ void ViewerAPI::hideEntities(ot::UID osgModelID, std::list<unsigned long long> h
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->hideEntities(hiddenID);
 	}
@@ -752,11 +779,11 @@ void ViewerAPI::hideEntities(ot::UID osgModelID, std::list<unsigned long long> h
 	}
 }
 
-void ViewerAPI::showBranch(ot::UID osgModelID, const std::string &branchName)
+void ViewerAPI::showBranch(ot::UID osgModelID, const std::string& branchName)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->showBranch(branchName);
 	}
@@ -766,11 +793,11 @@ void ViewerAPI::showBranch(ot::UID osgModelID, const std::string &branchName)
 	}
 }
 
-void ViewerAPI::hideBranch(ot::UID osgModelID, const std::string &branchName)
+void ViewerAPI::hideBranch(ot::UID osgModelID, const std::string& branchName)
 {
 	try
 	{
-		Model *model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
+		Model* model = intern::OsgModelManager::uidToModelMap().at(osgModelID);
 
 		model->hideBranch(branchName);
 	}
@@ -780,76 +807,95 @@ void ViewerAPI::hideBranch(ot::UID osgModelID, const std::string &branchName)
 	}
 }
 
-void ViewerAPI::enterEntitySelectionMode(ot::UID osgModelID, ot::serviceID_t replyTo, const std::string &selectionType, bool allowMultipleSelection, const std::string &selectionFilter, const std::string &selectionAction, const std::string &selectionMessage,
-									     std::list<std::string> &optionNames, std::list<std::string> &optionValues)
+void ViewerAPI::enterEntitySelectionMode(ot::UID osgModelID, ot::serviceID_t replyTo, const std::string& selectionType, bool allowMultipleSelection, const std::string& selectionFilter, const std::string& selectionAction, const std::string& selectionMessage,
+	std::list<std::string>& optionNames, std::list<std::string>& optionValues)
 {
 	getModelFromID(osgModelID)->enterEntitySelectionMode(replyTo, selectionType, allowMultipleSelection, selectionFilter, selectionAction, selectionMessage, optionNames, optionValues);
 }
 
-void ViewerAPI::setDataBaseConnection(const std::string &databaseURL, const std::string &userName, const std::string &password)
+void ViewerAPI::setDataBaseConnection(const std::string& databaseURL, const std::string& userName, const std::string& password)
 {
-	
+
 	DataBase::instance().setDataBaseServerURL(databaseURL);
 	DataBase::instance().setUserCredentials(userName, password);
 }
 
-void ViewerAPI::prefetchDocumentsFromStorage(const std::string &projectName, std::list<std::pair<unsigned long long, unsigned long long>> &prefetchIDs)
+void ViewerAPI::prefetchDocumentsFromStorage(const std::string& projectName, std::list<std::pair<unsigned long long, unsigned long long>>& prefetchIDs)
 {
 	DataBase::instance().prefetchDocumentsFromStorage(prefetchIDs);
 }
 
-void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string & _osgViewTabName, const std::string & _versionGraphTabName) {
-	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[_viewerID];
-	if (v != nullptr) {
+void ViewerAPI::setTabNames(ot::UID _viewerID, const std::string& _osgViewTabName, const std::string& _versionGraphTabName)
+{
+	ot::ViewerView* v = intern::ViewerManager::uidToViewerMap()[_viewerID];
+	if (v != nullptr)
+	{
 		v->getViewer()->setTabNames(_osgViewTabName, _versionGraphTabName);
 	}
 }
 
-void ViewerAPI::requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID)
+bool ViewerAPI::requestVisualizationIfNeeded(ot::UID _viewerID, ot::UID _modelEntityID)
 {
-	ot::ViewerView * v = intern::ViewerManager::uidToViewerMap()[_viewerID];
-	if (v != nullptr) {
-		v->getViewer()->requestVisualizationIfNeeded(_modelEntityID);
+	ot::ViewerView* v = intern::ViewerManager::uidToViewerMap()[_viewerID];
+	if (v != nullptr)
+	{
+		return v->getViewer()->requestVisualizationIfNeeded(_modelEntityID);
+	}
+	else
+	{
+		return false;
 	}
 }
 
-void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo) {
-	if (GlobalModel::instance() != nullptr) {
+void ViewerAPI::viewerTabChanged(const ot::WidgetViewBase& _viewInfo)
+{
+	if (GlobalModel::instance() != nullptr)
+	{
 		GlobalModel::instance()->viewerTabChanged(_viewInfo);
 	}
 }
 
-void ViewerAPI::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex) {
-	if (GlobalModel::instance() != nullptr) {
+void ViewerAPI::loadNextDataChunk(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex)
+{
+	if (GlobalModel::instance() != nullptr)
+	{
 		GlobalModel::instance()->loadNextDataChunk(_entityName, _type, _nextChunkStartIndex);
 	}
 }
 
-void ViewerAPI::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex) {
-	if (GlobalModel::instance() != nullptr) {
+void ViewerAPI::loadRemainingData(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, size_t _nextChunkStartIndex)
+{
+	if (GlobalModel::instance() != nullptr)
+	{
 		GlobalModel::instance()->loadRemainingData(_entityName, _type, _nextChunkStartIndex);
 	}
 }
 
-void ViewerAPI::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified) {
+void ViewerAPI::viewDataModifiedChanged(const std::string& _entityName, ot::WidgetViewBase::ViewType _type, bool _isModified)
+{
 	ViewerToolBar::instance().viewDataModifiedHasChanged(_type, _isModified);
 }
 
-void ViewerAPI::shortcutActivated(const std::string & _keySequence) {
-	if (GlobalModel::instance() != nullptr) {
+void ViewerAPI::shortcutActivated(const std::string& _keySequence)
+{
+	if (GlobalModel::instance() != nullptr)
+	{
 
 	}
 }
 
-void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string & _note, const std::string & _configurationJson) {
+void ViewerAPI::createRubberband(ot::UID _viewerID, ot::serviceID_t _senderId, std::string& _note, const std::string& _configurationJson)
+{
 	auto viewer = intern::ViewerManager::uidToViewerMap().find(_viewerID);
-	if (viewer == intern::ViewerManager::uidToViewerMap().end()) {
+	if (viewer == intern::ViewerManager::uidToViewerMap().end())
+	{
 		assert(0);
 		return;
 	}
 
-	Rubberband * rubberband = viewer->second->getViewer()->getRubberband();
-	if (rubberband) {
+	Rubberband* rubberband = viewer->second->getViewer()->getRubberband();
+	if (rubberband)
+	{
 		viewer->second->getViewer()->cancelRubberband();
 	}
 
@@ -870,9 +916,11 @@ void ViewerAPI::cancelAllRubberbands(ot::UID osgModelID)
 	}
 }
 
-void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item) {
+void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item)
+{
 	auto viewer = intern::ViewerManager::uidToViewerMap().find(_viewerID);
-	if (viewer == intern::ViewerManager::uidToViewerMap().end()) {
+	if (viewer == intern::ViewerManager::uidToViewerMap().end())
+	{
 		assert(0);
 		return;
 	}
@@ -882,7 +930,8 @@ void ViewerAPI::settingsItemChanged(ot::UID _viewerID, const ot::Property* _item
 bool ViewerAPI::propertyGridValuesChanged(ot::UID _viewerID, const std::list<const ot::Property*> _properties)
 {
 	auto viewer = intern::ViewerManager::uidToViewerMap().find(_viewerID);
-	if (viewer == intern::ViewerManager::uidToViewerMap().end()) {
+	if (viewer == intern::ViewerManager::uidToViewerMap().end())
+	{
 		assert(0);
 		return false;
 	}

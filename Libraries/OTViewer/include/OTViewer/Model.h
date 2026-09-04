@@ -157,7 +157,7 @@ public:
 	void storeShapeNode(osg::Node *node, SceneNodeBase *sceneNode);
 	void forgetShapeNode(osg::Node *node);
 
-	void notifySceneNodeAboutViewChange(const std::string& _sceneNodeName,const ot::ViewChangedStates& _state, const ot::WidgetViewBase::ViewType& _viewType);
+	void notifySceneNodeAboutViewChange(const std::string& _sceneNodeName,const ot::ViewChangedState& _state, const ot::WidgetViewBase::ViewType& _viewType);
 	std::list<Viewer *> getViewerList() { return m_viewerList; };
 
 	unsigned int getCurrentTraversalMask();

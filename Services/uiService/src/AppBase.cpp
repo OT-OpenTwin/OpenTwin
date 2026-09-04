@@ -3212,7 +3212,7 @@ void AppBase::slotTextEditorSaveRequested()
 			edit->setContentSaved();
 			edit->setNextChunkStartIndex(txt.size());
 			ot::UID globalActiveViewModel = -1;
-			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
+			ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedState::ChangesSaved, view->getViewData().getViewType());
 		}
 	}
 	catch (const std::exception& _e)
@@ -3310,7 +3310,7 @@ void AppBase::slotTableSaveRequested()
 		table->setContentChanged(false);
 
 		const ot::UID globalActiveViewModel = -1;
-		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedStates::changesSaved, view->getViewData().getViewType());
+		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, view->getViewData().getEntityName(), ot::ViewChangedState::ChangesSaved, view->getViewData().getViewType());
 
 	}
 	catch (const std::exception& _e)
@@ -3435,7 +3435,7 @@ void AppBase::slotViewAdded(ot::WidgetView* _newView)
 	{
 		const auto& viewerType = _newView->getViewData().getViewType();
 		const ot::UID globalActiveViewModel = -1;
-		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, _newView->getViewData().getEntityName(), ot::ViewChangedStates::viewOpened, viewerType);
+		ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, _newView->getViewData().getEntityName(), ot::ViewChangedState::ViewOpened, viewerType);
 	}
 }
 
@@ -3578,7 +3578,7 @@ void AppBase::slotViewCloseRequested(ot::WidgetView* _view)
 	std::string viewName = _view->getViewData().getEntityName();
 	ot::WidgetViewBase::ViewType viewType = _view->getViewData().getViewType();
 	ot::UID globalActiveViewModel = -1;
-	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedStates::viewClosed, viewType);
+	ViewerAPI::notifySceneNodeAboutViewChange(globalActiveViewModel, viewName, ot::ViewChangedState::ViewClosed, viewType);
 
 	auto& manager = ot::GlobalWidgetViewManager::instance();
 
