@@ -299,7 +299,7 @@ void EntityLumpedFDTDPort::determineLabelOrientation(double xmin, double xmax, d
         assert(0); // Unknown selection
     }
 
-    textString = "huhu";
+    textString = getNameOnly();
 }
 
 std::vector<double> EntityLumpedFDTDPort::getVectorFromText(const std::string& direction)
