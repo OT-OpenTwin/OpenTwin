@@ -75,6 +75,7 @@
 #include "OTCADEntities/GeometryOperations.h"
 #include "OTCADEntities/EntityFaceAnnotation.h"
 #include "OTCADEntities/EntityLumpedFDTDPort.h"
+#include "OTCADEntities/EntityMicrostripPort.h"
 
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
@@ -3043,7 +3044,13 @@ void Model::performSpecialUpdates(EntityBase *entity)
 		updateLumpedFDTDPort(dynamic_cast<EntityLumpedFDTDPort*>(entity));
 		return;
 	}
-	
+
+	if (dynamic_cast<EntityMicrostripPort*>(entity) != nullptr)
+	{
+		updateMicrostripPort(dynamic_cast<EntityMicrostripPort*>(entity));
+		return;
+	}
+
 	if (dynamic_cast<EntityParameter*>(entity) != nullptr)
 	{
 		setParameter(entity->getName(), dynamic_cast<EntityParameter*>(entity)->getNumericValue(), dynamic_cast<EntityParameter*>(entity));
@@ -3636,6 +3643,17 @@ void Model::updateAnnotationGeometry(EntityFaceAnnotation *annotationEntity)
 }
 
 void Model::updateLumpedFDTDPort(EntityLumpedFDTDPort* portEntity)
+{
+	TopoDS_Shape portShape = portEntity->createShape();
+
+	portEntity->setBrep(portShape);
+	portEntity->facetEntity(false);
+	portEntity->storeToDataBase();
+
+	portEntity->addVisualizationNodes();
+}
+
+void Model::updateMicrostripPort(EntityMicrostripPort* portEntity)
 {
 	TopoDS_Shape portShape = portEntity->createShape();
 

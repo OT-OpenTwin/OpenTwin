@@ -58,6 +58,7 @@ class TopoDS_Shape;
 class MicroserviceNotifier;
 class ModalCommandBase;
 class EntityLumpedFDTDPort;
+class EntityMicrostripPort;
 
 //! The Model class is the main interface to the model.
 //! There may be multiple instances of this class. Each model stores all objects within the model and provides access to the model
@@ -200,6 +201,7 @@ public:
 	void updateGeometryEntity(ot::UID geomEntityID, ot::UID brepEntityID, ot::UID brepEntityVersion, ot::UID facetsEntityID, ot::UID facetsEntityVersion, bool overrideGeometry, const ot::PropertyGridCfg& _configuration, bool updateProperties);
 	void updateCoordinateSystem(EntityCoordinateSystem* csEntity);
 	void updateLumpedFDTDPort(EntityLumpedFDTDPort *portEntity);
+	void updateMicrostripPort(EntityMicrostripPort *portEntity);
 
 	void updateTopologyEntities(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _comment, bool _considerVisualization, bool _updateSelfDependencies);
 

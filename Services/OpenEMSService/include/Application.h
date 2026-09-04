@@ -76,6 +76,7 @@ public:
 	void handleAddSolver(void);
 	void handleRunSolver(void);
 	void handleAddLumpedPort(void);
+	void handleAddMicrostripPort(void);
 	void handleAddWaveguidePort(void);
 	void handleAddFieldDump(void);
 
@@ -96,6 +97,7 @@ private:
 	ot::ToolBarButtonCfg m_addSolverButton;
 	ot::ToolBarButtonCfg m_runSolverButton;
 	ot::ToolBarButtonCfg m_addLumpedPortButton;
+	ot::ToolBarButtonCfg m_addMicrostripPortButton;
 	ot::ToolBarButtonCfg m_addWaveguidePortButton;
 	ot::ToolBarButtonCfg m_addFieldDumpButton;
 };
