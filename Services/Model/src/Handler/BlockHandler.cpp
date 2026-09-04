@@ -775,28 +775,30 @@ bool BlockHandler::createBlockToBlockConnection(EntityGraphicsScene* _scene, ot:
 	if (_originBlock->getClassName() == ot::EntityBlockCircuitConnector::className() ||
 		_destinationBlock->getClassName() == ot::EntityBlockCircuitConnector::className()) {
 
-		// Find connectors
-		auto originConnectorIt = _originBlock->getAllConnectorsByName().find(connection.getOriginConnectable());
-		auto destinationConnectorIt = _destinationBlock->getAllConnectorsByName().find(connection.getDestinationConnectable());
+		// EntityBlockCircuitConnector uses BasicGraphicsIntersectionItem where the entire item is connectable
+		// (ItemIsConnectable flag). It has no registered connectors in m_connectorsByName, so we only validate
+		// the connector type of the non-connector block (if it has registered connectors).
+		// The circuit connector itself acts as a junction point and accepts any connection direction.
 
-		if (originConnectorIt == _originBlock->getAllConnectorsByName().end() || destinationConnectorIt == _destinationBlock->getAllConnectorsByName().end()) {
-			OT_LOG_E("Could not find origin or destination connector for connection");
-			return false;
+		ot::EntityBlock* nonConnectorBlock = nullptr;
+		std::string nonConnectorConnectable;
+
+		if (_originBlock->getClassName() != ot::EntityBlockCircuitConnector::className()) {
+			nonConnectorBlock = _originBlock;
+			nonConnectorConnectable = connection.getOriginConnectable();
 		}
-
-		// Check connector types
-		auto originConnectorType = originConnectorIt->second.getConnectorType();
-		auto destinationConnectorType = destinationConnectorIt->second.getConnectorType();
-
-		if ((originConnectorType == ot::ConnectorType::In || originConnectorType == ot::ConnectorType::InOptional) &&
-			(destinationConnectorType == ot::ConnectorType::In || destinationConnectorType == ot::ConnectorType::InOptional)) {
-			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-			return true;
+		else if (_destinationBlock->getClassName() != ot::EntityBlockCircuitConnector::className()) {
+			nonConnectorBlock = _destinationBlock;
+			nonConnectorConnectable = connection.getDestinationConnectable();
 		}
-		else if (originConnectorType == ot::ConnectorType::Out &&
-			destinationConnectorType == ot::ConnectorType::Out) {
-			Application::instance()->getUiComponent()->displayMessage("Cannot create connection. One port needs to be an ingoing port while the other is an outgoing port.\n");
-			return true;
+		// If both are circuit connectors, no validation needed - just allow the connection.
+
+		if (nonConnectorBlock) {
+			auto connectorIt = nonConnectorBlock->getAllConnectorsByName().find(nonConnectorConnectable);
+			if (connectorIt == nonConnectorBlock->getAllConnectorsByName().end()) {
+				OT_LOG_E("Could not find connector for connection on non-connector block { \"BlockID\": " + std::to_string(nonConnectorBlock->getEntityID()) + ", \"Connectable\": \"" + nonConnectorConnectable + "\" }");
+				return false;
+			}
 		}
 	}
 	
