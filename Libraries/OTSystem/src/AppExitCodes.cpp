@@ -25,7 +25,16 @@
 
 std::string ot::AppExitCode::toString(int _exitCode) {
 	switch (_exitCode) {
-	case GeneralExitCode::Success: return "Success";
+	case StateExitCode::Success: return "Success";
+	case StateExitCode::ResultTrue: return "Result true";
+	case StateExitCode::ResultFalse: return "Result false";
+	case StateExitCode::ResultRetry: return "Result retry";
+	case StateExitCode::ResultCancel: return "Result cancel";
+	case StateExitCode::ResultSkipped: return "Result skipped";
+	case StateExitCode::ResultPartial: return "Result partial";
+	case StateExitCode::ResultPending: return "Result pending";
+	case StateExitCode::ResultAlreadyDone: return "Result already done";
+	case StateExitCode::ResultNotRequired: return "Result not required";
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -37,78 +46,77 @@ std::string ot::AppExitCode::toString(int _exitCode) {
 
 	// IO
 
-	case IOExitCode::GeneralIOError: return "General IO error";
-	case IOExitCode::FileNotFound: return "File not found";
-	case IOExitCode::InvalidFileFormat: return "Invalid file format";
-	case IOExitCode::PermissionDenied: return "Permission denied";
-	case IOExitCode::OutOfMemory: return "Out of memory";
-	case IOExitCode::InvalidPath: return "Invalid path";
-	case IOExitCode::SendFailed: return "Send failed";
+	case IOErrorCode::GeneralIOError: return "General IO error";
+	case IOErrorCode::FileNotFound: return "File not found";
+	case IOErrorCode::InvalidFileFormat: return "Invalid file format";
+	case IOErrorCode::PermissionDenied: return "Permission denied";
+	case IOErrorCode::OutOfMemory: return "Out of memory";
+	case IOErrorCode::InvalidPath: return "Invalid path";
+	case IOErrorCode::SendFailed: return "Send failed";
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Service Data
 
-	case ServiceDataExitCode::GeneralServiceDataError: return "General service data error";
-	case ServiceDataExitCode::ServiceUrlMissing: return "Service URL is missing";
-	case ServiceDataExitCode::ServiceUrlInvalid: return "Service URL is invalid";
-
-	case ServiceDataExitCode::AuthUrlMissing: return "Authentication URL is missing";
-	case ServiceDataExitCode::AuthUrlInvalid: return "Authentication URL is invalid";
-	case ServiceDataExitCode::GSSUrlMissing: return "Global Session Service URL is missing";
-	case ServiceDataExitCode::GSSUrlInvalid: return "Global Session Service URL is invalid";
-	case ServiceDataExitCode::LSSUrlMissing: return "Local Session Service URL is missing";
-	case ServiceDataExitCode::LSSUrlInvalid: return "Local Session Service URL is invalid";
-	case ServiceDataExitCode::GDSUrlMissing: return "Global Directory Service URL is missing";
-	case ServiceDataExitCode::GDSUrlInvalid: return "Global Directory Service URL is invalid";
-	case ServiceDataExitCode::LDSUrlMissing: return "Local Directory Service URL is missing";
-	case ServiceDataExitCode::LDSUrlInvalid: return "Local Directory Service URL is invalid";
+	case ServiceDataErrorCode::GeneralServiceDataError: return "General service data error";
+	case ServiceDataErrorCode::ServiceUrlMissing: return "Service URL is missing";
+	case ServiceDataErrorCode::ServiceUrlInvalid: return "Service URL is invalid";
+	case ServiceDataErrorCode::AuthUrlMissing: return "Authentication URL is missing";
+	case ServiceDataErrorCode::AuthUrlInvalid: return "Authentication URL is invalid";
+	case ServiceDataErrorCode::GSSUrlMissing: return "Global Session Service URL is missing";
+	case ServiceDataErrorCode::GSSUrlInvalid: return "Global Session Service URL is invalid";
+	case ServiceDataErrorCode::LSSUrlMissing: return "Local Session Service URL is missing";
+	case ServiceDataErrorCode::LSSUrlInvalid: return "Local Session Service URL is invalid";
+	case ServiceDataErrorCode::GDSUrlMissing: return "Global Directory Service URL is missing";
+	case ServiceDataErrorCode::GDSUrlInvalid: return "Global Directory Service URL is invalid";
+	case ServiceDataErrorCode::LDSUrlMissing: return "Local Directory Service URL is missing";
+	case ServiceDataErrorCode::LDSUrlInvalid: return "Local Directory Service URL is invalid";
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Service State
 
-	case ServiceStateExitCode::GeneralServiceStateError: return "General service state error";
-	case ServiceStateExitCode::AuthRegistrationFailed: return "Authentication Service registration failed";
-	case ServiceStateExitCode::GSSRegistrationFailed: return "Global Session Service registration failed";
-	case ServiceStateExitCode::LSSRegistrationFailed: return "Local Session Service registration failed";
-	case ServiceStateExitCode::GDSRegistrationFailed: return "Global Directory Service registration failed";
-	case ServiceStateExitCode::LDSRegistrationFailed: return "Local Directory Service registration failed";
+	case ServiceStateErrorCode::GeneralServiceStateError: return "General service state error";
+	case ServiceStateErrorCode::AuthRegistrationFailed: return "Authentication Service registration failed";
+	case ServiceStateErrorCode::GSSRegistrationFailed: return "Global Session Service registration failed";
+	case ServiceStateErrorCode::LSSRegistrationFailed: return "Local Session Service registration failed";
+	case ServiceStateErrorCode::GDSRegistrationFailed: return "Global Directory Service registration failed";
+	case ServiceStateErrorCode::LDSRegistrationFailed: return "Local Directory Service registration failed";
 
-	case ServiceStateExitCode::AuthNotRunning: return "Authentication Service is not running";
-	case ServiceStateExitCode::GSSNotRunning: return "Global Session Service is not running";
-	case ServiceStateExitCode::LSSNotRunning: return "Local Session Service is not running";
-	case ServiceStateExitCode::GDSNotRunning: return "Global Directory Service is not running";
-	case ServiceStateExitCode::LDSNotRunning: return "Local Directory Service is not running";
+	case ServiceStateErrorCode::AuthNotRunning: return "Authentication Service is not running";
+	case ServiceStateErrorCode::GSSNotRunning: return "Global Session Service is not running";
+	case ServiceStateErrorCode::LSSNotRunning: return "Local Session Service is not running";
+	case ServiceStateErrorCode::GDSNotRunning: return "Global Directory Service is not running";
+	case ServiceStateErrorCode::LDSNotRunning: return "Local Directory Service is not running";
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Data Base
 
-	case DataBaseExitCode::GeneralDataBaseError: return "General database error";
-	case DataBaseExitCode::DataBaseUrlMissing: return "Database URL is missing";
-	case DataBaseExitCode::DataBaseUrlInvalid: return "Database URL is invalid";
-	case DataBaseExitCode::DataBaseConnectionFailed: return "Database connection failed";
-	case DataBaseExitCode::DataBaseInvalidCredentials: return "Invalid database credentials";
+	case DataBaseErrorCode::GeneralDataBaseError: return "General database error";
+	case DataBaseErrorCode::DataBaseUrlMissing: return "Database URL is missing";
+	case DataBaseErrorCode::DataBaseUrlInvalid: return "Database URL is invalid";
+	case DataBaseErrorCode::DataBaseConnectionFailed: return "Database connection failed";
+	case DataBaseErrorCode::DataBaseInvalidCredentials: return "Invalid database credentials";
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// General
 
-	case GeneralExitCode::GeneralError: return "General error";
-	case GeneralExitCode::UnknownError: return "Unknown error";
-	case GeneralExitCode::EmergencyShutdown: return "Emergency shutdown";
-	case GeneralExitCode::EnvironmentError: return "Environment error";
-	case GeneralExitCode::ConfigurationBroken: return "Configuration is broken";
-	case GeneralExitCode::OpenGLError: return "OpenGL error";
-	case GeneralExitCode::AssetError: return "Asset error";
-	case GeneralExitCode::ComponentError: return "Component error";
-	case GeneralExitCode::GeneralTimeout: return "General timeout";
+	case GeneralErrorCode::GeneralError: return "General error";
+	case GeneralErrorCode::UnknownError: return "Unknown error";
+	case GeneralErrorCode::EmergencyShutdown: return "Emergency shutdown";
+	case GeneralErrorCode::EnvironmentError: return "Environment error";
+	case GeneralErrorCode::ConfigurationBroken: return "Configuration is broken";
+	case GeneralErrorCode::OpenGLError: return "OpenGL error";
+	case GeneralErrorCode::AssetError: return "Asset error";
+	case GeneralErrorCode::ComponentError: return "Component error";
+	case GeneralErrorCode::GeneralTimeout: return "General timeout";
 
-	case GeneralExitCode::LogInError: return "Log in error";
-	case GeneralExitCode::FailedToConvertPort: return "Failed to convert port";
-	case GeneralExitCode::KeepAliveFailed: return "Keep alive failed";
-	case GeneralExitCode::InitializationTimeout: return "Initialization timeout";
+	case GeneralErrorCode::LogInError: return "Log in error";
+	case GeneralErrorCode::FailedToConvertPort: return "Failed to convert port";
+	case GeneralErrorCode::KeepAliveFailed: return "Keep alive failed";
+	case GeneralErrorCode::InitializationTimeout: return "Initialization timeout";
 
 	default:
 		assert(0);

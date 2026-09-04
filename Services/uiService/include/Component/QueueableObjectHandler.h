@@ -28,7 +28,7 @@ public:
 	QueueableObjectHandler();
 	virtual ~QueueableObjectHandler();
 
-	void stopQueue(int _exitCode = ot::AppExitCode::GeneralExitCode::GeneralError);
+	void stopQueue(int _exitCode = ot::AppExitCode::GeneralError);
 
 	//! @brief Executes the given object immediately if the queue is not blocked, otherwise pushes it to the queue.
 	void runOrQueue(ot::BasicQueueObject* _object);

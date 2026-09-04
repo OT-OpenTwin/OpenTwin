@@ -138,7 +138,7 @@ int ot::BasicQueue::exec()
 			m_mutex.unlock(); // UNLOCK
 			return m_exitCode;
 		}
-		if (exitCode != AppExitCode::Success)
+		if (exitCode < AppExitCode::StateExitCode_IteratorFirst || exitCode > AppExitCode::StateExitCode_IteratorLast)
 		{
 			m_mutex.unlock(); // UNLOCK
 			return exitCode;
