@@ -34,6 +34,7 @@ public:
 	static std::string className() { return "EntityLumpedFDTDPort"; };
 	virtual std::string getClassName(void) const override { return EntityLumpedFDTDPort::className(); };
 	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+	virtual void setName(const std::string& _name) override;
 
 	void createProperties();
 
@@ -42,8 +43,17 @@ public:
 protected:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual bool getBackfaceCulling() override { return false; }
+	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
+	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+	virtual void addSpecificMembersForVisualization(ot::JsonDocument& doc) override;
+	void determineLabelOrientation(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
+	std::vector<double> getVectorFromText(const std::string& direction);
+	void clearText(void);
 
-
+	std::vector<double> textPosition = { 0.0, 0.0, 0.0 };
+	std::vector<double> textNormal = { 0.0, 0.0, 0.0 };
+	std::vector<double> textDirU = { 0.0, 0.0, 0.0 };
+	std::string textString;
 };
 
 

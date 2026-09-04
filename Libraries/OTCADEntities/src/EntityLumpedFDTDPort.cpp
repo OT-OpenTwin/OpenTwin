@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // OpenTwin header
+#include "OTCommunication/ActionTypes.h"
 #include "OTCADEntities/EntityLumpedFDTDPort.h"
 
 // OpenCASCADE header
@@ -48,6 +49,52 @@ EntityLumpedFDTDPort::~EntityLumpedFDTDPort()
 {
 }
 
+void EntityLumpedFDTDPort::addStorageData(bsoncxx::builder::basic::document& storage)
+{
+    // We store the parent class information first 
+    EntityGeometry::addStorageData(storage);
+
+    // Now we store the particular information about the current object
+
+    storage.append(
+        bsoncxx::builder::basic::kvp("TextString", textString),
+        bsoncxx::builder::basic::kvp("TextPosX", textPosition[0]),
+        bsoncxx::builder::basic::kvp("TextPosY", textPosition[1]),
+        bsoncxx::builder::basic::kvp("TextPosZ", textPosition[2]),
+        bsoncxx::builder::basic::kvp("TextNormalX", textNormal[0]),
+        bsoncxx::builder::basic::kvp("TextNormalY", textNormal[1]),
+        bsoncxx::builder::basic::kvp("TextNormalZ", textNormal[2]),
+        bsoncxx::builder::basic::kvp("TextDirUX", textDirU[0]),
+        bsoncxx::builder::basic::kvp("TextDirUY", textDirU[1]),
+        bsoncxx::builder::basic::kvp("TextDirUZ", textDirU[2])
+    );
+}
+
+void EntityLumpedFDTDPort::readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap)
+{
+    // We read the parent class information first 
+    EntityGeometry::readSpecificDataFromDataBase(doc_view, entityMap);
+
+    clearText();
+    if (doc_view["TextString"])
+    {
+        textString = doc_view["TextString"].get_string();
+        textPosition = { doc_view["TextPosX"].get_double(), doc_view["TextPosY"].get_double(), doc_view["TextPosZ"].get_double() };
+        textNormal = { doc_view["TextNormalX"].get_double(), doc_view["TextNormalY"].get_double(), doc_view["TextNormalZ"].get_double() };
+        textDirU = { doc_view["TextDirUX"].get_double(), doc_view["TextDirUY"].get_double(), doc_view["TextDirUZ"].get_double() };
+    }
+
+    resetModified();
+}
+
+void EntityLumpedFDTDPort::clearText(void)
+{
+    textString.clear();
+    textPosition = { 0.0, 0.0, 0.0 };
+    textNormal = { 0.0, 0.0, 0.0 };
+    textDirU = { 0.0, 0.0, 0.0 };
+}
+
 void EntityLumpedFDTDPort::createProperties()
 {
 	EntityPropertiesDouble::createProperty("General", "Impedance", 50, "Lumped Ports", getProperties());
@@ -60,10 +107,15 @@ void EntityLumpedFDTDPort::createProperties()
 	EntityPropertiesDouble::createProperty("Port range", "Ymax", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
 	EntityPropertiesDouble::createProperty("Port range", "Zmin", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
 	EntityPropertiesDouble::createProperty("Port range", "Zmax", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
+
+    EntityPropertiesSelection::createProperty("Label", "Text normal", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Lumped Ports", getProperties());
+    EntityPropertiesSelection::createProperty("Label", "Text direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Lumped Ports", getProperties());
 }
 
 TopoDS_Shape EntityLumpedFDTDPort::createShape(double lineRadius, double tolerance)
 {
+    getProperties().forceResetUpdateForAllProperties();
+
     EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmin"));
     EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmax"));
     EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Ymin"));
@@ -86,6 +138,8 @@ TopoDS_Shape EntityLumpedFDTDPort::createShape(double lineRadius, double toleran
         std::swap(ymin, ymax);
     if (zmin > zmax)
         std::swap(zmin, zmax);
+
+    determineLabelOrientation(xmin, xmax, ymin, ymax, zmin, zmax);
 
     const double dx = xmax - xmin;
     const double dy = ymax - ymin;
@@ -201,5 +255,107 @@ TopoDS_Shape EntityLumpedFDTDPort::createShape(double lineRadius, double toleran
     return TopoDS_Shape(); // he bounding box degenerates to a single point.
 }
 
+void EntityLumpedFDTDPort::determineLabelOrientation(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
+{
+    EntityPropertiesSelection* normalProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Text normal"));
+    EntityPropertiesSelection* directionProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Text direction"));
+    if (!normalProperty || !directionProperty) return;
+
+    textNormal = getVectorFromText(normalProperty->getValue());
+    textDirU   = getVectorFromText(directionProperty->getValue());
+
+    textPosition[0] = 0.5 * (xmin + xmax);
+    textPosition[1] = 0.5 * (ymin + ymax);
+    textPosition[2] = 0.5 * (zmin + zmax);
+
+    double offset = 1e-3 * sqrt((xmax-xmin)*(xmax-xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
+
+    if (normalProperty->getValue() == "-X")
+    {
+        textPosition[0] = xmin - offset;
+    }
+    else if(normalProperty->getValue() == "+X")
+    {
+        textPosition[0] = xmax + offset;
+    }
+    else if (normalProperty->getValue() == "-Y")
+    {
+        textPosition[1] = ymin - offset;
+    }
+    else if (normalProperty->getValue() == "+Y")
+    {
+        textPosition[1] = ymax + offset;
+    }
+    else if (normalProperty->getValue() == "-Z")
+    {
+        textPosition[2] = zmin - offset;
+    }
+    else if (normalProperty->getValue() == "+Z")
+    {
+        textPosition[2] = zmax + offset;
+    }
+    else
+    {
+        assert(0); // Unknown selection
+    }
+
+    textString = "huhu";
+}
+
+std::vector<double> EntityLumpedFDTDPort::getVectorFromText(const std::string& direction)
+{
+    if (direction == "+X")
+    {
+        return std::vector<double>{1.0, 0.0, 0.0};
+    }
+    else if (direction == "-X")
+    {
+        return std::vector<double>{-1.0, 0.0, 0.0};
+    }
+    else if (direction == "+Y")
+    {
+        return std::vector<double>{0.0, 1.0, 0.0};
+    }
+    else if (direction == "-Y")
+    {
+        return std::vector<double>{0.0, -1.0, 0.0};
+    }
+    else if (direction == "+Z")
+    {
+        return std::vector<double>{0.0, 0.0, 1.0};
+    }
+    else if (direction == "-Z")
+    {
+        return std::vector<double>{0.0, 0.0, -1.0};
+    }
+    else
+    {
+        assert(0); // unknown direction
+    }
+
+    return std::vector<double>{0.0, 0.0, 0.0};
+}
+
+void EntityLumpedFDTDPort::addSpecificMembersForVisualization(ot::JsonDocument& doc)
+{
+    if (!textString.empty())
+    {
+        doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextString, ot::JsonString(textString, doc.GetAllocator()), doc.GetAllocator());
+        doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextPosition, ot::JsonArray(textPosition, doc.GetAllocator()), doc.GetAllocator());
+        doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextNormal, ot::JsonArray(textNormal, doc.GetAllocator()), doc.GetAllocator());
+        doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_TextDirU, ot::JsonArray(textDirU, doc.GetAllocator()), doc.GetAllocator());
+    }
+}
+
+void EntityLumpedFDTDPort::setName(const std::string& _name)
+{
+    EntityGeometry::setName(_name);
+
+    if (!textString.empty())
+    {
+        textString = getNameOnly();
+        addVisualizationNodes();
+    }
+}
 
 

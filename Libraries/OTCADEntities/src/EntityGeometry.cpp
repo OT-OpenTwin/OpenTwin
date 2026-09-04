@@ -442,7 +442,6 @@ long long EntityGeometry::getFacetsPrefetchID(void)
 void EntityGeometry::addVisualizationNodes(void)
 {
 	EntityPropertiesColor *colorProp = dynamic_cast<EntityPropertiesColor*>(getProperties().getProperty("Color"));
-	assert(colorProp != nullptr);
 
 	std::vector<double> colorRGB;
 	
@@ -502,6 +501,8 @@ void EntityGeometry::addVisualizationNodes(void)
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ManageChildVis, this->getManageChildVisibility(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_ShowWhenSelected, this->getShowWhenSelected(), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MODEL_ITM_Transformation, ot::JsonArray(transformation, doc.GetAllocator()), doc.GetAllocator());
+
+	addSpecificMembersForVisualization(doc);
 
 	std::list<std::pair<ot::UID, ot::UID>> prefetchIds;
 	prefetchIds.push_back(std::pair<ot::UID, ot::UID>(facetsStorageID, storageVersion));

@@ -124,6 +124,8 @@ protected:
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual bool getBackfaceCulling() { return true; }
+	virtual void addSpecificMembersForVisualization(ot::JsonDocument& doc) {};
+
 
 private:
 	void ensureBrepIsLoaded(void);
