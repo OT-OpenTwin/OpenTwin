@@ -52,13 +52,14 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 
 	// Check if LoadFromLibrary was selected
 	auto basePropertyModel = getProperties().getProperty("ModelSelection");
-	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
-	if (modelProperty == nullptr) {
-		OT_LOG_E("Model selection property cast failed");
-		return false;
-	}
-	
-	if (modelProperty->getValueName() == "< Load from Library >") {
+	if (basePropertyModel) {
+		auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
+		if (modelProperty == nullptr) {
+			OT_LOG_E("Model selection property cast failed");
+			return false;
+		}
+		
+		if (modelProperty->getValueName() == "< Load from Library >") {
 
 		ot::LibraryElementSelectionCfg config;
 		config.setRequestingEntityID(this->getEntityID());
@@ -71,6 +72,7 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 
 		// if it was selected use observer to send message to LMS
 		getObserver()->requestConfigForModelDialog(config);
+		}
 	}
 
 	return true;
@@ -85,14 +87,17 @@ ot::EntityName::NamingBehavior EntityBlockCircuitElement::getNamingBehavior() co
 
 std::string EntityBlockCircuitElement::getCircuitModel() {
 	auto propertyBase = getProperties().getProperty("ModelSelection");
+	if (!propertyBase) return "";
 	auto propertyCircuitModel = dynamic_cast<EntityPropertiesExtendedEntityList*>(propertyBase);
-	assert(propertyBase != nullptr);
+	if (!propertyCircuitModel) return "";
 	std::string value = propertyCircuitModel->getValueName();
 	return value;
 }
 
 void EntityBlockCircuitElement::setCircuitModelFolder(ot::UID _folderID) {
 	auto basePropertyModel = getProperties().getProperty("ModelSelection");
+	if (!basePropertyModel) return;
+	
 	auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
 	if (modelProperty == nullptr) {
 		OT_LOG_E("Model selection property cast failed");
