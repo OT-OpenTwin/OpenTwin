@@ -189,6 +189,13 @@ void EntitySolverCircuitSimulator::setCircuitFolder(const std::string _circuitFo
 	}
 	circuit->setValueName(_circuitFolderName);
 	circuit->setValueID(_circuitFolderID);
+
+	EntityPropertiesEntityList* element = PropertyHelper::getEntityListProperty(this, "Element");
+	if (element != nullptr) {
+		element->setEntityContainerName(_circuitFolderName);
+		element->setEntityContainerID(_circuitFolderID);
+	}
+
 	this->setModified();
 }
 
