@@ -78,6 +78,7 @@ ot::FileInformation ot::DirectoryIterator::findFile(const std::string& _fileName
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
@@ -107,6 +108,7 @@ bool ot::DirectoryIterator::hasFile(const std::string& _fileName) {
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
@@ -135,6 +137,7 @@ bool ot::DirectoryIterator::hasDirectory(const std::string& _directoryName) {
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
@@ -162,6 +165,7 @@ std::list<ot::FileInformation> ot::DirectoryIterator::getInfos() {
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
@@ -190,6 +194,7 @@ std::list<std::filesystem::path> ot::DirectoryIterator::getPaths() {
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
@@ -221,6 +226,7 @@ std::list<std::filesystem::path> ot::DirectoryIterator::getRelativePaths() {
 		}
 	}
 	catch (const std::exception& _e) {
+		(void)_e;
 		//! @todo Log exception
 		OTAssert(0, "Log and not throw...");
 	}
