@@ -34,6 +34,7 @@ class EntityFacetData;
 class ResultManager;
 class EntityWaveguidePort;
 class EntityLumpedFDTDPort;
+class EntityMicrostripPort;
 class EntityFieldDump;
 class EntityVis2D3D;
 
@@ -61,6 +62,7 @@ private:
 	void addPorts(std::stringstream& runCommand);
 	void addWaveguidePorts(std::stringstream& runCommand);
 	void addLumpedPorts(std::stringstream& runCommand);
+	void addMicrostripPorts(std::stringstream& runCommand);
 	void addFieldDumps(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
@@ -102,6 +104,22 @@ private:
 	bool getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz);
 	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
 	double snapToMeshLine(double coordinate, const std::vector<double>& meshLines);
+	bool determinePortCoordinates(
+		const std::string& propagationDirection,
+		const std::string& excitationDirection,
+		double xmin, double xmax,
+		double ymin, double ymax,
+		double zmin, double zmax,
+		double xpos, double ypos, double zpos,
+		std::vector<double>& portStart,
+		std::vector<double>& portStop,
+		double& feedShift,
+		double& measurementShift,
+		std::size_t pmlCells = 8,
+		std::size_t feedCellsAfterPML = 2,
+		std::size_t measurementCellsAfterFeed = 5,
+		std::size_t portCellsAfterMeasurement = 5) const;
+	std::string directionToAxis(const std::string& direction);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -116,6 +134,7 @@ private:
 	std::list<std::map<int, double>> excitationList;
 	std::list<EntityWaveguidePort*> waveguidePortList;
 	std::list<EntityLumpedFDTDPort*> lumpedPortList;
+	std::list<EntityMicrostripPort*> microstripPortList;
 	std::list<EntityFieldDump*> fieldDumpList;
 	std::set<int> portList;
 

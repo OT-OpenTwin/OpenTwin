@@ -44,6 +44,7 @@
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/EntityWaveguidePort.h"
 #include "OTCADEntities/EntityLumpedFDTDPort.h"
+#include "OTCADEntities/EntityMicrostripPort.h"
 #include "OTCADEntities/EntityFieldDump.h"
 
 #include <fstream>
@@ -84,6 +85,11 @@ FDTDSolver::~FDTDSolver()
 	}
 
 	for (auto port : lumpedPortList)
+	{
+		delete port;
+	}	
+	
+	for (auto port : microstripPortList)
 	{
 		delete port;
 	}
@@ -483,6 +489,7 @@ void FDTDSolver::addPorts(std::stringstream& runCommand)
 
 	addWaveguidePorts(runCommand);
 	addLumpedPorts(runCommand);
+	addMicrostripPorts(runCommand);
 }
 
 void FDTDSolver::addWaveguidePorts(std::stringstream& runCommand)
@@ -641,6 +648,320 @@ void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
 	}
 }
 
+void FDTDSolver::addMicrostripPorts(std::stringstream& runCommand)
+{
+	if (microstripPortList.empty()) return;
+
+	// Here we create all ports first with excitation set on (this will be updated to the actual values in the solver run part).
+	// This is necessary to create the excitation data structures.
+
+	runCommand << "pec = CSX.AddMetal(\"PEC\")\n\n";
+	
+	for (auto port : microstripPortList)
+	{
+		int portNumber = std::stoi(port->getNameOnly());
+
+		EntityPropertiesSelection* propagationDirProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Propagation direction"));
+		EntityPropertiesSelection* currentDirProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Current direction"));
+		assert(propagationDirProperty && currentDirProperty);
+
+		EntityPropertiesDouble* xPosProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Position X"));
+		EntityPropertiesDouble* yPosProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Position Y"));
+		EntityPropertiesDouble* zPosProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Position Z"));
+		assert(xPosProperty && yPosProperty && zPosProperty);
+
+		EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmin"));
+		EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmax"));
+		EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymin"));
+		EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymax"));
+		EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmin"));
+		EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmax"));
+		assert(xMinProperty && xMaxProperty && yMinProperty && yMaxProperty && zMinProperty && zMaxProperty);
+
+		std::string propagationDirection = propagationDirProperty->getValue();
+		std::string currentDirection = currentDirProperty->getValue();
+
+		double xpos = xPosProperty->getValue();
+		double ypos = yPosProperty->getValue();
+		double zpos = zPosProperty->getValue();
+
+		double xmin = xMinProperty->getValue();
+		double xmax = xMaxProperty->getValue();
+		double ymin = yMinProperty->getValue();
+		double ymax = yMaxProperty->getValue();
+		double zmin = zMinProperty->getValue();
+		double zmax = zMaxProperty->getValue();
+
+		double tolerance = 1e-3 * minimumMeshStepWidth;
+
+		if (fabs(xmax - xmin) < tolerance) xmin = xmax = 0.5 * (xmin + xmax);
+		if (fabs(ymax - ymin) < tolerance) ymin = ymax = 0.5 * (ymin + ymax);
+		if (fabs(zmax - zmin) < tolerance) zmin = zmax = 0.5 * (zmin + zmax);
+
+		xmin = snapToMeshLine(xmin, xLines);
+		xmax = snapToMeshLine(xmax, xLines);
+		ymin = snapToMeshLine(ymin, yLines);
+		ymax = snapToMeshLine(ymax, yLines);
+		zmin = snapToMeshLine(zmin, zLines);
+		zmax = snapToMeshLine(zmax, zLines);
+
+		xpos = snapToMeshLine(xpos, xLines);
+		ypos = snapToMeshLine(ypos, yLines);
+		zpos = snapToMeshLine(zpos, zLines);
+
+		double feedShift = 0.0;
+		double measurementShift = 0.0;
+
+		std::vector<double> portStart = { 0.0, 0.0, 0.0 };
+		std::vector<double> portStop = { 0.0, 0.0, 0.0 };
+		
+		std::size_t pmlCells = 8;
+		std::size_t feedCellsAfterPML = 2*2;
+		std::size_t measurementCellsAfterFeed = 5*2;
+		std::size_t portCellsAfterMeasurement = 5*2;
+
+		if (determinePortCoordinates(propagationDirection, currentDirection, xmin, xmax, ymin, ymax, zmin, zmax, xpos, ypos, zpos, 
+									 portStart, portStop, feedShift, measurementShift, pmlCells, feedCellsAfterPML, measurementCellsAfterFeed, portCellsAfterMeasurement))
+		{
+			runCommand
+				<< "ports[" << portNumber << "] = FDTD.AddMSLPort(\n"
+				<< "    port_nr=" << portNumber << ",\n"
+				<< "    metal_prop = pec,\n"
+				<< "    start=[" << portStart[0] << ", " << portStart[1] << ", " << portStop[2] << "],\n"
+				<< "    stop=[" << portStop[0] << ", " << portStop[1] << ", " << portStart[2] << "],\n"
+				<< "    prop_dir='" << directionToAxis(propagationDirection) << "',\n"
+				<< "    exc_dir='" << directionToAxis(currentDirection) << "',\n"
+				<< "    priority = " << maximumObjectPriority + 1 << ",\n"
+				<< "    FeedShift = " << feedShift << ",\n"
+				<< "    MeasPlaneShift = " << measurementShift << ",\n"
+				<< "    Feed_R = np.inf,\n"
+				<< "    excite=1\n)\n\n";
+		}
+	}
+}
+
+std::string FDTDSolver::directionToAxis(const std::string& direction)
+{
+	if (direction.size() != 2 ||
+		(direction[0] != '+' && direction[0] != '-'))
+	{
+		throw std::invalid_argument(
+			"Invalid direction: " + direction);
+	}
+
+	const char axis = static_cast<char>(
+		std::tolower(
+			static_cast<unsigned char>(direction[1])));
+
+	if (axis != 'x' && axis != 'y' && axis != 'z')
+	{
+		throw std::invalid_argument(
+			"Invalid direction: " + direction);
+	}
+
+	return std::string(1, axis);
+}
+bool FDTDSolver::determinePortCoordinates(
+	const std::string& propagationDirection,
+	const std::string& excitationDirection,
+	double xmin, double xmax,
+	double ymin, double ymax,
+	double zmin, double zmax,
+	double xpos, double ypos, double zpos,
+	std::vector<double>& portStart,
+	std::vector<double>& portStop,
+	double& feedShift,
+	double& measurementShift,
+	std::size_t pmlCells,
+	std::size_t feedCellsAfterPML,
+	std::size_t measurementCellsAfterFeed,
+	std::size_t portCellsAfterMeasurement) const
+{
+	const auto parseDirection =
+		[](const std::string& direction,
+			std::size_t& axis,
+			int& sign) -> bool
+		{
+			if (direction.size() != 2 ||
+				(direction[0] != '+' && direction[0] != '-'))
+			{
+				return false;
+			}
+
+			sign = direction[0] == '+' ? 1 : -1;
+
+			switch (std::toupper(
+				static_cast<unsigned char>(direction[1])))
+			{
+			case 'X':
+				axis = 0;
+				return true;
+
+			case 'Y':
+				axis = 1;
+				return true;
+
+			case 'Z':
+				axis = 2;
+				return true;
+
+			default:
+				return false;
+			}
+		};
+
+	std::size_t propagationAxis = 0;
+	std::size_t excitationAxis = 0;
+	int propagationSign = 0;
+	int excitationSign = 0;
+
+	if (!parseDirection(
+		propagationDirection,
+		propagationAxis,
+		propagationSign) ||
+		!parseDirection(
+			excitationDirection,
+			excitationAxis,
+			excitationSign))
+	{
+		return false;
+	}
+
+	// Propagation and excitation directions must be perpendicular.
+	if (propagationAxis == excitationAxis)
+		return false;
+
+	if (feedCellsAfterPML == 0 ||
+		measurementCellsAfterFeed == 0 ||
+		portCellsAfterMeasurement == 0)
+	{
+		return false;
+	}
+
+	const std::array<const std::vector<double>*, 3> gridLines = {
+		&xLines, &yLines, &zLines
+	};
+
+	const std::vector<double>& lines =
+		*gridLines[propagationAxis];
+
+	const std::size_t feedOffset =
+		pmlCells + feedCellsAfterPML;
+
+	const std::size_t measurementOffset =
+		feedOffset + measurementCellsAfterFeed;
+
+	const std::size_t portEndOffset =
+		measurementOffset + portCellsAfterMeasurement;
+
+	// An offset of N cells requires at least N + 1 grid lines.
+	if (lines.size() <= portEndOffset)
+		return false;
+
+	// The grid lines must be strictly ascending.
+	for (std::size_t i = 1; i < lines.size(); ++i)
+	{
+		if (lines[i] <= lines[i - 1])
+			return false;
+	}
+
+	const std::array<double, 3> portPosition = {
+		xpos, ypos, zpos
+	};
+
+	const std::array<double, 3> minimum = {
+		xmin, ymin, zmin
+	};
+
+	const std::array<double, 3> maximum = {
+		xmax, ymax, zmax
+	};
+
+	const std::size_t widthAxis =
+		3 - propagationAxis - excitationAxis;
+
+	// Both transverse port dimensions must be nonzero.
+	if (maximum[excitationAxis] <= minimum[excitationAxis] ||
+		maximum[widthAxis] <= minimum[widthAxis])
+	{
+		return false;
+	}
+
+	const double expectedBoundary =
+		propagationSign > 0 ? lines.front() : lines.back();
+
+	const double positionTolerance =
+		1e-9 * std::max({
+			1.0,
+			std::abs(expectedBoundary),
+			std::abs(portPosition[propagationAxis])
+			});
+
+	// A positive direction must start at the lower boundary;
+	// a negative direction must start at the upper boundary.
+	if (std::abs(
+		portPosition[propagationAxis] -
+		expectedBoundary) > positionTolerance)
+	{
+		return false;
+	}
+
+	const auto lineAtOffset =
+		[&](std::size_t offset) -> double
+		{
+			if (propagationSign > 0)
+				return lines[offset];
+
+			return lines[lines.size() - 1 - offset];
+		};
+
+	const double feedCoordinate =
+		lineAtOffset(feedOffset);
+
+	const double measurementCoordinate =
+		lineAtOffset(measurementOffset);
+
+	const double portEndCoordinate =
+		lineAtOffset(portEndOffset);
+
+	std::array<double, 3> start = minimum;
+	std::array<double, 3> stop = maximum;
+
+	// The port starts at the simulation boundary and extends inward.
+	start[propagationAxis] = expectedBoundary;
+	stop[propagationAxis] = portEndCoordinate;
+
+	/*
+	 * The excitation direction is interpreted as pointing from the
+	 * microstrip conductor towards the reference/ground plane.
+	 *
+	 * +Z: conductor at zmin, reference plane at zmax
+	 * -Z: conductor at zmax, reference plane at zmin
+	 */
+	if (excitationSign > 0)
+	{
+		start[excitationAxis] = minimum[excitationAxis];
+		stop[excitationAxis] = maximum[excitationAxis];
+	}
+	else
+	{
+		start[excitationAxis] = maximum[excitationAxis];
+		stop[excitationAxis] = minimum[excitationAxis];
+	}
+
+	// FeedShift and MeasPlaneShift are positive distances from start.
+	feedShift = std::abs(
+		feedCoordinate - expectedBoundary);
+
+	measurementShift = std::abs(
+		measurementCoordinate - expectedBoundary);
+
+	portStart.assign(start.begin(), start.end());
+	portStop.assign(stop.begin(), stop.end());
+
+	return true;
+}
+
 void FDTDSolver::readPorts()
 {
 	std::list<std::string> portEntityNames = ot::ModelServiceAPI::getListOfFolderItems(solverEntity->getName() + "/Ports", false);
@@ -698,7 +1019,30 @@ void FDTDSolver::readPorts()
 			}
 			else
 			{
-				throw std::string("Invalid port name " + waveguidePort->getName());
+				throw std::string("Invalid port name " + lumpedPort->getName());
+			}
+		}
+
+		EntityMicrostripPort* microstripPort = dynamic_cast<EntityMicrostripPort*>(portEntity);
+		if (microstripPort != nullptr)
+		{
+			microstripPortList.push_back(microstripPort);
+			portEntity = nullptr;
+
+			int portNumber = 0;
+
+			if (parsePortNumber(microstripPort->getName(), portNumber))
+			{
+				if (portList.count(portNumber) != 0)
+				{
+					throw std::string("Port number " + std::to_string(portNumber) + " has been multiply defined");
+				}
+
+				portList.emplace(portNumber);
+			}
+			else
+			{
+				throw std::string("Invalid port name " + microstripPort->getName());
 			}
 		}
 
@@ -1474,7 +1818,7 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 
 	runCommand <<
 		"### S-parameter postprocessing\n"
-		"freq = np.linspace(f_start, f_stop, f_samples)\n"
+		"freq = np.linspace(max(f_start, 1e-6 * f_stop), f_stop, f_samples)\n"
 		"\n"
 		"for run_index, excitation_settings in enumerate(excitation_list, start=1):\n"
 		"    active_ports = [\n"
@@ -1491,7 +1835,11 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
 		"\n"
 		"    for port in ports.values():\n"
-		"        port.CalcPort(run_path, freq)\n"
+		"        port.CalcPort(run_path, freq, ref_impedance = 50)\n"
+		"        u_time = getattr(port, 'u_time', port.u_data.ui_time[0])\n"
+		"        i_time = getattr(port, 'i_time', port.i_data.ui_time[0])\n"
+		"        save_xy_data(u_time, port.ut_tot, f'run_{run_index}/port_u_{port.number}')\n"
+		"        save_xy_data(i_time, port.it_tot, f'run_{run_index}/port_i_{port.number}')\n"
 		"\n"
 		"    incident_wave = ports[input_port].uf_inc\n"
 		"\n"
@@ -1569,8 +1917,8 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		{
 			std::string portName = std::to_string(port);
 
-			convert1DTimeSignal("Ports/Currents/I" + portName + excitationString, resultFolderName + "port_it_" + portName, "Port " + portName + " Current", result1D, 1);
-			convert1DTimeSignal("Ports/Voltages/V" + portName + excitationString, resultFolderName + "port_ut_" + portName, "Port " + portName + " Voltage", result1D, 1);
+			convert1DTimeSignal("Ports/Currents/I" + portName + excitationString, resultFolderName + "port_i_" + portName, "Port " + portName + " Current", result1D, 1);
+			convert1DTimeSignal("Ports/Voltages/V" + portName + excitationString, resultFolderName + "port_u_" + portName, "Port " + portName + " Voltage", result1D, 1);
 		}
 
 		// Convert the field dumps
