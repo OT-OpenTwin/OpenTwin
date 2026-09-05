@@ -486,6 +486,7 @@ std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
 void FDTDSolver::addPorts(std::stringstream& runCommand)
 {
 	runCommand << "ports = {}\n";
+	runCommand << "port_reference_impedances = {}\n";
 
 	addWaveguidePorts(runCommand);
 	addLumpedPorts(runCommand);
@@ -543,6 +544,8 @@ void FDTDSolver::addWaveguidePorts(std::stringstream& runCommand)
 			nz /= -1.0 * facetEntity->getNodeVector().size();
 
 			double tolerance = 1e-4;
+
+			runCommand << "port_reference_impedances[" << portNumber << "] = 0\n";
 
 			if (fabs(ny) < tolerance && fabs(nz) < tolerance && fabs(fabs(nx) - 1.0) < tolerance)
 			{
@@ -636,6 +639,8 @@ void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
 				return static_cast<char>(std::tolower(c));
 			});
 
+		runCommand << "port_reference_impedances[" << portNumber << "] = 0\n";
+
 		runCommand 
 			<< "ports[" << portNumber << "] = FDTD.AddLumpedPort(\n"
 			<< "    port_nr=" << portNumber << ",\n"
@@ -661,6 +666,9 @@ void FDTDSolver::addMicrostripPorts(std::stringstream& runCommand)
 	{
 		int portNumber = std::stoi(port->getNameOnly());
 
+		EntityPropertiesDouble* impedanceProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Reference impedance"));
+		assert(impedanceProperty);
+
 		EntityPropertiesSelection* propagationDirProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Propagation direction"));
 		EntityPropertiesSelection* upDirProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Up direction"));
 		assert(propagationDirProperty && upDirProperty);
@@ -675,6 +683,8 @@ void FDTDSolver::addMicrostripPorts(std::stringstream& runCommand)
 
 		std::string propagationDirection = propagationDirProperty->getValue();
 		std::string upDirection = upDirProperty->getValue();
+
+		double impedance = impedanceProperty->getValue();
 
 		double xmin = xMinProperty->getValue();
 		double xmax = xMaxProperty->getValue();
@@ -801,6 +811,8 @@ void FDTDSolver::addMicrostripPorts(std::stringstream& runCommand)
 		{
 			throw std::string("The port is not backed by a PML boundary condition: " + port->getName());
 		}
+
+		runCommand << "port_reference_impedances[" << portNumber << "] = " << impedance << "\n";
 
 		runCommand
 			<< "ports[" << portNumber << "] = FDTD.AddMSLPort(\n"
@@ -1713,38 +1725,68 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
 		"\n"
 		"    for port in ports.values():\n"
+		"        port_number = int(port.number)\n"
 		"        port_type = type(port).__name__\n"
 		"\n"
+		"        if port_number not in port_reference_impedances:\n"
+		"            raise KeyError(\n"
+		"                f'No reference impedance specified for port {port_number}'\n"
+		"            )\n"
+		"\n"
+		"        requested_ref_impedance = float(\n"
+		"            port_reference_impedances[port_number]\n"
+		"        )\n"
+		"\n"
+		"        if requested_ref_impedance < 0.0:\n"
+		"            raise ValueError(\n"
+		"                f'Invalid reference impedance for port {port_number}: '\n"
+		"                f'{requested_ref_impedance}'\n"
+		"            )\n"
+		"\n"
+		"        calc_port_arguments = {}\n"
+		"\n"
+		"        # A value of zero selects the internal port impedance\n"
+		"        if requested_ref_impedance > 0.0:\n"
+		"            calc_port_arguments['ref_impedance'] = (\n"
+		"                requested_ref_impedance\n"
+		"            )\n"
+		"\n"
+		"        # Move the MSL reference plane to the end of the port\n"
 		"        if port_type == 'MSLPort':\n"
 		"            propagation_axis = port.prop_ny\n"
 		"            port_length = abs(\n"
 		"                port.stop[propagation_axis]\n"
 		"                - port.start[propagation_axis]\n"
 		"            )\n"
+		"            calc_port_arguments['ref_plane_shift'] = port_length\n"
 		"\n"
-		"            port.CalcPort(\n"
-		"                run_path,\n"
-		"                freq,\n"
-		"                ref_plane_shift=port_length\n"
-		"            )\n"
-		"        else:\n"
-		"            port.CalcPort(run_path, freq)\n"
+		"        port.CalcPort(\n"
+		"            run_path,\n"
+		"            freq,\n"
+		"            **calc_port_arguments\n"
+		"        )\n"
 		"\n"
-		"        u_time = getattr(port, 'u_time', port.u_data.ui_time[0])\n"
-		"        i_time = getattr(port, 'i_time', port.i_data.ui_time[0])\n"
+		"        u_time = getattr(\n"
+		"            port,\n"
+		"            'u_time',\n"
+		"            port.u_data.ui_time[0]\n"
+		"        )\n"
+		"        i_time = getattr(\n"
+		"            port,\n"
+		"            'i_time',\n"
+		"            port.i_data.ui_time[0]\n"
+		"        )\n"
 		"\n"
 		"        save_xy_data(\n"
 		"            u_time,\n"
 		"            port.ut_tot,\n"
-		"            f'run_{run_index}/port_u_{port.number}'\n"
+		"            f'run_{run_index}/port_u_{port_number}'\n"
 		"        )\n"
-		"\n"
 		"        save_xy_data(\n"
 		"            i_time,\n"
 		"            port.it_tot,\n"
-		"            f'run_{run_index}/port_i_{port.number}'\n"
+		"            f'run_{run_index}/port_i_{port_number}'\n"
 		"        )\n"
-		"\n"
 		"        port_voltage = np.asarray(\n"
 		"            port.uf_tot,\n"
 		"            dtype=np.complex128\n"
