@@ -594,15 +594,15 @@ void FDTDSolver::addLumpedPorts(std::stringstream& runCommand)
 	{
 		int portNumber = std::stoi(port->getNameOnly());
 
-		EntityPropertiesDouble* impedanceProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Impedance"));
+		EntityPropertiesDouble* impedanceProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Impedance"));
 		EntityPropertiesSelection* directionProperty = dynamic_cast<EntityPropertiesSelection*>(port->getProperties().getProperty("Current direction"));
 
-		EntityPropertiesDouble* xminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmin"));
-		EntityPropertiesDouble* xmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Xmax"));
-		EntityPropertiesDouble* yminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymin"));
-		EntityPropertiesDouble* ymaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Ymax"));
-		EntityPropertiesDouble* zminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmin"));
-		EntityPropertiesDouble* zmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("Zmax"));
+		EntityPropertiesDouble* xminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Xmin"));
+		EntityPropertiesDouble* xmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Xmax"));
+		EntityPropertiesDouble* yminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Ymin"));
+		EntityPropertiesDouble* ymaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Ymax"));
+		EntityPropertiesDouble* zminProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Zmin"));
+		EntityPropertiesDouble* zmaxProperty = dynamic_cast<EntityPropertiesDouble*>(port->getProperties().getProperty("#Zmax"));
 
 		assert(impedanceProperty && directionProperty && xminProperty && xmaxProperty && yminProperty && ymaxProperty && zminProperty && zmaxProperty);
 

@@ -51,7 +51,6 @@ protected:
 	void determinePortLabel(const std::string& propagationDirection, const std::string& currentDirection, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
 	std::vector<double> getVectorFromText(const std::string& direction);
 
-
 	std::vector<double> textPosition = { 0.0, 0.0, 0.0 };
 	std::vector<double> textNormal = { 0.0, 0.0, 0.0 };
 	std::vector<double> textDirU = { 0.0, 0.0, 0.0 };

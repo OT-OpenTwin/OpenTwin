@@ -97,16 +97,25 @@ void EntityLumpedFDTDPort::clearText(void)
 
 void EntityLumpedFDTDPort::createProperties()
 {
-	EntityPropertiesDouble::createProperty("General", "Impedance", 50, "Lumped Ports", getProperties());
+    EntityPropertiesString::createProperty("General", "Impedance", "50", "Lumped Ports", getProperties());
+    EntityPropertiesDouble::createProperty("General", "#Impedance", 50, "Lumped Ports", getProperties())->setVisible(false);
+
 	EntityPropertiesColor::createProperty("General", "Color", { 255, 171, 0 }, "Lumped Ports", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Current direction", {"X", "Y", "Z"}, "Z", "Lumped Ports", getProperties());
 
-	EntityPropertiesDouble::createProperty("Port range", "Xmin", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Xmax", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Ymin", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Ymax", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Zmin", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Zmax", 0, "Lumped Ports", getProperties())->setGroupChanges(true);
+	EntityPropertiesString::createProperty("Port range", "Xmin", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Xmax", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Ymin", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Ymax", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Zmin", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Zmax", "0", "Lumped Ports", getProperties())->setGroupChanges(true);
+
+    EntityPropertiesDouble::createProperty("Port range", "#Xmin", 0, "Lumped Ports", getProperties())->setVisible(false);
+    EntityPropertiesDouble::createProperty("Port range", "#Xmax", 0, "Lumped Ports", getProperties())->setVisible(false);
+    EntityPropertiesDouble::createProperty("Port range", "#Ymin", 0, "Lumped Ports", getProperties())->setVisible(false);
+    EntityPropertiesDouble::createProperty("Port range", "#Ymax", 0, "Lumped Ports", getProperties())->setVisible(false);
+    EntityPropertiesDouble::createProperty("Port range", "#Zmin", 0, "Lumped Ports", getProperties())->setVisible(false);
+    EntityPropertiesDouble::createProperty("Port range", "#Zmax", 0, "Lumped Ports", getProperties())->setVisible(false);
 
     EntityPropertiesSelection::createProperty("Label", "Text normal", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Lumped Ports", getProperties());
     EntityPropertiesSelection::createProperty("Label", "Text direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Lumped Ports", getProperties());
@@ -116,12 +125,12 @@ TopoDS_Shape EntityLumpedFDTDPort::createShape(double lineRadius, double toleran
 {
     getProperties().forceResetUpdateForAllProperties();
 
-    EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmin"));
-    EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmax"));
-    EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Ymin"));
-    EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Ymax"));
-    EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Zmin"));
-    EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Zmax"));
+    EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Xmin"));
+    EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Xmax"));
+    EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Ymin"));
+    EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Ymax"));
+    EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Zmin"));
+    EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Zmax"));
     assert(xMinProperty && xMaxProperty && yMinProperty && yMaxProperty && zMinProperty && zMaxProperty);
 
     double xmin = xMinProperty->getValue();
