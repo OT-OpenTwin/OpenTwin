@@ -161,7 +161,7 @@ void EntityMicrostripPort::determinePortLabel(const std::string& propagationDire
 {
     textPosition = { 0.5 * (xmin + xmax), 0.5 * (ymin + ymax), 0.5 * (zmin + zmax) };
 
-    double offset = 1e-3 * sqrt((xmax-xmin)*(xmax-xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
+    double offset = 2e-3 * sqrt((xmax-xmin)*(xmax-xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
 
     if (propagationDirection == "-X")
     {
@@ -226,12 +226,27 @@ void EntityMicrostripPort::determinePortLabel(const std::string& propagationDire
 
 TopoDS_Shape EntityMicrostripPort::createMicrostripPortBlock(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
 {
+    double offset = 1e-3 * sqrt((xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
+
+    xmin -= offset;
+    xmax += offset;
+    ymin -= offset;
+    ymax += offset;
+    zmin -= offset;
+    zmax += offset;
+
     BRepPrimAPI_MakeBox box(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
 
-    box.Build();
+    try
+    {
+        box.Build();
 
-    if (!box.IsDone())
+        if (!box.IsDone()) return TopoDS_Shape();
+    }
+    catch (const Standard_Failure&) 
+    {
         return TopoDS_Shape();
+    }
 
     return box.Shape();
 }
