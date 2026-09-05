@@ -104,21 +104,6 @@ private:
 	bool getGridDimensions(const std::vector<char>& data, int& nx, int& ny, int& nz);
 	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
 	double snapToMeshLine(double coordinate, const std::vector<double>& meshLines);
-	bool determinePortCoordinates(
-		const std::string& propagationDirection,
-		const std::string& excitationDirection,
-		double xmin, double xmax,
-		double ymin, double ymax,
-		double zmin, double zmax,
-		double xpos, double ypos, double zpos,
-		std::vector<double>& portStart,
-		std::vector<double>& portStop,
-		double& feedShift,
-		double& measurementShift,
-		std::size_t pmlCells = 8,
-		std::size_t feedCellsAfterPML = 2,
-		std::size_t measurementCellsAfterFeed = 5,
-		std::size_t portCellsAfterMeasurement = 5) const;
 	std::string directionToAxis(const std::string& direction);
 
 	Application* application;

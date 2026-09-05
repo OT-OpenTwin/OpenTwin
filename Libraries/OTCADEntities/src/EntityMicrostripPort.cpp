@@ -99,18 +99,21 @@ void EntityMicrostripPort::createProperties()
 {
 	EntityPropertiesColor::createProperty("General", "Color", { 255, 171, 0 }, "Microstrip Ports", getProperties());
     EntityPropertiesSelection::createProperty("General", "Propagation direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Z", "Microstrip Ports", getProperties());
-    EntityPropertiesSelection::createProperty("General", "Current direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Microstrip Ports", getProperties());
+    EntityPropertiesSelection::createProperty("General", "Up direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Microstrip Ports", getProperties())->setToolTip("Specify the direction from the groundplane to the conductor");
 
-    EntityPropertiesDouble::createProperty("Port range", "Position X", 0.0, "Microstrip Ports", getProperties())->setGroupChanges(true);;
-    EntityPropertiesDouble::createProperty("Port range", "Position Y", 0.0, "Microstrip Ports", getProperties())->setGroupChanges(true);;
-    EntityPropertiesDouble::createProperty("Port range", "Position Z", 0.0, "Microstrip Ports", getProperties())->setGroupChanges(true);;
+    EntityPropertiesString::createProperty("Port range", "Xmin", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Xmax", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Ymin", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Ymax", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Zmin", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
+    EntityPropertiesString::createProperty("Port range", "Zmax", "0", "Microstrip Ports", getProperties())->setGroupChanges(true);
 
-	EntityPropertiesDouble::createProperty("Port range", "Xmin", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Xmax", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Ymin", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Ymax", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Zmin", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Port range", "Zmax", 0, "Microstrip Ports", getProperties())->setGroupChanges(true);
+	EntityPropertiesDouble::createProperty("Port range", "#Xmin", 0, "Microstrip Ports", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Port range", "#Xmax", 0, "Microstrip Ports", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Port range", "#Ymin", 0, "Microstrip Ports", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Port range", "#Ymax", 0, "Microstrip Ports", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Port range", "#Zmin", 0, "Microstrip Ports", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Port range", "#Zmax", 0, "Microstrip Ports", getProperties())->setVisible(false);
 }
 
 TopoDS_Shape EntityMicrostripPort::createShape(double lineRadius, double tolerance)
@@ -118,28 +121,19 @@ TopoDS_Shape EntityMicrostripPort::createShape(double lineRadius, double toleran
     getProperties().forceResetUpdateForAllProperties();
 
     EntityPropertiesSelection* propagationDirProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Propagation direction"));
-    EntityPropertiesSelection* currentDirProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Current direction"));
-    assert(propagationDirProperty && currentDirProperty);
+    EntityPropertiesSelection* upDirProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Up direction"));
+    assert(propagationDirProperty && upDirProperty);
 
-    EntityPropertiesDouble* xPosProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position X"));
-    EntityPropertiesDouble* yPosProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position Y"));
-    EntityPropertiesDouble* zPosProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Position Z"));
-    assert(xPosProperty && yPosProperty && zPosProperty);
-
-    EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmin"));
-    EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Xmax"));
-    EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Ymin"));
-    EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Ymax"));
-    EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Zmin"));
-    EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Zmax"));
+    EntityPropertiesDouble* xMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Xmin"));
+    EntityPropertiesDouble* xMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Xmax"));
+    EntityPropertiesDouble* yMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Ymin"));
+    EntityPropertiesDouble* yMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Ymax"));
+    EntityPropertiesDouble* zMinProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Zmin"));
+    EntityPropertiesDouble* zMaxProperty = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("#Zmax"));
     assert(xMinProperty && xMaxProperty && yMinProperty && yMaxProperty && zMinProperty && zMaxProperty);
 
     std::string propagationDirection = propagationDirProperty->getValue();
-    std::string currentDirection     = currentDirProperty->getValue();
-
-    double xpos = xPosProperty->getValue();
-    double ypos = yPosProperty->getValue();
-    double zpos = zPosProperty->getValue();
+    std::string upDirection          = upDirProperty->getValue();
 
     double xmin = xMinProperty->getValue();
     double xmax = xMaxProperty->getValue();
@@ -156,196 +150,90 @@ TopoDS_Shape EntityMicrostripPort::createShape(double lineRadius, double toleran
     if (zmin > zmax)
         std::swap(zmin, zmax);
 
-    determinePortLabel(propagationDirection, currentDirection, xmin, xmax, ymin, ymax, zmin, zmax, xpos, ypos, zpos);
+    determinePortLabel(propagationDirection, upDirection, xmin, xmax, ymin, ymax, zmin, zmax);
 
-    return createMicrostripPortFace(propagationDirection, xmin, xmax, ymin, ymax, zmin, zmax, xpos, ypos, zpos);
+    return createMicrostripPortBlock(xmin, xmax, ymin, ymax, zmin, zmax);
 }
 
 void EntityMicrostripPort::determinePortLabel(const std::string& propagationDirection,
-                                              const std::string &currentDirection,
-                                              double xmin, double xmax, double ymin, double ymax, double zmin, double zmax,
-                                              double xpos, double ypos, double zpos)
+                                              const std::string &upDirection,
+                                              double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
 {
-    const auto parseDirection =
-        [](const std::string& direction) -> std::array<double, 3>
-        {
-            if (direction.size() != 2 ||
-                (direction[0] != '+' && direction[0] != '-'))
-            {
-                assert(0); // Invalid direction
-            }
+    textPosition = { 0.5 * (xmin + xmax), 0.5 * (ymin + ymax), 0.5 * (zmin + zmax) };
 
-            const double sign = direction[0] == '+' ? 1.0 : -1.0;
-            const char axis = static_cast<char>(
-                std::toupper(
-                    static_cast<unsigned char>(direction[1])));
+    double offset = 1e-3 * sqrt((xmax-xmin)*(xmax-xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
 
-            switch (axis)
-            {
-            case 'X':
-                return { sign, 0.0, 0.0 };
-
-            case 'Y':
-                return { 0.0, sign, 0.0 };
-
-            case 'Z':
-                return { 0.0, 0.0, sign };
-
-            default:
-                assert(0); // Invalid direction
-                return { 0.0, 0.0, 0.0 };
-            }
-        };
-
-    const std::array<double, 3> propagation = parseDirection(propagationDirection);
-
-    const std::array<double, 3> current = parseDirection(currentDirection);
-
-    std::array<double, 3> center = {
-        xmin + 0.5 * (xmax - xmin),
-        ymin + 0.5 * (ymax - ymin),
-        zmin + 0.5 * (zmax - zmin)
-    };
-
-    const double dx = xmax - xmin;
-    const double dy = ymax - ymin;
-    const double dz = zmax - zmin;
-
-    double portDiagonal = 0.0;
-
-    if (propagation[0] != 0.0)
+    if (propagationDirection == "-X")
     {
-        // Port plane is perpendicular to the X axis.
-        center[0] = xpos;
-        portDiagonal = std::sqrt(dy * dy + dz * dz);
+        textPosition[0] = xmax + offset;
+        textNormal = { 1.0, 0.0, 0.0 };
     }
-    else if (propagation[1] != 0.0)
+    else if (propagationDirection == "+X")
     {
-        // Port plane is perpendicular to the Y axis.
-        center[1] = ypos;
-        portDiagonal = std::sqrt(dx * dx + dz * dz);
+        textPosition[0] = xmin - offset;
+        textNormal = { -1.0, 0.0, 0.0 };
     }
-    else
+    else if (propagationDirection == "-Y")
     {
-        // Port plane is perpendicular to the Z axis.
-        center[2] = zpos;
-        portDiagonal = std::sqrt(dx * dx + dy * dy);
+        textPosition[1] = ymax + offset;
+        textNormal = { 0.0, 1.0, 0.0 };
+    }
+    else if (propagationDirection == "+Y")
+    {
+        textPosition[1] = ymin - offset;
+        textNormal = { 0.0, -1.0, 0.0 };
+    }
+    else if (propagationDirection == "-Z")
+    {
+        textPosition[2] = zmax + offset;
+        textNormal = { 0.0, 0.0, 1.0 };
+    }
+    else if (propagationDirection == "+Z")
+    {
+        textPosition[2] = zmin - offset;
+        textNormal = { 0.0, 0.0, -1.0 };
     }
 
-    const double offset = 1e-3 * portDiagonal;
+    std::vector<double> up = { 0.0, 0.0, 0.0 };
 
-    // Move the text against the propagation direction.
-    textPosition = {
-        center[0] - offset * propagation[0],
-        center[1] - offset * propagation[1],
-        center[2] - offset * propagation[2]
-    };
+    if (upDirection[1] == 'X')
+    {
+        up[0] = 1.0;
+    }
+    else if (upDirection[1] == 'Y')
+    {
+        up[1] = 1.0;
+    }
+    else if (upDirection[1] == 'Z')
+    {
+        up[2] = 1.0;
+    }
 
-    // The text normal points against the propagation direction.
-    textNormal = {
-        -propagation[0],
-        -propagation[1],
-        -propagation[2]
-    };
+    if (upDirection[0] == '-')
+    {
+        up = { -up[0], -up[1], -up[2] };
+    }
 
-    // U direction: propagationDirection x currentDirection.
+    // U direction: up x textNormal.
     textDirU = {
-        propagation[1] * current[2] -
-            propagation[2] * current[1],
-
-        propagation[2] * current[0] -
-            propagation[0] * current[2],
-
-        propagation[0] * current[1] -
-            propagation[1] * current[0]
+        up[1] * textNormal[2] - up[2] * textNormal[1],
+        up[2] * textNormal[0] - up[0] * textNormal[2],
+        up[0] * textNormal[1] - up[1] * textNormal[0]
     };
 
     textString = getNameOnly();
 }
 
-TopoDS_Shape EntityMicrostripPort::createMicrostripPortFace(const std::string& propagationDirection, 
-                                                            double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, 
-                                                            double xpos, double ypos, double zpos)
+TopoDS_Shape EntityMicrostripPort::createMicrostripPortBlock(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax)
 {
-    if (propagationDirection.size() != 2 ||
-        (propagationDirection[0] != '+' &&
-            propagationDirection[0] != '-'))
-    {
-        return TopoDS_Shape();
-    }
+    BRepPrimAPI_MakeBox box(gp_Pnt(xmin, ymin, zmin), gp_Pnt(xmax, ymax, zmax));
 
-    const bool positive = propagationDirection[0] == '+';
-    const char axis = static_cast<char>(
-        std::toupper(static_cast<unsigned char>(
-            propagationDirection[1])));
+    box.Build();
 
-    std::array<gp_Pnt, 4> points;
-
-    switch (axis)
-    {
-    case 'X':
-        if (ymax <= ymin || zmax <= zmin)
-            return TopoDS_Shape();
-
-        // Point order produces a normal in +X direction.
-        points = {
-            gp_Pnt(xpos, ymin, zmin),
-            gp_Pnt(xpos, ymax, zmin),
-            gp_Pnt(xpos, ymax, zmax),
-            gp_Pnt(xpos, ymin, zmax)
-        };
-        break;
-
-    case 'Y':
-        if (xmax <= xmin || zmax <= zmin)
-            return TopoDS_Shape();
-
-        // Point order produces a normal in +Y direction.
-        points = {
-            gp_Pnt(xmin, ypos, zmin),
-            gp_Pnt(xmin, ypos, zmax),
-            gp_Pnt(xmax, ypos, zmax),
-            gp_Pnt(xmax, ypos, zmin)
-        };
-        break;
-
-    case 'Z':
-        if (xmax <= xmin || ymax <= ymin)
-            return TopoDS_Shape();
-
-        // Point order produces a normal in +Z direction.
-        points = {
-            gp_Pnt(xmin, ymin, zpos),
-            gp_Pnt(xmax, ymin, zpos),
-            gp_Pnt(xmax, ymax, zpos),
-            gp_Pnt(xmin, ymax, zpos)
-        };
-        break;
-
-    default:
-        return TopoDS_Shape();
-    }
-
-    // Reverse the face orientation for -X, -Y or -Z.
-    if (!positive)
-        std::reverse(points.begin(), points.end());
-
-    BRepBuilderAPI_MakePolygon polygon;
-
-    for (const gp_Pnt& point : points)
-        polygon.Add(point);
-
-    polygon.Close();
-
-    if (!polygon.IsDone())
+    if (!box.IsDone())
         return TopoDS_Shape();
 
-    BRepBuilderAPI_MakeFace faceMaker(polygon.Wire(), true);
-
-    if (!faceMaker.IsDone())
-        return TopoDS_Shape();
-
-    return faceMaker.Shape();
+    return box.Shape();
 }
 
 std::vector<double> EntityMicrostripPort::getVectorFromText(const std::string& direction)

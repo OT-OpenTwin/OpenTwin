@@ -47,8 +47,8 @@ protected:
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 	virtual void addSpecificMembersForVisualization(ot::JsonDocument& doc) override;
 	void clearText(void);
-	TopoDS_Shape createMicrostripPortFace(const std::string& propagationDirection, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, double xpos, double ypos, double zpos);
-	void determinePortLabel(const std::string& propagationDirection, const std::string& currentDirection, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax, double xpos, double ypos, double zpos);
+	TopoDS_Shape createMicrostripPortBlock(double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
+	void determinePortLabel(const std::string& propagationDirection, const std::string& currentDirection, double xmin, double xmax, double ymin, double ymax, double zmin, double zmax);
 	std::vector<double> getVectorFromText(const std::string& direction);
 
 
