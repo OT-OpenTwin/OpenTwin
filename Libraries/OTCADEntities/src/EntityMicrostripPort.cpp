@@ -98,6 +98,10 @@ void EntityMicrostripPort::clearText(void)
 void EntityMicrostripPort::createProperties()
 {
 	EntityPropertiesColor::createProperty("General", "Color", { 255, 171, 0 }, "Microstrip Ports", getProperties());
+
+    EntityPropertiesString::createProperty("General", "Reference impedance", "0", "Microstrip Ports", getProperties())->setToolTip("Specify the reference impedance for the s-parameter calculation.\nA value of 0 normalizes to the actual microstrip port impedance.");
+    EntityPropertiesDouble::createProperty("General", "#Reference impedance", 0, "Microstrip Ports", getProperties())->setVisible(false);
+
     EntityPropertiesSelection::createProperty("General", "Propagation direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Z", "Microstrip Ports", getProperties());
     EntityPropertiesSelection::createProperty("General", "Up direction", { "-X", "+X", "-Y", "+Y", "-Z", "+Z" }, "+Y", "Microstrip Ports", getProperties())->setToolTip("Specify the direction from the groundplane to the conductor");
 

@@ -1713,12 +1713,50 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
 		"\n"
 		"    for port in ports.values():\n"
-//		"        port.CalcPort(run_path, freq, ref_impedance = 50)\n"
 		"        port.CalcPort(run_path, freq)\n"
+		"\n"
 		"        u_time = getattr(port, 'u_time', port.u_data.ui_time[0])\n"
 		"        i_time = getattr(port, 'i_time', port.i_data.ui_time[0])\n"
-		"        save_xy_data(u_time, port.ut_tot, f'run_{run_index}/port_u_{port.number}')\n"
-		"        save_xy_data(i_time, port.it_tot, f'run_{run_index}/port_i_{port.number}')\n"
+		"\n"
+		"        save_xy_data(\n"
+		"            u_time,\n"
+		"            port.ut_tot,\n"
+		"            f'run_{run_index}/port_u_{port.number}'\n"
+		"        )\n"
+		"\n"
+		"        save_xy_data(\n"
+		"            i_time,\n"
+		"            port.it_tot,\n"
+		"            f'run_{run_index}/port_i_{port.number}'\n"
+		"        )\n"
+		"\n"
+		"        port_voltage = np.asarray(\n"
+		"            port.uf_tot,\n"
+		"            dtype=np.complex128\n"
+		"        )\n"
+		"        port_current = np.asarray(\n"
+		"            port.if_tot,\n"
+		"            dtype=np.complex128\n"
+		"        )\n"
+		"\n"
+		"        port_impedance = np.full(\n"
+		"            port_voltage.shape,\n"
+		"            np.nan + 1j * np.nan,\n"
+		"            dtype=np.complex128\n"
+		"        )\n"
+		"\n"
+		"        np.divide(\n"
+		"            port_voltage,\n"
+		"            port_current,\n"
+		"            out=port_impedance,\n"
+		"            where=np.abs(port_current) > 0.0\n"
+		"        )\n"
+		"\n"
+		"        save_xy_data(\n"
+		"            freq,\n"
+		"            port_impedance,\n"
+		"            f'port_z_{port.number}'\n"
+		"        )\n"
 		"\n"
 		"    incident_wave = ports[input_port].uf_inc\n"
 		"\n"
@@ -1731,13 +1769,7 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"            freq,\n"
 		"            s_parameter,\n"
 		"            f's{output_port},{input_port}'\n"
-		"        )\n"
-		"\n"
-		"    input_impedance = (\n"
-		"        ports[input_port].uf_tot /\n"
-		"        ports[input_port].if_tot\n"
-		"    )\n"
-		"\n"
+		"        )\n";
 		//"    save_xy_data(\n"
 		//"        freq,\n"
 		//"        input_impedance,\n"
@@ -1806,6 +1838,9 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		++runIndex;
 	}
 
+	// Convert the port impedances
+	convertAndStorePortImpedances(result1D);
+
 	// Convert the S-parameters
 	convertAndStoreSParameters(result1D);
 
@@ -1871,6 +1906,20 @@ void FDTDSolver::convertAndStoreSParameters(ResultManager &result1D)
 				"S" + indices,
 				result1D);
 		}
+	}
+}
+
+void FDTDSolver::convertAndStorePortImpedances(ResultManager& result1D)
+{
+	for (const int port : portList)
+	{
+		const std::string portName = std::to_string(port);
+
+		convert1DFrequencySpectrum(
+			"Ports/Impedances/Z" + portName,
+			"port_z_" + portName,
+			"Z" + portName,
+			result1D);
 	}
 }
 
