@@ -63,7 +63,7 @@ void EntityBlockCircuitVoltageSource::createProperties() {
 
 void EntityBlockCircuitVoltageSource::createTRANProperties() {
 
-	EntityPropertiesSelection::createProperty("TRAN-Properties", "TRAN", { "PULSE", "SIN", "EXP"}, "", "default", getProperties());
+	EntityPropertiesSelection::createProperty("TRAN-Properties", "TRAN", { "", "PULSE", "SIN", "EXP"}, "", "default", getProperties());
 
 	createPULSEProperties();
 	createSINProperties();
