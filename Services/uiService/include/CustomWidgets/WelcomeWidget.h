@@ -105,6 +105,7 @@ private Q_SLOTS:
 	void slotExportProject();
 	void slotAccessProject();
 	void slotOwnerProject();
+	void slotCreateShareLink();
 
 	void slotSelectionChanged();
 
@@ -127,6 +128,7 @@ private:
 	ot::ToolButton* m_exportButton;
 	ot::ToolButton* m_accessButton;
 	ot::ToolButton* m_ownerButton;
+	ot::ToolButton* m_createShareLink;
 
 	ot::ProjectOverviewWidget* m_overview;
 };

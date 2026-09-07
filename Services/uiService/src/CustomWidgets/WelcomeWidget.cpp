@@ -21,6 +21,7 @@
 #include "AppBase.h"
 #include "UserManagement.h"
 #include "ProjectManagement.h"
+#include "Helper/StartArgumentParser.h"
 #include "CustomWidgets/WelcomeWidget.h"
 #include "ProjectOverview/ProjectOverviewWidget.h"
 
@@ -40,11 +41,13 @@
 #include <TabToolbar/Group.h>
 
 // Qt header
+#include <QtGui/qclipboard.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qheaderview.h>
 #include <QtOpenGLWidgets/qopenglwidget.h>
 
-WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, QWidget* _parent) {
+WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, QWidget* _parent)
+{
 	// Create layouts
 	m_widget = new QWidget(_parent);
 	QVBoxLayout* centralLayout = new QVBoxLayout(m_widget);
@@ -104,45 +107,57 @@ WelcomeWidget::WelcomeWidget(tt::Page* _ttbPage, UserManagement& _userManager, Q
 	m_ownerButton = this->iniToolButton("Owner", "ToolBar/ChangeProjectOwner.png", editGroup, "Manage Owner of selected projects");
 	this->connect(m_ownerButton, &ot::ToolButton::clicked, this, &WelcomeWidget::slotOwnerProject);
 
+	m_createShareLink = this->iniToolButton("Share", "ToolBar/CreateShareLink.png", editGroup, "Create Share Link for selected project.");
+	this->connect(m_createShareLink, &ot::ToolButton::clicked, this, &WelcomeWidget::slotCreateShareLink);
+
 	this->updateToolButtonsEnabledState();
 
 	// Initialize view mode
 	std::string viewMode = _userManager.restoreSetting("WelcomeWidget_ViewMode");
-	if (viewMode.empty()){
+	if (viewMode.empty())
+	{
 		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 	}
-	else {
+	else
+	{
 		setViewMode(ot::ProjectOverviewWidget::viewModeFromString(viewMode));
 	}
 }
 
-WelcomeWidget::~WelcomeWidget() {
+WelcomeWidget::~WelcomeWidget()
+{
 
 }
 
-void WelcomeWidget::setWidgetLocked(bool _isLocked) {
+void WelcomeWidget::setWidgetLocked(bool _isLocked)
+{
 	m_widget->setEnabled(!_isLocked);
 	this->updateToolButtonsEnabledState(_isLocked);
 	m_createButton->setEnabled(!_isLocked);
 	m_refreshButton->setEnabled(!_isLocked);
 }
 
-QString WelcomeWidget::getCurrentQuickFilter() const {
+QString WelcomeWidget::getCurrentQuickFilter() const
+{
 	return m_overview->getCurrentQuickFilter();
 }
 
-std::list<ot::ProjectInformation> WelcomeWidget::getAllProjects() const {
+std::list<ot::ProjectInformation> WelcomeWidget::getAllProjects() const
+{
 	return m_overview->getAllProjects();
 }
 
-std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const {
+std::list<ot::ProjectInformation> WelcomeWidget::getSelectedProjects() const
+{
 	return m_overview->getSelectedProjects();
 }
 
-void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
+void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode)
+{
 	m_overview->setViewMode(_mode);
 
-	switch (_mode) {
+	switch (_mode)
+	{
 	case ot::ProjectOverviewWidget::ViewMode::Tree:
 		m_toggleViewModeButton->setIcon(ot::IconManager::getIcon("ToolBar/ListView.png"));
 		m_toggleViewModeButton->setText("View as List");
@@ -159,73 +174,116 @@ void WelcomeWidget::setViewMode(ot::ProjectOverviewWidget::ViewMode _mode) {
 	}
 }
 
-void WelcomeWidget::storeViewModeSetting(UserManagement& _userManager) {
+void WelcomeWidget::storeViewModeSetting(UserManagement& _userManager)
+{
 	_userManager.storeSetting("WelcomeWidget_ViewMode", ot::ProjectOverviewWidget::toString(m_overview->getViewMode()));
 }
 
-std::optional<ot::ProjectInformation> WelcomeWidget::getProjectInformationAt(int _index) const {
+std::optional<ot::ProjectInformation> WelcomeWidget::getProjectInformationAt(int _index) const
+{
 	return m_overview->getProjectInformationAt(_index);
 }
 
-void WelcomeWidget::selectedProjectAboutToBeRemoved() {
+void WelcomeWidget::selectedProjectAboutToBeRemoved()
+{
 	m_overview->selectedProjectAboutToBeRemoved();
 }
 
-void WelcomeWidget::slotCreateProject() {
+void WelcomeWidget::slotCreateProject()
+{
 	Q_EMIT createProjectRequest();
 }
 
-void WelcomeWidget::slotRefreshProjectList() {
+void WelcomeWidget::slotRefreshProjectList()
+{
 	m_overview->refreshProjects();
 	m_overview->updateFilterOptions();
 
 	this->updateToolButtonsEnabledState();
 }
 
-void WelcomeWidget::slotToggleViewMode() {
-	if (m_overview->getViewMode() == ot::ProjectOverviewWidget::ViewMode::Tree) {
+void WelcomeWidget::slotToggleViewMode()
+{
+	if (m_overview->getViewMode() == ot::ProjectOverviewWidget::ViewMode::Tree)
+	{
 		setViewMode(ot::ProjectOverviewWidget::ViewMode::List);
 	}
-	else {
+	else
+	{
 		setViewMode(ot::ProjectOverviewWidget::ViewMode::Tree);
 	}
 }
 
-void WelcomeWidget::slotOpenProject() {
+void WelcomeWidget::slotOpenProject()
+{
 	Q_EMIT openProjectRequest();
 }
 
-void WelcomeWidget::slotCopyProject() {
+void WelcomeWidget::slotCopyProject()
+{
 	Q_EMIT copyProjectRequest();
 }
 
-void WelcomeWidget::slotRenameProject() {
+void WelcomeWidget::slotRenameProject()
+{
 	Q_EMIT renameProjectRequest();
 }
 
-void WelcomeWidget::slotDeleteProject() {
+void WelcomeWidget::slotDeleteProject()
+{
 	Q_EMIT deleteProjectRequest();
 }
 
-void WelcomeWidget::slotExportProject() {
+void WelcomeWidget::slotExportProject()
+{
 	Q_EMIT exportProjectRequest();
 }
 
-void WelcomeWidget::slotAccessProject() {
+void WelcomeWidget::slotAccessProject()
+{
 	Q_EMIT projectAccessRequest();
 	this->slotRefreshProjectList();
 }
 
-void WelcomeWidget::slotOwnerProject() {
+void WelcomeWidget::slotOwnerProject()
+{
 	Q_EMIT projectOwnerRequest();
 	this->slotRefreshProjectList();
 }
 
-void WelcomeWidget::slotSelectionChanged() {
+void WelcomeWidget::slotCreateShareLink()
+{
+	auto projects = m_overview->getSelectedProjects();
+	if (projects.size() != 1)
+	{
+		OT_LOG_W("Create Share Link is only available for a single project.");
+		return;
+	}
+
+	const ot::ProjectInformation& project = projects.front();
+
+	StartArgumentParser parser;
+	parser.setProjectInfo(project);
+	parser.setAutoLogin();
+
+	QString url = parser.createUrl();
+	QClipboard* clipboard = QApplication::clipboard();
+	if (clipboard == nullptr)
+	{
+		OT_LOG_E("Failed to access clipboard.");
+		return;
+	}
+	clipboard->setText(url);
+	AppBase::instance()->displayTemporaryStateMessage("Share link copied to clipboard");
+}
+
+void WelcomeWidget::slotSelectionChanged()
+{
 	this->updateToolButtonsEnabledState();
 }
 
-ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip) {
+ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString& _iconPath, tt::Group* _group, const QString& _toolTip)
+{
 	ot::ToolButton* newButton = new ot::ToolButton(ot::IconManager::getIcon(_iconPath), _text, _group);
 	const int iconSize = QApplication::style()->pixelMetric(QStyle::PM_LargeIconSize);
 	newButton->setAutoRaise(true);
@@ -240,18 +298,22 @@ ot::ToolButton* WelcomeWidget::iniToolButton(const QString& _text, const QString
 	return newButton;
 }
 
-void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
+void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled)
+{
 	std::list<ot::ProjectInformation> selectedProjects = m_overview->getSelectedProjects();
 
 	bool hasDifferentOwner = false;
-	for (const ot::ProjectInformation& proj : selectedProjects) {
-		if (proj.getUserName() != AppBase::instance()->getCurrentLoginData().getUserName()) {
+	for (const ot::ProjectInformation& proj : selectedProjects)
+	{
+		if (proj.getUserName() != AppBase::instance()->getCurrentLoginData().getUserName())
+		{
 			hasDifferentOwner = true;
 			break;
 		}
 	}
 
-	if (selectedProjects.empty() || _forceDisabled) {
+	if (selectedProjects.empty() || _forceDisabled)
+	{
 		m_openButton->setEnabled(false);
 		m_copyButton->setEnabled(false);
 		m_renameButton->setEnabled(false);
@@ -259,8 +321,10 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_exportButton->setEnabled(false);
 		m_accessButton->setEnabled(false);
 		m_ownerButton->setEnabled(false);
+		m_createShareLink->setEnabled(false);
 	}
-	else if (selectedProjects.size() == 1) {
+	else if (selectedProjects.size() == 1)
+	{
 		m_openButton->setEnabled(true);
 		m_copyButton->setEnabled(true);
 		m_renameButton->setEnabled(!hasDifferentOwner);
@@ -268,8 +332,10 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_exportButton->setEnabled(true);
 		m_accessButton->setEnabled(!hasDifferentOwner);
 		m_ownerButton->setEnabled(!hasDifferentOwner);
+		m_createShareLink->setEnabled(true);
 	}
-	else {
+	else
+	{
 		m_openButton->setEnabled(false);
 		m_copyButton->setEnabled(false);
 		m_renameButton->setEnabled(false);
@@ -277,5 +343,6 @@ void WelcomeWidget::updateToolButtonsEnabledState(bool _forceDisabled) {
 		m_exportButton->setEnabled(false);
 		m_accessButton->setEnabled(false);
 		m_ownerButton->setEnabled(false);
+		m_createShareLink->setEnabled(false);
 	}
 }

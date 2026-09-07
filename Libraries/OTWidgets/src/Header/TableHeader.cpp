@@ -113,6 +113,8 @@ void ot::TableHeader::sortOrderChangeRequest(int _logicalIndex, Qt::SortOrder _s
 
 void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 {
+	QAbstractItemModel* model = m_table->model();
+	
 	if (!_filterState.hasActiveFilter())
 	{
 		if (orientation() == Qt::Horizontal)
@@ -141,7 +143,7 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 				bool match = true;
 				for (const auto& [logicalIndex, selectedOptions] : filterData)
 				{
-					QVariant data = m_table->model()->data(m_table->model()->index(r, logicalIndex));
+					QVariant data = model->data(model->index(r, logicalIndex));
 					if (!data.isValid() || !selectedOptions.contains(data.toString()))
 					{
 						match = false;
@@ -159,7 +161,7 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 				bool match = true;
 				for (const auto& [logicalIndex, selectedOptions] : filterData)
 				{
-					QVariant data = m_table->model()->data(m_table->model()->index(logicalIndex, c));
+					QVariant data = model->data(model->index(logicalIndex, c));
 					if (!data.isValid() || !selectedOptions.contains(data.toString()))
 					{
 						match = false;
@@ -178,13 +180,14 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const
 {
 	QStringList options;
+	QAbstractItemModel* model = m_table->model();
 
 	if (orientation() == Qt::Horizontal)
 	{
 		options.reserve(m_table->rowCount());
 		for (int r = 0; r < m_table->rowCount(); r++)
 		{
-			QVariant data = m_table->model()->data(m_table->model()->index(r, _logicalIndex));
+			QVariant data = model->data(model->index(r, _logicalIndex));
 			if (data.isValid())
 			{
 				options.push_back(data.toString());
@@ -196,7 +199,7 @@ QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const
 		options.reserve(m_table->columnCount());
 		for (int c = 0; c < m_table->columnCount(); c++)
 		{
-			QVariant data = m_table->model()->data(m_table->model()->index(_logicalIndex, c));
+			QVariant data = model->data(model->index(_logicalIndex, c));
 			if (data.isValid())
 			{
 				options.push_back(data.toString());

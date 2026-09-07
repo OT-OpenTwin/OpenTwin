@@ -32,7 +32,6 @@ void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) 
 	m_encryptedUserPassword = ot::json::getString(_jsonObject, "UserPassword");
 	m_sessionToken = ot::json::getString(_jsonObject, "SessionToken");
 	m_gss.setUrl(QString::fromStdString(ot::json::getString(_jsonObject, "GSS")));
-
 }
 
 void LoginData::clear(void) {

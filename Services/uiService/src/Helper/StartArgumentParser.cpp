@@ -25,46 +25,278 @@
 #include "OTCore/Logging/Logger.h"
 
 // Qt header
+#include <QtCore/qurl.h>
+#include <QtCore/qurlquery.h>
 #include <QtCore/qcommandlineparser.h>
 
-bool StartArgumentParser::parse() {
+bool StartArgumentParser::parse()
+{
 	// Reset data
-	m_debug = false;
-	m_logIn = false;
-	m_openProject = false;
+	clear();
 
+	const QStringList arguments = QCoreApplication::instance()->arguments();
+
+	// No arguments besides the executable
+	if (arguments.size() <= 1)
+	{
+		return true;
+	}
+
+	// The first argument after the executable determines the format.
+	const QString firstArgument = arguments.at(1);
+
+	if (firstArgument.contains("://"))
+	{
+		return parseUrl(firstArgument);
+	}
+	else
+	{
+		return parseCommandLine();
+	}
+}
+
+QStringList StartArgumentParser::createCommandLineArgs() const
+{
+	QStringList args;
+
+	if (m_debug)
+	{
+		args << toCommandLine(ArgumentKey::Debug);
+	}
+
+	if (m_checkGraphics)
+	{
+		args << toCommandLine(ArgumentKey::CheckGraphics);
+	}
+
+	if (m_logInDataSet)
+	{
+		ot::JsonDocument doc;
+		m_loginData.addRequiredDataToJson(doc, doc.GetAllocator());
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
+		args << toCommandLine(ArgumentKey::LogInData) << QString::fromStdString(encoded);
+	}
+
+	if (m_autoLogin)
+	{
+		args << toCommandLine(ArgumentKey::AutoLogIn);
+	}
+
+	if (m_openProject)
+	{
+		ot::JsonDocument doc;
+		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
+		args << toCommandLine(ArgumentKey::OpenProject) << QString::fromStdString(encoded);
+	}
+
+	if (!m_projectVersion.empty())
+	{
+		args << toCommandLine(ArgumentKey::ProjectVersion) << QString::fromStdString(m_projectVersion);
+	}
+
+	if (!m_scriptFile.isEmpty())
+	{
+		args << toCommandLine(ArgumentKey::ScriptFile) << m_scriptFile;
+	}
+
+	return args;
+}
+
+QString StartArgumentParser::createUrl() const
+{
+	QStringList queryItems;
+
+	if (m_debug)
+	{
+		queryItems << toUrl(ArgumentKey::Debug);
+	}
+
+	if (m_checkGraphics)
+	{
+		queryItems << toUrl(ArgumentKey::CheckGraphics);
+	}
+
+	if (m_logInDataSet)
+	{
+		OT_LOG_E("Login data cannot be included in the URL for security reasons.");
+	}
+
+	if (m_autoLogin)
+	{
+		queryItems << toUrl(ArgumentKey::AutoLogIn);
+	}
+
+	if (m_openProject)
+	{
+		ot::JsonDocument doc;
+		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
+
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
+
+		queryItems << toUrl(ArgumentKey::OpenProject) + "=" + QString::fromStdString(encoded);
+
+		if (!m_projectVersion.empty())
+		{
+			queryItems << toUrl(ArgumentKey::ProjectVersion) + "=" + QString::fromStdString(m_projectVersion);
+		}
+	}
+
+	if (!m_scriptFile.isEmpty())
+	{
+		queryItems << toUrl(ArgumentKey::ScriptFile) + "=" + QString::fromUtf8(QUrl::toPercentEncoding(m_scriptFile));
+	}
+
+	return "opentwin://?" + queryItems.join("&");
+}
+
+void StartArgumentParser::clear()
+{
+	m_debug = false;
+	m_checkGraphics = false;
+
+	m_logInDataSet = false;
 	m_loginData = LoginData();
+
+	m_autoLogin = false;
+
+	m_openProject = false;
 	m_projectInfo = ot::ProjectInformation();
 	m_projectVersion.clear();
 
+	m_scriptFile.clear();
+}
+
+bool StartArgumentParser::parseUrl(const QString& _url)
+{
+	QString normalizedUrl = _url;
+
+	if (normalizedUrl.startsWith("opentwin:://", Qt::CaseInsensitive))
+	{
+		normalizedUrl.replace(0, 11, "opentwin://");
+	}
+
+	const QUrl url(normalizedUrl);
+
+	if (!url.isValid())
+	{
+		OT_LOG_E("Invalid OpenTwin URL: " + _url.toStdString());
+		return false;
+	}
+
+	if (url.scheme() != "opentwin")
+	{
+		OT_LOG_E("Unsupported URL scheme: " + url.scheme().toStdString());
+		return false;
+	}
+
+	const QUrlQuery query(url);
+
+	// Debug
+	if (query.hasQueryItem(toUrl(ArgumentKey::Debug)))
+	{
+		m_debug = true;
+	}
+
+	// Check graphics
+	if (query.hasQueryItem(toUrl(ArgumentKey::CheckGraphics)))
+	{
+		m_checkGraphics = true;
+	}
+
+	// Login
+	if (query.hasQueryItem(toUrl(ArgumentKey::LogInData)))
+	{
+		OT_LOG_E("Login data provided in URL");
+		return false;
+	}
+
+	if (query.hasQueryItem(toUrl(ArgumentKey::AutoLogIn)))
+	{
+		m_autoLogin = true;
+	}
+
+	// Open project
+	if (query.hasQueryItem(toUrl(ArgumentKey::OpenProject)))
+	{
+		const QString projectDataStr = query.queryItemValue(toUrl(ArgumentKey::OpenProject));
+
+		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
+		if (decoded.empty())
+		{
+			OT_LOG_E("Open project option set but no data provided");
+			return false;
+		}
+
+		ot::JsonDocument doc;
+		if (!doc.fromJson(decoded))
+		{
+			OT_LOG_E("Failed to parse project data from URL");
+			return false;
+		}
+
+		m_projectInfo.setFromJsonObject(doc.getConstObject());
+		m_openProject = true;
+
+		// Project version only has meaning together with an open-project
+		// argument, just like in parseCommandLine().
+		if (query.hasQueryItem(toUrl(ArgumentKey::ProjectVersion)))
+		{
+			m_projectVersion = query.queryItemValue(
+				toUrl(ArgumentKey::ProjectVersion)
+			).toStdString();
+		}
+	}
+
+	// Script
+	if (query.hasQueryItem(toUrl(ArgumentKey::ScriptFile)))
+	{
+		m_scriptFile = query.queryItemValue(toUrl(ArgumentKey::ScriptFile));
+	}
+
+	return true;
+}
+
+bool StartArgumentParser::parseCommandLine()
+{
 	// Prepare parser
 	QCommandLineParser parser;
 	parser.setApplicationDescription("OpenTwin Frontend");
 	parser.addHelpOption();
 
 	// Define command line options
-	QCommandLineOption debugOption("debug", "Run test code.");
+	QCommandLineOption debugOption(toCommandLine(ArgumentKey::Debug), "Run test code.");
 	parser.addOption(debugOption);
 
-	QCommandLineOption checkGraphicsOption({ "c", "checkgraphics"}, "Check the graphics settings.");
+	QCommandLineOption checkGraphicsOption({ toCommandLine(ArgumentKey::CheckGraphicsShort), toCommandLine(ArgumentKey::CheckGraphics) }, "Check the graphics settings.");
 	parser.addOption(checkGraphicsOption);
 
-	QCommandLineOption loginOption("login",
+	QCommandLineOption loginOption(
+		toCommandLine(ArgumentKey::LogInData),
 		"Login with JSON data.",
 		"string");
 	parser.addOption(loginOption);
 
-	QCommandLineOption openProjectOption("openproject",
+	QCommandLineOption autoLoginOption(
+		toCommandLine(ArgumentKey::AutoLogIn),
+		"Attempt to log in automatically using the initial login data."
+	);
+	parser.addOption(autoLoginOption);
+
+	QCommandLineOption openProjectOption(
+		toCommandLine(ArgumentKey::OpenProject),
 		"Open project with JSON data.",
 		"string");
 	parser.addOption(openProjectOption);
 
-	QCommandLineOption projectVersionOption("projversion",
+	QCommandLineOption projectVersionOption(
+		toCommandLine(ArgumentKey::ProjectVersion),
 		"Specify the project version to open.",
 		"string");
 	parser.addOption(projectVersionOption);
 
-	QCommandLineOption scriptFileOption("script",
+	QCommandLineOption scriptFileOption(
+		toCommandLine(ArgumentKey::ScriptFile),
 		"Execute the specified script file after initialization.",
 		"string");
 	parser.addOption(scriptFileOption);
@@ -73,44 +305,58 @@ bool StartArgumentParser::parse() {
 	parser.process(*QCoreApplication::instance());
 
 	// Check for debug option
-	if (parser.isSet(debugOption)) {
+	if (parser.isSet(debugOption))
+	{
 		m_debug = true;
 	}
 
 	// Check for graphics check option
-	if (parser.isSet(checkGraphicsOption)) {
+	if (parser.isSet(checkGraphicsOption))
+	{
 		m_checkGraphics = true;
 	}
 
+	// Check for auto login option
+	if (parser.isSet(autoLoginOption))
+	{
+		m_autoLogin = true;
+	}
+
 	// Check for login option
-	if (parser.isSet(loginOption)) {
+	if (parser.isSet(loginOption))
+	{
 		const QString loginDataStr = parser.value(loginOption);
 		std::string decoded = ot::String::fromBase64Url(loginDataStr.toStdString());
-		if (decoded.empty()) {
+		if (decoded.empty())
+		{
 			OT_LOG_E("Login option set but no data provided");
 			return false;
 		}
 
 		ot::JsonDocument doc;
-		if (!doc.fromJson(decoded)) {
+		if (!doc.fromJson(decoded))
+		{
 			OT_LOG_E("Failed to parse login data from command line argument");
 			return false;
 		}
 
 		m_loginData.setFromRequiredDataJson(doc.getConstObject());
-		m_logIn = true;
+		m_logInDataSet = true;
 	}
 
 	// Check for open project option
-	if (parser.isSet(openProjectOption)) {
+	if (parser.isSet(openProjectOption))
+	{
 		const QString projectDataStr = parser.value(openProjectOption);
 		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
-		if (decoded.empty()) {
+		if (decoded.empty())
+		{
 			OT_LOG_E("Open project option set but no data provided");
 			return false;
 		}
 		ot::JsonDocument doc;
-		if (!doc.fromJson(decoded)) {
+		if (!doc.fromJson(decoded))
+		{
 			OT_LOG_E("Failed to parse project data from command line argument");
 			return false;
 		}
@@ -118,51 +364,45 @@ bool StartArgumentParser::parse() {
 		m_openProject = true;
 
 		// Check for project version option
-		if (parser.isSet(projectVersionOption)) {
+		if (parser.isSet(projectVersionOption))
+		{
 			m_projectVersion = parser.value(projectVersionOption).toStdString();
 		}
 	}
 
 	// Check for script file option
-	if (parser.isSet(scriptFileOption)) {
+	if (parser.isSet(scriptFileOption))
+	{
 		m_scriptFile = parser.value(scriptFileOption);
 	}
 
-    return true;
+	return true;
 }
 
-QStringList StartArgumentParser::createCommandLineArgs() const {
-	QStringList args;
-
-	if (m_checkGraphics) {
-		args << "--debug";
+QString StartArgumentParser::toString(ArgumentKey _key) const
+{
+	switch (_key)
+	{
+	case ArgumentKey::Debug: return "debug";
+	case ArgumentKey::CheckGraphics: return "checkgraphics";
+	case ArgumentKey::CheckGraphicsShort: return "c";
+	case ArgumentKey::LogInData: return "logindata";
+	case ArgumentKey::AutoLogIn: return "autologin";
+	case ArgumentKey::OpenProject: return "openproject";
+	case ArgumentKey::ProjectVersion: return "projversion";
+	case ArgumentKey::ScriptFile: return "script";
+	default:
+		OT_LOG_ES("Unknown argument key: " + std::to_string(static_cast<int>(_key)));
+		return "unknown";
 	}
+}
 
-	if (m_checkGraphics) {
-		args << "--checkgraphics";
-	}
+QString StartArgumentParser::toUrl(ArgumentKey _key) const
+{
+	return toString(_key);
+}
 
-	if (m_logIn) {
-		ot::JsonDocument doc;
-		m_loginData.addRequiredDataToJson(doc, doc.GetAllocator());
-		std::string encoded = ot::String::toBase64Url(doc.toJson());
-		args << "--login" << QString::fromStdString(encoded);
-	}
-	
-	if (m_openProject) {
-		ot::JsonDocument doc;
-		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
-		std::string encoded = ot::String::toBase64Url(doc.toJson());
-		args << "--openproject" << QString::fromStdString(encoded);
-	}
-
-	if (!m_projectVersion.empty()) {
-		args << "--projversion" << QString::fromStdString(m_projectVersion);
-	}
-
-	if (!m_scriptFile.isEmpty()) {
-		args << "--script" << m_scriptFile;
-	}
-
-	return args;
+QString StartArgumentParser::toCommandLine(ArgumentKey _key) const
+{
+	return "--" + toString(_key);
 }

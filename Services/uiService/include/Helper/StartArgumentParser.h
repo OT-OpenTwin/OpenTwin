@@ -37,7 +37,13 @@ public:
 
 	bool parse();
 
+	//! @brief Create a list of command line arguments with the current data.
 	QStringList createCommandLineArgs() const;
+
+	//! @brief Create a URL with the current data.
+	QString createUrl() const;
+
+	void clear();
 
 	void setDebug(bool _debug = true) { m_debug = _debug; };
 	bool getDebug() const { return m_debug; };
@@ -45,9 +51,20 @@ public:
 	void setCheckGraphics(bool _check = true) { m_checkGraphics = _check; };
 	bool getCheckGraphics() const { return m_checkGraphics; };
 
-	bool getLogInSet() const { return m_logIn; };
-	void setLogInData(const LoginData& _data) { m_loginData = _data; m_logIn = true; };
+	//! @brief Set the log in data.
+	//! The login data is used to log in automatically when the application starts with the given login information.
+	//! @warning This should only be used when launching a new instance of the application locally.
+	//! Do not use this to create shared information.
+	void setLogInData(const LoginData& _data) { m_loginData = _data; m_logInDataSet = true; };
+	bool getLogInDataSet() const { return m_logInDataSet; };
 	const LoginData& getLogInData() const { return m_loginData; };
+
+	//! @brief Set auto login enabled flag.
+	//! If enabled the application will attempt to log in automatically using the intially set login data.
+	//! This is only possible if the user uses SSO or has saved the password.
+	//! This has no effect if the log in data is set.
+	void setAutoLogin(bool _autoLogin = true) { m_autoLogin = _autoLogin; };
+	bool getAutoLogin() const { return m_autoLogin; };
 
 	bool getOpenProjectSet() const { return m_openProject; };
 	void setProjectInfo(const ot::ProjectInformation& _info) { m_projectInfo = _info; m_openProject = true; };
@@ -60,11 +77,31 @@ public:
 	const QString& getScriptFile() const { return m_scriptFile; };
 
 private:
+	bool parseUrl(const QString& _url);
+	bool parseCommandLine();
+
+	enum class ArgumentKey
+	{
+		Debug,
+		CheckGraphics,
+		CheckGraphicsShort,
+		LogInData,
+		AutoLogIn,
+		OpenProject,
+		ProjectVersion,
+		ScriptFile
+	};
+	QString toString(ArgumentKey _key) const;
+	QString toUrl(ArgumentKey _key) const;
+	QString toCommandLine(ArgumentKey _key) const;
+
 	bool m_debug = false;
 	bool m_checkGraphics = false;
 
-	bool m_logIn = false;
+	bool m_logInDataSet = false;
 	LoginData m_loginData;
+
+	bool m_autoLogin = false;
 
 	bool m_openProject = false;
 	ot::ProjectInformation m_projectInfo;

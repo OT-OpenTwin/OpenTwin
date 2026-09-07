@@ -270,7 +270,7 @@ bool initializeAssets() {
 	return true;
 }
 
-bool initializeComponents(void) {
+bool initializeComponents() {
 	// Initialize Application Settings
 	ot::ApplicationPropertiesManager::instance().setReplaceExistingPropertiesOnMerge(true);
 

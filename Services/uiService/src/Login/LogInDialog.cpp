@@ -63,7 +63,7 @@
 #define TOGGLE_MODE_LABEL_SwitchToRegister "Switch to Registration"
 #define TOGGLE_MODE_LABEL_SwitchToChangePassword "Change Password"
 
-LogInDialog::LogInDialog() 
+LogInDialog::LogInDialog()
 	: ot::Dialog(nullptr), m_state(LogInStateFlag::NoState)
 {
 	using namespace ot;
@@ -75,7 +75,7 @@ LogInDialog::LogInDialog()
 	QGridLayout* buttonLayout = new QGridLayout;
 	QHBoxLayout* changePasswordLayout = new QHBoxLayout;
 	QHBoxLayout* registerLayout = new QHBoxLayout;
-	
+
 	// Create controls
 	ImagePreview* titleImageView = new ImagePreview(IconManager::getPixmap("Images/OpenTwinIcon.png").scaled(QSize(192, 192), Qt::KeepAspectRatio).toImage(), this);
 	titleImageView->setObjectName("LogInDialogImageView");
@@ -91,11 +91,11 @@ LogInDialog::LogInDialog()
 
 	m_usernameLabel = new Label("Username:", this);
 	m_username = new LineEdit(this);
-	
+
 	m_passwordLabel = new Label("Password:", this);
 	m_password = new LineEdit(this);
 	m_password->setEchoMode(QLineEdit::Password);
-	
+
 	m_passwordNewLabel = new Label("New Password:", this);
 	m_passwordNewLabel->setHidden(true);
 	m_passwordNew = new LineEdit(this);
@@ -113,7 +113,7 @@ LogInDialog::LogInDialog()
 
 	Label* spacerLabel1 = new Label(" ", this);
 	Label* spacerLabel2 = new Label(" ", this);
-	
+
 	m_logInButton = new PushButton("Login", this);
 	m_registerButton = new PushButton("Register", this);
 	m_registerButton->setHidden(true);
@@ -128,14 +128,15 @@ LogInDialog::LogInDialog()
 	m_username->setText(m_userNameTmp);
 	m_restoredPassword = settings->value("LastPassword", QString()).toString();
 	m_savePassword->setChecked(settings->value("LastSavePassword", false).toBool());
-	
-	if (!m_restoredPassword.isEmpty()) {
+
+	if (!m_restoredPassword.isEmpty())
+	{
 		m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
 		m_state.set(LogInStateFlag::RestoredPassword);
 	}
 
 	this->initializeGssData(settings);
-	
+
 	// Setup layouts
 	imageViewLayout->addStretch(1);
 	imageViewLayout->addWidget(titleImageView);
@@ -154,7 +155,7 @@ LogInDialog::LogInDialog()
 	inputLayout->addWidget(m_passwordConfirmLabel, r, 0);
 	inputLayout->addWidget(m_passwordConfirm, r++, 1);
 	inputLayout->addWidget(m_savePassword, r++, 1);
-	
+
 	buttonLayout->addWidget(m_logInButton, 0, 0);
 	buttonLayout->addWidget(m_registerButton, 1, 0);
 	buttonLayout->addWidget(m_changePasswordButton, 2, 0);
@@ -186,7 +187,7 @@ LogInDialog::LogInDialog()
 	changePasswordLayout->addWidget(m_toggleChangePasswordModeLabel);
 	changePasswordLayout->addStretch(1);
 	connect(m_toggleChangePasswordModeLabel, &InteractiveLabel::mouseClicked, this, &LogInDialog::slotToggleChangePasswordMode);
-	
+
 	// Setup window
 	QSize fixSize(350, m_maxDefaultHeight);
 	QRect newTargetRect(ot::Positioning::getCenterWidgetOnParentRect(nullptr, QRect(QPoint(0, 0), fixSize)).topLeft(), fixSize);
@@ -215,20 +216,24 @@ LogInDialog::LogInDialog()
 	connect(m_password, &LineEdit::textChanged, this, &LogInDialog::slotPasswordChanged);
 	connect(this, &LogInDialog::configChanged, this, &LogInDialog::applyConfig);
 
-	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO)
+	{
 		setControlsForSSO();
 	}
-	else {
+	else
+	{
 		setControlsForUsernamePassword();
 	}
 
 }
 
-LogInDialog::~LogInDialog() {
-	
+LogInDialog::~LogInDialog()
+{
+
 }
 
-void LogInDialog::setControlsEnabled(bool _enabled) {
+void LogInDialog::setControlsEnabled(bool _enabled)
+{
 	m_gss->setEnabled(_enabled);
 	m_username->setEnabled(_enabled);
 	m_password->setEnabled(_enabled);
@@ -243,20 +248,25 @@ void LogInDialog::setControlsEnabled(bool _enabled) {
 	m_exitButton->setEnabled(_enabled);
 }
 
-void LogInDialog::initialize() {
+void LogInDialog::initialize()
+{
 	StartArgumentParser args;
 
 	// Check if we have to restore a login
-	if (!args.parse()) {
+	if (!args.parse())
+	{
 		return;
 	}
 
-	if (args.getDebug()) {
+	if (args.getDebug())
+	{
 		QMessageBox msg(QMessageBox::Information, "Debug", "Debug mode was requeted and is now enabled for this instance!", QMessageBox::Ok);
 		msg.exec();
 	}
 
-	if (args.getLogInSet()) {
+	// Check if login data was set in start arguments
+	if (args.getLogInDataSet())
+	{
 		{
 			QSignalBlocker textBlock(m_password);
 			m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
@@ -271,8 +281,10 @@ void LogInDialog::initialize() {
 		QString gss = args.getLogInData().getGss().getName();
 
 		int ix = 0;
-		for (const LogInGSSEntry& entry : m_gssData) {
-			if (entry.getName() == gss) {
+		for (const LogInGSSEntry& entry : m_gssData)
+		{
+			if (entry.getName() == gss)
+			{
 				m_gss->setCurrentIndex(ix);
 				break;
 			}
@@ -282,13 +294,22 @@ void LogInDialog::initialize() {
 		// Queue login request
 		QMetaObject::invokeMethod(this, &LogInDialog::slotLogIn, Qt::QueuedConnection);
 	}
+	// Check if auto login was set in start arguments
+	else if (args.getAutoLogin())
+	{
+		// Queue login request
+		QMetaObject::invokeMethod(this, &LogInDialog::slotLogIn, Qt::QueuedConnection);
+	}
 }
 
-void LogInDialog::setConfigFlag(ConfigFlag _flag, bool _enabled) {
-	if (_enabled && m_config.has(_flag)) {
+void LogInDialog::setConfigFlag(ConfigFlag _flag, bool _enabled)
+{
+	if (_enabled && m_config.has(_flag))
+	{
 		return;
 	}
-	if (!_enabled && !m_config.hasAny(_flag)) {
+	if (!_enabled && !m_config.hasAny(_flag))
+	{
 		return;
 	}
 
@@ -297,8 +318,10 @@ void LogInDialog::setConfigFlag(ConfigFlag _flag, bool _enabled) {
 	Q_EMIT configChanged(m_config);
 }
 
-void LogInDialog::setConfig(const Config& _cfg) {
-	if (_cfg == m_config) {
+void LogInDialog::setConfig(const Config& _cfg)
+{
+	if (_cfg == m_config)
+	{
 		return;
 	}
 	m_config = _cfg;
@@ -310,7 +333,8 @@ void LogInDialog::setConfig(const Config& _cfg) {
 
 // Public slots
 
-void LogInDialog::applyConfig() {
+void LogInDialog::applyConfig()
+{
 	m_toggleRegisterModeLabel->setHidden(m_config.has(ConfigFlag::NoRegister));
 }
 
@@ -318,11 +342,13 @@ void LogInDialog::applyConfig() {
 
 // Protected
 
-bool LogInDialog::mayCloseDialogWindow() {
+bool LogInDialog::mayCloseDialogWindow()
+{
 	return !m_state.has(LogInStateFlag::WorkerRunning);
 }
 
-void LogInDialog::showEvent(QShowEvent* _event) {
+void LogInDialog::showEvent(QShowEvent* _event)
+{
 	ot::Dialog::showEvent(_event);
 
 	Q_EMIT dialogShown();
@@ -332,24 +358,28 @@ void LogInDialog::showEvent(QShowEvent* _event) {
 
 // Slots
 
-void LogInDialog::slotLogIn() {
+void LogInDialog::slotLogIn()
+{
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
-	
+
 	// Check user inputs
 	LogInGSSEntry gssData = this->findCurrentGssEntry();
-	if (!gssData.isValid()) {
+	if (!gssData.isValid())
+	{
 		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
 		return;
 	}
 
-	if (m_username->text().isEmpty() && !m_isSSOLogin) {
+	if (m_username->text().isEmpty() && !m_isSSOLogin)
+	{
 		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
 		return;
 	}
 
-	if (m_password->text().isEmpty() && !m_isSSOLogin) {
+	if (m_password->text().isEmpty() && !m_isSSOLogin)
+	{
 		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
 		return;
 	}
@@ -371,35 +401,41 @@ void LogInDialog::slotLogIn() {
 	worker.detach();
 }
 
-void LogInDialog::slotRegister() {
+void LogInDialog::slotRegister()
+{
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
 
 	LogInGSSEntry gssData = this->findCurrentGssEntry();
-	if (!gssData.isValid()) {
+	if (!gssData.isValid())
+	{
 		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
 		return;
 	}
 
 	if (!m_isSSOLogin)
 	{
-		if (m_username->text().isEmpty()) {
+		if (m_username->text().isEmpty())
+		{
 			QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
 			return;
 		}
 
-		if (m_password->text().isEmpty()) {
+		if (m_password->text().isEmpty())
+		{
 			QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
 			return;
 		}
 
-		if (m_password->text().length() < 4) {
+		if (m_password->text().length() < 4)
+		{
 			QToolTip::showText(this->mapToGlobal(m_password->pos()), "Password is too short", m_password, QRect(), 3000);
 			return;
 		}
 
-		if (m_password->text() != m_passwordConfirm->text()) {
+		if (m_password->text() != m_passwordConfirm->text())
+		{
 			QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the password", m_passwordConfirm, QRect(), 3000);
 			return;
 		}
@@ -416,33 +452,39 @@ void LogInDialog::slotRegister() {
 	worker.detach();
 }
 
-void LogInDialog::slotChangePassword() {
+void LogInDialog::slotChangePassword()
+{
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker already running");
 
 	m_loginData.clear();
 
 	LogInGSSEntry gssData = this->findCurrentGssEntry();
-	if (!gssData.isValid()) {
+	if (!gssData.isValid())
+	{
 		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
 		return;
 	}
 
-	if (m_username->text().isEmpty()) {
+	if (m_username->text().isEmpty())
+	{
 		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
 		return;
 	}
 
-	if (m_passwordNew->text().isEmpty()) {
+	if (m_passwordNew->text().isEmpty())
+	{
 		QToolTip::showText(this->mapToGlobal(m_passwordNew->pos()), "No password provided", m_passwordNew, QRect(), 3000);
 		return;
 	}
 
-	if (m_passwordNew->text().length() < 4) {
+	if (m_passwordNew->text().length() < 4)
+	{
 		QToolTip::showText(this->mapToGlobal(m_passwordNew->pos()), "Password is too short", m_passwordNew, QRect(), 3000);
 		return;
 	}
 
-	if (m_passwordNew->text() != m_passwordConfirm->text()) {
+	if (m_passwordNew->text() != m_passwordConfirm->text())
+	{
 		QToolTip::showText(this->mapToGlobal(m_passwordConfirm->pos()), "Confirm password does not match the new password", m_passwordConfirm, QRect(), 3000);
 		return;
 	}
@@ -458,19 +500,25 @@ void LogInDialog::slotChangePassword() {
 	worker.detach();
 }
 
-void LogInDialog::slotToggleLogInAndRegisterMode() {
+void LogInDialog::slotToggleLogInAndRegisterMode()
+{
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker running");
 
-	if (m_state.has(LogInStateFlag::RegisterMode)) {
-		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+	if (m_state.has(LogInStateFlag::RegisterMode))
+	{
+		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO)
+		{
 			setControlsForSSO();
 		}
-		else {
+		else
+		{
 			setControlsForUsernamePassword();
 		}
 	}
-	else {
-		if (findCurrentGssEntry().getLoginType() != ot::LoginType::SSO) {
+	else
+	{
+		if (findCurrentGssEntry().getLoginType() != ot::LoginType::SSO)
+		{
 			setControlsForRegister();
 		}
 	}
@@ -478,30 +526,39 @@ void LogInDialog::slotToggleLogInAndRegisterMode() {
 	this->update();
 }
 
-void LogInDialog::slotToggleChangePasswordMode() {
+void LogInDialog::slotToggleChangePasswordMode()
+{
 	OTAssert(!m_state.has(LogInStateFlag::WorkerRunning), "Worker running");
 
-	if (m_state.has(LogInStateFlag::ChangePasswordMode)) {
-		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) {
+	if (m_state.has(LogInStateFlag::ChangePasswordMode))
+	{
+		if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO)
+		{
 			setControlsForSSO();
 		}
-		else {
+		else
+		{
 			setControlsForUsernamePassword();
 		}
 	}
-	else {
+	else
+	{
 		setControlsForChangePassword();
 	}
 
 	this->update();
 }
 
-void LogInDialog::slotGSSChanged() {
-	if (m_gss->currentText() == EDIT_GSS_TEXT) {
+void LogInDialog::slotGSSChanged()
+{
+	if (m_gss->currentText() == EDIT_GSS_TEXT)
+	{
 		editGSSEntries();
 	}
-	else {
-		switch (findCurrentGssEntry().getLoginType()) {
+	else
+	{
+		switch (findCurrentGssEntry().getLoginType())
+		{
 		case ot::LoginType::UsernamePassword:
 			setControlsForUsernamePassword();
 			break;
@@ -517,32 +574,41 @@ void LogInDialog::slotGSSChanged() {
 	}
 }
 
-void LogInDialog::slotPasswordChanged() {
-	if (!m_state.has(LogInStateFlag::RestoredPassword)) {
+void LogInDialog::slotPasswordChanged()
+{
+	if (!m_state.has(LogInStateFlag::RestoredPassword))
+	{
 		return;
 	}
 
 	QString txt = m_password->text();
 	QString newTxt;
 	int placeholderLength = QString(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER).length();
-	if (txt.length() < placeholderLength) {
+	if (txt.length() < placeholderLength)
+	{
 		newTxt = "";
-		for (const QChar& c : txt) {
+		for (const QChar& c : txt)
+		{
 			if (c != '*') newTxt.append(c);
 		}
 	}
-	else if (txt.length() == placeholderLength) {
+	else if (txt.length() == placeholderLength)
+	{
 		newTxt = "";
-		for (const QChar& c : txt) {
+		for (const QChar& c : txt)
+		{
 			if (c != '*') newTxt.append(c);
 		}
 	}
-	else {
+	else
+	{
 		int ct = 0;
 		newTxt = "";
-		for (const QChar& c : txt) {
+		for (const QChar& c : txt)
+		{
 			if (c == '*') ct++;
-			if (c != '*' || ct > placeholderLength) {
+			if (c != '*' || ct > placeholderLength)
+			{
 				newTxt.append(c);
 			}
 		}
@@ -552,13 +618,15 @@ void LogInDialog::slotPasswordChanged() {
 	m_password->setText(newTxt);
 }
 
-void LogInDialog::slotLogInSuccess() {
+void LogInDialog::slotLogInSuccess()
+{
 	m_state.remove(LogInStateFlag::WorkerRunning);
 	this->saveUserSettings();
 	this->closeDialog(ot::Dialog::Ok);
 }
 
-void LogInDialog::slotRegisterSuccess() {
+void LogInDialog::slotRegisterSuccess()
+{
 	m_state.remove(LogInStateFlag::WorkerRunning);
 	if (m_isSSOLogin)
 	{
@@ -577,7 +645,8 @@ void LogInDialog::slotRegisterSuccess() {
 	this->setControlsEnabled(true);
 }
 
-void LogInDialog::slotChangePasswordSuccess() {
+void LogInDialog::slotChangePasswordSuccess()
+{
 	m_state.remove(LogInStateFlag::WorkerRunning);
 
 	QMessageBox msgBox(QMessageBox::Information, "Change Password", "The password was updated successfully.", QMessageBox::Ok);
@@ -585,21 +654,24 @@ void LogInDialog::slotChangePasswordSuccess() {
 
 	m_passwordNew->setText(QString());
 	m_passwordConfirm->setText(QString());
-	
+
 	this->slotToggleChangePasswordMode();
 	this->setControlsEnabled(true);
 }
 
-void LogInDialog::slotWorkerError(WorkerError _error) {
+void LogInDialog::slotWorkerError(WorkerError _error)
+{
 	m_state.remove(LogInStateFlag::WorkerRunning);
 
 	// Create error message
 	QString msg;
 
-	if (m_state.has(LogInStateFlag::RegisterMode)) {
+	if (m_state.has(LogInStateFlag::RegisterMode))
+	{
 		msg = "Registration failed:\n";
 	}
-	else {
+	else
+	{
 		msg = "Login failed:\n";
 	}
 
@@ -607,7 +679,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	if (_error == WorkerError::IncompatibleVersions)
 	{
 		msg.append("Incompatible versions of frontend and backend services.\n\n"
-				   "Do you want to update the frontend to match the backend?");
+			"Do you want to update the frontend to match the backend?");
 
 		QMessageBox msgBox(QMessageBox::Warning, "Login Error", msg, QMessageBox::Yes | QMessageBox::Cancel);
 		msgBox.setWindowIcon(ot::IconManager::getApplicationIcon());
@@ -668,7 +740,8 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 
 	// Display error message and unlock controls
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
-	if (!m_curlErrorMessage.empty()) {
+	if (!m_curlErrorMessage.empty())
+	{
 		msgBox.setDetailedText(QString::fromStdString(m_curlErrorMessage));
 	}
 	msgBox.exec();
@@ -677,7 +750,7 @@ void LogInDialog::slotWorkerError(WorkerError _error) {
 	this->setControlsEnabled(true);
 }
 
-void LogInDialog::slotWorkerCustomFeedback(const std::string& _title,const std::string& _feedback)
+void LogInDialog::slotWorkerCustomFeedback(const std::string& _title, const std::string& _feedback)
 {
 	m_state.remove(LogInStateFlag::WorkerRunning);
 
@@ -695,12 +768,14 @@ void LogInDialog::slotWorkerCustomFeedback(const std::string& _title,const std::
 
 // Private helper
 
-void LogInDialog::saveUserSettings() const {
+void LogInDialog::saveUserSettings() const
+{
 	OTAssert(m_loginData.isValid(), "Invalid login data");
 	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 
-	if (m_savePassword->isChecked()) {
-		switch (findCurrentGssEntry().getLoginType()) 
+	if (m_savePassword->isChecked())
+	{
+		switch (findCurrentGssEntry().getLoginType())
 		{
 			// Save if username/password mode
 		case ot::LoginType::UsernamePassword:
@@ -717,7 +792,8 @@ void LogInDialog::saveUserSettings() const {
 			break;
 		}
 	}
-	else {
+	else
+	{
 		// No save: Clear existing values
 		settings->setValue("LastUsername", QString());
 		settings->setValue("LastPassword", QString());
@@ -728,11 +804,13 @@ void LogInDialog::saveUserSettings() const {
 	this->saveGSSOptions();
 }
 
-void LogInDialog::saveGSSOptions() const {
+void LogInDialog::saveGSSOptions() const
+{
 	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 
 	QJsonArray gssOptionsArr;
-	for (const LogInGSSEntry& entry : m_gssData) {
+	for (const LogInGSSEntry& entry : m_gssData)
+	{
 		QJsonObject entryObj;
 		entryObj["Name"] = entry.getName();
 		entryObj["IP"] = entry.getUrl();
@@ -745,14 +823,16 @@ void LogInDialog::saveGSSOptions() const {
 	settings->setValue("SessionServiceJSON", gssOptionsDoc.toJson(QJsonDocument::Compact));
 }
 
-void LogInDialog::editGSSEntries() {
+void LogInDialog::editGSSEntries()
+{
 	LogInGSSEditDialog dialog(m_gssData, this);
 
 	ot::Dialog::DialogResult result = dialog.showDialog();
 
 	m_gss->blockSignals(true);
 
-	if (result == ot::Dialog::Ok) {
+	if (result == ot::Dialog::Ok)
+	{
 		m_gssData = dialog.getEntries();
 		this->updateGssOptions();
 		this->saveGSSOptions();
@@ -762,96 +842,118 @@ void LogInDialog::editGSSEntries() {
 	m_gss->blockSignals(false);
 }
 
-LogInGSSEntry LogInDialog::findCurrentGssEntry() const {
+LogInGSSEntry LogInDialog::findCurrentGssEntry() const
+{
 	int index = m_gss->currentIndex();
-	if (index < 0 || index >= m_gssData.size()) {
+	if (index < 0 || index >= m_gssData.size())
+	{
 		return LogInGSSEntry();
 	}
-	else {
+	else
+	{
 		return m_gssData[index];
 	}
 }
 
-void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings) {
+void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings)
+{
 	QString lastSessionServiceName = _settings->value("SessionServiceURL", "").toString();
 	QByteArray sessionServiceJSON = _settings->value("SessionServiceJSON", QByteArray()).toByteArray();
 	int newCurrentIndex = -1;
 	int counter = 0;
 
 	QStringList gssOptions;
-	if (!sessionServiceJSON.isEmpty()) {
+	if (!sessionServiceJSON.isEmpty())
+	{
 		QJsonDocument doc = QJsonDocument::fromJson(sessionServiceJSON);
-		if (doc.isArray()) {
+		if (doc.isArray())
+		{
 			QJsonArray arr = doc.array();
-			for (int i = 0; i < arr.count(); i++) {
-				if (!arr[i].isObject()) {
+			for (int i = 0; i < arr.count(); i++)
+			{
+				if (!arr[i].isObject())
+				{
 					OT_LOG_E("GSS data entry is not an object");
 					continue;
 				}
 				QJsonObject obj = arr[i].toObject();
-				if (!obj.contains("Name")) {
+				if (!obj.contains("Name"))
+				{
 					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
-				if (!obj.contains("IP")) {
+				if (!obj.contains("IP"))
+				{
 					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
-				if (!obj.contains("Port")) {
+				if (!obj.contains("Port"))
+				{
 					OT_LOG_E("JSON member \"Name\" is missing");
 					continue;
 				}
-				if (!obj["Name"].isString()) {
+				if (!obj["Name"].isString())
+				{
 					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
-				if (!obj["IP"].isString()) {
+				if (!obj["IP"].isString())
+				{
 					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
-				if (!obj["Port"].isString()) {
+				if (!obj["Port"].isString())
+				{
 					OT_LOG_E("JSON member \"Name\" is not a string");
 					continue;
 				}
 
 				LogInGSSEntry newEntry(obj["Name"].toString(), obj["IP"].toString(), obj["Port"].toString());
-				if (obj.contains("ConType")) {
+				if (obj.contains("ConType"))
+				{
 					newEntry.setLoginType(ot::stringToLoginType(obj["ConType"].toString().toStdString()));
 				}
 				m_gssData.push_back(newEntry);
 
-				if (newEntry.getName() == lastSessionServiceName) {
+				if (newEntry.getName() == lastSessionServiceName)
+				{
 					newCurrentIndex = counter;
 				}
 
 				counter++;
 			}
 		}
-		else {
+		else
+		{
 			OT_LOG_E("SessionService list is not a JSON array");
 		}
 	}
 
 	this->updateGssOptions();
 
-	if (newCurrentIndex >= 0) {
+	if (newCurrentIndex >= 0)
+	{
 		m_gss->setCurrentIndex(newCurrentIndex);
 	}
-	else if (counter >= 0) {
+	else if (counter >= 0)
+	{
 		m_gss->setCurrentIndex(0);
 	}
 }
 
-void LogInDialog::updateGssOptions() {
+void LogInDialog::updateGssOptions()
+{
 	QStringList options;
-	for (const LogInGSSEntry& entry : m_gssData) {
+	for (const LogInGSSEntry& entry : m_gssData)
+	{
 		options.append(entry.getDisplayText());
 	}
-	
-	if (options.isEmpty()) {
+
+	if (options.isEmpty())
+	{
 		options.append(QString());
 	}
-	
+
 	options.append(EDIT_GSS_TEXT);
 
 	m_gss->clear();
@@ -859,14 +961,16 @@ void LogInDialog::updateGssOptions() {
 }
 
 
-void LogInDialog::setControlsForUsernamePassword() {
+void LogInDialog::setControlsForUsernamePassword()
+{
 	m_isSSOLogin = false;
 	m_logInButton->setHidden(false);
 	m_registerButton->setHidden(true);
 	m_savePassword->setHidden(false);
 
 	m_username->setReadOnly(false);
-	if (m_state.has(LogInStateFlag::SSOMode)) {
+	if (m_state.has(LogInStateFlag::SSOMode))
+	{
 		m_username->setText(m_userNameTmp);
 		m_logInButton->setText("Login");
 		resize(width(), m_maxDefaultHeight);
@@ -884,7 +988,8 @@ void LogInDialog::setControlsForUsernamePassword() {
 	m_state.remove(LogInStateFlag::RegisterMode);
 }
 
-void LogInDialog::setControlsForRegister() {
+void LogInDialog::setControlsForRegister()
+{
 	m_logInButton->setHidden(true);
 	m_registerButton->setHidden(false);
 	m_savePassword->setHidden(true);
@@ -899,24 +1004,28 @@ void LogInDialog::setControlsForRegister() {
 
 	m_state.set(LogInStateFlag::RegisterMode);
 
-	if (m_state.has(LogInStateFlag::RestoredPassword)) {
+	if (m_state.has(LogInStateFlag::RestoredPassword))
+	{
 		QSignalBlocker textBlock(m_password);
 		m_password->setText(QString());
 	}
 }
 
-void LogInDialog::setControlsForChangePassword() {
+void LogInDialog::setControlsForChangePassword()
+{
 	OT_LOG_W("Not implemented yet");
 }
 
-void LogInDialog::setControlsForSSO(bool _resize) {
+void LogInDialog::setControlsForSSO(bool _resize)
+{
 	m_isSSOLogin = true;
 	m_logInButton->setHidden(false);
 	m_registerButton->setHidden(true);
 
 	m_usernameLabel->setHidden(true);
 	m_savePassword->setHidden(true);
-	if (!m_state.has(LogInStateFlag::SSOMode)) {
+	if (!m_state.has(LogInStateFlag::SSOMode))
+	{
 		m_userNameTmp = m_username->text();
 		m_logInButton->setText("Login with Systems Account");
 		m_state.set(LogInStateFlag::SSOMode);
@@ -928,7 +1037,7 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 		resize(currentWidgetWidth, m_maxSSOHeight);
 	}
 	m_username->setHidden(true);
-	
+
 	m_password->setHidden(true);
 	m_passwordLabel->setHidden(true);
 	m_passwordConfirm->setHidden(true);
@@ -944,24 +1053,28 @@ void LogInDialog::setControlsForSSO(bool _resize) {
 
 // Async worker
 
-void LogInDialog::stopWorkerWithError(WorkerError _error) {
+void LogInDialog::stopWorkerWithError(WorkerError _error)
+{
 	QMetaObject::invokeMethod(this, &LogInDialog::slotWorkerError, Qt::QueuedConnection, _error);
 }
 
-void LogInDialog::loginWorkerStart() {
+void LogInDialog::loginWorkerStart()
+{
 	WorkerError currentError = WorkerError::NoError;
 
 	// Check the version compatiblity
 	currentError = this->workerCheckVersionCompatibility();
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
-	
+
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
@@ -971,7 +1084,8 @@ void LogInDialog::loginWorkerStart() {
 	UserManagement userManager;
 	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
 	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
-	if (!userManager.checkConnectionAuthorizationService()) {
+	if (!userManager.checkConnectionAuthorizationService())
+	{
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
 		return;
@@ -979,19 +1093,21 @@ void LogInDialog::loginWorkerStart() {
 
 	// Attempt to log in the user
 	std::string customTitle, customMsg;
-	currentError = this->workerLogin(userManager,customTitle, customMsg);
+	currentError = this->workerLogin(userManager, customTitle, customMsg);
 	if (currentError == WorkerError::NoError_CustomFeedback)
 	{
 		QMetaObject::invokeMethod(this, &LogInDialog::slotWorkerCustomFeedback, Qt::QueuedConnection, customTitle, customMsg);
 		return;
 	}
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(currentError);
 		return;
 	}
 
-	if (!m_loginData.isValid()) {
+	if (!m_loginData.isValid())
+	{
 		m_curlErrorMessage = ot::msg::getLastError();
 		this->stopWorkerWithError(WorkerError::InvalidData);
 		return;
@@ -1000,12 +1116,14 @@ void LogInDialog::loginWorkerStart() {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotLogInSuccess, Qt::QueuedConnection);
 }
 
-void LogInDialog::registerWorkerStart() {
+void LogInDialog::registerWorkerStart()
+{
 	WorkerError currentError = WorkerError::NoError;
 
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -1014,13 +1132,15 @@ void LogInDialog::registerWorkerStart() {
 	UserManagement userManager;
 	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
 	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
-	if (!userManager.checkConnectionAuthorizationService()) {
+	if (!userManager.checkConnectionAuthorizationService())
+	{
 		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
 		return;
 	}
 
 	currentError = workerRegister(userManager);
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -1030,12 +1150,14 @@ void LogInDialog::registerWorkerStart() {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotRegisterSuccess, Qt::QueuedConnection);
 }
 
-void LogInDialog::changePasswordWorkerStart() {
+void LogInDialog::changePasswordWorkerStart()
+{
 	WorkerError currentError = WorkerError::NoError;
 
 	// Get data from GSS
 	currentError = this->workerConnectToGSS();
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -1044,13 +1166,15 @@ void LogInDialog::changePasswordWorkerStart() {
 	UserManagement userManager;
 	userManager.setAuthServerURL(m_loginData.getAuthorizationUrl());
 	userManager.setDatabaseURL(m_loginData.getDatabaseUrl());
-	if (!userManager.checkConnectionAuthorizationService()) {
+	if (!userManager.checkConnectionAuthorizationService())
+	{
 		this->stopWorkerWithError(WorkerError::AuthorizationConnetionFailed);
 		return;
 	}
 
 	currentError = workerChangePassword(userManager);
-	if (currentError != WorkerError::NoError) {
+	if (currentError != WorkerError::NoError)
+	{
 		this->stopWorkerWithError(currentError);
 		return;
 	}
@@ -1060,12 +1184,14 @@ void LogInDialog::changePasswordWorkerStart() {
 	QMetaObject::invokeMethod(this, &LogInDialog::slotChangePasswordSuccess, Qt::QueuedConnection);
 }
 
-LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility() {
+LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility()
+{
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetBuildInformation, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
-	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	{
 		return WorkerError::GSSConnectionFailed;
 	}
 
@@ -1082,53 +1208,65 @@ LogInDialog::WorkerError LogInDialog::workerCheckVersionCompatibility() {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
+LogInDialog::WorkerError LogInDialog::workerConnectToGSS()
+{
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_GetGlobalServicesUrl, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_MESSAGE, ot::JsonString(OT_INFO_MESSAGE_LogIn, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string responseStr;
-	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+	if (!ot::msg::send("", m_loginData.getGss().getConnectionUrl().toStdString(), ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	{
 		return WorkerError::GSSConnectionFailed;
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-	if (!response.isOk()) {
+	if (!response.isOk())
+	{
 		return WorkerError::InvalidGssResponse;
 	}
-	
+
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response.getWhat());
 
-	if (!responseDoc.IsObject()) {
+	if (!responseDoc.IsObject())
+	{
 		return WorkerError::InvalidGssResponseSyntax;
 	}
-	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_DBURL)) {
+	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_DBURL))
+	{
 		return WorkerError::InvalidGssResponseSyntax;
 	}
-	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_AUTHURL)) {
+	if (!responseDoc.HasMember(OT_ACTION_PARAM_SERVICE_AUTHURL))
+	{
 		return WorkerError::InvalidGssResponseSyntax;
 	}
-	if (!responseDoc[OT_ACTION_PARAM_SERVICE_DBURL].IsString()) {
+	if (!responseDoc[OT_ACTION_PARAM_SERVICE_DBURL].IsString())
+	{
 		return WorkerError::InvalidGssResponseSyntax;
 	}
-	if (!responseDoc[OT_ACTION_PARAM_SERVICE_AUTHURL].IsString()) {
+	if (!responseDoc[OT_ACTION_PARAM_SERVICE_AUTHURL].IsString())
+	{
 		return WorkerError::InvalidGssResponseSyntax;
 	}
 
 	m_loginData.setDatabaseUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_DBURL));
 	m_loginData.setAuthorizationUrl(ot::json::getString(responseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
 
-	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl)) {
-		if (!responseDoc[OT_ACTION_PARAM_GlobalLoggerUrl].IsString()) {
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLoggerUrl))
+	{
+		if (!responseDoc[OT_ACTION_PARAM_GlobalLoggerUrl].IsString())
+		{
 			return WorkerError::InvalidGssResponseSyntax;
 		}
 
 		ot::ServiceLogNotifier::instance().setLoggingServiceURL(ot::json::getString(responseDoc, OT_ACTION_PARAM_GlobalLoggerUrl));
 	}
 
-	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags)) {
-		if (!responseDoc[OT_ACTION_PARAM_GlobalLogFlags].IsArray()) {
+	if (responseDoc.HasMember(OT_ACTION_PARAM_GlobalLogFlags))
+	{
+		if (!responseDoc[OT_ACTION_PARAM_GlobalLogFlags].IsArray())
+		{
 			return WorkerError::InvalidGssResponseSyntax;
 		}
 
@@ -1139,30 +1277,35 @@ LogInDialog::WorkerError LogInDialog::workerConnectToGSS() {
 	return WorkerError::NoError;
 }
 
-LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg) {
-	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO) 
+LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)
+{
+	if (findCurrentGssEntry().getLoginType() == ot::LoginType::SSO)
 	{
 		return this->workerLoginSSO(_userManager, _customTitle, _customMsg);
 	}
-	else {
+	else
+	{
 		return this->workerLoginUsernamePassword(_userManager);
 	}
 }
 
-LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserManagement& _userManager) {
+LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserManagement& _userManager)
+{
 	// Check the username, password combination
 	std::string sessionUser, sessionPassword, validEncryptedPassword;
 
 	std::string currentPassword = m_password->text().toStdString();
 	bool isCurrentPasswordEncrypted = false;
 
-	if (m_state.has(LogInStateFlag::RestoredPassword)) {
+	if (m_state.has(LogInStateFlag::RestoredPassword))
+	{
 		currentPassword = m_restoredPassword.toStdString();
 		isCurrentPasswordEncrypted = true;
 	}
 
 	std::string currentUserName = m_username->text().toStdString();
-	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validEncryptedPassword)) {
+	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validEncryptedPassword))
+	{
 		return WorkerError::InvalidCreadentials;
 	}
 
@@ -1171,7 +1314,8 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	m_loginData.setSessionUser(sessionUser);
 	m_loginData.setSessionPassword(sessionPassword);
 
-	if (!_userManager.checkConnectionDataBase(m_loginData.getSessionUser(), m_loginData.getSessionPassword())) {
+	if (!_userManager.checkConnectionDataBase(m_loginData.getSessionUser(), m_loginData.getSessionPassword()))
+	{
 		return WorkerError::DatabaseConnectionFailed;
 	}
 
@@ -1181,7 +1325,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 
 
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)
-{		
+{
 	m_loginData.setAuthorizationUrl(_userManager.getAuthorisationServerURL());
 
 	std::optional<std::string> errorMessage = ot::Authentication::loginSSO(m_loginData, _customTitle, _customMsg);
@@ -1200,7 +1344,8 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 	}
 }
 
-LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager) {
+LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _userManager)
+{
 	if (!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
 	{
 		return WorkerError::FailedToRegister;
@@ -1211,7 +1356,8 @@ LogInDialog::WorkerError LogInDialog::workerRegister(const UserManagement& _user
 	}
 }
 
-LogInDialog::WorkerError LogInDialog::workerChangePassword(const UserManagement& _userManager) {
+LogInDialog::WorkerError LogInDialog::workerChangePassword(const UserManagement& _userManager)
+{
 	if (true) //!_userManager.addUser(m_username->text().toStdString(), m_password->text().toStdString()))
 	{
 		return WorkerError::FailedToChangePassword;
