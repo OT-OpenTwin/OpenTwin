@@ -41,7 +41,9 @@ public:
 	QStringList createCommandLineArgs() const;
 
 	//! @brief Create a URL with the current data.
-	QString createUrl() const;
+	QString createFrontendUrlLink() const;
+
+	QString createShareLink() const;
 
 	void clear();
 
@@ -94,6 +96,13 @@ private:
 	QString toString(ArgumentKey _key) const;
 	QString toUrl(ArgumentKey _key) const;
 	QString toCommandLine(ArgumentKey _key) const;
+
+	static QString shareBackendScheme() { return "https"; };
+	static QString shareBackendEndpoint() { return "/open"; };
+	static QString shareBackendArgumentsKey() { return "uri"; };
+
+	static QString shareFrontendScheme() { return "opentwin"; };
+	static QString shareFrontendHost() { return "run"; };
 
 	bool m_debug = false;
 	bool m_checkGraphics = false;

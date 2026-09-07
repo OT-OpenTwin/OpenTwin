@@ -18,6 +18,7 @@
 // @otlicense-end
 
 // Frontend header
+#include "AppBase.h"
 #include "Helper/StartArgumentParser.h"
 
 // OpenTwin header
@@ -103,51 +104,97 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 	return args;
 }
 
-QString StartArgumentParser::createUrl() const
+QString StartArgumentParser::createFrontendUrlLink() const
 {
-	QStringList queryItems;
+	QUrlQuery query;
 
 	if (m_debug)
 	{
-		queryItems << toUrl(ArgumentKey::Debug);
+		query.addQueryItem(toUrl(ArgumentKey::Debug), QString());
 	}
 
 	if (m_checkGraphics)
 	{
-		queryItems << toUrl(ArgumentKey::CheckGraphics);
+		query.addQueryItem(toUrl(ArgumentKey::CheckGraphics), QString());
 	}
 
 	if (m_logInDataSet)
 	{
-		OT_LOG_E("Login data cannot be included in the URL for security reasons.");
+		OT_LOG_E("Login data provided in URL");
 	}
 
 	if (m_autoLogin)
 	{
-		queryItems << toUrl(ArgumentKey::AutoLogIn);
+		query.addQueryItem(toUrl(ArgumentKey::AutoLogIn), QString());
 	}
 
 	if (m_openProject)
 	{
-		ot::JsonDocument doc;
-		m_projectInfo.addToJsonObject(doc, doc.GetAllocator());
-
-		std::string encoded = ot::String::toBase64Url(doc.toJson());
-
-		queryItems << toUrl(ArgumentKey::OpenProject) + "=" + QString::fromStdString(encoded);
+		query.addQueryItem(toUrl(ArgumentKey::OpenProject), QString::fromStdString(m_projectInfo.getProjectName()));
 
 		if (!m_projectVersion.empty())
 		{
-			queryItems << toUrl(ArgumentKey::ProjectVersion) + "=" + QString::fromStdString(m_projectVersion);
+			query.addQueryItem(toUrl(ArgumentKey::ProjectVersion), QString::fromStdString(m_projectVersion));
 		}
 	}
 
 	if (!m_scriptFile.isEmpty())
 	{
-		queryItems << toUrl(ArgumentKey::ScriptFile) + "=" + QString::fromUtf8(QUrl::toPercentEncoding(m_scriptFile));
+		query.addQueryItem(toUrl(ArgumentKey::ScriptFile), m_scriptFile);
 	}
 
-	return "opentwin://?" + queryItems.join("&");
+	QUrl url;
+	url.setScheme(shareFrontendScheme());
+	url.setHost(shareFrontendHost());
+	url.setQuery(query);
+
+	return url.toString(QUrl::FullyEncoded);
+}
+
+QString StartArgumentParser::createShareLink() const
+{
+	QString frontendLink = createFrontendUrlLink();
+
+	if (frontendLink.isEmpty())
+	{
+		OT_LOG_E("No arguments to create share link");
+		return QString();
+	}
+
+	AppBase* app = AppBase::instance();
+	OTAssertNullptr(app);
+	
+	const auto& loginData = app->getCurrentLoginData();
+	const auto& gss = loginData.getGss();
+	QString gssUrl = gss.getUrl();
+	if (gssUrl.isEmpty())
+	{
+		OT_LOG_E("No GSS URL provided");
+		return QString();
+	}
+	if (gssUrl == "localhost")
+	{
+		gssUrl = "127.0.0.1";
+	}
+	
+	QUrl gssEndpoint;
+	gssEndpoint.setScheme(shareBackendScheme());
+	gssEndpoint.setHost(gssUrl);
+	bool ok = false;
+	gssEndpoint.setPort(gss.getPort().toInt(&ok));
+	if (!ok)
+	{
+		OT_LOG_E("Invalid GSS port: " + gss.getPort().toStdString());
+		return QString();
+	}
+	gssEndpoint.setPath(shareBackendEndpoint());
+
+	QUrlQuery query;
+	query.addQueryItem(shareBackendArgumentsKey(), frontendLink);
+
+	gssEndpoint.setQuery(query);
+
+	return gssEndpoint.toString(QUrl::FullyEncoded);
 }
 
 void StartArgumentParser::clear()
@@ -211,6 +258,7 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 		return false;
 	}
 
+	// Auto login
 	if (query.hasQueryItem(toUrl(ArgumentKey::AutoLogIn)))
 	{
 		m_autoLogin = true;
@@ -219,32 +267,16 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 	// Open project
 	if (query.hasQueryItem(toUrl(ArgumentKey::OpenProject)))
 	{
-		const QString projectDataStr = query.queryItemValue(toUrl(ArgumentKey::OpenProject));
+		const QString projectName = query.queryItemValue(toUrl(ArgumentKey::OpenProject));
 
-		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
-		if (decoded.empty())
-		{
-			OT_LOG_E("Open project option set but no data provided");
-			return false;
-		}
-
-		ot::JsonDocument doc;
-		if (!doc.fromJson(decoded))
-		{
-			OT_LOG_E("Failed to parse project data from URL");
-			return false;
-		}
-
-		m_projectInfo.setFromJsonObject(doc.getConstObject());
+		m_projectInfo = ot::ProjectInformation();
+		m_projectInfo.setProjectName(projectName.toStdString());
 		m_openProject = true;
 
-		// Project version only has meaning together with an open-project
-		// argument, just like in parseCommandLine().
+		// Project version
 		if (query.hasQueryItem(toUrl(ArgumentKey::ProjectVersion)))
 		{
-			m_projectVersion = query.queryItemValue(
-				toUrl(ArgumentKey::ProjectVersion)
-			).toStdString();
+			m_projectVersion = query.queryItemValue(toUrl(ArgumentKey::ProjectVersion)).toStdString();
 		}
 	}
 

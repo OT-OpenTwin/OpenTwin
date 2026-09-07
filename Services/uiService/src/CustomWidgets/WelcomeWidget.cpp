@@ -266,7 +266,13 @@ void WelcomeWidget::slotCreateShareLink()
 	parser.setProjectInfo(project);
 	parser.setAutoLogin();
 
-	QString url = parser.createUrl();
+	QString url = parser.createShareLink();
+	if (url.isEmpty())
+	{
+		OT_LOG_E("Failed to create share link.");
+		return;
+	}
+
 	QClipboard* clipboard = QApplication::clipboard();
 	if (clipboard == nullptr)
 	{
