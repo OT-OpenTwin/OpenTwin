@@ -297,38 +297,38 @@ bool StartArgumentParser::parseCommandLine()
 	parser.addHelpOption();
 
 	// Define command line options
-	QCommandLineOption debugOption(toCommandLine(ArgumentKey::Debug), "Run test code.");
+	QCommandLineOption debugOption(toString(ArgumentKey::Debug), "Run test code.");
 	parser.addOption(debugOption);
 
-	QCommandLineOption checkGraphicsOption({ toCommandLine(ArgumentKey::CheckGraphicsShort), toCommandLine(ArgumentKey::CheckGraphics) }, "Check the graphics settings.");
+	QCommandLineOption checkGraphicsOption({ toString(ArgumentKey::CheckGraphicsShort), toString(ArgumentKey::CheckGraphics) }, "Check the graphics settings.");
 	parser.addOption(checkGraphicsOption);
 
 	QCommandLineOption loginOption(
-		toCommandLine(ArgumentKey::LogInData),
+		toString(ArgumentKey::LogInData),
 		"Login with JSON data.",
 		"string");
 	parser.addOption(loginOption);
 
 	QCommandLineOption autoLoginOption(
-		toCommandLine(ArgumentKey::AutoLogIn),
+		toString(ArgumentKey::AutoLogIn),
 		"Attempt to log in automatically using the initial login data."
 	);
 	parser.addOption(autoLoginOption);
 
 	QCommandLineOption openProjectOption(
-		toCommandLine(ArgumentKey::OpenProject),
+		toString(ArgumentKey::OpenProject),
 		"Open project with JSON data.",
 		"string");
 	parser.addOption(openProjectOption);
 
 	QCommandLineOption projectVersionOption(
-		toCommandLine(ArgumentKey::ProjectVersion),
+		toString(ArgumentKey::ProjectVersion),
 		"Specify the project version to open.",
 		"string");
 	parser.addOption(projectVersionOption);
 
 	QCommandLineOption scriptFileOption(
-		toCommandLine(ArgumentKey::ScriptFile),
+		toString(ArgumentKey::ScriptFile),
 		"Execute the specified script file after initialization.",
 		"string");
 	parser.addOption(scriptFileOption);
