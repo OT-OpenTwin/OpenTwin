@@ -731,7 +731,7 @@ void FDTDSolver::addMicrostripPorts(std::stringstream& runCommand)
 		bool portToShortError = false;
 		bool pmlBoundaryMissing = false;
 
-		double feedRatio = 0.25;
+		double feedRatio = 0.5;
 		double measurementRatio = 0.75;
 
 		// If the up direction points into the positive coordinate direction, the start is at the upper coordinate bound
@@ -2705,10 +2705,8 @@ void FDTDSolver::findPortRange(
 		}
 	}
 
-	if (position < gridLines.front() || position > gridLines.back())
-	{
-		throw std::string("The port position is outside the grid.");
-	}
+	if (position < gridLines.front()) position = gridLines.front();
+	if (position > gridLines.back()) position = gridLines.back();
 
 	const auto isPML = [](const std::string& boundary)
 		{
