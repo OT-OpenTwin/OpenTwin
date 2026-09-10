@@ -176,15 +176,18 @@ void WeldedMesh::computeVertexNormals()
         vector3 e1 = p1 - p0;
         vector3 e2 = p2 - p0;
 
-        // Area-weighted face normal.
-        // This must point outward.
         vector3 faceNormal = e1.cross(e2);
+
+        // Normalize first so that every triangle contributes
+        // independently of its surface area.
+        faceNormal.normalize();
 
         m_vertexNormals[i0] += faceNormal;
         m_vertexNormals[i1] += faceNormal;
         m_vertexNormals[i2] += faceNormal;
     }
 
+    // Normalize the averaged vertex normals.
     for (vector3& n : m_vertexNormals)
     {
         n.normalize();
