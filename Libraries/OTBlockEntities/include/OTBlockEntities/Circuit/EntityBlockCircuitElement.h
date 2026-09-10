@@ -30,6 +30,7 @@ public:
 	virtual std::string getTypeAbbreviation() = 0;
 	virtual std::string getFolderName() = 0;
 	virtual bool updateFromProperties(void) override;
+	virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) override;
 
 	virtual ot::EntityName::NamingBehavior getNamingBehavior() const override;
 	virtual std::string getCircuitModel();

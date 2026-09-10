@@ -228,7 +228,7 @@ void FileHandler::showExportDialog(const std::string& _title, const std::string&
 	}
 
 	gridConfig.addRootGroup(pythonScriptGroup);
-	//gridConfig.addRootGroup(circuitModelGroup);
+	gridConfig.addRootGroup(circuitModelGroup);
 	dialogConfig.setGridConfig(gridConfig);
 
 	ot::JsonDocument doc;
@@ -1656,8 +1656,14 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 				std::string newAdditionalInfosStr = ot::json::toJson(newAdditionalInfosClean);
 				std::string existingAdditionalInfosStr = ot::json::toJson(existingAdditionalInfosClean);
 
-				// Only consider metadata changed if MetaData or AdditionalInfos differ
-				metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr);
+				// Check if essential dynamic fields are missing on disk
+				bool missingDynamicFields = !existingMetaDoc.HasMember("LibraryElementID") ||
+											!existingMetaDoc.HasMember("Version") ||
+											!existingMetaDoc.HasMember("Name") ||
+											!existingMetaDoc.HasMember("FileName");
+
+				// Only consider metadata changed if MetaData, AdditionalInfos differ, or essential fields are missing
+				metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr) || missingDynamicFields;
 			}
 			catch (const std::exception& _e)
 			{

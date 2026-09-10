@@ -102,11 +102,16 @@ std::shared_ptr<EntityFileText> NGSpice::getModelEntity(const std::string& _fold
 std::string NGSpice::getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity) {
 	if (_circuitModelEntity != nullptr) {
 		auto propertyBase = _circuitModelEntity->getProperties().getProperty("ModelType");
-		auto circuitModelType = dynamic_cast<EntityPropertiesString*>(propertyBase);
-		return circuitModelType->getValue();
+		if (propertyBase) {
+			auto circuitModelType = dynamic_cast<EntityPropertiesString*>(propertyBase);
+			if (circuitModelType) {
+				return circuitModelType->getValue();
+			}
+		}
+		return "";
 	}
 
-	OT_LOG_E("No Circuit model type found: " + _circuitModelEntity->getClassName() + " is null");
+	OT_LOG_E("No Circuit model type found: EntityFileText is null");
 	return "";
 }
 

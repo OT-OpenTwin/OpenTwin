@@ -36,9 +36,8 @@ void EntityBlockCircuitElement::createProperties()
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Horizontal", false, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Vertical", false, "default", getProperties());
-	/*EntityPropertiesSelection::createProperty("Model-Properties", "ModelSelection", { "LoadFromLibrary",""}, "", "default", getProperties());*/
-	//EntityPropertiesExtendedEntityList* selProp = EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, "default", getProperties());
-	//selProp->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
+	EntityPropertiesExtendedEntityList* selProp = EntityPropertiesExtendedEntityList::createProperty("Model-Properties", "ModelSelection", ot::FolderNames::CircuitModelsFolder + "/" + getFolderName(), ot::invalidUID, "", -1, "default", getProperties());
+	selProp->addPrefixOption("< Load from Library >", ot::PropertyBase::ValueHandlingType::Action);
 }
 
 bool EntityBlockCircuitElement::updateFromProperties(void) {
@@ -46,36 +45,44 @@ bool EntityBlockCircuitElement::updateFromProperties(void) {
 	auto flipHProperty = getProperties().getProperty("Flip Horizontal");
 	auto flipVProperty = getProperties().getProperty("Flip Vertical");
 
-	if (rotationProperty->needsUpdate() || flipHProperty->needsUpdate() || flipVProperty->needsUpdate()) {
+	if (rotationProperty->needsUpdate() || flipHProperty->needsUpdate() || flipVProperty->needsUpdate()) 
+	{
 		createBlockItem();
 	}
-
-	// Check if LoadFromLibrary was selected
-	auto basePropertyModel = getProperties().getProperty("ModelSelection");
-	if (basePropertyModel) {
-		auto modelProperty = dynamic_cast<EntityPropertiesExtendedEntityList*>(basePropertyModel);
-		if (modelProperty == nullptr) {
-			OT_LOG_E("Model selection property cast failed");
-			return false;
-		}
-		
-		if (modelProperty->getValueName() == "< Load from Library >") {
-
-		ot::LibraryElementSelectionCfg config;
-		config.setRequestingEntityID(this->getEntityID());
-		config.setCollectionName(this->getCollectionType());
-		config.addAditionalInfoFilter("ElementType", getFolderName());
-		config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
-		config.setEntityType(EntityFileText::className());
-		config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
-		config.setPropertyName("ModelSelection");
-
-		// if it was selected use observer to send message to LMS
-		getObserver()->requestConfigForModelDialog(config);
-		}
-	}
+	
+	getProperties().forceResetUpdateForAllProperties();
 
 	return true;
+}
+
+void EntityBlockCircuitElement::nonValuePropertyValueSelected(const EntityPropertiesBase* _property)
+{
+	OTAssertNullptr(getObserver());
+
+	if (_property->getName() == "ModelSelection")
+	{
+		const EntityPropertiesExtendedEntityList* actualProperty = dynamic_cast<const EntityPropertiesExtendedEntityList*>(_property);
+		if (!actualProperty)
+		{
+			OT_LOG_E("Property is not of type EntityPropertiesExtendedEntityList");
+			return;
+		}
+
+		if (actualProperty->getValueName() == "< Load from Library >")
+		{
+			ot::LibraryElementSelectionCfg config;
+			config.setRequestingEntityID(this->getEntityID());
+			config.setCollectionName(this->getCollectionType());
+			config.addAditionalInfoFilter("ElementType", getFolderName());
+			config.setCallBackAction(OT_ACTION_CMD_LMS_CreateConfig);
+			config.setEntityType(EntityFileText::className());
+			config.setNewEntityFolder(this->getCircuitModelFolder() + "/" + this->getFolderName());
+			config.setPropertyName("ModelSelection");
+
+			// if it was selected use observer to send message to LMS
+			getObserver()->requestConfigForModelDialog(config);
+		}
+	}
 }
 
 ot::EntityName::NamingBehavior EntityBlockCircuitElement::getNamingBehavior() const {

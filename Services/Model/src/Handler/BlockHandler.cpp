@@ -1140,6 +1140,12 @@ std::unique_ptr<ot::EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsS
 		pythonBlock->setScriptFolder(scriptFolder->getEntityID());
 		pythonBlock->setManifestFolder(manifestFolder->getEntityID());
 	}
+	else if (EntityBlockCircuitElement* circuitElement = dynamic_cast<EntityBlockCircuitElement*>(blockEnt.get())) {
+		EntityBase* circuitModelsFolder = model->findEntityFromName(ot::FolderNames::CircuitModelsFolder + "/" + circuitElement->getFolderName());
+		if (circuitModelsFolder != nullptr) {
+			circuitElement->setCircuitModelFolder(circuitModelsFolder->getEntityID());
+		}
+	}
 
 
 	// Store block entity
