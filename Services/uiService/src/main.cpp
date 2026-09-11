@@ -103,7 +103,7 @@ namespace ot::intern
 #endif
 }
 
-void initializeLogging(void) {
+void initializeLogging() {
 	// Get logging URL
 	std::string loggingenv = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL");
 
@@ -133,10 +133,29 @@ QApplication* initializeQt(int &_argc, char* _argv[]) {
 	
 	ot::GlobalColorStyle::instance().setApplication(newApp);
 
+	if (ot::LogDispatcher::mayLog(ot::LogFlag::DETAILED_LOG))
+	{
+		ot::LogMessageStream argumentsLog(__FUNCTION__, ot::LogFlags(ot::LogFlag::DETAILED_LOG));
+		argumentsLog << "Start arguments: ";
+		if (_argc == 0)
+		{
+			argumentsLog << "<empty>";
+		}
+		else
+		{
+			for (int i = 0; i < _argc; i++)
+			{
+				argumentsLog << "\n[" << i << "]: " << std::string(_argv[i]);
+			}
+			ot::LogDispatcher::instance().dispatch(argumentsLog);
+		}
+	}
+	
+
 	return newApp;
 }
 
-void initializeAppBase(void) {
+void initializeAppBase() {
 	AppBase* app = AppBase::instance();
 	app->setSiteID(0);
 }
@@ -302,7 +321,7 @@ int main(int _argc, char *_argv[])
 		initializeLogging();
 
 		QApplication* app = initializeQt(_argc, _argv);
-
+		
 		StartArgumentParser argsParser;
 		argsParser.parse();
 
