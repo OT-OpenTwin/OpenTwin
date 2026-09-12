@@ -260,11 +260,15 @@ void WelcomeWidget::slotCreateShareLink()
 		return;
 	}
 
+	AppBase* app = AppBase::instance();
+	const auto& loginData = app->getCurrentLoginData();
+	const auto& gss = loginData.getGss();
+
 	const ot::ProjectInformation& project = projects.front();
 
 	StartArgumentParser parser;
 	parser.setProjectInfo(project);
-	parser.setAutoLogin();
+	parser.setLoginGSS(gss);
 
 	QString url = parser.createShareLink();
 	if (url.isEmpty())

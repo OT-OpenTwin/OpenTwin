@@ -387,7 +387,7 @@ bool AppBase::logIn()
 	StartArgumentParser args;
 	if (args.parse())
 	{
-		if (args.getOpenProjectSet())
+		if (args.getProjectInfoSet())
 		{
 			std::string projName = args.getProjectInfo().getProjectName();
 			std::string projVersion = args.getProjectVersion();
@@ -2420,7 +2420,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 	}
 
 	StartArgumentParser args;
-	args.setLogInData(m_loginData);
+	args.setLoginData(m_loginData);
 	args.setProjectInfo(_projectInfo);
 	args.setProjectVersion(_customVersion);
 	//args.setDebug();

@@ -63,7 +63,7 @@ void ot::PropertyInputStringList::addPropertyInputValueToJson(ot::JsonValue& _ob
 	else
 	{
 		OTAssertNullptr(m_comboButton);
-		_object.AddMember(JsonString(_memberNameValue, _allocator), JsonString(m_comboButton->text().toStdString(), _allocator), _allocator);
+		_object.AddMember(JsonString(_memberNameValue, _allocator), JsonString(m_comboButton->getText().toStdString(), _allocator), _allocator);
 	}
 }
 
@@ -76,7 +76,7 @@ QVariant ot::PropertyInputStringList::getCurrentValue() const
 	else
 	{
 		OTAssertNullptr(m_comboButton);
-		return QVariant(m_comboButton->text());
+		return QVariant(m_comboButton->getText());
 	}
 }
 
@@ -148,7 +148,7 @@ ot::Property* ot::PropertyInputStringList::createPropertyConfiguration() const
 			newProperty->addOption(txt, type);
 		}
 
-		newProperty->setCurrent(m_comboButton->text().toStdString());
+		newProperty->setCurrent(m_comboButton->getText().toStdString());
 	}
 
 	newProperty->setCurrentValueHandlingType(m_currentValueHandlingType);
@@ -270,7 +270,7 @@ QString ot::PropertyInputStringList::getCurrentText() const
 	else
 	{
 		OTAssertNullptr(m_comboButton);
-		return m_comboButton->text();
+		return m_comboButton->getText();
 	}
 }
 
@@ -315,7 +315,7 @@ void ot::PropertyInputStringList::slotTextInputChanged()
 
 	if (m_comboButton)
 	{
-		txt = m_comboButton->text();
+		txt = m_comboButton->getText();
 
 		const auto& userData = m_comboButton->getCurrentUserData();
 		if (userData.isValid())
