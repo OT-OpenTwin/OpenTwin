@@ -632,8 +632,7 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_GET_ALL_PROJECT_INFO, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(app->getCurrentLoginData().getUserName(), doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(app->getCurrentLoginData().getUserPassword(), doc.GetAllocator()), doc.GetAllocator());
+	ot::Authentication::addAuthenticationData(AppBase::instance()->getCurrentLoginData(), doc);
 	doc.AddMember(OT_PARAM_AUTH_PROJECT_NAMES, ot::JsonArray(_projects, doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
@@ -641,6 +640,12 @@ bool ProjectManagement::readProjectsInfo(std::list<std::string>& _projects) {
 		OT_LOG_E("Failed to send request to authorization service");
 		AppBase::instance()->slotShowErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
 		exit(ot::AppExitCode::SendFailed);
+		return false;
+	}
+
+	if (hasError(response))
+	{
+		OT_LOG_E("Failed to retreive user projects");
 		return false;
 	}
 
