@@ -40,8 +40,8 @@ namespace ot {
 	class Label;
 	class CheckBox;
 	class LineEdit;
-	class ComboBox;
 	class PushButton;
+	class ComboButton;
 	class InteractiveLabel;
 }
 
@@ -49,8 +49,8 @@ class LogInDialog : public ot::Dialog {
 	Q_OBJECT
 public:
 	enum class ConfigFlag {
-		NoFlags    = 0 << 0, //! @brief Default configuration with no special flags.
-		NoRegister = 1 << 0  //! @brief Configuration flag to disable the registration option in the dialog.
+		NoFlags     = 0 << 0, //! @brief Default configuration with no special flags.
+		NoRegister  = 1 << 0  //! @brief If set, disable the registration option in the dialog.
 	};
 	typedef ot::Flags<ConfigFlag> Config;
 
@@ -66,7 +66,11 @@ public:
 	void setConfigFlag(ConfigFlag _flag, bool _enabled = true);
 	void setConfig(const Config& _cfg);
 	const Config& getConfig() const { return m_config; };
-	bool isSSOLogin() const { return m_isSSOLogin; };
+	bool hasConfigFlag(ConfigFlag _flag) const { return m_config.has(_flag); };
+
+	bool isSSOLogin() const { return m_state.has(LoginState::SSOMode); };
+	bool isGSSReadOnly() const { return m_state.has(LoginState::EnforcedGSS); };
+
 Q_SIGNALS:
 	void dialogShown();
 	void configChanged(const Config& _newConfig);
@@ -79,7 +83,8 @@ protected:
 	virtual void showEvent(QShowEvent* _event) override;
 
 private:
-	enum class LogInStateFlag {
+	enum class LoginState
+	{
 		NoState            = 0 << 0,
 		RestoredPassword   = 1 << 0,
 		WorkerRunning      = 1 << 1,
@@ -87,10 +92,12 @@ private:
 
 		RegisterMode       = 1 << 3,
 		ChangePasswordMode = 1 << 4,
-		SSOMode            = 1 << 5
+		SSOMode            = 1 << 5,
+
+		EnforcedGSS        = 1 << 6
 	};
-	typedef ot::Flags<LogInStateFlag> LogInState;
-	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LogInStateFlag, LogInDialog::LogInState)
+	typedef ot::Flags<LoginState> LoginStateFlags;
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LoginState, LogInDialog::LoginStateFlags)
 
 	enum class WorkerError {
 		NoError,
@@ -107,12 +114,14 @@ private:
 		FailedToChangePassword
 	};
 
-	LogInState m_state;
+	LoginStateFlags m_state;
 	Config m_config;
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 	
-	ot::ComboBox* m_gss;
+	LogInGSSEntry m_enforcedGSS;
+
+	ot::ComboButton* m_gss;
 	ot::LineEdit* m_username;
 	ot::Label* m_usernameLabel;
 	ot::Label* m_passwordLabel;
@@ -171,7 +180,7 @@ private:
 	void saveGSSOptions() const;
 	void editGSSEntries();
 
-	LogInGSSEntry findCurrentGssEntry() const;
+	std::optional<LogInGSSEntry> findCurrentGssEntry() const;
 	void initializeGssData(std::shared_ptr<QSettings> _settings);
 	void updateGssOptions();
 
@@ -179,6 +188,8 @@ private:
 	void setControlsForRegister();
 	void setControlsForChangePassword();
 	void setControlsForSSO(bool _resize = false);
+
+	void enforceGSS(const LogInGSSEntry& _gss);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

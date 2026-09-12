@@ -22,16 +22,46 @@
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
 #include "OTCore/LoginTypes.h"
+#include "OTCore/Serializable.h"
 
 // Qt header
 #include <QtCore/qstring.h>
+#include <QtCore/qurlquery.h>
 
-class LogInGSSEntry {
+// std header
+#include <optional>
+ 
+class LogInGSSEntry : public ot::Serializable {
 	OT_DECL_DEFCOPY(LogInGSSEntry)
 	OT_DECL_DEFMOVE(LogInGSSEntry)
 public:
 	LogInGSSEntry() = default;
 	LogInGSSEntry(const QString& _name, const QString& _url, const QString& _port);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// JSON serialization
+
+	virtual void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const override;
+	virtual void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) override;
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Query serialization
+
+	void addToQuery(QUrlQuery& _query, bool _includeName = false) const;
+	void addToQuery(QUrlQuery& _query, const QString& _primaryKey, bool _includeName = false) const;
+
+	OT_DECL_NODISCARD std::optional<QString> readFromQuery(const QUrlQuery& _query);
+	OT_DECL_NODISCARD std::optional<QString> readFromQuery(const QUrlQuery& _query, const QString& _primaryKey);
+
+	// ###########################################################################################################################################################################################################################################################################################################################
+
+	// Setter / Getter
+
+	bool isValid(bool _nameMayBeEmpty = true) const { return (_nameMayBeEmpty || !m_name.isEmpty()) && !m_url.isEmpty() && !m_port.isEmpty(); };
+
+	void clear();
 
 	void setName(const QString& _name) { m_name = _name; };
 	const QString& getName() const { return m_name; };
@@ -47,10 +77,8 @@ public:
 
 	QString getConnectionUrl() const { return m_url + ":" + m_port; };
 
-	void clear();
-
-	bool isValid() const { return !m_name.isEmpty() && !m_url.isEmpty() && !m_port.isEmpty(); };
-
+	//! @brief Returns a string with the current name and connection information.
+	//! The format is: name (url:port (login_mode))
 	QString getDisplayText() const;
 
 private:
