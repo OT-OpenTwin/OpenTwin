@@ -276,24 +276,26 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 
 #include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "QueuingHttpRequestsRAII.h"
+#include "OTGui/Painter/StyleRefPainter2D.h"
 void ViewVisualisationHandler::handleDependencyGraphRequest()
 {
 	QueuingHttpRequestsRAII raiiUI;
 	const std::string sceneName = "Dependency Graph";
+	/*
 	ot::GraphicsNewEditorPackage editor(sceneName, sceneName);
-	editor.setPickerKey(OT_INFO_SERVICE_TYPE_MODEL);
+	
 	ot::JsonObject pckgObj;
 	
 	ot::JsonDocument document;
 	editor.addToJsonObject(pckgObj, document.GetAllocator());
 	document.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, document.GetAllocator()), document.GetAllocator());
 	document.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, document.GetAllocator());
-	Application::instance()->queuedRequestToFrontend(document);
+	Application::instance()->queuedRequestToFrontend(document);*/
 
 	ot::GraphicsHierarchicalItemBuilder builder;
 	std::list<std::string> vertexNames = { "Data file", "Series data", "Post processed" };
 	uint64_t vertexID = 0;
-	std::list<ot::Point2DD> positions = { ot::Point2DD(0., 0.), ot::Point2DD(-5, 0), ot::Point2DD(5, 0.) };
+	std::list<ot::Point2DD> positions = { ot::Point2DD(0., 0.), ot::Point2DD(-180, 0), ot::Point2DD(180, 0.) };
 	auto currentPosition = positions.begin();
 
 	/*const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
@@ -301,31 +303,59 @@ void ViewVisualisationHandler::handleDependencyGraphRequest()
 	ot::GraphicsScenePackage pckg(graphicsSceneName);
 	pckg.addItem(blockCfg);
 	pckg.setPickerKey(m_graphicsPickerKey);*/
-
+	ot::GraphicsScenePackage pckg(sceneName);
+	std::list < ot::GraphicsItemCfg*> blockCfgs;
 	for (const std::string& name : vertexNames)
 	{
 		builder.setEntityName(name);
-
+		builder.setTopText(name);
 		builder.setBackgroundShape(ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse);
-		auto blockCfg = builder.createGraphicsItem();
-		blockCfg->setUid(vertexID++);
-		blockCfg->setPosition((*currentPosition));
+		blockCfgs.push_back(builder.createGraphicsItem());
+		blockCfgs.back()->setUid(vertexID++);
+		blockCfgs.back()->setPosition((*currentPosition));
 		currentPosition++;
-		
-
-		ot::JsonDocument reqDoc;
-		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-		ot::VisualisationCfg visualisationCfg;
-		ot::JsonObject visualisationCfgJson;
-		visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-		reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
-		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-		
-		Application::instance()->queuedRequestToFrontend(reqDoc);
+		pckg.addItem(blockCfgs.back());
 	}
 
-	//ot::GraphicsConnectionCfg cfg(0, m_connectorNameOrigin, 1, m_connectorNameDestination);
+
+	auto allCfgs = blockCfgs.begin();
+	std::string originConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Right);
+	allCfgs++;
+	std::string destConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Left);
+	ot::GraphicsConnectionCfg cfg1 (0, originConnector, 1, destConnector);
+	
+	cfg1.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+	cfg1.setUid(13);
+	ot::GraphicsConnectionPackage connPkg(sceneName);
+	connPkg.addConnection(cfg1);
+
+	ot::JsonDocument reqDoc;
+	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	ot::VisualisationCfg visualisationCfg;
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
+
+	ot::JsonObject pckgObj;
+	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+	Application::instance()->queuedRequestToFrontend(reqDoc);
+
+
+	ot::JsonDocument connReqDoc;
+	connReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+	ot::VisualisationCfg v;
+	ot::JsonObject vObj;
+	v.addToJsonObject(vObj, connReqDoc.GetAllocator());
+	connReqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, vObj, connReqDoc.GetAllocator());
+
+	ot::JsonObject connPckgObj;
+	connPkg.addToJsonObject(connPckgObj, connReqDoc.GetAllocator());
+	connReqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, connPckgObj, reqDoc.GetAllocator());
+
+	Application::instance()->queuedRequestToFrontend(connReqDoc);
+
 	//ot::PenFCfg outlineCfg;
 
 	///*const EntityPropertiesGuiPainter* painterProperty = dynamic_cast<const EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
