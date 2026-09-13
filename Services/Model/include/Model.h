@@ -347,6 +347,7 @@ private:
 	ot::ToolBarButtonCfg m_createParameterButton;
 	ot::ToolBarButtonCfg m_createGroupButton;
 	ot::ToolBarButtonCfg m_datasetInfoButton;
+	ot::ToolBarButtonCfg m_showDependencyGraph;
 
 	void handleUndoLastOperation();
 	void handleRedoNextOperation();

@@ -179,6 +179,11 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_createGroupButton = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Create Group", "Default/CreateGroup");
 	m_createGroupButton.setButtonLockFlags(ot::LockType::ModelRead);
 	m_buttonHandler.connectToolBarButton(m_createGroupButton, this, &Model::handleCreateNewGroup);
+
+	m_showDependencyGraph = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Show Dependency Graph", "Default/Icon");
+	m_showDependencyGraph.setButtonLockFlags(ot::LockType::ModelRead);
+	m_buttonHandler.connectToolBarButton(m_showDependencyGraph, &Application::instance()->getVisualisationHandler(), &ViewVisualisationHandler::handleDependencyGraphRequest);
+
 }
 
 void Model::clearAll()
@@ -555,6 +560,7 @@ void Model::setupUIControls(ot::components::UiComponent* _ui)
 		_ui->addMenuButton(m_infoButton);
 		_ui->addMenuButton(m_createParameterButton);
 		_ui->addMenuButton(m_createGroupButton);
+		_ui->addMenuButton(m_showDependencyGraph);
 	}
 
 	Application::instance()->addButtons();
