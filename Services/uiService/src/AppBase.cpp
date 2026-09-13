@@ -3094,80 +3094,91 @@ void AppBase::slotGraphicsConnectionToConnectionRequested(const ot::UID& _fromIt
 
 void AppBase::slotGraphicsSelectionChanged()
 {
-	OT_UI_VIEWSEL_DBG("Graphics selection changed");
+	try
+	{
+		OT_UI_VIEWSEL_DBG("Graphics selection changed");
 
-	ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
-	if (scene == nullptr)
-	{
-		OT_LOG_E("GraphicsScene cast failed");
-		return;
-	}
-	ot::GraphicsViewView* graphicsView = nullptr;
-	for (auto& v : m_graphicsViews)
-	{
-		if (v.second->getGraphicsView() == scene->getGraphicsView())
+		ot::GraphicsScene* scene = dynamic_cast<ot::GraphicsScene*>(sender());
+		if (scene == nullptr)
 		{
-			graphicsView = v.second;
-			break;
+			OT_LOG_E("GraphicsScene cast failed");
+			return;
 		}
-	}
-
-	if (!graphicsView)
-	{
-		OT_LOG_E("Failed to determine graphics view for graphics selection event");
-		return;
-	}
-
-	ot::UIDList selectedGraphicSceneItemIDs;
-	auto selectedItems = scene->selectedItems();
-	if (selectedItems.size() == 0)
-	{
-		//return;
-	}
-
-	ot::UIDList newVisualizingEntities;
-	for (auto selectedItem : selectedItems)
-	{
-		ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
-		if (selectedGraphicsItem)
+		ot::GraphicsViewView* graphicsView = nullptr;
+		for (auto& v : m_graphicsViews)
 		{
-			if (selectedGraphicsItem->getGraphicsItemUid() != ot::invalidUID)
+			if (v.second->getGraphicsView() == scene->getGraphicsView())
 			{
-				selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
-				newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedGraphicsItem->getGraphicsItemUid()));
+				graphicsView = v.second;
+				break;
+			}
+		}
+
+		if (!graphicsView)
+		{
+			OT_LOG_E("Failed to determine graphics view for graphics selection event");
+			return;
+		}
+
+		ot::UIDList selectedGraphicSceneItemIDs;
+		auto selectedItems = scene->selectedItems();
+		if (selectedItems.size() == 0)
+		{
+			//return;
+		}
+
+		ot::UIDList newVisualizingEntities;
+		for (auto selectedItem : selectedItems)
+		{
+			ot::GraphicsItem* selectedGraphicsItem = dynamic_cast<ot::GraphicsItem*>(selectedItem);
+			if (selectedGraphicsItem)
+			{
+				if (selectedGraphicsItem->getGraphicsItemUid() != ot::invalidUID)
+				{
+					selectedGraphicSceneItemIDs.push_back(selectedGraphicsItem->getGraphicsItemUid());
+					newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedGraphicsItem->getGraphicsItemUid()));
+				}
+
+				continue;
 			}
 
-			continue;
+			ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
+			if (selectedConnection)
+			{
+				selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
+				newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedConnection->getConfiguration().getUid()));
+				continue;
+			}
+
+			OTAssert(0, "Unknown graphics element selected");
 		}
 
-		ot::GraphicsConnectionItem* selectedConnection = dynamic_cast<ot::GraphicsConnectionItem*>(selectedItem);
-		if (selectedConnection)
+
+		graphicsView->setVisualizingItems(newVisualizingEntities);
+		m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
+
 		{
-			selectedGraphicSceneItemIDs.push_back(selectedConnection->getConfiguration().getUid());
-			newVisualizingEntities.push_back(ViewerAPI::getTreeIDFromModelEntityID(selectedConnection->getConfiguration().getUid()));
-			continue;
+			QSignalBlocker sigBlock(m_projectNavigation->getTree());
+			clearNavigationTreeSelection();
+
+			for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
+			{
+				ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
+				setNavigationTreeItemSelected(treeID, true);
+			}
 		}
 
-		OTAssert(0, "Unknown graphics element selected");
+		OT_UI_VIEWSEL_DBG(">> Graphics selection change completed. Running selection handling");
+		this->runSelectionHandling(ot::SelectionOrigin::User);
 	}
-
-
-	graphicsView->setVisualizingItems(newVisualizingEntities);
-	m_navigationManager.setSelectedItems(m_projectNavigation->getTree()->selectedItems());
-
+	catch (const std::exception& _e)
 	{
-		QSignalBlocker sigBlock(m_projectNavigation->getTree());
-		clearNavigationTreeSelection();
-
-		for (ot::UID selectedSceneItemID : selectedGraphicSceneItemIDs)
-		{
-			ot::UID treeID = ViewerAPI::getTreeIDFromModelEntityID(selectedSceneItemID);
-			setNavigationTreeItemSelected(treeID, true);
-		}
+		OT_LOG_ES("Exception during selection handling: " << _e.what());
 	}
-
-	OT_UI_VIEWSEL_DBG(">> Graphics selection change completed. Running selection handling");
-	this->runSelectionHandling(ot::SelectionOrigin::User);
+	catch (...)
+	{
+		OT_LOG_E("[FATAL] Unknown error during selection handling");
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
