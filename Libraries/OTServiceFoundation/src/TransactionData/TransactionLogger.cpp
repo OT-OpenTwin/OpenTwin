@@ -15,7 +15,31 @@ void TransactionLogger::log(const std::string& _userName, TransactionType _trans
 	m_dataLakeAPI.flushQueuedData();
 }
 
-#include "OTCore/TimeFormatter.h"
+void TransactionLogger::searchEntry(TransactionType _transactionType, ot::UID _vertex)
+{
+	bsoncxx::builder::basic::document builder;
+	builder.append(bsoncxx::builder::basic::kvp("transactionType", static_cast<int>(_transactionType)));
+	
+	
+	builder.append(
+		bsoncxx::builder::basic::kvp(
+		"$or", bsoncxx::builder::basic::make_array(
+			bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("from", static_cast<int64_t>(_vertex))),
+			bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("to", static_cast<int64_t>(_vertex)))
+		)
+		)
+	);
+	mongocxx::options::find options;
+	DataStorageAPI::DataStorageResponse response = m_dataLakeAPI.searchInDataLakePartition(builder.extract(),options);
+	if (response.getSuccess())
+	{
+		std::string temp = response.getResult();
+		ot::JsonDocument doc;
+		doc.fromJson(temp);
+		auto& entries = doc["Documents"];
+	}
+}
+
 BsonViewOrValue TransactionLogger::create(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSsettings, ot::UIDList _from, ot::UIDList _to)
 {
 	auto now = std::chrono::system_clock::now();
