@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: MongoProjectFunctions.cpp
 // 
 // License:
@@ -731,11 +731,13 @@ bool MongoProjectFunctions::removeProject(Project& project, mongocxx::client& ad
 	mongocxx::collection projectFilesCollection = secondaryDb.collection(project.getCollectionName() + ".files");
 	mongocxx::collection projectChunksCollection = secondaryDb.collection(project.getCollectionName() + ".chunks");
 	mongocxx::collection projectResultsCollection = secondaryDb.collection(project.getCollectionName() + ".results");
+	mongocxx::collection projectTransactionsCollection = secondaryDb.collection(project.getCollectionName() + ".transactions");
 
 	projectDataCollection.drop();
 	projectFilesCollection.drop();
 	projectChunksCollection.drop();
 	projectResultsCollection.drop();
+	projectTransactionsCollection.drop();
 
 	mongocxx::collection projectsCollection = secondaryDb.collection(MongoConstants::PROJECT_CATALOG_COLLECTION);
 

@@ -520,6 +520,25 @@ namespace MongoRoleFunctions
 			<< "resource"
 			<< open_document
 			<< "db" << MongoConstants::PROJECTS_DB
+			<< "collection" << collectionName + ".transactions" // Project collection Name for transactions
+			<< close_document
+			<< "actions"
+			<< open_array
+			<< "find"
+			<< "insert"
+			<< "update"
+			<< "remove"
+			<< "listIndexes"
+			<< "listCollections"
+			<< "createIndex"
+			<< "dropIndex"
+			<< close_array
+			<< close_document
+
+			<< open_document
+			<< "resource"
+			<< open_document
+			<< "db" << MongoConstants::PROJECTS_DB
 			<< "collection" << collectionName + ".transformed" // Project collection Name for transformed 
 			<< close_document
 			<< "actions"
