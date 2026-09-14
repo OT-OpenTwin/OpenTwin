@@ -112,6 +112,12 @@ void MetadataSeries::setFromJsonObject(const ot::ConstJsonObject& _object)
 		quantity.setFromJsonObject(ot::json::getObject(allQuantity, i));
 		m_quantity.push_back(quantity);
 	}
+
+	if (_object.HasMember("Metadata"))
+	{
+		const auto& metadata = _object["Metadata"];
+		this->m_metaData.CopyFrom(metadata, m_metaData.GetAllocator());
+	}
 }
 
 size_t MetadataSeries::getMemSize()

@@ -111,8 +111,9 @@ bool BlockHandlerStorage::executeSpecialized()
 			std::map<std::string, DatasetDescription> datasetDescriptionByQuantityLabel;
 			std::map < std::string, MetadataParameter> occurringParametersByLabel;
 			
-			ot::JsonValue& dataEntries = dataPipeline->getData()["Data"];
-			const std::string temp = ot::json::toJson(dataEntries);
+			
+			ot::JsonValue& dataEntries = dataPipeline->getData();
+			
 			if (dataEntries.IsArray())
 			{
 				auto dataArray = dataEntries.GetArray();
@@ -298,11 +299,35 @@ bool BlockHandlerStorage::executeSpecialized()
 				datasetDescr.push_back(std::move(dataset));
 
 			}
+			const std::list<MetadataSeries>& allPipelineSeries =	pipelineCampaign->getSeriesMetadata();
+			std::set<const MetadataSeries*> newSeries;
+			for (const MetadataSeries& pipelineSeries : allPipelineSeries)
+			{
+				resultCollectionExtender.findMetadataSeries(pipelineSeries.getLabel());
+				newSeries.insert(&pipelineSeries);
+			}
 
+			if (newSeries.size() > 1)
+			{
+				throw std::exception("Data storage block can only store one series at a time. Multiple new series definitions were detected.");
+			}
+
+			ot::UID seriesID;
+			std::string seriesName;
+			if (newSeries.size() == 1)
+			{
+				auto singleNewSeries = *newSeries.begin();
+				seriesName = ot::FolderNames::DatasetFolder + "/" + singleNewSeries->getName();
+				const ot::JsonDocument& seriesMetadata = singleNewSeries->getMetadata();
+				auto temp = ot::json::toJson(seriesMetadata);
+				seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName, seriesMetadata);
+			}
+			else
+			{
+				seriesName = ot::FolderNames::DatasetFolder + "/" + blockNameShort;
+				seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName);
+			}	
 			
-			const std::string seriesName = ot::FolderNames::DatasetFolder + "/" + blockNameShort;
-			
-			ot::UID seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName);
 			
 			SolverReport::instance().addToContentAndDisplay("Storing data into series: " + seriesName + ".\n", _uiComponent);
 
