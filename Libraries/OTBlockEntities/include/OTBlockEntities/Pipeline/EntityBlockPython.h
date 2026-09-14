@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityBlockPython.h
 // 
 // License:
@@ -51,9 +51,12 @@ public:
 
 	virtual void nonValuePropertyValueSelected(const EntityPropertiesBase* _property) override;
 
+	std::string getArgsPortLabel();
 private:
 	const std::string m_propertyNameScripts = "Scripts";
 	const std::string m_propertyNameEnvironments = "Environment";
+
+	ot::Connector m_argsConnector;
 
 	void updateBlockAccordingToScriptHeader();
 	void resetBlockRelatedAttributes();

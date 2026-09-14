@@ -39,6 +39,9 @@ EntityBlockPython::EntityBlockPython(ot::UID ID, EntityBase* parent, EntityObser
 	treeItem.setHiddenIcon(ot::BlockImageNames::getCornerImagePath() + getIconName());
 	this->setDefaultTreeItem(treeItem);
 
+	m_argsConnector = { ot::ConnectorType::InOptional, "Args", "Args" };
+	addConnector(m_argsConnector);
+
 	setBlockTitle("Python");
 
 	resetModified();
@@ -247,6 +250,11 @@ void EntityBlockPython::nonValuePropertyValueSelected(const EntityPropertiesBase
 	}
 }
 
+std::string EntityBlockPython::getArgsPortLabel()
+{
+	return m_argsConnector.getConnectorName();
+}
+
 void EntityBlockPython::updateBlockAccordingToScriptHeader()
 {
 	resetBlockRelatedAttributes();
@@ -301,7 +309,7 @@ void EntityBlockPython::updateBlockAccordingToScriptHeader()
 void EntityBlockPython::resetBlockRelatedAttributes()
 {
 	clearConnectors();
-
+	addConnector(m_argsConnector);
 	auto allProperties = getProperties().getListOfAllProperties();
 	for (auto& property : allProperties)
 	{
