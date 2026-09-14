@@ -92,6 +92,8 @@ public:
 	std::string getCircuitRootName(void) { return "Circuits/"; }
 	SubprocessHandler* getSubProcessHandler();
 
+	virtual void logFlagsChanged(const ot::LogFlags& _flags) override;
+
 	// ##################################################################################################################################################################################################################
 
 	// Required functions

@@ -468,6 +468,12 @@ SubprocessHandler* Application::getSubProcessHandler() {
 	return m_subprocessHandler;
 }
 
+void Application::logFlagsChanged(const ot::LogFlags& _flags) {
+	if (m_qtWrapper && m_qtWrapper->getConnectionManager()) {
+		m_qtWrapper->getConnectionManager()->send("SetLogFlags", std::to_string(_flags.underlying()));
+	}
+}
+
 // ##################################################################################################################################################################################################################
 
 // Required functions

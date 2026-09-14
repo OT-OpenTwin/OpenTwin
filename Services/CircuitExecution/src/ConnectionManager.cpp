@@ -127,6 +127,9 @@ while (true) {
 
         QString typeString = jsonObject["type"].toString();
         QJsonArray jsonArray = jsonObject["data"].toArray();
+        if (jsonArray.isEmpty() && jsonObject.contains("results")) {
+            jsonArray.append(jsonObject["results"].toString());
+        }
 
         handleActionType(typeString, jsonArray);
     }
@@ -203,6 +206,13 @@ void ConnectionManager::handleActionType(QString _actionType, QJsonArray _data) 
     else if (_actionType.toStdString() == "ResultPing") {
         OT_LOG_D("Received ResultPing. waitForHealthcheck before reset: " + std::to_string(waitForHealthcheck));
         waitForHealthcheck = false;
+    }
+    else if (_actionType.toStdString() == "SetLogFlags") {
+        if (!_data.isEmpty() && _data[0].isString()) {
+            ot::LogFlags flags(static_cast<uint64_t>(std::stoull(_data[0].toString().toStdString())));
+            ot::LogDispatcher::instance().setLogFlags(flags);
+            OT_LOG_D("Log flags updated to: " + std::to_string(flags.underlying()));
+        }
     }
     else {
         

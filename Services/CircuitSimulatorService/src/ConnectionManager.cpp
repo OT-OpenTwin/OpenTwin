@@ -25,6 +25,7 @@
 #include "Application.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTGui/Style/StyledTextBuilder.h"
 #include "OTCommunication/ActionTypes.h"
 
@@ -113,6 +114,9 @@ void ConnectionManager::send(std::string messageType, std::string message) {
 
     jsonObject["type"] = messageType.c_str();
     jsonObject["results"] = message.c_str();
+    QJsonArray dataArray;
+    dataArray.append(message.c_str());
+    jsonObject["data"] = dataArray;
 
     QJsonDocument jsonDoc(jsonObject);
     QByteArray data = jsonDoc.toJson(QJsonDocument::Compact);
@@ -335,6 +339,9 @@ void ConnectionManager::handleConnection() {
 
     OT_LOG_D("Hello CircuitExecution!");
 
+    // Forward current log flags to subprocess
+    ot::LogFlags logFlags = ot::LogDispatcher::instance().getLogFlags();
+    send("SetLogFlags", std::to_string(logFlags.underlying()));
 }
 
 

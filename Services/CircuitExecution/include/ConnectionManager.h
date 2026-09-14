@@ -21,6 +21,7 @@
 #include "QtNetwork/qlocalsocket.h"
 #include "QtCore/qobject.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTCore/Logging/LogDispatcher.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
