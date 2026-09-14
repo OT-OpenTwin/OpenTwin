@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PipelineHandler.cpp
 // 
 // License:
@@ -23,12 +23,14 @@
 #include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
 #include "OTBlockEntities/Pipeline/EntityBlockFileWriter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
+#include "OTBlockEntities/Pipeline/EntityBlockRefinement.h"
 
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDisplay.h"
 #include "BlockHandlerFileWriter.h"
 #include "BlockHandlerStorage.h"
+#include "BlockHandlerRefinement.h"
 
 #include "OTCore/Logging/Logger.h"
 #include <string>
@@ -105,6 +107,12 @@ std::shared_ptr<BlockHandler> PipelineHandler::createBlockHandler(std::shared_pt
 		return std::make_shared<BlockHandlerStorage>(storage, m_blockHandlerByGraphNode);
 	}
 	
+	EntityBlockRefinement* zoneAccess = dynamic_cast<EntityBlockRefinement*>(_blockEntity.get());
+	if (zoneAccess != nullptr)
+	{
+		return std::make_shared<BlockHandlerRefinement>(zoneAccess, m_blockHandlerByGraphNode);
+	}
+
 	assert(0);
 	throw std::exception("Not supported block type detected.");
 	

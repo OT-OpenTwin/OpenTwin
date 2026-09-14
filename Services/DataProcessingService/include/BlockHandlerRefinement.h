@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: BlockImageNames.h
+// File: BlockHandlerDisplay.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -19,18 +19,18 @@
 
 #pragma once
 
-// std header
-#include <string>
+#include "BlockHandler.h"
+#include "OTCore/DataStruct/GenericDataStruct.h"
+#include "OTBlockEntities/Pipeline/EntityBlockRefinement.h"
 
-namespace ot {
 
-	struct BlockImageNames
-	{
-		static std::string getCornerImagePath() { return "Images/"; }
-		static std::string getCornerImageNameDB() {return "DataBase.svg";}
-		static std::string getCornerImageNameDLZone() {return "DataBase.svg";}
-		static std::string getCornerImageNameVis() { return "Visualisation.svg"; }
-		static std::string getCornerImageNamePython() { return "Python.svg"; }
-	};
+class BlockHandlerRefinement  : public BlockHandler
+{
+public:
+	BlockHandlerRefinement(EntityBlockRefinement* _blockEntity, const HandlerMap& _handlerMap);
+	virtual bool executeSpecialized() override;
 
-}
+	std::string getBlockType() const override;
+private:
+	std::string m_selectedZone = "";
+};

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: BlockEntityHandler.cpp
 // 
 // License:
@@ -33,6 +33,7 @@
 #include "OTBlockEntities/Pipeline/EntityBlockDisplay.h"
 #include "OTBlockEntities/Pipeline/EntityBlockFileWriter.h"
 #include "OTBlockEntities/Pipeline/EntityBlockDatabaseAccess.h"
+#include "OTBlockEntities/Pipeline/EntityBlockRefinement.h"
 
 void BlockEntityHandler::createBlockPicker()
 {
@@ -54,7 +55,7 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 	ot::GraphicsPickerCollectionCfg controlBlockCollection("Control Blocks", "Control Blocks");
 	ot::GraphicsPickerCollectionCfg controlBlockDatabaseCollection("Database", "Database");
 	ot::GraphicsPickerCollectionCfg controlBlockVisualizationCollection("Visualization", "Visualization");
-
+	
 	//ot::GraphicsPickerCollectionCfg* mathBlockCollection("Mathematical Operations", "Mathematical Operations");
 	ot::GraphicsPickerCollectionCfg customizedBlockCollection("Customized Blocks", "Customized Blocks");
 	
@@ -72,6 +73,9 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::BuildUpBlockPicker()
 
 	EntityBlockFileWriter fileWriter;
 	controlBlockDatabaseCollection.addItem(fileWriter.getClassName(), fileWriter.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockFileWriter::getIconName());
+
+	EntityBlockRefinement zoneAccess;
+	controlBlockDatabaseCollection.addItem(zoneAccess.getClassName(), zoneAccess.createBlockHeadline(), ot::BlockImageNames::getCornerImagePath() + EntityBlockRefinement::getIconName());
 
 	controlBlockCollection.addChildCollection(std::move(controlBlockDatabaseCollection));
 	controlBlockCollection.addChildCollection(std::move(controlBlockVisualizationCollection));
