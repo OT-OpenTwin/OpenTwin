@@ -34,8 +34,6 @@ public:
 	LibraryManagementWrapper() {};
 	~LibraryManagementWrapper() {};
 
-	std::list<std::string> getCircuitModels();
-	std::string getCircuitModel(std::string _modelName);
 	std::string requestCreateConfig(const ot::JsonDocument& _doc);
 	void createLibraryEntity(const ot::LibraryElement& _importCfg);
 	void createLibraryEntity(const ot::LibraryElement& _importCfg, Model* _model, ot::NewModelStateInfo& _newStateInfo);
