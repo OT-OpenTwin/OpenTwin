@@ -610,6 +610,72 @@ std::string Application::handleGetCurrentVisualizationModelID() {
 	return newDoc.toJson();
 }
 
+#include "OTModelEntities/Properties/Bundle/PropertyBundleProductMasterData.h"
+std::string Application::handleGetZoneEntities(ot::JsonDocument& _document)
+{
+	bool zoneLevelShallBeMax = ot::json::getBool(_document, OT_ACTION_PARAM_SETTINGS_ValueMax);
+	
+	std::string zoneTagString = ot::json::getString(_document, OT_ACTION_PARAM_Text);
+	ot::ZoneTagConverter converter;
+	ot::ZoneTag zoneTag = converter.toZoneTag(zoneTagString);
+
+	std::list<EntityBase*> allEntities;
+	m_model->getAllEntities(allEntities);
+	
+	PropertyBundleProductMasterData pmdBundle;
+	std::list<ot::EntityInformation> productMasterDataOfZone;
+	for (EntityBase* entBase : allEntities)
+	{
+		bool isPMD = pmdBundle.isAlreadySet(entBase);
+
+		if (isPMD)
+		{
+			ot::ProductMasterDataConfiguration configuration = pmdBundle.getSetProductMasterDataConfigurations(entBase);
+			// Now we check if the entity is tagged with the requested zone 
+			if (configuration.m_zoneTags.find(zoneTag) != configuration.m_zoneTags.end())
+			{
+				// We may want to exclude entities that also have taggs of higher zones.
+				if (zoneLevelShallBeMax)
+				{
+					std::optional<ot::ZoneTag> nextInLine = converter.nextInLine(zoneTag);
+					if (nextInLine.has_value())
+					{
+						if (configuration.m_zoneTags.find(nextInLine.value()) == configuration.m_zoneTags.end())
+						{
+							ot::EntityInformation infos(entBase);
+							productMasterDataOfZone.push_back(infos);
+						}
+					}
+					else
+					{
+						// In this case the target zone was already the highest. 
+						ot::EntityInformation infos(entBase);
+						productMasterDataOfZone.push_back(infos);
+					}
+				}
+				else
+				{
+					ot::EntityInformation infos(entBase);
+					productMasterDataOfZone.push_back(infos);
+				}
+			}
+		}
+	}
+
+	ot::JsonDocument newDoc;
+	ot::JsonArray entityInfosArr;
+	for (auto& info : productMasterDataOfZone)
+	{
+		ot::JsonObject obj;
+		info.addToJsonObject(obj, newDoc.GetAllocator());
+		entityInfosArr.PushBack(obj, newDoc.GetAllocator());
+	}
+
+	newDoc.AddMember(OT_ACTION_PARAM_MODEL_EntityInfo, entityInfosArr, newDoc.GetAllocator());
+
+	return newDoc.toJson();
+}
+
 void Application::handleEntitiesSelected(ot::JsonDocument& _document) {
 	if (!m_model) {
 		OT_LOG_E("No model created yet");
@@ -1399,6 +1465,8 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_MODEL_GetAllGeometryEntitiesForMeshing, this, &Application::handleGetAllGeometryEntitiesForMeshing);
 	connectAction(OT_ACTION_CMD_MODEL_GetCurrentVisModelID, this, &Application::handleGetCurrentVisualizationModelID);
 	
+	connectAction(OT_ACTION_CMD_MODEL_GetEntitiesOfZone, this, &Application::handleGetZoneEntities);
+
 	connectAction(OT_ACTION_CMD_MODEL_EntitiesSelected, this, &Application::handleEntitiesSelected);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITY_IDENTIFIER, this, &Application::handleGetEntityIdentifier);
 	connectAction(OT_ACTION_CMD_MODEL_GET_ENTITIES_FROM_ANOTHER_COLLECTION, this, &Application::handleGetEntitiesFromAnotherCollection);

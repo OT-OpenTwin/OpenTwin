@@ -19,6 +19,7 @@ public:
 	void createProperties();
 
 	std::string getSelectedZone();
+	std::string getOutputConnectorName() { return m_outputConnector.getConnectorName(); }
 
 private:	
 	ot::Connector m_outputConnector;

@@ -48,6 +48,23 @@ void PropertyBundleProductMasterData::setConfiguration(EntityBase* _thisObject, 
 	}
 }
 
+ot::ProductMasterDataConfiguration PropertyBundleProductMasterData::getSetProductMasterDataConfigurations(EntityBase* _thisObject)
+{
+	ot::ZoneTagConverter converter;
+	ot::ProductMasterDataConfiguration configuration;
+	for (auto zoneTag : converter.getAllZoneTags())
+	{
+		const std::string zoneTagPropertyName = getZoneTagPropertyName(zoneTag);
+		bool tagIsSet =	PropertyHelper::getBoolPropertyValue(_thisObject, zoneTagPropertyName, m_groupName);
+		if (tagIsSet)
+		{
+			configuration.m_zoneTags.insert(zoneTag);
+		}
+	}
+
+	return configuration;
+}
+
 bool PropertyBundleProductMasterData::updatePropertyVisibility(EntityBase* _thisObject)
 {
 	return false;

@@ -39,7 +39,7 @@ ot::GraphicsItemCfg* EntityBlockRefinement::createBlockCfg()
 void EntityBlockRefinement::createProperties()
 {
 	ot::ZoneTagConverter converter;
-	std::list<std::string> zoneTags = converter.getAllZoneTags();
+	std::list<std::string> zoneTags = converter.getAllZoneTagStrings();
 	EntityPropertiesSelection::createProperty("Data lake zone", "Zone tag", zoneTags, *zoneTags.begin(), "default", getProperties());
 }
 

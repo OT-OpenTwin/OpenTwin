@@ -39,5 +39,5 @@ private:
 	std::string m_entityName;
 	ot::UID m_manifestUID = ot::invalidUID;
 	ot::PythonServiceInterface* m_pythonServiceInterface = nullptr;
-
+	std::string m_argPort;
 };

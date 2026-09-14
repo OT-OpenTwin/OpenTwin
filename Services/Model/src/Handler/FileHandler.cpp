@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: FileHandler.cpp
 // 
 // License:
@@ -25,7 +25,7 @@
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
 #include "Handler/FileHandler.h"
-
+#include "OTModelEntities/Properties/Bundle/PropertyBundleProductMasterData.h"
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/DateTime.h"
@@ -738,6 +738,13 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	_folderContent.push_back(entityName);
 
 	textFile->setTextEncoding(guesser(_text.data(), _text.size()));
+
+	PropertyBundleProductMasterData bundle;
+	ot::ProductMasterDataConfiguration config;
+	config.m_zoneTags.insert(ot::ZoneTag::RAW);
+
+	bundle.initialise(textFile.get(),config);
+
 	textFile->storeToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
 	m_entityVersionsTopo.push_back(textFile->getEntityStorageVersion());

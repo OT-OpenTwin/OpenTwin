@@ -153,6 +153,8 @@ public:
 	std::string handleGetAllGeometryEntitiesForMeshing(ot::JsonDocument& _document);
 
 	std::string handleGetCurrentVisualizationModelID();
+	
+	std::string handleGetZoneEntities(ot::JsonDocument& _document);
 
 	void handleEntitiesSelected(ot::JsonDocument& _document);
 

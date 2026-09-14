@@ -53,6 +53,7 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const Ha
                m_outputs.push_back(connector.getConnectorName());
            }
       }     
+      m_argPort = _blockEntity->getArgsPortLabel();
       m_entityName = _blockEntity->getName();
       m_scriptName = _blockEntity->getSelectedScript();
       m_manifestUID =  _blockEntity->getSelectedEnvironment();
@@ -73,10 +74,27 @@ bool BlockHandlerPython::executeSpecialized()
     
     if (allInputsComplete)
     {
-                
+        if (m_dataPerPort.find(m_argPort) != m_dataPerPort.end())
+        {
+            const auto& portData = m_dataPerPort.find(m_argPort)->second->getData();
+            ot::JSONToVariableConverter converter;
+            std::string tt = ot::json::toJson(portData);
+            //std::list<Variable> operator() (ot::ConstJsonArray & value);
+            //std::list<ot::Variable> value = converter(portData);
+            auto parameterArray = portData.GetArray();
+            auto parameterValues = converter(parameterArray);
+            std::map < std::string, std::list<ot::Variable>>parameterValuesByArgName;
+            parameterValuesByArgName["fileName"] = parameterValues;
+            PythonParameter parameter = PyhonParameterBuilderGeneric::create(m_entityName, parameterValuesByArgName);
+            m_pythonServiceInterface->addScriptWithParameter(m_scriptName, "", parameter);
+        }
+        else
+        {
+            PythonParameter parameter = PyhonParameterBuilderGeneric::create(m_entityName, {});
+            m_pythonServiceInterface->addScriptWithParameter(m_scriptName, "", parameter);
+        }
         //First assemble the job for the python service
-        PythonParameter parameter = PyhonParameterBuilderGeneric::create(m_entityName, {});
-        m_pythonServiceInterface->addScriptWithParameter(m_scriptName,"", parameter);
+        
 		m_pythonServiceInterface->addManifestUID(m_manifestUID);
 
         for (auto& dataPortEntry : m_dataPerPort)

@@ -33,4 +33,7 @@ public:
 	std::string getBlockType() const override;
 private:
 	std::string m_selectedZone = "";
+	std::string m_outputConnector = "";
+
+	PipelineData m_output;
 };

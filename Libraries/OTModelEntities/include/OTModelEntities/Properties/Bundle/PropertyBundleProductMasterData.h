@@ -14,7 +14,7 @@ public:
 	bool isAlreadySet(EntityBase* _thisObject) const;
 	void initialise(EntityBase* _thisObject, const ot::ProductMasterDataConfiguration& _config);
 	void setConfiguration(EntityBase* _thisObject, const ot::ProductMasterDataConfiguration& _config);
-
+	ot::ProductMasterDataConfiguration getSetProductMasterDataConfigurations(EntityBase* _thisObject);
 	bool updatePropertyVisibility(EntityBase* _thisObject) override;
 
 private:
