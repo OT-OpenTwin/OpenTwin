@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityFile.cpp
 // 
 // License:
@@ -159,4 +159,9 @@ void EntityFile::readSpecificDataFromDataBase(const bsoncxx::document::view & _d
 	if (_doc_view.find("FileFilter") != _doc_view.end()) { m_fileFilter = _doc_view["FileFilter"].get_utf8().value.data(); }
 	m_dataUID = _doc_view["DataUID"].get_int64();
 	m_dataVersion = _doc_view["DataVersionID"].get_int64();
+}
+
+void EntityFile::releaseData()
+{
+	m_data.reset();
 }

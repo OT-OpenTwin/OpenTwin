@@ -248,6 +248,30 @@ PyObject* PythonExtensions::OT_GetTableCell(PyObject* _self, PyObject* _args)
     }
 }
 
+static PyObject* PythonExtensions::OT_GetText(PyObject* _self, PyObject* _args)
+{
+    try
+    {
+        CPythonObjectBorrowed args(_args);
+        auto numberOfArguments = PyTuple_Size(args);
+        const int expectedNumberOfArguments = 1;
+        if (numberOfArguments != expectedNumberOfArguments) {
+            throw std::exception("OT_GetTableCell expects three arguments");
+        }
+        PythonObjectBuilder pyObBuilder;
+        std::string absoluteEntityName = pyObBuilder.getStringValueFromTuple(args, 0, "Parameter 0");
+        
+        PyObject* textFileContent =  EntityBuffer::instance().getTextEntityContent(absoluteEntityName);
+        
+        return textFileContent;
+    }
+    catch (std::exception& _e)
+    {
+        PyErr_SetString(PyExc_RuntimeError, _e.what());
+        return nullptr;
+    }
+}
+
 PyObject* PythonExtensions::OT_GetPortData(PyObject* _self, PyObject* _args) 
 {
     try

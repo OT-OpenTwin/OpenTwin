@@ -36,7 +36,8 @@ public:
 	PyObject* getTableCellValue(const std::string& _absoluteEntityName, uint32_t _row, uint32_t _column);
 	void updateEntityPropertyValue(const std::string& _absoluteEntityName, const std::string& _propertyName, const std::string& _propertyGroup, const CPythonObject& _values);
 	std::shared_ptr<EntityBase> getEntity(const std::string& _absoluteEntityName);
-	
+	PyObject* getTextEntityContent(const std::string& _absoluteEntityName);
+
 	PyObject* getAllPropertyGroups(const std::string& _absoluteEntityName);
 	void saveChangedEntities();
 	

@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityFile.h
 // 
 // License:
@@ -43,6 +43,7 @@ public:
 	//! @brief Does not reset the data entity. If a new data entity is assinged, this topology entity will still hold a reference to the old one. However, typically one would update the old data entity.
 	void setDataEntity(ot::UID _dataID, ot::UID _dataVersion);
 	std::shared_ptr<EntityBinaryData> getDataEntity();
+	void releaseData();
 
 	std::string getPath() const { return m_path; }
 	std::string getFileName() const { return m_fileName; }
@@ -66,7 +67,6 @@ private:
 	std::string m_fileFilter;
 
 	std::shared_ptr<EntityBinaryData> m_data = nullptr;
-
 	void ensureDataIsLoaded();
 	void setProperties();
 	virtual int getSchemaVersion() { return 1; }

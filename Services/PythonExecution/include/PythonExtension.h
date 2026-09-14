@@ -43,6 +43,8 @@ namespace PythonExtensions {
     static PyObject* OT_FlushEntity(PyObject* _self, PyObject* _args);
 
     static PyObject* OT_GetTableCell(PyObject* _self, PyObject* _args);
+
+    static PyObject* OT_GetText(PyObject* _self, PyObject* _args);
     
     static PyObject* OT_GetPortData(PyObject* _self, PyObject* _args);
     
@@ -60,6 +62,7 @@ namespace PythonExtensions {
 
         {"GetPropertyValue", OT_GetPropertyValue, METH_VARARGS, "Get the value of a requested property from a requested entity."},
         {"GetTableCellValue", OT_GetTableCell, METH_VARARGS, "Get the value of a cell from a requested entity."},
+        {"GetText", OT_GetText, METH_VARARGS, "Get the content of a requested text file entity."},
         {"SetPropertyValue", OT_SetPropertyValue, METH_VARARGS, "Set the property value of a requested property from a requested entity."},
         {"Flush", OT_Flush, METH_NOARGS, "Apply all changes on entity properties."},
         {"FlushEntity", OT_FlushEntity, METH_VARARGS, "Apply all changes on requested entity."},

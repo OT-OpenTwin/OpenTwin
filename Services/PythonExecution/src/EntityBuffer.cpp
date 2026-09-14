@@ -26,6 +26,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/EntityTableSelectedRanges.h"
 #include "OTModelEntities/Interfaces/IPropertyHandling.h"
+#include "OTModelEntities/EntityFileText.h"
 
 #include "OTCADEntities/CADEntitiesAPI.h"
 #include "OTBlockEntities/BlockEntitiesAPI.h"
@@ -116,6 +117,23 @@ void EntityBuffer::saveChangedEntities()
 std::shared_ptr<EntityBase> EntityBuffer::getEntity(const std::string& _absoluteEntityName)
 {
 	return loadEntity(_absoluteEntityName);
+}
+
+PyObject* EntityBuffer::getTextEntityContent(const std::string& _absoluteEntityName)
+{
+	std::shared_ptr<EntityBase> baseEntity = getEntity(_absoluteEntityName);
+	EntityFileText* textEntity = dynamic_cast<EntityFileText*>(baseEntity.get());
+	if (textEntity == nullptr)
+	{
+		throw std::exception(("Entity " + _absoluteEntityName + " is not a text entity.").c_str());
+	}
+	const std::string content = textEntity->getText();
+	textEntity->releaseData();
+
+	PythonObjectBuilder builder;
+	auto pCellValue = builder.setString(content);
+	Py_INCREF(pCellValue);
+	return pCellValue;
 }
 
 
