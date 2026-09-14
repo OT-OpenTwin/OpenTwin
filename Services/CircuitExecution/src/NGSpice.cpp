@@ -160,7 +160,13 @@ void NGSpice::init(std::list<std::string> _netlist) {
 	//Executing run from NGSpice
 	runSimulation(_netlist);
 
-	Application::getInstance()->getConnectionManager()->sendBackResults(SimulationResults::getInstance()->getResultMap());
+	auto& results = SimulationResults::getInstance()->getResultMap();
+	if (!results.empty()) {
+		Application::getInstance()->getConnectionManager()->sendBackResults(results);
+	}
+	else {
+		OT_LOG_E("No results after simulation, skipping sendBackResults");
+	}
 }
 
 void NGSpice::runSimulation(std::list<std::string>& _netlist) {

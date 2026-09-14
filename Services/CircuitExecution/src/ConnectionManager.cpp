@@ -250,6 +250,7 @@ void ConnectionManager::sendBackResults(std::map<std::string, std::vector<double
     if (_results.empty()) {
         OT_LOG_E("No Results");
         handleDisconnected();
+        return;
     }
 
     QJsonObject jsonObject;
