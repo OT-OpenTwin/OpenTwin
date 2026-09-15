@@ -19,6 +19,8 @@
 
 #include "Application.h"
 #include "BlockHandlerPython.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "TransactionLoggerInstance.h"
 
 // OpenTwin header
 #include "OTCore/ReturnValues.h"
@@ -32,6 +34,8 @@
 #include "OTCore/Python/PyhonParameterBuilderGeneric.h"
 
 #include "OTModelEntities/EntityFile.h"
+
+
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
     : BlockHandler(_blockEntity, _handlerMap)
@@ -56,6 +60,11 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const Ha
       m_argPort = _blockEntity->getArgsPortLabel();
       m_entityName = _blockEntity->getName();
       m_scriptName = _blockEntity->getSelectedScript();
+
+      ot::EntityInformation entityInfo;
+      ot::ModelServiceAPI::getEntityInformation(m_scriptName, entityInfo);
+      TransactionLoggerInstance::INSTANCE().addFromEntity(entityInfo.getEntityID());
+
       m_manifestUID =  _blockEntity->getSelectedEnvironment();
 }
 

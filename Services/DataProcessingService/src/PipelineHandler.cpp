@@ -38,6 +38,8 @@
 #include "SolverReport.h"
 #include "OTCore/TimeFormatter.h"
 
+#include "TransactionLoggerInstance.h"
+
 void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID)
 {
 	try
@@ -48,8 +50,10 @@ void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootN
 
 		for (std::shared_ptr<GraphNode> rootNode : _rootNodes)
 		{
+			TransactionLoggerInstance::INSTANCE().initiate();
 			std::shared_ptr<BlockHandler> handler = m_blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
+			TransactionLoggerInstance::INSTANCE().log();
 		}
 		SolverReport::instance().addToContentAndDisplay("Pipeline executed successfull.\n", _uiComponent);
 		SolverReport::instance().storeReport();

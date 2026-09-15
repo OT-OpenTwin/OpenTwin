@@ -15,7 +15,7 @@ void TransactionLogger::log(const std::string& _userName, TransactionType _trans
 	m_dataLakeAPI.flushQueuedData();
 }
 
-void TransactionLogger::searchEntry(TransactionType _transactionType, ot::UID _vertex)
+std::string TransactionLogger::searchEntry(TransactionType _transactionType, ot::UID _vertex)
 {
 	bsoncxx::builder::basic::document builder;
 	builder.append(bsoncxx::builder::basic::kvp("transactionType", static_cast<int>(_transactionType)));
@@ -33,10 +33,7 @@ void TransactionLogger::searchEntry(TransactionType _transactionType, ot::UID _v
 	DataStorageAPI::DataStorageResponse response = m_dataLakeAPI.searchInDataLakePartition(builder.extract(),options);
 	if (response.getSuccess())
 	{
-		std::string temp = response.getResult();
-		ot::JsonDocument doc;
-		doc.fromJson(temp);
-		auto& entries = doc["Documents"];
+		return response.getResult();		
 	}
 }
 

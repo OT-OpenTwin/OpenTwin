@@ -21,6 +21,8 @@
 #include "BlockHandlerStorage.h"
 #include "Application.h"
 
+#include "TransactionLoggerInstance.h"
+
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/TimeFormatter.h"
@@ -328,7 +330,8 @@ bool BlockHandlerStorage::executeSpecialized()
 				seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName);
 			}	
 			
-			
+			TransactionLoggerInstance::INSTANCE().addToEntity(seriesID);
+
 			SolverReport::instance().addToContentAndDisplay("Storing data into series: " + seriesName + ".\n", _uiComponent);
 
 			auto startTimePoint = std::chrono::high_resolution_clock::now();

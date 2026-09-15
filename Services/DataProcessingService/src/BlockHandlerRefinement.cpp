@@ -1,5 +1,7 @@
 ﻿#include "BlockHandlerRefinement.h"
 #include "Application.h"
+#include "TransactionLoggerInstance.h"
+
 BlockHandlerRefinement::BlockHandlerRefinement(EntityBlockRefinement* _zoneBlockEntity, const HandlerMap& _handlerMap)
 	:BlockHandler(_zoneBlockEntity, _handlerMap)
 {
@@ -19,23 +21,36 @@ bool BlockHandlerRefinement::executeSpecialized()
 	ot::JsonDocument responsDoc; 
 	responsDoc.fromJson(response);
 	auto matchingEntitiesInfos = ot::json::getArray(responsDoc, OT_ACTION_PARAM_MODEL_EntityInfo);
-	std::list<ot::EntityInformation> entityInfos;
-	std::list<std::string> names;
-	for (const auto& entry : matchingEntitiesInfos)
+	
+	if (matchingEntitiesInfos.Size() > 0)
 	{
+		// Currently we handle only one per run (temporary)
+		std::list<ot::EntityInformation> entityInfos;
+		std::list<std::string> names;
+		const auto& entry = matchingEntitiesInfos.begin();
 		ot::EntityInformation info;
-		info.setFromJsonObject(entry.GetObject());
+		info.setFromJsonObject(entry->GetObject());
 		names.push_back(info.getEntityName());
 		entityInfos.push_back(info);
+
+		TransactionLoggerInstance::INSTANCE().addFromEntity(info.getEntityID());
+		TransactionLoggerInstance::INSTANCE().setTransactionType(TransactionType::Refinement);
+		ot::JsonDocument description;
+		description.AddMember("Operation", ot::JsonString("Raw -> Refined", description.GetAllocator()), description.GetAllocator());
+		TransactionLoggerInstance::INSTANCE().setTransactionDescription(description.toJson());
+		ot::JsonDocument temp;
+		temp.AddMember("EntityNames", ot::JsonArray(names, temp.GetAllocator()),temp.GetAllocator());
+
+		m_output.setData(std::move(temp["EntityNames"]));
+
+		m_dataPerPort[m_outputConnector] = &m_output;
+		return true;
+	}
+	else
+	{
+		return false;
 	}
 	
-	ot::JsonDocument temp;
-	temp.AddMember("EntityNames", ot::JsonArray(names, temp.GetAllocator()),temp.GetAllocator());
-
-	m_output.setData(std::move(temp["EntityNames"]));
-
-	m_dataPerPort[m_outputConnector] = &m_output;
-	return true;
 }
 
 std::string BlockHandlerRefinement::getBlockType() const

@@ -180,7 +180,7 @@ Model::Model(const std::string &_projectName, const std::string& _projectType, c
 	m_createGroupButton.setButtonLockFlags(ot::LockType::ModelRead);
 	m_buttonHandler.connectToolBarButton(m_createGroupButton, this, &Model::handleCreateNewGroup);
 
-	m_showDependencyGraph = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Show Dependency Graph", "Default/Icon");
+	m_showDependencyGraph = ot::ToolBarButtonCfg(Application::getToolBarPageName(), "Groups", "Show Dependency Graph", "Default/Information");
 	m_showDependencyGraph.setButtonLockFlags(ot::LockType::ModelRead);
 	m_buttonHandler.connectToolBarButton(m_showDependencyGraph, &Application::instance()->getVisualisationHandler(), &ViewVisualisationHandler::handleDependencyGraphRequest);
 

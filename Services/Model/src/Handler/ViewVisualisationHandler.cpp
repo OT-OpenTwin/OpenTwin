@@ -47,7 +47,7 @@
 #else
 #define OT_TEST_VISUALIZATIONHANDLER_Interval(___testText)
 #endif
-
+#include "Handler/SelectionHandler.h"
 void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot::VisualisationCfg& _visualisationCfg)
 {
 	Model* model = Application::instance()->getModel();
@@ -277,144 +277,102 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 #include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTServiceFoundation/TransactionData/TransactionLogger.h"
+
 void ViewVisualisationHandler::handleDependencyGraphRequest()
 {
 	QueuingHttpRequestsRAII raiiUI;
 	const std::string sceneName = "Dependency Graph";
-	/*
-	ot::GraphicsNewEditorPackage editor(sceneName, sceneName);
 	
-	ot::JsonObject pckgObj;
-	
-	ot::JsonDocument document;
-	editor.addToJsonObject(pckgObj, document.GetAllocator());
-	document.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor, document.GetAllocator()), document.GetAllocator());
-	document.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, document.GetAllocator());
-	Application::instance()->queuedRequestToFrontend(document);*/
-
-	ot::GraphicsHierarchicalItemBuilder builder;
-	std::list<std::string> vertexNames = { "Data file", "Series data", "Post processed" };
-	uint64_t vertexID = 0;
-	std::list<ot::Point2DD> positions = { ot::Point2DD(0., 0.), ot::Point2DD(-180, 0), ot::Point2DD(180, 0.) };
-	auto currentPosition = positions.begin();
-
-	/*const std::string graphicsSceneName = ot::BlockConfigurationHelper::getGraphicSceneName(getName(), m_graphicsScenePackageChildName);
-
-	ot::GraphicsScenePackage pckg(graphicsSceneName);
-	pckg.addItem(blockCfg);
-	pckg.setPickerKey(m_graphicsPickerKey);*/
-	ot::GraphicsScenePackage pckg(sceneName);
-	std::list < ot::GraphicsItemCfg*> blockCfgs;
-	for (const std::string& name : vertexNames)
+	auto selectedEntities = Application::instance()->getModel()->getListOfSelectedEntities();
+	if (selectedEntities.size() == 1)
 	{
-		builder.setEntityName(name);
-		builder.setTopText(name);
-		builder.setBackgroundShape(ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse);
-		blockCfgs.push_back(builder.createGraphicsItem());
-		blockCfgs.back()->setUid(vertexID++);
-		blockCfgs.back()->setPosition((*currentPosition));
-		currentPosition++;
-		pckg.addItem(blockCfgs.back());
+		TransactionLogger logger(Application::instance()->getCollectionName());
+		ot::UID selectedID = (*selectedEntities.begin())->getEntityID();
+		std::string result = logger.searchEntry(TransactionType::Refinement, selectedID);
+		ot::JsonDocument doc;
+		doc.fromJson(result);
+		const auto& allDocuments = doc["Documents"];
+		const auto& entries = allDocuments.GetArray();
+
+
+		std::string originConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Bottom);
+		std::string destConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Top);
+		std::list< ot::GraphicsConnectionCfg> edges;
+		
+		ot::GraphicsHierarchicalItemBuilder builder;
+		ot::GraphicsScenePackage pckg(sceneName);
+		ot::GraphicsConnectionPackage connPkg(sceneName);
+
+		std::list < ot::GraphicsItemCfg*> blockCfgs;
+
+		std::set<ot::UID> allVertices;
+		ot::UID dummyID = 13;
+		for (auto& entry : entries)
+		{
+			ot::UIDList verticesFrom = ot::json::getUInt64List(entry, "from");
+			ot::UIDList verticesTo = ot::json::getUInt64List(entry, "to");
+			std::string edgeWriting =	ot::json::getString(entry, "transactionSettings");
+			for (ot::UID origin : verticesFrom)
+			{
+				allVertices.insert(origin);
+				for (ot::UID target : verticesTo)
+				{
+					allVertices.insert(target);
+					ot::GraphicsConnectionCfg edge (origin, originConnector, target, destConnector);
+					edge.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+					edge.setUid(dummyID++);
+					connPkg.addConnection(edge);
+				}
+			}
+		}
+		std::list<ot::Point2DD> position = { ot::Point2DD(-180., 0.), ot::Point2DD(90., 100.), ot::Point2DD(180., 0.) };
+		auto currentPos = position.begin();
+		for (ot::UID uniqueVertex : allVertices)
+		{
+			EntityBase* baseEnt = Application::instance()->getModel()->getEntityByID(uniqueVertex);
+			builder.setEntityName(baseEnt->getName());
+			builder.setTopText(baseEnt->getName());
+			builder.setBackgroundShape(ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse);
+			blockCfgs.push_back(builder.createGraphicsItem());
+			blockCfgs.back()->setUid(uniqueVertex);
+			blockCfgs.back()->setPosition(*currentPos);
+			currentPos++;
+			pckg.addItem(blockCfgs.back());
+		}
+
+
+		ot::JsonDocument reqDoc;
+		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+		ot::VisualisationCfg visualisationCfg;
+		ot::JsonObject visualisationCfgJson;
+		visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
+		reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
+
+		ot::JsonObject pckgObj;
+		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
+		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
+
+		Application::instance()->queuedRequestToFrontend(reqDoc);
+
+
+		ot::JsonDocument connReqDoc;
+		connReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
+		ot::VisualisationCfg v;
+		ot::JsonObject vObj;
+		v.addToJsonObject(vObj, connReqDoc.GetAllocator());
+		connReqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, vObj, connReqDoc.GetAllocator());
+
+		ot::JsonObject connPckgObj;
+		connPkg.addToJsonObject(connPckgObj, connReqDoc.GetAllocator());
+		connReqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, connPckgObj, reqDoc.GetAllocator());
+
+		Application::instance()->queuedRequestToFrontend(connReqDoc);
 	}
-
-
-	auto allCfgs = blockCfgs.begin();
-	std::string originConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Right);
-	allCfgs++;
-	std::string destConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Left);
-	ot::GraphicsConnectionCfg cfg1 (0, originConnector, 1, destConnector);
-	
-	cfg1.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
-	cfg1.setUid(13);
-	ot::GraphicsConnectionPackage connPkg(sceneName);
-	connPkg.addConnection(cfg1);
-
-	ot::JsonDocument reqDoc;
-	reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	ot::VisualisationCfg visualisationCfg;
-	ot::JsonObject visualisationCfgJson;
-	visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
-
-	ot::JsonObject pckgObj;
-	pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-	reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-	Application::instance()->queuedRequestToFrontend(reqDoc);
-
-
-	ot::JsonDocument connReqDoc;
-	connReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-	ot::VisualisationCfg v;
-	ot::JsonObject vObj;
-	v.addToJsonObject(vObj, connReqDoc.GetAllocator());
-	connReqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, vObj, connReqDoc.GetAllocator());
-
-	ot::JsonObject connPckgObj;
-	connPkg.addToJsonObject(connPckgObj, connReqDoc.GetAllocator());
-	connReqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, connPckgObj, reqDoc.GetAllocator());
-
-	Application::instance()->queuedRequestToFrontend(connReqDoc);
-
-	//ot::PenFCfg outlineCfg;
-
-	///*const EntityPropertiesGuiPainter* painterProperty = dynamic_cast<const EntityPropertiesGuiPainter*>(this->getProperties().getProperty("Line Painter"));
-	//outlineCfg.setPainter(painterProperty->getValue()->createCopy());
-
-	//const EntityPropertiesDouble* lineWidthProperty = dynamic_cast<const EntityPropertiesDouble*>(this->getProperties().getProperty("Line Width"));
-	//outlineCfg.setWidth(lineWidthProperty->getValue());
-
-	//const EntityPropertiesSelection* lineStyleProperty = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Style"));
-	//outlineCfg.setStyle(ot::stringToLineStyle(lineStyleProperty->getValue()));
-
-	//cfg.setLineStyle(outlineCfg);*/
-
-	///*const EntityPropertiesSelection* lineShapeProperty = dynamic_cast<const EntityPropertiesSelection*>(this->getProperties().getProperty("Line Shape"));
-	//cfg.setLineShape(ot::GraphicsConnectionCfg::stringToShape(lineShapeProperty->getValue()));*/
-
-	//cfg.setDestinationPos(ot::Point2DD(0., 0.));
-	//cfg.setOriginPos(ot::Point2DD(-5, 0));
-	//cfg.setUid(9);
-
-	//ot::GraphicsConnectionPackage connectionPckg(sceneName);
-	//
-
-	//connectionPckg.setPickerKey(OT_INFO_SERVICE_TYPE_MODEL);
-	//connectionPckg.addConnection(cfg);
-	//
-	//ot::JsonDocument reqDoc;
-	//reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-
-	//ot::VisualisationCfg visualisationCfg;
-	//ot::JsonObject visualisationCfgJson;
-	//visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-	//reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
-	//reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-	//Application::instance()->queuedRequestToFrontend(reqDoc);
-
-	//graph = createGraph()
-
-	//	createGraphViews(graph)
-	//{
-	//	createSceneConfig();
-	//	buildPositionGrid(vertices);
-	//	radius = 5 ppt;
-	//	angle = alpha;
-
-
-	//	for (auto vertex : graph.vertices)
-	//	{
-	//		if (vertex.isView())
-	//		{
-	//			createItemCfg(vertex)
-	//		}
-	//	}
-	//	for (auto edge : graph.edges)
-	//	{
-	//		crateConneectionCfg(edge)
-	//	}
-	//}
-
+	else
+	{
+		OT_LOG_E("Only supported for a single Master Data Entity");
+	}	
 }
 
 void ViewVisualisationHandler::setupPlot(EntityBase* _plotEntityBase, bool _setAsActiveView)

@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTCore/Variable/VariableListToStringListConverter.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleProductMasterData.h"
 
 #include "OTModelEntities/MetadataEntityInterface.h"
 #include "OTCore/Tuple/TupleFactory.h"
@@ -26,6 +27,8 @@
 #include "OTModelEntities/EntityBase.h"
 // std header
 #include <vector>
+#include "OTCore/ProductMasterData/ProductMasterDataConfiguration.h"
+
 
 MetadataCampaign MetadataEntityInterface::createCampaign(EntityMetadataCampaign* _rmd, std::list<EntityMetadataSeries*>& _allSeries)
 {
@@ -80,6 +83,10 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _
 
 ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(std::list<const MetadataSeries*>& _seriesMetadata, bool _saveModel)
 {
+	ot::ProductMasterDataConfiguration config;
+	config.m_zoneTags.insert(ot::ZoneTag::REFINED);
+	config.m_zoneTags.insert(ot::ZoneTag::RAW);
+	PropertyBundleProductMasterData bundle;
 	ot::NewModelStateInfo newEntitiesInfos;
 	std::list< EntityMetadataSeries> entitiesMetadataSeries;
 	for (auto& newSeriesMetadata : _seriesMetadata)
@@ -90,7 +97,7 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(std::list<const Met
 		entitySeries.setTreeItemEditable(true);
 		entitySeries.setCallbackData(this->getCallbackData());
 		entitySeries.setSeries(*newSeriesMetadata);
-		
+		bundle.initialise(&entitySeries, config);
 		entitySeries.storeToDataBase();
 		newEntitiesInfos.addTopologyEntity(entitySeries);
 	}
