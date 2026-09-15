@@ -8,10 +8,11 @@ TransactionLogger::TransactionLogger(const std::string& _collectionName)
 	
 }
 
-void TransactionLogger::log(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSsettings, ot::UIDList _from, ot::UIDList _to)
+void TransactionLogger::log(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSettings, ot::UIDList _from, ot::UIDList _to)
 {
-	BsonViewOrValue entry = create(_userName, _transactionType, transactionSsettings, _from, _to);
-	m_dataLakeAPI.insertDocumentToDataLakePartition(entry, false, false);
+	BsonValue entry = create(_userName, _transactionType, transactionSettings, _from, _to);
+	BsonViewOrValue view = entry.view();
+	m_dataLakeAPI.insertDocumentToDataLakePartition(view, false, false);
 	m_dataLakeAPI.flushQueuedData();
 }
 
@@ -35,28 +36,37 @@ std::string TransactionLogger::searchEntry(TransactionType _transactionType, ot:
 	{
 		return response.getResult();		
 	}
+	else
+	{
+		return "";
+	}
 }
 
-BsonViewOrValue TransactionLogger::create(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSsettings, ot::UIDList _from, ot::UIDList _to)
+BsonValue TransactionLogger::create(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSettings, ot::UIDList _from, ot::UIDList _to)
 {
 	auto now = std::chrono::system_clock::now();
 
 	// b_date has a constructor from time_point
 	bsoncxx::types::b_date ts{ now };
+	
 	bsoncxx::builder::basic::document builder;
 	builder.append(bsoncxx::builder::basic::kvp("userName", _userName));
 	builder.append(bsoncxx::builder::basic::kvp("Date", ts));
 	builder.append(bsoncxx::builder::basic::kvp("transactionType", static_cast<int>(_transactionType)));
-	builder.append(bsoncxx::builder::basic::kvp("transactionSettings", transactionSsettings));
-	builder.append(bsoncxx::builder::basic::kvp("from", [&_from](bsoncxx::builder::basic::sub_array subarr) {
-		for (auto uid : _from) {
-			subarr.append(static_cast<int64_t>(uid)) ;
-		}
-		}));
-	builder.append(bsoncxx::builder::basic::kvp("to", [&_to](bsoncxx::builder::basic::sub_array subarr) {
-		for (auto uid : _to) {
-			subarr.append(static_cast<int64_t>(uid));
-		}
-		}));
+	builder.append(bsoncxx::builder::basic::kvp("transactionSettings", transactionSettings));
+
+	bsoncxx::builder::basic::array from, to;
+	for (auto uid : _from) 
+	{
+		from.append(static_cast<int64_t>(uid));
+	}
+	builder.append(bsoncxx::builder::basic::kvp("from", from));
+	
+	for (auto uid : _to)
+	{
+		to.append(static_cast<int64_t>(uid));
+	}
+	builder.append(bsoncxx::builder::basic::kvp("to", to));
+
 	return builder.extract();
 }

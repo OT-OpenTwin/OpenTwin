@@ -3,11 +3,12 @@
 
 void TransactionLoggerInstance::initiate()
 {
-	if (m_logger != nullptr)
+	if (m_logger == nullptr)
 	{
 		m_logger = new TransactionLogger(Application::instance()->getCollectionName());
 		m_userName = Application::instance()->getLogInUserName();
 	}
+
 	m_from.clear();
 	m_to.clear();
 }
@@ -24,6 +25,8 @@ void TransactionLoggerInstance::addToEntity(ot::UID _entityID)
 
 void TransactionLoggerInstance::log()
 {
+
+	assert(m_logger != nullptr);
 	if (m_from.size() > 0 && m_to.size() > 0)
 	{
 		m_logger->log(m_userName, m_type, "", m_from, m_to);

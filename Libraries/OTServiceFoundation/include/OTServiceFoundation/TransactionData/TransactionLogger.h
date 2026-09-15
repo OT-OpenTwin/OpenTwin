@@ -15,7 +15,7 @@ public:
 private:
 	DataStorageAPI::DataLakeAPI m_dataLakeAPI;
 
-	static BsonViewOrValue create(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSsettings, ot::UIDList _from, ot::UIDList _to);
+	static BsonValue create(const std::string& _userName, TransactionType _transactionType, const std::string& transactionSsettings, ot::UIDList _from, ot::UIDList _to);
 	
 
 };
