@@ -19,6 +19,9 @@
 
 #pragma once
 
+// Service header
+#include "Handler/ProjectComparisonManager.h"
+
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
 #include "OTCore/ProjectCompareConfig.h"
@@ -67,38 +70,6 @@ private:
 	// Comparison
 
 	void comparisonWorker(ot::ProjectCompareConfig&& _config);
-
-	struct ComparisonData
-	{
-		enum ComparisonStep {
-			InitialStep,
-			StepOpenOtherProject,
-			StepCompare,
-			StepDone,
-			StepCount
-		};
-
-		ComparisonData() = delete;
-		ComparisonData(const ComparisonData&) = delete;
-		ComparisonData(ComparisonData&&) = delete;
-		ComparisonData(ot::ProjectCompareConfig&& _config, ot::ParallelCollectionRAII&& _collectionSwitch, ModelState* _leftState, ModelState* _rightState)
-			: config(std::move(_config)), collectionSwitch(std::move(_collectionSwitch)), leftState(_leftState), rightState(_rightState)
-		{};
-
-		void initializeUpdater(ProgressUpdater* _updater);
-		void switchToStep(ComparisonStep _step);
-
-		ot::ProjectCompareConfig config;
-		ot::ParallelCollectionRAII collectionSwitch;
-		ModelState* leftState;
-		ModelState* rightState;
-
-		ComparisonStep step = ComparisonStep::InitialStep;
-		ProgressUpdater* progressUpdater = nullptr;
-	};
-
-	void comparisonStepEntities(ComparisonData& _data);
-	void comparisonStepDone(ComparisonData& _data);
 
 	// ##################################################################################################################################################################################################################
 

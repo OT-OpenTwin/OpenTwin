@@ -22,6 +22,7 @@
 // Service header
 #include "Model.h"
 #include "Application.h"
+#include "Handler/ProjectComparisonManager.h"
 #include "Handler/ProjectInformationHandler.h"
 
 // OpenTwin header
@@ -304,7 +305,10 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 
 		ProgressUpdater progressUpdater(ui, "Comparing projects", false);
 		progressUpdater.setTimeTrigger(std::chrono::seconds(1));
-		progressUpdater.setTotalNumberOfUpdates(ComparisonData::ComparisonStep::StepCount, ComparisonData::ComparisonStep::StepCount);
+
+		const int totalUpdateSteps = ProjectComparisonManager::getTotalNumberOfSteps();
+
+		progressUpdater.setTotalNumberOfUpdates(totalUpdateSteps, totalUpdateSteps);
 		_config.getTargetProjectName();
 
 		// Create user output
@@ -351,22 +355,16 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 			return;
 		}
 		
-		// Here we should load the data entities if needed.
-
 		// Switch to the target collection and load the target version
 		collectionSwitch.switchToOther();
 		ModelState rightState;
 		
-		ComparisonData data(std::move(_config), std::move(collectionSwitch), leftState, &rightState);
-		data.switchToStep(ComparisonData::StepOpenOtherProject);
-		if (!rightState.loadModelState(targetVersion))
+		ProjectComparisonManager comparisonManager(std::move(collectionSwitch), leftState, &rightState);
+		if (!comparisonManager.exec(std::move(_config)))
 		{
-			OT_LOG_E("Failed to load model state for project: " + _config.getTargetProjectName() + " with version: " + targetVersion);
+			OT_LOG_E("Project comparison failed");
 			return;
 		}
-
-		comparisonStepEntities(data);
-		comparisonStepDone(data);
 	}
 	catch (const std::exception& _e)
 	{
@@ -381,39 +379,6 @@ void ProjectInformationHandler::comparisonWorker(ot::ProjectCompareConfig&& _con
 // ##################################################################################################################################################################################################################
 
 // Helper
-
-void ProjectInformationHandler::comparisonStepEntities(ComparisonData& _data)
-{
-	_data.switchToStep(ComparisonData::StepCompare);
-	_data.collectionSwitch.switchToInitial();
-
-	std::map<std::string, EntityBase*> leftEntitiesBuffer;
-	std::list<std::pair<ot::UID, ModelStateEntity>> leftEntityInfos;
-	_data.leftState->getListOfTopologyEntities(leftEntityInfos);
-	auto it = leftEntitiesBuffer.find(0);
-	if (it != leftEntitiesBuffer.end())
-	{
-		leftEntitiesBuffer.erase(it);
-	}
-
-
-
-	_data.collectionSwitch.switchToOther();
-
-	std::map<std::string, EntityBase*> rightEntitiesBuffer;
-	std::list<std::pair<ot::UID, ModelStateEntity>> rightEntityInfos;
-	_data.rightState->getListOfTopologyEntities(rightEntityInfos);
-	it = rightEntitiesBuffer.find(0);
-	if (it != rightEntitiesBuffer.end())
-	{
-		rightEntitiesBuffer.erase(it);
-	}
-}
-
-void ProjectInformationHandler::comparisonStepDone(ComparisonData& _data)
-{
-	_data.switchToStep(ComparisonData::StepDone);
-}
 
 void ProjectInformationHandler::requestProjectInformation(const std::string& _projectName)
 {
@@ -477,23 +442,4 @@ void ProjectInformationHandler::loadAuthorisationURL()
 	const std::string authURL = response.getWhat();
 	Application::instance()->setAuthorizationURL(authURL);
 
-}
-
-void ProjectInformationHandler::ComparisonData::initializeUpdater(ProgressUpdater* _updater)
-{
-	progressUpdater = _updater;
-	if (progressUpdater)
-	{
-		progressUpdater->setTotalNumberOfSteps(static_cast<uint64_t>(ComparisonStep::StepDone));
-	}
-	switchToStep(step);
-}
-
-void ProjectInformationHandler::ComparisonData::switchToStep(ComparisonStep _step)
-{
-	step = _step;
-	if (progressUpdater)
-	{
-		progressUpdater->triggerUpdate(static_cast<uint64_t>(step));
-	}
 }

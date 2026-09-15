@@ -40,6 +40,7 @@ namespace ot
 		const std::string CircuitsFolder = "Circuits";
 		const std::string CircuitModelsFolder = "Circuit Models";
 		const std::string HierarchicalProjectRoot = "Project";
+		const std::string ProjectCompareFolder = "Project Compare";
 
 	}
 }
