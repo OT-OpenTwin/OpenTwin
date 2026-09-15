@@ -384,9 +384,6 @@ std::vector<ot::CreateProjectDialogEntry*> ot::CreateProjectDialog::getAllEntrie
 		if (entry) {
 			result.push_back(entry);
 		}
-		else {
-			OT_LOG_E("Item cast failed");
-		}
 	}
 
 	return result;
