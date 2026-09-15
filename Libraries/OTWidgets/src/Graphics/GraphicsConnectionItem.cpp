@@ -29,6 +29,7 @@
 #include "OTWidgets/Graphics/GraphicsItem.h"
 #include "OTWidgets/Graphics/GraphicsView.h"
 #include "OTWidgets/Graphics/GraphicsScene.h"
+#include "OTWidgets/Graphics/GraphicsItemFactory.h"
 #include "OTWidgets/Graphics/GraphicsConnectionItem.h"
 #include "OTWidgets/Graphics/GraphicsDisconnectItem.h"
 #include "OTWidgets/Graphics/GraphicsConnectionConnectorItem.h"
@@ -39,7 +40,8 @@
 
 ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	m_dest(nullptr), m_origin(nullptr), m_originConnector(nullptr), m_destConnector(nullptr),
-	m_disconnectOffset(-(GraphicsDisconnectItem::getSize() / 2.), -(GraphicsDisconnectItem::getSize() / 2.))
+	m_disconnectOffset(-(GraphicsDisconnectItem::getSize() / 2.), -(GraphicsDisconnectItem::getSize() / 2.)),
+	m_originLineTip(nullptr), m_destLineTip(nullptr)
 {
 	m_originDisconnect = new GraphicsDisconnectItem(this);
 	m_originDisconnect->setVisible(false);
@@ -53,32 +55,50 @@ ot::GraphicsConnectionItem::GraphicsConnectionItem() :
 	this->setZValue(GraphicsZValues::Connection);
 }
 
-ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
+ot::GraphicsConnectionItem::~GraphicsConnectionItem()
+{
 	this->setGraphicsElementDestroying();
 
-	if (this->getGraphicsScene()) {
+	if (this->getGraphicsScene())
+	{
 		this->getGraphicsScene()->connectionAboutToBeRemoved(this);
 	}
 
-	if (m_origin) {
+	if (m_origin)
+	{
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
 	}
-	if (m_dest) {
+	if (m_dest)
+	{
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
-	if (m_originConnector) {
+	if (m_originConnector)
+	{
 		m_originConnector->setGraphicsElementDestroying();
 		m_originConnector->forgetConnection(this);
 		delete m_originConnector;
 		m_originConnector = nullptr;
 	}
-	if (m_destConnector) {
+	if (m_destConnector)
+	{
 		m_destConnector->setGraphicsElementDestroying();
 		m_destConnector->forgetConnection(this);
 		delete m_destConnector;
 		m_destConnector = nullptr;
+	}
+	if (m_originLineTip)
+	{
+		m_originLineTip->setGraphicsElementDestroying();
+		delete m_originLineTip;
+		m_originLineTip = nullptr;
+	}
+	if (m_destLineTip)
+	{
+		m_destLineTip->setGraphicsElementDestroying();
+		delete m_destLineTip;
+		m_destLineTip = nullptr;
 	}
 }
 
@@ -86,7 +106,8 @@ ot::GraphicsConnectionItem::~GraphicsConnectionItem() {
 
 // QGraphicsItem
 
-QRectF ot::GraphicsConnectionItem::boundingRect() const {
+QRectF ot::GraphicsConnectionItem::boundingRect() const
+{
 	QPainterPath path;
 	this->calculatePainterPath(path);
 	double margs = m_config.getLineWidth() / 2.;
@@ -94,16 +115,20 @@ QRectF ot::GraphicsConnectionItem::boundingRect() const {
 		QMarginsF(margs, margs, margs, margs));
 }
 
-void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
+void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget)
+{
 	QPen linePen = QtFactory::toQPen(m_config.getLineStyle());
 
-	if (m_config.getHandlesState()) {
-		if (this->getGraphicsElementState() & GraphicsElement::HoverState) {
+	if (m_config.getHandlesState())
+	{
+		if (this->getGraphicsElementState() & GraphicsElement::HoverState)
+		{
 			const Painter2D* newPainter = GraphicsItem::createHoverBorderPainter();
 			linePen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;
 		}
-		else if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
+		else if (this->getGraphicsElementState() & GraphicsElement::SelectedState)
+		{
 			const Painter2D* newPainter = GraphicsItem::createSelectionBorderPainter();
 			linePen.setBrush(QtFactory::toQBrush(newPainter));
 			delete newPainter;
@@ -114,18 +139,33 @@ void ot::GraphicsConnectionItem::paint(QPainter* _painter, const QStyleOptionGra
 
 	QPainterPath path;
 	this->calculatePainterPath(path);
-	if (path.isEmpty()) return;
+	if (path.isEmpty())
+	{
+		return;
+	}
 	_painter->drawPath(path);
+
+	if (m_originLineTip && m_origin)
+	{
+		m_originLineTip->callPaint(_painter, _opt, _widget);
+	}
+	if (m_destLineTip && m_dest)
+	{
+		m_destLineTip->callPaint(_painter, _opt, _widget);
+	}
 }
 
-QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {
+QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value)
+{
 	switch (_change)
 	{
 	case QGraphicsItem::ItemSelectedHasChanged:
-		if (this->isSelected()) {
+		if (this->isSelected())
+		{
 			this->setGraphicsElementState(GraphicsElement::SelectedState, true);
 		}
-		else {
+		else
+		{
 			this->setGraphicsElementState(GraphicsElement::SelectedState, false);
 		}
 		break;
@@ -135,10 +175,13 @@ QVariant ot::GraphicsConnectionItem::itemChange(QGraphicsItem::GraphicsItemChang
 	return QGraphicsItem::itemChange(_change, _value);
 }
 
-void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event) {
-	if (_event->button() == Qt::LeftButton && this->flags() & QGraphicsItem::ItemIsSelectable) {
+void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _event)
+{
+	if (_event->button() == Qt::LeftButton && this->flags() & QGraphicsItem::ItemIsSelectable)
+	{
 		GraphicsScene* sc = dynamic_cast<GraphicsScene*>(this->scene());
-		if (!sc) {
+		if (!sc)
+		{
 			OT_LOG_E("Scene cast failed");
 			return;
 		}
@@ -147,7 +190,8 @@ void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _even
 		sc->setIgnoreEvents(true);
 		sc->blockSignals(true);
 
-		if (_event->modifiers() != Qt::ControlModifier || !sc->getMultiselectionEnabled()) {
+		if (_event->modifiers() != Qt::ControlModifier || !sc->getMultiselectionEnabled())
+		{
 			sc->clearSelection();
 		}
 		this->setSelected(true);
@@ -159,15 +203,18 @@ void ot::GraphicsConnectionItem::mousePressEvent(QGraphicsSceneMouseEvent* _even
 	}
 }
 
-void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event) {
+void ot::GraphicsConnectionItem::mouseReleaseEvent(QGraphicsSceneMouseEvent* _event)
+{
 
 }
 
-void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event) {
+void ot::GraphicsConnectionItem::hoverEnterEvent(QGraphicsSceneHoverEvent* _event)
+{
 	//this->setGraphicsElementState(GraphicsElement::HoverState, true);
 }
 
-void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
+void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event)
+{
 	//this->setGraphicsElementState(GraphicsElement::HoverState, false);
 }
 
@@ -175,7 +222,8 @@ void ot::GraphicsConnectionItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _even
 
 // Graphics Base
 
-qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF& _pt) const {
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF& _pt) const
+{
 	qreal distance = -1.;
 
 	switch (m_config.getLineShape())
@@ -203,11 +251,13 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPoint(const QPointF
 	return distance;
 }
 
-QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() {
+QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem()
+{
 	return this;
 }
 
-const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
+const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const
+{
 	return this;
 }
 
@@ -215,25 +265,32 @@ const QGraphicsItem* ot::GraphicsConnectionItem::getQGraphicsItem() const {
 
 // Configuration
 
-bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg) {
+bool ot::GraphicsConnectionItem::setConfiguration(const ot::GraphicsConnectionCfg& _cfg)
+{
 	m_config = _cfg;
+
 	this->updatePositionsFromItems();
+	this->updateLineTipsFromConfig();
 	return true;
 }
 
-void ot::GraphicsConnectionItem::setLineShape(GraphicsConnectionCfg::ConnectionShape _shape) {
+void ot::GraphicsConnectionItem::setLineShape(GraphicsConnectionCfg::ConnectionShape _shape)
+{
 	this->prepareGeometryChange();
 	m_config.setLineShape(_shape);
+	this->repositionLineTips();
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::setLineWidth(double _width) {
+void ot::GraphicsConnectionItem::setLineWidth(double _width)
+{
 	this->prepareGeometryChange();
 	m_config.setLineWidth(_width);
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::setLineStyle(const PenFCfg& _style) {
+void ot::GraphicsConnectionItem::setLineStyle(const PenFCfg& _style)
+{
 	this->prepareGeometryChange();
 	m_config.setLineStyle(_style);
 	this->update();
@@ -243,7 +300,8 @@ void ot::GraphicsConnectionItem::setLineStyle(const PenFCfg& _style) {
 
 // Item handling
 
-void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest) {
+void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsItem* _dest)
+{
 	OTAssertNullptr(_origin);
 	OTAssertNullptr(_dest);
 	OTAssert(m_origin == nullptr, "Origin already set");
@@ -260,18 +318,21 @@ void ot::GraphicsConnectionItem::connectItems(GraphicsItem* _origin, GraphicsIte
 	this->updateOriginConnectionInformation();
 	this->updateDestConnectionInformation();
 	this->updatePositionsFromItems();
+	this->repositionLineTips();
 	this->update();
 
 }
 
-void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
+void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin)
+{
 	OTAssertNullptr(_origin);
 	OTAssert(m_origin != _origin, "Origin already set to the given item");
 	OTAssert(m_dest != _origin, "Given item is already set as destination");
 
 	this->prepareGeometryChange();
 
-	if (m_origin) {
+	if (m_origin)
+	{
 		OT_LOG_W("Origin item already set. Replacing...");
 		m_origin->forgetConnection(this);
 	}
@@ -282,31 +343,38 @@ void ot::GraphicsConnectionItem::setOriginItem(GraphicsItem* _origin) {
 	this->updateConnectors();
 	this->updateOriginConnectionInformation();
 	this->updatePositionsFromItems();
+	this->repositionLineTips();
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::setOriginPos(const Point2DD& _pos) {
-	if (m_origin) {
+void ot::GraphicsConnectionItem::setOriginPos(const Point2DD& _pos)
+{
+	if (m_origin)
+	{
 		OT_LOG_W("Origin item is set. Ignoring position change.");
 		return;
 	}
-	else {
+	else
+	{
 		OTAssertNullptr(m_originConnector);
 		this->prepareGeometryChange();
 		m_config.setOriginPos(_pos);
 		m_originConnector->setPos(QtFactory::toQPoint(_pos) - QPointF(m_originConnector->boundingRect().width() / 2., m_originConnector->boundingRect().height() / 2.));
+		this->repositionLineTips();
 		this->update();
 	}
 }
 
-void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
+void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest)
+{
 	OTAssertNullptr(_dest);
 	OTAssert(m_dest != _dest, "Destination already set to the given item");
 	OTAssert(m_origin != _dest, "Given item is already set as origin");
-	
+
 	this->prepareGeometryChange();
-	
-	if (m_dest) {
+
+	if (m_dest)
+	{
 		OT_LOG_W("Destination item already set. Replacing...");
 		m_dest->forgetConnection(this);
 	}
@@ -317,106 +385,132 @@ void ot::GraphicsConnectionItem::setDestItem(GraphicsItem* _dest) {
 	this->updateConnectors();
 	this->updateDestConnectionInformation();
 	this->updatePositionsFromItems();
+	this->repositionLineTips();
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::setDestPos(const Point2DD& _pos) {
-	if (m_dest) {
+void ot::GraphicsConnectionItem::setDestPos(const Point2DD& _pos)
+{
+	if (m_dest)
+	{
 		OT_LOG_W("Destination item is set. Ignoring position change.");
 		return;
 	}
-	else {
+	else
+	{
 		OTAssertNullptr(m_destConnector);
 		this->prepareGeometryChange();
 		m_config.setDestinationPos(_pos);
 		m_destConnector->setPos(QtFactory::toQPoint(_pos) - QPointF(m_destConnector->boundingRect().width() / 2., m_destConnector->boundingRect().height() / 2.));
+		this->repositionLineTips();
 		this->update();
 	}
 }
 
-void ot::GraphicsConnectionItem::disconnectItems(bool _updateConfig) {
+void ot::GraphicsConnectionItem::disconnectItems(bool _updateConfig)
+{
 	this->prepareGeometryChange();
 
-	if (m_origin) {
+	if (m_origin)
+	{
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
 	}
-	if (m_dest) {
+	if (m_dest)
+	{
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 	}
-	
+
 	this->updateConnectors();
-	
-	if (_updateConfig) {
+
+	if (_updateConfig)
+	{
 		this->updateOriginConnectionInformation();
 		this->updateDestConnectionInformation();
 	}
 
+	this->repositionLineTips();
+
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::disconnectItem(const GraphicsItem* _item, bool _updateConfig) {
+void ot::GraphicsConnectionItem::disconnectItem(const GraphicsItem* _item, bool _updateConfig)
+{
 	this->prepareGeometryChange();
 
 	bool wasOrigin = false;
-	if (m_origin == _item) {
+	if (m_origin == _item)
+	{
 		m_origin->forgetConnection(this);
 		m_origin = nullptr;
 		wasOrigin = true;
 	}
 
 	bool wasDest = false;
-	if (m_dest == _item) {
+	if (m_dest == _item)
+	{
 		m_dest->forgetConnection(this);
 		m_dest = nullptr;
 		wasDest = true;
 	}
-	
+
 	this->updateConnectors();
 
-	if (_updateConfig) {
-		if (wasOrigin) {
+	if (_updateConfig)
+	{
+		if (wasOrigin)
+		{
 			this->updateOriginConnectionInformation();
 		}
-		if (wasDest) {
+		if (wasDest)
+		{
 			this->updateDestConnectionInformation();
 		}
 	}
 
+	this->repositionLineTips();
+
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _disconnector) {
+void ot::GraphicsConnectionItem::disconnectRequested(GraphicsDisconnectItem* _disconnector)
+{
 	GraphicsScene* sc = this->getGraphicsScene();
 	OTAssertNullptr(sc);
 
 	GraphicsView* view = sc->getGraphicsView();
 	OTAssertNullptr(view);
 
-	if (_disconnector == m_originDisconnect) {
+	if (_disconnector == m_originDisconnect)
+	{
 		this->disconnectItem(m_origin, true);
 		view->notifyConnectionConfigurationChanged(this);
 	}
-	else if (_disconnector == m_destDisconnect) {
+	else if (_disconnector == m_destDisconnect)
+	{
 		this->disconnectItem(m_dest, true);
 		view->notifyConnectionConfigurationChanged(this);
 	}
-	else {
+	else
+	{
 		OT_LOG_E("Unknown disconnector");
 	}
 }
 
-void ot::GraphicsConnectionItem::updatePositionsFromItems() {
+void ot::GraphicsConnectionItem::updatePositionsFromItems()
+{
 	m_config.setOriginPos(QtFactory::toPoint2D(this->getOriginPos()));
 	m_config.setDestinationPos(QtFactory::toPoint2D(this->getDestPos()));
 }
 
-void ot::GraphicsConnectionItem::updateConnectionView() {
+void ot::GraphicsConnectionItem::updateConnectionView()
+{
 	m_originDisconnect->setPos(this->getOriginPos() + m_disconnectOffset);
 	m_destDisconnect->setPos(this->getDestPos() + m_disconnectOffset);
 
 	this->prepareGeometryChange();
+	this->repositionLineTips();
 	this->update();
 }
 
@@ -426,13 +520,16 @@ void ot::GraphicsConnectionItem::updateConnectionInformation()
 	this->updateDestConnectionInformation();
 }
 
-QPointF ot::GraphicsConnectionItem::getOriginPos() const {
+QPointF ot::GraphicsConnectionItem::getOriginPos() const
+{
 	QGraphicsItem* itm = nullptr;
-	if (m_origin) {
+	if (m_origin)
+	{
 		// Origin set
 		itm = m_origin->getQGraphicsItem();
 	}
-	else {
+	else
+	{
 		// Origin not set
 		OTAssertNullptr(m_originConnector);
 		itm = m_originConnector->getQGraphicsItem();
@@ -442,13 +539,16 @@ QPointF ot::GraphicsConnectionItem::getOriginPos() const {
 	return itm->mapToScene(itm->boundingRect().center());
 }
 
-QPointF ot::GraphicsConnectionItem::getDestPos() const {
+QPointF ot::GraphicsConnectionItem::getDestPos() const
+{
 	QGraphicsItem* itm = nullptr;
-	if (m_dest) {
+	if (m_dest)
+	{
 		// Destination set
 		itm = m_dest->getQGraphicsItem();
 	}
-	else {
+	else
+	{
 		// Destination not set
 		OTAssertNullptr(m_destConnector);
 		itm = m_destConnector->getQGraphicsItem();
@@ -462,13 +562,16 @@ QPointF ot::GraphicsConnectionItem::getDestPos() const {
 
 // Protected
 
-void ot::GraphicsConnectionItem::graphicsSceneSet(GraphicsScene* _scene) {
-	if (m_originConnector) {
+void ot::GraphicsConnectionItem::graphicsSceneSet(GraphicsScene* _scene)
+{
+	if (m_originConnector)
+	{
 		_scene->addItem(m_originConnector);
 		m_originConnector->setGraphicsScene(_scene);
 		m_originConnector->finalizeGraphicsItem();
 	}
-	if (m_destConnector) {
+	if (m_destConnector)
+	{
 		_scene->addItem(m_destConnector);
 		m_destConnector->setGraphicsScene(_scene);
 		m_destConnector->finalizeGraphicsItem();
@@ -477,10 +580,24 @@ void ot::GraphicsConnectionItem::graphicsSceneSet(GraphicsScene* _scene) {
 	_scene->addItem(m_originDisconnect);
 	_scene->addItem(m_destDisconnect);
 
+	if (m_originLineTip)
+	{
+		_scene->addItem(m_originLineTip->getQGraphicsItem());
+		m_originLineTip->setGraphicsScene(_scene);
+		m_originLineTip->finalizeGraphicsItem();
+	}
+	if (m_destLineTip)
+	{
+		_scene->addItem(m_destLineTip->getQGraphicsItem());
+		m_destLineTip->setGraphicsScene(_scene);
+		m_destLineTip->finalizeGraphicsItem();
+	}
+
 	this->update();
 }
 
-void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _flags) {
+void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsElementStateFlags& _flags)
+{
 	GraphicsElement::graphicsElementStateChanged(_flags);
 
 	updateDisconnectVisibility();
@@ -492,58 +609,74 @@ void ot::GraphicsConnectionItem::graphicsElementStateChanged(const GraphicsEleme
 
 // Private functions
 
-void ot::GraphicsConnectionItem::updateOriginConnectionInformation() {
-	if (m_origin) {
+void ot::GraphicsConnectionItem::updateOriginConnectionInformation()
+{
+	if (m_origin)
+	{
 		m_config.setOriginConnectable(m_origin->getGraphicsItemName());
 		m_config.setOriginUid(m_origin->getRootItem()->getGraphicsItemUid());
 	}
-	else {
+	else
+	{
 		m_config.setOriginConnectable("");
 		m_config.setOriginUid(ot::invalidUID);
 	}
 }
 
-void ot::GraphicsConnectionItem::updateDestConnectionInformation() {
-	if (m_dest) {
+void ot::GraphicsConnectionItem::updateDestConnectionInformation()
+{
+	if (m_dest)
+	{
 		m_config.setDestinationConnectable(m_dest->getGraphicsItemName());
 		m_config.setDestinationUid(m_dest->getRootItem()->getGraphicsItemUid());
 	}
-	else {
+	else
+	{
 		m_config.setDestinationConnectable("");
 		m_config.setDestinationUid(ot::invalidUID);
 	}
 }
 
-ot::ConnectionDirection ot::GraphicsConnectionItem::calculateOriginDirection() const {
-	if (m_origin) {
+ot::ConnectionDirection ot::GraphicsConnectionItem::calculateOriginDirection() const
+{
+	if (m_origin)
+	{
 		return m_origin->getConnectionDirection();
 	}
-	else {
+	else
+	{
 		OTAssertNullptr(m_originConnector);
 		return m_originConnector->getConnectionDirection();
 	}
 }
 
-ot::ConnectionDirection ot::GraphicsConnectionItem::calculateDestDirection() const {
-	if (m_dest) {
+ot::ConnectionDirection ot::GraphicsConnectionItem::calculateDestDirection() const
+{
+	if (m_dest)
+	{
 		return m_dest->getConnectionDirection();
 	}
-	else {
+	else
+	{
 		OTAssertNullptr(m_destConnector);
 		return m_destConnector->getConnectionDirection();
 	}
 }
 
-void ot::GraphicsConnectionItem::updateConnectors() {
+void ot::GraphicsConnectionItem::updateConnectors()
+{
 	GraphicsScene* sc = this->getGraphicsScene();
 
-	if (m_origin) {
+	if (m_origin)
+	{
 		// Origin set
-		if (m_originConnector) {
+		if (m_originConnector)
+		{
 			m_originConnector->setGraphicsElementDestroying();
 			m_originConnector->forgetConnection(this);
 
-			if (sc) {
+			if (sc)
+			{
 				sc->itemAboutToBeRemoved(m_originConnector);
 				sc->removeItem(m_originConnector);
 				m_originConnector->setGraphicsScene(nullptr);
@@ -553,11 +686,14 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 			m_originConnector = nullptr;
 		}
 	}
-	else {
+	else
+	{
 		// Origin not set
-		if (!m_originConnector) {
+		if (!m_originConnector)
+		{
 			m_originConnector = new GraphicsConnectionConnectorItem(this);
-			if (sc) {
+			if (sc)
+			{
 				sc->addItem(m_originConnector);
 				m_originConnector->setGraphicsScene(sc);
 				m_originConnector->finalizeGraphicsItem();
@@ -569,27 +705,33 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 
 	}
 
-	if (m_dest) {
+	if (m_dest)
+	{
 		// Destination set
-		if (m_destConnector) {
+		if (m_destConnector)
+		{
 			m_destConnector->setGraphicsElementDestroying();
 			m_destConnector->forgetConnection(this);
 
-			if (sc) {
+			if (sc)
+			{
 				sc->itemAboutToBeRemoved(m_destConnector);
 				sc->removeItem(m_destConnector);
 				m_destConnector->setGraphicsScene(nullptr);
 			}
-			
+
 			delete m_destConnector;
 			m_destConnector = nullptr;
 		}
 	}
-	else {
+	else
+	{
 		// Destination not set
-		if (!m_destConnector) {
+		if (!m_destConnector)
+		{
 			m_destConnector = new GraphicsConnectionConnectorItem(this);
-			if (sc) {
+			if (sc)
+			{
 				sc->addItem(m_destConnector);
 				m_destConnector->setGraphicsScene(sc);
 				m_destConnector->finalizeGraphicsItem();
@@ -604,28 +746,36 @@ void ot::GraphicsConnectionItem::updateConnectors() {
 	this->updateDisconnectVisibility();
 }
 
-void ot::GraphicsConnectionItem::updateDisconnectVisibility() {
-	if (this->getGraphicsElementState() & GraphicsElement::SelectedState) {
-		if (m_origin) {
+void ot::GraphicsConnectionItem::updateDisconnectVisibility()
+{
+	if (this->getGraphicsElementState() & GraphicsElement::SelectedState)
+	{
+		if (m_origin)
+		{
 			m_originDisconnect->setVisible(true);
 		}
-		else {
+		else
+		{
 			m_originDisconnect->setVisible(false);
 		}
-		if (m_dest) {
+		if (m_dest)
+		{
 			m_destDisconnect->setVisible(true);
 		}
-		else {
+		else
+		{
 			m_destDisconnect->setVisible(false);
 		}
 	}
-	else {
+	else
+	{
 		m_originDisconnect->setVisible(false);
 		m_destDisconnect->setVisible(false);
 	}
 }
 
-void ot::GraphicsConnectionItem::calculatePainterPath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculatePainterPath(QPainterPath& _path) const
+{
 	switch (m_config.getLineShape())
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::DirectLine:
@@ -649,12 +799,14 @@ void ot::GraphicsConnectionItem::calculatePainterPath(QPainterPath& _path) const
 	}
 }
 
-void ot::GraphicsConnectionItem::calculateDirectLinePath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculateDirectLinePath(QPainterPath& _path) const
+{
 	_path.moveTo(this->getOriginPos());
 	_path.lineTo(this->getDestPos());
 }
 
-void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) const
+{
 	// Get the center point of the connectable items
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
@@ -673,26 +825,32 @@ void ot::GraphicsConnectionItem::calculateSmoothLinePath(QPainterPath& _path) co
 	_path.cubicTo(controlPoint1, controlPoint2, destinationPoint);
 }
 
-void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const {
-	switch (_direction) {
+void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin, const QPointF& _destination, double _halfdistX, double _halfdistY, QPointF& _control, ot::ConnectionDirection _direction) const
+{
+	switch (_direction)
+	{
 	case ConnectionDirection::Any:
 	{
 		double ptx, pty;
-		if (_origin.x() > _destination.x()) {
+		if (_origin.x() > _destination.x())
+		{
 			ptx = _origin.x() - _halfdistX;
 		}
-		else {
+		else
+		{
 			ptx = _origin.x() + _halfdistX;
 		}
-		if (_origin.y() > _destination.y()) {
+		if (_origin.y() > _destination.y())
+		{
 			pty = _origin.y() - _halfdistY;
 		}
-		else {
+		else
+		{
 			pty = _origin.y() + _halfdistY;
 		}
 		_control = QPointF(ptx, pty);
 	}
-		break;
+	break;
 	case ConnectionDirection::Left:
 		_control = QPointF(_origin.x() - _halfdistX, _origin.y());
 		break;
@@ -711,33 +869,38 @@ void ot::GraphicsConnectionItem::calculateSmoothLineStep(const QPointF& _origin,
 	}
 }
 
-void ot::GraphicsConnectionItem::calculateXYLinePath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculateXYLinePath(QPainterPath& _path) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 	const QPointF controlPoint(destinationPoint.x(), originPoint.y());
 
 	_path.moveTo(originPoint);
 
-	if (destinationPoint != controlPoint) {
+	if (destinationPoint != controlPoint)
+	{
 		_path.lineTo(controlPoint);
 	}
 	_path.lineTo(destinationPoint);
 }
 
-void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculateYXLinePath(QPainterPath& _path) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 	const QPointF controlPoint(originPoint.x(), destinationPoint.y());
 
 	_path.moveTo(originPoint);
 
-	if (destinationPoint != controlPoint) {
+	if (destinationPoint != controlPoint)
+	{
 		_path.lineTo(controlPoint);
 	}
 	_path.lineTo(destinationPoint);
 }
 
-void ot::GraphicsConnectionItem::calculateAutoXYLinePath(QPainterPath& _path) const {
+void ot::GraphicsConnectionItem::calculateAutoXYLinePath(QPainterPath& _path) const
+{
 	switch (this->calculateAutoXYShape())
 	{
 	case ot::GraphicsConnectionCfg::ConnectionShape::XYLine:
@@ -755,14 +918,16 @@ void ot::GraphicsConnectionItem::calculateAutoXYLinePath(QPainterPath& _path) co
 	}
 }
 
-qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const QPointF& _pt) const {
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointDirect(const QPointF& _pt) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 
 	return Math::calculateShortestDistanceFromPointToLine(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), destinationPoint.x(), destinationPoint.y());
 }
 
-qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const QPointF& _pt) const {
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const QPointF& _pt) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 
@@ -779,7 +944,8 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointSmooth(const Q
 	return Math::calculateShortestDistanceFromPointToBezierCurve(_pt.x(), _pt.y(), originPoint.x(), originPoint.y(), controlPoint1.x(), controlPoint1.y(), controlPoint2.x(), controlPoint2.y(), destinationPoint.x(), destinationPoint.y());
 }
 
-qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPointF& _pt) const {
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPointF& _pt) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 	const QPointF controlPoint(destinationPoint.x(), originPoint.y());
@@ -790,7 +956,8 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointXY(const QPoin
 	return std::min(d1, d2);
 }
 
-qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPointF& _pt) const {
+qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointYX(const QPointF& _pt) const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 	const QPointF controlPoint(originPoint.x(), destinationPoint.y());
@@ -818,46 +985,177 @@ qreal ot::GraphicsConnectionItem::calculateShortestDistanceToPointAutoXY(const Q
 ot::GraphicsConnectionCfg::ConnectionShape ot::GraphicsConnectionItem::calculateAutoXYShape() const
 {
 	Alignment connectionAlignment = this->calculateConnectionDirectionAlignment();
-	
+
 	if (
 		connectionAlignment == Alignment::Left ||
 		connectionAlignment == Alignment::Top ||
 		connectionAlignment == Alignment::Right ||
 		connectionAlignment == Alignment::Bottom ||
 		connectionAlignment == Alignment::Center
-		) {
+		)
+	{
 		return GraphicsConnectionCfg::ConnectionShape::XYLine;
 	}
 
 	GraphicsConnectionCalculationData info(this->calculateOriginDirection(), this->calculateDestDirection(), connectionAlignment);
 	std::list<GraphicsConnectionCalculationData> yxLines = GraphicsConnectionCalculationData::getAllYXLines();
-	
-	if (std::find(yxLines.begin(), yxLines.end(), info) != yxLines.end()) {
+
+	if (std::find(yxLines.begin(), yxLines.end(), info) != yxLines.end())
+	{
 		return GraphicsConnectionCfg::ConnectionShape::YXLine;
 	}
-	else {
+	else
+	{
 		return GraphicsConnectionCfg::ConnectionShape::XYLine;
 	}
 }
 
-ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment() const {
+ot::Alignment ot::GraphicsConnectionItem::calculateConnectionDirectionAlignment() const
+{
 	const QPointF originPoint = this->getOriginPos();
 	const QPointF destinationPoint = this->getDestPos();
 	const QPointF delta = destinationPoint - originPoint;
 
-	if (delta.x() > 0.) {
+	if (delta.x() > 0.)
+	{
 		if (delta.y() > 0.) return Alignment::BottomRight;
 		else if (delta.y() < 0.) return Alignment::TopRight;
 		else return Alignment::Right;
 	}
-	else if (delta.x() < 0.) {
+	else if (delta.x() < 0.)
+	{
 		if (delta.y() > 0.) return Alignment::BottomLeft;
 		else if (delta.y() < 0.) return Alignment::TopLeft;
 		else return Alignment::Left;
 	}
-	else {
+	else
+	{
 		if (delta.y() > 0.) return Alignment::Bottom;
 		else if (delta.y() < 0.) return Alignment::Top;
 		else return Alignment::Center;
 	}
+}
+
+void ot::GraphicsConnectionItem::updateLineTipsFromConfig()
+{
+	GraphicsScene* sc = this->getGraphicsScene();
+
+	if (m_originLineTip)
+	{
+		m_originLineTip->setGraphicsElementDestroying();
+		if (this->getGraphicsScene())
+		{
+			this->getGraphicsScene()->itemAboutToBeRemoved(m_originLineTip);
+			this->getGraphicsScene()->removeItem(m_originLineTip->getQGraphicsItem());
+			m_originLineTip->setGraphicsScene(nullptr);
+		}
+		delete m_originLineTip;
+		m_originLineTip = nullptr;
+	}
+	if (m_destLineTip)
+	{
+		m_destLineTip->setGraphicsElementDestroying();
+		if (this->getGraphicsScene())
+		{
+			this->getGraphicsScene()->itemAboutToBeRemoved(m_destLineTip);
+			this->getGraphicsScene()->removeItem(m_destLineTip->getQGraphicsItem());
+			m_destLineTip->setGraphicsScene(nullptr);
+		}
+		delete m_destLineTip;
+		m_destLineTip = nullptr;
+	}
+
+	if (m_config.hasOriginLineTip())
+	{
+		m_originLineTip = GraphicsItemFactory::itemFromConfig(m_config.getOriginLineTip());
+		if (sc)
+		{
+			sc->addItem(m_originLineTip->getQGraphicsItem());
+			m_originLineTip->setGraphicsScene(sc);
+			m_originLineTip->finalizeGraphicsItem();
+		}
+	}
+	if (m_config.hasDestinationLineTip())
+	{
+		m_destLineTip = GraphicsItemFactory::itemFromConfig(m_config.getDestinationLineTip());
+		OT_LOG_T("T");
+		if (sc)
+		{
+			sc->addItem(m_destLineTip->getQGraphicsItem());
+			m_destLineTip->setGraphicsScene(sc);
+			m_destLineTip->finalizeGraphicsItem();
+		}
+	}
+}
+
+void ot::GraphicsConnectionItem::repositionLineTips()
+{
+	if (!m_originLineTip && !m_destLineTip)
+	{
+		return;
+	}
+
+	QPainterPath path;
+	this->calculatePainterPath(path);
+
+	if (path.isEmpty())
+	{
+		return;
+	}
+
+	if (m_originLineTip)
+	{
+		QGraphicsItem* item = m_originLineTip->getQGraphicsItem();
+		OTAssertNullptr(item);
+
+		const double angle = this->calculatePathAngle(path, true);
+		const QRectF bounds = item->boundingRect();
+
+		QPointF anchor(bounds.right(), bounds.center().y());
+
+		if (!m_originLineTip->getGraphicsItemFlags().has(GraphicsItemCfg::ItemIgnoresParentTransform))
+		{
+			item->setRotation(angle);
+		}
+
+		QTransform rotation;
+		rotation.rotate(angle);
+
+		item->setPos(path.pointAtPercent(0.) - rotation.map(anchor));
+	}
+
+	if (m_destLineTip)
+	{
+		QGraphicsItem* item = m_destLineTip->getQGraphicsItem();
+		OTAssertNullptr(item);
+
+		const double angle = this->calculatePathAngle(path, false);
+		const QRectF bounds = item->boundingRect();
+
+		QPointF anchor(bounds.right(), bounds.center().y());
+
+		if (!m_destLineTip->getGraphicsItemFlags().has(GraphicsItemCfg::ItemIgnoresParentTransform))
+		{
+			item->setRotation(angle);
+		}
+
+		QTransform rotation;
+		rotation.rotate(angle);
+
+		item->setPos(path.pointAtPercent(1.) - rotation.map(anchor));
+	}
+}
+
+double ot::GraphicsConnectionItem::calculatePathAngle(const QPainterPath& _path, bool _atOrigin) const
+{
+	const QPointF point = _atOrigin ? _path.pointAtPercent(0.) : _path.pointAtPercent(1.);
+	const QPointF adjacentPoint = _atOrigin ? _path.pointAtPercent(0.001) : _path.pointAtPercent(0.999);
+	const QPointF direction = point - adjacentPoint;
+
+	if (qFuzzyIsNull(direction.x()) && qFuzzyIsNull(direction.y()))
+	{
+		return 0.;
+	}
+
+	return std::atan2(direction.y(), direction.x()) * 180. / Math::pi();
 }

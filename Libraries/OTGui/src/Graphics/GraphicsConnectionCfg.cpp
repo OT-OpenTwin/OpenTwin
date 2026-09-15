@@ -73,7 +73,10 @@ void ot::GraphicsConnectionCfg::addToJsonObject(JsonValue& _object, JsonAllocato
 	_object.AddMember("HandleState", m_handlesState, _allocator);
 	
 	_object.AddMember("OriginPos", JsonObject(m_originPos, _allocator), _allocator);
+	_object.AddMember("OriginLineTip", JsonObject(m_originLineTip, _allocator), _allocator);
+
 	_object.AddMember("DestinationPos", JsonObject(m_destPos, _allocator), _allocator);
+	_object.AddMember("DestinationLineTip", JsonObject(m_destLineTip, _allocator), _allocator);
 
 	_object.AddMember("Shape", JsonString(this->shapeToString(this->m_lineShape), _allocator), _allocator);
 	_object.AddMember("Style", JsonObject(m_lineStyle, _allocator), _allocator);
@@ -85,7 +88,10 @@ void ot::GraphicsConnectionCfg::setFromJsonObject(const ConstJsonObject& _object
 	m_handlesState = json::getBool(_object, "HandleState");
 
 	m_originPos.setFromJsonObject(json::getObject(_object, "OriginPos"));
+	m_originLineTip.setFromJsonObject(json::getObject(_object, "OriginLineTip"));
+
 	m_destPos.setFromJsonObject(json::getObject(_object, "DestinationPos"));
+	m_destLineTip.setFromJsonObject(json::getObject(_object, "DestinationLineTip"));
 
 	m_lineShape = this->stringToShape(json::getString(_object, "Shape"));
 	m_lineStyle.setFromJsonObject(json::getObject(_object, "Style"));
@@ -97,10 +103,27 @@ ot::GraphicsConnectionCfg ot::GraphicsConnectionCfg::getReversedConnectionCfg() 
 	ret.setOriginUid(this->getDestinationUid());
 	ret.setOriginConnectable(this->getDestinationConnectable());
 	ret.setOriginPos(this->getDestinationPos());
+	if (this->hasDestinationLineTip())
+	{
+		ret.setOriginLineTip(this->getDestinationLineTip()->createCopy());
+	}
+	else
+	{
+		ret.setOriginLineTip(nullptr);
+	}
+	
 
 	ret.setDestinationUid(this->getOriginUid());
 	ret.setDestinationConnectable(this->getOriginConnectable());
 	ret.setDestinationPos(this->getOriginPos());
+	if (this->hasOriginLineTip())
+	{
+		ret.setDestinationLineTip(this->getOriginLineTip()->createCopy());
+	}
+	else
+	{
+		ret.setDestinationLineTip(nullptr);
+	}
 
 	return ret;
 }

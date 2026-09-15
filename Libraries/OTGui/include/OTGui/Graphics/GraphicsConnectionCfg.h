@@ -24,6 +24,7 @@
 #include "OTCore/Geometry/Point2D.h"
 #include "OTGui/Style/PenCfg.h"
 #include "OTGui/Graphics/GraphicsConnectionInfo.h"
+#include "OTGui/Graphics/GraphicsItemCfgContainer.h"
 
 // std header
 #include <string>
@@ -70,9 +71,19 @@ namespace ot {
 		void setOriginPos(const Point2DD& _pos) { m_originPos = _pos; };
 		const Point2DD& getOriginPos() const { return m_originPos; };
 
+		void setOriginLineTip(GraphicsItemCfg* _tip) { m_originLineTip.replace(_tip); };
+		GraphicsItemCfg* getOriginLineTip() { return m_originLineTip.get(); };
+		const GraphicsItemCfg* getOriginLineTip() const { return m_originLineTip.get(); };
+		bool hasOriginLineTip() const { return !m_originLineTip.isEmpty(); };
+
 		void setDestinationPos(double _x, double _y) { m_destPos.set(_x, _y); };
 		void setDestinationPos(const Point2DD& _pos) { m_destPos = _pos; };
 		const Point2DD& getDestinationPos() const { return m_destPos; };
+
+		void setDestinationLineTip(GraphicsItemCfg* _tip) { m_destLineTip.replace(_tip); };
+		GraphicsItemCfg* getDestinationLineTip() { return m_destLineTip.get(); };
+		const GraphicsItemCfg* getDestinationLineTip() const { return m_destLineTip.get(); };
+		bool hasDestinationLineTip() const { return !m_destLineTip.isEmpty(); };
 
 		void setLineShape(ConnectionShape _shape) { m_lineShape = _shape; };
 		ConnectionShape getLineShape() const { return m_lineShape; };
@@ -99,7 +110,10 @@ namespace ot {
 
 	private:
 		Point2DD m_originPos;
+		GraphicsItemCfgContainer m_originLineTip;
+
 		Point2DD m_destPos;
+		GraphicsItemCfgContainer m_destLineTip;
 
 		ConnectionShape m_lineShape;
 		PenFCfg m_lineStyle;

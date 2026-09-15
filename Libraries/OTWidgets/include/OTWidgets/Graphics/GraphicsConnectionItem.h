@@ -194,15 +194,21 @@ namespace ot {
 
 		ot::Alignment calculateConnectionDirectionAlignment() const;
 
+		void updateLineTipsFromConfig();
+		void repositionLineTips();
+		double calculatePathAngle(const QPainterPath& _path, bool _atOrigin) const;
+
 		GraphicsConnectionCfg m_config;
 
 		GraphicsItem* m_origin;
 		GraphicsDisconnectItem* m_originDisconnect;
 		GraphicsConnectionConnectorItem* m_originConnector;
+		GraphicsItem* m_originLineTip;
 
 		GraphicsItem* m_dest;
 		GraphicsDisconnectItem* m_destDisconnect;
 		GraphicsConnectionConnectorItem* m_destConnector;
+		GraphicsItem* m_destLineTip;
 
 		QRectF m_lastRect;
 		QPointF m_disconnectOffset;
