@@ -238,6 +238,13 @@ ot::GraphicsConnectionCfg DependencyGraph::createEdge(ot::UID _origin, const std
     ot::GraphicsConnectionCfg edge(_origin, _originConnector, _destination, _destinationConnector);
     edge.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
     edge.setUid(Application::instance()->getModel()->createEntityUID());
+    
+    ot::GraphicsTriangleItemCfg* arrowHead = new ot::GraphicsTriangleItemCfg();
+    edge.setDestinationLineTip(arrowHead);
+    arrowHead->setSize(ot::Size2DD(10., 10.));
+    arrowHead->setOutline(ot::PenFCfg(1., new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection)));
+    arrowHead->setBackgroundPainer(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
+
     return edge;
 }
 
