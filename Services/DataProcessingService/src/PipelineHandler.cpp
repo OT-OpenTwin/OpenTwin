@@ -25,6 +25,8 @@
 #include "OTBlockEntities/Pipeline/EntityBlockStorage.h"
 #include "OTBlockEntities/Pipeline/EntityBlockRefinement.h"
 
+#include "Application.h"
+
 #include "BlockHandlerDatabaseAccess.h"
 #include "BlockHandlerPython.h"
 #include "BlockHandlerDisplay.h"
@@ -38,7 +40,7 @@
 #include "SolverReport.h"
 #include "OTCore/TimeFormatter.h"
 
-#include "TransactionLoggerInstance.h"
+#include "OTServiceFoundation/TransactionData/TransactionEntryBuilder.h"
 
 void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootNodes, const std::map<ot::UID, std::shared_ptr<GraphNode>>& _graphNodesByBlockID, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allBlockEntitiesByBlockID)
 {
@@ -50,10 +52,10 @@ void PipelineHandler::runAll(const std::list<std::shared_ptr<GraphNode>>& _rootN
 
 		for (std::shared_ptr<GraphNode> rootNode : _rootNodes)
 		{
-			TransactionLoggerInstance::INSTANCE().initiate();
+			ot::TransactionEntryBuilder::INSTANCE().initiate(Application::instance()->getCollectionName(), Application::instance()->getLogInUserName());
 			std::shared_ptr<BlockHandler> handler = m_blockHandlerByGraphNode[rootNode];
 			handler->executeOwnNode(rootNode);
-			TransactionLoggerInstance::INSTANCE().log();
+			ot::TransactionEntryBuilder::INSTANCE().log();
 		}
 		SolverReport::instance().addToContentAndDisplay("Pipeline executed successfull.\n", _uiComponent);
 		SolverReport::instance().storeReport();

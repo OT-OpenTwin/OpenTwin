@@ -20,7 +20,6 @@
 #include "Application.h"
 #include "BlockHandlerPython.h"
 #include "OTModelAPI/ModelServiceAPI.h"
-#include "TransactionLoggerInstance.h"
 
 // OpenTwin header
 #include "OTCore/ReturnValues.h"
@@ -34,7 +33,7 @@
 #include "OTCore/Python/PyhonParameterBuilderGeneric.h"
 
 #include "OTModelEntities/EntityFile.h"
-
+#include "OTServiceFoundation/TransactionData/TransactionEntryBuilder.h"
 
 
 BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const HandlerMap& _handlerMap)
@@ -57,19 +56,21 @@ BlockHandlerPython::BlockHandlerPython(EntityBlockPython* _blockEntity, const Ha
                m_outputs.push_back(connector.getConnectorName());
            }
       }     
+      
       m_argPort = _blockEntity->getArgsPortLabel();
       m_entityName = _blockEntity->getName();
       m_scriptName = _blockEntity->getSelectedScript();
 
       ot::EntityInformation entityInfo;
       ot::ModelServiceAPI::getEntityInformation(m_scriptName, entityInfo);
-      TransactionLoggerInstance::INSTANCE().addFromEntity(entityInfo.getEntityID());
+      m_scriptIdentifier = ot::EntityIdentifier(entityInfo.getEntityID(), entityInfo.getEntityVersion());
 
       m_manifestUID =  _blockEntity->getSelectedEnvironment();
 }
 
 bool BlockHandlerPython::executeSpecialized()
 {
+    ot::TransactionEntryBuilder::INSTANCE().addFromEntity(m_scriptIdentifier);
     //The block has n-ports which are defiend in the script. We need to check if all inputs are set.
     bool allInputsComplete = true;
     for (std::string& requiredPort : m_requiredInput)

@@ -36,6 +36,7 @@ private:
 	std::list<std::string> m_outputs;
 	std::list<PipelineData> m_outputData;
 	std::string m_scriptName;
+	ot::EntityIdentifier m_scriptIdentifier;
 	std::string m_entityName;
 	ot::UID m_manifestUID = ot::invalidUID;
 	ot::PythonServiceInterface* m_pythonServiceInterface = nullptr;

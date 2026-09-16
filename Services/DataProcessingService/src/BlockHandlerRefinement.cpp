@@ -1,6 +1,6 @@
 ﻿#include "BlockHandlerRefinement.h"
 #include "Application.h"
-#include "TransactionLoggerInstance.h"
+#include "OTServiceFoundation/TransactionData/TransactionEntryBuilder.h"
 
 BlockHandlerRefinement::BlockHandlerRefinement(EntityBlockRefinement* _zoneBlockEntity, const HandlerMap& _handlerMap)
 	:BlockHandler(_zoneBlockEntity, _handlerMap)
@@ -32,12 +32,13 @@ bool BlockHandlerRefinement::executeSpecialized()
 		info.setFromJsonObject(entry->GetObject());
 		names.push_back(info.getEntityName());
 		entityInfos.push_back(info);
-
-		TransactionLoggerInstance::INSTANCE().addFromEntity(info.getEntityID());
-		TransactionLoggerInstance::INSTANCE().setTransactionType(TransactionType::Refinement);
+		
+		ot::TransactionEntryBuilder::INSTANCE().addFromEntity(ot::EntityIdentifier(info.getEntityID(), info.getEntityVersion()));
+		ot::TransactionEntryBuilder::INSTANCE().setTransactionType(ot::TransactionType::Refinement);
+		
 		ot::JsonDocument description;
 		description.AddMember("Operation", ot::JsonString("Raw -> Refined", description.GetAllocator()), description.GetAllocator());
-		TransactionLoggerInstance::INSTANCE().setTransactionDescription(description.toJson());
+		ot::TransactionEntryBuilder::INSTANCE().setTransactionDescription(description.toJson());
 		ot::JsonDocument temp;
 		temp.AddMember("EntityNames", ot::JsonArray(names, temp.GetAllocator()),temp.GetAllocator());
 

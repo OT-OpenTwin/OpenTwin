@@ -277,7 +277,7 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 #include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
-#include "OTServiceFoundation/TransactionData/TransactionLogger.h"
+#include "OTServiceFoundation/TransactionData/TransactionCollectionAccess.h"
 
 void ViewVisualisationHandler::handleDependencyGraphRequest()
 {
@@ -287,15 +287,11 @@ void ViewVisualisationHandler::handleDependencyGraphRequest()
 	auto selectedEntities = Application::instance()->getModel()->getListOfSelectedEntities();
 	if (selectedEntities.size() == 1)
 	{
-		TransactionLogger logger(Application::instance()->getCollectionName());
+		ot::TransactionCollectionAccess access(Application::instance()->getCollectionName());
 		ot::UID selectedID = (*selectedEntities.begin())->getEntityID();
-		std::string result = logger.searchEntry(TransactionType::Refinement, selectedID);
-		ot::JsonDocument doc;
-		doc.fromJson(result);
-		const auto& allDocuments = doc["Documents"];
-		const auto& entries = allDocuments.GetArray();
-
-
+		ot::UID selectedVersion = (*selectedEntities.begin())->getEntityStorageVersion();
+		std::list<ot::TransactionEntry> entries = access.searchEntry(ot::TransactionType::Refinement, ot::EntityIdentifier(selectedID,selectedVersion));
+				
 		std::string originConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Bottom);
 		std::string destConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Top);
 		std::list< ot::GraphicsConnectionCfg> edges;
@@ -308,18 +304,15 @@ void ViewVisualisationHandler::handleDependencyGraphRequest()
 
 		std::set<ot::UID> allVertices;
 		ot::UID dummyID = 13;
-		for (auto& entry : entries)
+		for (ot::TransactionEntry& entry : entries)
 		{
-			ot::UIDList verticesFrom = ot::json::getUInt64List(entry, "from");
-			ot::UIDList verticesTo = ot::json::getUInt64List(entry, "to");
-			std::string edgeWriting =	ot::json::getString(entry, "transactionSettings");
-			for (ot::UID origin : verticesFrom)
+			for (ot::EntityIdentifier origin : entry.getEntityIdentifierFrom())
 			{
-				allVertices.insert(origin);
-				for (ot::UID target : verticesTo)
+				allVertices.insert(origin.m_id);
+				for (ot::EntityIdentifier target : entry.getEntityIdentifierTo())
 				{
-					allVertices.insert(target);
-					ot::GraphicsConnectionCfg edge (origin, originConnector, target, destConnector);
+					allVertices.insert(target.m_id);
+					ot::GraphicsConnectionCfg edge (origin.m_id, originConnector, target.m_id, destConnector);
 					edge.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
 					edge.setUid(dummyID++);
 					connPkg.addConnection(edge);

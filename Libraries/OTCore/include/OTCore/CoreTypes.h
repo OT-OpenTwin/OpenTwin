@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: CoreTypes.h
 // 
 // License:
@@ -58,5 +58,11 @@ namespace ot {
 
 	//! @brief Unique identifier list
 	typedef std::list<UID> UIDList;
+
+	struct EntityIdentifier
+	{
+		ot::UID m_id;
+		ot::UID m_version;
+	};
 }
 

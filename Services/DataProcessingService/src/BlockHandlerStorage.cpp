@@ -21,7 +21,7 @@
 #include "BlockHandlerStorage.h"
 #include "Application.h"
 
-#include "TransactionLoggerInstance.h"
+#include "OTServiceFoundation/TransactionData/TransactionEntryBuilder.h"
 
 #include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
@@ -330,7 +330,7 @@ bool BlockHandlerStorage::executeSpecialized()
 				seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName);
 			}	
 			
-			TransactionLoggerInstance::INSTANCE().addToEntity(seriesID);
+
 
 			SolverReport::instance().addToContentAndDisplay("Storing data into series: " + seriesName + ".\n", _uiComponent);
 
@@ -339,7 +339,18 @@ bool BlockHandlerStorage::executeSpecialized()
 			{
 				resultCollectionExtender.processDataPoints(&dsd, seriesID);
 			}
-			resultCollectionExtender.storeCampaignChanges();
+			ot::NewModelStateInfo newEntities =	resultCollectionExtender.storeCampaignChanges();
+			auto topoIDItt = newEntities.getTopologyEntityIDs().begin();
+			auto topoVersionItt = newEntities.getTopologyEntityVersions().begin();
+
+			while (topoIDItt != newEntities.getTopologyEntityIDs().end())
+			{
+				ot::TransactionEntryBuilder::INSTANCE().addToEntity(ot::EntityIdentifier(*topoIDItt, *topoVersionItt));
+				topoIDItt++;
+				topoVersionItt++;
+			}
+
+
 			auto endTimePoint = std::chrono::high_resolution_clock::now();
 
 			const std::string duration = TimeFormatter::formatDuration(startTimePoint, endTimePoint);

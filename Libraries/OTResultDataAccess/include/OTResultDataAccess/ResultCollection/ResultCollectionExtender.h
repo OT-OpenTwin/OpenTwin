@@ -31,6 +31,7 @@
 #include "OTResultDataAccess/ResultImportLogger/ResultImportLogger.h"
 #include "OTResultDataAccess/SerialisationInterfaces/DatasetDescription.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionMetadataAccess.h"
+#include "OTModelEntities/NewModelStateInfo.h"
 
 // std header
 #include <string>
@@ -50,7 +51,7 @@ public:
 	//! @brief Throws exception if any parameter/quantity constellation is unvalid.
 	void processDataPoints(DatasetDescription* dataDescription, uint64_t seriesMetadataIndex);
 			
-	void storeCampaignChanges();
+	ot::NewModelStateInfo storeCampaignChanges();
 	bool removeSeries(ot::UID _uid);
 
 	ResultImportLogger& getLogger() { return m_logger; }

@@ -127,7 +127,7 @@ void ResultCollectionExtender::processDataPoints(DatasetDescription* _dataDescri
 	//DataLakeHelper::createDefaultIndexes(m_collectionName);
 }
 
-void ResultCollectionExtender::storeCampaignChanges()
+ot::NewModelStateInfo ResultCollectionExtender::storeCampaignChanges()
 {
 	MetadataEntityInterface entityCreator;
 	entityCreator.setCallbackData(this->getCallbackData());
@@ -149,6 +149,7 @@ void ResultCollectionExtender::storeCampaignChanges()
 	{
 		ot::ModelServiceAPI::addEntitiesToModel(newEntities, "Updated result data collection", true, m_saveModel);
 	}
+	return newEntities;
 }
 
 bool ResultCollectionExtender::removeSeries(ot::UID _uid)
