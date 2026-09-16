@@ -21,26 +21,47 @@ bool BlockHandlerRefinement::executeSpecialized()
 	ot::JsonDocument responsDoc; 
 	responsDoc.fromJson(response);
 	auto matchingEntitiesInfos = ot::json::getArray(responsDoc, OT_ACTION_PARAM_MODEL_EntityInfo);
+	// These entities have been tagged with a maximum of the selected zone
 	
-	if (matchingEntitiesInfos.Size() > 0)
+	std::list<ot::EntityInformation> entityInfos;
+	for (int i = 0; i < matchingEntitiesInfos.Size(); i++)
 	{
-		// Currently we handle only one per run (temporary)
-		std::list<ot::EntityInformation> entityInfos;
-		std::list<std::string> names;
-		const auto& entry = matchingEntitiesInfos.begin();
+		auto entry = ot::json::getObject(matchingEntitiesInfos, i);
 		ot::EntityInformation info;
-		info.setFromJsonObject(entry->GetObject());
-		names.push_back(info.getEntityName());
+		info.setFromJsonObject(entry);
 		entityInfos.push_back(info);
+	}
+
+	// Now we check if they need refinement or if there is already a refinement connection comming from them
+	ot::TransactionCollectionAccess access(Application::instance()->getCollectionName());
+	std::list<ot::EntityInformation> entitiesForRefinement;
+	for (const ot::EntityInformation& info : entityInfos)
+	{
+		std::list<ot::TransactionEntry> transactions =	access.searchEntry(ot::TransactionType::Refinement, ot::EntityIdentifier(info.getEntityID(), info.getEntityVersion()), ot::TransactionCollectionAccess::EdgeDirection::FromStartVertex);
+		if (transactions.size() == 0)
+		{
+			entitiesForRefinement.push_back(info);
+		}
+	}
+
+	if (entitiesForRefinement.size() > 0)
+	{
+		// Currently we handle only one per run so that the transactions describe a single refinement. 
+
+		const auto& firstEntity= entitiesForRefinement.begin();
 		
-		ot::TransactionEntryBuilder::INSTANCE().addFromEntity(ot::EntityIdentifier(info.getEntityID(), info.getEntityVersion()));
+		
+		
+		
+		ot::TransactionEntryBuilder::INSTANCE().addFromEntity(ot::EntityIdentifier(firstEntity->getEntityID(), firstEntity->getEntityVersion()));
 		ot::TransactionEntryBuilder::INSTANCE().setTransactionType(ot::TransactionType::Refinement);
 		
 		ot::JsonDocument description;
 		description.AddMember("Operation", ot::JsonString("Raw -> Refined", description.GetAllocator()), description.GetAllocator());
 		ot::TransactionEntryBuilder::INSTANCE().setTransactionDescription(description.toJson());
 		ot::JsonDocument temp;
-		temp.AddMember("EntityNames", ot::JsonArray(names, temp.GetAllocator()),temp.GetAllocator());
+		std::list<std::string> names = { firstEntity->getEntityName() };
+		temp.AddMember("EntityNames", ot::JsonArray(names, temp.GetAllocator()), temp.GetAllocator());
 
 		m_output.setData(std::move(temp["EntityNames"]));
 
@@ -49,6 +70,7 @@ bool BlockHandlerRefinement::executeSpecialized()
 	}
 	else
 	{
+		OT_USER_LOG_I("No data found of the selected zone that need refinement");
 		return false;
 	}
 	

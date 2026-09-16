@@ -10,9 +10,16 @@ namespace ot
 	class OT_SERVICEFOUNDATION_API_EXPORT TransactionCollectionAccess
 	{
 	public:
+		enum class EdgeDirection
+		{
+			TowardsStartVertex,
+			FromStartVertex,
+			BothDirections
+		};
+
 		TransactionCollectionAccess(const std::string& _collectionName);
 		void log(TransactionEntry& _transactionEntry);
-		std::list<ot::TransactionEntry> searchEntry(TransactionType _transactionType, ot::EntityIdentifier _startVertex);
+		std::list<ot::TransactionEntry> searchEntry(TransactionType _transactionType, ot::EntityIdentifier _startVertex, EdgeDirection _edgeDirection = EdgeDirection::BothDirections);
 
 	private:
 		DataStorageAPI::DataLakeAPI m_dataLakeAPI;

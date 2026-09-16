@@ -15,7 +15,7 @@ void ot::TransactionCollectionAccess::log(TransactionEntry& _transactionEntry)
 	m_dataLakeAPI.flushQueuedData();
 }
 
-std::list<ot::TransactionEntry> ot::TransactionCollectionAccess::searchEntry(TransactionType _transactionType, ot::EntityIdentifier _startVertex)
+std::list<ot::TransactionEntry> ot::TransactionCollectionAccess::searchEntry(TransactionType _transactionType, ot::EntityIdentifier _startVertex, EdgeDirection _edgeDirection)
 {
 
 	// Query targets a tuple of id and version.
@@ -49,14 +49,30 @@ std::list<ot::TransactionEntry> ot::TransactionCollectionAccess::searchEntry(Tra
 		bsoncxx::builder::basic::kvp("to", bsoncxx::builder::basic::make_document(bsoncxx::builder::basic::kvp("$elemMatch", elemMatchCond.view())))
 	);
 
+
 	// $or: [ fromCond, toCond ]
 	bsoncxx::builder::basic::document builder;
 	builder.append(
 		bsoncxx::builder::basic::kvp("$or", bsoncxx::builder::basic::make_array(fromCond, toCond))
 	);
+	auto combined = builder.extract();
+	
+	BsonViewOrValue filter;
+	if (_edgeDirection == EdgeDirection::BothDirections)
+	{
+		filter = combined.view();
+	}
+	else if( _edgeDirection == EdgeDirection::FromStartVertex)
+	{
+		filter = fromCond.view();
+	}
+	else if (_edgeDirection == EdgeDirection::TowardsStartVertex)
+	{
+		filter = toCond.view();
+	}
 
 	mongocxx::options::find options;
-	DataStorageAPI::DataStorageResponse response = m_dataLakeAPI.searchInDataLakePartition(builder.extract(), options);
+	DataStorageAPI::DataStorageResponse response = m_dataLakeAPI.searchInDataLakePartition(filter, options);
 	std::list<ot::TransactionEntry> allMatchingEntries;
 
 	if (response.getSuccess())
