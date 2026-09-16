@@ -22,6 +22,7 @@
 //Service Header
 #include "Circuit.h"
 #include "Connection.h"
+#include "ElementNamingRegistry.h"
 
 //OpenTwin Header
 #include "OTBlockEntities/EntityBlock.h"
@@ -44,10 +45,7 @@ public:
 	
 	std::map<std::string, Circuit> mapOfCircuits;
 	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
-	std::map<std::string, std::string> customNameToNetlistNameMap;
-	std::map<std::string, std::string> netlistNameToCustomNameMap;
-	std::map<std::string, int> elementCounters;
-
+	ElementNamingRegistry m_elementNamingRegistry;
 
 
 	//Simulation Functions
@@ -79,21 +77,12 @@ public:
 	void setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
 	
 	
-	//Setter
-	bool addToCustomNameToNetlistMap(const std::string&, const std::string&);
-	bool addToNetlistNameToCustomMap(const std::string&, const std::string&);
-	std::string assignElementID(const std::string& elementType);
-	std::string to_lowercase(const std::string& str);
-
-
 	//Getter
 	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
 	std::string const getVoltMeterConnectionName() const { return m_voltMeterConnection; }
-	std::map<std::string, std::string>& getMapOfCustomToNetlistName() { return this->customNameToNetlistNameMap; }
-	std::map<std::string, int>& getMapOfElementCounters() { return this->elementCounters; }
-	std::string getNetlistNameOfMap(const std::string& customName) const;
 	std::shared_ptr<ot::EntityBlock> getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const;
 	ot::UIDList getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const;
+	ElementNamingRegistry& getElementNamingRegistry() { return m_elementNamingRegistry; }
 
 private:
 	const std::string m_voltMeterConnection = "voltageMeterConnection";

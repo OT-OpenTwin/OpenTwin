@@ -288,7 +288,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	ot::ModelServiceAPI::deleteEntitiesFromModel({ fullPlotNameVoltage, fullPlotNameCurrent }, false);
 
 	ot::PainterRainbowIterator rainbowPainterIt;
-	auto& nameMap = Application::instance()->getNGSpice().netlistNameToCustomNameMap;
+	auto& nameMap = Application::instance()->getNGSpice().getElementNamingRegistry().getNetlistToCustomMap();
+
 
 	OT_LOG_D("Starting to create curves. Total result vectors: " + std::to_string(resultVectors.size()));
 
@@ -315,7 +316,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		std::string delimiter = "#branch";
 		std::size_t pos = resultPair.first.find(delimiter);
 		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
-		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
+		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap.at(key) : resultPair.first;
 		std::string curveName = displayName + "-" + normalizedSimType;
 
 		quantity->setName(curveName);
@@ -348,7 +349,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		std::string delimiter = "#branch";
 		std::size_t pos = resultPair.first.find(delimiter);
 		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
-		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap[key] : resultPair.first;
+		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap.at(key) : resultPair.first;
 		std::string curveName = displayName + "-" + normalizedSimType;
 
 		quantity->setName(curveName);

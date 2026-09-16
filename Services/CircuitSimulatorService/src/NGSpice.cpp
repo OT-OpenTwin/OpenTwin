@@ -76,9 +76,7 @@ void NGSpice::clearBufferStructure(std::string name)
 	this->getMapOfCircuits().find(name)->second.getMapOfEntityBlcks().clear();
 	this->getMapOfCircuits().clear();
 	this->connectionNodeNumbers.clear();
-	this->elementCounters.clear();
-	this->customNameToNetlistNameMap.clear();
-	this->netlistNameToCustomNameMap.clear();
+	this->m_elementNamingRegistry.reset();
 	Numbers::nodeNumber = 1;
 	//SimulationResults::getInstance()->getResultMap().clear();
 	/*ngSpice_Command(const_cast<char*>("show"));*/
@@ -626,21 +624,20 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			
 			auto voltageSource = std::make_unique<VoltageSource>(myElement->getVoltage(),myElement->getFunction(),notInitialized,myElement->getAmplitude(),
 										myElement->getBlockTitle(),editorname,myElement->getEntityID(),notInitialized);
-			
+		
+
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "V");
+			voltageSource->setNetlistName(netlistName);
 			voltageSource->setCustomName(myElement->getNameOnly());
-			voltageSource->setNetlistName(assignElementID("V"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 
 			voltageSource->setModel(circuitModel);
 			voltageSource->setFolderName(myElement->getFolderName());
 
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(voltageSource->getCustomName(), voltageSource->getNetlistName()) || 
-				!addToNetlistNameToCustomMap(voltageSource->getCustomName(), voltageSource->getNetlistName()))
-			{
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
+
 
 			if (voltageSource->getFunction() == "PULSE")
 			{
@@ -696,20 +693,16 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 		{
 			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
 			auto resistor = std::make_unique<Resistor>(myElement->getResistance(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
+
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "R");
+			resistor->setNetlistName(netlistName);
 			resistor->setCustomName(myElement->getNameOnly());
-			resistor->setNetlistName(assignElementID("R"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			resistor->setModel(circuitModel);
 			resistor->setFolderName(myElement->getFolderName());
-
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(resistor->getCustomName(), resistor->getNetlistName()) ||
-				!addToNetlistNameToCustomMap(resistor->getCustomName(), resistor->getNetlistName()))
-			{
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
 
 			ot::UID uid = resistor->getUID();
 			auto resistor_p = resistor.release();
@@ -720,19 +713,18 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
 			auto diode = std::make_unique<Diode>("", myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
+
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "D");
+			diode->setNetlistName(netlistName);
 			diode->setCustomName(myElement->getNameOnly());
-			diode->setNetlistName(assignElementID("D"));
+
+			
+			
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			diode->setModel(circuitModel);
 			diode->setFolderName(myElement->getFolderName());
-
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(diode->getCustomName(), diode->getNetlistName()) ||
-				!addToNetlistNameToCustomMap(diode->getCustomName(), diode->getNetlistName()))
-			{
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
 
 			ot::UID uid = diode->getUID();
 			auto diode_p = diode.release();
@@ -743,19 +735,15 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
 			auto capacitor = std::make_unique<Capacitor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "C");
+			capacitor->setNetlistName(netlistName);
 			capacitor->setCustomName(myElement->getNameOnly());
-			capacitor->setNetlistName(assignElementID("C"));
+ 
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			capacitor->setModel(circuitModel);
 			capacitor->setFolderName(myElement->getFolderName());
-
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(capacitor->getCustomName(), capacitor->getNetlistName()) ||
-				!addToNetlistNameToCustomMap(capacitor->getCustomName(), capacitor->getNetlistName()))
-			{
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
 
 			ot::UID uid = capacitor->getUID();
 			auto capacitor_p = capacitor.release();
@@ -766,19 +754,15 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
 			auto inductor = std::make_unique<Inductor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 			
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "L");
+			inductor->setNetlistName(netlistName);
 			inductor->setCustomName(myElement->getNameOnly());
-			inductor->setNetlistName(assignElementID("L"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			inductor->setModel(circuitModel);
 			inductor->setFolderName(myElement->getFolderName());
-
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(inductor->getCustomName(), inductor->getNetlistName()) ||
-				!addToNetlistNameToCustomMap(inductor->getCustomName(), inductor->getNetlistName()))
-			{
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
 
 			ot::UID uid = inductor->getUID();
 			auto inductor_p = inductor.release();
@@ -787,9 +771,12 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 		else if (blockEntity->getClassName() == "EntityBlockCircuitVoltageMeter") {
 			auto myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
 			auto voltMeter = std::make_unique<VoltageMeter>( myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
+		
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "VM");
+			voltMeter->setNetlistName(netlistName);
 			voltMeter->setCustomName(myElement->getNameOnly());
-			voltMeter->setNetlistName(assignElementID("VM"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			voltMeter->setModel(circuitModel);
@@ -803,8 +790,11 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			auto myElement = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
 			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "CM");
+			currentMeter->setNetlistName(netlistName);
 			currentMeter->setCustomName(myElement->getNameOnly());
-			currentMeter->setNetlistName(assignElementID("CM"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			currentMeter->setModel(circuitModel);
@@ -818,18 +808,15 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 			auto myElement = dynamic_cast<EntityBlockCircuitTransmissionLine*>(blockEntity.get());
 			auto transmissionLine = std::make_unique<TransmissionLine>(myElement->getImpedance(),myElement->getTransmissionDelay(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
 
+			// Add customName and netlistName to Map
+			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "T");
+			transmissionLine->setNetlistName(netlistName);
 			transmissionLine->setCustomName(myElement->getNameOnly());
-			transmissionLine->setNetlistName(assignElementID("T"));
+
 			std::string circuitModel = myElement->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
 			transmissionLine->setModel(circuitModel);
 			transmissionLine->setFolderName(myElement->getFolderName());
-
-			//Add customName and netlistName to Map
-			if (!addToCustomNameToNetlistMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName()) ||
-				!addToNetlistNameToCustomMap(transmissionLine->getCustomName(), transmissionLine->getNetlistName())) {
-				OT_LOG_E("customName and netlistName could not be added to map");
-			}
 
 			ot::UID uid = transmissionLine->getUID();
 			auto transmissionLine_p = transmissionLine.release();
@@ -968,7 +955,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				}
 				else {
 					if (modelType == m_subcktType) {
-						netlistElementName = assignElementID("X");
+						netlistElementName = m_elementNamingRegistry.generateNextId("X");
 					}
 					else {
 						netlistElementName = voltagesource->getNetlistName();
@@ -1005,7 +992,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			}
 			else {
 				if (modelType == m_subcktType) {
-					netlistElementName = assignElementID("X");
+					netlistElementName = m_elementNamingRegistry.generateNextId("X");
 				}
 				else {
 					netlistElementName = resistor->getNetlistName();
@@ -1022,7 +1009,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 			// Check if .model or .subckt
 			if (modelType == m_subcktType) {
-				netlistElementName = assignElementID("X");
+				netlistElementName = m_elementNamingRegistry.generateNextId("X");
 			}
 			else {
 				netlistElementName = diode->getNetlistName();
@@ -1074,8 +1061,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				namesOfCurrentMeter.push_back(currentMeter->getCustomName());
 				std::string name = "Rshunt" + std::to_string(rshuntCounter++); // Increase counter for next Rshunt
 				nameOfRShunts.push_back(name);
-				addToCustomNameToNetlistMap(currentMeter->getCustomName(), to_lowercase(name));
-				addToNetlistNameToCustomMap(currentMeter->getCustomName(), to_lowercase(name));
+				m_elementNamingRegistry.registerMapping(currentMeter->getCustomName(), ElementNamingRegistry::toLowercase(name));
 				std::vector<std::string> nodeNumbers;
 				std::unordered_set<std::string> temp;
 				auto connections = circuitElement->getList();
@@ -1120,7 +1106,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			}
 			else {
 				if (modelType == m_subcktType) {
-					netlistElementName = assignElementID("X");
+					m_elementNamingRegistry.generateNextId("X");
 				}
 				else {
 					netlistElementName = capacitor->getNetlistName();
@@ -1140,7 +1126,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			}
 			else {
 				if (modelType == m_subcktType) {
-					netlistElementName = assignElementID("X");
+					m_elementNamingRegistry.generateNextId("X");
 				}
 				else {
 					netlistElementName = inductor->getNetlistName();
@@ -1160,7 +1146,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 			}
 			else {
 				if (modelType == m_subcktType) {
-					netlistElementName = assignElementID("X");
+					m_elementNamingRegistry.generateNextId("X");
 				}
 				else {
 					netlistElementName = transmissionLine->getNetlistName();
@@ -1381,7 +1367,7 @@ std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::
 		return "failed";
 		
 	}
-	std::string netlistName = getNetlistNameOfMap(element);
+	std::string netlistName = m_elementNamingRegistry.getNetlistName(element);
 	
 	
 
@@ -1433,53 +1419,6 @@ std::list<std::string> NGSpice::ngSpice_Initialize(std::map<ot::UID, ot::UIDList
 	
 	return temp;
 
-}
-
-
-bool NGSpice::addToCustomNameToNetlistMap(const std::string& customName, const std::string& netlistName) {
-	
-	if (customNameToNetlistNameMap.find(customName) != customNameToNetlistNameMap.end()) {
-		OT_LOG_E("The custom name:" + customName + "already exists");
-		return false;
-	}
-
-	customNameToNetlistNameMap[customName] = netlistName;
-	return true;
-}
-
-bool NGSpice::addToNetlistNameToCustomMap(const std::string& customName, const std::string& netlistName)
-{
-	if (netlistNameToCustomNameMap.find(netlistName) != netlistNameToCustomNameMap.end()) {
-		OT_LOG_E("The netlist name:" + netlistName + "already exists");
-		return false;
-	}
-
-	netlistNameToCustomNameMap[netlistName] = customName;
-	return true;
-}
-
-std::string NGSpice::assignElementID(const std::string& elementType) {
-	elementCounters[elementType]++;
-	return elementType + std::to_string(elementCounters[elementType]);
-}
-
-std::string NGSpice::to_lowercase(const std::string& str) {
-	std::string lower_str = str;
-	std::transform(lower_str.begin(), lower_str.end(), lower_str.begin(), ::tolower);
-	return lower_str;
-}
-
-
-std::string NGSpice::getNetlistNameOfMap(const std::string& customName) const
-{
-	auto it = customNameToNetlistNameMap.find(customName);
-	if (it != customNameToNetlistNameMap.end()) {
-		return it->second; 
-	}
-	else {
-		OT_LOG_E("Netlist name in customNameToNetlistNameMap not found!");
-		return "failed"; 
-	}
 }
 
 std::shared_ptr<ot::EntityBlock> NGSpice::getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const {
