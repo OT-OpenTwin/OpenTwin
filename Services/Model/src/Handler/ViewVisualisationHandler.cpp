@@ -34,6 +34,9 @@
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
 
+#include "DependencyGraph.h"
+#include "OTServiceFoundation/TransactionData/TransactionCollectionAccess.h"
+
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_VISUALIZATIONHANDLER_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
 #elif OT_TESTING_GLOBAL_RuntimeTestingEnabled==true
@@ -274,15 +277,10 @@ void ViewVisualisationHandler::handleRenaming(ot::UID _entityID)
 
 }
 
-#include "OTGui/Graphics/Builder/GraphicsHierarchicalItemBuilder.h"
-#include "QueuingHttpRequestsRAII.h"
-#include "OTGui/Painter/StyleRefPainter2D.h"
-#include "OTServiceFoundation/TransactionData/TransactionCollectionAccess.h"
+
 
 void ViewVisualisationHandler::handleDependencyGraphRequest()
 {
-	QueuingHttpRequestsRAII raiiUI;
-	const std::string sceneName = "Dependency Graph";
 	
 	auto selectedEntities = Application::instance()->getModel()->getListOfSelectedEntities();
 	if (selectedEntities.size() == 1)
@@ -292,75 +290,10 @@ void ViewVisualisationHandler::handleDependencyGraphRequest()
 		ot::UID selectedVersion = (*selectedEntities.begin())->getEntityStorageVersion();
 		std::list<ot::TransactionEntry> entries = access.searchEntry(ot::TransactionType::Refinement, ot::EntityIdentifier(selectedID,selectedVersion));
 				
-		std::string originConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Bottom);
-		std::string destConnector = ot::GraphicsHierarchicalItemBuilder::createConnectorItemName(ot::Alignment::Top);
-		std::list< ot::GraphicsConnectionCfg> edges;
+		DependencyGraph builder;
+		int distance = 500;
+		builder.createGraph(entries, selectedID, distance,DependencyGraph::DistributionStyle::circular);
 		
-		ot::GraphicsHierarchicalItemBuilder builder;
-		ot::GraphicsScenePackage pckg(sceneName);
-		ot::GraphicsConnectionPackage connPkg(sceneName);
-
-		std::list < ot::GraphicsItemCfg*> blockCfgs;
-
-		std::set<ot::UID> allVertices;
-		ot::UID dummyID = 13;
-		for (ot::TransactionEntry& entry : entries)
-		{
-			for (ot::EntityIdentifier origin : entry.getEntityIdentifierFrom())
-			{
-				allVertices.insert(origin.m_id);
-				for (ot::EntityIdentifier target : entry.getEntityIdentifierTo())
-				{
-					allVertices.insert(target.m_id);
-					ot::GraphicsConnectionCfg edge (origin.m_id, originConnector, target.m_id, destConnector);
-					edge.setLinePainter(new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::GraphicsItemConnection));
-					edge.setUid(dummyID++);
-					connPkg.addConnection(edge);
-				}
-			}
-		}
-		std::list<ot::Point2DD> position = { ot::Point2DD(-180., 0.), ot::Point2DD(90., 100.), ot::Point2DD(180., 0.) };
-		auto currentPos = position.begin();
-		for (ot::UID uniqueVertex : allVertices)
-		{
-			EntityBase* baseEnt = Application::instance()->getModel()->getEntityByID(uniqueVertex);
-			builder.setEntityName(baseEnt->getName());
-			builder.setTopText(baseEnt->getName());
-			builder.setBackgroundShape(ot::GraphicsHierarchicalItemBuilder::BackgroundShape::Ellipse);
-			blockCfgs.push_back(builder.createGraphicsItem());
-			blockCfgs.back()->setUid(uniqueVertex);
-			blockCfgs.back()->setPosition(*currentPos);
-			currentPos++;
-			pckg.addItem(blockCfgs.back());
-		}
-
-
-		ot::JsonDocument reqDoc;
-		reqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-		ot::VisualisationCfg visualisationCfg;
-		ot::JsonObject visualisationCfgJson;
-		visualisationCfg.addToJsonObject(visualisationCfgJson, reqDoc.GetAllocator());
-		reqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, reqDoc.GetAllocator());
-
-		ot::JsonObject pckgObj;
-		pckg.addToJsonObject(pckgObj, reqDoc.GetAllocator());
-		reqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, pckgObj, reqDoc.GetAllocator());
-
-		Application::instance()->queuedRequestToFrontend(reqDoc);
-
-
-		ot::JsonDocument connReqDoc;
-		connReqDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddConnection, reqDoc.GetAllocator()), reqDoc.GetAllocator());
-		ot::VisualisationCfg v;
-		ot::JsonObject vObj;
-		v.addToJsonObject(vObj, connReqDoc.GetAllocator());
-		connReqDoc.AddMember(OT_ACTION_PARAM_VisualisationConfig, vObj, connReqDoc.GetAllocator());
-
-		ot::JsonObject connPckgObj;
-		connPkg.addToJsonObject(connPckgObj, connReqDoc.GetAllocator());
-		connReqDoc.AddMember(OT_ACTION_PARAM_GRAPHICSEDITOR_Package, connPckgObj, reqDoc.GetAllocator());
-
-		Application::instance()->queuedRequestToFrontend(connReqDoc);
 	}
 	else
 	{
