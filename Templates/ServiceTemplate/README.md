@@ -1,37 +1,42 @@
-########################################
-#
-#	Setup the environment
-#
-########################################
+# Service Template
 
-Read the README.md file in the OpenTwin repository
+Copy this folder into `Services/`, rename it, and work through the steps below.
+It builds with CMake and the Python scripts under `Scripts/Python`.
 
-########################################
-#
-#	Setup the batch files
-#
-########################################
+## 1. Rename
 
-1) build.bat
-In the line after: ECHO %TYPE_NAME% DEBUG, change the file path to your service project path
-In the line after: ECHO %TYPE_NAME% RELEASE, change the file path to your service project path
+| file | what to change |
+| --- | --- |
+| folder | `Services/<YourService>` |
+| `CMakeLists.txt` | `project()` and every `ServiceTemplate` occurrence |
+| `tests/CMakeLists.txt` | `project()` and `ot_initialize_test` |
+| `build.bat` `clean.bat` `edit.bat` `test.bat` | replace `SERVICE_TEMPLATE` with your key |
 
-2) edit.bat
-In the line after: REM Open project, change the file path to your service project path
+## 2. Register the service
 
-########################################
-#
-#	Edit your project
-#
-########################################
+`Scripts/Python/SetupEnvironment.py` - add the root to `SERVICES`:
 
-Use the edit.bat file to start the VisualStudio2017 development environment with all environment variables set
+    "OT_MY_SERVICE_ROOT": "MyService",
 
-########################################
-#
-#	Setup the project		
-#
-########################################
+The key used by the batch files is that name without `OT_` and `_ROOT`,
+so `OT_MY_SERVICE_ROOT` is driven as `MY_SERVICE`.
 
-Project Properties:
-Configuration Properties->Debugging->Command Argument:	Set the arguments according to your requirements (...)
+`Scripts/Python/build_all.py` - add the key to `BUILD_ORDER` in dependency order.
+
+## 3. Build, test and edit
+
+    build.bat  [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]
+    test.bat   [DEBUG|RELEASE|BOTH]
+    clean.bat
+    edit.bat
+
+## 4. Dependencies
+
+Add tokens to `ot_add_dependency` in `CMakeLists.txt`. The tokens are defined in
+`Scripts/CMake/OTProject.cmake`, and third party paths come from the ThirdParty
+`SetupEnvironment` - never `find_package`.
+
+## 5. Optional
+
+Services that need a debug launch entry add `ot_service_debug_launch` with their
+own port; see `Services/LoggerService/CMakeLists.txt`.
