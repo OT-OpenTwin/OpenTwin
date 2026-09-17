@@ -5,3 +5,4 @@ target
 # Build Logs
 buildLog_Debug.txt
 buildLog_Release.txt
+Framework_buildLog.txt
