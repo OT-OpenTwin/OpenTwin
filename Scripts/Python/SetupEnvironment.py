@@ -94,8 +94,12 @@ TOOLS = {
     "OT_MONGODBUPGRADEMANAGER_ROOT": "MongoDBUpgrader/Upgrader_Exe",
 }
 
+FRAMEWORK = {
+    "OT_FRAMEWORK_ROOT": "OpenTwin",
+}
+
 # Each project group is resolved below the given folder of the development root.
-GROUPS = ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools"))
+GROUPS = ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools"), (FRAMEWORK, "Framework"))
 
 # ===== Relative path fragments =====
 RELATIVE = {
