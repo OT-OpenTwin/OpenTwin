@@ -600,20 +600,19 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 {
 
 
-	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
-	if ( it == Application::instance()->getNGSpice().getMapOfCircuits().end())
+	auto [it, inserted] = Application::instance()->getNGSpice().getMapOfCircuits().try_emplace(editorname);
+	if (inserted)
 	{
-		Circuit circuit;
-		circuit.setEditorName(editorname);
-		circuit.setId(editorname);
-		Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(editorname, circuit);
+		it->second.setEditorName(editorname);
+		it->second.setId(editorname);
 	}
 
-	std::string notInitialized = "NotYet";
+	Circuit& circuit = it->second;
 
 	for (auto& [blockID, blockEntity] : allEntitiesByBlockID)
 	{
-		it->second.addBlockEntity(blockEntity->getClassName(), blockEntity);
+		
+		circuit.addBlockEntity(blockEntity->getClassName(), blockEntity);
 		
 		CircuitElement* element = CircuitElement::createFromClassName(blockEntity->getClassName());
 		if (!element)
@@ -639,7 +638,7 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 
 		ot::UID uid = blockEntity->getEntityID();
 		auto element_p = elementPtr.release();
-		it->second.addElement(uid, element_p);
+		circuit.addElement(uid, element_p);
 
 	}
 
@@ -654,8 +653,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 
 
 // First I get all the VoltageSources of the Circuit
-	auto vectorGND = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitGND");
-	if (vectorGND != it->second.getMapOfEntityBlcks().end()) {
+	auto vectorGND = circuit.getMapOfEntityBlcks().find("EntityBlockCircuitGND");
+	if (vectorGND != circuit.getMapOfEntityBlcks().end()) {
 		std::set<ot::UID> visitedElements; // Initialize visited set
 
 		for (auto GNDElement : vectorGND->second) {
@@ -668,8 +667,8 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 	}
 	else
 	{
-		auto vectorVoltageSource = it->second.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
-		if (vectorVoltageSource == it->second.getMapOfEntityBlcks().end())
+		auto vectorVoltageSource = circuit.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
+		if (vectorVoltageSource == circuit.getMapOfEntityBlcks().end())
 		{
 			OT_LOG_E("No VoltageSource found at connection Algorithm");
 			return;
