@@ -17,15 +17,28 @@
 // limitations under the License.
 // @otlicense-end
 
-// Sevice Header
+// Service Header
 #include "CircuitElements/Resistor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitResistor.h"
 
-Resistor::Resistor( std::string resistance, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName) : m_resistance(resistance), 
-					CircuitElement(itemName,editorName,Uid,netlistName) {
+static CircuitElement::Registrar<Resistor> registrar("EntityBlockCircuitResistor");
 
+Resistor::Resistor(std::string resistance, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
+	: m_resistance(resistance), CircuitElement(itemName, editorName, Uid, netlistName)
+{
 }
 
 Resistor::~Resistor()
 {
+}
 
+void Resistor::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+	auto* myElement = dynamic_cast<EntityBlockCircuitResistor*>(_entity.get());
+	if (!myElement) return;
+
+	m_resistance = myElement->getResistance();
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

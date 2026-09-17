@@ -26,10 +26,16 @@ class CurrentMeter : public CircuitElement {
 
 
 public:
+	CurrentMeter() = default;
 	CurrentMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~CurrentMeter();
 
-	std::string type() const override { return "CurrentMeter"; }
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 
+	// Getter
+	std::string type() const override { return "CurrentMeter"; }
+	std::string getNetlistPrefix() const override { return "CM"; }
+	std::string getNetlistValue() const override { return ""; }
+	bool isMeter() const override { return true; }
 
 };

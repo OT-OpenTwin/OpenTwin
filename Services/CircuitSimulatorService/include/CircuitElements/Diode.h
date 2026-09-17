@@ -26,15 +26,20 @@ class Diode : public CircuitElement {
 
 
 public:
+	Diode() = default;
 	Diode(std::string value, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~Diode();
 
 	std::string type() const override { return "Diode"; }
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 
 	//Getter
 	const std::string getValue() const { return this->m_value; }
+	std::string getNetlistPrefix() const override { return "D"; }
+	std::string getNetlistValue() const override { return this->m_value + " " + getModel(); }
+
 	//Setter
-	std::string setValue(std::string value) { this->m_value = value; }
+	void setValue(std::string value) { this->m_value = value; }
 
 private:
 	std::string m_value;

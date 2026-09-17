@@ -18,10 +18,22 @@
 // @otlicense-end
 
 #include "CircuitElements/Capacitor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCapacitor.h"
+
+static CircuitElement::Registrar<Capacitor> registrar("EntityBlockCircuitCapacitor");
 
 Capacitor::Capacitor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
 					: m_capacity(capacity), CircuitElement(itemName, editorName, Uid, netlistName) {
 }
 
 Capacitor::~Capacitor() {
+}
+
+void Capacitor::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) {
+	auto* myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(_entity.get());
+	if (!myElement) return;
+	m_capacity = myElement->getElementType();
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

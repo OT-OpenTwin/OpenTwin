@@ -26,10 +26,17 @@ class VoltageMeter : public CircuitElement {
 
 
 public:
+	VoltageMeter() = default;
 	VoltageMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~VoltageMeter();
 
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
+
+	//Getter
 	std::string type() const override { return "VoltageMeter"; }
+	std::string getNetlistPrefix() const override { return "VM"; }
+	std::string getNetlistValue() const override { return ""; }
+	bool isMeter() const override { return true; }
 
 	
 };

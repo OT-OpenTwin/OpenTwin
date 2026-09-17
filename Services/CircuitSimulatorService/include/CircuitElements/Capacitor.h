@@ -26,6 +26,7 @@ class Capacitor : public CircuitElement {
 
 
 public:
+	Capacitor() = default;
 	Capacitor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~Capacitor();
 
@@ -33,9 +34,12 @@ public:
 
 	//Getter
 	const std::string getCapacity() const { return this->m_capacity; }
-	//Setter
-	std::string setCapacity(std::string capacity) { this->m_capacity = capacity; }
+	std::string getNetlistPrefix() const override { return "C"; }
+	std::string getNetlistValue() const override { return this->m_capacity; }
 
+	//Setter
+	void setCapacity(std::string capacity) { this->m_capacity = capacity; }
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 private:
 	std::string m_capacity;
 }; 

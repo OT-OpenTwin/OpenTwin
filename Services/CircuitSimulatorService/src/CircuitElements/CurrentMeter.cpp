@@ -18,10 +18,25 @@
 // @otlicense-end
 
 #include "CircuitElements/CurrentMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitCurrentMeter.h"
+
+static CircuitElement::Registrar<CurrentMeter> registrar("EntityBlockCircuitCurrentMeter");
 
 CurrentMeter::CurrentMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
-	:CircuitElement(itemName, editorName, Uid, netlistName) {
+	: CircuitElement(itemName, editorName, Uid, netlistName)
+{
 }
 
-CurrentMeter::~CurrentMeter() {
+CurrentMeter::~CurrentMeter()
+{
+}
+
+void CurrentMeter::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+	auto* myElement = dynamic_cast<EntityBlockCircuitCurrentMeter*>(_entity.get());
+	if (!myElement) return;
+
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

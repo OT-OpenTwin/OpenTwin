@@ -19,13 +19,25 @@
 
 
 #include "CircuitElements/VoltageMeter.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageMeter.h"
+
+static CircuitElement::Registrar<VoltageMeter> registrar("EntityBlockCircuitVoltageMeter");
 
 VoltageMeter::VoltageMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
-							:CircuitElement(itemName, editorName, Uid, netlistName) {
-
+	: CircuitElement(itemName, editorName, Uid, netlistName)
+{
 }
 
 VoltageMeter::~VoltageMeter()
 {
+}
 
+void VoltageMeter::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+	auto* myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(_entity.get());
+	if (!myElement) return;
+
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

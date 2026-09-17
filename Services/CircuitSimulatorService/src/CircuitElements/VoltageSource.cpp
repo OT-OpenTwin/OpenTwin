@@ -20,6 +20,10 @@
 // Service Header
 #include "CircuitElements/VoltageSource.h"
 
+// OpenTwin Header
+#include "OTBlockEntities/Circuit/EntityBlockCircuitVoltageSource.h"
+
+static CircuitElement::Registrar<VoltageSource> registrar("EntityBlockCircuitVoltageSource");
 
 VoltageSource::VoltageSource(std::string value,std::string function,std::string type, std::string amplitude,
 	const std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
@@ -29,5 +33,30 @@ VoltageSource::VoltageSource(std::string value,std::string function,std::string 
 
 VoltageSource::~VoltageSource(){
 
+}
+
+void VoltageSource::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+    auto* myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(_entity.get());
+    if (!myElement) return;
+
+    m_value = myElement->getVoltage();
+    m_function = myElement->getFunction();
+    m_Amplitude = myElement->getAmplitude();
+    m_itemName = myElement->getBlockTitle();
+    m_editorName = _editorName;
+    m_Uid = myElement->getEntityID();
+    // VoltageSource-spezifisch: Function-String bauen
+    if (m_function == "PULSE" || m_function == "SIN" || m_function == "EXP")
+    {
+        std::string functionStr = m_function + "(";
+        std::vector<std::string> parameters;
+        if (m_function == "PULSE") { parameters = myElement->getPulseParameters(); }
+        else if (m_function == "SIN") { parameters = myElement->getSinParameters(); }
+        else { parameters = myElement->getExpParameters(); }
+        for (const auto& param : parameters) { functionStr += param + " "; }
+        functionStr += ")";
+        m_function = functionStr;
+    }
 }
 

@@ -26,17 +26,25 @@ class TransmissionLine : public CircuitElement {
 
 
 public:
+	TransmissionLine() = default;
 	TransmissionLine(std::string impedance, std::string transmissionDelay, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~TransmissionLine();
 
 	std::string type() const override { return "TransmissionLine"; }
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 
 	//Getter
 	const std::string getImpedance() const { return "Z0=" + this->m_impedance; }
 	const std::string getTransmissionDelay() const { return "TD=" + this->m_transmissionDelay; }
+	std::string getNetlistPrefix() const override { return "T"; }
+	std::string getNetlistValue() const override { return this->m_impedance + " " + this->m_transmissionDelay; }
+	bool isTransmissionLine() const override { return true; }
+	std::vector<std::string> getPositivePoleNames() const override { return { "PositivePole1", "PositivePole2" }; }
+	std::vector<std::string> getNegativePoleNames() const override { return { "NegativePole1", "NegativePole2" }; }
+
 	//Setter
-	std::string setImpedance(std::string impedance) { this->m_impedance = impedance; }
-	std::string setTransmissionDelay(std::string transmissionDelay) { this->m_transmissionDelay = transmissionDelay; }
+	void setImpedance(std::string impedance) { this->m_impedance = impedance; }
+	void setTransmissionDelay(std::string transmissionDelay) { this->m_transmissionDelay = transmissionDelay; }
 
 private:
 	std::string m_impedance;

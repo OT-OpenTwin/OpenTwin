@@ -17,10 +17,15 @@
 // limitations under the License.
 // @otlicense-end
 
-//Service Header
+// Service Header
 #include "CircuitElement.h"
 
-//C++ Header
+// OpenTwin Header
+#include "OTCore/Logging/Logger.h"
+
+OT_DECL_INCLASS_FACTORY_CPP(CircuitElement)
+
+// C++ Header
 #include <string>
 #include <algorithm>
 #include <vector>
@@ -35,6 +40,23 @@ CircuitElement::CircuitElement( std::string itemName,  std::string editorName, o
 
 //Getter
 
+CircuitElement* CircuitElement::createFromClassName(const std::string& _className)
+{
+	const auto& factory = CircuitElement::getRegisteredClasses();
+	auto it = factory.find(_className);
+	if (it == factory.end())
+	{
+		return nullptr;
+	}
+	CircuitElement* instance = it->second();
+	if (!instance)
+	{
+		OT_LOG_E("CircuitElement::createFromClassName: Failed to create instance of class: " + _className);
+		return nullptr;
+	}
+	return instance;
+}
+
 std::string CircuitElement::getItemName()	{return this->m_itemName;}
 
 std::string CircuitElement::getEditorName()   {return this->m_editorName;}
@@ -47,7 +69,7 @@ std::string CircuitElement::getNetlistName() { return this->m_netlistName; }
 
 std::string CircuitElement::getCustomName() { return this->m_customName; }
 
-std::string CircuitElement::getModel() { return this->m_model; }
+std::string CircuitElement::getModel() const { return this->m_model; }
 
 std::string CircuitElement::getFolderName() { return this->m_folderName; }
 

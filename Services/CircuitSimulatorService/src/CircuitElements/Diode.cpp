@@ -18,12 +18,25 @@
 // @otlicense-end
 
 #include "CircuitElements/Diode.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitDiode.h"
 
-Diode::Diode(std::string value,std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
-	:CircuitElement(itemName,editorName,Uid,netlistName),m_value(value) {
+static CircuitElement::Registrar<Diode> registrar("EntityBlockCircuitDiode");
 
+Diode::Diode(std::string value, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
+	: CircuitElement(itemName, editorName, Uid, netlistName), m_value(value)
+{
 }
 
-Diode::~Diode() {
+Diode::~Diode()
+{
+}
 
+void Diode::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+	auto* myElement = dynamic_cast<EntityBlockCircuitDiode*>(_entity.get());
+	if (!myElement) return;
+
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

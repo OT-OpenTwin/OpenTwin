@@ -24,11 +24,14 @@
 
 class VoltageSource: public CircuitElement {
 public:
-
+	VoltageSource() = default;
 	VoltageSource(std::string value,  std::string function, std::string type,  std::string amplitude,
 		const std::string itemName, std::string editorName, ot::UID Uid,  std::string netlistName);
 
 	~VoltageSource();
+
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
+
 	//Getter
 	std::string const getValue() const { return m_value; }
 	std::string const getType() const { return m_type; }
@@ -36,6 +39,8 @@ public:
 	std::string const getAmplitude() const { return m_Amplitude; }
 
 	std::string type() const override { return "VoltageSource"; }
+	std::string getNetlistPrefix() const override { return "V"; }
+	std::string getNetlistValue() const override { return this->m_value; }
 
 	//Setter
 	void setValue(std::string value) { this->m_value = value; }

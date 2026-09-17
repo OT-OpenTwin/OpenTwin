@@ -23,6 +23,9 @@
 #pragma once
 //OT Header
 #include "OTCore/Geometry/Point2D.h"
+#include "OTBlockEntities/EntityBlock.h"
+#include "OTCore/InClassFactory.h"
+#include "OTBlockEntities/EntityBlock.h"
 
 //C++ Header
 #include <string>
@@ -30,35 +33,19 @@
 #include <map>
 #include <set>
 #include <unordered_set>
-#include <list>
+#include <memory>
 
 class CircuitElement
 {
-
-
-protected:
-
-
-	//Attributes
-	std::string  m_itemName;
-	std::string m_editorName;
-	ot::UID m_Uid;
-	std::string m_netlistName;
-	std::string m_customName;
-	std::map < std::string, Connection > m_listOfConnections;
-	std::string m_model;
-	std::string m_folderName;
-	
+	OT_DECL_INCLASS_FACTORY(CircuitElement, CircuitElement, Registrar)
 public:
-
-
+	CircuitElement() = default;
 	CircuitElement(std::string itemName,  std::string editorName, ot::UID Uid,  std::string netlistName);
-
 	virtual ~CircuitElement() {}
-
 	virtual std::string type() const = 0;
 
-	
+	// Factory method to create a CircuitElement from an EntityBlock
+	static CircuitElement* createFromClassName(const std::string& _className);
 
 	//Getter
 	std::string getItemName();
@@ -67,7 +54,7 @@ public:
 	std::map<std::string ,Connection>& getList();
 	std::string getNetlistName();
 	std::string getCustomName();
-	std::string getModel();
+	std::string getModel() const;
 	std::string getFolderName();
 
 	//Setter
@@ -78,14 +65,25 @@ public:
 	void setCustomName(std::string name);
 	void setModel(std::string _model);
 	void setFolderName(std::string _folderName);
+	void addConnection(std::string connactable,const Connection& obj);
 
-	//Additional Functions
-	/*bool*/ void addConnection(std::string connactable,const Connection& obj);
-	
-	
-	
+	virtual std::string getNetlistPrefix() const = 0;
+	virtual std::string getNetlistValue() const = 0;
+	virtual bool isMeter() const { return false; };
+	virtual bool isTransmissionLine() const { return false; };
 
+	virtual std::vector<std::string> getPositivePoleNames() const { return { "positivePole" }; };
+	virtual std::vector<std::string> getNegativePoleNames() const { return { "negativePole" }; };
 	
-
-	
+	virtual void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) = 0;
+protected:
+	//Attributes
+	std::string  m_itemName;
+	std::string m_editorName;
+	ot::UID m_Uid;
+	std::string m_netlistName;
+	std::string m_customName;
+	std::map < std::string, Connection > m_listOfConnections;
+	std::string m_model;
+	std::string m_folderName;
 };

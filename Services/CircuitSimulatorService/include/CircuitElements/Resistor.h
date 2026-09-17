@@ -26,15 +26,22 @@ class Resistor : public CircuitElement {
 
 
 public:
+	Resistor() = default;
 	Resistor(std::string resistance, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~Resistor();
 
 	std::string type() const override { return "Resistor"; }
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 
 	//Getter
 	const std::string getResistance() const { return this->m_resistance; }
+	std::string getNetlistPrefix() const override { return "R"; }
+	std::string getNetlistValue() const override { return this->m_resistance; }
+
 	//Setter
-	std::string setResistance(std::string resistance) { this->m_resistance = resistance; }
+	void setResistance(std::string resistance) { this->m_resistance = resistance; }
+
+	
 
 private:
 	std::string m_resistance;

@@ -18,11 +18,26 @@
 // @otlicense-end
 
 #include "CircuitElements/Inductor.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitInductor.h"
 
+static CircuitElement::Registrar<Inductor> registrar("EntityBlockCircuitInductor");
 
 Inductor::Inductor(std::string inductance, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
-	: m_inductance(inductance), CircuitElement(itemName, editorName, Uid, netlistName) {
+	: m_inductance(inductance), CircuitElement(itemName, editorName, Uid, netlistName)
+{
 }
 
-Inductor::~Inductor(){
+Inductor::~Inductor()
+{
+}
+
+void Inductor::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+	auto* myElement = dynamic_cast<EntityBlockCircuitInductor*>(_entity.get());
+	if (!myElement) return;
+
+	m_inductance = myElement->getElementType();
+	m_itemName = myElement->getBlockTitle();
+	m_editorName = _editorName;
+	m_Uid = myElement->getEntityID();
 }

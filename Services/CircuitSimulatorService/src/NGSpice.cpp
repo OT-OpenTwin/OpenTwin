@@ -35,6 +35,7 @@
 
 //Open Twin Header
 #include "OTBlockEntities//EntityBlockConnection.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitGND.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitDiode.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitInductor.h"
@@ -610,219 +611,36 @@ void NGSpice::updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlo
 
 	std::string notInitialized = "NotYet";
 
-	for (auto& blockEntityByID : allEntitiesByBlockID)
+	for (auto& [blockID, blockEntity] : allEntitiesByBlockID)
 	{
-		std::shared_ptr<ot::EntityBlock> blockEntity = blockEntityByID.second;
-		it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 		it->second.addBlockEntity(blockEntity->getClassName(), blockEntity);
 		
-
-		if (blockEntity->getClassName() == "EntityBlockCircuitVoltageSource")
+		CircuitElement* element = CircuitElement::createFromClassName(blockEntity->getClassName());
+		if (!element)
 		{
-
-			auto myElement = dynamic_cast<EntityBlockCircuitVoltageSource*>(blockEntity.get());
-			
-			auto voltageSource = std::make_unique<VoltageSource>(myElement->getVoltage(),myElement->getFunction(),notInitialized,myElement->getAmplitude(),
-										myElement->getBlockTitle(),editorname,myElement->getEntityID(),notInitialized);
-		
-
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "V");
-			voltageSource->setNetlistName(netlistName);
-			voltageSource->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-
-			voltageSource->setModel(circuitModel);
-			voltageSource->setFolderName(myElement->getFolderName());
-
-
-
-			if (voltageSource->getFunction() == "PULSE")
-			{
-				std::string function = "PULSE(";
-				std::vector<std::string> parameters = myElement->getPulseParameters();
-
-				for (auto parameter : parameters)
-				{
-					function += parameter + " ";
-				}
-
-				function += ")";
-
-				
-
-				voltageSource->setFunction(function);
-				
-			}
-			else if (voltageSource->getFunction() == "SIN")
-			{
-				std::string function = "SIN(";
-				std::vector<std::string> parameters = myElement->getSinParameters();
-				
-				for (auto parameter : parameters)
-				{
-					function += parameter + " ";
-				}
-
-				function += ")";
-
-				voltageSource->setFunction(function);
-			}
-			else if (voltageSource->getFunction() == "EXP")
-			{
-				std::string function = "EXP(";
-				std::vector<std::string> parameters = myElement->getExpParameters();
-
-				for (auto parameter : parameters)
-				{
-					function += parameter + " ";
-				}
-
-				function += ")";
-
-				voltageSource->setFunction(function);
-			}
-			ot::UID uid = voltageSource->getUID();
-			auto voltageSource_p = voltageSource.release();
-			it->second.addElement(uid, voltageSource_p);
-
+			continue;
 		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitResistor")
+
+		auto elementPtr = std::unique_ptr<CircuitElement>(element);
+		elementPtr->initFromEntity(blockEntity, editorname);
+
+		std::string netlistName = m_elementNamingRegistry.registerElement(blockEntity->getNameOnly(), elementPtr->getNetlistPrefix());
+		elementPtr->setNetlistName(netlistName);
+		elementPtr->setCustomName(blockEntity->getNameOnly());
+
+		auto* circuitEntity = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
+		if (circuitEntity)
 		{
-			auto myElement = dynamic_cast<EntityBlockCircuitResistor*>(blockEntity.get());
-			auto resistor = std::make_unique<Resistor>(myElement->getResistance(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "R");
-			resistor->setNetlistName(netlistName);
-			resistor->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
+			std::string circuitModel = circuitEntity->getCircuitModel();
 			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			resistor->setModel(circuitModel);
-			resistor->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = resistor->getUID();
-			auto resistor_p = resistor.release();
-			it->second.addElement(uid, resistor_p);
+			elementPtr->setModel(circuitModel);
+			elementPtr->setFolderName(circuitEntity->getFolderName());
 		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitDiode")
-		{
-			auto myElement = dynamic_cast<EntityBlockCircuitDiode*>(blockEntity.get());
-			auto diode = std::make_unique<Diode>("", myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
 
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "D");
-			diode->setNetlistName(netlistName);
-			diode->setCustomName(myElement->getNameOnly());
+		ot::UID uid = blockEntity->getEntityID();
+		auto element_p = elementPtr.release();
+		it->second.addElement(uid, element_p);
 
-			
-			
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			diode->setModel(circuitModel);
-			diode->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = diode->getUID();
-			auto diode_p = diode.release();
-			it->second.addElement(uid, diode_p);
-		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitCapacitor")
-		{
-			auto myElement = dynamic_cast<EntityBlockCircuitCapacitor*>(blockEntity.get());
-			auto capacitor = std::make_unique<Capacitor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "C");
-			capacitor->setNetlistName(netlistName);
-			capacitor->setCustomName(myElement->getNameOnly());
- 
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			capacitor->setModel(circuitModel);
-			capacitor->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = capacitor->getUID();
-			auto capacitor_p = capacitor.release();
-			it->second.addElement(uid, capacitor_p);
-		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitInductor")
-		{
-			auto myElement = dynamic_cast<EntityBlockCircuitInductor*>(blockEntity.get());
-			auto inductor = std::make_unique<Inductor>(myElement->getElementType(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-			
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "L");
-			inductor->setNetlistName(netlistName);
-			inductor->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			inductor->setModel(circuitModel);
-			inductor->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = inductor->getUID();
-			auto inductor_p = inductor.release();
-			it->second.addElement(uid, inductor_p);
-		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitVoltageMeter") {
-			auto myElement = dynamic_cast<EntityBlockCircuitVoltageMeter*>(blockEntity.get());
-			auto voltMeter = std::make_unique<VoltageMeter>( myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-		
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "VM");
-			voltMeter->setNetlistName(netlistName);
-			voltMeter->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			voltMeter->setModel(circuitModel);
-			voltMeter->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = voltMeter->getUID();
-			auto voltMeter_p = voltMeter.release();
-			it->second.addElement(uid, voltMeter_p);
-		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitCurrentMeter") {
-			auto myElement = dynamic_cast<EntityBlockCircuitCurrentMeter*>(blockEntity.get());
-			auto currentMeter = std::make_unique<CurrentMeter>(myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "CM");
-			currentMeter->setNetlistName(netlistName);
-			currentMeter->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			currentMeter->setModel(circuitModel);
-			currentMeter->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = currentMeter->getUID();
-			auto currentMeter_p = currentMeter.release();
-			it->second.addElement(uid, currentMeter_p);
-		}
-		else if (blockEntity->getClassName() == "EntityBlockCircuitTransmissionLine") {
-			auto myElement = dynamic_cast<EntityBlockCircuitTransmissionLine*>(blockEntity.get());
-			auto transmissionLine = std::make_unique<TransmissionLine>(myElement->getImpedance(),myElement->getTransmissionDelay(), myElement->getBlockTitle(), editorname, myElement->getEntityID(), notInitialized);
-
-			// Add customName and netlistName to Map
-			std::string netlistName = m_elementNamingRegistry.registerElement(myElement->getNameOnly(), "T");
-			transmissionLine->setNetlistName(netlistName);
-			transmissionLine->setCustomName(myElement->getNameOnly());
-
-			std::string circuitModel = myElement->getCircuitModel();
-			circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
-			transmissionLine->setModel(circuitModel);
-			transmissionLine->setFolderName(myElement->getFolderName());
-
-			ot::UID uid = transmissionLine->getUID();
-			auto transmissionLine_p = transmissionLine.release();
-			it->second.addElement(uid, transmissionLine_p);
-		}
-	
 	}
 
 	

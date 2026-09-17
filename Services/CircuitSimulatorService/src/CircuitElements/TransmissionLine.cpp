@@ -19,6 +19,9 @@
 
 //Service Header
 #include "CircuitElements/TransmissionLine.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
+
+static CircuitElement::Registrar<TransmissionLine> registrar("EntityBlockCircuitTransmissionLine");
 
 TransmissionLine::TransmissionLine(std::string impedance, std::string transmissionDelay, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName)
 : m_impedance(impedance),m_transmissionDelay(transmissionDelay),CircuitElement(itemName, editorName, Uid, netlistName) {
@@ -27,4 +30,16 @@ TransmissionLine::TransmissionLine(std::string impedance, std::string transmissi
 
 TransmissionLine::~TransmissionLine() {
 
+}
+
+void TransmissionLine::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName)
+{
+    auto* myElement = dynamic_cast<EntityBlockCircuitTransmissionLine*>(_entity.get());
+    if (!myElement) return;
+
+    m_impedance = myElement->getImpedance();
+    m_transmissionDelay = myElement->getTransmissionDelay();
+    m_itemName = myElement->getBlockTitle();
+    m_editorName = _editorName;
+    m_Uid = myElement->getEntityID();
 }

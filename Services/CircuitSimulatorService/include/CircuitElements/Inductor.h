@@ -26,15 +26,19 @@ class Inductor : public CircuitElement {
 
 
 public:
+	Inductor() = default;
 	Inductor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);
 	~Inductor();
 
 	std::string type() const override { return "Inductor"; }
-
+	void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) override;
 	//Getter
 	const std::string getInductance() const { return this->m_inductance; }
+	std::string getNetlistPrefix() const override { return "L"; }
+	std::string getNetlistValue() const override { return this->m_inductance; }
+
 	//Setter
-	std::string setInductance(std::string inductance) { this->m_inductance = inductance; }
+	void setInductance(std::string inductance) { this->m_inductance = inductance; }
 
 private:
 	std::string m_inductance;
