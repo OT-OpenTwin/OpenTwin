@@ -47,6 +47,9 @@ namespace ot {
 	inline constexpr const char* c_tableRangeRightColumnKey = "rC";
 	inline constexpr const char* c_tableRangeBottomRowKey = "bR";
 
+	//! @class TableRange
+	//! @brief Base class for table ranges. Concrete subclasses provide specialized behavior for specific range types.
+	//! This class is also directly instantiable for full backward compatibility.
 	class OT_GUI_API_EXPORT TableRange : public ot::Serializable {
 	public:
 		TableRange();
@@ -57,35 +60,132 @@ namespace ot {
 
 		TableRange(const TableRange& other);
 		TableRange& operator=(const TableRange& other);
+		virtual ~TableRange() = default;
+
 		bool operator==(const TableRange& other) const;
 		bool operator!=(const TableRange& other) const;
 
-		// Inherited via Serializable
+		// Virtual methods for polymorphism
+		virtual TableRangeType getRangeType() const { return m_rangeType; }
+		virtual void setRangeType(TableRangeType _type) { m_rangeType = _type; }
 
+		virtual bool isInRange(int _row, int _column) const;
+		bool isInRange(uint64_t _column, uint64_t _row) const { return isInRange(static_cast<int>(_row), static_cast<int>(_column)); }
+
+		virtual TableRange* clone() const;
+		virtual bool isEqualTo(const TableRange& other) const;
+
+		// Inherited via Serializable
 		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
-		TableRangeType getRangeType() const { return m_rangeType; }
-		void setRangeType(TableRangeType _type) { m_rangeType = _type; }
+		virtual int getTopRow() const { return m_topRow; }
+		virtual int getBottomRow() const { return m_bottomRow; }
+		virtual int getLeftColumn() const { return m_leftColumn; }
+		virtual int getRightColumn() const { return m_rightColumn; }
 
-		bool isInRange(int _row, int _column) const;
-		bool isInRange(uint64_t _column, uint64_t _row) const { return isInRange(static_cast<int>(_row), static_cast<int>(_column)); }
+		virtual void setTopRow(int _topRow) { m_topRow = _topRow; }
+		virtual void setBottomRow(int _bottomRow) { m_bottomRow = _bottomRow; }
+		virtual void setLeftColumn(int _leftColumn) { m_leftColumn = _leftColumn; }
+		virtual void setRightColumn(int _rightColumn) { m_rightColumn = _rightColumn; }
 
-		int getTopRow() const { return m_topRow; }
-		int getBottomRow() const { return m_bottomRow; }
-		int getLeftColumn() const { return m_leftColumn; }
-		int getRightColumn() const { return m_rightColumn; }
-
-		void setTopRow(int _topRow) { m_topRow = _topRow; }
-		void setBottomRow(int _bottomRow) { m_bottomRow = _bottomRow; }
-		void setLeftColumn(int _leftColumn) { m_leftColumn = _leftColumn; }
-		void setRightColumn(int _rightColumn) { m_rightColumn = _rightColumn; }
-
-	private:
+	protected:
 		TableRangeType m_rangeType;
 		int m_topRow;
 		int m_bottomRow;
 		int m_leftColumn;
 		int m_rightColumn;
+	};
+
+	//! @class TableRangeTable
+	//! @brief Represents the entire table. Covers all rows and columns.
+	class OT_GUI_API_EXPORT TableRangeTable : public TableRange {
+	public:
+		TableRangeTable();
+
+		virtual TableRangeType getRangeType() const override { return TableRangeType::Table; }
+		virtual bool isInRange(int _row, int _column) const override { return true; }
+		virtual TableRange* clone() const override { return new TableRangeTable(*this); }
+		virtual bool isEqualTo(const TableRange& other) const override { return true; }
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+	};
+
+	//! @class TableRangeSection
+	//! @brief Represents a rectangular section (box) of cells defined by top-left and bottom-right coordinates.
+	class OT_GUI_API_EXPORT TableRangeSection : public TableRange {
+	public:
+		TableRangeSection();
+		TableRangeSection(int _topRow, int _leftColumn, int _bottomRow, int _rightColumn);
+
+		virtual TableRangeType getRangeType() const override { return TableRangeType::Section; }
+		virtual bool isInRange(int _row, int _column) const override;
+		virtual TableRange* clone() const override { return new TableRangeSection(*this); }
+		virtual bool isEqualTo(const TableRange& other) const override;
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+	};
+
+	//! @class TableRangeColumn
+	//! @brief Represents one or more entire columns.
+	class OT_GUI_API_EXPORT TableRangeColumn : public TableRange {
+	public:
+		TableRangeColumn();
+		TableRangeColumn(int _column);
+		TableRangeColumn(int _leftColumn, int _rightColumn);
+
+		int getColumn() const { return m_leftColumn; }
+		void setColumn(int _column) { m_leftColumn = _column; m_rightColumn = _column; }
+
+		virtual TableRangeType getRangeType() const override { return TableRangeType::Column; }
+		virtual bool isInRange(int _row, int _column) const override;
+		virtual TableRange* clone() const override { return new TableRangeColumn(*this); }
+		virtual bool isEqualTo(const TableRange& other) const override;
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+	};
+
+	//! @class TableRangeRow
+	//! @brief Represents one or more entire rows.
+	class OT_GUI_API_EXPORT TableRangeRow : public TableRange {
+	public:
+		TableRangeRow();
+		TableRangeRow(int _row);
+		TableRangeRow(int _topRow, int _bottomRow);
+
+		int getRow() const { return m_topRow; }
+		void setRow(int _row) { m_topRow = _row; m_bottomRow = _row; }
+
+		virtual TableRangeType getRangeType() const override { return TableRangeType::Row; }
+		virtual bool isInRange(int _row, int _column) const override;
+		virtual TableRange* clone() const override { return new TableRangeRow(*this); }
+		virtual bool isEqualTo(const TableRange& other) const override;
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
+	};
+
+	//! @class TableRangeCell
+	//! @brief Represents a single table cell.
+	class OT_GUI_API_EXPORT TableRangeCell : public TableRange {
+	public:
+		TableRangeCell();
+		TableRangeCell(int _row, int _column);
+
+		int getRow() const { return m_topRow; }
+		int getColumn() const { return m_leftColumn; }
+		void setRow(int _row) { m_topRow = _row; m_bottomRow = _row; }
+		void setColumn(int _column) { m_leftColumn = _column; m_rightColumn = _column; }
+
+		virtual TableRangeType getRangeType() const override { return TableRangeType::Cell; }
+		virtual bool isInRange(int _row, int _column) const override;
+		virtual TableRange* clone() const override { return new TableRangeCell(*this); }
+		virtual bool isEqualTo(const TableRange& other) const override;
+
+		virtual void addToJsonObject(JsonValue& _object, JsonAllocator& _allocator) const override;
+		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 	};
 }

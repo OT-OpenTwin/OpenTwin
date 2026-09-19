@@ -265,19 +265,19 @@ void Application::testTableColored(void) {
 	}
 
 	// 1. Table Range: Whole table base color (light gray)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(245, 245, 245)));
+	cfg.addColoredRange(ColoredTableRange(TableRangeTable(), Color(245, 245, 245)));
 
 	// 2. Section Range: (2, 2) to (7, 5) (soft yellow)
-	cfg.addColoredRange(ColoredTableRange(TableRange(2, 2, 7, 5), Color(255, 255, 180)));
+	cfg.addColoredRange(ColoredTableRange(TableRangeSection(2, 2, 7, 5), Color(255, 255, 180)));
 
 	// 3. Column Range: Column 7 (soft blue)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Column, 7), Color(180, 220, 255)));
+	cfg.addColoredRange(ColoredTableRange(TableRangeColumn(7), Color(180, 220, 255)));
 
 	// 4. Row Range: Row 4 (soft green)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Row, 4), Color(180, 255, 180)));
+	cfg.addColoredRange(ColoredTableRange(TableRangeRow(4), Color(180, 255, 180)));
 
 	// 5. Cell Range: Cell (4, 3) (soft red)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Cell, 4, 3), Color(255, 150, 150)));
+	cfg.addColoredRange(ColoredTableRange(TableRangeCell(4, 3), Color(255, 150, 150)));
 
 	// Create table document and send to UI
 	JsonDocument doc;
