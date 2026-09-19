@@ -72,6 +72,22 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
                 _painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
             }
 
+            if (item->foreground().color().isValid()) {
+                textPen.setBrush(item->foreground());
+            }
+        }
+    }
+    else {
+        if (opt.state & QStyle::State_MouseOver) {
+            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetHoverBackground).toBrush());
+            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetHoverForeground).toBrush());
+        }
+        else if (opt.state & QStyle::State_Selected) {
+            _painter->fillRect(opt.rect, style.getValue(ColorStyleValueEntry::WidgetSelectionBackground).toBrush());
+            textPen.setBrush(style.getValue(ColorStyleValueEntry::WidgetSelectionForeground).toBrush());
+        }
+        else {
+            _painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
         }
     }
 

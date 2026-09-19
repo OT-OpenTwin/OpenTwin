@@ -50,6 +50,7 @@
 namespace ot {
 
 	class Painter2D;
+	class Table;
 
 	//! @class QtFactory
 	//! @brief The QtFactory is used to convert OpenTwin configuration objects to Qt objects.
@@ -117,7 +118,7 @@ namespace ot {
 		static QTransform toQTransformOnCenter(const ot::Transform& _transform, const QPointF& _centerPos);
 
 		static ot::TableRange toTableRange(const QTableWidgetSelectionRange& _range);
-		static QTableWidgetSelectionRange toQTableRange(const ot::TableRange& _range);
+		static QTableWidgetSelectionRange toQTableRange(const ot::TableRange& _range, const ot::Table* _table = nullptr);
 
 		static ot::SortOrder toSortOrder(Qt::SortOrder _order);
 		static Qt::SortOrder toQSortOrder(ot::SortOrder _order);

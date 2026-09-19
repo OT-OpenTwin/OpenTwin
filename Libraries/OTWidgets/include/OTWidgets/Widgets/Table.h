@@ -62,6 +62,14 @@ namespace ot {
 		virtual void setupFromConfig(const TableCfg& _config);
 		virtual TableCfg createConfig() const;
 
+		QColor getCurrentCellColor(int _row, int _column) const;
+
+		const std::vector<TableRangeType>& getRangePriority() const { return m_rangePriority; }
+		void setRangePriority(const std::vector<TableRangeType>& _priority) { m_rangePriority = _priority; }
+
+		const std::vector<ColoredTableRange>& getColoredRanges() const { return m_coloredRanges; }
+		void setColoredRanges(const std::vector<ColoredTableRange>& _ranges) { m_coloredRanges = _ranges; }
+
 		void setContentChanged(bool _changed = true);
 		bool getContentChanged() const { return m_contentChanged; };
 
@@ -142,6 +150,9 @@ namespace ot {
 
 		TableHeader* m_verticalHeader;
 		std::vector<TableHeaderItemCfg*> m_verticalHeaderItemCfgs;
+
+		std::vector<TableRangeType> m_rangePriority;
+		std::vector<ColoredTableRange> m_coloredRanges;
 	};
 
 }

@@ -26,6 +26,7 @@
 #include "OTGui/Painter/LinearGradientPainter2D.h"
 #include "OTGui/Painter/RadialGradientPainter2D.h"
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 
 // Qt header
@@ -299,7 +300,38 @@ ot::TableRange ot::QtFactory::toTableRange(const QTableWidgetSelectionRange& _ra
     return ot::TableRange(_range.topRow(), _range.leftColumn(), _range.bottomRow(), _range.rightColumn());
 }
 
-QTableWidgetSelectionRange ot::QtFactory::toQTableRange(const ot::TableRange& _range) {
+QTableWidgetSelectionRange ot::QtFactory::toQTableRange(const ot::TableRange& _range, const ot::Table* _table) {
+    switch (_range.getRangeType()) {
+    case TableRangeType::Table:
+        if (_table && _table->rowCount() > 0 && _table->columnCount() > 0) {
+            return QTableWidgetSelectionRange(0, 0, _table->rowCount() - 1, _table->columnCount() - 1);
+        }
+        break;
+
+    case TableRangeType::Row:
+        if (_table && _table->columnCount() > 0) {
+            int top = _range.getTopRow() >= 0 ? _range.getTopRow() : 0;
+            int bottom = _range.getBottomRow() >= 0 ? _range.getBottomRow() : top;
+            return QTableWidgetSelectionRange(top, 0, bottom, _table->columnCount() - 1);
+        }
+        break;
+
+    case TableRangeType::Column:
+        if (_table && _table->rowCount() > 0) {
+            int left = _range.getLeftColumn() >= 0 ? _range.getLeftColumn() : 0;
+            int right = _range.getRightColumn() >= 0 ? _range.getRightColumn() : left;
+            return QTableWidgetSelectionRange(0, left, _table->rowCount() - 1, right);
+        }
+        break;
+
+    case TableRangeType::Cell:
+        return QTableWidgetSelectionRange(_range.getTopRow(), _range.getLeftColumn(), _range.getTopRow(), _range.getLeftColumn());
+
+    case TableRangeType::Section:
+    default:
+        break;
+    }
+
     return QTableWidgetSelectionRange(_range.getTopRow(), _range.getLeftColumn(), _range.getBottomRow(), _range.getRightColumn());
 }
 

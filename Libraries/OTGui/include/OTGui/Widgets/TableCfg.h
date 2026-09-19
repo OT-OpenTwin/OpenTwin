@@ -23,6 +23,8 @@
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include "OTGui/Widgets/WidgetViewBase.h"
 #include "OTGui/Widgets/TableHeaderItemCfg.h"
+#include "OTGui/TableRange.h"
+#include "OTGui/ColoredTableRange.h"
 
 // std header
 #include <string>
@@ -99,6 +101,14 @@ namespace ot {
 		void setReadOnly(bool _readOnly = true) { m_readOnly = _readOnly; };
 		bool getReadOnly() const { return m_readOnly; };
 
+		void setRangePriority(const std::vector<TableRangeType>& _priority) { m_rangePriority = _priority; }
+		const std::vector<TableRangeType>& getRangePriority() const { return m_rangePriority; }
+
+		void addColoredRange(const ColoredTableRange& _range) { m_coloredRanges.push_back(_range); }
+		void setColoredRanges(const std::vector<ColoredTableRange>& _ranges) { m_coloredRanges = _ranges; }
+		const std::vector<ColoredTableRange>& getColoredRanges() const { return m_coloredRanges; }
+		std::vector<ColoredTableRange>& getColoredRanges() { return m_coloredRanges; }
+
 	private:
 		void initialize();
 		void initialize(int _rows, int _columns);
@@ -116,6 +126,9 @@ namespace ot {
 		std::vector<std::vector<std::string>> m_data;
 
 		bool m_readOnly = false;
+
+		std::vector<TableRangeType> m_rangePriority = { TableRangeType::Cell, TableRangeType::Row, TableRangeType::Column, TableRangeType::Section, TableRangeType::Table };
+		std::vector<ColoredTableRange> m_coloredRanges;
 	};
 
 }

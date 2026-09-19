@@ -4480,7 +4480,10 @@ void ExternalServicesComponent::handleCloseAllTextEditors(ot::JsonDocument& _doc
 void ExternalServicesComponent::handleSetupTable(ot::JsonDocument& _document)
 {
 	ot::VisualisationCfg visualisationCfg;
-	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
+	if (_document.HasMember(OT_ACTION_PARAM_VisualisationConfig))
+	{
+		visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
+	}
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView())

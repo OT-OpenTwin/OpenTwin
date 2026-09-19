@@ -43,6 +43,11 @@ namespace ot::TableHeaderModeNames{
 	const std::string ModeNameNone = "None";
 }
 
+namespace {
+	inline constexpr const char* c_tableRangePriorityKey = "RangePriority";
+	inline constexpr const char* c_tableColoredRangesKey = "ColoredRanges";
+}
+
 std::string ot::TableCfg::toString(ot::TableCfg::TableHeaderMode _headerMode) {
 	switch (_headerMode) {
 	case ot::TableCfg::TableHeaderMode::NoHeader: return TableHeaderModeNames::ModeNameNone;
@@ -154,6 +159,8 @@ ot::TableCfg::TableCfg(TableCfg&& _other) noexcept
 	m_rowsSortable = _other.m_rowsSortable;
 
 	m_readOnly = _other.m_readOnly;
+	m_rangePriority = std::move(_other.m_rangePriority);
+	m_coloredRanges = std::move(_other.m_coloredRanges);
 }
 
 ot::TableCfg::~TableCfg() {
@@ -178,6 +185,8 @@ ot::TableCfg& ot::TableCfg::operator = (const TableCfg& _other) {
 	m_rowsSortable = _other.m_rowsSortable;
 
 	m_readOnly = _other.m_readOnly;
+	m_rangePriority = _other.m_rangePriority;
+	m_coloredRanges = _other.m_coloredRanges;
 
 	this->initialize();
 
@@ -219,6 +228,8 @@ ot::TableCfg& ot::TableCfg::operator=(TableCfg&& _other) noexcept {
 		m_data = std::move(_other.m_data);
 
 		m_readOnly = _other.m_readOnly;
+		m_rangePriority = std::move(_other.m_rangePriority);
+		m_coloredRanges = std::move(_other.m_coloredRanges);
 	}
 	return *this;
 }
@@ -268,6 +279,22 @@ void ot::TableCfg::addToJsonObject(ot::JsonValue& _object, ot::JsonAllocator& _a
 		dataArr.PushBack(JsonArray(column, _allocator), _allocator);
 	}
 	_object.AddMember("Data", dataArr, _allocator);
+
+	// Range priority
+	JsonArray prioArr;
+	for (TableRangeType p : m_rangePriority) {
+		prioArr.PushBack(JsonString(ot::toString(p), _allocator), _allocator);
+	}
+	_object.AddMember(JsonString(c_tableRangePriorityKey, _allocator), prioArr, _allocator);
+
+	// Colored ranges
+	JsonArray coloredRangesArr;
+	for (const ColoredTableRange& cr : m_coloredRanges) {
+		JsonObject crObj;
+		cr.addToJsonObject(crObj, _allocator);
+		coloredRangesArr.PushBack(crObj, _allocator);
+	}
+	_object.AddMember(JsonString(c_tableColoredRangesKey, _allocator), coloredRangesArr, _allocator);
 }
 
 void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
@@ -323,6 +350,29 @@ void ot::TableCfg::setFromJsonObject(const ot::ConstJsonObject& _object) {
 		}
 	}
 
+	// Range priority
+	if (_object.HasMember(c_tableRangePriorityKey)) {
+		m_rangePriority.clear();
+		ConstJsonArray prioArr = json::getArray(_object, c_tableRangePriorityKey);
+		for (JsonSizeType i = 0; i < prioArr.Size(); i++) {
+			m_rangePriority.push_back(stringToTableRangeType(json::getString(prioArr, i)));
+		}
+	}
+	else {
+		m_rangePriority = { TableRangeType::Cell, TableRangeType::Row, TableRangeType::Column, TableRangeType::Section, TableRangeType::Table };
+	}
+
+	// Colored ranges
+	m_coloredRanges.clear();
+	if (_object.HasMember(c_tableColoredRangesKey)) {
+		ConstJsonArray coloredRangesArr = json::getArray(_object, c_tableColoredRangesKey);
+		for (JsonSizeType i = 0; i < coloredRangesArr.Size(); i++) {
+			ConstJsonObject crObj = json::getObject(coloredRangesArr, i);
+			ColoredTableRange newRange;
+			newRange.setFromJsonObject(crObj);
+			m_coloredRanges.push_back(newRange);
+		}
+	}
 }
 
 ot::GenericDataStructMatrix ot::TableCfg::createMatrix() const {
@@ -415,6 +465,9 @@ void ot::TableCfg::clear(void) {
 
 	m_rows = 0;
 	m_columns = 0;
+
+	m_rangePriority = { TableRangeType::Cell, TableRangeType::Row, TableRangeType::Column, TableRangeType::Section, TableRangeType::Table };
+	m_coloredRanges.clear();
 }
 
 const std::vector<std::string>& ot::TableCfg::getRow(int _row) const {

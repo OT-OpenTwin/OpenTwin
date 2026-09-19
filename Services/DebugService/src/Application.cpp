@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Application.cpp
 // 
 // License:
@@ -42,6 +42,7 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
 #include "OTGui/Widgets/TableCfg.h"
+#include "OTGui/VisualisationCfg.h"
 
 #include "OTGuiAPI/Frontend.h"
 
@@ -133,6 +134,7 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Small (100k)", "Default/GreenCircle"), std::bind(&Application::testTableSmall, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Medium (1M)", "Default/YellowCircle"), std::bind(&Application::testTableMedium, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Big (10M)", "Default/RedCircle"), std::bind(&Application::testTableBig, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Colored Table", "Default/Color"), std::bind(&Application::testTableColored, this)));
 
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
@@ -239,6 +241,62 @@ void Application::testTableMedium(void) {
 void Application::testTableBig(void) {
 	std::thread t(&Application::sendTableWorker, this, 10000, 1000);
 	t.detach();
+}
+
+void Application::testTableColored(void) {
+	using namespace ot;
+
+	auto ui = this->getUiComponent();
+	if (!ui) {
+		OT_LOG_E("No ui? How?");
+		return;
+	}
+
+	const int rows = 15;
+	const int columns = 10;
+
+	TableCfg cfg(rows, columns);
+	cfg.setEntityName("Test (" + std::to_string(m_nameCounter++) + "): Colored Table");
+
+	for (int r = 0; r < rows; r++) {
+		for (int c = 0; c < columns; c++) {
+			cfg.setCellText(r, c, "(" + std::to_string(r) + ", " + std::to_string(c) + ")");
+		}
+	}
+
+	// 1. Table Range: Whole table base color (light gray)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(245, 245, 245)));
+
+	// 2. Section Range: (2, 2) to (7, 5) (soft yellow)
+	cfg.addColoredRange(ColoredTableRange(TableRange(2, 2, 7, 5), Color(255, 255, 180)));
+
+	// 3. Column Range: Column 7 (soft blue)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Column, 7), Color(180, 220, 255)));
+
+	// 4. Row Range: Row 4 (soft green)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Row, 4), Color(180, 255, 180)));
+
+	// 5. Cell Range: Cell (4, 3) (soft red)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Cell, 4, 3), Color(255, 150, 150)));
+
+	// Create table document and send to UI
+	JsonDocument doc;
+	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::VisualisationCfg visCfg;
+	visCfg.setAsActiveView(true);
+	visCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+	JsonObject visObj;
+	visCfg.addToJsonObject(visObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visObj, doc.GetAllocator());
+
+	JsonObject cfgObj;
+	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+
+	std::string resp;
+	ui->sendMessage(true, doc, resp);
 }
 
 void Application::createPlotOneComplexCurveMagPhase()
@@ -847,6 +905,13 @@ void Application::sendTableWorker(int _rows, int _columns) {
 	JsonObject cfgObj;
 	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
+
+	ot::VisualisationCfg visCfg;
+	visCfg.setAsActiveView(true);
+	visCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+	JsonObject visObj;
+	visCfg.addToJsonObject(visObj, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visObj, doc.GetAllocator());
 
 	std::string resp;
 	ui->sendMessage(true, doc, resp);

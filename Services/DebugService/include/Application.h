@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Application.h
 // 
 // License:
@@ -55,6 +55,7 @@ public:
 	void testTableSmall();
 	void testTableMedium();
 	void testTableBig();
+	void testTableColored();
 	
 	void createPlotOneComplexCurveMagPhase();
 	void createPlotOneComplexCurveRealImag();
