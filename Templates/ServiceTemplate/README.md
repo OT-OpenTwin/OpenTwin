@@ -14,14 +14,14 @@ It builds with CMake and the Python scripts under `Scripts/Python`.
 
 ## 2. Register the service
 
-`Scripts/Python/SetupEnvironment.py` - add the root to `SERVICES`:
+`Scripts/SetupEnvironment.py` - add the root to `SERVICES`:
 
     "OT_MY_SERVICE_ROOT": "MyService",
 
 The key used by the batch files is that name without `OT_` and `_ROOT`,
 so `OT_MY_SERVICE_ROOT` is driven as `MY_SERVICE`.
 
-`Scripts/Python/build_all.py` - add the key to `BUILD_ORDER` in dependency order.
+`Scripts/BuildOrder.py` - add the key to `BUILD_ORDER` in dependency order.
 
 ## 3. Build, test and edit
 
