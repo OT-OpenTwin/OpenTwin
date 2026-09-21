@@ -198,7 +198,6 @@ _NOT_RECOGNIZED = 9009
 
 
 def _not_found(program: str) -> int:
-    # Same text and exit code as cmd, so a batch using run.py fails as it did before.
     if Path(program).parent != Path(".") and not Path(program).parent.is_dir():
         print("The system cannot find the path specified.", file=sys.stderr, flush=True)
         return _NO_PATH
@@ -227,11 +226,13 @@ def run_program(env: Mapping[str, str], command: Sequence[str],
     found = shutil.which(program, path=env.get("PATH")) or program
     if not Path(found).is_file():
         return _not_found(program)
-    args = [found, *rest]
+
+    args, executable = [program, *rest], found
     if WINDOWS and found.lower().endswith((".cmd", ".bat")):
-        args = ["cmd", "/c", *args]
+        args, executable = ["cmd", "/c", found, *rest], None
     sys.stdout.flush()
+
     if detach:
-        subprocess.Popen(args, env=env)
+        subprocess.Popen(args, executable=executable, env=env)
         return 0
-    return subprocess.run(args, env=env).returncode
+    return subprocess.run(args, executable=executable, env=env).returncode
