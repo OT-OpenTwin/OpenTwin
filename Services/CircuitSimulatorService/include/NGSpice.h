@@ -56,12 +56,6 @@ public:
 	std::list<std::string> ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string);
 	void clearBufferStructure(std::string name);
 
-	// CircuitModel functions
-	std::shared_ptr<EntityFileText> getModelEntity(const std::string& _folderName,std::string _modelName);
-	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
-	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
-	std::vector<std::string> convertToCircByLine(const std::string& lines);
-
 	//Connection Algorithm functions
 	void connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
 	void connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
