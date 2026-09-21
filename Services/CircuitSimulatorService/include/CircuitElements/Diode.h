@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class Diode : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(Diode)
 public:
 	Diode() = default;
 	Diode(std::string value, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

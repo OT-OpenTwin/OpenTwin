@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class Capacitor : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(Capacitor)
 public:
 	Capacitor() = default;
 	Capacitor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

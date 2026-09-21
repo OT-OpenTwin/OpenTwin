@@ -41,7 +41,9 @@
 
 class NGSpice
 {
+	OT_DECL_NOCOPY(NGSpice)
 public:
+	NGSpice() = default;
 	
 	std::map<std::string, Circuit> mapOfCircuits;
 	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;

@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class Resistor : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(Resistor)
 public:
 	Resistor() = default;
 	Resistor(std::string resistance, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

@@ -25,7 +25,7 @@
 #include "OTCore/Geometry/Point2D.h"
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTCore/InClassFactory.h"
-#include "OTBlockEntities/EntityBlock.h"
+#include "OTCore/OTClassHelper.h"
 
 //C++ Header
 #include <string>
@@ -37,6 +37,7 @@
 
 class CircuitElement
 {
+	OT_DECL_NOCOPY(CircuitElement)
 	OT_DECL_INCLASS_FACTORY(CircuitElement, CircuitElement, Registrar)
 public:
 	CircuitElement() = default;

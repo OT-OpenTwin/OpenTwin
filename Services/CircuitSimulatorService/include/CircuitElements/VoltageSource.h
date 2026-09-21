@@ -23,6 +23,7 @@
 #include "CircuitElement.h"
 
 class VoltageSource: public CircuitElement {
+	OT_DECL_NOCOPY(VoltageSource)
 public:
 	VoltageSource() = default;
 	VoltageSource(std::string value,  std::string function, std::string type,  std::string amplitude,

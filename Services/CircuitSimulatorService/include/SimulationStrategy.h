@@ -20,6 +20,7 @@
 
 // Open Twin Header
 #include "OTBlockEntities/EntityBlock.h"
+#include "OTCore/OTClassHelper.h"
 
 // Service Header
 #include "CircuitElements/VoltageSource.h"
@@ -32,7 +33,9 @@
 
 class SimulationStrategy
 {
+	OT_DECL_NOCOPY(SimulationStrategy)
 public: 
+	SimulationStrategy() = default;
 	virtual ~SimulationStrategy() = default;
 	
 	// @brief Gives the netlist type of a voltage source based on its properties.
@@ -43,7 +46,9 @@ public:
 
 class DCSimulationStrategy : public SimulationStrategy
 {
+	OT_DECL_NOCOPY(DCSimulationStrategy)
 public:
+	DCSimulationStrategy() = default;
 	std::string getVoltageSourceNetlistType(VoltageSource* _voltageSource) const override;
 
 	std::string generateSimulationLine(EntityBase* _solverEntity, const ElementNamingRegistry& _elementNamingRegistry) const override;
@@ -51,14 +56,18 @@ public:
 
 class ACSimulationStrategy : public SimulationStrategy
 {
+	OT_DECL_NOCOPY(ACSimulationStrategy)
 public:
+	ACSimulationStrategy() = default;
 	std::string getVoltageSourceNetlistType(VoltageSource* _voltageSource) const override;
 	std::string generateSimulationLine(EntityBase* _solverEntity, const ElementNamingRegistry& _elementNamingRegistry) const override;
 };
 
 class TRANSimulationStrategy : public SimulationStrategy
 {
+	OT_DECL_NOCOPY(TRANSimulationStrategy)
 public:
+	TRANSimulationStrategy() = default;
 	std::string getVoltageSourceNetlistType(VoltageSource* _voltageSource) const override;
 	std::string generateSimulationLine(EntityBase* _solverEntity, const ElementNamingRegistry& _elementNamingRegistry) const override;
 };

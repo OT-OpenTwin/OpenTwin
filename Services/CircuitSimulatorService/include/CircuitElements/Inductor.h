@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class Inductor : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(Inductor)
 public:
 	Inductor() = default;
 	Inductor(std::string capacity, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

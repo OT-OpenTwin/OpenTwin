@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class TransmissionLine : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(TransmissionLine)
 public:
 	TransmissionLine() = default;
 	TransmissionLine(std::string impedance, std::string transmissionDelay, std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

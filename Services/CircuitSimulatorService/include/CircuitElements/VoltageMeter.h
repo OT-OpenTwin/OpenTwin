@@ -23,8 +23,7 @@
 #include "CircuitElement.h"
 
 class VoltageMeter : public CircuitElement {
-
-
+	OT_DECL_NOCOPY(VoltageMeter)
 public:
 	VoltageMeter() = default;
 	VoltageMeter(std::string itemName, std::string editorName, ot::UID Uid, std::string netlistName);

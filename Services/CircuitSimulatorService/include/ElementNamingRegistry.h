@@ -18,12 +18,16 @@
 // @otlicense-end
 #pragma once
 
+// OpenTwin Header
+#include "OTCore/OTClassHelper.h"
+
 // std Header
 #include <string>
 #include <map>
 
 class ElementNamingRegistry
 {
+	OT_DECL_NOCOPY(ElementNamingRegistry)
 public:
 	ElementNamingRegistry() = default;
 
