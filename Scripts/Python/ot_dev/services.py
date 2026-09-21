@@ -16,6 +16,7 @@
 import csv
 import subprocess
 import time
+from typing import Callable
 
 from .platform import WINDOWS
 
@@ -38,27 +39,54 @@ def _running(name: str) -> bool:
     return bool(_pids(name))
 
 
-def shutdown_all() -> int:
+def _require_windows() -> None:
     if not WINDOWS:
         # TODO(linux): taskkill/tasklist have no direct equivalent.
         raise SystemExit("shutdown is only implemented for Windows")
 
+
+def _stop(name: str) -> tuple[str, list[str]]:
+    pids = _pids(name)
+    code = subprocess.run(["taskkill", "/IM", name, "/F"],
+                          stdout=subprocess.DEVNULL,
+                          stderr=subprocess.DEVNULL).returncode
+    return {_KILLED: "stopped", _NOT_FOUND: "not running"}.get(code, f"taskkill returned {code}"), pids
+
+
+def _await(report: Callable[[str], None]) -> None:
+    remaining = _pids(AWAITED)
+    if remaining:
+        report(f"waiting for {AWAITED} to exit (pid {' '.join(remaining)})")
+        while _running(AWAITED):
+            time.sleep(1)
+
+
+def shutdown_all() -> int:
+    _require_windows()
+
     print("Shutting down OpenTwin", flush=True)
     for name in PROCESSES:
-        pids = _pids(name)
-        code = subprocess.run(["taskkill", "/IM", name, "/F"],
-                              stdout=subprocess.DEVNULL,
-                              stderr=subprocess.DEVNULL).returncode
-        state = {_KILLED: "stopped", _NOT_FOUND: "not running"}.get(code, f"taskkill returned {code}")
+        state, pids = _stop(name)
         detail = f"pid {' '.join(pids)}" if pids else ""
         print(f"  {name:24}{state:14}{detail}".rstrip(), flush=True)
 
-    remaining = _pids(AWAITED)
-    if remaining:
-        print(f"  waiting for {AWAITED} to exit (pid {' '.join(remaining)})", flush=True)
-        while _running(AWAITED):
-            time.sleep(1)
+    _await(lambda line: print(f"  {line}", flush=True))
 
     print("---", flush=True)
     print("SUCCESS", flush=True)
     return 0
+
+
+def stop_processes(report: Callable[[str], None]) -> list[str]:
+    """shutdown_all without the report; returns only what was actually running."""
+    _require_windows()
+
+    stopped = []
+    for name in PROCESSES:
+        state, pids = _stop(name)
+        if state == "stopped":
+            stopped.append(f"{name} (pid {' '.join(pids)})" if pids else name)
+        elif state != "not running":
+            stopped.append(f"{name}: {state}")
+    _await(report)
+    return stopped
