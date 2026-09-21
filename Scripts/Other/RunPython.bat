@@ -20,15 +20,7 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
     goto END
 )
 
-REM Setup environment
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-    echo Failed to set up Environment
-    exit(1);
-    goto END
-)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 if "%1"=="" (
     echo Please specify a source file when running this script
@@ -36,9 +28,8 @@ if "%1"=="" (
     goto END
 )
 
-CALL "%OPENTWIN_THIRDPARTY_ROOT%\Python\set_paths_dev.bat"
-
-start python %1 %2 %3 %4 %5 %6 %7 %8 %9
+REM Same as Python\set_paths_dev.bat: the legacy interpreter first on PATH
+start "" "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" "PYTHONPATH=%%OT_PYTHONPATH_LEGACY%%" "PATH=%%OT_PYTHONPATH_LEGACY%%;%%PATH%%" python %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto END
 
 :END

@@ -29,19 +29,13 @@ if "%QtMsBuild%"=="" (
 )
 
 rem ====================================================================
-rem Preparations for the build process 
+rem Preparations for the build process
 rem ====================================================================
 
-rem Setup eviroment
-call "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-rem Ensure that the script finished successfully
-if not "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-	goto END
-)
+call "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 rem rem Enabled:
-call "%OT_FILEHEADERUPDATER_ROOT%\x64\Release\FileHeaderUpdater.exe" --out "%OT_FILEHEADERUPDATER_ROOT%\FHU_Log.txt" --config "%OT_FILEHEADERUPDATER_ROOT%\OT_FHU_Config.json" %1 %2 %3 %4 %5 %6 %7 %8 %9
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" "%%OT_FILEHEADERUPDATER_ROOT%%\build\windows-release\Release\FileHeaderUpdater.exe" --out "%%OT_FILEHEADERUPDATER_ROOT%%\FHU_Log.txt" --config "%%OT_FILEHEADERUPDATER_ROOT%%\OT_FHU_Config.json" %1 %2 %3 %4 %5 %6 %7 %8 %9
 
 if "%1"=="--pause" (
 	goto PAUSE_END

@@ -19,23 +19,17 @@ IF "%DEVENV_ROOT_2022%" == "" (
 	goto PAUSE_END
 )
 
-REM Call third party environment shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-	goto END
-)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 ECHO Launching development enviroment
 
 IF "%1" == "" (
 	REM Open without project
-	START "" "%DEVENV_ROOT_2022%\devenv.exe"
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --detach "%DEVENV_ROOT_2022%\devenv.exe"
 )
 ELSE (
 	REM Open with project
-	START "" "%DEVENV_ROOT_2022%\devenv.exe" %1
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --detach "%DEVENV_ROOT_2022%\devenv.exe" %1
 )
 
 GOTO END

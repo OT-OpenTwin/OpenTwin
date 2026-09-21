@@ -19,31 +19,17 @@ IF "%DEVENV_ROOT_2022%" == "" (
 	goto PAUSE_END
 )
 
-REM Call third party environment shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-	goto END
-)
-
-REM Setup the native toolchain (required by the Ninja generator)
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupToolchain.bat"
-
-REM Ensure that the script finished successfully
-IF NOT "%OT_TOOLCHAIN_READY%" == "1" (
-	goto END
-)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 ECHO Launching development enviroment
 
 IF "%1" == "" (
 	REM Open without project
-	cmake-gui
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --toolchain cmake-gui
 )
 ELSE (
 	REM Open with project
-	cmake-gui %1
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --toolchain cmake-gui %1
 )
 
 GOTO END
