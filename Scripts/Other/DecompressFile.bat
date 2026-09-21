@@ -18,14 +18,7 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 	goto PAUSE_END
 )
 
-REM Setup environment
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-REM Ensure that the script finished successfully
-IF NOT "%OPENTWIN_DEV_ENV_DEFINED%" == "1" (
-    echo Failed to set up Environment
-	goto PAUSE_END
-)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 if "%1"=="" (
     echo Please specify a file when running this script
@@ -53,6 +46,6 @@ if not exist %decompressedFolder% (
 )
 
 REM Run expand
-"%OPENTWIN_THIRDPARTY_ROOT%\7-Zip\Win64\7z.exe" x -o%decompressedFolder% %sourceFile%
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" "%OPENTWIN_THIRDPARTY_ROOT%\7-Zip\Win64\7z.exe" x -o%decompressedFolder% %sourceFile%
 
 :END
