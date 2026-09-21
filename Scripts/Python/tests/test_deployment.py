@@ -35,9 +35,7 @@ VERBS = {"COPY": "copy", "XCOPY": "tree", "MKDIR": "mkdir",
          "RMDIR": "rmtree", "DEL": "remove", "FOR": "remove_glob",
          "REN": "rename", "MOVE": "move"}
 
-# Deliberate deviations from the batch. OTRandom was deleted from the repository,
-# so the batch deletes and copies a DLL that can never exist; the python rail drops it.
-OMITTED = ("OTRandom.dll",)
+OMITTED = ("OTRandom.dll", "Qt6WebEngineWidgets.dll", "PyritEnvironment")
 
 
 def _args(rest):
@@ -183,8 +181,9 @@ class PlanMatchesBatch(unittest.TestCase):
                         self.assertNotIn(name, value)
 
     def test_the_batch_still_contains_what_we_omit(self):
-        """If the batch drops OTRandom too, this exception should be deleted."""
-        text = (BATCH / "UpdateDeploymentLibrariesOnly.bat").read_text()
+        """If the batch drops one of them too, its exception should be deleted."""
+        text = "".join((BATCH / name).read_text()
+                       for name in ("UpdateDeploymentLibrariesOnly.bat", "CreateDeployment.bat"))
         for name in OMITTED:
             self.assertIn(name, text, f"{name} is gone from the batch; remove it from OMITTED")
 

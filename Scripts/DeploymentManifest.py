@@ -16,8 +16,7 @@
 """What CreateDeployment and UpdateDeploymentLibrariesOnly copy.
 
 Edit this file to change the contents of a deployment. Each entry mirrors one
-line of the matching batch script; Scripts/Python/tests/test_deployment.py
-compares the two and fails if they drift apart.
+line of the matching batch script.
 
     plan.copy(source, target)          COPY, wildcards allowed
     plan.tree(source, target)          XCOPY /S, add empty=True for /E
@@ -40,9 +39,10 @@ INSTALLER_DIR = r"%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest"
 
 
 def update_libraries(plan) -> None:
-    # Setup eviroment
-    # Ensure that the script finished successfully
+    # Shutdown
     plan.action("shutdown")
+
+    # Previous build
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\DebugService.dll')
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\OTSystem.dll')
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\OTCore.dll')
@@ -98,12 +98,16 @@ def update_libraries(plan) -> None:
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\HierarchicalProjectService.dll')
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\FileManagementProjectService.dll')
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\OpenEMSService.dll')
+
+    # Data folders
     plan.rmtree('%OPENTWIN_DEPLOYMENT_DIR%\\LibraryData')
     plan.remove('%OPENTWIN_DEPLOYMENT_DIR%\\ColorStyles\\*.otcsf')
     plan.rmtree('%OPENTWIN_DEPLOYMENT_DIR%\\GraphicsItems')
     plan.mkdir('%OPENTWIN_DEPLOYMENT_DIR%\\Apache')
     plan.rmtree('%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\htdocs')
     plan.mkdir('%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\htdocs')
+
+    # Libraries
     plan.copy('%OT_CORE_ROOT%\\%OT_CDLLR%\\OTCore.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_SYSTEM_ROOT%\\%OT_CDLLR%\\OTSystem.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_COMMUNICATION_ROOT%\\%OT_CDLLR%\\OTCommunication.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
@@ -125,6 +129,8 @@ def update_libraries(plan) -> None:
     plan.copy('%OT_LTSPICE_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTLTSpiceConnector.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_BLOCKENTITIES_ROOT%\\%OT_CDLLR%\\OTBlockEntities.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_RESULT_DATA_ACCESS_ROOT%\\%OT_CDLLR%\\OTResultDataAccess.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
+
+    # Services
     plan.copy('%OT_MODEL_SERVICE_ROOT%\\%OT_CDLLR%\\Model.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_GLOBAL_SESSION_SERVICE_ROOT%\\%OT_CDLLR%\\GlobalSessionService.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_LOCAL_SESSION_SERVICE_ROOT%\\%OT_CDLLR%\\LocalSessionService.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
@@ -156,46 +162,60 @@ def update_libraries(plan) -> None:
     plan.copy('%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\\%OT_CDLLR%\\HierarchicalProjectService.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%\\%OT_CDLLR%\\FileManagementProjectService.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OT_OPENEMS_SERVICE_ROOT%\\%OT_CDLLR%\\OpenEMSService.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
+
+    # Framework and tools
     plan.copy('%OPENTWIN_DEV_ROOT%\\Framework\\OpenTwin\\target\\release\\open_twin.exe', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\OToolkitAPI\\%OT_CDLLR%\\OToolkitAPI.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\OToolkit\\%OT_CDLLR%\\OToolkit.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\OTSystemInformationTool\\%OT_CDLLR%\\OTSystemInformationTool.exe', '%OPENTWIN_DEPLOYMENT_DIR%')
+
+    # Data
     plan.tree('%OPENTWIN_DEV_ROOT%\\LibraryData', '%OPENTWIN_DEPLOYMENT_DIR%\\LibraryData', empty=True)
     plan.copy('%OPENTWIN_DEV_ROOT%\\Assets\\ColorStyles\\*.otcsf', '%OPENTWIN_DEPLOYMENT_DIR%\\ColorStyles')
     plan.mkdir('%OPENTWIN_DEPLOYMENT_DIR%\\GraphicsItems')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\GraphicsItems\\*.ot.json', '%OPENTWIN_DEPLOYMENT_DIR%\\GraphicsItems')
+
+    # Admin panel
     plan.tree('%OPENTWIN_DEV_ROOT%\\Tools\\AdminPanel\\build\\*.*', '%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\htdocs', empty=True)
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\AdminPanel\\Apache_config\\.htaccess', '%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\htdocs')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\AdminPanel\\Apache_config\\httpd.conf', '%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\conf')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\AdminPanel\\Apache_config\\httpd-ahssl.conf', '%OPENTWIN_DEPLOYMENT_DIR%\\Apache\\conf\\extra')
-    # Create the build informatiomn file
+
+    # Build information
     plan.action("build information")
 
 
 def create_deployment(plan) -> None:
-    # Setup eviroment
-    # Shutdown the session and authorisation services if they are still running
+    # Shutdown
     plan.action("shutdown")
-    # Clean up the Deployment directory
+
+    # Clean up
     plan.rmtree('%OT_DEPLOYMENT_DIR%')
     plan.rmtree('%OPENTWIN_DEV_ROOT%\\Deployment_Documentation')
     plan.mkdir('%OT_DEPLOYMENT_DIR%')
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\Certificates')
+
     # Qwt
     plan.copy('%QWT_LIB_DLLR%\\qwt.dll', '%OT_DEPLOYMENT_DIR%')
+
     # QtTabToolbar
     plan.copy('%QT_TT_DLLR%\\TabToolbar.dll', '%OT_DEPLOYMENT_DIR%')
+
     # Qt AdvancedDockingSystem
     plan.copy('%QT_ADS_ROOT%\\lib\\qtadvanceddocking-qt6.dll', '%OT_DEPLOYMENT_DIR%')
+
     # OpenSceneGraph
     plan.copy('%OSG_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\osgPlugins-3.6.3')
     plan.tree('%OSG_DLLR%\\osgPlugins-3.6.3', '%OT_DEPLOYMENT_DIR%\\osgPlugins-3.6.3')
+
     # Fonts
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\fonts')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\Fonts', '%OT_DEPLOYMENT_DIR%\\fonts')
+
     # OpenGL Software Rendering
     plan.copy('%OPENTWIN_THIRDPARTY_ROOT%\\MesaOpenGL\\*.*', '%OT_DEPLOYMENT_DIR%')
+
     # Qt
     plan.copy('%QT_DLLR%\\Qt63DAnimation.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt63DCore.dll', '%OT_DEPLOYMENT_DIR%')
@@ -247,11 +267,13 @@ def create_deployment(plan) -> None:
     plan.copy('%QT_DLLR%\\Qt6Test.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6TextToSpeech.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6WebChannel.dll', '%OT_DEPLOYMENT_DIR%')
-    plan.copy('%QT_DLLR%\\Qt6WebEngineWidgets.dll', '%OT_DEPLOYMENT_DIR%')
+    # plan.copy('%QT_DLLR%\\Qt6WebEngineWidgets.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6WebSockets.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6WebView.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6Widgets.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%QT_DLLR%\\Qt6Xml.dll', '%OT_DEPLOYMENT_DIR%')
+
+    # Qt plugins
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\plugins')
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\plugins\\imageformats')
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\plugins\\platforms')
@@ -262,11 +284,16 @@ def create_deployment(plan) -> None:
     plan.tree('%QDIR%\\plugins\\renderers', '%OT_DEPLOYMENT_DIR%\\plugins\\renderers')
     plan.tree('%QDIR%\\plugins\\tls', '%OT_DEPLOYMENT_DIR%\\plugins\\tls')
     plan.remove_glob('%OT_DEPLOYMENT_DIR%\\plugins', '*.pdb')
+
+    # OpenSSL websocket
     plan.copy('%OPENSSL_WEBSOCKET_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
+
     # Boost
     plan.copy('%BOOST_DLLPATHR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
+
     # CGAL
     plan.copy('%GMP_DLLPATHR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
+
     # OpenCascade
     plan.copy('%FMP_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%FRI_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
@@ -276,63 +303,93 @@ def create_deployment(plan) -> None:
     plan.copy('%TBB_DLLR%\\tbbmalloc.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%OVR_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%JEM_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
+
     # VTK
     plan.copy('%VTK_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
+
+    # Icons
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\icons')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\Icons', '%OT_DEPLOYMENT_DIR%\\icons')
+
+    # ColorStyles
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\ColorStyles')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\ColorStyles', '%OT_DEPLOYMENT_DIR%\\ColorStyles')
+
     # GMSH
     plan.copy('%GMSH_ROOT_BIN%\\gmsh.dll', '%OT_DEPLOYMENT_DIR%')
-    # CURL
+
+    # Curl
     plan.copy('%CURL_DLLR%\\libcurl.dll', '%OT_DEPLOYMENT_DIR%')
-    # OPENSSL
+
+    # OpenSSL
     plan.copy('%OPENSSL_DLL%\\libcrypto-1_1-x64.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%OPENSSL_DLL%\\libssl-1_1-x64.dll', '%OT_DEPLOYMENT_DIR%')
+
     # MongoDB
     plan.copy('%MONGO_CXX_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%MONGO_C_DLLR%\\*.dll', '%OT_DEPLOYMENT_DIR%')
-    # ZLIB
+
+    # ZLib
     plan.copy('%ZLIB_DLLPATHR%\\zlib.dll', '%OT_DEPLOYMENT_DIR%')
-    # EMBREE
+
+    # Embree
     plan.copy('%EMBREE_BIN%\\embree3.dll', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%EMBREE_BIN%\\tbb12.dll', '%OT_DEPLOYMENT_DIR%')
-    # GETDP
+
+    # GetDP
     plan.copy('%GETDP_BIN%\\*.*', '%OT_DEPLOYMENT_DIR%')
-    # FDTD
+
+    # openEMS
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\openEMSSolver')
     plan.tree('%OPENTWIN_THIRDPARTY_ROOT%\\openEMS\\openEMS_v0.0.36\\*.*', '%OT_DEPLOYMENT_DIR%\\openEMSSolver')
-    # ELMERFEM
+
+    # ElmerFEM
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\ElmerFEM')
     plan.tree('%ELMERFEM_BIN%\\*.*', '%OT_DEPLOYMENT_DIR%\\ElmerFEM')
-    # PYTHON
+
+    # Python
     plan.copy('%OT_PYTHON_BIN%\\Release\\python.exe', '%OT_DEPLOYMENT_DIR%')
     plan.copy('%OT_PYTHON_BIN%\\Release\\%OT_PYTHON_BIN_NAME%_release._pth', '%OT_DEPLOYMENT_DIR%\\%OT_PYTHON_BIN_NAME%._pth')
     plan.copy('%OT_PYTHON_BIN%\\Release\\%OT_PYTHON_BIN_NAME%.dll', '%OT_DEPLOYMENT_DIR%')
-    plan.tree('%OT_PYTHON_ROOT%\\Environments\\PyritEnvironment\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\PyritEnvironment\\')
+
+    # Python environments
+    # plan.tree('%OT_PYTHON_ROOT%\\Environments\\PyritEnvironment\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\PyritEnvironment\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\OpenEMSEnvironment\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\OpenEMSEnvironment\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\PythonBuildTools\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\PythonBuildTools\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\Lib\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\CoreEnvironment\\Lib\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\DLLs\\Release\\*.*', '%OT_DEPLOYMENT_DIR%\\PythonEnvironments\\CoreEnvironment\\DLLs\\')
+
     # NGSpice
     plan.copy('%NGSPICE_ROOT%\\visualc\\sharedspice\\Release.x64\\ngspice.dll', '%OT_DEPLOYMENT_DIR%')
+
     # Expat
     plan.copy('%EXPAT_BIN%\\libexpat.dll', '%OT_DEPLOYMENT_DIR%')
-    # Apache Server
+
+    # Apache
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\Apache')
     plan.tree('%APACHE_ROOT%\\*.*', '%OT_DEPLOYMENT_DIR%\\Apache')
+
     # Visual Studio Redistributables
     plan.mkdir('%OT_DEPLOYMENT_DIR%\\VC_Redist')
     plan.copy('%VC_REDIST_ROOT%\\*.exe', '%OT_DEPLOYMENT_DIR%\\VC_Redist')
+
     # Documentation
     plan.mkdir('%OPENTWIN_DEV_ROOT%\\Deployment_Documentation')
     plan.tree('%OT_DOCUMENTATION_ROOT%\\_build\\html\\*.*', '%OPENTWIN_DEV_ROOT%\\Deployment_Documentation')
-    # Shutdown Script
+
+    # Shutdown script
     plan.copy('%OPENTWIN_DEV_ROOT%\\Scripts\\BuildAndTest\\ShutdownAll.bat', '%OT_DEPLOYMENT_DIR%')
+
+    # Libraries and services
     update_libraries(plan)
+
     # Launcher scripts
     plan.tree('%OPENTWIN_DEV_ROOT%\\Scripts\\Launcher\\*.*', '%OT_DEPLOYMENT_DIR%')
+
+    # Password encryption
     plan.tree('%OPENTWIN_DEV_ROOT%\\Tools\\PasswordEncryption\\%OT_CDLLR%\\PasswordEncryption.exe', '%OT_DEPLOYMENT_DIR%')
+
+    # Certificates
     plan.tree('%OPENTWIN_THIRDPARTY_ROOT%\\CertificateCreation\\*.*', '%OT_DEPLOYMENT_DIR%\\Certificates')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Certificates\\CreateServerCertificates\\*.*', '%OT_DEPLOYMENT_DIR%\\Certificates')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Certificates\\Generated\\ca.pem', '%OT_DEPLOYMENT_DIR%\\Certificates')
@@ -340,18 +397,21 @@ def create_deployment(plan) -> None:
     plan.copy('%OPENTWIN_DEV_ROOT%\\Certificates\\Generated\\server-key.pem', '%OT_DEPLOYMENT_DIR%\\Certificates')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Certificates\\Generated\\ca-key.pem', '%OT_DEPLOYMENT_DIR%\\Certificates')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Certificates\\Generated\\certificateKeyFile.pem', '%OT_DEPLOYMENT_DIR%\\Certificates')
+
+    # Qt configuration
     plan.write('%OT_DEPLOYMENT_DIR%\\qt.conf', QT_CONF)
 
 
 def create_frontend_installer(plan) -> None:
-    # Setup eviroment
-    # Clean up the FrontendDeployment directory
+    # Clean up
     plan.rmtree('%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # create FrontendInstaller folder in Deployment
+
+    # Installer folder
     plan.rmtree('%OPENTWIN_DEV_ROOT%\\Deployment\\FrontendInstaller')
     plan.mkdir('%OPENTWIN_DEV_ROOT%\\Deployment\\FrontendInstaller')
-    # This files are needed for the distribution of the frontend
+
+    # Visual C++ runtime
     plan.copy('%SYSTEM_32%\\downlevel\\api-ms-win-crt-runtime-l1-1-0.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%SYSTEM_32%\\msvcp140.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%SYSTEM_32%\\msvcp140_1.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
@@ -361,14 +421,17 @@ def create_frontend_installer(plan) -> None:
     plan.copy('%SYSTEM_32%\\ucrtbase.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%SYSTEM_32%\\vcruntime140.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%SYSTEM_32%\\vcruntime140_1.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # Curl
     plan.copy('%CURL_DLLR%\\libcurl.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # MongoDB
     plan.copy('%MONGO_C_DLLR%\\bson-1.0.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%MONGO_C_DLLR%\\mongoc-1.0.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%MONGO_CXX_DLLR%\\bsoncxx.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%MONGO_CXX_DLLR%\\mongocxx.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OpenCASCADE
+
+    # OpenCascade
     plan.copy('%TBB_DLLR%\\tbb12.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%TBB_DLLR%\\tbbmalloc.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%JEM_DLLR%\\jemalloc.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
@@ -382,7 +445,8 @@ def create_frontend_installer(plan) -> None:
     plan.copy('%OC_DLLR%\\TKMesh.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OC_DLLR%\\TKShHealing.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OC_DLLR%\\TKTopAlgo.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OpenSceneGraph-OpenSceneGraph-3.6.3
+
+    # OpenSceneGraph
     plan.copy('%OSG_DLLR%\\OpenThreads.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OSG_DLLR%\\osg.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OSG_DLLR%\\osgDB.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
@@ -392,10 +456,12 @@ def create_frontend_installer(plan) -> None:
     plan.copy('%OSG_DLLR%\\osgViewer.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\osgPlugins-3.6.3')
     plan.tree('%OSG_DLLR%\\osgPlugins-3.6.3', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\osgPlugins-3.6.3')
+
     # OpenSSL
     plan.copy('%OPENSSL_DLL%\\libcrypto-1_1-x64.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OPENSSL_DLL%\\libssl-1_1-x64.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # Qt6
+
+    # Qt
     plan.copy('%QT_DLLR%\\QT6Core.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%QT_DLLR%\\QT6Gui.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%QT_DLLR%\\QT6Network.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
@@ -406,9 +472,11 @@ def create_frontend_installer(plan) -> None:
     plan.copy('%QT_DLLR%\\QT6WebSockets.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%QT_DLLR%\\QT6Widgets.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%QT_DLLR%\\QT6Qml.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # Qt-Advanced-Docking-System
+
+    # Qt AdvancedDockingSystem
     plan.copy('%QT_ADS_ROOT%\\lib\\qtadvanceddocking-qt6.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # QT Plugins
+
+    # Qt plugins
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins')
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins\\imageformats')
     plan.copy('%QT_PLUGINS%\\imageformats\\qgif.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins\\imageformats')
@@ -426,99 +494,93 @@ def create_frontend_installer(plan) -> None:
     plan.copy('%QT_PLUGINS%\\tls\\qcertonlybackend.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins\\tls')
     plan.copy('%QT_PLUGINS%\\tls\\qopensslbackend.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins\\tls')
     plan.copy('%QT_PLUGINS%\\tls\\qschannelbackend.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\plugins\\tls')
+
     # QtTabToolbar
     plan.copy('%QT_TT_DLLR%\\TabToolbar.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # Qwt
     plan.copy('%QWT_LIB_DLLR%\\qwt.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # ZLib
     plan.copy('%ZLIB_DLLPATHR%\\zlib.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # Python
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments')
     plan.copy('%OT_PYTHON_ROOT%\\python.exe', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OT_PYTHON_BIN%\\Release\\python311.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\Lib\\*.*', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments\\CoreEnvironment\\Lib\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\DLLs\\Release\\*.*', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments\\CoreEnvironment\\DLLs\\')
+
     # Icons
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\icons')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\Icons', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\icons')
-    # Colorstyles
+
+    # ColorStyles
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\colorstyles')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\ColorStyles', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\colorstyles')
+
     # GraphicsItems
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\GraphicsItems')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\GraphicsItems', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\GraphicsItems')
+
     # Fonts
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\fonts')
     plan.tree('%OPENTWIN_DEV_ROOT%\\Assets\\Fonts', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\fonts')
+
     # OpenGL Software Rendering
     plan.copy('%OPENTWIN_THIRDPARTY_ROOT%\\MesaOpenGL\\*.*', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTCADEntities
+
+    # OpenTwin
     plan.copy('%OT_CADMODELENTITIES_ROOT%\\%OT_CDLLR%\\OTCADEntities.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTDataStorage
     plan.copy('%OT_DATASTORAGE_ROOT%\\%OT_CDLLR%\\OTDataStorage.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTServiceFoundation.dll
     plan.copy('%OT_FOUNDATION_ROOT%\\%OT_CDLLR%\\OTServiceFoundation.dll', '%OPENTWIN_DEPLOYMENT_DIR%')
-    # OTLTSpiceConnector
     plan.copy('%OT_LTSPICE_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTLTSpiceConnector.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTModelEntities
     plan.copy('%OT_MODELENTITIES_ROOT%\\%OT_CDLLR%\\OTModelEntities.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTCommunication
     plan.copy('%OT_COMMUNICATION_ROOT%\\%OT_CDLLR%\\OTCommunication.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTModelAPI
     plan.copy('%OT_MODELAPI_ROOT%\\%OT_CDLLR%\\OTModelAPI.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTCore
     plan.copy('%OT_CORE_ROOT%\\%OT_CDLLR%\\OTCore.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTGuiAPI
     plan.copy('%OT_GUIAPI_ROOT%\\%OT_CDLLR%\\OTGuiAPI.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTGui
     plan.copy('%OT_GUI_ROOT%\\%OT_CDLLR%\\OTGui.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTSystem
     plan.copy('%OT_SYSTEM_ROOT%\\%OT_CDLLR%\\OTSystem.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTWidgets
     plan.copy('%OT_WIDGETS_ROOT%\\%OT_CDLLR%\\OTWidgets.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # Rubberband
     plan.copy('%OT_RUBBERBANDAPI_ROOT%\\%OT_CDLLR%\\OTRubberband.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OT_RUBBERBAND_OSG_ROOT%\\%OT_CDLLR%\\OTRubberbandOSG.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # FrontendConnectorAPI
     plan.copy('%OT_FRONTEND_CONNECTOR_API_ROOT%\\%OT_CDLLR%\\OTFrontendConnectorAPI.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # File Management Connector
     plan.copy('%OT_FILE_MANAGER_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTFMC.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTStudioSuiteConnector
     plan.copy('%OT_STUDIO_SUITE_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTStudioSuiteConnector.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTLTSpiceConnector
     plan.copy('%OT_LTSPICE_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTLTSpiceConnector.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTBlockEntities
     plan.copy('%OT_BLOCKENTITIES_ROOT%\\%OT_CDLLR%\\OTBlockEntities.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # UI Core
     plan.copy('%OT_UICORE_ROOT%\\%OT_CDLLR%\\uiCore.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # UI Service
     plan.copy('%OT_UI_SERVICE_ROOT%\\%OT_CDLLR%\\uiFrontend.exe', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.rename('%OPENTWIN_FRONTEND_DEPLOYMENT%\\uiFrontend.exe', 'OpenTwin.exe')
-    # PythonExecution
     plan.copy('%OT_PYTHON_EXECUTION_ROOT%\\%OT_CDLLR%\\PythonExecution.exe', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # OTViewer
     plan.copy('%OT_VIEWER_ROOT%\\%OT_CDLLR%\\OTViewer.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # ResultDatabaseAccess
     plan.copy('%OT_RESULT_DATA_ACCESS_ROOT%\\%OT_CDLLR%\\OTResultDataAccess.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+
     # Certificates
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\Certificates')
     plan.copy('%OT_ENCRYPTIONKEY_ROOT%\\ca.pem', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\Certificates')
     plan.copy('%OT_ENCRYPTIONKEY_ROOT%\\certificateKeyFile.pem', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\Certificates')
+
+    # Qt configuration
     plan.write('%OPENTWIN_FRONTEND_DEPLOYMENT%\\qt.conf', QT_CONF)
-    # Copy the build information files
+
+    # Build information
     plan.copy('%OPENTWIN_DEV_ROOT%\\Deployment\\BuildInfo.txt', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
-    # Finally create the Installer
+
+    # Installer
     plan.run('creating installer', [MAKENSIS, NSI], INSTALLER_DIR)
-    # move the installer into the Deployment folder for distribution via a server
     plan.move(INSTALLER_DIR + '\\Install_OpenTwin_Frontend.exe', '%OPENTWIN_DEV_ROOT%\\Deployment\\FrontendInstaller')
 
 
 def create_debug_files(plan) -> None:
-    # Setup eviroment
-    # Ensure that the script finished successfully
+    # Shutdown
     plan.action("shutdown")
-    # First, build with special setting Release
+
+    # Build
     plan.action("build all")
+
+    # Previous build
     plan.mkdir('%OPENTWIN_DEBUG_FILES%')
     plan.remove('%OPENTWIN_DEBUG_FILES%\\BlockEditorService.dll')
     plan.remove('%OPENTWIN_DEBUG_FILES%\\OTSystem.dll')
@@ -567,7 +629,8 @@ def create_debug_files(plan) -> None:
     plan.remove('%OPENTWIN_DEBUG_FILES%\\CircuitExecution.exe')
     plan.remove('%OPENTWIN_DEBUG_FILES%\\OToolkit.dll')
     plan.remove('%OPENTWIN_DEBUG_FILES%\\OTResultDataAccess.dll')
-    # Copy libraries
+
+    # Libraries
     plan.copy('%OT_CORE_ROOT%\\%OT_CDLLR%\\OTCore.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_SYSTEM_ROOT%\\%OT_CDLLR%\\OTSystem.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_COMMUNICATION_ROOT%\\%OT_CDLLR%\\OTCommunication.dll', '%OPENTWIN_DEBUG_FILES%')
@@ -587,7 +650,8 @@ def create_debug_files(plan) -> None:
     plan.copy('%OT_LTSPICE_CONNECTOR_ROOT%\\%OT_CDLLR%\\OTLTSpiceConnector.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_BLOCKENTITIES_ROOT%\\%OT_CDLLR%\\OTBlockEntities.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_RESULT_DATA_ACCESS_ROOT%\\%OT_CDLLR%\\OTResultDataAccess.dll', '%OPENTWIN_DEBUG_FILES%')
-    # Copy Services
+
+    # Services
     plan.copy('%OT_MODEL_SERVICE_ROOT%\\%OT_CDLLR%\\Model.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_GLOBAL_SESSION_SERVICE_ROOT%\\%OT_CDLLR%\\GlobalSessionService.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_LOCAL_SESSION_SERVICE_ROOT%\\%OT_CDLLR%\\LocalSessionService.dll', '%OPENTWIN_DEBUG_FILES%')
@@ -616,6 +680,7 @@ def create_debug_files(plan) -> None:
     plan.copy('%OT_CIRCUIT_SIMULATOR_SERVICE_ROOT%\\%OT_CDLLR%\\CircuitSimulatorService.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OT_CIRCUIT_EXECUTION_ROOT%\\%OT_CDLLR%\\CircuitExecution.exe', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Framework\\OpenTwin\\target\\debug\\open_twin.exe', '%OPENTWIN_DEBUG_FILES%')
-    # Copy Tools
+
+    # Tools
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\OToolkitAPI\\%OT_CDLLR%\\OToolkitAPI.dll', '%OPENTWIN_DEBUG_FILES%')
     plan.copy('%OPENTWIN_DEV_ROOT%\\Tools\\OToolkit\\%OT_CDLLR%\\OToolkit.dll', '%OPENTWIN_DEBUG_FILES%')
