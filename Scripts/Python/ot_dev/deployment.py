@@ -27,7 +27,7 @@ from pathlib import Path
 from typing import Callable
 
 from .actions import SEPARATOR
-from .config import definitions, manifest, order
+from .config import definitions, manifest
 from .environment import build_env
 from .expansion import expand
 from .platform import USE_SHELL, WINDOWS
@@ -238,9 +238,7 @@ def _build_all(progress: Progress) -> tuple[bool, str]:
 
     env = build_env()
     logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*script.LOG_DIR)
-    code = script.build_all(env, order.BUILD_ORDER, order.BUILD_OVERRIDES, script.SPECIAL,
-                            cli.configurations("BOTH"), cli.build_type("BUILD"),
-                            logs, script.SUMMARY)
+    code = script.rebuild_all(env, cli.configurations("BOTH"), cli.build_type("BUILD"))
     return code == 0, f"build all returned {code}, see {logs}"
 
 

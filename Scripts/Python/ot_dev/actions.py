@@ -17,11 +17,13 @@ import os
 import re
 import shutil
 import subprocess
+import sys
 from pathlib import Path
 from typing import Mapping, Sequence, TextIO
 
 from .platform import (DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS,
                        cmake_executable, ctest_executable)
+from .expansion import expand, merge
 from .toolchain import apply_toolchain
 
 SEPARATOR = "=" * 90
@@ -186,3 +188,50 @@ def launch_editor(env: Mapping[str, str], target: str, editor: str | None = None
     if root:
         return _rooted(env, root, executable, target)
     return _on_path(env, executable, target)
+
+
+_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
+
+
+_NO_PATH = 3
+_NOT_RECOGNIZED = 9009
+
+
+def _not_found(program: str) -> int:
+    # Same text and exit code as cmd, so a batch using run.py fails as it did before.
+    if Path(program).parent != Path(".") and not Path(program).parent.is_dir():
+        print("The system cannot find the path specified.", file=sys.stderr, flush=True)
+        return _NO_PATH
+    shown = f'"{program}"' if Path(program).parent != Path(".") else program
+    print(f"'{shown}' is not recognized as an internal or external command,\n"
+          "operable program or batch file.", file=sys.stderr, flush=True)
+    return _NOT_RECOGNIZED
+
+
+def run_program(env: Mapping[str, str], command: Sequence[str],
+                toolchain: bool = False, detach: bool = False) -> int:
+    """Runs a program with the environment. Leading NAME=VALUE entries are set
+    first; %VAR% anywhere in the command is expanded with the environment."""
+    env = dict(env)
+    if toolchain and not env.get("OT_TOOLCHAIN_READY"):
+        apply_toolchain(env)
+        print("OpenTwin native toolchain was set up successfully.", flush=True)
+    command = list(command)
+    while command and _ASSIGNMENT.match(command[0]):
+        name, _, value = command.pop(0).partition("=")
+        merge(env, {name: expand(env, value)})
+    if not command:
+        raise SystemExit("no program given")
+
+    program, *rest = (expand(env, part) for part in command)
+    found = shutil.which(program, path=env.get("PATH")) or program
+    if not Path(found).is_file():
+        return _not_found(program)
+    args = [found, *rest]
+    if WINDOWS and found.lower().endswith((".cmd", ".bat")):
+        args = ["cmd", "/c", *args]
+    sys.stdout.flush()
+    if detach:
+        subprocess.Popen(args, env=env)
+        return 0
+    return subprocess.run(args, env=env).returncode
