@@ -21,15 +21,13 @@ IF "%DEVENV_ROOT_2022%" == "" (
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-ECHO Launching development enviroment
-
 IF "%1" == "" (
 	REM Open without project
-	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --toolchain cmake-gui
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" run-cmake
 )
 ELSE (
 	REM Open with project
-	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" --toolchain cmake-gui %1
+	"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" run-cmake %1
 )
 
 GOTO END

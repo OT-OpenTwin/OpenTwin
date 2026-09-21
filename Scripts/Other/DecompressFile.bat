@@ -20,32 +20,6 @@ IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
 
 CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-if "%1"=="" (
-    echo Please specify a file when running this script
-    goto END
-)
-
-if "%2"=="" (
-    echo Please specify a output directory for the file
-    goto END
-)
-
-set sourceFile=%1
-set decompressedFolder=%2
-
-REM Check source exists
-if not exist %sourceFile% (
-    echo Source file does not exist "%sourceFile%"
-    goto END
-)
-
-REM Check destination does not exist
-if not exist %decompressedFolder% (
-    echo Destination folder does not exists "%decompressedFile%"
-    goto END
-)
-
-REM Run expand
-"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" "%OPENTWIN_THIRDPARTY_ROOT%\7-Zip\Win64\7z.exe" x -o%decompressedFolder% %sourceFile%
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" decompress-file %1 %2
 
 :END

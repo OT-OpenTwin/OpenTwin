@@ -28,8 +28,7 @@ if "%1"=="" (
     goto END
 )
 
-REM Same as Python\set_paths_dev.bat: the legacy interpreter first on PATH
-start "" "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\run.py" "PYTHONPATH=%%OT_PYTHONPATH_LEGACY%%" "PATH=%%OT_PYTHONPATH_LEGACY%%;%%PATH%%" python %1 %2 %3 %4 %5 %6 %7 %8 %9
+start "" "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" run-python %1 %2 %3 %4 %5 %6 %7 %8 %9
 goto END
 
 :END
