@@ -19,30 +19,17 @@ from typing import Sequence
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-from ot_dev import build_admin_panel, build_all, build_framework, cli
-from ot_dev.batch import Step
-from ot_dev.config import order
-
-# Steps that are not CMake projects and bring their own build system.
-SPECIAL: dict[str, tuple[str, Step]] = {
-    "FRAMEWORK": ("Framework", build_framework),
-    "ADMINPANEL": ("AdminPanel", build_admin_panel),
-}
-
-LOG_DIR = ("Scripts", "BuildAndTest")
-SUMMARY = "buildLog_Summary.txt"
+from ot_dev import cli, build_framework
 
 
 def main(argv: Sequence[str]) -> int:
     if len(argv) > 2:
-        raise SystemExit("usage: build_all.py [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]")
+        raise SystemExit("usage: build_framework.py [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]")
 
     env = cli.environment()
     configurations = cli.configurations(cli.argument(argv, 0))
     rebuild = cli.build_type(cli.argument(argv, 1))
-    logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*LOG_DIR)
-    return build_all(env, order.BUILD_ORDER, order.BUILD_OVERRIDES, SPECIAL,
-                     configurations, rebuild, logs, SUMMARY)
+    return build_framework(env, configurations, rebuild, Path.cwd())
 
 
 if __name__ == "__main__":

@@ -38,7 +38,7 @@ REQUIRED: list[str] = ["DEVENV_ROOT_2022"] if WINDOWS else []
 # yarn/cargo are .cmd shims on Windows; on POSIX a list argv must not use a shell.
 USE_SHELL = WINDOWS
 
-DEFAULT_EDITOR = "VS" if WINDOWS else "CODE"
+DEFAULT_EDITOR = "VS"
 
 EDITORS: dict[str, tuple[str | None, str]] = {
     "VS": ("DEVENV_ROOT_2022", "devenv.exe"),

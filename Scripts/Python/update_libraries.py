@@ -13,19 +13,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from typing import Mapping
+import sys
+from pathlib import Path
+from typing import Sequence
 
-from .config import definitions
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+
+from ot_dev import cli, update_libraries
 
 
-def project_roots() -> dict[str, str]:
-    return {name.removeprefix("OT_").removesuffix("_ROOT"): name
-            for group, _ in definitions.GROUPS for name in group}
+def main(argv: Sequence[str]) -> int:
+    if argv:
+        raise SystemExit("usage: update_libraries.py")
+
+    return update_libraries()
 
 
-def resolve_root(env: Mapping[str, str], key: str) -> str:
-    roots = project_roots()
-    name = roots.get(key.upper())
-    if name is None or name not in env:
-        raise SystemExit(f"Unknown project '{key}'. Known: " + ", ".join(sorted(roots)))
-    return env[name]
+if __name__ == "__main__":
+    sys.exit(cli.run(main, sys.argv[1:]))

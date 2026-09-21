@@ -13,7 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import importlib.util
 import re
 from pathlib import Path
 from types import ModuleType
@@ -52,10 +51,14 @@ def unique(values: Iterable[str]) -> list[str]:
 
 
 def load_module(name: str, path: Path) -> ModuleType:
-    spec = importlib.util.spec_from_file_location(name, path)
-    if spec is None or spec.loader is None:
+    # Compiled on every load instead of imported, so no __pycache__ lands next to
+    # configuration files in Scripts/, ThirdParty or the Launcher folder.
+    try:
+        source = path.read_bytes()
+    except OSError:
         raise SystemExit(f"Cannot load module {name!r} from {path}")
 
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
+    module = ModuleType(name)
+    module.__file__ = str(path)
+    exec(compile(source, str(path), "exec"), module.__dict__)
     return module

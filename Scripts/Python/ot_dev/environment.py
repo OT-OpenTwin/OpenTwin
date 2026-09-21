@@ -16,8 +16,7 @@
 import os
 from pathlib import Path
 
-import SetupEnvironment as definitions
-
+from .config import definitions
 from .expansion import expand, load_module
 from .platform import REQUIRED as PLATFORM_REQUIRED
 

@@ -24,9 +24,13 @@ from ot_dev import launch_editor, cli
 
 def main(argv: Sequence[str]) -> int:
     if not 1 <= len(argv) <= 2:
-        raise SystemExit("usage: edit.py <PROJECT> [EDITOR]")
+        raise SystemExit("usage: edit.py <PROJECT|FOLDER> [EDITOR]")
 
-    env, target = cli.prepare(argv[0])
+    # An absolute path opens that folder; anything else is a project key.
+    if Path(argv[0]).is_absolute():
+        env, target = cli.environment(), argv[0]
+    else:
+        env, target = cli.prepare(argv[0])
     return launch_editor(env, target, cli.argument(argv, 1))
 
 

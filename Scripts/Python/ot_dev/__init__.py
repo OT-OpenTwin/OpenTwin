@@ -23,6 +23,9 @@ if _ROOT not in sys.path:
 from .actions import build_project, clean_project, launch_editor, test_project
 from .admin_panel import build_admin_panel
 from .batch import build_all, clean_all, test_all, testable_projects
+from .deployment import (create_build_information, create_debug_files, create_deployment,
+                         create_frontend_installer, update_libraries)
+from .documentation import build_documentation
 from .environment import build_env, check_required
 from .framework import build_framework
 from .projects import project_roots, resolve_root
@@ -33,12 +36,17 @@ __all__ = [
     "apply_toolchain",
     "build_admin_panel",
     "build_all",
+    "build_documentation",
     "build_env",
     "build_framework",
     "build_project",
     "check_required",
     "clean_all",
     "clean_project",
+    "create_build_information",
+    "create_debug_files",
+    "create_deployment",
+    "create_frontend_installer",
     "launch_editor",
     "project_roots",
     "resolve_root",
@@ -46,4 +54,5 @@ __all__ = [
     "test_all",
     "test_project",
     "testable_projects",
+    "update_libraries",
 ]
