@@ -31,7 +31,7 @@
 #include "CircuitElements/TransmissionLine.h"
 #include "SimulationResults.h"
 #include "BlockEntityHandler.h"
-
+#include "SimulationStrategy.h"
 
 //Open Twin Header
 #include "OTBlockEntities//EntityBlockConnection.h"
@@ -717,9 +717,17 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	EntityPropertiesSelection* simulationTypeProperty = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Simulation Type"));
 	assert(simulationTypeProperty != nullptr);
 	std::string simulationType = simulationTypeProperty->getValue();
-	std::string voltageSourceType = "";
 
-	auto it =Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
+	// Create the appropriate simulation strategy based on the simulation type
+	auto strategy = createSimulationStrategy(simulationType);
+	if (!strategy)
+	{
+		OT_LOG_E("Failed to create simulation strategy for type: " + simulationType);
+		_netlist.clear();
+		return _netlist;
+	}
+
+	auto it = Application::instance()->getNGSpice().getMapOfCircuits().find(editorname);
 	 
 	for (const auto& mapOfElements : it->second.getMapOfElements())
 	{
@@ -747,9 +755,6 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 				modelNetlistLine = convertToCircByLine(getCircuitModelText(circuitModelEntity));
 				usedModels.insert(circuitElement->getModel());
 			}
-
-
-
 			
 		}
 		else {
@@ -761,42 +766,24 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		if (circuitElement->type() == "VoltageSource")
 		{
 			VoltageSource* voltagesource = dynamic_cast<VoltageSource*>(circuitElement);
-			
-			if (simulationType == ".dc")
-			{
-				voltagesource->setType("DC");
-				netlistVoltageSourceType = voltagesource->getType() + " ";
-				if (modelType.empty()) {
-					netlistElementName = voltagesource->getNetlistName();
-					netlistValue = voltagesource->getValue();
+			netlistVoltageSourceType = strategy->getVoltageSourceNetlistType(voltagesource);
+
+			if (modelType.empty()) {
+				netlistElementName = voltagesource->getNetlistName();
+				netlistValue = voltagesource->getValue();
+			}
+			else {
+				if (modelType == m_subcktType) {
+					netlistElementName = m_elementNamingRegistry.generateNextId("X");
 				}
 				else {
-					if (modelType == m_subcktType) {
-						netlistElementName = m_elementNamingRegistry.generateNextId("X");
-					}
-					else {
-						netlistElementName = voltagesource->getNetlistName();
-					}
-
-					netlistValue = voltagesource->getModel();
+					netlistElementName = voltagesource->getNetlistName();
 				}
+
+				netlistValue = voltagesource->getModel();
 			}
-			else if (simulationType == ".ac")
-			{
-				voltageSourceType = "AC ";
-				netlistVoltageSourceType = "DC 0 " + voltageSourceType + voltagesource->getAmplitude();
-				netlistElementName = voltagesource->getNetlistName();
-			}
-			else
-			{
-				voltageSourceType = "TRAN";
-				netlistVoltageSourceType = voltagesource->getFunction();
-				netlistElementName = voltagesource->getNetlistName();
-			}
-			
-	
+
 			netlistLine += netlistElementName + " ";
-			
 		}
 		else if (circuitElement->type() == "Resistor")
 		{
@@ -1057,11 +1044,6 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 		}
 
 		netlistLine += netlistValue;
-		
-		if (circuitElement->type() == "VoltageSource")
-		{
-			voltageSourceType = "";
-		}
 
 
 		//Here i put the netlist instance line into my _netlist
@@ -1080,23 +1062,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 
 	//After i got the TitleLine and the elements which represent my circuit I check which simulation was chosen and create the simlationLine
 	
-	std::string simulationLine = "";
-
-	if (simulationType == ".dc")
-	{
-		simulationLine = generateNetlistDCSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-	}
-	else if (simulationType == ".TRAN")
-	{
-		simulationLine = generateNetlistTRANSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-
-	}
-	else
-	{
-		simulationLine = generateNetlistACSimulation(solverEntity, allConnectionEntities, allEntitiesByBlockID, editorname);
-
-	}
-
+	std::string simulationLine = strategy->generateSimulationLine(solverEntity, m_elementNamingRegistry);
 
 	if (simulationLine == "failed")
 	{
@@ -1173,57 +1139,7 @@ std::list<std::string> NGSpice::generateNetlist(EntityBase* solverEntity,std::ma
 	return _netlist;
 }
 
-std::string NGSpice::generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
-{
-	EntityPropertiesEntityList* elementProperty = dynamic_cast<EntityPropertiesEntityList*>(solverEntity->getProperties().getProperty("Element"));
-	
-	std::string element = Application::instance()->extractStringAfterDelimiter(elementProperty->getValueName(), '/', 2);
-	if (element == "failed")
-	{
-		OT_LOG_E("No Element for DC Simulation found or selected!");
-		return "failed";
-		
-	}
-	std::string netlistName = m_elementNamingRegistry.getNetlistName(element);
-	
-	
 
-	std::string simulationLine="";
-	std::string type = ".dc";
-	EntityPropertiesString* from = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("From"));
-	EntityPropertiesString* to = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("To"));
-	EntityPropertiesString* step = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Step"));
-	simulationLine = type + " " + netlistName + " " + from->getValue() + " " + to->getValue() + " " + step->getValue();
-	return simulationLine;
-}
-
-std::string NGSpice::generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
-{
-	EntityPropertiesSelection* variation = dynamic_cast<EntityPropertiesSelection*>(solverEntity->getProperties().getProperty("Variation"));
-	EntityPropertiesString* np = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Number of Points"));
-	EntityPropertiesString* fStart = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Starting Frequency"));
-	EntityPropertiesString* fEnd = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Final Frequency"));
-
-	std::string simulationLine = "";
-	std::string type = ".ac";
-
-	simulationLine = type + " " + variation->getValue() + " " + np->getValue() + " " + fStart->getValue() + " " + fEnd->getValue();
-
-	return simulationLine;
-}
-
-std::string NGSpice::generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname)
-{
-	EntityPropertiesString* duration = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("Duration"));
-	EntityPropertiesString* timeSteps = dynamic_cast<EntityPropertiesString*>(solverEntity->getProperties().getProperty("TimeSteps"));
-
-	std::string simulationLine = "";
-	std::string type = ".TRAN";
-
-	simulationLine = type  + " " + timeSteps->getValue() + " " + duration->getValue();
-
-	return simulationLine;
-}
 
 std::list<std::string> NGSpice::ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID,std::string editorname)
 {

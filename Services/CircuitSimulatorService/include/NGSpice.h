@@ -51,9 +51,6 @@ public:
 	//Simulation Functions
 	void updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string);
 	std::list<std::string> generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string editorname);
-	std::string generateNetlistDCSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname);
-	std::string generateNetlistACSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname);
-	std::string generateNetlistTRANSimulation(EntityBase* solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&, std::string editorname);
 	std::list<std::string> ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string);
 	void clearBufferStructure(std::string name);
 
