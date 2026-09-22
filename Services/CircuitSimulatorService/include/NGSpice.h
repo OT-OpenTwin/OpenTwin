@@ -19,71 +19,46 @@
 
 #pragma once
 
-//Service Header
+// Service Header
 #include "Circuit.h"
-#include "Connection.h"
 #include "ElementNamingRegistry.h"
+#include "NetlistGenerator.h"
+#include "NodeAssigner.h"
 
-//OpenTwin Header
+// OpenTwin Header
+#include "OTCore/OTClassHelper.h"
 #include "OTBlockEntities/EntityBlock.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
-#include "OTServiceFoundation/BusinessLogicHandler.h"
-#include "OTModelEntities/EntityFileText.h"
 
-//ThirdPartyHeader
-#include <iostream>
-#include <string>
-#include <fstream>
-#include <filesystem>
-#include <string.h>
+// std Header
 #include <map>
+#include <list>
+#include <string>
+#include <memory>
 
+class EntityBase;
 
 class NGSpice
 {
 	OT_DECL_NOCOPY(NGSpice)
 public:
-	NGSpice() = default;
-	
-	std::map<std::string, Circuit> mapOfCircuits;
-	std::map<std::pair<ot::UID, std::string>, std::string> connectionNodeNumbers;
-	ElementNamingRegistry m_elementNamingRegistry;
+	NGSpice();
 
+	// Simulation Functions
+	std::list<std::string> ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, EntityBase* _solverEntity, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, std::string _editorname);
 
-	//Simulation Functions
-	void updateBufferClasses(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string);
-	std::list<std::string> generateNetlist(EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string editorname);
-	std::list<std::string> ngSpice_Initialize(std::map<ot::UID, ot::UIDList>& _connectionBlockMap,EntityBase* solverEntity,std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>,std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&,std::string);
-	void clearBufferStructure(std::string name);
+	void clearBufferStructure(const std::string& _name);
 
-	//Connection Algorithm functions
-	void connectionAlgorithmWithGNDElement(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement,int counter,ot::UID startingElementUID,ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	void connectionAlgorithmWithGNDVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	void handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	void setNodeNumbers(Connection& myConn);
-	void setNodeNumbersWithGNDVoltageSource(Connection& myConn, ot::UID startingElementUID);
-	bool checkIfElementOrConnectionVisited(std::set<ot::UID>& visitedElements, ot::UID elementUID);
-	Connection createConnection(std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities,ot::UID connection);
-	bool checkIfConnectionIsConnectedToGND(std::string pole);
-	bool checkIfConnectionIsConnectedToGndVoltageSource(std::string pole, ot::UID voltageSourceUID, ot::UID elementUID);
-	bool checkIfConnectionIsConnectedToVoltageMeter( std::string blockTitle);
-	void setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string startingElement, int counter, ot::UID startingElementUID, ot::UID elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& allEntitiesByBlockID, std::string editorname, std::set<ot::UID>& visitedElements);
-	
-	
-	//Getter
-	std::map<std::string, Circuit>& getMapOfCircuits() { return mapOfCircuits; }
-	std::string const getVoltMeterConnectionName() const { return m_voltMeterConnection; }
-	std::shared_ptr<ot::EntityBlock> getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const ot::UID& _uid) const;
-	ot::UIDList getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const;
+	// Getter
+	std::map<std::string, Circuit>& getMapOfCircuits() { return m_circuits; }
 	ElementNamingRegistry& getElementNamingRegistry() { return m_elementNamingRegistry; }
 
 private:
-	const std::string m_voltMeterConnection = "voltageMeterConnection";
-	const std::string m_voltageMeterTitle = "Voltage Meter";
-	const std::string m_positivePole = "positivePole";
-	const std::string m_gndPole = "GNDPole";
-	const std::string m_modelType = "MODEL";
-	const std::string m_subcktType = "SUBCKT";
-	
-	
+	Circuit& getOrCreateCircuit(const std::string& _editorname);
+
+	std::map<std::string, Circuit> m_circuits;
+
+	ElementNamingRegistry m_elementNamingRegistry;
+	NetlistGenerator m_netlistGenerator;
+	NodeAssigner m_nodeAssigner;
 };
