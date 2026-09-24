@@ -55,8 +55,11 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 		auto elementPtr = std::unique_ptr<CircuitElement>(element);
 		elementPtr->initFromEntity(blockEntity, _editorname);
 
-		std::string netlistName = m_elementNamingRegistry.registerElement(blockEntity->getNameOnly(), elementPtr->getNetlistPrefix());
-		elementPtr->setNetlistName(netlistName);
+		if (!elementPtr->isMeter())
+		{
+			std::string netlistName = m_elementNamingRegistry.registerElement(blockEntity->getNameOnly(), elementPtr->getNetlistPrefix());
+			elementPtr->setNetlistName(netlistName);
+		}
 		elementPtr->setCustomName(blockEntity->getNameOnly());
 
 		auto* circuitEntity = dynamic_cast<EntityBlockCircuitElement*>(blockEntity.get());
