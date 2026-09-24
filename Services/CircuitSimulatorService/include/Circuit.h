@@ -23,29 +23,20 @@
 #include "CircuitElement.h"
 
 // OpenTwin header
+#include "OTCore/OTClassHelper.h"
 #include "OTBlockEntities/EntityBlock.h"
 
 // std Header
 #include <map>
-
-
+#include <memory>
 
 class Circuit
 {
+	OT_DECL_NOCOPY(Circuit)
 public:
-
-	// Existing move constructor
+	// Move constructor & Move assignment operator
 	Circuit(Circuit&& other) noexcept = default;
-
-	// Copy constructor
-	Circuit(const Circuit& other) = default;
-
-	// Copy assignment operator
-	Circuit& operator=(const Circuit& other) = default;
-
-	// Move assignment operator
 	Circuit& operator=(Circuit&& other) noexcept = default;
-
 
 	Circuit();
 	~Circuit();
@@ -53,25 +44,22 @@ public:
 	//Getter
 	std::string getEditorName();
 	std::string getId();
-	std::map<ot::UID, CircuitElement*>& getMapOfElements();
+	std::map<ot::UID, std::unique_ptr<CircuitElement>>& getMapOfElements();
 	std::map <std::string, std::vector<std::shared_ptr<ot::EntityBlock>>>& getMapOfEntityBlcks();
 
 	//Setter
-	void addElement(ot::UID key, CircuitElement* obj);
+	void addElement(ot::UID key, std::unique_ptr<CircuitElement> obj);
 	void addBlockEntity(std::string block, const std::shared_ptr<ot::EntityBlock> obj);
 	void setEditorName(std::string name);
 	void setId(const std::string id);
 	
 	//additionalFunctions
-/*	bool*/ void addConnection(std::string connactable,const ot::UID& key, const Connection& obj);
+	void addConnection(std::string connactable,const ot::UID& key, const Connection& obj);
 	std::string findElement(const ot::UID& key);
 		
 private:
-
-	std::map <ot::UID, CircuitElement*> mapOfElements;
+	std::map <ot::UID, std::unique_ptr<CircuitElement>> mapOfElements;
 	std::map <std::string, std::vector<std::shared_ptr<ot::EntityBlock>>> mapOfEntityBlocks;
 	std::string editorName;
 	std::string id;
-	
-
 };

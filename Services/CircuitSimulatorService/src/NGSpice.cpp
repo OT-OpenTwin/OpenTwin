@@ -69,8 +69,7 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 		}
 
 		ot::UID uid = blockEntity->getEntityID();
-		auto element_p = elementPtr.release();
-		circuit.addElement(uid, element_p);
+		circuit.addElement(uid, std::move(elementPtr));
 	}
 
 	// 3. Assign node numbers via NodeAssigner
@@ -93,19 +92,8 @@ Circuit& NGSpice::getOrCreateCircuit(const std::string& _editorname)
 
 void NGSpice::clearBufferStructure(const std::string& _name)
 {
-	auto it = m_circuits.find(_name);
-	if (it != m_circuits.end())
-	{
-		auto elements = it->second.getMapOfElements();
-		for (auto element : elements)
-		{
-			delete element.second;
-			element.second = nullptr;
-		}
-		it->second.getMapOfEntityBlcks().clear();
-		it->second.getMapOfElements().clear();
-	}
-	m_circuits.clear();
+	this->getMapOfCircuits().find(_name)->second.getMapOfEntityBlcks().clear();
+	this->getMapOfCircuits().clear();
 	m_elementNamingRegistry.reset();
 	m_nodeAssigner.reset();
 }

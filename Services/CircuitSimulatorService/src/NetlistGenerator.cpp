@@ -67,8 +67,9 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
     std::vector<MeterData> currentMeterData;
     std::unordered_set<std::string> usedModels;
     int rshuntCounter = 1;
-    for (const auto& [uid, circuitElement] : _circuit.getMapOfElements())
+    for (const auto& [uid, elementPtr] : _circuit.getMapOfElements())
     {
+		CircuitElement* circuitElement = elementPtr.get();
 		// Meter Handling: VoltageMeter and CurrentMeter are handled separately
         if (circuitElement->type() == "VoltageMeter")
         {

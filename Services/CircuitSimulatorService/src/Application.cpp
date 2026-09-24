@@ -112,7 +112,7 @@ void Application::createNewCircuit() {
 	Circuit circuit;
 	circuit.setEditorName(circuitName);
 	circuit.setId(circuitName);
-	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(circuitName, circuit);
+	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(circuitName, std::move(circuit));
 }
 
 void Application::createInitialCircuit() {
