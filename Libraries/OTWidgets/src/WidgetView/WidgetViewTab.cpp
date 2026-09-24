@@ -152,6 +152,7 @@ void ot::WidgetViewTab::mouseReleaseEvent(QMouseEvent* _event) {
 			Q_EMIT viewCloseRequested();
 		}
 		m_isMiddleButtonPressed = false;
+		_event->accept();
 	}
 	else
 	{
