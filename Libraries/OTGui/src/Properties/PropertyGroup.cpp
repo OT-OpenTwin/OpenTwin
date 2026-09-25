@@ -294,6 +294,20 @@ void ot::PropertyGroup::addChildGroup(PropertyGroup* _group) {
 	m_childGroups.push_back(_group);
 }
 
+ot::PropertyGroup* ot::PropertyGroup::addChildGroup(const std::string& _groupNameAndTitle)
+{
+	PropertyGroup* newGroup = new PropertyGroup(_groupNameAndTitle);
+	this->addChildGroup(newGroup);
+	return newGroup;
+}
+
+ot::PropertyGroup* ot::PropertyGroup::addChildGroup(const std::string& _groupName, const std::string& _groupTitle)
+{
+	PropertyGroup* newGroup = new PropertyGroup(_groupName, _groupTitle);
+	this->addChildGroup(newGroup);
+	return newGroup;
+}
+
 ot::PropertyGroup* ot::PropertyGroup::findGroup(const std::string& _name) const {
 	for (PropertyGroup* g : m_childGroups) {
 		if (g->getName() == _name) return g;

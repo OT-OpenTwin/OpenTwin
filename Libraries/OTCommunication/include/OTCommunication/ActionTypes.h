@@ -204,6 +204,7 @@
 #define OT_ACTION_CMD_UI_AddSettingsData "UI.AddSettingsData"
 #define OT_ACTION_CMD_UI_SettingsItemChanged "UI.SettingsData.ItemChanged"
 #define OT_ACTION_CMD_UI_AddIconSearchPath "UI.IconManager.AddSearchPath"
+#define OT_ACTION_CMD_UI_ShowDialog "UI.ShowDialog"
 #define OT_ACTION_CMD_UI_ModelDialog "UI.ModelDialog"
 #define OT_ACTION_CMD_UI_ModelDialogConfirmed "UI.ModelDialog.Confirmed"
 #define OT_ACTION_CMD_UI_ModelDialogCanceled "UI.ModelDialog.Canceled"

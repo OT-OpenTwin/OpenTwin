@@ -121,6 +121,20 @@ void ot::PropertyGridCfg::addRootGroup(PropertyGroup* _group) {
 	m_rootGroups.push_back(_group);
 }
 
+ot::PropertyGroup* ot::PropertyGridCfg::addRootGroup(const std::string& _groupNameAndTitle)
+{
+	ot::PropertyGroup* newGroup = new ot::PropertyGroup(_groupNameAndTitle);
+	this->addRootGroup(newGroup);
+	return newGroup;
+}
+
+ot::PropertyGroup* ot::PropertyGridCfg::addRootGroup(const std::string& _groupName, const std::string& _groupTitle)
+{
+	ot::PropertyGroup* newGroup = new ot::PropertyGroup(_groupName, _groupTitle);
+	this->addRootGroup(newGroup);
+	return newGroup;
+}
+
 ot::PropertyGroup* ot::PropertyGridCfg::findGroup(const std::string& _name, bool _searchChildGroups) {
 	for (PropertyGroup* g : m_rootGroups) {
 		if (g->getName() == _name) return g;

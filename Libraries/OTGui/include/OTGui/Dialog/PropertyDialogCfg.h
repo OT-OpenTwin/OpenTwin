@@ -49,11 +49,13 @@ namespace ot {
 		virtual void setFromJsonObject(const ot::ConstJsonObject& _object) override;
 
 		void setGridConfig(const PropertyGridCfg& _config) { m_gridConfig = _config; };
-		const PropertyGridCfg& getGridConfig(void) const { return m_gridConfig; };
+		const PropertyGridCfg& getGridConfig() const { return m_gridConfig; };
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups) { m_gridConfig.setRootGroups(_groups); };
 		void addRootGroup(PropertyGroup* _group) { m_gridConfig.addRootGroup(_group); };
-		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_gridConfig.getRootGroups(); };
+		PropertyGroup* addRootGroup(const std::string& _groupNameAndTitle) { return m_gridConfig.addRootGroup(_groupNameAndTitle); };
+		PropertyGroup* addRootGroup(const std::string& _groupName, const std::string& _groupTitle) { return m_gridConfig.addRootGroup(_groupName, _groupTitle); };
+		const std::list<PropertyGroup*>& getRootGroups() const { return m_gridConfig.getRootGroups(); };
 
 	private:
 		PropertyGridCfg m_gridConfig;

@@ -979,8 +979,13 @@ void Application::testCodeWorker()
 {
 	try
 	{
+		Application& app = Application::instance();
+		ot::UILockWrapper lock(app.getUiComponent(), ot::LockType::ModelWrite);
+		ProgressUpdater updater(app.getUiComponent(), "Running test code", true);
+
 		OT_LOG_T("Test code execution started at " + ot::DateTime::currentTimestamp(ot::DateTime::Simple) + "\n");
 		ot::RuntimeIntervalTestLog test("Test code execution took ");
+
 		m_testCode->runTestCode();
 	}
 	catch (const std::exception& e)
@@ -1109,6 +1114,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 	if (m_testCode == nullptr)
 	{
 		m_testCode = new TestCode(this);
+		m_testCode->initialize();
 	}
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);

@@ -72,19 +72,19 @@ namespace ot {
 		virtual void mergeWith(const PropertyGroup& _other, const PropertyBase::MergeMode& _mergeMode);
 
 		void setParentGroup(PropertyGroup* _group) { m_parentGroup = _group; };
-		PropertyGroup* getParentGroup(void) const { return m_parentGroup; };
+		PropertyGroup* getParentGroup() const { return m_parentGroup; };
 
 		//! @brief Returns the root group.
 		//! If this group has no parent returns this group.
-		PropertyGroup* getRootGroup(void);
+		PropertyGroup* getRootGroup();
 
 		void setName(const std::string& _name) { m_name = _name; };
-		std::string& getName(void) { return m_name; };
-		const std::string& getName(void) const { return m_name; };
+		std::string& getName() { return m_name; };
+		const std::string& getName() const { return m_name; };
 
 		void setTitle(const std::string& _title) { m_title = _title; };
-		std::string& getTitle(void) { return m_title; };
-		const std::string& getTitle(void) const { return m_title; };
+		std::string& getTitle() { return m_title; };
+		const std::string& getTitle() const { return m_title; };
 
 		//! @brief Set the properties.
 		//! This group takes ownership of the properties.
@@ -101,10 +101,10 @@ namespace ot {
 		void forgetProperty(Property* _property);
 
 		//! @brief Group properties.
-		const std::list<Property*>& getProperties(void) const { return m_properties; };
+		const std::list<Property*>& getProperties() const { return m_properties; };
 
 		//! @brief Returns all properties of all groups and nested groups.
-		std::list<Property*> getAllProperties(void) const;
+		std::list<Property*> getAllProperties() const;
 
 		//! @brief Returns the property at the given path.
 		//! @param _path Path to property. The path entry must be the property name.
@@ -128,11 +128,14 @@ namespace ot {
 		//! This group takes ownership of the groups.
 		void setChildGroups(const std::list<PropertyGroup*>& _groups);
 
-		const std::list<PropertyGroup*>& getChildGroups(void) const { return m_childGroups; };
+		const std::list<PropertyGroup*>& getChildGroups() const { return m_childGroups; };
 
 		//! @brief Add the provided group as a child.
 		//! This group takes ownership of the child.
 		void addChildGroup(PropertyGroup* _group);
+
+		PropertyGroup* addChildGroup(const std::string& _groupNameAndTitle);
+		PropertyGroup* addChildGroup(const std::string& _groupName, const std::string& _groupTitle);
 
 		PropertyGroup* findGroup(const std::string& _name) const;
 
@@ -144,7 +147,7 @@ namespace ot {
 		void clear(bool _keepGroups = false);
 
 		//! @brief Returns false if at least one property exists in this group or any of the child groups.
-		bool isEmpty(void) const;
+		bool isEmpty() const;
 
 		//! @brief Returns the group path.
 		//! The group path is a string containing all parent groups and this group name (e.g. "Root/Child/ThisGroup").

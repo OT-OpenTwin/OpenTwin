@@ -67,8 +67,10 @@ namespace ot {
 
 		void setRootGroups(const std::list<PropertyGroup*>& _groups);
 		void addRootGroup(PropertyGroup* _group);
-		std::list<PropertyGroup*>& getRootGroups(void) { return m_rootGroups; };
-		const std::list<PropertyGroup*>& getRootGroups(void) const { return m_rootGroups; };
+		PropertyGroup* addRootGroup(const std::string& _groupNameAndTitle);
+		PropertyGroup* addRootGroup(const std::string& _groupName, const std::string& _groupTitle);
+		std::list<PropertyGroup*>& getRootGroups() { return m_rootGroups; };
+		const std::list<PropertyGroup*>& getRootGroups() const { return m_rootGroups; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -87,7 +89,7 @@ namespace ot {
 		PropertyGroup* findOrCreateGroup(const std::string& _name, bool _searchChildGroups = false);
 
 		//! @brief Returns all properties of all groups and nested groups.
-		std::list<Property*> getAllProperties(void) const;
+		std::list<Property*> getAllProperties() const;
 		std::list<Property*> findPropertiesBySpecialType(const std::string& _specialType) const;
 
 		//! @brief Returns the property at the given path.
@@ -109,10 +111,10 @@ namespace ot {
 		const Property* findPropertyByPath(std::list<std::string> _path) const;
 
 		//! @brief Returns false if at least one property exists in any of the groups and its child groups.
-		bool isEmpty(void) const;
+		bool isEmpty() const;
 
 	private:
-		void clear(void);
+		void clear();
 
 		bool m_isModal;
 		std::list<PropertyGroup*> m_rootGroups;
