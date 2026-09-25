@@ -32,6 +32,8 @@
 #include <string>
 #include <functional>
 
+class TestCode;
+
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 private:
 	//! @brief Constructor
@@ -97,7 +99,7 @@ public:
 	bool getFeatureEnabled(const DebugServiceConfig::FeatureFlag& _flag) const { return m_config.getFeatureFlags().has(_flag); };
 	
 	void setFeatures(const DebugServiceConfig::Features& _features) { m_config.setFeatureFlags(_features); };
-	const DebugServiceConfig::Features& getFeatures(void) const { return m_config.getFeatureFlags(); };
+	const DebugServiceConfig::Features& getFeatures() const { return m_config.getFeatureFlags(); };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	
@@ -110,13 +112,18 @@ public:
 	static Application& instance();
 
 private:
+	friend class TesteCode;
+
+	TestCode* m_testCode;
+	void testCodeWorker();
+
 	virtual ~Application();
 
 	struct ButtonInfo {
-		ButtonInfo(ot::ToolBarButtonCfg&& _cfg, std::function<void(void)>&& _callback) 
+		ButtonInfo(ot::ToolBarButtonCfg&& _cfg, std::function<void()>&& _callback) 
 			: cfg(std::move(_cfg)), callback(std::move(_callback)) {}
 		ot::ToolBarButtonCfg cfg;
-		std::function<void(void)> callback;
+		std::function<void()> callback;
 	};
 
 	std::list<ButtonInfo> m_testButtons;
@@ -133,12 +140,12 @@ public:
 	virtual void initialize() override;
 
 	//! @brief Will be called when the service was successfully started, the hppt and/or websocket connection is established and the service may start its work
-	virtual void run(void) override;
+	virtual void run() override;
 
 	//! @brief Will be called when a UI connected to the session and is ready to work
 	virtual void uiConnected(ot::components::UiComponent * _ui) override;
 
 	//! @brief Will be called before the whole session starts to shut down (shut down can not be stopped)
 	//! At this point all services, that are listed as connected, are still reachable.
-	virtual void preShutdown(void) override;
+	virtual void preShutdown() override;
 };

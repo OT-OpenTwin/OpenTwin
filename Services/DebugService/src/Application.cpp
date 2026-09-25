@@ -18,9 +18,11 @@
 // @otlicense-end
 
 // DebugService header
+#include "TestCode.h"
 #include "Application.h"
 
 // OpenTwin header
+#include "OTSystem/DateTime.h"
 #include "OTSystem/OperatingSystem.h"
 
 #include "OTCore/FolderNames.h"
@@ -50,6 +52,7 @@
 #include "OTCommunication/ActionTypes.h"
 
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTServiceFoundation/UILockWrapper.h"
 #include "OTServiceFoundation/ModelComponent.h"
 #include "OTServiceFoundation/ProgressUpdater.h"
 #include "OTServiceFoundation/AbstractUiNotifier.h"
@@ -111,7 +114,14 @@ void testPropertyGrid() {
 }
 
 void Application::testCode() {
-	testPropertyGrid();
+	if (!m_testCode)
+	{
+		OT_LOG_E("No test code created yet");
+		return;
+	}
+
+	std::thread workerThread(&Application::testCodeWorker, this);
+	workerThread.detach();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -122,7 +132,7 @@ void Application::testCode() {
 
 Application::Application() :
 	ot::ApplicationBase(OT_INFO_SERVICE_TYPE_DebugService, OT_INFO_SERVICE_TYPE_DebugService, new ot::AbstractUiNotifier(), new ot::AbstractModelNotifier()),
-	m_nameCounter(0)
+	m_nameCounter(0), m_testCode(nullptr)
 {
 	// Debug buttons
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Test", "Test", "Default/BugRed"), std::bind(&Application::testCode, this)));
@@ -965,6 +975,24 @@ Application& Application::instance() {
 	return g_instance;
 }
 
+void Application::testCodeWorker()
+{
+	try
+	{
+		OT_LOG_T("Test code execution started at " + ot::DateTime::currentTimestamp(ot::DateTime::Simple) + "\n");
+		ot::RuntimeIntervalTestLog test("Test code execution took ");
+		m_testCode->runTestCode();
+	}
+	catch (const std::exception& e)
+	{
+		OT_LOG_E("Uncaught exception during test code execution: " + std::string(e.what()));
+	}
+	catch (...)
+	{
+		OT_LOG_E("[FATAL] Unknown exception during test code execution");
+	}
+}
+
 Application::~Application()
 {
 
@@ -1076,6 +1104,11 @@ void Application::uiConnected(ot::components::UiComponent * _ui)
 		cfg.setButtonLockFlags(ot::LockType::ModelWrite | ot::LockType::ViewRead | ot::LockType::ViewWrite);
 		_ui->addMenuButton(cfg);
 		this->connectToolBarButton(cfg, it.callback);
+	}
+
+	if (m_testCode == nullptr)
+	{
+		m_testCode = new TestCode(this);
 	}
 
 	enableMessageQueuing(OT_INFO_SERVICE_TYPE_UI, false);
