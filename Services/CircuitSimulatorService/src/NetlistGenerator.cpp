@@ -200,32 +200,23 @@ std::string NetlistGenerator::buildElementLine(CircuitElement* _element, const s
 std::string NetlistGenerator::buildNodeNumbers(CircuitElement* _element)
 {
     std::string netlistNodeNumbers;
-    std::unordered_set<std::string> temp;
+    std::unordered_set<std::string> seen;
+    bool dedup = !_element->allowDuplicateNodes();
     auto connections = _element->getList();
 
-    // Use the polymorphic pole names from the element
-    for (const auto& poleName : _element->getPositivePoleNames())
+    // Use the ordered pole names for correct NGSpice node sequence
+    for (const auto& poleName : _element->getOrderedPoleNames())
     {
         if (connections.find(poleName) != connections.end())
         {
             auto& conn = connections.at(poleName);
-            if (conn.getNodeNumber() != m_voltMeterConnection && temp.find(conn.getNodeNumber()) == temp.end())
+            if (conn.getNodeNumber() != m_voltMeterConnection)
             {
-                netlistNodeNumbers += conn.getNodeNumber() + " ";
-                temp.insert(conn.getNodeNumber());
-            }
-        }
-    }
-
-    for (const auto& poleName : _element->getNegativePoleNames())
-    {
-        if (connections.find(poleName) != connections.end())
-        {
-            auto& conn = connections.at(poleName);
-            if (conn.getNodeNumber() != m_voltMeterConnection && temp.find(conn.getNodeNumber()) == temp.end())
-            {
-                netlistNodeNumbers += conn.getNodeNumber() + " ";
-                temp.insert(conn.getNodeNumber());
+                if (!dedup || seen.find(conn.getNodeNumber()) == seen.end())
+                {
+                    netlistNodeNumbers += conn.getNodeNumber() + " ";
+                    seen.insert(conn.getNodeNumber());
+                }
             }
         }
     }

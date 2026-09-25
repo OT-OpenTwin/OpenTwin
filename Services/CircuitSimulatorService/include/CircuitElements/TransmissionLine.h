@@ -36,10 +36,18 @@ public:
 	const std::string getImpedance() const { return "Z0=" + this->m_impedance; }
 	const std::string getTransmissionDelay() const { return "TD=" + this->m_transmissionDelay; }
 	std::string getNetlistPrefix() const override { return "T"; }
-	std::string getNetlistValue() const override { return this->m_impedance + " " + this->m_transmissionDelay; }
+	std::string getNetlistValue() const override { return getImpedance() + " " + getTransmissionDelay(); }
 	bool isTransmissionLine() const override { return true; }
 	std::vector<std::string> getPositivePoleNames() const override { return { "PositivePole1", "PositivePole2" }; }
 	std::vector<std::string> getNegativePoleNames() const override { return { "NegativePole1", "NegativePole2" }; }
+
+	// NGSpice T-line requires: port1+, port1-, port2+, port2- (interleaved, not grouped)
+	std::vector<std::string> getOrderedPoleNames() const override {
+		return { "PositivePole1", "NegativePole1", "PositivePole2", "NegativePole2" };
+	}
+
+	// T-line needs all 4 nodes even if some share the same number (e.g., both grounds = 0)
+	bool allowDuplicateNodes() const override { return true; }
 
 	//Setter
 	void setImpedance(std::string impedance) { this->m_impedance = impedance; }

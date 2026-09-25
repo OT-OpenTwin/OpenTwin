@@ -75,6 +75,19 @@ public:
 
 	virtual std::vector<std::string> getPositivePoleNames() const { return { "positivePole" }; };
 	virtual std::vector<std::string> getNegativePoleNames() const { return { "negativePole" }; };
+
+	// Returns all pole names in the correct NGSpice node order.
+	// Default: all positive poles, then all negative poles.
+	// Override for multi-port elements (e.g., TransmissionLine: port1+, port1-, port2+, port2-).
+	virtual std::vector<std::string> getOrderedPoleNames() const {
+		auto result = getPositivePoleNames();
+		auto neg = getNegativePoleNames();
+		result.insert(result.end(), neg.begin(), neg.end());
+		return result;
+	}
+
+	// If true, duplicate node numbers are allowed in the netlist (needed for multi-port elements).
+	virtual bool allowDuplicateNodes() const { return false; }
 	
 	virtual void initFromEntity(const std::shared_ptr<ot::EntityBlock>& _entity, const std::string& _editorName) = 0;
 protected:
