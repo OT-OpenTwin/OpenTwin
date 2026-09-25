@@ -29,10 +29,12 @@
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h"	// Base class
+#include "OTServiceFoundation/UILockWrapper.h"
 
 // C++ header
 #include <string>
 #include <map>
+#include <memory>
 
 // Forward declaration
 namespace ot {
@@ -109,6 +111,7 @@ public:
 private:
 	SubprocessHandler* m_subprocessHandler = nullptr;
 	QtWrapper* m_qtWrapper = nullptr;
+	std::unique_ptr<ot::UILockWrapper> m_uiLock;
 	ot::ToolBarButtonCfg m_buttonRunSimulation;
 	ot::ToolBarButtonCfg m_buttonAddCircuit;
 	ot::ToolBarButtonCfg m_buttonAddSolver;

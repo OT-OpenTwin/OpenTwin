@@ -287,9 +287,8 @@ void Application::runNextSolvers() {
 }
 
 void Application::runSingleSolver(ot::EntityInformation& solver, std::string& modelVersion, EntityBase* solverEntity) {
-	
 
-	this->getUiComponent()->lockUI(ot::LockType::ModelWrite);
+	m_uiLock = std::make_unique<ot::UILockWrapper>(this->getUiComponent(), ot::LockType::ModelWrite);
 	m_SimulationRunning = true;
 
 	// Enusre that subprocessHandler is null before starting
@@ -464,7 +463,7 @@ void Application::finishSimulation() {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	this->getUiComponent()->setProgress(100);
 	this->getUiComponent()->closeProgressInformation();
-	this->getUiComponent()->unlockUI(ot::LockType::ModelWrite);
+	m_uiLock.reset();
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();
@@ -476,7 +475,7 @@ void Application::finishFailedSimulation() {
 	OT_LOG_E("Simulation Failed! Shutting down!");
 
 	this->getUiComponent()->closeProgressInformation();
-	this->getUiComponent()->unlockUI(ot::LockType::ModelWrite);
+	m_uiLock.reset();
 	m_SimulationRunning = false;
 	SimulationResults::getInstance()->storeLogDataInResultText();
 	SimulationResults::getInstance()->clearUp();

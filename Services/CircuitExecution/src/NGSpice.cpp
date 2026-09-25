@@ -166,6 +166,11 @@ void NGSpice::init(std::list<std::string> _netlist) {
 	}
 	else {
 		OT_LOG_E("No results after simulation, skipping sendBackResults");
+		// Send error to SimulatorService synchronously before shutting down
+		Application::getInstance()->getConnectionManager()->sendMessage(
+			"Error", "No results produced by simulation - check circuit and solver configuration");
+		// sendBackResults handles disconnect + process exit for empty results
+		Application::getInstance()->getConnectionManager()->sendBackResults(results);
 	}
 }
 
