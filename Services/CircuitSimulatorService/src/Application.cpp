@@ -363,6 +363,24 @@ void Application::runSingleSolver(ot::EntityInformation& solver, std::string& mo
 		return;
 	}
 
+	// Capture netlist in SimulationResults (generated before simulation, stored with results)
+	{
+		std::string netlistText;
+		for (const auto& line : _netlist)
+		{
+			// Strip "circbyline " prefix for human-readable storage
+			const std::string prefix = "circbyline ";
+			if (line.substr(0, prefix.size()) == prefix) {
+				netlistText += line.substr(prefix.size()) + "\n";
+			}
+			else {
+				netlistText += line + "\n";
+			}
+		}
+		SimulationResults::getInstance()->setNetlist(netlistText);
+	}
+
+
 	// After generating the netlist I start the subprocess
 	// Initialization time of subprocess
 	QDateTime initTime = QDateTime::currentDateTime();

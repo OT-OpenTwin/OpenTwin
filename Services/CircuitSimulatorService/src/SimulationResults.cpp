@@ -125,7 +125,6 @@ void SimulationResults::handleUnknownMessageType(std::string _message) {
 
 void SimulationResults::storeLogDataInResultText() {
     std::lock_guard<std::mutex> lock(m_mutex);
-    EntityResultText* output = _modelComponent->addResultTextEntity(solverName + "/Output", logData);
 
     std::list<ot::UID> topologyEntityIDList;
     std::list<ot::UID> topologyEntityVersionList;
@@ -133,6 +132,9 @@ void SimulationResults::storeLogDataInResultText() {
     std::list<ot::UID> dataEntityIDList;
     std::list<ot::UID> dataEntityVersionList;
     std::list<ot::UID> dataEntityParentList;
+
+    // Store log output
+    EntityResultText* output = _modelComponent->addResultTextEntity(solverName + "/Output", logData);
 
     topologyEntityIDList.push_back(output->getEntityID());
     topologyEntityVersionList.push_back(output->getEntityStorageVersion());
@@ -142,7 +144,20 @@ void SimulationResults::storeLogDataInResultText() {
     dataEntityVersionList.push_back(output->getTextDataStorageVersion());
     dataEntityParentList.push_back(output->getEntityID());
 
-    
+    // Store netlist (generated before simulation, persisted alongside results)
+    if (!m_netlistData.empty())
+    {
+        EntityResultText* netlistEntity = _modelComponent->addResultTextEntity(solverName + "/Netlist", m_netlistData);
+
+        topologyEntityIDList.push_back(netlistEntity->getEntityID());
+        topologyEntityVersionList.push_back(netlistEntity->getEntityStorageVersion());
+        topologyEntityForceVisibleList.push_back(false);
+
+        dataEntityIDList.push_back(netlistEntity->getTextDataStorageId());
+        dataEntityVersionList.push_back(netlistEntity->getTextDataStorageVersion());
+        dataEntityParentList.push_back(netlistEntity->getEntityID());
+    }
+
     ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisibleList, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "added Circuit Simulation results");
 }
 
@@ -174,6 +189,12 @@ void SimulationResults::handleCircuitExecutionTiming(const QDateTime& _timePoint
 void SimulationResults::clearUp() {
     this->logData.clear();
     this->resultMap.clear();
+    this->m_netlistData.clear();
+}
+
+void SimulationResults::setNetlist(const std::string& _netlist) {
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_netlistData = _netlist;
 }
 
 std::vector<int> SimulationResults::findPercentage(const std::string& input) {

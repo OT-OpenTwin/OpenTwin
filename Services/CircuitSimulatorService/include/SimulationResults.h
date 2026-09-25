@@ -55,6 +55,9 @@ public:
     void handleUnknownMessageType(std::string _message);
     void storeLogDataInResultText();
 
+    //Netlist
+    void setNetlist(const std::string& _netlist);
+
     //Time Handling
     void handleCircuitExecutionTiming(const QDateTime& _timePoint, std::string timeType);
 
@@ -83,6 +86,7 @@ private:
     std::string circuitName;
     std::mutex m_mutex;
     std::string logData;
+    std::string m_netlistData;
 
     std::vector<int> findPercentage(const std::string& input);
 
