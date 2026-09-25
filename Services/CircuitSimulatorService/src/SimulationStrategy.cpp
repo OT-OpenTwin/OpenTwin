@@ -27,7 +27,7 @@
 std::string DCSimulationStrategy::getVoltageSourceNetlistType(VoltageSource* _voltageSource) const
 {
 	_voltageSource->setType("DC");
-	return _voltageSource->getType() + " ";
+	return "DC " + _voltageSource->getValue();
 }
 
 std::string DCSimulationStrategy::generateSimulationLine(EntityBase* _solverEntity, const ElementNamingRegistry& _elementNamingRegistry) const
@@ -109,7 +109,14 @@ std::string ACSimulationStrategy::generateSimulationLine(EntityBase* _solverEnti
 std::string TRANSimulationStrategy::getVoltageSourceNetlistType(VoltageSource* _voltageSource) const
 {
 	_voltageSource->setType("TRAN");
-	return _voltageSource->getFunction();
+	if (!_voltageSource->getFunction().empty())
+	{
+		return _voltageSource->getFunction();
+	}
+	else
+	{
+		return "DC " + _voltageSource->getValue();
+	}
 }
 
 std::string TRANSimulationStrategy::generateSimulationLine(EntityBase* _solverEntity, const ElementNamingRegistry& _elementNamingRegistry) const

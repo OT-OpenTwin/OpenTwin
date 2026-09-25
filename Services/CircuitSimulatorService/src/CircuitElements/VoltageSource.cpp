@@ -54,7 +54,14 @@ void VoltageSource::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _enti
         if (m_function == "PULSE") { parameters = myElement->getPulseParameters(); }
         else if (m_function == "SIN") { parameters = myElement->getSinParameters(); }
         else { parameters = myElement->getExpParameters(); }
-        for (const auto& param : parameters) { functionStr += param + " "; }
+        for (size_t i = 0; i < parameters.size(); ++i)
+        {
+            functionStr += parameters[i];
+            if (i + 1 < parameters.size())
+            {
+                functionStr += " ";
+            }
+        }
         functionStr += ")";
         m_function = functionStr;
     }

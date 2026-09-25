@@ -115,12 +115,15 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
             auto* vs = dynamic_cast<VoltageSource*>(circuitElement);
             line += strategy->getVoltageSourceNetlistType(vs);
         }
-		// add value or model depending on whether a model is specified
-        if (modelType.empty()) {
-            line += circuitElement->getNetlistValue();
-        }
-        else {
-            line += circuitElement->getModel();
+        else
+        {
+		    // add value or model depending on whether a model is specified
+            if (modelType.empty()) {
+                line += circuitElement->getNetlistValue();
+            }
+            else {
+                line += circuitElement->getModel();
+            }
         }
         netlist.push_back(line);
 		// Add model lines 
