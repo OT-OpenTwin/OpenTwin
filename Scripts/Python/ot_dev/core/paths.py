@@ -48,7 +48,6 @@ def test_log(config: str) -> str:
 
 # --- relative to a project root ---
 def cmake_output(config: str) -> tuple[str, ...]:
-    """Where the CMake presets put the binaries of one configuration."""
     return ("build", f"{SYSTEM}-{config}", config.capitalize())
 
 

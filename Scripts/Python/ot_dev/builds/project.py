@@ -27,7 +27,7 @@ from ..core.toolchain import apply_toolchain
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
 
-TEST_DLL_PATHS = {"debug": "OT_ALL_DLLD", "release": "OT_ALL_DLLR"}
+TEST_DLL_PATHS = {"debug": ("OT_ALL_DLLD", "ZLIB_DLLPATHD"), "release": ("OT_ALL_DLLR",)}
 
 
 def _build_config(cmake: Path, env: Mapping[str, str], target: str, config: str,
@@ -111,9 +111,10 @@ def test_project(env: Mapping[str, str], target: str, configs: Sequence[str],
         print(config.upper(), flush=True)
 
         step = dict(env)
-        dlls = step.get(TEST_DLL_PATHS[config], "")
-        if dlls:
-            step["PATH"] = dlls + os.pathsep + step.get("PATH", "")
+        step.update(ENV_VARS)
+        deployment = str(Path(step["OPENTWIN_DEV_ROOT"]).joinpath(*paths.DEPLOYMENT))
+        entries = [step.get(name, "") for name in TEST_DLL_PATHS[config]]
+        step["PATH"] = os.pathsep.join([*entries, deployment, step.get("PATH", "")])
 
         with open(logs / paths.test_log(config), "a", encoding="utf-8") as out:
             out.write(f"{SEPARATOR}\nTesting project: {target}\n{SEPARATOR}\n")

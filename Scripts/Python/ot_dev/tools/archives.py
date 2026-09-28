@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""7-Zip helpers and the ThirdParty files too large for git."""
-
 from pathlib import Path
 from typing import Mapping
 
@@ -22,7 +20,7 @@ from ..core import paths
 from ..core.expansion import get
 from ..core.process import run_program
 
-# relative to OPENTWIN_THIRDPARTY_ROOT
+# ThirdParty files too large for git, relative to OPENTWIN_THIRDPARTY_ROOT
 QT_BIN = r"Qt\6.6.1\msvc2019_64\bin"
 QT_LIB = r"Qt\6.6.1\msvc2019_64\lib"
 DESIGN_STUDIO = r"Qt\Tools\QtDesignStudio\qt6_design_studio_reduced_version\bin"

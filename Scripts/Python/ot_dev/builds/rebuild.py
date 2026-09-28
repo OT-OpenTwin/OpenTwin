@@ -43,7 +43,6 @@ def _admin_panel(env: dict[str, str], configs: Sequence[str], rebuild: bool, log
     return build_admin_panel(env, configs, rebuild, logs)
 
 
-# Steps that are not plain CMake builds.
 SPECIAL: dict[str, tuple[str, Step]] = {
     "KEYGENERATOR": ("KeyGenerator", _key_generator),
     "FRAMEWORK": ("Framework", build_framework),

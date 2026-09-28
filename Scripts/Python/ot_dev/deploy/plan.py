@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""A deployment plan: ordered copy, remove and write steps, inspectable before anything runs."""
-
 import ctypes
 import fnmatch
 import os
@@ -82,7 +80,6 @@ def _matches(name: str, pattern: str | None) -> bool:
     return pattern is None or pattern in ANY or fnmatch.fnmatch(name.lower(), pattern.lower())
 
 
-# CopyFileW is roughly twice as fast as shutil for many small files.
 if WINDOWS:
     _kernel32 = ctypes.WinDLL("kernel32", use_last_error=True)
     _kernel32.CopyFileW.argtypes = (ctypes.c_wchar_p, ctypes.c_wchar_p, ctypes.c_int)
@@ -98,8 +95,6 @@ def _copy_file(source: str, destination: str) -> None:
 
 
 class Result:
-    """Missing sources are a content problem; blocked targets are a permissions one."""
-
     def __init__(self) -> None:
         self.missing: list[str] = []
         self.blocked: list[str] = []

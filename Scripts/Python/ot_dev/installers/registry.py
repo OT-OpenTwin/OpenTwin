@@ -23,7 +23,6 @@ if WINDOWS:
 
 
 def read_value(root: str, key: str, name: str) -> str:
-    """The value as text, or "" when the key or value is missing. Opens the key with KEY_READ only."""
     try:
         with winreg.OpenKey(getattr(winreg, root), key, 0, winreg.KEY_READ) as handle:
             return str(winreg.QueryValueEx(handle, name)[0])

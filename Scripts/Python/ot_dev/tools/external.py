@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Starting the external development programs: Qt Creator, CMake GUI, Visual Studio,
-the FileHeaderUpdater and the legacy Python."""
-
 from pathlib import Path
 from typing import Mapping, Sequence
 

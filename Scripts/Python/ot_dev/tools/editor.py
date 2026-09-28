@@ -21,7 +21,6 @@ from typing import Mapping
 from ..core.expansion import get
 from ..core.platform import DEFAULT_EDITOR, EDITORS, WINDOWS
 
-# Optional: the editor used when none is given, instead of DEFAULT_EDITOR.
 EDITOR_VARIABLE = "OT_DEFAULT_EDITOR"
 
 

@@ -28,7 +28,6 @@ SYSTEM = "windows" if WINDOWS else "linux"
 
 EXE = ".exe" if WINDOWS else ""
 
-# Applied to build subprocesses.
 ENV_VARS: dict[str, str] = {"VSLANG": "1033"} if WINDOWS else {}
 
 # Added to the cross-platform names in SetupEnvironment.REQUIRED.
@@ -59,7 +58,6 @@ def _devenv_tool(env: Mapping[str, str], name: str) -> Path:
 
 
 def cmake_executable(env: Mapping[str, str]) -> Path:
-    """Windows uses the cmake shipped with Visual Studio."""
     if WINDOWS:
         return _devenv_tool(env, "cmake.exe")
 

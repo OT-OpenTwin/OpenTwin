@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The plans themselves are in Scripts/DeploymentManifest.py."""
-
 import contextlib
 import io
 import os
@@ -89,7 +87,6 @@ def _relative(path: str, base: Path) -> str:
 
 def _finished(step: tuple, base: Path, result: Result, copied: int, missing: int,
               seconds: float) -> tuple[str, str] | None:
-    """Folder steps are the slow ones; each gets a line of its own once it is done."""
     if step[0] == "rmtree":
         return "Removed", f"{_relative(step[1], base):<63.63}{seconds:5.1f}s"
     if step[0] != "tree" or Path(step[1]).is_file():

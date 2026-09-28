@@ -13,9 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The progress bar of the deployment steps: pinned above the scrolling log in a
-console, plain lines when the output is redirected."""
-
 import ctypes
 import sys
 import time
@@ -104,7 +101,6 @@ class Progress:
         self._draw(label)
 
     def detail(self, name: str) -> None:
-        # throttled by time so naming every file costs nothing
         if not self.row:
             return
         now = time.monotonic()

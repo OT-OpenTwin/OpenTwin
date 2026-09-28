@@ -13,8 +13,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Local certificates for the development services and the encryption key header."""
-
 import shutil
 import subprocess
 import sys

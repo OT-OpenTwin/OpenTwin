@@ -67,7 +67,6 @@ def _run(command, cwd: Path, env: Mapping[str, str], out: TextIO) -> int:
 
 
 def mathjax_relative_path(env: Mapping[str, str]) -> str | None:
-    """Relative path from the code docs to MathJax in the ThirdParty tree."""
     existing = env.get("MATHJAX_REL_PATH")
     if existing:
         return existing
@@ -105,7 +104,6 @@ def build_sphinx(env: Mapping[str, str], logs: Path) -> int:
 
 
 def make_html(env: Mapping[str, str]) -> int:
-    """Sphinx HTML only, the output stays on the console."""
     sphinx = env.get("SPHINXBUILD") or SPHINX
     root = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.DEVELOPER_DOCS)
     found = shutil.which(sphinx, path=env.get("PATH"))
