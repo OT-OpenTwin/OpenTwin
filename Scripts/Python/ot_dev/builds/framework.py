@@ -18,11 +18,12 @@ import subprocess
 from pathlib import Path
 from typing import Any, Mapping, Sequence, TextIO
 
-from .platform import USE_SHELL
+from ..core import paths
+from ..core.output import build_result, finish
+from ..core.platform import USE_SHELL
 
 ROOT = ("Framework", "OpenTwin")
 QT_CONF = ("Assets", "qt.conf")
-LOG_NAME = "Framework_buildLog.txt"
 FINGERPRINTS = ["output-lib-open_twin", "output-bin-open_twin"]
 
 CARGO: dict[str, dict[str, Any]] = {
@@ -67,7 +68,7 @@ def build_framework(env: Mapping[str, str], configs: Sequence[str],
     failed = 0
 
     print(f"Building Project {root}", flush=True)
-    with open(Path(logs) / LOG_NAME, "w", encoding="utf-8") as out:
+    with open(Path(logs) / paths.FRAMEWORK_LOG, "w", encoding="utf-8") as out:
         for config in configs:
             spec = CARGO[config]
             print(config.upper(), flush=True)
@@ -78,9 +79,8 @@ def build_framework(env: Mapping[str, str], configs: Sequence[str],
             code = _run(spec["build"], root, env, out)
             _write_fingerprints(root, spec["target"], out)
             _install_qt_conf(dev, root, spec["target"])
-            out.write(f"--- Build {'successful' if code == 0 else 'failed'}: {root} ---\n")
+            out.write(build_result(str(root), code))
             failed = failed or code
 
-    print("---", flush=True)
-    print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+    finish(failed)
     return failed

@@ -17,16 +17,13 @@ import os
 import re
 import shutil
 import subprocess
-import sys
 from pathlib import Path
 from typing import Mapping, Sequence, TextIO
 
-from .platform import (DEFAULT_EDITOR, EDITORS, ENV_VARS, SYSTEM, WINDOWS,
-                       cmake_executable, ctest_executable)
-from .expansion import expand, merge
-from .toolchain import apply_toolchain
-
-SEPARATOR = "=" * 90
+from ..core import paths
+from ..core.output import SEPARATOR, build_result, finish
+from ..core.platform import ENV_VARS, SYSTEM, cmake_executable, ctest_executable
+from ..core.toolchain import apply_toolchain
 
 CLEAN_DIRS = [".vs", "build", "x64", "packages", "test"]
 
@@ -57,21 +54,21 @@ def build_project(env: Mapping[str, str], target: str, configs: Sequence[str],
     print(f"Building Project {target}", flush=True)
     for config in configs:
         print(config.upper(), flush=True)
-        with open(logs / f"buildlog_{config.capitalize()}.txt", "a", encoding="utf-8") as out:
+        with open(logs / paths.build_log(config), "a", encoding="utf-8") as out:
             out.write(f"{SEPARATOR}\nBuilding project: {target}\n{SEPARATOR}\n")
             out.flush()
             code = _build_config(cmake, env, target, config, rebuild, parallel, out)
-            out.write(f"--- Build {'successful' if code == 0 else 'failed'}: {target} ---\n")
+            out.write(build_result(target, code))
         failed = failed or code
 
-    print("---", flush=True)
-    print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+    finish(failed)
     return failed
 
 
 _PASSED = re.compile(r"\[  PASSED  \] (\d+) test")
 _FAILED = re.compile(r"\[  FAILED  \] ([A-Za-z_][\w/]*\.[\w/]+)")
 _NO_RUN = re.compile(r"(Exit code 0x[0-9a-fA-F]+|Subprocess aborted|Timeout)")
+
 
 def _test_summary(output: str) -> str:
     passed = sum(int(n) for n in _PASSED.findall(output))
@@ -87,7 +84,7 @@ def _test_summary(output: str) -> str:
 
 def _test_config(ctest: Path, env: Mapping[str, str], target: str, config: str,
                  out: TextIO) -> int | None:
-    tests = Path(target) / "build" / f"{SYSTEM}-{config}" / "tests"
+    tests = Path(target).joinpath(*paths.cmake_tests(config))
     if not tests.is_dir():
         out.write(f"--- Not built, nothing to test: {tests} ---\n")
         return None
@@ -118,7 +115,7 @@ def test_project(env: Mapping[str, str], target: str, configs: Sequence[str],
         if dlls:
             step["PATH"] = dlls + os.pathsep + step.get("PATH", "")
 
-        with open(logs / f"testlog_{config.capitalize()}.txt", "a", encoding="utf-8") as out:
+        with open(logs / paths.test_log(config), "a", encoding="utf-8") as out:
             out.write(f"{SEPARATOR}\nTesting project: {target}\n{SEPARATOR}\n")
             out.flush()
             code = _test_config(ctest, step, target, config, out)
@@ -129,11 +126,11 @@ def test_project(env: Mapping[str, str], target: str, configs: Sequence[str],
                 out.write(f"--- Test {'successful' if code == 0 else 'failed'}: {target} ---\n")
                 failed = failed or code
 
-    print("---", flush=True)
     if not ran:
+        print("---", flush=True)
         print("SKIPPED (not built)", flush=True)
     else:
-        print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+        finish(failed)
     return failed
 
 
@@ -152,87 +149,5 @@ def clean_project(target: str | Path) -> int:
             locked.append(name)
         print(f"{name}{' (locked)' if path.exists() else ''}", flush=True)
 
-    print("---", flush=True)
-    print("FAILED" if locked else "SUCCESS", flush=True)
+    finish(bool(locked))
     return 1 if locked else 0
-
-
-def _rooted(env: Mapping[str, str], root: str, executable: str, target: str) -> int:
-    command = Path(env[root]) / executable
-    if not command.is_file():
-        raise SystemExit(f"{executable} not found: {command}")
-    subprocess.Popen([str(command), target], env=env)
-    return 0
-
-
-def _on_path(env: Mapping[str, str], executable: str, target: str) -> int:
-    command = shutil.which(executable, path=env.get("PATH"))
-    if not command:
-        raise SystemExit(f"{executable} not found on PATH")
-
-    args = [command, target]
-    if WINDOWS and command.lower().endswith((".cmd", ".bat")):
-        args = ["cmd", "/c", *args]
-    return subprocess.run(args, env=env).returncode
-
-
-def launch_editor(env: Mapping[str, str], target: str, editor: str | None = None) -> int:
-    key = (editor or DEFAULT_EDITOR).upper()
-    if key not in EDITORS:
-        raise SystemExit(f"Unknown editor '{editor}'. Known: " + ", ".join(sorted(EDITORS)))
-    if not Path(target).exists():
-        raise SystemExit(f"path does not exist: {target}")
-
-    root, executable = EDITORS[key]
-    print(f"Launching {key}", flush=True)
-    if root:
-        return _rooted(env, root, executable, target)
-    return _on_path(env, executable, target)
-
-
-_ASSIGNMENT = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*=")
-
-
-_NO_PATH = 3
-_NOT_RECOGNIZED = 9009
-
-
-def _not_found(program: str) -> int:
-    if Path(program).parent != Path(".") and not Path(program).parent.is_dir():
-        print("The system cannot find the path specified.", file=sys.stderr, flush=True)
-        return _NO_PATH
-    shown = f'"{program}"' if Path(program).parent != Path(".") else program
-    print(f"'{shown}' is not recognized as an internal or external command,\n"
-          "operable program or batch file.", file=sys.stderr, flush=True)
-    return _NOT_RECOGNIZED
-
-
-def run_program(env: Mapping[str, str], command: Sequence[str],
-                toolchain: bool = False, detach: bool = False) -> int:
-    """Runs a program with the environment. Leading NAME=VALUE entries are set
-    first; %VAR% anywhere in the command is expanded with the environment."""
-    env = dict(env)
-    if toolchain and not env.get("OT_TOOLCHAIN_READY"):
-        apply_toolchain(env)
-        print("OpenTwin native toolchain was set up successfully.", flush=True)
-    command = list(command)
-    while command and _ASSIGNMENT.match(command[0]):
-        name, _, value = command.pop(0).partition("=")
-        merge(env, {name: expand(env, value)})
-    if not command:
-        raise SystemExit("no program given")
-
-    program, *rest = (expand(env, part) for part in command)
-    found = shutil.which(program, path=env.get("PATH")) or program
-    if not Path(found).is_file():
-        return _not_found(program)
-
-    args, executable = [program, *rest], found
-    if WINDOWS and found.lower().endswith((".cmd", ".bat")):
-        args, executable = ["cmd", "/c", found, *rest], None
-    sys.stdout.flush()
-
-    if detach:
-        subprocess.Popen(args, executable=executable, env=env)
-        return 0
-    return subprocess.run(args, executable=executable, env=env).returncode

@@ -17,10 +17,11 @@ import subprocess
 from pathlib import Path
 from typing import Mapping, Sequence
 
-from .platform import USE_SHELL
+from ..core import paths
+from ..core.output import build_result, finish
+from ..core.platform import USE_SHELL
 
 ROOT = ("Tools", "AdminPanel")
-LOG_NAME = "AdminPanel_buildLog.txt"
 COMMANDS = [["yarn", "install"], ["yarn", "build"]]
 
 
@@ -30,15 +31,14 @@ def build_admin_panel(env: Mapping[str, str], configs: Sequence[str],
     failed = 0
 
     print(f"Building Project {root}", flush=True)
-    with open(Path(logs) / LOG_NAME, "w", encoding="utf-8") as out:
+    with open(Path(logs) / paths.ADMIN_PANEL_LOG, "w", encoding="utf-8") as out:
         for command in COMMANDS:
             out.write(f"$ {' '.join(command)}\n")
             out.flush()
             code = subprocess.run(command, cwd=root, env=env, stdout=out,
                                   stderr=subprocess.STDOUT, shell=USE_SHELL).returncode
             failed = failed or code
-        out.write(f"--- Build {'successful' if failed == 0 else 'failed'}: {root} ---\n")
+        out.write(build_result(str(root), failed))
 
-    print("---", flush=True)
-    print("SUCCESS" if failed == 0 else "FAILED", flush=True)
+    finish(failed)
     return failed

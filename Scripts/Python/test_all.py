@@ -20,8 +20,7 @@ from typing import Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from ot_dev import cli, test_all, testable_projects
-
-LOG_DIR = ("Scripts", "BuildAndTest")
+from ot_dev.core import paths
 
 
 def main(argv: Sequence[str]) -> int:
@@ -30,9 +29,8 @@ def main(argv: Sequence[str]) -> int:
 
     env = cli.environment()
     configurations = cli.configurations(cli.argument(argv, 0))
-    logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*LOG_DIR)
+    logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.BUILD_AND_TEST)
 
-    # Derived, not listed: a project is tested exactly when it has tests.
     projects = testable_projects(env)
     return test_all(env, projects, configurations, logs)
 

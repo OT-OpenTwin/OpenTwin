@@ -13,11 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""The build server jobs: the nightly build and deploy, the continuous build and
-their scheduled tasks, which log the job and send the result by email."""
-
 import os
-import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -32,11 +28,10 @@ import create_deployment
 import create_frontend_installer
 import installers
 from ot_dev import cli
+from ot_dev.core import paths
+from ot_dev.core.output import FAILED_BUILD
+from ot_dev.core.process import find_program
 
-LOG_DIR = ("Scripts", "BuildAndTest")
-INSTALLER_DIR = ("Scripts", "Installer")
-SUMMARY = "buildLog_Summary.txt"
-FAILED_BUILD = "Build failed"
 WINSCP = ("WinSCP", "WinSCP.com")
 UPLOAD_SCRIPT = "BatchBuildAndDeploy.txt"
 VERSIONS = "OT_LAST_CONTIBUILD_VERSIONS"
@@ -64,23 +59,18 @@ def _root(name: str, *parts: str) -> Path:
     return Path(os.environ[name]).joinpath(*parts)
 
 
-def _program(name: str) -> str:
-    """Found on PATH first, like cmd does; CreateProcess would look in System32 before PATH."""
-    return shutil.which(name) or name
-
-
 def _pull(folder: Path) -> None:
     os.chdir(folder)
     sys.stdout.flush()
-    subprocess.run([_program("git"), "pull"])
+    subprocess.run([find_program("git"), "pull"])
 
 
 def _revision() -> str:
-    return subprocess.run([_program("git"), "rev-parse", "--short", "HEAD"], stdout=subprocess.PIPE, text=True).stdout.strip()
+    return subprocess.run([find_program("git"), "rev-parse", "--short", "HEAD"], stdout=subprocess.PIPE, text=True).stdout.strip()
 
 
 def _call(step: Callable[[Sequence[str]], int], *arguments: str) -> None:
-    """Runs one job step. Like CALL, a failing step does not stop the job."""
+    """A failing step does not stop the job."""
     try:
         step(list(arguments))
     except SystemExit as stop:
@@ -89,7 +79,7 @@ def _call(step: Callable[[Sequence[str]], int], *arguments: str) -> None:
 
 
 def _build_failed() -> bool:
-    summary = Path.cwd() / SUMMARY
+    summary = Path.cwd() / paths.SUMMARY
     if not summary.is_file():
         print("The system cannot find the file specified.", file=sys.stderr, flush=True)
         return False
@@ -111,7 +101,7 @@ def build_and_deploy() -> int:
     _pull(_root("OPENTWIN_THIRDPARTY_ROOT"))
 
     _header("Build the software")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     _call(clean_all.main)
     _call(build_all.main, "BOTH", "REBUILD")
 
@@ -119,26 +109,26 @@ def build_and_deploy() -> int:
         return 1
 
     _header("Build the documentation")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     _call(build_documentation.main)
 
     _header("Create the deployment")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     _call(create_deployment.main)
 
     _header("Build the frontend installer")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     _call(create_frontend_installer.main)
 
     _header("Build the full installers")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *INSTALLER_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.INSTALLER))
     _call(installers.main, "build")
 
     _header("Upload the documentation and the nightly installers")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     sys.stdout.flush()
     subprocess.run(f'"{_root("OPENTWIN_THIRDPARTY_ROOT", *WINSCP)}" /ini=nul '
-                   f'/script="{_root("OPENTWIN_DEV_ROOT", *LOG_DIR, UPLOAD_SCRIPT)}"')
+                   f'/script="{_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST, UPLOAD_SCRIPT)}"')
     return 0
 
 
@@ -159,22 +149,21 @@ def continuous_build() -> int:
 
     _header("Building Software for following commits:", f"OpenTwin = {opentwin}", f"ThirdParty = {thirdparty}")
     print('""', flush=True)
-    subprocess.run(["SETX", VERSIONS, versions], executable=_program("setx"))
+    subprocess.run(["SETX", VERSIONS, versions], executable=find_program("setx"))
 
     _header("Build the software")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     _call(build_all.main, "BOTH", "BUILD")
 
     return 1 if _build_failed() else 0
 
 
 def _task(job: str, log: str, notification: str, result: Callable[[int], str | None]) -> int:
-    """Runs a job with its output in the log, then mails the result."""
     if _missing(TASK_REQUIRED):
         return 1
 
     _header("Start the build and deploy batch script")
-    os.chdir(_root("OPENTWIN_DEV_ROOT", *LOG_DIR))
+    os.chdir(_root("OPENTWIN_DEV_ROOT", *paths.BUILD_AND_TEST))
     if not Path(log).exists():
         print(f"Could Not Find {Path.cwd() / log}", file=sys.stderr, flush=True)
     Path(log).unlink(missing_ok=True)
@@ -186,7 +175,7 @@ def _task(job: str, log: str, notification: str, result: Callable[[int], str | N
     if status is None:
         return 0
     sys.stdout.flush()
-    return subprocess.run([_program("powershell.exe"), "-ExecutionPolicy", "Bypass", "-File", notification, status]).returncode
+    return subprocess.run([find_program("powershell.exe"), "-ExecutionPolicy", "Bypass", "-File", notification, status]).returncode
 
 
 def build_and_deploy_task() -> int:

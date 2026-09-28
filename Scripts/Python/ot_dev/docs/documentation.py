@@ -21,29 +21,25 @@ from datetime import datetime
 from pathlib import Path
 from typing import Mapping, TextIO
 
-from .actions import SEPARATOR
-from .environment import build_env
-from .platform import USE_SHELL
-
-DEVELOPER = ("Documentation", "Developer")
-DOXYFILE = ("Documentation", "Doxygen", "Doxyfile")
-CODEDOC = ("Documentation", "Developer", "_build", "html", "_static")
-CODEDOC_FOLDER = "codedochtml"
-CODEDOC_INDEX = ("index.xhtml", "code_doc_index.xhtml")
-
-LOG_DIR = ("Scripts", "BuildAndTest")
-SPHINX_LOG = "Documentation_buildLog.txt"
-DOXYGEN_LOG = "DoxygenDocumentation_buildLog.txt"
+from ..core import paths
+from ..core.environment import build_env
+from ..core.output import SEPARATOR
+from ..core.platform import USE_SHELL
+from ..core.process import NOT_FOUND
 
 SPHINX = "sphinx-build"
 DOXYGEN = "doxygen"
 BUILD_DIR = "_build"
 
-# BuildDocumentation.bat builds the MathJax path six levels up from the code docs.
+DOXYFILE = ("Documentation", "Doxygen", "Doxyfile")
+CODEDOC = paths.DEVELOPER_DOCS + (BUILD_DIR, "html", "_static")
+CODEDOC_FOLDER = "codedochtml"
+CODEDOC_INDEX = ("index.xhtml", "code_doc_index.xhtml")
+
+# levels from the code docs up to the folder holding both OpenTwin and ThirdParty
 MATHJAX_DEPTH = 6
 
 MODES = ("BOTH", "SPHINX", "DOXYGEN", "HTML")
-NOT_FOUND = 9009
 
 SPHINX_MISSING = """
 The 'sphinx-build' command was not found. Make sure you have Sphinx
@@ -94,26 +90,26 @@ def _codedoc_root(env: Mapping[str, str]) -> Path:
 
 def build_sphinx(env: Mapping[str, str], logs: Path) -> int:
     root = Path(env.get("OT_DOCUMENTATION_ROOT") or
-                Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*DEVELOPER))
+                Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.DEVELOPER_DOCS))
     sphinx = env.get("SPHINXBUILD") or SPHINX
 
     print("Build Sphinx Documentation", flush=True)
-    with open(logs / SPHINX_LOG, "w", encoding="utf-8") as out:
+    with open(logs / paths.SPHINX_LOG, "w", encoding="utf-8") as out:
         out.write(_stamp("Started at: ") + "\n")
         code = _run([sphinx, "-M", "html", ".", BUILD_DIR], root, env, out)
         out.write(_stamp("Finished at: ") + "\n")
 
     if code:
-        print(f"  {sphinx} failed, see {logs / SPHINX_LOG}", flush=True)
+        print(f"  {sphinx} failed, see {logs / paths.SPHINX_LOG}", flush=True)
     return code
 
 
 def make_html(env: Mapping[str, str]) -> int:
-    """Documentation/Developer/make.bat html: the output stays on the console."""
+    """Sphinx HTML only, the output stays on the console."""
     sphinx = env.get("SPHINXBUILD") or SPHINX
-    root = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*DEVELOPER)
+    root = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.DEVELOPER_DOCS)
     found = shutil.which(sphinx, path=env.get("PATH"))
-    # make.bat probes the command once and only checks for "not found" (9009)
+    # probed once, only "not found" (9009) counts as missing
     if not found or subprocess.run([sphinx], executable=found, cwd=root, env=env, stdout=subprocess.DEVNULL,
                                    stderr=subprocess.DEVNULL).returncode >= NOT_FOUND:
         print(SPHINX_MISSING, flush=True)
@@ -142,7 +138,7 @@ def build_doxygen(env: Mapping[str, str], logs: Path) -> int:
     shutil.rmtree(output / CODEDOC_FOLDER, ignore_errors=True)
 
     print("Build Doxygen Documentation", flush=True)
-    with open(logs / DOXYGEN_LOG, "w", encoding="utf-8") as out:
+    with open(logs / paths.DOXYGEN_LOG, "w", encoding="utf-8") as out:
         out.write(f"Output Path      = {output}\n")
         out.write(f"MATHJAX_REL_PATH = {mathjax}\n")
         out.write(_stamp("Started at: ") + "\n")
@@ -158,7 +154,7 @@ def build_doxygen(env: Mapping[str, str], logs: Path) -> int:
         print(f"  {source} was not produced", flush=True)
 
     if code:
-        print(f"  {DOXYGEN} failed, see {logs / DOXYGEN_LOG}", flush=True)
+        print(f"  {DOXYGEN} failed, see {logs / paths.DOXYGEN_LOG}", flush=True)
     return code
 
 
@@ -171,7 +167,7 @@ def build_documentation(env: Mapping[str, str] | None = None, mode: str = "BOTH"
     if mode == "HTML":
         return make_html(env)
 
-    logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*LOG_DIR)
+    logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.BUILD_AND_TEST)
     logs.mkdir(parents=True, exist_ok=True)
     failed = 0
 

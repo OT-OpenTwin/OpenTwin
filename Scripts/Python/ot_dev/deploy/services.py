@@ -18,7 +18,7 @@ import subprocess
 import time
 from typing import Callable
 
-from .platform import WINDOWS
+from ..core.platform import WINDOWS
 
 PROCESSES = ("open_twin.exe", "PythonExecution.exe", "uiFrontend.exe", "httpd.exe")
 
@@ -33,10 +33,6 @@ def _pids(name: str) -> list[str]:
                             capture_output=True, text=True, errors="replace")
     return [row[1] for row in csv.reader((result.stdout or "").splitlines())
             if len(row) > 1 and row[0].lower() == name.lower()]
-
-
-def _running(name: str) -> bool:
-    return bool(_pids(name))
 
 
 def _require_windows() -> None:
@@ -57,7 +53,7 @@ def _await(report: Callable[[str], None]) -> None:
     remaining = _pids(AWAITED)
     if remaining:
         report(f"waiting for {AWAITED} to exit (pid {' '.join(remaining)})")
-        while _running(AWAITED):
+        while _pids(AWAITED):
             time.sleep(1)
 
 

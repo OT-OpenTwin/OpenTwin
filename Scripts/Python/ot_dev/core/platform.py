@@ -13,12 +13,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-"""Platform specifics for the OpenTwin build scripts.
-
-TODO(linux): path separators are not handled here on purpose.
-OT_ALL_DLLD is read both as a CMake list (";" everywhere)
-and as a PATH (":" on Linux), so it needs splitting, not a separator swap.
-"""
+# TODO(linux): path separators are not handled here on purpose.
+# OT_ALL_DLLD is read both as a CMake list (";" everywhere)
+# and as a PATH (":" on Linux), so it needs splitting, not a separator swap.
 
 import os
 import shutil
@@ -28,6 +25,8 @@ from typing import Mapping
 WINDOWS = os.name == "nt"
 
 SYSTEM = "windows" if WINDOWS else "linux"
+
+EXE = ".exe" if WINDOWS else ""
 
 # Applied to build subprocesses.
 ENV_VARS: dict[str, str] = {"VSLANG": "1033"} if WINDOWS else {}
@@ -60,7 +59,7 @@ def _devenv_tool(env: Mapping[str, str], name: str) -> Path:
 
 
 def cmake_executable(env: Mapping[str, str]) -> Path:
-    """Locate cmake. Windows uses the copy shipped with Visual Studio."""
+    """Windows uses the cmake shipped with Visual Studio."""
     if WINDOWS:
         return _devenv_tool(env, "cmake.exe")
 
@@ -72,8 +71,8 @@ def cmake_executable(env: Mapping[str, str]) -> Path:
 
 
 def ctest_executable(env: Mapping[str, str]) -> Path:
-    """Locate ctest, from the same bundle as cmake_executable. A bare ctest on
-    PATH can resolve to an unrelated standalone CMake install."""
+    """From the same bundle as cmake_executable. A bare ctest on PATH can
+    resolve to an unrelated standalone CMake install."""
     if WINDOWS:
         return _devenv_tool(env, "ctest.exe")
 

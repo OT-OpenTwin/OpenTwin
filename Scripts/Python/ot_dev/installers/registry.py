@@ -13,23 +13,19 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-from pathlib import Path
-from typing import Sequence
+"""Read-only registry lookups."""
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from ..core.platform import WINDOWS
 
-from ot_dev import cli
-from ot_dev.builds.certificates import create_local_certificates
+# TODO(linux): NSIS and 7-Zip are found through the Windows registry.
+if WINDOWS:
+    import winreg
 
 
-def main(argv: Sequence[str]) -> int:
-    if argv:
-        raise SystemExit("usage: certificates.py")
-
-    return create_local_certificates(os.environ)
-
-
-if __name__ == "__main__":
-    sys.exit(cli.run(main, sys.argv[1:]))
+def read_value(root: str, key: str, name: str) -> str:
+    """The value as text, or "" when the key or value is missing. Opens the key with KEY_READ only."""
+    try:
+        with winreg.OpenKey(getattr(winreg, root), key, 0, winreg.KEY_READ) as handle:
+            return str(winreg.QueryValueEx(handle, name)[0])
+    except OSError:
+        return ""

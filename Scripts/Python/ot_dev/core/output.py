@@ -13,23 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import os
-import sys
-from pathlib import Path
-from typing import Sequence
+SEPARATOR = "=" * 90
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
-
-from ot_dev import cli
-from ot_dev.builds.certificates import create_local_certificates
+# CheckForFailedBuilds and the build server look for this text in the summary.
+FAILED_BUILD = "Build failed"
 
 
-def main(argv: Sequence[str]) -> int:
-    if argv:
-        raise SystemExit("usage: certificates.py")
-
-    return create_local_certificates(os.environ)
+def build_result(target: str, code: int) -> str:
+    return f"--- Build {'successful' if code == 0 else 'failed'}: {target} ---\n"
 
 
-if __name__ == "__main__":
-    sys.exit(cli.run(main, sys.argv[1:]))
+def finish(failed: bool) -> None:
+    print("---", flush=True)
+    print("FAILED" if failed else "SUCCESS", flush=True)

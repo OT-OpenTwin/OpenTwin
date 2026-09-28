@@ -15,17 +15,21 @@
 
 import os
 from pathlib import Path
+from typing import Iterable
 
 from .config import definitions
 from .expansion import expand, load_module
 from .platform import REQUIRED as PLATFORM_REQUIRED
 
 
-def check_required() -> None:
-    required = list(definitions.REQUIRED) + PLATFORM_REQUIRED
-    missing = [name for name in required if not os.environ.get(name)]
+def require(names: Iterable[str]) -> None:
+    missing = [name for name in names if not os.environ.get(name)]
     if missing:
         raise SystemExit("Please specify the following environment variables: " + ", ".join(missing))
+
+
+def check_required() -> None:
+    require(list(definitions.REQUIRED) + PLATFORM_REQUIRED)
 
 
 def _thirdparty(env: dict[str, str], third: Path) -> None:

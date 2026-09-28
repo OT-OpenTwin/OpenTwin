@@ -17,7 +17,7 @@ from pathlib import Path
 
 from .expansion import load_module
 
-SCRIPTS = Path(__file__).resolve().parents[2]
+SCRIPTS = Path(__file__).resolve().parents[3]
 
 definitions = load_module("SetupEnvironment", SCRIPTS / "SetupEnvironment.py")
 manifest = load_module("DeploymentManifest", SCRIPTS / "DeploymentManifest.py")

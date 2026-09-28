@@ -17,10 +17,12 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
 
-from .actions import SEPARATOR, build_project, clean_project, test_project
-from .cli import terminate_requested
-from .projects import project_roots, resolve_root
-from .toolchain import apply_toolchain
+from ..core import paths
+from ..core.cli import terminate_requested
+from ..core.output import SEPARATOR
+from ..core.projects import project_roots, resolve_root
+from ..core.toolchain import apply_toolchain
+from .project import build_project, clean_project, test_project
 
 Step = Callable[[dict[str, str], Sequence[str], bool, Path], int]
 Overrides = Mapping[str, tuple[Sequence[str], bool]]
@@ -31,7 +33,7 @@ def _summary(path: Path, configs: Sequence[str], logs: Path, started: datetime,
     lines = [f"Build started at: {started:%Y-%m-%d %H:%M:%S}",
              f"Build ended at:   {finished:%Y-%m-%d %H:%M:%S}", ""]
     for config in configs:
-        log = logs / f"buildlog_{config.capitalize()}.txt"
+        log = logs / paths.build_log(config)
         lines += [SEPARATOR, f"{config.capitalize()} Builds", SEPARATOR]
         if log.is_file():
             lines += [line for line in log.read_text(encoding="utf-8", errors="replace").splitlines()
@@ -76,7 +78,7 @@ def build_all(env: dict[str, str], order: Sequence[str], overrides: Overrides,
     logs = Path(logs)
     logs.mkdir(parents=True, exist_ok=True)
     for config in configs:
-        (logs / f"buildlog_{config.capitalize()}.txt").unlink(missing_ok=True)
+        (logs / paths.build_log(config)).unlink(missing_ok=True)
 
     env = apply_toolchain(dict(env))
     steps = _resolve(env, order, overrides, special)
@@ -103,11 +105,11 @@ def build_all(env: dict[str, str], order: Sequence[str], overrides: Overrides,
 
 
 def testable_projects(env: Mapping[str, str]) -> list[str]:
-    """Project tokens that have tests, derived rather than listed. A project is
-    testable exactly when ot_add_test() would add its tests/ subdirectory."""
+    """A project is testable when ot_add_test() would add its tests/ subdirectory."""
+    roots = project_roots()
     found = []
-    for key in sorted(project_roots()):
-        root = env.get(project_roots()[key])
+    for key in sorted(roots):
+        root = env.get(roots[key])
         if root and (Path(root) / "tests" / "CMakeLists.txt").is_file():
             found.append(key)
     return found
@@ -118,7 +120,7 @@ def test_all(env: Mapping[str, str], projects: Sequence[str], configs: Sequence[
     logs = Path(logs)
     logs.mkdir(parents=True, exist_ok=True)
     for config in configs:
-        (logs / f"testlog_{config.capitalize()}.txt").unlink(missing_ok=True)
+        (logs / paths.test_log(config)).unlink(missing_ok=True)
 
     started = datetime.now()
     failed: list[str] = []

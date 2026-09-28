@@ -13,24 +13,30 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import sys
-from pathlib import Path
+"""The OpenTwin developer rail.
 
-_ROOT = str(Path(__file__).resolve().parent.parent)
-if _ROOT not in sys.path:
-    sys.path.insert(0, _ROOT)
+core/        environment, configuration, shared paths and process handling
+builds/      CMake projects, the framework, the admin panel, RebuildAll
+deploy/      deployment plans and the running services
+docs/        Sphinx and Doxygen
+tools/       editors, 7-Zip, external programs, the URL protocol
+installers/  the NSIS installers
+"""
 
-from .actions import build_project, clean_project, launch_editor, run_program, test_project
-from .admin_panel import build_admin_panel
-from .batch import build_all, clean_all, test_all, testable_projects
-from .deployment import (create_build_information, create_debug_files, create_deployment,
-                         create_frontend_installer, update_libraries)
-from .documentation import build_documentation
-from .environment import build_env, check_required
-from .framework import build_framework
-from .projects import project_roots, resolve_root
-from .services import shutdown_all
-from .toolchain import apply_toolchain
+from .builds.admin_panel import build_admin_panel
+from .builds.batch import build_all, clean_all, test_all, testable_projects
+from .builds.framework import build_framework
+from .builds.project import build_project, clean_project, test_project
+from .core import cli  # the entry scripts use `from ot_dev import cli`
+from .core.environment import build_env, check_required
+from .core.process import run_program
+from .core.projects import project_roots, resolve_root
+from .core.toolchain import apply_toolchain
+from .deploy.deployment import (create_build_information, create_debug_files, create_deployment,
+                                create_frontend_installer, update_libraries)
+from .deploy.services import shutdown_all
+from .docs.documentation import build_documentation
+from .tools.editor import launch_editor
 
 __all__ = [
     "apply_toolchain",
