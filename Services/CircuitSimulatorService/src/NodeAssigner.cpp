@@ -78,7 +78,7 @@ void NodeAssigner::traverseFromGND(
 	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
 	std::string _startingElement, int _counter,
 	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities,
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
 	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
 	const std::string& _editorname, Circuit& _circuit,
 	std::set<ot::UID>& _visitedElements)
@@ -183,7 +183,7 @@ void NodeAssigner::traverseFromVoltageSource(
 	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
 	std::string _startingElement, int _counter,
 	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities,
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
 	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
 	const std::string& _editorname, Circuit& _circuit,
 	std::set<ot::UID>& _visitedElements)
@@ -285,7 +285,7 @@ void NodeAssigner::traverseFromVoltageSource(
 void NodeAssigner::handleWithConnectors(
 	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
 	ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities,
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
 	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
 	const std::string& _editorname, Circuit& _circuit,
 	std::set<ot::UID>& _visitedElements)
@@ -326,117 +326,117 @@ void NodeAssigner::handleWithConnectors(
 	}
 }
 
-void NodeAssigner::assignNodeNumber(Connection& _connection)
+std::string NodeAssigner::getAssignedNodeNumber(ot::UID _uid, const std::string& _connectable) const
 {
-	if (isGNDConnection(_connection.getOriginConnectable()) ||
-		isGNDConnection(_connection.getDestinationConnectable()))
+	auto appInstance = Application::instance();
+	if (appInstance->extractStringAfterDelimiter(_connectable, '/', 2).find("Connector") != std::string::npos)
 	{
-		auto connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getDestinationUid(), _connection.getDestinationConnectable() });
-		if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
+		for (const auto& pair : m_connectionNodeNumbers)
 		{
-			_connection.setNodeNumber(connectionWithNodeNumber->second);
-			m_connectionNodeNumbers[{_connection.getOriginUid(), _connection.getOriginConnectable()}] = _connection.getNodeNumber();
-		}
-		else
-		{
-			connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getOriginUid(), _connection.getOriginConnectable() });
-			if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
+			if (pair.first.first == _uid)
 			{
-				_connection.setNodeNumber(connectionWithNodeNumber->second);
-				m_connectionNodeNumbers[{_connection.getDestinationUid(), _connection.getDestinationConnectable()}] = _connection.getNodeNumber();
-			}
-			else
-			{
-				_connection.setNodeNumber("0");
-				m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-				m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
+				return pair.second;
 			}
 		}
 	}
 	else
 	{
-		auto connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getDestinationUid(), _connection.getDestinationConnectable() });
-		if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
+		auto it = m_connectionNodeNumbers.find({ _uid, _connectable });
+		if (it != m_connectionNodeNumbers.end())
 		{
-			_connection.setNodeNumber(connectionWithNodeNumber->second);
-			m_connectionNodeNumbers[{_connection.getOriginUid(), _connection.getOriginConnectable()}] = _connection.getNodeNumber();
+			return it->second;
+		}
+	}
+	return "";
+}
+
+void NodeAssigner::assignNodeNumber(Connection& _connection)
+{
+	std::string nodeNumDest = getAssignedNodeNumber(_connection.getDestinationUid(), _connection.getDestinationConnectable());
+	std::string nodeNumOrigin = getAssignedNodeNumber(_connection.getOriginUid(), _connection.getOriginConnectable());
+
+	if (isGNDConnection(_connection.getOriginConnectable()) ||
+		isGNDConnection(_connection.getDestinationConnectable()))
+	{
+		if (!nodeNumDest.empty())
+		{
+			_connection.setNodeNumber(nodeNumDest);
+		}
+		else if (!nodeNumOrigin.empty())
+		{
+			_connection.setNodeNumber(nodeNumOrigin);
 		}
 		else
 		{
-			connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getOriginUid(), _connection.getOriginConnectable() });
-			if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
-			{
-				_connection.setNodeNumber(connectionWithNodeNumber->second);
-				m_connectionNodeNumbers[{_connection.getDestinationUid(), _connection.getDestinationConnectable()}] = _connection.getNodeNumber();
-			}
-			else
-			{
-				_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
-				m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-				m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
-			}
+			_connection.setNodeNumber("0");
 		}
 	}
+	else
+	{
+		if (!nodeNumDest.empty())
+		{
+			_connection.setNodeNumber(nodeNumDest);
+		}
+		else if (!nodeNumOrigin.empty())
+		{
+			_connection.setNodeNumber(nodeNumOrigin);
+		}
+		else
+		{
+			_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
+		}
+	}
+
+	m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
+	m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
 }
 
 void NodeAssigner::assignNodeNumberForGndVoltageSource(Connection& _connection, ot::UID _startingElementUID)
 {
+	std::string nodeNumDest = getAssignedNodeNumber(_connection.getDestinationUid(), _connection.getDestinationConnectable());
+	std::string nodeNumOrigin = getAssignedNodeNumber(_connection.getOriginUid(), _connection.getOriginConnectable());
+
 	if (isGndVoltageSourceConnection(_connection.getOriginConnectable(), _startingElementUID, _connection.getOriginUid()) ||
 		isGndVoltageSourceConnection(_connection.getDestinationConnectable(), _startingElementUID, _connection.getDestinationUid()))
 	{
-		auto connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getDestinationUid(), _connection.getDestinationConnectable() });
-		if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
+		if (!nodeNumDest.empty())
 		{
-			_connection.setNodeNumber(connectionWithNodeNumber->second);
-			m_connectionNodeNumbers[{_connection.getOriginUid(), _connection.getOriginConnectable()}] = _connection.getNodeNumber();
+			_connection.setNodeNumber(nodeNumDest);
+		}
+		else if (!nodeNumOrigin.empty())
+		{
+			_connection.setNodeNumber(nodeNumOrigin);
 		}
 		else
 		{
-			connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getOriginUid(), _connection.getOriginConnectable() });
-			if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
-			{
-				_connection.setNodeNumber(connectionWithNodeNumber->second);
-				m_connectionNodeNumbers[{_connection.getDestinationUid(), _connection.getDestinationConnectable()}] = _connection.getNodeNumber();
-			}
-			else
-			{
-				_connection.setNodeNumber("0");
-				m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-				m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
-			}
+			_connection.setNodeNumber("0");
 		}
 	}
 	else
 	{
-		auto connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getDestinationUid(), _connection.getDestinationConnectable() });
-		if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
+		if (!nodeNumDest.empty())
 		{
-			_connection.setNodeNumber(connectionWithNodeNumber->second);
-			m_connectionNodeNumbers[{_connection.getOriginUid(), _connection.getOriginConnectable()}] = _connection.getNodeNumber();
+			_connection.setNodeNumber(nodeNumDest);
+		}
+		else if (!nodeNumOrigin.empty())
+		{
+			_connection.setNodeNumber(nodeNumOrigin);
 		}
 		else
 		{
-			connectionWithNodeNumber = m_connectionNodeNumbers.find({ _connection.getOriginUid(), _connection.getOriginConnectable() });
-			if (connectionWithNodeNumber != m_connectionNodeNumbers.end())
-			{
-				_connection.setNodeNumber(connectionWithNodeNumber->second);
-				m_connectionNodeNumbers[{_connection.getDestinationUid(), _connection.getDestinationConnectable()}] = _connection.getNodeNumber();
-			}
-			else
-			{
-				_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
-				m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-				m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
-			}
+			_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
 		}
 	}
+
+	m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
+	m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
 }
 
 void NodeAssigner::setNodeNumbersOfVoltageSource(
 	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
 	std::string _startingElement, int _counter,
 	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities,
+	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
 	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
 	const std::string& _editorname, Circuit& _circuit,
 	std::set<ot::UID>& _visitedElements)
@@ -487,7 +487,7 @@ bool NodeAssigner::isVisited(std::set<ot::UID>& _visited, ot::UID _uid)
 	}
 }
 
-Connection NodeAssigner::createConnection(std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnections, ot::UID _connectionUID)
+Connection NodeAssigner::createConnection(const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnections, ot::UID _connectionUID)
 {
 	auto it = _allConnections.find(_connectionUID);
 	if (it != _allConnections.end())

@@ -54,19 +54,20 @@ private:
 	const std::string m_voltageMeterTitle = "Voltage Meter";
 
 	// Graph traversal (moved from NGSpice)
-	void traverseFromGND(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
+	void traverseFromGND(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
 
-	void traverseFromVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
+	void traverseFromVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
 
-	void handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
+	void handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
 
-	void setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
+	void setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
 
+	std::string getAssignedNodeNumber(ot::UID _uid, const std::string& _connectable) const;
 	void assignNodeNumber(Connection& _connection);
 	void assignNodeNumberForGndVoltageSource(Connection& _connection, ot::UID _startingElementUID);
 
 	bool isVisited(std::set<ot::UID>& _visited, ot::UID _uid);
-	Connection createConnection(std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>> _allConnections, ot::UID _connectionUID);
+	Connection createConnection(const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnections, ot::UID _connectionUID);
 	bool isGNDConnection(const std::string& _pole) const;
 	bool isGndVoltageSourceConnection(const std::string& _pole, ot::UID _voltageSourceUID, ot::UID _elementUID) const;
 
