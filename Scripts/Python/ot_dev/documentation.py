@@ -16,6 +16,7 @@
 import os
 import shutil
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Mapping, TextIO
@@ -41,7 +42,17 @@ BUILD_DIR = "_build"
 # BuildDocumentation.bat builds the MathJax path six levels up from the code docs.
 MATHJAX_DEPTH = 6
 
-MODES = ("BOTH", "SPHINX", "DOXYGEN")
+MODES = ("BOTH", "SPHINX", "DOXYGEN", "HTML")
+NOT_FOUND = 9009
+
+SPHINX_MISSING = """
+The 'sphinx-build' command was not found. Make sure you have Sphinx
+installed, then set the SPHINXBUILD environment variable to point
+to the full path of the 'sphinx-build' executable. Alternatively you
+may add the Sphinx directory to PATH.
+
+If you don't have Sphinx installed, grab it from
+https://www.sphinx-doc.org/"""
 
 
 def _stamp(label: str) -> str:
@@ -97,6 +108,23 @@ def build_sphinx(env: Mapping[str, str], logs: Path) -> int:
     return code
 
 
+def make_html(env: Mapping[str, str]) -> int:
+    """Documentation/Developer/make.bat html: the output stays on the console."""
+    sphinx = env.get("SPHINXBUILD") or SPHINX
+    root = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*DEVELOPER)
+    found = shutil.which(sphinx, path=env.get("PATH"))
+    # make.bat probes the command once and only checks for "not found" (9009)
+    if not found or subprocess.run([sphinx], executable=found, cwd=root, env=env, stdout=subprocess.DEVNULL,
+                                   stderr=subprocess.DEVNULL).returncode >= NOT_FOUND:
+        print(SPHINX_MISSING, flush=True)
+        return 1
+
+    options = f"{env.get('SPHINXOPTS', '')} {env.get('O', '')}".split()
+    sys.stdout.flush()
+    return subprocess.run([sphinx, "-M", "html", ".", BUILD_DIR, *options], executable=found,
+                          cwd=root, env=env).returncode
+
+
 def build_doxygen(env: Mapping[str, str], logs: Path) -> int:
     dev = Path(env["OPENTWIN_DEV_ROOT"])
     output = _codedoc_root(env)
@@ -140,6 +168,9 @@ def build_documentation(env: Mapping[str, str] | None = None, mode: str = "BOTH"
         raise SystemExit(f"Unknown mode '{mode}'. Known: " + ", ".join(MODES))
 
     env = dict(env if env is not None else build_env())
+    if mode == "HTML":
+        return make_html(env)
+
     logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*LOG_DIR)
     logs.mkdir(parents=True, exist_ok=True)
     failed = 0

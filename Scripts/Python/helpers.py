@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import sys
 from pathlib import Path
 from typing import Callable, Mapping, Sequence
@@ -24,6 +25,10 @@ from ot_dev.expansion import get
 from ot_dev.platform import WINDOWS
 
 SUFFIX = ".exe" if WINDOWS else ""
+
+# TODO(linux): the URL protocol is registered in the Windows registry.
+if WINDOWS:
+    import winreg
 
 # TODO(linux): 7-Zip, Qt Creator, Visual Studio and the legacy Python are Windows installs.
 SEVEN_ZIP = ("7-Zip", "Win64", "7z" + SUFFIX)
@@ -57,6 +62,14 @@ LARGE_FILES = (
 )
 
 BATCH_ARGUMENTS = 9
+
+BUILD_SUMMARY = ("Scripts", "BuildAndTest", "buildLog_Summary.txt")
+FAILED_BUILD = "Build failed"
+FAILED_BUILD_MESSAGE = ("Add-Type -AssemblyName PresentationFramework;"
+                        "[System.Windows.MessageBox]::Show('Project(s) have failed in build process')")
+
+FRONTEND = ("Deployment", "uiFrontend.exe")
+SCHEME_KEY = r"Software\Classes\OpenTwin"
 
 
 def _qt_env(env: Mapping[str, str], qt6_dir: bool) -> list[str]:
@@ -171,6 +184,64 @@ def run_python(env: Mapping[str, str], arguments: Sequence[str]) -> int:
                              "python", *arguments[:BATCH_ARGUMENTS]])
 
 
+def check_failed_builds(env: Mapping[str, str]) -> int:
+    summary = Path(get(env, "OPENTWIN_DEV_ROOT")).joinpath(*BUILD_SUMMARY)
+    if summary.is_file():
+        failed = [line for line in summary.read_text(encoding="utf-8", errors="replace").splitlines()
+                  if FAILED_BUILD in line]
+        for line in failed:
+            print(line, flush=True)
+    else:
+        # the batch reported a missing summary as a failed build
+        print("The system cannot find the file specified.", file=sys.stderr, flush=True)
+        failed = [str(summary)]
+    if failed:
+        os.chdir(summary.parent)
+        run_program(env, ["PowerShell", "-Command", FAILED_BUILD_MESSAGE])
+    return 0
+
+
+def _register(key: str, name: str, value: str) -> None:
+    with winreg.CreateKey(winreg.HKEY_CURRENT_USER, key) as handle:
+        winreg.SetValueEx(handle, name, 0, winreg.REG_SZ, value)
+    print("The operation completed successfully.", flush=True)
+
+
+def register_scheme(env: Mapping[str, str]) -> int:
+    print("Registering OpenTwin URL protocol...", flush=True)
+    frontend = Path(get(env, "OPENTWIN_DEV_ROOT")).joinpath(*FRONTEND)
+    if not frontend.exists():
+        print("ERROR: OpenTwin executable not found:", flush=True)
+        print(f'       "{frontend}"', flush=True)
+        return 1
+
+    print("Executable:")
+    print(f'  "{frontend}"')
+    print(flush=True)
+
+    try:
+        _register(SCHEME_KEY, "", "URL:OpenTwin Protocol")
+        _register(SCHEME_KEY, "URL Protocol", "")
+        _register(SCHEME_KEY + r"\DefaultIcon", "", f'"{frontend}",0')
+        _register(SCHEME_KEY + r"\shell\open\command", "", f'"{frontend}" "%1"')
+    except OSError as error:
+        print(error, file=sys.stderr)
+        print()
+        print("ERROR: Failed to register OpenTwin URL protocol.", flush=True)
+        return 1
+
+    print()
+    print("Successfully registered:")
+    print("  opentwin://")
+    print()
+    print("Command:")
+    print(f'  "{frontend}" "%1"')
+    print()
+    print("You can test it with:")
+    print('  start "" "opentwin://open?project=test"', flush=True)
+    return 0
+
+
 def _argument(arguments: Sequence[str], index: int) -> str | None:
     return arguments[index] if len(arguments) > index else None
 
@@ -188,14 +259,20 @@ COMMANDS: dict[str, Callable[[Mapping[str, str], Sequence[str]], int]] = {
     "run-devenv": run_devenv,
     "build-solution": lambda env, a: build_solution(env, a[0], a[1:]),
     "run-python": run_python,
+    "check-failed-builds": lambda env, a: check_failed_builds(env),
+    "register-scheme": lambda env, a: register_scheme(env),
 }
+
+# Commands that only need the caller's environment, like their batch files did.
+PLAIN = {"check-failed-builds", "register-scheme"}
 
 
 def main(argv: Sequence[str]) -> int:
     if not argv or argv[0] not in COMMANDS:
         raise SystemExit("usage: helpers.py <" + "|".join(COMMANDS) + "> [ARGS...]")
 
-    return COMMANDS[argv[0]](cli.environment(), argv[1:])
+    env = dict(os.environ) if argv[0] in PLAIN else cli.environment()
+    return COMMANDS[argv[0]](env, argv[1:])
 
 
 if __name__ == "__main__":

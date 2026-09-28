@@ -57,7 +57,7 @@ def _install_qt_conf(dev: Path, root: Path, target: str) -> None:
     source = dev.joinpath(*QT_CONF)
     destination = root / "target" / target
     if source.is_file() and destination.is_dir():
-        shutil.copy(source, destination / "qt.conf")
+        shutil.copy2(source, destination / "qt.conf")
 
 
 def build_framework(env: Mapping[str, str], configs: Sequence[str],

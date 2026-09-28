@@ -24,7 +24,7 @@ from ot_dev import build_documentation, cli
 
 def main(argv: Sequence[str]) -> int:
     if len(argv) > 1:
-        raise SystemExit("usage: build_documentation.py [BOTH|SPHINX|DOXYGEN]")
+        raise SystemExit("usage: build_documentation.py [BOTH|SPHINX|DOXYGEN|HTML]")
 
     return build_documentation(mode=cli.argument(argv, 0) or "BOTH")
 

@@ -231,14 +231,16 @@ def _build_information(progress: Progress) -> tuple[bool, str]:
 
 
 def _build_all(progress: Progress) -> tuple[bool, str]:
-    """CreateDebugFiles.bat calls BuildAll.bat, which is RebuildAll.bat BOTH BUILD."""
+    """CreateDebugFiles.bat calls BuildAll.bat: RebuildAll.bat BOTH BUILD, then CheckForFailedBuilds.bat."""
     import build_all as script
+    import helpers
 
     from . import cli
 
     env = build_env()
     logs = Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*script.LOG_DIR)
     code = script.rebuild_all(env, cli.configurations("BOTH"), cli.build_type("BUILD"))
+    helpers.check_failed_builds(env)
     return code == 0, f"build all returned {code}, see {logs}"
 
 
