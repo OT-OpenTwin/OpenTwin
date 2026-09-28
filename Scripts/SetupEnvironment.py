@@ -13,7 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Platform-specific additions live in opentwin/platform.py REQUIRED.
+# Platform-specific additions live in ot_dev/core/platform.py REQUIRED.
 REQUIRED = ["OPENTWIN_DEV_ROOT", "OPENTWIN_THIRDPARTY_ROOT"]
 
 # ===== Services =====
