@@ -27,12 +27,13 @@ TOOLS = {
 }
 ```
 
-[!IMPORTANT] For full paths with reference to other set variables, please use pythons r-strings:
-[!IMPORTANT] To reference a different variable: `%VARIABLE%`
-
-```python
-    r"%OPENTWIN_DEV_ROOT%\Deployment",
-```
+> [!IMPORTANT]
+> For full paths with reference to other set variables, please use pythons r-strings.
+> To reference a different variable: `%VARIABLE%`
+>
+> ```python
+> r"%OPENTWIN_DEV_ROOT%\Deployment",
+> ```
 
 
 ## DeploymentManifest.py
