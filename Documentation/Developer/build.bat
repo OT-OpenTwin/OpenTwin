@@ -1,22 +1,12 @@
 @ECHO OFF
 
-REM This script requires the following environment variables to be set:
-REM 1. OPENTWIN_DEV_ROOT
-REM 2. OPENTWIN_THIRDPARTY_ROOT
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto END
+	PAUSE
+	EXIT /B 1
 )
 
-IF "%OPENTWIN_THIRDPARTY_ROOT%" == "" (
-	ECHO Please specify the following environment variables: OPENTWIN_THIRDPARTY_ROOT
-	goto END
-)
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-REM Setup eviroment
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
-
-CALL "%OPENTWIN_DEV_ROOT%\Documentation\Developer\make.bat" html
-
-:END
-
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build_documentation.py" HTML
+IF ERRORLEVEL 1 PAUSE

@@ -223,6 +223,6 @@ environment variables and wires it up generically:
 * link libs: ``<TOKEN>_LIBD`` / ``<TOKEN>_LIBR`` (or a single ``<TOKEN>_LIB``)
 
 So a simple new third party dependency can often be added just by defining those
-variables in ``SetupEnvironment.bat`` and using the token, with no change to
+variables in the ThirdParty ``SetupEnvironment.py`` and using the token, with no change to
 ``OTProject.cmake``. For anything less regular, add a branch in
 ``_ot_apply_dep_to_core`` and ``_ot_apply_dep_to_final``.

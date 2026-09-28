@@ -19,7 +19,7 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
        including it also applies the global MSVC compile flags, the common
        definitions and the default runtime library.
    * - ``OTEnvironment.cmake``
-     - Reads the OpenTwin environment variables that ``SetupEnvironment.bat``
+     - Reads the OpenTwin environment variables that ``SetupEnvironment.py``
        sets and exposes them as CMake variables and path helpers.
    * - ``OTQt.cmake``
      - Finds Qt 6 and defines the imported ``Qt6::*`` targets used by the
@@ -31,13 +31,13 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
        are defined in one place.
 
 A project finds the meta system through the ``OT_CMAKE_DIR`` environment
-variable, which points at ``Scripts/CMake``. ``SetupEnvironment.bat`` exports it
+variable, which points at ``Scripts/CMake``. ``SetupEnvironment.py`` exports it
 together with the per project root variables (``OT_<NAME>_ROOT``) and the third
 party paths.
 
 .. note::
    The System depends on the set environment variable ``OT_CMAKE_DIR``, which is defined in the
-   ``SetupEnvironment.bat`` of OpenTwin.
+   ``Scripts/SetupEnvironment.py`` of OpenTwin.
    If unset, CMake wont be able to find all the CMake scripts defined in ``/Scripts/CMake`` as well as the presets.
 
 The two target model: ``_core`` plus the final target

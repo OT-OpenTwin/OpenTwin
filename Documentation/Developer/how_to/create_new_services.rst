@@ -24,7 +24,7 @@ The easiest way to create a new service for OpenTwin is to use the service templ
        #. `*.vcxproj.user`
 
     #. If the project folder contains the folder “.vs” and/or “x64”, delete them with all their contents
-    #. Create a new environment variable for the service in the Scripts/SetupEnvironment.bat file
+    #. Create a new environment variable for the service in the Scripts/SetupEnvironment.py file
     #. Replace the project path in all batch files so that the new environment variable is used
     #. Now you can open the project by running the edit.bat file.
     #. Create new macros for the service in OpenTwinCommunication/ActionTypes.h.
