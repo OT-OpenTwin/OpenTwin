@@ -1,19 +1,12 @@
 @ECHO OFF
 
-REM This script requires the following environment variables to be set:
-REM 1. OPENTWIN_DEV_ROOT
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto PAUSE_END
+	PAUSE
+	EXIT /B 1
 )
 
-call "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CleanSingleProject.bat %OT_GUI_ROOT%"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-GOTO END
-
-:PAUSE_END
-pause
-GOTO END
-
-:END
-
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\clean.py" GUI
+IF ERRORLEVEL 1 PAUSE

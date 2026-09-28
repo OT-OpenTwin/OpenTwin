@@ -1,23 +1,12 @@
 @ECHO OFF
 
-REM This script requires the following environment variables to be set:
-REM 1. OPENTWIN_DEV_ROOT
 IF "%OPENTWIN_DEV_ROOT%" == "" (
 	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
-	goto PAUSE_END
+	PAUSE
+	EXIT /B 1
 )
 
-REM Setup eviroment
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\SetupEnvironment.bat"
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
-REM Call the build shell
-CALL "%OPENTWIN_DEV_ROOT%\Scripts\BuildAndTest\CMakeBuildSingleProject.bat" "%OT_BLOCKENTITIES_ROOT%" %1 %2 
-
-GOTO END
-
-:PAUSE_END
-pause
-GOTO END
-
-:END
-
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" BLOCKENTITIES %1 %2
+IF ERRORLEVEL 1 PAUSE
