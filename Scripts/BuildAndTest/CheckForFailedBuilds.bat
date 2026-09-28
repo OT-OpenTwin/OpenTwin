@@ -1,7 +1,11 @@
-@echo off
-findstr /c:"Build failed" < buildLog_Summary.txt
-if %errorlevel%==0 (
-PowerShell -Command "Add-Type -AssemblyName PresentationFramework;[System.Windows.MessageBox]::Show('Project(s) have failed in build process')"
+@ECHO OFF
+
+IF "%OPENTWIN_DEV_ROOT%" == "" (
+	ECHO Please specify the following environment variables: OPENTWIN_DEV_ROOT
+	PAUSE
+	EXIT /B 1
 )
 
-::pause
+CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
+
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" check-failed-builds
