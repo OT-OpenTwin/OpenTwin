@@ -4,9 +4,9 @@
 
 This single script module is the central environment setter.
 In there you can set and change or delete various development related environment variables.
-Each development 'Section' is divied by a **python dictionary**. E.g. 
+Each development 'Section' is divided by a **python dictionary**.
 
-- To correctly set a new variable:
+**To correctly set a new variable:**
 
 1. As the key, set the variable name.
 2. As the value, set the path or the name of the Service/Library/Tools directory (The system automatically resolves the path for these cases).
@@ -27,8 +27,8 @@ TOOLS = {
 }
 ```
 
-! For full paths with reference to other set variables, please use pythons r-strings:
-! To reference a different variable: `%VARIABLE%`
+[!IMPORTANT] For full paths with reference to other set variables, please use pythons r-strings:
+[!IMPORTANT] To reference a different variable: `%VARIABLE%`
 
 ```python
     r"%OPENTWIN_DEV_ROOT%\Deployment",
@@ -71,7 +71,7 @@ This module resembles the batch functions of the old batch system.
 
 ## BuildOrder.py
 
-The planned build order of the `BuidlAll` script.
+The planned build order of the `BuildAll` script.
 
 Add or change the build order by changing the `BUILD_ORDER` list.
 A correct list entry should only be the key of a environment variable:
