@@ -18,7 +18,6 @@
 Add a new project's key here, after everything it depends on.
 """
 
-# Dependency order, mirroring Scripts\BuildAndTest\RebuildAll.bat
 BUILD_ORDER: list[str] = [
     "SYSTEM",
     "CORE",
