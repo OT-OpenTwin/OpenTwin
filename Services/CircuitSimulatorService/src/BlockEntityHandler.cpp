@@ -52,6 +52,7 @@
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitGND.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitBehavioralSource.h"
 
 
 // Third Party Header
@@ -151,6 +152,7 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 	a2.addItem(EntityBlockCircuitCurrentMeter::className(), "Current Meter", "CircuitElementImages/CurrentMeter.png");
 
 	a3.addItem(EntityBlockCircuitVoltageSource::className(), "Voltage Source", "CircuitElementImages/VoltageSource.png");
+	a3.addItem(EntityBlockCircuitBehavioralSource::className(), "Behavioral Source (ASRC)", "CircuitElementImages/VoltageSource.png");
 	
 
 	a4.addItem(EntityBlockCircuitDiode::className(), "Diode", "CircuitElementImages/Diod2.png");

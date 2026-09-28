@@ -1,0 +1,55 @@
+// @otlicense
+// File: EntityBlockCircuitBehavioralSource.h
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
+
+#pragma once
+
+// OpenTwin header
+#include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
+
+class OT_BLOCKENTITIES_API_EXPORT EntityBlockCircuitBehavioralSource : public EntityBlockCircuitElement
+{
+public:
+	EntityBlockCircuitBehavioralSource() : EntityBlockCircuitBehavioralSource(0, nullptr, nullptr, nullptr) {};
+	EntityBlockCircuitBehavioralSource(ot::UID ID, EntityBase* parent, EntityObserver* obs, ModelState* ms);
+
+	static std::string className() { return "EntityBlockCircuitBehavioralSource"; }
+	virtual std::string getClassName(void) const override { return EntityBlockCircuitBehavioralSource::className(); };
+	virtual entityType getEntityType(void) const override { return TOPOLOGY; };
+	virtual void createProperties() override;
+	std::string getSourceType();
+	std::string getExpression();
+	virtual std::string getTypeAbbreviation() override;
+	virtual std::string getFolderName() override;
+
+	virtual ot::GraphicsItemCfg* createBlockCfg() override;
+
+	double getRotation() const;
+	bool getFlipHorizontal() const;
+	bool getFlipVertical() const;
+	const ot::Connector getPositiveConnector() const { return m_PositiveConnector; }
+	const ot::Connector getNegativeConnector() const { return m_NegativeConnector; }
+	virtual bool updateFromProperties(void) override;
+
+private:
+	ot::Connector m_PositiveConnector;
+	ot::Connector m_NegativeConnector;
+
+	void addStorageData(bsoncxx::builder::basic::document& storage) override;
+	void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
+};
