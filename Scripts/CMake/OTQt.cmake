@@ -50,7 +50,7 @@ endfunction()
 
 function(ot_validate_qt_env)
     if(NOT DEFINED ENV{QT_INC} OR "$ENV{QT_INC}" STREQUAL "")
-        message(FATAL_ERROR "QT_INC env var not set (SetupEnvironment.bat not applied?)")
+        message(FATAL_ERROR "QT_INC env var not set (OpenTwin environment not applied?)")
     endif()
 
     if(NOT THIRDPARTY_ROOT_PATH)

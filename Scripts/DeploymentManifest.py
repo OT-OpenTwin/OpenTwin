@@ -506,7 +506,7 @@ def create_frontend_installer(plan) -> None:
 
     # Python
     plan.mkdir('%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments')
-    plan.copy('%OT_PYTHON_ROOT%\\python.exe', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
+    # plan.copy('%OT_PYTHON_ROOT%\\python.exe', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.copy('%OT_PYTHON_BIN%\\Release\\python311.dll', '%OPENTWIN_FRONTEND_DEPLOYMENT%')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\Lib\\*.*', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments\\CoreEnvironment\\Lib\\')
     plan.tree('%OT_PYTHON_ROOT%\\Environments\\CoreEnvironment\\DLLs\\Release\\*.*', '%OPENTWIN_FRONTEND_DEPLOYMENT%\\PythonEnvironments\\CoreEnvironment\\DLLs\\')

@@ -140,7 +140,7 @@ function(_ot_guess_ot_root_envvar OUT_VAR DEP_TOKEN)
     set(${OUT_VAR} "OT_${_snake_u}_ROOT" PARENT_SCOPE)
 endfunction()
 
-# Overrides for exceptions in your SetupEnvironment.bat
+# Overrides for exceptions in your SetupEnvironment.py
 function(_ot_get_ot_root_envvar OUT_VAR DEP_TOKEN)
     if(DEP_TOKEN STREQUAL "OTServiceFoundation")
         set(${OUT_VAR} "OT_FOUNDATION_ROOT" PARENT_SCOPE)
@@ -302,7 +302,7 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
     if(NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "")
         message(FATAL_ERROR
             "ot_initialize_lib/bin(${TARGET_NAME} ...): root path var '${ROOT_PATH_VAR}' is not set. "
-            "Did you run SetupEnvironment.bat and include OTEnvironment.cmake?"
+            "Did you configure through the OpenTwin build scripts and include OTEnvironment.cmake?"
         )
     endif()
 

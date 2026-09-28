@@ -18,7 +18,7 @@ include_guard(GLOBAL)
 # Centralized environment parsing for OpenTwin subprojects
 # Purpose:
 #   - Used by OTProject.cmake to help parse include and link setup
-#   - Read environment variables set by SetupEnvironment.bat
+#   - Read environment variables set by Scripts/SetupEnvironment.py
 #   - Expose parsed values as regular CMake variables
 #
 # Notes:
@@ -148,7 +148,7 @@ endfunction()
 # ============================================================
 if(NOT DEFINED ENV{OPENTWIN_DEV_ENV_DEFINED} OR NOT "$ENV{OPENTWIN_DEV_ENV_DEFINED}" STREQUAL "1")
     message(WARNING
-        "OPENTWIN_DEV_ENV_DEFINED is not 1. Did you run SetupEnvironment.bat before configuring CMake?"
+        "OPENTWIN_DEV_ENV_DEFINED is not 1. Did you configure through the OpenTwin build scripts (Scripts/Python)?"
     )
 endif()
 
@@ -157,7 +157,7 @@ if(NOT DEFINED ENV{OT_CMAKE_DIR} OR "$ENV{OT_CMAKE_DIR}" STREQUAL "")
 endif()
 
 # ============================================================
-# OpenTwin subdir vars from SetupEnvironment.bat
+# OpenTwin subdir vars from SetupEnvironment.py
 # ============================================================
 ot_get_env_path(OT_INC_PATH                       OT_INC)
 ot_get_env_path(OT_SRC_PATH                       OT_SRC)
@@ -168,7 +168,7 @@ ot_get_env_path(OT_CLIBR_PATH                     OT_CLIBR)
 ot_get_env_path(OT_TEST_PATH                      OT_TEST)
 
 # ============================================================
-# OpenTwin service roots from SetupEnvironment.bat
+# OpenTwin service roots from SetupEnvironment.py
 # ============================================================
 ot_get_env_path(OT_AUTHORISATION_SERVICE_ROOT_PATH         OT_AUTHORISATION_SERVICE_ROOT)
 ot_get_env_path(OT_MODEL_SERVICE_ROOT_PATH                 OT_MODEL_SERVICE_ROOT)
@@ -204,7 +204,7 @@ ot_get_env_path(OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT_PATH OT_FILEMANAGEMENT_PR
 ot_get_env_path(OT_OPENEMS_SERVICE_ROOT_PATH              OT_OPENEMS_SERVICE_ROOT)
 
 # ============================================================
-# OpenTwin library roots from SetupEnvironment.bat
+# OpenTwin library roots from SetupEnvironment.py
 # ============================================================
 ot_get_env_path(OT_CADMODELENTITIES_ROOT_PATH         OT_CADMODELENTITIES_ROOT)
 ot_get_env_path(OT_DATASTORAGE_ROOT_PATH              OT_DATASTORAGE_ROOT)
@@ -480,7 +480,7 @@ ot_join_paths(OT_LTSPICECONNECTOR_DEBUG_LIB_DIR   "${OT_LTSPICECONNECTOR_ROOT_PA
 ot_join_paths(OT_LTSPICECONNECTOR_RELEASE_LIB_DIR "${OT_LTSPICECONNECTOR_ROOT_PATH}"     "${OT_LIBR_PATH}")
 
 # ============================================================
-# env vars from SetupEnvironment.bat
+# env vars from SetupEnvironment.py
 # ============================================================
 ot_get_env_path_list(OT_DEFAULT_SERVICE_INCD_LIST     OT_DEFAULT_SERVICE_INCD)
 ot_get_env_path_list(OT_DEFAULT_SERVICE_INCR_LIST     OT_DEFAULT_SERVICE_INCR)
