@@ -19,7 +19,7 @@
 
 #include "OTCore/Logging/Logger.h"
 #include "OTViewer/FrontendAPI.h"
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 #include "OTViewer/Node/SceneNodeBase.h"
 #include "OTViewer/Visualizer/TextVisualiser.h"
 #include "OTViewer/Visualizer/PlotVisualiser.h"

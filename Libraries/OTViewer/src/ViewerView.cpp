@@ -21,7 +21,7 @@
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 #include "OTViewer/Viewer.h"
 #include "OTViewer/ViewerView.h"
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 
 ot::ViewerView::ViewerView(ot::UID _modelID, ot::UID _viewerID, double _scaleWidth, double _scaleHeight, int _backgroundR, int _backgroundG, int _backgroundB, int _overlayTextR, int _overlayTextG, int _overlayTextB, QWidget* _parent)
 	: WidgetView(WidgetViewBase::View3D, _parent)

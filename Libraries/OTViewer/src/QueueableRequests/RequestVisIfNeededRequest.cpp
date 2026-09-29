@@ -1,7 +1,7 @@
 // @otlicense
 
 // OpenTwin header
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 #include "OTViewer/ViewerAPI.h"
 #include "OTViewer/QueueableRequests/RequestVisIfNeededRequest.h"
 

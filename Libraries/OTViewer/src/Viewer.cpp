@@ -50,7 +50,7 @@
 #include "OTViewer/ClipPlaneManipulator.h"
 #include "OTViewer/TransformManipulator.h"
 #include "OTViewer/ViewerObjectSelectionHandler.h"
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 #include "OTViewer/ColorRamp.h"
 
 // Qt header

@@ -32,7 +32,7 @@
 #include "OTViewer/ViewerToolBar.h"
 #include "OTViewer/GlobalFontPath.h"
 #include "OTViewer/PlotManagerView.h"
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 
 namespace ViewerAPI
 {

@@ -20,10 +20,10 @@
 #pragma once
 
 // OpenTwin header
-#include "OTViewer/Intern/ViewerDebug.h"
+#include "OTViewer/Debugging/ViewerDebug.h"
 
-#define OT_UI_USE_CUSTOM_DELETE              false
-#define OT_UI_USE_GLOBAL_EVENT_DBG           false
+#define OT_UI_USE_CUSTOM_DELETE              true
+#define OT_UI_USE_GLOBAL_EVENT_DBG           true
 #define OT_UI_PROJECT_NAVIGATION_DBG_ENABLED false
 
 // 

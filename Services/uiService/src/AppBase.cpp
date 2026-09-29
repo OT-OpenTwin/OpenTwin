@@ -126,6 +126,7 @@
 #include "OTCommunication/ServiceLogNotifier.h"
 
 #include "OTModelEntities/DataBase.h"
+#include "OTModelEntities/Properties/EntityPropertiesItems.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>
@@ -1776,7 +1777,7 @@ bool AppBase::checkForContinue(const std::string& _title)
 	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
 	return true;
 }
-#include "OTModelEntities/Properties/EntityPropertiesItems.h"
+
 void AppBase::setupPropertyGrid(const ot::PropertyGridCfg& _configuration)
 {
 	OTAssertNullptr(m_propertyGrid);
