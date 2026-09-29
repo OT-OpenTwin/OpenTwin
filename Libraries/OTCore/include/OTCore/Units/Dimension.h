@@ -6,7 +6,7 @@ namespace ot
     // Expression of a Quantity as the product of base quantities
     struct  Dimension 
     {
-        // Base quantities
+        // ISQ base quantities: length, mass, time, electric current, thermodynamic temperature, amount of substance and luminous intensity
         int mass = 0, length = 0, time = 0,
             current = 0, temp = 0, amount = 0, intensity = 0, 
             angle = 0; // pseudo-dimension:prevents rad/deg <-> scalar confusion.
