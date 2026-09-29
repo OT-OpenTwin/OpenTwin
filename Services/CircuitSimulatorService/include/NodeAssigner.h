@@ -40,6 +40,8 @@ public:
 	NodeAssigner() = default;
 
 	// @brief Assigns node numbers to connections in a circuit based on the provided connection block map and entity information.
+	// @brief This class uses a union-find algorithm to efficiently manage connected components and assign node numbers accordingly.
+	// @brief How this method works: It goes through all connections and uses union-find to group connectables. It then handles connectors and treats all connectables connected to a connector as one set. Finally, it traverses the graph from GND and voltage sources to assign node numbers.
 	void assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname);
 
 	// @brief Resets the node assigner state (node counter and node number map).
@@ -47,30 +49,24 @@ public:
 
 private:
 
+	std::string findRoot(const std::string& _connectableName);
+	void unionConnectables(const std::string& _connectableNameA, const std::string& _connectableNameB);
+
+	// Helper Functions
+	std::string createConnectableKey(ot::UID _blockUID, const std::string& _connectableName) const;
+	bool isConnectorConnectable(const std::string& _connectableName) const;
+	bool isGNDConnection(const std::string& _pole) const;
+
+	// Maps for new union find algorithm
+	// Every connectionable or pin is identiefied by <BlockUID>:<ConnectableName>
+	std::unordered_map<std::string, std::string> m_parent;
+	std::unordered_map<std::string, int> m_rank;
+	std::unordered_map<std::string, bool> m_hasGND;
+
 	unsigned long long m_currentNodeNumber = 1;
 	std::map<std::pair<ot::UID, std::string>, std::string> m_connectionNodeNumbers;
 
 	const std::string m_gndPole = "GNDPole";
 	const std::string m_voltageMeterTitle = "Voltage Meter";
 
-	// Graph traversal (moved from NGSpice)
-	void traverseFromGND(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
-
-	void traverseFromVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
-
-	void handleWithConnectors(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
-
-	void setNodeNumbersOfVoltageSource(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, std::string _startingElement, int _counter, ot::UID _startingElementUID, ot::UID _elementUID, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, Circuit& _circuit, std::set<ot::UID>& _visitedElements);
-
-	std::string getAssignedNodeNumber(ot::UID _uid, const std::string& _connectable) const;
-	void assignNodeNumber(Connection& _connection);
-	void assignNodeNumberForGndVoltageSource(Connection& _connection, ot::UID _startingElementUID);
-
-	bool isVisited(std::set<ot::UID>& _visited, ot::UID _uid);
-	Connection createConnection(const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnections, ot::UID _connectionUID);
-	bool isGNDConnection(const std::string& _pole) const;
-	bool isGndVoltageSourceConnection(const std::string& _pole, ot::UID _voltageSourceUID, ot::UID _elementUID) const;
-
-	std::shared_ptr<ot::EntityBlock> getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntities, const ot::UID& _uid) const;
-	ot::UIDList getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const;
 };

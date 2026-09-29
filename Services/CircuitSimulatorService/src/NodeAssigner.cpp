@@ -27,510 +27,209 @@
 void NodeAssigner::reset()
 {
 	m_currentNodeNumber = 1;
-	m_connectionNodeNumbers.clear();
+	m_parent.clear();
+	m_rank.clear();
+	m_hasGND.clear();
 }
 
-void NodeAssigner::assignNodeNumbers(
-	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
-	Circuit& _circuit,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
-	const std::string& _editorname)
+std::string NodeAssigner::findRoot(const std::string& _connectableName)
 {
-	// First check for GND elements
-	auto vectorGND = _circuit.getMapOfEntityBlcks().find("EntityBlockCircuitGND");
-	if (vectorGND != _circuit.getMapOfEntityBlcks().end())
+	// If connectable is not in the parent map, it is its own root
+	if(m_parent.find(_connectableName) == m_parent.end())
 	{
-		std::set<ot::UID> visitedElements;
+		m_parent[_connectableName] = _connectableName;
+		m_rank[_connectableName] = 0;
+	}
 
-		for (auto GNDElement : vectorGND->second)
-		{
-			ot::UID elementUID = GNDElement->getEntityID();
-			int counter = 0;
-			traverseFromGND(_connectionBlockMap, GNDElement->getClassName(), counter, elementUID, elementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, visitedElements);
-		}
+	// Step 1: Find the root of the connectable
+	std::string current = _connectableName;
+	while(m_parent[current] != current)
+	{
+		current = m_parent[current];
+	}
+	std::string root = current;
+
+	// Step 2: Path compression - make all nodes on the path point directly to the root
+	// For example we had A -> B -> C -> D, and D is the root. After this loop it will be A->D, B->D, C->D
+	current = _connectableName;
+	while(m_parent[current] != current)
+	{
+		std::string next = m_parent[current];
+		m_parent[current] = root;
+		current = next;
+	}
+
+	return root;
+}
+
+void NodeAssigner::unionConnectables(const std::string& _connectableNameA, const std::string& _connectableNameB)
+{
+	std::string rootA = findRoot(_connectableNameA);
+	std::string rootB = findRoot(_connectableNameB);
+
+	if(rootA == rootB)
+	{
+		return; // They are already in the same set
+	}
+
+	// Union by rank
+	if(m_rank[rootA] < m_rank[rootB])
+	{
+		m_parent[rootA] = rootB;
+	}
+	else if(m_rank[rootA] > m_rank[rootB])
+	{
+		m_parent[rootB] = rootA;
 	}
 	else
 	{
-		auto vectorVoltageSource = _circuit.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
-		if (vectorVoltageSource == _circuit.getMapOfEntityBlcks().end())
-		{
-			OT_LOG_E("No VoltageSource found at connection Algorithm");
-			return;
-		}
-		std::set<ot::UID> visitedElements;
+		m_parent[rootB] = rootA;
+		m_rank[rootA]++;
+	}
 
-		for (auto voltageSource : vectorVoltageSource->second)
-		{
-			ot::UID elementUID = voltageSource->getEntityID();
-			int counter = 0;
-
-			// First set the GND connections of the VoltageSource
-			setNodeNumbersOfVoltageSource(_connectionBlockMap, voltageSource->getClassName(), counter, elementUID, elementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, visitedElements);
-
-			// Now go through all the other connections
-			traverseFromVoltageSource(_connectionBlockMap, voltageSource->getClassName(), counter, elementUID, elementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, visitedElements);
-		}
+	// If either of the roots has GND, mark the new root as having GND
+	if(m_hasGND[rootA] || m_hasGND[rootB])
+	{
+		m_hasGND[rootA] = true; // After union, find the new root and mark it
 	}
 }
 
-void NodeAssigner::traverseFromGND(
-	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
-	std::string _startingElement, int _counter,
-	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
-	const std::string& _editorname, Circuit& _circuit,
-	std::set<ot::UID>& _visitedElements)
+std::string NodeAssigner::createConnectableKey(ot::UID _blockUID, const std::string& _connectableName) const
 {
-	_counter++;
-
-	auto appInstance = Application::instance();
-	auto element = getEntityBlock(_allEntitiesByBlockID, _elementUID);
-	if (element == nullptr)
-	{
-		return;
-	}
-	auto connections = getConnections(_connectionBlockMap, _elementUID);
-	if (connections.empty())
-	{
-		return;
-	}
-
-	// Check if Element already exists
-	if (isVisited(_visitedElements, _elementUID))
-	{
-		return;
-	}
-
-	for (auto connection : connections)
-	{
-		Connection myConn = createConnection(_allConnectionEntities, connection);
-
-		// I always start with GND Element and give the Connection the nodeNumber 0
-		if (_counter == 1 && _startingElement == "EntityBlockCircuitGND")
-		{
-			if (isGNDConnection(myConn.getOriginConnectable()) ||
-				isGNDConnection(myConn.getDestinationConnectable()))
-			{
-				myConn.setNodeNumber("0");
-				m_connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestinationConnectable() }] = myConn.getNodeNumber();
-				m_connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-				_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);
-			}
-		}
-
-		// Check the case if the connection is connected to a connector
-		if (appInstance->extractStringAfterDelimiter(myConn.getDestinationConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID() ||
-			appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
-		{
-			ot::UID nextElementUID;
-			if (myConn.getOriginUid() == _elementUID)
-			{
-				nextElementUID = myConn.getDestinationUid();
-			}
-			else
-			{
-				nextElementUID = myConn.getOriginUid();
-			}
-
-			handleWithConnectors(_connectionBlockMap, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-
-			traverseFromGND(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-		}
-		else
-		{
-			// Here i check if connection already exists
-			if (isVisited(_visitedElements, connection))
-			{
-				ot::UID nextElementUID;
-				if (myConn.getOriginUid() == _elementUID)
-				{
-					nextElementUID = myConn.getDestinationUid();
-				}
-				else
-				{
-					nextElementUID = myConn.getOriginUid();
-				}
-
-				traverseFromGND(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-			}
-			else
-			{
-				assignNodeNumber(myConn);
-
-				_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-				_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);
-
-				// Recursive call to explore the next element
-				ot::UID nextElementUID;
-				if (myConn.getOriginUid() == _elementUID)
-				{
-					nextElementUID = myConn.getDestinationUid();
-				}
-				else
-				{
-					nextElementUID = myConn.getOriginUid();
-				}
-				traverseFromGND(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-			}
-		}
-	}
+	return std::to_string(_blockUID) + ":" + _connectableName;
 }
 
-void NodeAssigner::traverseFromVoltageSource(
-	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
-	std::string _startingElement, int _counter,
-	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
-	const std::string& _editorname, Circuit& _circuit,
-	std::set<ot::UID>& _visitedElements)
+bool NodeAssigner::isConnectorConnectable(const std::string& _connectableName) const
 {
-	_counter++;
-
-	auto appInstance = Application::instance();
-	auto element = getEntityBlock(_allEntitiesByBlockID, _elementUID);
-	if (element == nullptr)
-	{
-		return;
-	}
-	auto connections = getConnections(_connectionBlockMap, _elementUID);
-	if (connections.empty())
-	{
-		return;
-	}
-
-	// Check if Element already exists
-	if (isVisited(_visitedElements, _elementUID))
-	{
-		return;
-	}
-
-	for (auto connection : connections)
-	{
-		Connection myConn = createConnection(_allConnectionEntities, connection);
-
-		if (_counter == 1 && _startingElement == "EntityBlockCircuitVoltageSource")
-		{
-			if (isGndVoltageSourceConnection(myConn.getOriginConnectable(), _startingElementUID, myConn.getOriginUid()) ||
-				isGndVoltageSourceConnection(myConn.getDestinationConnectable(), _startingElementUID, myConn.getDestinationUid()))
-			{
-				myConn.setNodeNumber("0");
-				m_connectionNodeNumbers[{ myConn.getDestinationUid(), myConn.getDestinationConnectable() }] = myConn.getNodeNumber();
-				m_connectionNodeNumbers[{ myConn.getOriginUid(), myConn.getOriginConnectable() }] = myConn.getNodeNumber();
-				_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-				_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);
-			}
-		}
-
-		// Check the case if the connection is connected to a connector
-		if (appInstance->extractStringAfterDelimiter(myConn.getDestinationConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID() ||
-			appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
-		{
-			ot::UID nextElementUID;
-			if (myConn.getOriginUid() == _elementUID)
-			{
-				nextElementUID = myConn.getDestinationUid();
-			}
-			else
-			{
-				nextElementUID = myConn.getOriginUid();
-			}
-
-			handleWithConnectors(_connectionBlockMap, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-
-			traverseFromGND(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-		}
-		else
-		{
-			if (isVisited(_visitedElements, connection))
-			{
-				ot::UID nextElementUID;
-				if (myConn.getOriginUid() == _elementUID)
-				{
-					nextElementUID = myConn.getDestinationUid();
-				}
-				else
-				{
-					nextElementUID = myConn.getOriginUid();
-				}
-
-				traverseFromVoltageSource(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-			}
-			else
-			{
-				assignNodeNumber(myConn);
-
-				_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
-				_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);
-
-				// Recursive call to explore the next element
-				ot::UID nextElementUID;
-				if (myConn.getOriginUid() == _elementUID)
-				{
-					nextElementUID = myConn.getDestinationUid();
-				}
-				else
-				{
-					nextElementUID = myConn.getOriginUid();
-				}
-				traverseFromVoltageSource(_connectionBlockMap, _startingElement, _counter, _startingElementUID, nextElementUID, _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-			}
-		}
-	}
+	std::string element = Application::instance()->extractStringAfterDelimiter(_connectableName, '/', 2);
+	return element.find("Connector") != std::string::npos;
 }
 
-void NodeAssigner::handleWithConnectors(
-	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
-	ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
-	const std::string& _editorname, Circuit& _circuit,
-	std::set<ot::UID>& _visitedElements)
+void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname)
 {
-	auto appInstance = Application::instance();
-	auto element = getEntityBlock(_allEntitiesByBlockID, _elementUID);
-	if (element == nullptr)
+
+	// Step 1: Go through all connections and Union-Find to group connectables
+	for(const auto& [connUID, connEntity] : _allConnectionEntities)
 	{
-		return;
-	}
-	auto connections = getConnections(_connectionBlockMap, _elementUID);
-	if (connections.empty())
-	{
-		return;
+		ot::GraphicsConnectionCfg cfg = connEntity->getConnectionCfg();
+		Connection myConn(cfg);
+
+		std::string originConnectable = createConnectableKey(myConn.getOriginUid(), myConn.getOriginConnectable());
+		std::string destConnectable = createConnectableKey(myConn.getDestinationUid(), myConn.getDestinationConnectable());
+
+		// Both connectables of the connection are in same set, union them
+		unionConnectables(originConnectable, destConnectable);
+
+		// Find GND and mark
+		if(myConn.getOriginConnectable() == m_gndPole)
+		{
+			m_hasGND[findRoot(originConnectable)] = true;
+		}
+		if(myConn.getDestinationConnectable() == m_gndPole)
+		{
+			m_hasGND[findRoot(destConnectable)] = true;
+		}
 	}
 
-	for (auto connection : connections)
+	// Step 2: Handle with connector connectables and treat all connectables connected to a connector as one set
+	std::unordered_map<ot::UID, std::string> connectorFirstConnectable;
+
+	for (const auto& [connUID, connEntity] : _allConnectionEntities)
 	{
-		Connection myConn = createConnection(_allConnectionEntities, connection);
-		if (isVisited(_visitedElements, connection))
+		ot::GraphicsConnectionCfg cfg = connEntity->getConnectionCfg();
+		Connection myConn(cfg);
+		
+		// Check origin 
+		if (isConnectorConnectable(myConn.getOriginConnectable()))
 		{
-			continue;
+			ot::UID connectorUid = myConn.getOriginUid();
+			std::string pinKey = createConnectableKey(connectorUid, myConn.getOriginConnectable());
+
+			auto it = connectorFirstConnectable.find(connectorUid);
+			if( it == connectorFirstConnectable.end())
+			{
+				connectorFirstConnectable[connectorUid] = pinKey;
+			}
+			else
+			{
+				unionConnectables(it->second, pinKey);
+			}
 		}
 
-		assignNodeNumber(myConn);
+		// Check destination
+		if (isConnectorConnectable(myConn.getDestinationConnectable()))
+		{
+			ot::UID connectorUid = myConn.getDestinationUid();
+			std::string pinKey = createConnectableKey(connectorUid, myConn.getDestinationConnectable());
+			auto it = connectorFirstConnectable.find(connectorUid);
+			if( it == connectorFirstConnectable.end())
+			{
+				connectorFirstConnectable[connectorUid] = pinKey;
+			}
+			else
+			{
+				unionConnectables(it->second, pinKey);
+			}
+		} 
+	}
 
+	// Step 3: Fallback: No GND found, assign voltage source negative terminal to node 0
+	bool hasAnyGND = false;
+	for (const auto& [root, isGnd] : m_hasGND)
+	{
+		if(isGnd)
+		{
+			hasAnyGND = true;
+			break;
+		}
+	}
+
+	if (!hasAnyGND)
+	{
+		auto vecVS = _circuit.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
+		if (vecVS != _circuit.getMapOfEntityBlcks().end() && !vecVS->second.empty())
+		{
+			ot::UID vsUid = vecVS->second.front()->getEntityID();
+			std::string negPin = createConnectableKey(vsUid, "negativePole");
+			m_hasGND[findRoot(negPin)] = true;
+		}
+	}
+
+	// Step 4: Assign node numbers to each unique root
+	std::unordered_map<std::string, std::string> rootToNodeNumber;
+
+	for (const auto& [pinKey, _] : m_parent)
+	{
+		std::string root = findRoot(pinKey);
+		if (rootToNodeNumber.find(root) == rootToNodeNumber.end())
+		{
+			if (m_hasGND[root])
+			{
+				rootToNodeNumber[root] = "0";
+			}
+			else
+			{
+				rootToNodeNumber[root] = std::to_string(m_currentNodeNumber++);
+			}
+		}
+	}
+
+	// Step 5: Write results to circuit 
+
+	for (const auto& [connUID, connEntity] : _allConnectionEntities)
+	{
+		ot::GraphicsConnectionCfg cfg = connEntity->getConnectionCfg();
+		Connection myConn(cfg);
+		std::string originPin = createConnectableKey(myConn.getOriginUid(), myConn.getOriginConnectable());
+		std::string nodeNumber = rootToNodeNumber[findRoot(originPin)];
+		myConn.setNodeNumber(nodeNumber);
 		_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
 		_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);
-
-		if (appInstance->extractStringAfterDelimiter(myConn.getDestinationConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getDestinationUid() != element->getEntityID())
-		{
-			handleWithConnectors(_connectionBlockMap, myConn.getDestinationUid(), _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-		}
-		else if (appInstance->extractStringAfterDelimiter(myConn.getOriginConnectable(), '/', 2).find("Connector") != std::string::npos && myConn.getOriginUid() != element->getEntityID())
-		{
-			handleWithConnectors(_connectionBlockMap, myConn.getOriginUid(), _allConnectionEntities, _allEntitiesByBlockID, _editorname, _circuit, _visitedElements);
-		}
-	}
-}
-
-std::string NodeAssigner::getAssignedNodeNumber(ot::UID _uid, const std::string& _connectable) const
-{
-	auto appInstance = Application::instance();
-	if (appInstance->extractStringAfterDelimiter(_connectable, '/', 2).find("Connector") != std::string::npos)
-	{
-		for (const auto& pair : m_connectionNodeNumbers)
-		{
-			if (pair.first.first == _uid)
-			{
-				return pair.second;
-			}
-		}
-	}
-	else
-	{
-		auto it = m_connectionNodeNumbers.find({ _uid, _connectable });
-		if (it != m_connectionNodeNumbers.end())
-		{
-			return it->second;
-		}
-	}
-	return "";
-}
-
-void NodeAssigner::assignNodeNumber(Connection& _connection)
-{
-	std::string nodeNumDest = getAssignedNodeNumber(_connection.getDestinationUid(), _connection.getDestinationConnectable());
-	std::string nodeNumOrigin = getAssignedNodeNumber(_connection.getOriginUid(), _connection.getOriginConnectable());
-
-	if (isGNDConnection(_connection.getOriginConnectable()) ||
-		isGNDConnection(_connection.getDestinationConnectable()))
-	{
-		if (!nodeNumDest.empty())
-		{
-			_connection.setNodeNumber(nodeNumDest);
-		}
-		else if (!nodeNumOrigin.empty())
-		{
-			_connection.setNodeNumber(nodeNumOrigin);
-		}
-		else
-		{
-			_connection.setNodeNumber("0");
-		}
-	}
-	else
-	{
-		if (!nodeNumDest.empty())
-		{
-			_connection.setNodeNumber(nodeNumDest);
-		}
-		else if (!nodeNumOrigin.empty())
-		{
-			_connection.setNodeNumber(nodeNumOrigin);
-		}
-		else
-		{
-			_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
-		}
 	}
 
-	m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-	m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
-}
-
-void NodeAssigner::assignNodeNumberForGndVoltageSource(Connection& _connection, ot::UID _startingElementUID)
-{
-	std::string nodeNumDest = getAssignedNodeNumber(_connection.getDestinationUid(), _connection.getDestinationConnectable());
-	std::string nodeNumOrigin = getAssignedNodeNumber(_connection.getOriginUid(), _connection.getOriginConnectable());
-
-	if (isGndVoltageSourceConnection(_connection.getOriginConnectable(), _startingElementUID, _connection.getOriginUid()) ||
-		isGndVoltageSourceConnection(_connection.getDestinationConnectable(), _startingElementUID, _connection.getDestinationUid()))
-	{
-		if (!nodeNumDest.empty())
-		{
-			_connection.setNodeNumber(nodeNumDest);
-		}
-		else if (!nodeNumOrigin.empty())
-		{
-			_connection.setNodeNumber(nodeNumOrigin);
-		}
-		else
-		{
-			_connection.setNodeNumber("0");
-		}
-	}
-	else
-	{
-		if (!nodeNumDest.empty())
-		{
-			_connection.setNodeNumber(nodeNumDest);
-		}
-		else if (!nodeNumOrigin.empty())
-		{
-			_connection.setNodeNumber(nodeNumOrigin);
-		}
-		else
-		{
-			_connection.setNodeNumber(std::to_string(m_currentNodeNumber++));
-		}
-	}
-
-	m_connectionNodeNumbers[{ _connection.getDestinationUid(), _connection.getDestinationConnectable() }] = _connection.getNodeNumber();
-	m_connectionNodeNumbers[{ _connection.getOriginUid(), _connection.getOriginConnectable() }] = _connection.getNodeNumber();
-}
-
-void NodeAssigner::setNodeNumbersOfVoltageSource(
-	std::map<ot::UID, ot::UIDList>& _connectionBlockMap,
-	std::string _startingElement, int _counter,
-	ot::UID _startingElementUID, ot::UID _elementUID,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities,
-	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
-	const std::string& _editorname, Circuit& _circuit,
-	std::set<ot::UID>& _visitedElements)
-{
-	auto element = getEntityBlock(_allEntitiesByBlockID, _elementUID);
-	if (element == nullptr)
-	{
-		return;
-	}
-	auto connections = getConnections(_connectionBlockMap, _elementUID);
-	if (connections.empty())
-	{
-		return;
-	}
-
-	std::vector<Connection> connectionsToBeSet;
-	for (auto connection : connections)
-	{
-		Connection myConn = createConnection(_allConnectionEntities, connection);
-		connectionsToBeSet.push_back(myConn);
-	}
-
-	for (auto myConn = connectionsToBeSet.begin(); myConn != connectionsToBeSet.end(); ++myConn)
-	{
-		if (isGndVoltageSourceConnection(myConn->getOriginConnectable(), _startingElementUID, myConn->getOriginUid()) ||
-			isGndVoltageSourceConnection(myConn->getDestinationConnectable(), _startingElementUID, myConn->getDestinationUid()))
-		{
-			myConn->setNodeNumber("0");
-			m_connectionNodeNumbers[{ myConn->getDestinationUid(), myConn->getDestinationConnectable() }] = myConn->getNodeNumber();
-			m_connectionNodeNumbers[{ myConn->getOriginUid(), myConn->getOriginConnectable() }] = myConn->getNodeNumber();
-
-			_circuit.addConnection(myConn->getOriginConnectable(), myConn->getOriginUid(), *myConn);
-			_circuit.addConnection(myConn->getDestinationConnectable(), myConn->getDestinationUid(), *myConn);
-		}
-	}
-}
-
-bool NodeAssigner::isVisited(std::set<ot::UID>& _visited, ot::UID _uid)
-{
-	if (_visited.find(_uid) != _visited.end())
-	{
-		return true;
-	}
-	else
-	{
-		_visited.insert(_uid);
-		return false;
-	}
-}
-
-Connection NodeAssigner::createConnection(const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnections, ot::UID _connectionUID)
-{
-	auto it = _allConnections.find(_connectionUID);
-	if (it != _allConnections.end())
-	{
-		ot::GraphicsConnectionCfg connectionCfg = it->second->getConnectionCfg();
-		Connection myConn(connectionCfg);
-		return myConn;
-	}
-	else
-	{
-		OT_LOG_E("Connection does not exist - EntityID: " + _connectionUID);
-		return Connection();
-	}
 }
 
 bool NodeAssigner::isGNDConnection(const std::string& _pole) const
 {
 	return (_pole == m_gndPole);
-}
-
-bool NodeAssigner::isGndVoltageSourceConnection(const std::string& _pole, ot::UID _voltageSourceUID, ot::UID _elementUID) const
-{
-	return (_elementUID == _voltageSourceUID && _pole == "negativePole");
-}
-
-std::shared_ptr<ot::EntityBlock> NodeAssigner::getEntityBlock(std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntities, const ot::UID& _uid) const
-{
-	auto it = _allEntities.find(_uid);
-	if (it != _allEntities.end())
-	{
-		return it->second;
-	}
-	OT_LOG_E("Block not found - EntityID: " + std::to_string(_uid));
-	return nullptr;
-}
-
-ot::UIDList NodeAssigner::getConnections(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, const ot::UID& _uid) const
-{
-	auto it = _connectionBlockMap.find(_uid);
-	if (it != _connectionBlockMap.end())
-	{
-		return it->second;
-	}
-	OT_LOG_E("Connection not found - EntityID: " + std::to_string(_uid));
-	return ot::UIDList{};
 }
