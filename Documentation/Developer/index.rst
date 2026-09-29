@@ -24,7 +24,6 @@ Overview
    get_started/get_started
    general_concepts/general_concepts
    how_to/how_to
-   cmake/cmake
    ui_api/ui_api
    services/services
    documented_endpoints/documented_endpoints

@@ -7,6 +7,8 @@ See here for more details:
    :maxdepth: 3
 
    coding_standards
+   cmake/cmake
+   python_scripts/python_scripts
    opentwin_layers
    service_information
    app_exit_codes
