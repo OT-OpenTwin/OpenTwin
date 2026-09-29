@@ -377,13 +377,10 @@ def create_deployment(plan) -> None:
     plan.mkdir('%OPENTWIN_DEV_ROOT%\\Deployment_Documentation')
     plan.tree('%OT_DOCUMENTATION_ROOT%\\_build\\html\\*.*', '%OPENTWIN_DEV_ROOT%\\Deployment_Documentation')
 
-    # Shutdown script
-    plan.copy('%OPENTWIN_DEV_ROOT%\\Scripts\\BuildAndTest\\ShutdownAll.bat', '%OT_DEPLOYMENT_DIR%')
-
     # Libraries and services
     update_libraries(plan)
 
-    # Launcher scripts
+    # Launcher scripts, ShutdownAll and the ot_launcher package
     plan.tree('%OPENTWIN_DEV_ROOT%\\Scripts\\Launcher\\*.*', '%OT_DEPLOYMENT_DIR%')
 
     # Password encryption

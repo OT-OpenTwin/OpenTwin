@@ -147,6 +147,6 @@ PATH_PREPEND = [
 
 # ===== Externally provided environment =====
 THIRDPARTY_MODULE = "SetupEnvironment.py"
-SERVICE_ARGS_MODULE = ("Scripts", "Launcher", "OpenTwin_set_up_service_args.py")
+SERVICE_ARGS_MODULE = ("Scripts", "Launcher", "ot_launcher", "service_args.py")
 
 READY_FLAG = "OPENTWIN_DEV_ENV_DEFINED"

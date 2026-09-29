@@ -19,10 +19,11 @@ import sys
 from pathlib import Path
 from typing import Mapping
 
+from ot_launcher.shutdown import shutdown_all
+
 from ..builds.project import build_project
 from ..core import paths
 from ..core.projects import resolve_root
-from ..deploy.services import shutdown_all
 from .registry import read_value
 
 # TODO(linux): NSIS installers, the registry and 7-Zip are Windows only.

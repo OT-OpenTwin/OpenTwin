@@ -14,21 +14,7 @@
 # limitations under the License.
 
 import sys
-from pathlib import Path
-from typing import Sequence
 
-sys.path.insert(0, str(Path(__file__).resolve().parent))
+from .cli import main
 
-from ot_dev import cli
-from ot_launcher.shutdown import shutdown_all
-
-
-def main(argv: Sequence[str]) -> int:
-    if argv:
-        raise SystemExit("usage: shutdown_all.py")
-
-    return shutdown_all()
-
-
-if __name__ == "__main__":
-    sys.exit(cli.run(main, sys.argv[1:]))
+sys.exit(main(sys.argv[1:]))

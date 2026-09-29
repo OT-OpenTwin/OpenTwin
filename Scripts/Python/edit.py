@@ -20,6 +20,7 @@ from typing import Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from ot_dev import cli, launch_editor
+from ot_dev.tools.editor import project_environment
 
 
 def main(argv: Sequence[str]) -> int:
@@ -31,6 +32,7 @@ def main(argv: Sequence[str]) -> int:
         env, target = cli.environment(), argv[0]
     else:
         env, target = cli.prepare(argv[0])
+        project_environment(env, argv[0])
     return launch_editor(env, target, cli.argument(argv, 1))
 
 

@@ -14,11 +14,12 @@
 # limitations under the License.
 
 import csv
+import os
 import subprocess
 import time
 from typing import Callable
 
-from ..core.platform import WINDOWS
+WINDOWS = os.name == "nt"
 
 PROCESSES = ("open_twin.exe", "PythonExecution.exe", "uiFrontend.exe", "httpd.exe")
 

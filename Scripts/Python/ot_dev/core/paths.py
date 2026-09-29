@@ -24,6 +24,7 @@ from .platform import EXE, SYSTEM
 # --- relative to OPENTWIN_DEV_ROOT ---
 BUILD_AND_TEST = ("Scripts", "BuildAndTest")
 INSTALLER = ("Scripts", "Installer")
+LAUNCHER = ("Scripts", "Launcher")
 DEPLOYMENT = ("Deployment",)
 DEPLOYMENT_FRONTEND = ("Deployment_Frontend",)
 DEBUG_FILES = ("DebugFiles",)

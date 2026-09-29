@@ -22,6 +22,8 @@ from datetime import datetime
 from pathlib import Path
 from typing import Callable
 
+from ot_launcher.shutdown import stop_processes
+
 from ..builds.rebuild import rebuild_all
 from ..core import cli, paths
 from ..core.config import definitions, manifest
@@ -31,7 +33,6 @@ from ..core.platform import USE_SHELL
 from ..tools.checks import check_failed_builds
 from .plan import WILDCARD, Plan, Result, _step, _write
 from .progress import Progress
-from .services import stop_processes
 
 
 def _revision(root: Path) -> str:

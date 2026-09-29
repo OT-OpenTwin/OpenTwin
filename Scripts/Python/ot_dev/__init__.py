@@ -17,11 +17,25 @@
 
 core/        environment, configuration, shared paths and process handling
 builds/      CMake projects, the framework, the admin panel, RebuildAll
-deploy/      deployment plans and the running services
+deploy/      deployment plans
 docs/        Sphinx and Doxygen
 tools/       editors, 7-Zip, external programs, the URL protocol
 installers/  the NSIS installers
+
+Starting and stopping OpenTwin lives in Scripts/Launcher/ot_launcher, which also ships with the Deployment.
 """
+
+import sys
+
+from .core import paths
+from .core.config import SCRIPTS
+
+# ot_launcher lives with the launcher scripts, it ships with the Deployment
+_LAUNCHER = str(SCRIPTS.parent.joinpath(*paths.LAUNCHER))
+if _LAUNCHER not in sys.path:
+    sys.path.insert(0, _LAUNCHER)
+
+from ot_launcher.shutdown import shutdown_all  # noqa: E402
 
 from .builds.admin_panel import build_admin_panel
 from .builds.batch import build_all, clean_all, test_all, testable_projects
@@ -34,7 +48,6 @@ from .core.projects import project_roots, resolve_root
 from .core.toolchain import apply_toolchain
 from .deploy.deployment import (create_build_information, create_debug_files, create_deployment,
                                 create_frontend_installer, update_libraries)
-from .deploy.services import shutdown_all
 from .docs.documentation import build_documentation
 from .tools.editor import launch_editor
 

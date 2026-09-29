@@ -13,15 +13,22 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import os
 import shutil
 import subprocess
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, MutableMapping
 
+from ot_launcher.environment import lds
+
+from ..core import paths
 from ..core.expansion import get
 from ..core.platform import DEFAULT_EDITOR, EDITORS, WINDOWS
 
 EDITOR_VARIABLE = "OT_DEFAULT_EDITOR"
+
+# Visual Studio passes its environment to the LDS when debugging it.
+LDS_KEY = "LOCAL_DIRECTORY_SERVICE"
 
 
 def _rooted(env: Mapping[str, str], root: str, executable: str, target: str) -> int:
@@ -58,3 +65,7 @@ def launch_editor(env: Mapping[str, str], target: str, editor: str | None = None
         return _rooted(env, root, executable, target)
     return _on_path(env, executable, target)
 
+
+def project_environment(env: MutableMapping[str, str], key: str) -> None:
+    if key.upper() == LDS_KEY:
+        lds(env, root=str(Path(env["OPENTWIN_DEV_ROOT"]).joinpath(*paths.LAUNCHER)) + os.sep)
