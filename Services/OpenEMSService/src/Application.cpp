@@ -46,6 +46,7 @@
 #include "OTCADEntities/EntityFieldDump.h"
 #include "OTCADEntities/EntityLumpedFDTDPort.h"
 #include "OTCADEntities/EntityMicrostripPort.h"
+#include "OTCADEntities/EntityFarfieldDump.h"
 
 #include <fstream>
 #include <direct.h>
@@ -91,6 +92,10 @@ Application::Application()
 	m_addFieldDumpButton = ot::ToolBarButtonCfg("OpenEMS", "Field Dumps", "Add Field Dump", "Default/FieldDumpVisible");
 	m_addFieldDumpButton.setButtonLockFlags(ot::LockType::ModelWrite);
 	connectToolBarButton(m_addFieldDumpButton, this, &Application::handleAddFieldDump);
+
+	m_addFarfieldDumpButton = ot::ToolBarButtonCfg("OpenEMS", "Field Dumps", "Add Farfield Dump", "Default/FieldDumpVisible");
+	m_addFarfieldDumpButton.setButtonLockFlags(ot::LockType::ModelWrite);
+	connectToolBarButton(m_addFarfieldDumpButton, this, &Application::handleAddFarfieldDump);
 }
 
 Application::~Application()
@@ -154,6 +159,7 @@ void Application::uiConnected(ot::components::UiComponent * _ui) {
 	_ui->addMenuButton(m_addMicrostripPortButton);
 	_ui->addMenuButton(m_addWaveguidePortButton);
 	_ui->addMenuButton(m_addFieldDumpButton);
+	_ui->addMenuButton(m_addFarfieldDumpButton);
 
 	modelSelectionChanged();
 
@@ -288,10 +294,25 @@ void Application::handleAddSolver()
 
 	fieldDumpEntity->storeToDataBase();
 
+	// Create a farfield dump item below the solver
+	EntityContainer* farfieldDumpEntity = new EntityContainer(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	farfieldDumpEntity->setName(solverName + "/Farfield Dumps");
+	farfieldDumpEntity->setTreeItemEditable(false);
+	farfieldDumpEntity->setVisibleTreeItemIcon("Default/SettingsVisible");
+	farfieldDumpEntity->setHiddenTreeItemIcon("Default/SettingsHidden");
+	farfieldDumpEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
+
+	farfieldDumpEntity->storeToDataBase();
+
 	// Register the new solver item in the model
-	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), portEntity->getEntityID(), fieldDumpEntity->getEntityID() };
-	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion(), portEntity->getEntityStorageVersion(), fieldDumpEntity->getEntityStorageVersion() };
-	std::list<bool> topologyEntityForceVisible = { false, false };
+	std::list<ot::UID> topologyEntityIDList = { solverEntity->getEntityID(), portEntity->getEntityID(), fieldDumpEntity->getEntityID(), farfieldDumpEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { solverEntity->getEntityStorageVersion(), portEntity->getEntityStorageVersion(), fieldDumpEntity->getEntityStorageVersion(), farfieldDumpEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false, false, false, false };
 	std::list<ot::UID> dataEntityIDList;
 	std::list<ot::UID> dataEntityVersionList;
 	std::list<ot::UID> dataEntityParentList;
@@ -544,6 +565,50 @@ void Application::handleAddFieldDump(void)
 
 	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
 	this->getUiComponent()->selectEntity(ot::ModelServiceAPI::getCurrentVisualizationModelID(), fieldDumpName);
+}
+
+void Application::handleAddFarfieldDump(void)
+{
+	std::list<std::string> selectedSolvers = getSelectedOpenEMSSolvers();
+	if (selectedSolvers.size() != 1) return;
+
+	std::string currentSolver = selectedSolvers.front();
+
+	// First get a list of all folder items of the Field Dumps folder
+	std::list<std::string> farfieldDumpItems = ot::ModelServiceAPI::getListOfFolderItems(currentSolver + "/Farfield Dumps");
+
+	// Create a unique name for the new field dump item
+	int count = 1;
+	std::string farfieldDumpName;
+	do
+	{
+		farfieldDumpName = currentSolver + "/Farfield Dumps/farfield dump " + std::to_string(count);
+		count++;
+	} while (std::find(farfieldDumpItems.begin(), farfieldDumpItems.end(), farfieldDumpName) != farfieldDumpItems.end());
+
+	// Create a field dump item below the solver
+	EntityFarfieldDump* farfieldDumpEntity = new EntityFarfieldDump(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
+	farfieldDumpEntity->setName(farfieldDumpName);
+	farfieldDumpEntity->setTreeItemEditable(true);
+	farfieldDumpEntity->registerCallbacks(
+		ot::EntityCallbackBase::Callback::Properties |
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
+		getServiceName()
+	);
+
+	farfieldDumpEntity->storeToDataBase();
+
+	// Register the new solver item in the model
+	std::list<ot::UID> topologyEntityIDList = { farfieldDumpEntity->getEntityID() };
+	std::list<ot::UID> topologyEntityVersionList = { farfieldDumpEntity->getEntityStorageVersion() };
+	std::list<bool> topologyEntityForceVisible = { false };
+	std::list<ot::UID> dataEntityIDList;
+	std::list<ot::UID> dataEntityVersionList;
+	std::list<ot::UID> dataEntityParentList;
+
+	ot::ModelServiceAPI::addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList, "create solver");
+	this->getUiComponent()->selectEntity(ot::ModelServiceAPI::getCurrentVisualizationModelID(), farfieldDumpName);
 }
 
 void Application::solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap) {

@@ -36,6 +36,7 @@ class EntityWaveguidePort;
 class EntityLumpedFDTDPort;
 class EntityMicrostripPort;
 class EntityFieldDump;
+class EntityFarfieldDump;
 class EntityVis2D3D;
 
 #include "OTModelEntities/Geometry.h"
@@ -64,6 +65,7 @@ private:
 	void addLumpedPorts(std::stringstream& runCommand);
 	void addMicrostripPorts(std::stringstream& runCommand);
 	void addFieldDumps(std::stringstream& runCommand);
+	void addFarfieldDumps(std::stringstream& runCommand);
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
 	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
@@ -85,6 +87,7 @@ private:
 	void writeLinesArray(const std::string& direction, const std::vector<double>& linesArray, std::stringstream& runCommand);
 	void readExcitation();
 	void readFieldDumps();
+	void readFarfieldDumps();
 	std::list<std::map<int, double>> parseExcitations(std::string_view input);
 	void readPorts();
 	bool parsePortNumber(const std::string& name, int& portNumber);
@@ -99,6 +102,7 @@ private:
 	std::string getResolutionString(EntityFieldDump* fieldDump);
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
 	std::string getStartStopString(EntityFieldDump* fieldDump);
+	void addFrequencies(EntityFarfieldDump* fieldDump, std::set<double>& farfieldFrequencyList);
 	bool isFrequencyDump(EntityFieldDump* fieldDump);
 	std::size_t moveMergedNodesOutward(std::vector<Geometry::Node>& nodes, double mergeTolerance, double clearance);
 	std::size_t mergeCloseNodes(std::vector<Geometry::Node>& nodes, double tolerance);
@@ -106,6 +110,7 @@ private:
 	void fixPlanePLocation(int gridNx, int gridNy, int gridNz, EntityVis2D3D* visualizationEntity, EntityFieldDump* fieldDump);
 	double snapToMeshLine(double coordinate, const std::vector<double>& meshLines);
 	std::string directionToAxis(const std::string& direction);
+	std::size_t removeNearlyEqualFrequencies(std::set<double>& frequencies, double relativeTolerance = 1e-3, double absoluteTolerance = 0.0);
 
 	Application* application;
 	EntityBase *solverEntity;
@@ -122,6 +127,7 @@ private:
 	std::list<EntityLumpedFDTDPort*> lumpedPortList;
 	std::list<EntityMicrostripPort*> microstripPortList;
 	std::list<EntityFieldDump*> fieldDumpList;
+	std::list<EntityFarfieldDump*> farfieldDumpList;
 	std::set<int> portList;
 
 	std::string xminBoundary;

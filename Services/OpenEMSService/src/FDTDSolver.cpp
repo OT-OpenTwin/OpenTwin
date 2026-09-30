@@ -46,6 +46,7 @@
 #include "OTCADEntities/EntityLumpedFDTDPort.h"
 #include "OTCADEntities/EntityMicrostripPort.h"
 #include "OTCADEntities/EntityFieldDump.h"
+#include "OTCADEntities/EntityFarfieldDump.h"
 
 #include <fstream>
 #include <filesystem>
@@ -66,6 +67,8 @@
 #include <cstdint>
 #include <numeric>
 #include <sstream>
+#include <iterator>
+#include <set>
 
 FDTDSolver::FDTDSolver(Application* _application, EntityBase* _solverEntity, EntityMeshCartesian* _meshEntity, const std::string& _openEMSPath, const std::string& _tempDirPath)
 	: application(_application), solverEntity(_solverEntity), meshEntity(_meshEntity), openEMSPath(_openEMSPath), tempDirPath(_tempDirPath), entityUnits(nullptr), timeStepWidth(0.0)
@@ -108,6 +111,7 @@ std::string FDTDSolver::generateRunCommand()
 	readPorts();
 	readExcitation();
 	readFieldDumps();
+	readFarfieldDumps();
 
 	checkCartesianMesh(runCommand);
 
@@ -118,6 +122,7 @@ std::string FDTDSolver::generateRunCommand()
 	addGeometry(runCommand);
 	addPorts(runCommand);
 	addFieldDumps(runCommand);
+	addFarfieldDumps(runCommand);
 	addSolverRun(runCommand);
 	addPostprocessing(runCommand);
 
@@ -172,7 +177,7 @@ void FDTDSolver::addFieldDumps(std::stringstream& runCommand)
 
 			runCommand << ")\n";
 
-			runCommand << startStopString << "dump" << count << ".AddBox(start, stop)\n";
+			runCommand << startStopString << "dump" << count << ".AddBox(start, stop)\n\n";
 
 			count++;
 		}
@@ -327,6 +332,67 @@ bool FDTDSolver::getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string& fi
 	return true;
 }
 
+void FDTDSolver::addFarfieldDumps(std::stringstream& runCommand)
+{
+	// First determine a unique list of all farfield dump frequencies
+	std::set<double> farfieldFrequencyList;
+
+	for (auto farfieldDump : farfieldDumpList)
+	{
+		addFrequencies(farfieldDump, farfieldFrequencyList);
+	}
+
+	removeNearlyEqualFrequencies(farfieldFrequencyList);
+
+	// Now define the necessary farfield dumps 
+
+	runCommand << "nf2ff = FDTD.CreateNF2FFBox(name = 'nf2ff', frequency = np.array([";
+
+	bool isFirst = true;
+	for (double freq : farfieldFrequencyList)
+	{
+		if (!isFirst) runCommand << ", ";
+		isFirst = false;
+
+		runCommand << freq;
+	}
+
+	runCommand << "]))\n\n";
+}
+
+std::size_t FDTDSolver::removeNearlyEqualFrequencies(std::set<double>& frequencies, double relativeTolerance, double absoluteTolerance)
+{
+	if (frequencies.empty()) {
+		return 0;
+	}
+
+	const std::size_t originalSize = frequencies.size();
+
+	auto lastKept = frequencies.begin();
+	auto it = std::next(lastKept);
+
+	while (it != frequencies.end()) {
+		const double a = *lastKept;
+		const double b = *it;
+
+		const double scale =
+			(std::max)(std::abs(a), std::abs(b));
+
+		const double tolerance =
+			(std::max)(absoluteTolerance, relativeTolerance * scale);
+
+		if (std::abs(b - a) <= tolerance) {
+			it = frequencies.erase(it);
+		}
+		else {
+			lastKept = it;
+			++it;
+		}
+	}
+
+	return originalSize - frequencies.size();
+}
+
 bool FDTDSolver::isFrequencyDump(EntityFieldDump* fieldDump)
 {
 	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(fieldDump->getProperties().getProperty("Type"));
@@ -335,6 +401,31 @@ bool FDTDSolver::isFrequencyDump(EntityFieldDump* fieldDump)
 	bool isFrequencyDomain = typeProperty->getValue().find("(Frequency Domain)") != std::string::npos;
 
 	return isFrequencyDomain;
+}
+
+void FDTDSolver::addFrequencies(EntityFarfieldDump* fieldDump, std::set<double> &farfieldFrequencyList)
+{
+	EntityPropertiesString* frequencyProperty = dynamic_cast<EntityPropertiesString*>(fieldDump->getProperties().getProperty("Frequencies"));
+	if (frequencyProperty == nullptr) return;
+
+	std::istringstream stream(frequencyProperty->getValue());
+	std::string item;
+
+	while (std::getline(stream, item, ','))
+	{
+		if (item.empty()) return; // Empty value in frquency list
+
+		std::size_t parsedCharacters = 0;
+		const double value = std::stod(item, &parsedCharacters);
+
+		// Allow whitespace after the number, but no other characters.
+		if (item.find_first_not_of(" \t\r\n", parsedCharacters) != std::string::npos)
+		{
+			return; // Invalid double value
+		}
+
+		farfieldFrequencyList.emplace(value);
+	}
 }
 
 std::string FDTDSolver::getFrequencyString(EntityFieldDump* fieldDump)
@@ -986,6 +1077,36 @@ void FDTDSolver::readFieldDumps()
 		{
 			std::string error = "The field dump named " + fieldDumpEntity->getName() + " is not a supported type";
 			delete fieldDumpEntity;
+
+			throw error;
+		}
+	}
+}
+
+void FDTDSolver::readFarfieldDumps()
+{
+	std::list<std::string> farfieldDumpEntityNames = ot::ModelServiceAPI::getListOfFolderItems(solverEntity->getName() + "/Farfield Dumps", false);
+	if (farfieldDumpEntityNames.empty()) return;
+
+	std::list<ot::EntityInformation> farfieldDumpEntitiesInfo;
+	ot::ModelServiceAPI::getEntityInformation(farfieldDumpEntityNames, farfieldDumpEntitiesInfo);
+
+	// Read all geometry entities
+	DataBase::instance().prefetchDocumentsFromStorage(farfieldDumpEntitiesInfo);
+
+	for (auto dump : farfieldDumpEntitiesInfo)
+	{
+		EntityBase* farfieldDumpEntity = ot::EntityAPI::readEntityFromEntityIDandVersion(dump.getEntityID(), dump.getEntityVersion());
+
+		EntityFarfieldDump* farfieldDump = dynamic_cast<EntityFarfieldDump*>(farfieldDumpEntity);
+		if (farfieldDump != nullptr)
+		{
+			farfieldDumpList.push_back(farfieldDump);
+		}
+		else if (farfieldDumpEntity != nullptr)
+		{
+			std::string error = "The farfield dump named " + farfieldDumpEntity->getName() + " is not a supported type";
+			delete farfieldDumpEntity;
 
 			throw error;
 		}

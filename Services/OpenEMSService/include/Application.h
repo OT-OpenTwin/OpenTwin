@@ -79,6 +79,7 @@ public:
 	void handleAddMicrostripPort(void);
 	void handleAddWaveguidePort(void);
 	void handleAddFieldDump(void);
+	void handleAddFarfieldDump(void);
 
 	void solverThread(std::list<ot::EntityInformation> solverInfo, std::list<ot::EntityInformation> meshInfo, std::map<std::string, EntityBase*> solverMap);
 	void runSingleSolver(ot::EntityInformation& solver, std::list<ot::EntityInformation>& meshInfo, EntityBase* solverEntity);
@@ -100,4 +101,5 @@ private:
 	ot::ToolBarButtonCfg m_addMicrostripPortButton;
 	ot::ToolBarButtonCfg m_addWaveguidePortButton;
 	ot::ToolBarButtonCfg m_addFieldDumpButton;
+	ot::ToolBarButtonCfg m_addFarfieldDumpButton;
 };
