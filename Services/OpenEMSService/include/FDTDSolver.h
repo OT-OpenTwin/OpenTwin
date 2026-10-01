@@ -59,6 +59,8 @@ private:
 	void addGeometry(std::stringstream& runCommand);
 	void addSolverRun(std::stringstream& runCommand);
 	void addPostprocessing(std::stringstream& runCommand);
+	void addSparameterPostprocessing(std::stringstream& runCommand);
+	void addFarfieldPostprocessing(std::stringstream& runCommand);
 	void addUnits(std::stringstream& runCommand);
 	void addPorts(std::stringstream& runCommand);
 	void addWaveguidePorts(std::stringstream& runCommand);

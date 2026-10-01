@@ -1815,6 +1815,12 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 	runCommand << "# Define post-processing\n";
 	runCommand << "#=================================================================================\n";
 
+	addSparameterPostprocessing(runCommand);
+	addFarfieldPostprocessing(runCommand);
+}
+
+void FDTDSolver::addSparameterPostprocessing(std::stringstream& runCommand)
+{
 	runCommand <<
 		"### S-parameter postprocessing\n"
 		"freq = np.linspace(max(f_start, 1e-6 * f_stop), f_stop, f_samples)\n"
@@ -1947,17 +1953,40 @@ void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
 		"            s_parameter,\n"
 		"            f's{output_port},{input_port}'\n"
 		"        )\n";		//"    save_xy_data(\n"
-		//"        freq,\n"
-		//"        input_impedance,\n"
-		//"        f'Zin{input_port}'\n"
-		//"    )\n"
-		//"\n"
-		//"    save_xy_data(\n"
-		//"        freq,\n"
-		//"        ports[input_port].ZL,\n"
-		//"        f'ZL_analytic_{input_port}'\n"
-		//"    )\n"
-		"\n";
+	//"        freq,\n"
+	//"        input_impedance,\n"
+	//"        f'Zin{input_port}'\n"
+	//"    )\n"
+	//"\n"
+	//"    save_xy_data(\n"
+	//"        freq,\n"
+	//"        ports[input_port].ZL,\n"
+	//"        f'ZL_analytic_{input_port}'\n"
+	//"    )\n"
+	"\n";
+}
+
+void FDTDSolver::addFarfieldPostprocessing(std::stringstream& runCommand)
+{
+	// Loop through all farfield dumps and calculate the results
+
+	runCommand <<
+		"\n\n### Farfield postprocessing\n";
+		"for run_index in enumerate(excitation_list, start=1):\n"
+		"\n"
+		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n";
+
+
+	//for (auto farfieldDump : farfieldDumpList)
+	//{
+	//	std::string type		= getType(farfieldDump);
+	//	std::string frequencies = getFrequencyList(farfieldDump);
+	//	std::string thetaAngles = getThetaAngles(farfieldDump);
+	//	std::string phiAngles   = getPhiAngles(farfieldDump);
+
+	//	runCommand << "    ff = nf2ff.CalcNF2FF(run_path, " << frequencies << ", " << thetaAngles << ", " << phiAngles << ")\n";
+
+	//}
 }
 
 void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
