@@ -21,6 +21,16 @@ root path. ``OTEnvironment.cmake`` derives it from the ``OT_<NAME>_ROOT``
 environment variable, for example ``OT_LOGGER_SERVICE_ROOT`` becomes
 ``OT_LOGGER_SERVICE_ROOT_PATH``.
 
+``OTEnvironment.cmake`` only does this for the projects listed in it. A new project sets the
+variable itself, before the ``include`` of ``OTProject.cmake``:
+
+.. code-block:: cmake
+
+   set(OT_FOO_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
+
+Without it, configuring stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
+See the :ref:`Project Setup Guide<target Project Setup Guide>`.
+
 Preamble
 --------
 
@@ -242,18 +252,42 @@ pass to ``ot_add_dependency``.
 
 .. _target Debugging services:
 
-Debugging services in Visual Studio
------------------------------------
+Debugging in Visual Studio
+--------------------------
 
-``ot_finalize_lib`` generates a ``.vs/launch.vs.json`` for every ``Services/`` target,
-so **F5** launches the service under the loader. Most services need nothing more: in a
-Debug build they read their configuration from a ``.cfg`` written by the Local
-Directory Service, so the launch arguments are ignored.
+To start a project with **F5**, Visual Studio needs a launch configuration: which program to start,
+with which arguments and with which ``PATH``. The build system writes it to ``.vs/launch.vs.json``
+in the project folder while CMake configures, with one entry for Debug and one for Release.
 
-Only the **backbone services** that run stand-alone and parse their own arguments
-(logger, authorisation, session and directory services) call ``ot_service_debug_launch``
-(between initialize and finalize) to declare them with ``ARGS``, using ``@NAME@`` tokens
-for environment values:
+The file is generated, so do not edit it by hand. Change the ``CMakeLists.txt`` and configure again.
+``clean.bat`` deletes the ``.vs`` folder, the next configure writes the file again.
+
+There is one function per kind of project. Each one writes the whole file, so a project uses only one of them:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 32 38 30
+
+   * - Function
+     - For
+     - Visual Studio starts
+   * - ``ot_service_debug_launch``
+     - services in ``Services/`` that need startup arguments
+     - ``open_twin.exe`` with the service DLL
+   * - ``ot_bin_debug_launch``
+     - executables that need a special ``PATH``
+     - the executable
+   * - ``ot_tool_debug_launch``
+     - DLLs outside ``Services/`` that run in ``open_twin.exe``
+     - ``open_twin.exe`` with the DLL
+   * - ``ot_tool_bin_debug_launch``
+     - executables in ``Tools/``
+     - the executable
+
+From CMakeLists.txt to F5
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The Local Session Service shows every step. In its ``CMakeLists.txt``:
 
 .. code-block:: cmake
 
@@ -263,9 +297,151 @@ for environment values:
             "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_GSS_PORT@"
             "@OPEN_TWIN_AUTH_PORT@")
 
+Every ``@NAME@`` is written to ``launch.vs.json`` as ``${env.NAME}``. The value is not filled in yet:
+
+.. code-block:: json
+
+   "exe": "${env.OPENTWIN_DEV_ROOT}\\Framework\\OpenTwin\\target\\debug\\open_twin.exe",
+   "args": [ "C:\\...\\LocalSessionService\\build\\windows-debug\\Debug\\LocalSessionService.dll",
+             "${env.OPEN_TWIN_LOGGING_URL}",
+             "${env.OPEN_TWIN_SERVICES_ADDRESS}:${env.OPEN_TWIN_LSS_PORT}",
+             "${env.OPEN_TWIN_SERVICES_ADDRESS}:${env.OPEN_TWIN_GSS_PORT}",
+             "${env.OPEN_TWIN_AUTH_PORT}" ],
+
+When you press F5, Visual Studio fills in the values from the environment it was started with by ``edit.bat``.
+With the default values the service is started as:
+
+.. code-block:: text
+
+   open_twin.exe ...\LocalSessionService.dll 127.0.0.1:8090 127.0.0.1:8093 127.0.0.1:8091 8092
+
+The defaults come from ``Scripts/Launcher/ot_launcher/service_args.py``. A variable you set yourself,
+for example ``OPEN_TWIN_SERVICES_ADDRESS``, wins over the default. Restart Visual Studio with
+``edit.bat`` after changing one, an open Visual Studio keeps the old values.
+
+Because the values are only filled in at F5, changing a port needs no new configure.
+Changing the ``ARGS`` list in the ``CMakeLists.txt`` does.
+
+Services
+~~~~~~~~
+
+``ot_finalize_lib`` writes the launch configuration for every target in ``Services/`` by itself.
+It always starts ``open_twin.exe`` and puts the path of the built service DLL in front of the ``ARGS``.
+The ``PATH`` is ``OT_ALL_DLLD`` (or ``OT_ALL_DLLR``) plus the normal ``PATH``.
+
+Most services need no ``ARGS`` at all: in a Debug build they read their configuration from a ``.cfg``
+written by the Local Directory Service. Only the **backbone services** that run stand-alone
+(logger, authorisation, session and directory services) declare ``ARGS``.
+
+``ot_service_debug_launch`` only stores the ``ARGS``, ``ot_finalize_lib`` writes them into the file.
+So it has to come **before** ``ot_finalize_lib``, otherwise the arguments are missing.
+
+The arguments are passed by position, in the order the service expects them. Use the same values and
+order as the start scripts in ``Scripts/Launcher``. A position cannot be left out, the next value would move
+into its place. A service that does not read a position gets the placeholder ``"unused"`` there,
+as in ``LoggerService``, which only reads its own address:
+
+.. code-block:: cmake
+
+   ot_service_debug_launch(LoggerService
+       ARGS "unused"                                             # 1: not read
+            "@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LOG_PORT@"  # 2: its own address
+            "unused"                                             # 3: not read
+            "unused"                                             # 4: not read
+   )
+
+Writing the arguments
+~~~~~~~~~~~~~~~~~~~~~
+
+These rules apply to the ``ARGS``, ``ARGSD``, ``ARGSR``, ``PATHD`` and ``PATHR`` of all launch functions:
+
+- Write every argument as its own string in double quotes: ``"--config"``, ``"127.0.0.1:8080"``.
+  Text outside of ``@...@`` is passed as it is.
+- ``@NAME@`` stands for the environment variable ``NAME``. It can be mixed with text,
+  ``"@OPEN_TWIN_SERVICES_ADDRESS@:@OPEN_TWIN_LSS_PORT@"`` becomes ``127.0.0.1:8093``.
+- A backslash is written as ``\\``, because CMake reads a single ``\`` as an escape character:
+  ``"@OPENTWIN_DEV_ROOT@\\Tools\\FileHeaderUpdater"``. The JSON escaping is done by the build system.
+- An argument must not contain ``;``, CMake would split it into two arguments.
+  In ``PATHD`` and ``PATHR`` the ``;`` separates the folders as usual.
+- If a variable used in an argument is not set when CMake configures, the whole argument is passed empty.
+  Check the variable first if a service complains about an empty argument.
+
+Executables
+~~~~~~~~~~~
+
+An executable is started directly by Visual Studio, its arguments go to its ``main()`` as usual.
+``ot_bin_debug_launch`` is for an executable that needs a special ``PATH``. Call it **after** ``ot_finalize_bin``.
+
+``PythonExecution`` uses it, because it runs the release runtime in Debug as well
+(see :ref:`Runtime library<target CMake Runtime Library>`). It must load the release OpenTwin DLLs,
+the debug ones would crash it:
+
+.. code-block:: cmake
+
+   ot_finalize_bin(PythonExecution)
+
+   ot_bin_debug_launch(PythonExecution
+       # release OpenTwin DLLs ; release Python ; the normal PATH
+       PATH [[${env.OT_ALL_DLLR};${env.OT_PYTHON_BIN}\Release;${env.PATH}]])
+
+Unlike the other functions, ``PATH`` here is written in the Visual Studio syntax ``${env.NAME}`` instead of ``@NAME@``.
+The ``[[...]]`` brackets keep CMake from changing the ``$`` and the ``\``, so a single ``\`` is enough inside them.
+``ARGS`` applies to Debug and Release alike.
+
+Tools
+~~~~~
+
+The two tool functions take separate values per configuration: ``ARGSD`` and ``PATHD`` for Debug,
+``ARGSR`` and ``PATHR`` for Release. Arguments that are left out are empty, a ``PATH`` that is left out
+gets the default. Call them **after** ``ot_finalize_bin`` or ``ot_finalize_lib``.
+
+``ot_tool_bin_debug_launch`` is for a tool executable. ``FileHeaderUpdater`` gets arguments for a safe test run in Debug:
+
+.. code-block:: cmake
+
+   ot_finalize_bin(FileHeaderUpdater)
+
+   ot_tool_bin_debug_launch(FileHeaderUpdater
+       ARGSD "--dry"         # dry run: report the changes, modify no file
+             "--config"      # the next argument is the configuration file
+             "@OPENTWIN_DEV_ROOT@\\Tools\\FileHeaderUpdater\\OT_FHU_Config.json"
+   )
+
+In Debug, F5 runs ``FileHeaderUpdater.exe --dry --config C:\...\OT_FHU_Config.json``.
+There is no ``ARGSR``, so Release starts it without arguments.
+
+``EndpointDocParser`` needs no arguments, only the debug DLLs of ``OTSystem`` and ``OTCore``:
+
+.. code-block:: cmake
+
+   ot_tool_bin_debug_launch(EndpointDocParser
+       # OTSystem debug DLL ; OTCore debug DLL ; zlib debug DLL ; the normal PATH
+       PATHD "@OT_SYSTEM_ROOT@\\@OT_CDLLD@;@OT_CORE_ROOT@\\@OT_CDLLD@;@ZLIB_DLLPATHD@;@PATH@"
+   )
+
+Without ``PATHD``, ``ot_tool_bin_debug_launch`` uses the ``PATH`` Visual Studio was started with.
+End your own ``PATH`` with ``@PATH@``, otherwise the normal ``PATH`` is lost.
+
+``ot_tool_debug_launch`` is for a DLL that runs in ``open_twin.exe`` like a service but lives outside ``Services/``,
+such as ``OToolkit``. Its arguments are passed by position like those of a service. ``OToolkit`` reads position 2 as its own address
+and position 4 for its own options, 1 and 3 are not read:
+
+.. code-block:: cmake
+
+   ot_finalize_lib(OToolkit)
+
+   ot_tool_debug_launch(OToolkit
+       ARGSD "unused" "127.0.0.1:8080" "unused" "unused"
+       ARGSR "unused" "127.0.0.1:8094" "127.0.0.1:8095" "unused"
+       PATHD "@OT_DEFAULT_SERVICE_DLLD@;@OT_GUI_ROOT@\\@OT_CDLLD@;@OT_WIDGETS_ROOT@\\@OT_CDLLD@;@OT_OTOOLKITAPI_ROOT@\\@OT_CDLLD@;@QT_ADS_ROOT@\\lib;@QT_DLLD@;@PATH@"
+       PATHR "@QT_DLLR@;@OT_DEFAULT_SERVICE_DLLR@;@OT_WIDGETS_ROOT@\\@OT_CDLLR@;@OT_OTOOLKITAPI_ROOT@\\@OT_CDLLR@;@QT_ADS_ROOT@\\lib;@PATH@"
+   )
+
+Its default ``PATH`` is ``OT_ALL_DLLD`` or ``OT_ALL_DLLR`` plus the normal ``PATH``. ``OToolkit`` sets its own,
+because it also needs Qt and the Qt Advanced Docking System.
+
 .. note::
    Third-party runtime DLLs (Python, ngspice, ...) live in ``Deployment``, which is on
-   ``PATH``, so services that link them load without extra configuration. The execution
-   subprocesses (``PythonExecution``, ``CircuitExecution``) are plain executables that
-   Visual Studio launches directly and resolve their DLLs the same way, so they need no
-   launch declaration either.
+   ``PATH``, so services that link them load without extra configuration.
+   ``CircuitExecution`` is a plain executable that Visual Studio starts directly, it needs no launch declaration.
+   ``PythonExecution`` is the exception, see Executables above.

@@ -7,7 +7,7 @@ These sections cover the basics of getting started with OpenTwin, including sett
    :maxdepth: 3
 
    setup_development_environment
-   python_scripts/python_scripts
+   project_setup
    building_the_software
    managing_certificates
    architecture_overview

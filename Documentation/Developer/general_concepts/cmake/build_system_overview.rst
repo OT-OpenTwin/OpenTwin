@@ -25,10 +25,17 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
      - Finds Qt 6 and defines the imported ``Qt6::*`` targets used by the
        ``Qt*`` dependency tokens.
        Instead of using ``find_package()`` we directly read set environment for our ``Qt`` packges.
+       A Qt outside the ThirdParty folder is rejected, so a system Qt is never picked up by accident.
+   * - ``OTPlatform.cmake``
+     - Everything that differs between platforms and compilers: the system libraries behind
+       ``OSLibs``, the ``WINLIB:`` tokens, warning IDs and the Qt library file names.
    * - ``OTPresets.json``
      - The shared ``CMakePresets`` definition that every project includes, so
        the configurations (such as ``windows-debug`` and ``windows-release``)
-       are defined in one place.
+       are defined in one place. See :ref:`Configurations and presets<target CMake Presets>`.
+   * - ``templates/``
+     - Templates for the Visual Studio ``launch.vs.json``, see
+       :ref:`Debugging in Visual Studio<target Debugging services>`.
 
 A project finds the meta system through the ``OT_CMAKE_DIR`` environment
 variable, which points at ``Scripts/CMake``. ``SetupEnvironment.py`` exports it
@@ -140,11 +147,53 @@ the release runtime, even in Debug. ``ot_initialize_bin_python`` handles that di
 it keeps ``/MD`` in every configuration and, in Debug, defines ``_RELEASEDEBUG``
 instead of ``_DEBUG`` so the service's debug code paths are still active.
 
+.. _target CMake Presets:
+
 Configurations and presets
 --------------------------
 
-Configurations come from ``OTPresets.json`` through each project's
-``CMakePresets.json``. The Visual Studio generator is multi config, so one
-generated ``.vcxproj`` contains ``Debug``, ``Release``, ``RelWithDebInfo`` and
-``MinSizeRel``. Day to day you mostly use ``windows-debug`` and
-``windows-release``.
+All presets are defined once, in ``Scripts/CMake/OTPresets.json``. Every project has its own
+``CMakePresets.json`` next to its ``CMakeLists.txt``, but that file only includes the shared one:
+
+.. code-block:: json
+
+   {
+     "version": 7,
+     "include": [ "$penv{OT_CMAKE_DIR}/OTPresets.json" ]
+   }
+
+So to change a compiler setting or a build folder for all projects, edit ``OTPresets.json``.
+The project files never need changes, a new project simply copies one from a sibling.
+
+``OTPresets.json`` defines two configure presets:
+
+.. list-table::
+   :header-rows: 1
+   :widths: 25 35 40
+
+   * - Configure preset
+     - Build folder
+     - Build preset
+   * - ``windows-debug``
+     - ``build/windows-debug``
+     - ``build-windows-debug`` (builds ``Debug``)
+   * - ``windows-release``
+     - ``build/windows-release``
+     - ``build-windows-release`` (builds ``Release``)
+
+Both use the ``Ninja Multi-Config`` generator with the Ninja and the MSVC compiler (``cl.exe``)
+that come with Visual Studio 2022. They also write a ``compile_commands.json``, which editors such as
+VS Code use for code completion.
+
+``build.bat`` uses exactly these presets: it runs ``cmake --preset windows-debug`` and then
+``cmake --build --preset build-windows-debug``, the same for Release. Visual Studio reads the same
+file when it opens the project folder and shows both presets in its configuration list.
+
+The finished binaries end up in ``build/windows-debug/Debug`` and ``build/windows-release/Release``.
+These folders match ``OT_CDLLD`` and ``OT_CDLLR`` in ``Scripts/SetupEnvironment.py``, which is how other
+projects, the tests and the deployment find them. If the build folders in ``OTPresets.json`` change,
+those two values have to change with them.
+
+The presets also put the OpenTwin and ThirdParty DLL folders and ``Deployment`` on ``PATH``
+(the debug or the release ones), so programs started from Visual Studio find their DLLs.
+The ``test-windows-debug`` and ``test-windows-release`` presets do the same for ``ctest``.

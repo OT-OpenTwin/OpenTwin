@@ -41,7 +41,8 @@ Finalize
     Creates the shared library ``<Target>`` from the core objects, exposes
     ``include/`` as a ``PUBLIC`` include directory, applies all recorded
     dependencies and the requested subsystem, and enables ``AUTOMOC`` if any
-    ``Qt*`` token is present.
+    ``Qt*`` token is present. For a target in ``Services/`` it also writes the
+    Visual Studio ``launch.vs.json`` (see ``ot_service_debug_launch``).
 
 ``ot_finalize_bin(<Target> [OUTPUT_NAME])``
     Creates the executable ``<Target>`` from the core objects. ``WIN32_EXECUTABLE``
@@ -135,6 +136,29 @@ Debug launch (Visual Studio F5)
     debug against the **release** OT DLLs (``${env.OT_ALL_DLLR}``) plus release
     python - never the ``/MDd`` debug DLLs, which would CRT- /
     ``_ITERATOR_DEBUG_LEVEL``-mismatch and crash.
+
+``ot_tool_bin_debug_launch(<Target> [ARGSD <arg> ...] [ARGSR <arg> ...] [PATHD <path>] [PATHR <path>])``
+    Generates the ``launch.vs.json`` for a tool executable, with separate arguments and
+    ``PATH`` for Debug and Release. ``@NAME@`` tokens work as in ``ot_service_debug_launch``.
+    ``PATHD`` and ``PATHR`` default to the inherited ``PATH``. Call it after ``ot_finalize_bin``.
+
+``ot_tool_debug_launch(<Target> [ARGSD <arg> ...] [ARGSR <arg> ...] [PATHD <path>] [PATHR <path>])``
+    Like ``ot_tool_bin_debug_launch``, but for a DLL outside ``Services/`` that runs in
+    ``open_twin.exe`` (for example ``OToolkit``). The DLL path is passed as first argument.
+    ``PATHD`` and ``PATHR`` default to ``OT_ALL_DLLD`` or ``OT_ALL_DLLR`` plus the inherited ``PATH``.
+    Call it after ``ot_finalize_lib``.
+
+All four launch functions are Visual Studio only and do nothing with other compilers.
+Each one writes the whole ``launch.vs.json``, so a project uses only one of them. Examples:
+:ref:`Debugging in Visual Studio<target Debugging services>`.
+
+Qt
+--
+
+``ot_bin_use_release_qt(<Target>)``
+    Makes the Debug configuration link the release Qt libraries. For targets that run the
+    release runtime in Debug (``ot_initialize_bin_python``). Call it after ``ot_finalize_bin``,
+    when the Qt targets exist. Visual Studio only.
 
 Internal helpers
 ----------------

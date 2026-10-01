@@ -32,8 +32,9 @@ through its ``OT_<NAME>_ROOT`` environment variable. The build system adds the
 library's include directory to your core target and links its import library to
 the final target, picking the correct paths per configuration.
 
-Most names follow a simple rule: ``OTFooBar`` maps to ``OT_FOO_BAR_ROOT``. A few
-older names break that rule and are mapped by hand:
+Most names follow a simple rule: ``OTFooBar`` maps to ``OT_FOO_BAR_ROOT``.
+If that variable does not exist, the same name without the extra ``_`` is tried,
+so ``OTGuiAPI`` finds ``OT_GUIAPI_ROOT``. A few older names break both rules and are mapped by hand:
 
 .. list-table::
    :header-rows: 1
@@ -58,7 +59,7 @@ older names break that rule and are mapped by hand:
    * - ``UICore``
      - ``OT_UICORE_ROOT``
    * - ``OTFMC``
-     - ``OT_FILE_MANAGER_CONNECTOR_ROOT`` (with fallbacks)
+     - ``OT_FILE_MANAGER_CONNECTOR_ROOT``
 
 If you add a new OpenTwin library whose root variable does not match the
 ``OT_FOO_BAR_ROOT`` pattern, add a mapping in the ``_ot_get_ot_root_envvar``
@@ -200,6 +201,7 @@ System and special tokens
    * - ``WINLIB:<name>``
      - Links a single Windows system library, for example
        ``WINLIB:Crypt32``. The ``.lib`` suffix is optional; the linker adds it.
+       On other platforms the token is accepted and ignored.
    * - ``OTEncryptionKey``
      - Adds the encryption key include directory only.
 
@@ -224,5 +226,8 @@ environment variables and wires it up generically:
 
 So a simple new third party dependency can often be added just by defining those
 variables in the ThirdParty ``SetupEnvironment.py`` and using the token, with no change to
-``OTProject.cmake``. For anything less regular, add a branch in
+``OTProject.cmake``.
+
+Several tokens in use today work only this way and have no entry in the tables above:
+``ZLIB``, ``QT_TT``, ``MDFLIB``, ``EXPAT`` and ``CGAL`` (headers only). For anything less regular, add a branch in
 ``_ot_apply_dep_to_core`` and ``_ot_apply_dep_to_final``.

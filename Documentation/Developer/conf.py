@@ -24,6 +24,7 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 #html_theme = 'agogo'
 html_theme = 'sphinx_rtd_theme'
+html_theme_options = { 'navigation_depth': 5 }
 html_static_path = ['_static']
 html_style = 'css/my_theme.css'
 html_logo = 'images/logo_small.png'

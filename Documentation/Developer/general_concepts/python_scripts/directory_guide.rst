@@ -14,7 +14,13 @@ Directory guide
      BuildAndTest/           RebuildAll, TestAll, CleanAll, deployments, build server jobs, build logs
      CMake/                  shared CMake modules and presets (OT_CMAKE_DIR)
      Installer/              NSIS installers
-     Launcher/               start scripts that ship with the deployment
+     Launcher/               start scripts that ship with the deployment, and the ot_launcher package they use
      Other/                  helpers: compress/decompress, file headers, URL scheme, cmake-gui/VS with env
 
 Every project folder has its own build.bat, clean.bat, test.bat and edit.bat (see :ref:`Project batches<target Project batches>`).
+
+Where to read more:
+
+- ``SetupEnvironment.py``, ``BuildOrder.py`` and ``DeploymentManifest.py``: :ref:`Environment Setup Guide<target Environment Setup Guide>`
+- ``Python/``: :ref:`Entry Scripts<target Entry scripts>`, also for writing new scripts
+- ``CMake/``: :ref:`CMake Build System<target CMake Build System>`
