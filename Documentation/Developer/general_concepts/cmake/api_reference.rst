@@ -166,5 +166,6 @@ Internal helpers
 Functions prefixed with ``_ot_`` (for example ``_ot_initialize_target``,
 ``_ot_apply_dep_to_core``, ``_ot_apply_dep_to_final``, ``_ot_get_ot_root_envvar``)
 are implementation details of the meta system. Do not call them from a project
-``CMakeLists.txt``. Extend them only when adding a new dependency token or
-environment-variable mapping that the public API cannot express.
+``CMakeLists.txt``. A new dependency normally needs no change here: a third party library is added
+through its environment variables, an OpenTwin library through a matching variable name
+(see :ref:`Dependency tokens<target CMake Dependency Tokens>`).

@@ -34,7 +34,7 @@ the final target, picking the correct paths per configuration.
 
 Most names follow a simple rule: ``OTFooBar`` maps to ``OT_FOO_BAR_ROOT``.
 If that variable does not exist, the same name without the extra ``_`` is tried,
-so ``OTGuiAPI`` finds ``OT_GUIAPI_ROOT``. A few older names break both rules and are mapped by hand:
+so ``OTGuiAPI`` finds ``OT_GUIAPI_ROOT``. A few older names are mapped by hand:
 
 .. list-table::
    :header-rows: 1
@@ -61,9 +61,8 @@ so ``OTGuiAPI`` finds ``OT_GUIAPI_ROOT``. A few older names break both rules and
    * - ``OTFMC``
      - ``OT_FILE_MANAGER_CONNECTOR_ROOT``
 
-If you add a new OpenTwin library whose root variable does not match the
-``OT_FOO_BAR_ROOT`` pattern, add a mapping in the ``_ot_get_ot_root_envvar``
-function in ``OTProject.cmake``.
+For a new OpenTwin library, name its variable in ``SetupEnvironment.py`` after one of the two rules,
+so the token works without any change to the build system: ``OTFooBar`` as ``OT_FOO_BAR_ROOT`` or ``OT_FOOBAR_ROOT``.
 
 .. note::
   This will be revised in the upcoming Environment setup changes via Python in the future.
@@ -224,10 +223,14 @@ environment variables and wires it up generically:
 * link dirs: ``<TOKEN>_LIBPATHD`` / ``<TOKEN>_LIBPATHR``
 * link libs: ``<TOKEN>_LIBD`` / ``<TOKEN>_LIBR`` (or a single ``<TOKEN>_LIB``)
 
-So a simple new third party dependency can often be added just by defining those
-variables in the ThirdParty ``SetupEnvironment.py`` and using the token, with no change to
-``OTProject.cmake``.
+So a new third party library, headers and libraries, is added just by defining those
+variables in the ThirdParty ``SetupEnvironment.py`` and using the token. Nothing in ``Scripts/CMake`` has to change.
 
-Several tokens in use today work only this way and have no entry in the tables above:
-``ZLIB``, ``QT_TT``, ``MDFLIB``, ``EXPAT`` and ``CGAL`` (headers only). For anything less regular, add a branch in
-``_ot_apply_dep_to_core`` and ``_ot_apply_dep_to_final``.
+Many tokens in daily use work exactly this way: ``CURL``, ``MONGO_C``, ``MONGO_CXX``, ``BOOST``,
+and ``ZLIB``, ``QT_TT``, ``MDFLIB`` and ``EXPAT``, which have no entry in the tables above.
+
+The link part is only used when ``<TOKEN>_LIBPATHD`` or ``<TOKEN>_LIBPATHR`` is set.
+A ``<TOKEN>_LIB`` without a lib path is not linked.
+
+A header only library without a lib path still gets its include directories,
+but configure prints the warning "Unknown dependency token" for it. The build works, the warning can be ignored.
