@@ -60,10 +60,10 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		throw std::exception("Values are missing either the imaginary or the real part.");
 	}
 
-	if (_numberOfParameterValues != dataValues.size())
-	{
-		throw std::exception("Number of real values does not match the number of parameter values.");
-	}
+	//if (_numberOfParameterValues != dataValues.size())
+	//{
+	//	throw std::exception("Number of real values does not match the number of parameter values.");
+	//}
 	
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
@@ -73,19 +73,19 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 
 	m_bucketSize = 1;
 	
-	const size_t numberOfDocuments = _numberOfParameterValues;
+	const size_t numberOfDocuments = dataValues.size();
 	m_logger.log("Storing " + std::to_string(numberOfDocuments) + " documents");
 
 	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
 	const size_t constCount = currentParameterValues.size();
 
-	for (uint64_t i = 0; i < _numberOfParameterValues; i++)
+	for (uint64_t i = 0; i < dataValues.size(); i++)
 	{
 		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
 		{
 			currentParameterValues.push_back(*changingParameterValueIt);
-			if (i != _numberOfParameterValues - 1)
+			if (i != dataValues.size() - 1)
 			{
 				changingParameterValueIt++;
 			}
@@ -101,7 +101,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityID, *dataValueItt);
 		}
 
-		if (i != _numberOfParameterValues - 1)
+		if (i != dataValues.size() - 1)
 		{
 			dataValueItt++;
 		}
