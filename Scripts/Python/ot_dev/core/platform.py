@@ -36,6 +36,12 @@ REQUIRED: list[str] = ["DEVENV_ROOT_2022"] if WINDOWS else []
 # yarn/cargo are .cmd shims on Windows; on POSIX a list argv must not use a shell.
 USE_SHELL = WINDOWS
 
+
+# SetupEnvironment.py keeps the Windows spelling of its paths.
+def native_path(value: str) -> str:
+    return value if WINDOWS else value.replace("\\", "/")
+
+
 DEFAULT_EDITOR = "VS"
 
 EDITORS: dict[str, tuple[str | None, str]] = {

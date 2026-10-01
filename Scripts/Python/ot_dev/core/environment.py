@@ -19,7 +19,7 @@ from typing import Iterable
 
 from .config import definitions
 from .expansion import expand, load_module
-from .platform import REQUIRED as PLATFORM_REQUIRED
+from .platform import REQUIRED as PLATFORM_REQUIRED, native_path
 
 
 def require(names: Iterable[str]) -> None:
@@ -37,7 +37,7 @@ def _thirdparty(env: dict[str, str], third: Path) -> None:
 
 
 def _projects(env: dict[str, str], dev: Path) -> None:
-    env.update(definitions.RELATIVE)
+    env.update({name: native_path(value) for name, value in definitions.RELATIVE.items()})
     for group, folder in definitions.GROUPS:
         for name, project in group.items():
             env[name] = str(dev / folder / project)
@@ -45,18 +45,18 @@ def _projects(env: dict[str, str], dev: Path) -> None:
 
 def _dev_paths(env: dict[str, str], dev: Path) -> None:
     for name, relative in definitions.DEV_PATHS.items():
-        env[name] = str(dev / relative)
+        env[name] = str(dev / native_path(relative))
 
 
 def _certificates(env: dict[str, str], dev: Path) -> None:
-    root = Path(env.get(definitions.CERTIFICATES_OVERRIDE) or dev / definitions.CERTIFICATES_ROOT)
+    root = Path(env.get(definitions.CERTIFICATES_OVERRIDE) or dev / native_path(definitions.CERTIFICATES_ROOT))
     for name, filename in definitions.CERTIFICATES.items():
         env[name] = str(root / filename)
 
 
 def _composites(env: dict[str, str]) -> None:
     for name, template in definitions.COMPOSITES.items():
-        env[name] = expand(env, template)
+        env[name] = native_path(expand(env, template))
 
 
 def _service_args(env: dict[str, str], dev: Path) -> None:
@@ -68,7 +68,7 @@ def _service_args(env: dict[str, str], dev: Path) -> None:
 
 def _path(env: dict[str, str]) -> None:
     for entry in definitions.PATH_PREPEND:
-        env["PATH"] = expand(env, f"{entry};%PATH%")
+        env["PATH"] = expand(env, f"{native_path(entry)}{os.pathsep}%PATH%")
 
 
 def build_env(base: str | Path | None = None) -> dict[str, str]:
