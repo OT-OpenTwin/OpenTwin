@@ -99,11 +99,13 @@ private:
 	void convertAndStoreFieldDumps(const std::string& resultFolderName, const std::string& excitationString);
 	bool getFieldDumpTypeAndMode(EntityFieldDump* fieldDump, int& dumpType, int& dumpMode);
 	bool getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string &fieldType, std::string &unit);
-	std::string getFrequencyString(EntityFieldDump* fieldDump);
+	std::string getFrequencyString(EntityBase* fieldDump);
 	std::string getSubsamplingString(EntityFieldDump* fieldDump);
 	std::string getResolutionString(EntityFieldDump* fieldDump);
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
 	std::string getStartStopString(EntityFieldDump* fieldDump);
+	std::string getThetaAngles(EntityFarfieldDump* farfieldDump);
+	std::string getPhiAngles(EntityFarfieldDump* farfieldDump);
 	void addFrequencies(EntityFarfieldDump* fieldDump, std::set<double>& farfieldFrequencyList);
 	bool isFrequencyDump(EntityFieldDump* fieldDump);
 	std::size_t moveMergedNodesOutward(std::vector<Geometry::Node>& nodes, double mergeTolerance, double clearance);

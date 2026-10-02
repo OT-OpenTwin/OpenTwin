@@ -424,11 +424,11 @@ void FDTDSolver::addFrequencies(EntityFarfieldDump* fieldDump, std::set<double> 
 			return; // Invalid double value
 		}
 
-		farfieldFrequencyList.emplace(value);
+		farfieldFrequencyList.emplace(value * entityUnits->getScaleToSIFrequency());
 	}
 }
 
-std::string FDTDSolver::getFrequencyString(EntityFieldDump* fieldDump)
+std::string FDTDSolver::getFrequencyString(EntityBase* fieldDump)
 {
 	EntityPropertiesString* frequencyProperty = dynamic_cast<EntityPropertiesString*>(fieldDump->getProperties().getProperty("Frequencies"));
 	if (frequencyProperty == nullptr) return "";
@@ -1972,21 +1972,248 @@ void FDTDSolver::addFarfieldPostprocessing(std::stringstream& runCommand)
 
 	runCommand <<
 		"\n\n### Farfield postprocessing\n";
-		"for run_index in enumerate(excitation_list, start=1):\n"
+
+	// Define the class which is needed for accumulating all farfield data into a single table
+	runCommand << R"PY(
+import numpy as np
+
+class FarFieldTable:
+    COLUMNS = (
+        "Frequency", "Theta", "Phi",
+        "Etheta_Abs", "Etheta_Phase",
+        "Ephi_Abs", "Ephi_Phase", "Eabs"
+    )
+
+    def __init__(self):
+        self._blocks = []
+        self._nrows = 0
+
+    def append(self, ff, frequencies, theta_deg, phi_deg):
+        frequencies = np.asarray(
+            frequencies, dtype=np.float64
+        ).reshape(-1)
+
+        theta = np.asarray(
+            theta_deg, dtype=np.float64
+        ).reshape(-1)
+
+        phi = np.asarray(
+            phi_deg, dtype=np.float64
+        ).reshape(-1)
+
+        nf, nt, np_ = frequencies.size, theta.size, phi.size
+
+        if len(ff.E_theta) != nf or len(ff.E_phi) != nf:
+            raise ValueError("Field count does not match frequency count.")
+
+        nrows = nf * nt * np_
+        if nrows == 0:
+            return 0
+
+        data = np.empty((nf, nt, np_, 8), dtype=np.float64)
+
+        # Use the originally requested frequencies and angles.
+        data[..., 0] = frequencies[:, None, None]
+        data[..., 1] = theta[None, :, None]
+        data[..., 2] = phi[None, None, :]
+
+        for k in range(nf):
+            et = np.asarray(ff.E_theta[k])
+            ep = np.asarray(ff.E_phi[k])
+
+            if et.shape != (nt, np_) or ep.shape != (nt, np_):
+                raise ValueError(
+                    f"Frequency index {k}: expected shape {(nt, np_)}, "
+                    f"got E_theta={et.shape}, E_phi={ep.shape}."
+                )
+
+            plane = data[k]
+            np.abs(et, out=plane[..., 3])
+            plane[..., 4] = np.angle(et, deg=True)
+            np.abs(ep, out=plane[..., 5])
+            plane[..., 6] = np.angle(ep, deg=True)
+            np.hypot(plane[..., 3], plane[..., 5], out=plane[..., 7])
+
+        self._blocks.append(data.reshape(nrows, 8))
+        self._nrows += nrows
+        return nrows
+
+    def to_numpy(self):
+        if not self._blocks:
+            return np.empty((0, 8), dtype=np.float64)
+        return np.concatenate(self._blocks, axis=0)
+
+    def remove_duplicates(self, keep="last", key_decimals=None):
+        if keep not in ("first", "last"):
+            raise ValueError("keep must be 'first' or 'last'.")
+
+        if key_decimals is not None and len(key_decimals) != 3:
+            raise ValueError("key_decimals must contain three integers.")
+
+        if self._nrows < 2:
+            return 0
+
+        data = self.to_numpy()
+        keys = data[:, :3]
+
+        # Optional: only round the comparison keys.
+        if key_decimals is not None:
+            keys = np.column_stack([
+                np.round(keys[:, column], decimals=decimals)
+                for column, decimals in enumerate(key_decimals)
+            ])
+
+        if keep == "last":
+            _, indices = np.unique(
+                keys[::-1], axis=0, return_index=True
+            )
+            indices = len(data) - 1 - indices
+        else:
+            _, indices = np.unique(
+                keys, axis=0, return_index=True
+            )
+
+        removed = len(data) - len(indices)
+
+        if removed:
+            indices.sort()
+            self._blocks = [data[indices]]
+            self._nrows = len(indices)
+
+        return removed
+
+    def save_csv(self, filename, delimiter=";", header=True):
+        with open(filename, "w", encoding="utf-8", newline="") as output:
+            if header:
+                output.write(delimiter.join(self.COLUMNS) + "\n")
+
+            for block in self._blocks:
+                np.savetxt(
+                    output, block, delimiter=delimiter, fmt="%.17g"
+                )
+
+    def save_txt(self, filename, header=True):
+        self.save_csv(filename, delimiter="\t", header=header)
+
+    def clear(self):
+        self._blocks.clear()
+        self._nrows = 0
+
+    def __len__(self):
+        return self._nrows
+
+)PY";
+
+	// Process all farfield definitions, calculate the farfields and write them to the table
+	runCommand <<
+		"\n\nfor run_index, excitation_settings in enumerate(excitation_list, start=1):\n"
 		"\n"
-		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n";
+		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
+		"    far_fields = FarFieldTable();\n";
 
+	for (auto farfieldDump : farfieldDumpList)
+	{
+		std::string frequencies = getFrequencyString(farfieldDump);
+		std::string thetaAngles = getThetaAngles(farfieldDump);
+		std::string phiAngles   = getPhiAngles(farfieldDump);
 
-	//for (auto farfieldDump : farfieldDumpList)
-	//{
-	//	std::string type		= getType(farfieldDump);
-	//	std::string frequencies = getFrequencyList(farfieldDump);
-	//	std::string thetaAngles = getThetaAngles(farfieldDump);
-	//	std::string phiAngles   = getPhiAngles(farfieldDump);
+		runCommand << "    ff_freq = [" << frequencies << "]\n";
+		runCommand << "    theta_deg = [" << thetaAngles << "]\n";
+		runCommand << "    phi_deg = [" << phiAngles << "]\n";
+		runCommand << "    ff = nf2ff.CalcNF2FF(run_path, ff_freq, theta_deg, phi_deg)\n";
+		runCommand << "    far_fields.append(ff, ff_freq, theta_deg, phi_deg)\n";
+	}
 
-	//	runCommand << "    ff = nf2ff.CalcNF2FF(run_path, " << frequencies << ", " << thetaAngles << ", " << phiAngles << ")\n";
+	// Remove duplicates and write the result to the file farfields.txt
+	runCommand << "    far_fields.remove_duplicates(keep='last', key_decimals=(3, 9, 9))\n";
+	runCommand << "    far_fields.save_txt(os.path.join(run_path, 'farfields.txt'), header=True)\n";
+	runCommand << "\n";
+}
 
-	//}
+std::string FDTDSolver::getThetaAngles(EntityFarfieldDump* farfieldDump)
+{
+	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(farfieldDump->getProperties().getProperty("Type"));
+	if (typeProperty == nullptr) return "";
+
+	bool fixedTheta = (typeProperty->getValue() == "1D (Theta constant)");
+
+	std::stringstream angleList;
+	angleList << std::defaultfloat << std::setprecision(6);
+
+	if (fixedTheta)
+	{
+		EntityPropertiesDouble* thetaCutProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta cut (deg.)"));
+
+		angleList << thetaCutProperty->getValue();
+	}
+	else
+	{
+		EntityPropertiesDouble* thetaMinProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta min (deg.)"));
+		EntityPropertiesDouble* thetaMaxProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta max (deg.)"));
+		EntityPropertiesInteger* thetaStepsProperty = dynamic_cast<EntityPropertiesInteger*>(farfieldDump->getProperties().getProperty("Theta steps"));
+
+		double angleMin = thetaMinProperty->getValue();
+		double angleMax = thetaMaxProperty->getValue();
+		int angleSteps  = thetaStepsProperty->getValue();
+
+		if (angleSteps > 0)
+		{
+			double angleStepWidth = (angleMax - angleMin) / angleSteps;
+
+			for (int step = 0; step <= angleSteps; step++)
+			{
+				double angle = angleMin + step * angleStepWidth;
+
+				if (step > 0) angleList << ", ";
+				angleList << angle;
+			}
+		}
+	}
+
+	return angleList.str();
+}
+
+std::string FDTDSolver::getPhiAngles(EntityFarfieldDump* farfieldDump)
+{
+	EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(farfieldDump->getProperties().getProperty("Type"));
+	if (typeProperty == nullptr) return "";
+
+	bool fixedPhi = (typeProperty->getValue() == "1D (Phi constant)");
+
+	std::stringstream angleList;
+	angleList << std::defaultfloat << std::setprecision(6);
+
+	if (fixedPhi)
+	{
+		EntityPropertiesDouble* phiCutProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi cut (deg.)"));
+
+		angleList << phiCutProperty->getValue();
+	}
+	else
+	{
+		EntityPropertiesDouble* phiMinProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi min (deg.)"));
+		EntityPropertiesDouble* phiMaxProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi max (deg.)"));
+		EntityPropertiesInteger* phiStepsProperty = dynamic_cast<EntityPropertiesInteger*>(farfieldDump->getProperties().getProperty("Phi steps"));
+
+		double angleMin = phiMinProperty->getValue();
+		double angleMax = phiMaxProperty->getValue();
+		int angleSteps  = phiStepsProperty->getValue();
+
+		if (angleSteps > 0)
+		{
+			double angleStepWidth = (angleMax - angleMin) / angleSteps;
+
+			for (int step = 0; step <= angleSteps; step++)
+			{
+				double angle = angleMin + step * angleStepWidth;
+
+				if (step > 0) angleList << ", ";
+				angleList << angle;
+			}
+		}
+	}
+
+	return angleList.str();
 }
 
 void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
