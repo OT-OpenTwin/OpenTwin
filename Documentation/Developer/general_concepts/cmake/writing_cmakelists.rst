@@ -16,15 +16,17 @@ Any optional tweaks go between initialize and finalize.
    ot_finalize_<kind>(<Target>)
    ot_add_test(<Target>)        # optional
 
-``<ROOT_PATH_VAR>`` is the name of the CMake variable that holds the project's
-root path. ``OTEnvironment.cmake`` derives it from the ``OT_<NAME>_ROOT``
-environment variable, for example ``OT_LOGGER_SERVICE_ROOT`` becomes
-``OT_LOGGER_SERVICE_ROOT_PATH``.
+``<ROOT_PATH_VAR>`` is the name of the CMake variable that holds the project's folder.
+It is the project's variable name from ``SetupEnvironment.py`` with ``_PATH`` added:
 
-A project that is not listed in ``OTEnvironment.cmake`` gets the value directly from its
-``OT_<NAME>_ROOT`` variable, so registering the project in ``SetupEnvironment.py`` is enough.
-If neither exists, configuring stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
-See the :ref:`Project Setup Guide<target Project Setup Guide>`.
+.. code-block:: text
+
+   OT_LOGGER_SERVICE_ROOT         in SetupEnvironment.py
+   OT_LOGGER_SERVICE_ROOT_PATH    in ot_initialize_lib(LoggerService OT_LOGGER_SERVICE_ROOT_PATH ...)
+
+The build system fills in the value by itself, nothing else has to be set.
+If the two names do not match, configuring stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
+See the :ref:`Project Setup Guide<target Project Setup Guide>`, step 2 and 5.
 
 Preamble
 --------

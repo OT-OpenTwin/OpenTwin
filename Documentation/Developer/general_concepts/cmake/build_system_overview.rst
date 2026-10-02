@@ -21,6 +21,11 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
    * - ``OTEnvironment.cmake``
      - Reads the OpenTwin environment variables that ``SetupEnvironment.py``
        sets and exposes them as CMake variables and path helpers.
+       It prepares the values so the other files can use them directly,
+       for example where the OpenTwin libraries keep their headers and builds,
+       and the paths of third party libraries like OSG, Qwt or VTK.
+       It also holds the folders of the older projects, from before the build system
+       could read them from ``SetupEnvironment.py`` itself.
    * - ``OTQt.cmake``
      - Finds Qt 6 and defines the imported ``Qt6::*`` targets used by the
        ``Qt*`` dependency tokens.
