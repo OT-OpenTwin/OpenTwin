@@ -851,7 +851,8 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _prevFocus, ads::C
 		{
 			m_focusChangeData.prevFocus = _prevFocus;
 			m_focusChangeData.requestQueued = true;
-			QTimer::singleShot(0, this, &WidgetViewManager::slotViewFocusedImpl);
+			//QTimer::singleShot(0, this, &WidgetViewManager::slotViewFocusedImpl);
+			this->slotViewFocusedImpl();
 		}
 		else
 		{
@@ -859,7 +860,6 @@ void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _prevFocus, ads::C
 		}
 		
 	}
-	//this->slotViewFocusedImpl();
 }
 
 void ot::WidgetViewManager::slotViewFocusedImpl()
