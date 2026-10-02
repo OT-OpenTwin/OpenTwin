@@ -40,6 +40,7 @@
 // Qt header
 #include <QtCore/qtimer.h>
 #include <QtWidgets/qmenu.h>
+#include <QtWidgets/qapplication.h>
 
 ot::WidgetViewManager::WidgetViewManager() :
 	m_dockManager(nullptr), m_dockToggleRoot(nullptr), m_config(NoFlags), m_state(DefaultState),
@@ -260,7 +261,9 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 	m_autoCloseInfo.activeSelection = _activeSelection;
 	m_autoCloseInfo.ignoreCurrent = _ignoreCurrent;
 
-	FocusChangeData lastFocusData = m_focusChangeData;
+	const bool hadFocusedView = m_focusChangeData.nextFocus != nullptr;
+
+	//FocusChangeData lastFocusData = m_focusChangeData;
 
 	/*OT_LOG_TS("Auto close upinned views called with: { \"Flags\": " << (int)_flags << ", \"ActiveSelection\": " << &_activeSelection
 		<< ", \"IgnoreCurrent\": " << _ignoreCurrent << ", \"LastFocusedInfo\": { \"Last\": \"" << (m_focusInfo.last ? m_focusInfo.last->getViewData().getEntityName() : std::string("< null >"))
@@ -330,19 +333,17 @@ void ot::WidgetViewManager::requestCloseUnpinnedViews(const WidgetViewBase::View
 			WidgetView* view = m_autoCloseInfo.viewsToClose.front();
 			m_autoCloseInfo.viewsToClose.pop_front();
 
-			if (view->getViewDockWidget() == lastFocusData.newFocus)
-			{
-				lastFocusData.newFocus = nullptr;
-			}
-
 			//OT_LOG_TS("Requesting view auto close: { \"View\": " << view << ", \"EntityName\": " << view->getViewData().getEntityName() << ", \"ViewType\": \"" << WidgetViewBase::toString(view->getViewData().getViewType()) << "\" }");
 			this->handleViewCloseRequest(view);
 		}
 	}
 
-	if (lastFocusData.newFocus == nullptr)
+	// Check if the last focused view was closed during the auto close process
+	if (hadFocusedView && !m_focusChangeData.nextFocus)
 	{
-		m_focusChangeData.oldFocus = nullptr;
+		// Clear the old focus information
+		m_focusChangeData.prevFocus = nullptr;
+		OT_WIDGETS_VIEW_DBG("Auto close unpinned views: No new focus set, clearing old focus");
 		slotViewFocusedImpl();
 	}
 }
@@ -394,11 +395,14 @@ ot::WidgetView* ot::WidgetViewManager::forgetView(const std::string& _entityName
 	if (view == m_focusInfo.lastSide) m_focusInfo.lastSide = nullptr;
 	if (view == m_focusInfo.lastTool) m_focusInfo.lastTool = nullptr;
 	if (view == m_focusInfo.lastCentral) m_focusInfo.lastCentral = nullptr;
-	if (view->getViewDockWidget() == m_focusChangeData.newFocus) m_focusChangeData.newFocus = nullptr;
-	if (view->getViewDockWidget() == m_focusChangeData.oldFocus) m_focusChangeData.oldFocus = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.nextFocus) m_focusChangeData.nextFocus = nullptr;
+	if (view->getViewDockWidget() == m_focusChangeData.prevFocus) m_focusChangeData.prevFocus = nullptr;
 
 	// Drag info
-	if (view == m_dragInfo.view) m_dragInfo.view = nullptr;
+	if (view == m_dragInfo.view)
+	{
+		m_dragInfo.view = nullptr;
+	}
 
 	// Find name list from owner and erase the view entry
 	ViewNameTypeList* lst = this->findViewNameTypeList(owner);
@@ -829,54 +833,81 @@ void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocat
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
-void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _oldFocus, ads::CDockWidget* _newFocus)
+void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _prevFocus, ads::CDockWidget* _nextFocus)
 {
-	m_focusChangeData.newFocus = _newFocus;
-	m_focusChangeData.oldFocus = _oldFocus;
-	this->slotViewFocusedImpl();
+	OT_WIDGETS_VIEW_DBG("View focus changed: "
+		<< (_prevFocus ? _prevFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_prevFocus) << ") -> "
+		<< (_nextFocus ? _nextFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_nextFocus) << ")\n\nNew Focus object:\n"
+		<< WidgetDebugHelper::objectHierarchyString(_nextFocus) << "\n\nAplication focus object:\n"
+		<< WidgetDebugHelper::objectHierarchyString(QApplication::focusWidget()) << "\n\nApplication active window:\n"
+		<< WidgetDebugHelper::objectHierarchyString(QApplication::activeWindow())
+	);
+
+	if (m_focusChangeData.nextFocus != _nextFocus)
+	{
+		m_focusChangeData.nextFocus = _nextFocus;
+
+		if (!m_focusChangeData.requestQueued)
+		{
+			m_focusChangeData.prevFocus = _prevFocus;
+			m_focusChangeData.requestQueued = true;
+			QTimer::singleShot(0, this, &WidgetViewManager::slotViewFocusedImpl);
+		}
+		else
+		{
+			OT_WIDGETS_VIEW_DBG("Focus change request already queued. Skipping queue");
+		}
+		
+	}
+	//this->slotViewFocusedImpl();
 }
 
 void ot::WidgetViewManager::slotViewFocusedImpl()
 {
+	m_focusChangeData.requestQueued = false;
+
 	if (m_state.hasAny(MulticloseViewState | InsertViewState | DragFinishHandleState))
 	{
+		OT_WIDGETS_VIEW_DBG("Focus change ignored due to \"" << (m_state.has(MulticloseViewState) ? "Multiclose" : (m_state.has(InsertViewState) ? "View Insert" : (m_state.has(DragFinishHandleState) ? "Drag Finish" : ("<unknown>")))) << "\" state");
 		return;
 	}
+	
+	OT_WIDGETS_VIEW_DBG("Running view focus change handling");
 
-	WidgetView* o = this->getViewFromDockWidget(m_focusChangeData.oldFocus);
-	WidgetView* n = this->getViewFromDockWidget(m_focusChangeData.newFocus);
+	WidgetView* prevView = this->getViewFromDockWidget(m_focusChangeData.prevFocus);
+	WidgetView* nextView = this->getViewFromDockWidget(m_focusChangeData.nextFocus);
 
-	if (n)
+	if (nextView)
 	{
-		OT_WIDGETS_VIEW_DBG_PTR(n, ": View focused");
+		OT_WIDGETS_VIEW_DBG_PTR(nextView, ": View focused");
 
-		m_focusInfo.last = n;
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral)
+		m_focusInfo.last = nextView;
+		if (nextView->getViewData().getViewFlags() & WidgetViewBase::ViewIsCentral)
 		{
-			m_focusInfo.lastCentral = n;
+			m_focusInfo.lastCentral = nextView;
 			if (!(m_config.has(IgnoreInputFocusOnViewInsert) && m_state.has(InsertViewState)) && m_config.has(InputFocusCentralViewOnFocusChange))
 			{
-				n->setViewWidgetFocus();
+				nextView->setViewWidgetFocus();
 			}
 		}
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide)
+		if (nextView->getViewData().getViewFlags() & WidgetViewBase::ViewIsSide)
 		{
-			m_focusInfo.lastSide = n;
+			m_focusInfo.lastSide = nextView;
 			if (!(m_config.has(IgnoreInputFocusOnViewInsert) && m_state.has(InsertViewState)) && m_config.has(InputFocusSideViewOnFocusChange))
 			{
-				n->setViewWidgetFocus();
+				nextView->setViewWidgetFocus();
 			}
 		}
-		if (n->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool)
+		if (nextView->getViewData().getViewFlags() & WidgetViewBase::ViewIsTool)
 		{
-			m_focusInfo.lastTool = n;
+			m_focusInfo.lastTool = nextView;
 			if (!(m_config.has(IgnoreInputFocusOnViewInsert) && m_state.has(InsertViewState)) && m_config.has(InputFocusToolViewOnFocusChange))
 			{
-				n->setViewWidgetFocus();
+				nextView->setViewWidgetFocus();
 			}
 		}
 
-		Q_EMIT viewFocusChanged(n, o);
+		Q_EMIT viewFocusChanged(prevView, nextView);
 	}
 }
 
@@ -979,6 +1010,7 @@ void ot::WidgetViewManager::slotUpdateViewFocus()
 	ads::CDockWidget* lastFocus = (m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr);
 	if (currentFocus != lastFocus)
 	{
+		OT_WIDGETS_VIEW_DBG("Calling view focused trough update view focus");
 		slotViewFocused(lastFocus, currentFocus);
 	}
 }
@@ -1116,6 +1148,7 @@ bool ot::WidgetViewManager::addViewImpl(const BasicServiceInformation& _owner, W
 		else
 		{
 			m_state.remove(InsertViewState);
+			OT_WIDGETS_VIEW_DBG("Calling view focused trough insert of view " << LogMsgPtr(_view) << " with its dock " << LogMsgPtr(_view->getViewDockWidget()));
 			this->slotViewFocused((m_focusInfo.last ? m_focusInfo.last->getViewDockWidget() : nullptr), _view->getViewDockWidget());
 		}
 	}
@@ -1416,7 +1449,7 @@ void ot::WidgetViewManager::prepareDragFinishHandlingFinished()
 	OT_WIDGETS_VIEW_DBG(": Drag finish - finished");
 
 	// Ensure focus did not change during drop
-	if (m_dragInfo.view && m_dragInfo.view->getViewDockWidget() != m_focusChangeData.newFocus)
+	if (m_dragInfo.view && m_dragInfo.view->getViewDockWidget() != m_focusChangeData.nextFocus)
 	{
 		m_dragInfo.view->setAsCurrentViewTab();
 		if (m_dragInfo.view->getViewDockWidget())

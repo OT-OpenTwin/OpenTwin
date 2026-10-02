@@ -46,25 +46,33 @@
 #define OT_TEST_TABLE_Interval(___testText)
 #endif
 
-QRect ot::Table::getSelectionBoundingRect(const QList<QTableWidgetSelectionRange>& _selections) {
-	if (_selections.empty()) {
+QRect ot::Table::getSelectionBoundingRect(const QList<QTableWidgetSelectionRange>& _selections)
+{
+	if (_selections.empty())
+	{
 		return QRect();
 	}
-	else {
+	else
+	{
 		QPoint minPt(std::numeric_limits<int>::max(), std::numeric_limits<int>::max());
 		QPoint maxPt(std::numeric_limits<int>::lowest(), std::numeric_limits<int>::lowest());
 
-		for (const QTableWidgetSelectionRange& range : _selections) {
-			if (range.leftColumn() < minPt.x()) {
+		for (const QTableWidgetSelectionRange& range : _selections)
+		{
+			if (range.leftColumn() < minPt.x())
+			{
 				minPt.setX(range.leftColumn());
 			}
-			if (range.rightColumn() > maxPt.x()) {
+			if (range.rightColumn() > maxPt.x())
+			{
 				maxPt.setX(range.rightColumn());
 			}
-			if (range.topRow() < minPt.y()) {
+			if (range.topRow() < minPt.y())
+			{
 				minPt.setY(range.topRow());
 			}
-			if (range.bottomRow() > maxPt.y()) {
+			if (range.bottomRow() > maxPt.y())
+			{
 				maxPt.setY(range.bottomRow());
 			}
 		}
@@ -80,14 +88,15 @@ ot::Table::Table(QWidget* _parentWidget)
 	this->ini();
 }
 
-ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget) 
+ot::Table::Table(int _rows, int _columns, QWidget* _parentWidget)
 	: QTableWidget(_rows, _columns, _parentWidget), m_contentChanged(false), m_resizeRequired(false),
 	m_stopResizing(true), m_itemDelegate(nullptr), m_horizontalHeader(nullptr), m_verticalHeader(nullptr)
 {
 	this->ini();
 }
 
-ot::Table::~Table() {
+ot::Table::~Table()
+{
 	delete m_itemDelegate;
 	m_itemDelegate = nullptr;
 
@@ -98,7 +107,8 @@ ot::Table::~Table() {
 
 // Setter / Getter
 
-void ot::Table::setupFromConfig(const TableCfg& _config) {
+void ot::Table::setupFromConfig(const TableCfg& _config)
+{
 	OT_TEST_TABLE_Interval("Setup from config: Total");
 
 	QSignalBlocker blocker(this);
@@ -125,12 +135,14 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		OT_TEST_TABLE_Interval("Setup from config: Set vertical header");
 		m_verticalHeaderItemCfgs.reserve(_config.getRowCount());
 		QHeaderView* header = this->verticalHeader();
-		for (int r = 0; r < _config.getRowCount(); r++) {
+		for (int r = 0; r < _config.getRowCount(); r++)
+		{
 			const TableHeaderItemCfg* headerItem = _config.getRowHeader(r);
-			if (headerItem) {
+			if (headerItem)
+			{
 				m_verticalHeaderItemCfgs.push_back(headerItem->createCopy());
 				this->setVerticalHeaderItem(r, createHeaderItem(headerItem));
-				
+
 				if (!headerItem->getActiveFilters().empty())
 				{
 					QStringList filterList;
@@ -151,9 +163,10 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		OT_TEST_TABLE_Interval("Setup from config: Set horizontal header");
 		m_horizontalHeaderItemCfgs.reserve(_config.getColumnCount());
 		QHeaderView* header = this->horizontalHeader();
-		for (int c = 0; c < _config.getColumnCount(); c++) {
+		for (int c = 0; c < _config.getColumnCount(); c++)
+		{
 			const TableHeaderItemCfg* headerItem = _config.getColumnHeader(c);
-			if (headerItem) 
+			if (headerItem)
 			{
 				m_horizontalHeaderItemCfgs.push_back(headerItem->createCopy());
 				this->setHorizontalHeaderItem(c, createHeaderItem(headerItem));
@@ -181,11 +194,14 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		int rows = _config.getRowCount();
 		int columns = _config.getColumnCount();
 
-		for (int r = 0; r < rows; r++) {
-			for (int c = 0; c < columns; c++) {
+		for (int r = 0; r < rows; r++)
+		{
+			for (int c = 0; c < columns; c++)
+			{
 				TableItem* newItem = new TableItem(QString::fromStdString(_config.getCellText(r, c)));
 				QColor cellColor = this->getCurrentCellColor(r, c);
-				if (cellColor.isValid()) {
+				if (cellColor.isValid())
+				{
 					newItem->setBackground(QBrush(cellColor));
 				}
 				this->setItem(r, c, newItem);
@@ -204,46 +220,57 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		QSignalBlocker horizontalBlock(m_horizontalHeader);
 		m_horizontalHeader->applyActiveFilters();
 	}
-	
+
 	this->setResizeRequired();
 }
 
-ot::TableCfg ot::Table::createConfig() const {
+ot::TableCfg ot::Table::createConfig() const
+{
 	OT_TEST_TABLE_Interval("Create config");
 
 	TableCfg cfg(this->rowCount(), this->columnCount());
-	
+
 	bool hasColumnHeader = false;
-	for (int column = 0; column < columnCount(); column++) {
-		if (column < m_horizontalHeaderItemCfgs.size() && m_horizontalHeaderItemCfgs[column]) {
+	for (int column = 0; column < columnCount(); column++)
+	{
+		if (column < m_horizontalHeaderItemCfgs.size() && m_horizontalHeaderItemCfgs[column])
+		{
 			hasColumnHeader = true;
 			cfg.setColumnHeader(column, m_horizontalHeaderItemCfgs[column]->createCopy());
 		}
 	}
 
 	bool hasRowHeader = false;
-	for (int row = 0; row < this->rowCount(); row++) {
-		if (row < m_verticalHeaderItemCfgs.size() && m_verticalHeaderItemCfgs[row]) {
+	for (int row = 0; row < this->rowCount(); row++)
+	{
+		if (row < m_verticalHeaderItemCfgs.size() && m_verticalHeaderItemCfgs[row])
+		{
 			hasRowHeader = true;
 			cfg.setRowHeader(row, m_verticalHeaderItemCfgs[row]->createCopy());
 		}
 	}
 
-	if (hasRowHeader) {
-		for (int row = 0; row < cfg.getRowCount(); row++) {
-			if (!cfg.getRowHeader(row)) {
+	if (hasRowHeader)
+	{
+		for (int row = 0; row < cfg.getRowCount(); row++)
+		{
+			if (!cfg.getRowHeader(row))
+			{
 				cfg.setRowHeader(row, new TableHeaderItemCfg());
 			}
 		}
 	}
-	if (hasColumnHeader) {
-		for (int column = 0; column < cfg.getColumnCount(); column++) {
-			if (!cfg.getColumnHeader(column)) {
+	if (hasColumnHeader)
+	{
+		for (int column = 0; column < cfg.getColumnCount(); column++)
+		{
+			if (!cfg.getColumnHeader(column))
+			{
 				cfg.setColumnHeader(column, new TableHeaderItemCfg());
 			}
 		}
 	}
-	
+
 	cfg.setRowSortingEnabled(m_filterRowSortingEnabled);
 	cfg.setColumnSortingEnabled(m_filterColumnSortingEnabled);
 
@@ -253,10 +280,14 @@ ot::TableCfg ot::Table::createConfig() const {
 	return cfg;
 }
 
-QColor ot::Table::getCurrentCellColor(int _row, int _column) const {
-	for (TableRangeType prioType : m_rangePriority) {
-		for (const ColoredTableRange& coloredRange : m_coloredRanges) {
-			if (coloredRange.getRange().getRangeType() == prioType && coloredRange.getRange().isInRange(_row, _column)) {
+QColor ot::Table::getCurrentCellColor(int _row, int _column) const
+{
+	for (TableRangeType prioType : m_rangePriority)
+	{
+		for (const ColoredTableRange& coloredRange : m_coloredRanges)
+		{
+			if (coloredRange.getRange().getRangeType() == prioType && coloredRange.getRange().isInRange(_row, _column))
+			{
 				return QtFactory::toQColor(coloredRange.getColor());
 			}
 		}
@@ -264,7 +295,8 @@ QColor ot::Table::getCurrentCellColor(int _row, int _column) const {
 	return QColor();
 }
 
-void ot::Table::setContentChanged(bool _changed) {
+void ot::Table::setContentChanged(bool _changed)
+{
 	if (m_contentChanged == _changed)
 	{
 		return;
@@ -273,31 +305,37 @@ void ot::Table::setContentChanged(bool _changed) {
 	Q_EMIT modifiedChanged(m_contentChanged);
 }
 
-void ot::Table::setSelectedCellsBackground(const ot::Color& _color) {
+void ot::Table::setSelectedCellsBackground(const ot::Color& _color)
+{
 	this->setSelectedCellsBackground(QtFactory::toQColor(_color));
 }
 
-void ot::Table::setSelectedCellsBackground(const QColor& _color) {
+void ot::Table::setSelectedCellsBackground(const QColor& _color)
+{
 	OT_TEST_TABLE_Interval("Set selected cells background");
 
 	QSignalBlocker blocker(this);
-	
-	for (QTableWidgetItem* item : this->selectedItems()) {
+
+	for (QTableWidgetItem* item : this->selectedItems())
+	{
 		item->setBackground(QBrush(_color));
 	}
 }
 
-void ot::Table::prepareForDataChange() {
+void ot::Table::prepareForDataChange()
+{
 	m_stopResizing = true;
 }
 
-ot::TableItem* ot::Table::addItem(int _row, int _column, const QString& _text, const QString& _sortHint) {
+ot::TableItem* ot::Table::addItem(int _row, int _column, const QString& _text, const QString& _sortHint)
+{
 	TableItem* newItem = new TableItem(_text, _sortHint);
 	this->setItem(_row, _column, newItem);
 	return newItem;
 }
 
-ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint) {
+ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, const QString& _text, const QString& _sortHint)
+{
 	TableItem* newItem = new TableItem(_text, _sortHint);
 	newItem->setIcon(_icon);
 	this->setItem(_row, _column, newItem);
@@ -306,7 +344,8 @@ ot::TableItem* ot::Table::addItem(int _row, int _column, const QIcon& _icon, con
 
 const ot::TableHeaderItemCfg* ot::Table::getHorizontalHeaderItemCfg(int _column) const
 {
-	if (_column >= 0 && _column < m_horizontalHeaderItemCfgs.size()) {
+	if (_column >= 0 && _column < m_horizontalHeaderItemCfgs.size())
+	{
 		return m_horizontalHeaderItemCfgs.at(_column);
 	}
 	else
@@ -317,7 +356,8 @@ const ot::TableHeaderItemCfg* ot::Table::getHorizontalHeaderItemCfg(int _column)
 
 const ot::TableHeaderItemCfg* ot::Table::getVerticalHeaderItemCfg(int _row) const
 {
-	if (_row >= 0 && _row < m_verticalHeaderItemCfgs.size()) {
+	if (_row >= 0 && _row < m_verticalHeaderItemCfgs.size())
+	{
 		return m_verticalHeaderItemCfgs.at(_row);
 	}
 	{
@@ -329,7 +369,8 @@ const ot::TableHeaderItemCfg* ot::Table::getVerticalHeaderItemCfg(int _row) cons
 
 // Public slots
 
-void ot::Table::slotSaveRequested() {
+void ot::Table::slotSaveRequested()
+{
 	Q_EMIT saveRequested();
 }
 
@@ -337,47 +378,60 @@ void ot::Table::slotSaveRequested() {
 
 // Protected
 
-void ot::Table::showEvent(QShowEvent* _event) {
+void ot::Table::showEvent(QShowEvent* _event)
+{
 	OT_TEST_TABLE_Interval("Show event");
 	QTableWidget::showEvent(_event);
 
-	if (!m_columnWidthBuffer.empty() || !m_rowHeightBuffer.empty()) {
-		if (this->columnCount() != m_columnWidthBuffer.size()) {
+	if (!m_columnWidthBuffer.empty() || !m_rowHeightBuffer.empty())
+	{
+		if (this->columnCount() != m_columnWidthBuffer.size())
+		{
 			OT_LOG_E("Column width buffer is invalid");
-		} else if (this->rowCount() != m_rowHeightBuffer.size()) {
+		}
+		else if (this->rowCount() != m_rowHeightBuffer.size())
+		{
 			OT_LOG_E("Row height buffer is invalid");
 		}
-		else if (!m_columnWidthBuffer.empty()) {
+		else if (!m_columnWidthBuffer.empty())
+		{
 			m_stopResizing = false;
 			this->slotRestoreColumnSize(0);
 		}
-		else if (!m_rowHeightBuffer.empty()) {
+		else if (!m_rowHeightBuffer.empty())
+		{
 			m_stopResizing = false;
 			this->slotRestoreRowSize(0);
 		}
 	}
-	else if (m_resizeRequired) {
+	else if (m_resizeRequired)
+	{
 		this->resizeColumnsToContentIfNeeded();
 		m_resizeRequired = false;
 	}
 }
 
-void ot::Table::hideEvent(QHideEvent* _event) {
+void ot::Table::hideEvent(QHideEvent* _event)
+{
 	m_columnWidthBuffer.clear();
 	m_rowHeightBuffer.clear();
 	m_columnWidthBuffer.reserve(this->columnCount());
 	m_rowHeightBuffer.reserve(this->rowCount());
 
-	for (int i = 0; i < this->columnCount(); i++) {
-		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+	for (int i = 0; i < this->columnCount(); i++)
+	{
+		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive)
+		{
 			m_columnWidthBuffer.clear();
 			m_rowHeightBuffer.clear();
 			return;
 		}
 		m_columnWidthBuffer.push_back(this->columnWidth(i));
 	}
-	for (int i = 0; i < this->rowCount(); i++) {
-		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+	for (int i = 0; i < this->rowCount(); i++)
+	{
+		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive)
+		{
 			m_columnWidthBuffer.clear();
 			m_rowHeightBuffer.clear();
 			return;
@@ -392,26 +446,33 @@ void ot::Table::hideEvent(QHideEvent* _event) {
 
 // Private slots
 
-void ot::Table::slotCellDataChanged(int _row, int _column) {
-	if (_row >= 0 && _row < this->rowCount()) {
+void ot::Table::slotCellDataChanged(int _row, int _column)
+{
+	if (_row >= 0 && _row < this->rowCount())
+	{
 		QSignalBlocker sigBlock(this);
 		this->resizeRowToContents(_row);
 	}
 
-	if (_row >= 0 && _row < this->rowCount() && _column >= 0 && _column < this->columnCount()) {
+	if (_row >= 0 && _row < this->rowCount() && _column >= 0 && _column < this->columnCount())
+	{
 		QTableWidgetItem* itm = this->item(_row, _column);
-		if (itm) {
+		if (itm)
+		{
 			QColor cellColor = this->getCurrentCellColor(_row, _column);
-			if (cellColor.isValid()) {
+			if (cellColor.isValid())
+			{
 				itm->setBackground(QBrush(cellColor));
 			}
-			else {
+			else
+			{
 				itm->setBackground(QBrush());
 			}
 		}
 	}
 
-	if (m_contentChanged) {
+	if (m_contentChanged)
+	{
 		return;
 	}
 
@@ -419,34 +480,43 @@ void ot::Table::slotCellDataChanged(int _row, int _column) {
 	Q_EMIT modifiedChanged(m_contentChanged);
 }
 
-void ot::Table::slotRestoreColumnSize(int _column) {
-	if (m_stopResizing) { // Stop
+void ot::Table::slotRestoreColumnSize(int _column)
+{
+	if (m_stopResizing)
+	{ // Stop
 		return;
 	}
-	if (_column >= this->columnCount()) { // Last column reached, now go for rows
-		if (!m_rowHeightBuffer.empty()) {
+	if (_column >= this->columnCount())
+	{ // Last column reached, now go for rows
+		if (!m_rowHeightBuffer.empty())
+		{
 			this->slotRestoreRowSize(0);
 		}
 	}
-	else { // Resize column and queue next
+	else
+	{ // Resize column and queue next
 		QSignalBlocker sigBlock(this);
 
 		OTAssert(m_columnWidthBuffer.size() == this->columnCount(), "Invalid data");
 		this->setColumnWidth(_column, m_columnWidthBuffer[_column]);
-		
+
 		_column++;
 		QTimer::singleShot(0, [=]() { Table::slotRestoreColumnSize(_column); });
 	}
 }
 
-void ot::Table::slotResizeColumnToContent(int _column) {
-	if (m_stopResizing) { // Stop
+void ot::Table::slotResizeColumnToContent(int _column)
+{
+	if (m_stopResizing)
+	{ // Stop
 		return;
 	}
-	if (_column >= this->columnCount()) { // Last column reached, now go for rows
+	if (_column >= this->columnCount())
+	{ // Last column reached, now go for rows
 		this->resizeRowsToContentIfNeeded();
 	}
-	else { // Resize column and queue next
+	else
+	{ // Resize column and queue next
 		QSignalBlocker sigBlock(this);
 
 		this->resizeColumnToContents(_column++);
@@ -454,11 +524,14 @@ void ot::Table::slotResizeColumnToContent(int _column) {
 	}
 }
 
-void ot::Table::slotRestoreRowSize(int _row) {
-	if (m_stopResizing || _row >= this->rowCount()) { // Stop
+void ot::Table::slotRestoreRowSize(int _row)
+{
+	if (m_stopResizing || _row >= this->rowCount())
+	{ // Stop
 		return;
 	}
-	else { // Resize column and queue next
+	else
+	{ // Resize column and queue next
 		QSignalBlocker sigBlock(this);
 
 		OTAssert(m_rowHeightBuffer.size() == this->rowCount(), "Invalid data");
@@ -469,11 +542,14 @@ void ot::Table::slotRestoreRowSize(int _row) {
 	}
 }
 
-void ot::Table::slotResizeRowToContent(int _row) {
-	if (m_stopResizing || _row >= this->rowCount()) { // Stop
+void ot::Table::slotResizeRowToContent(int _row)
+{
+	if (m_stopResizing || _row >= this->rowCount())
+	{ // Stop
 		return;
 	}
-	else { // Resize column and queue next
+	else
+	{ // Resize column and queue next
 		QSignalBlocker sigBlock(this);
 
 		this->resizeRowToContents(_row++);
@@ -495,7 +571,8 @@ void ot::Table::slotRowFilterChanged(const HeaderFilterState& _filterState)
 
 // Private helper
 
-void ot::Table::ini() {
+void ot::Table::ini()
+{
 	m_itemDelegate = new TableItemDelegate(this);
 
 	m_horizontalHeader = new TableHeader(this, Qt::Horizontal);
@@ -508,21 +585,25 @@ void ot::Table::ini() {
 
 	QShortcut* saveShortcut = new QShortcut(QKeySequence("Ctrl+S"), this);
 	saveShortcut->setContext(Qt::WidgetWithChildrenShortcut);
-	
+
 	this->connect(this, &Table::cellChanged, this, &Table::slotCellDataChanged);
 	this->connect(saveShortcut, &QShortcut::activated, this, &Table::slotSaveRequested);
 }
 
-void ot::Table::resizeColumnsToContentIfNeeded() {
+void ot::Table::resizeColumnsToContentIfNeeded()
+{
 	// Ensure we have any content
-	if (this->horizontalHeader()->count() == 0) {
+	if (this->horizontalHeader()->count() == 0)
+	{
 		this->resizeRowsToContentIfNeeded();
 		return;
 	}
 
 	// Ensure the content is interactive
-	for (int i = 0; i < this->horizontalHeader()->count(); i++) {
-		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+	for (int i = 0; i < this->horizontalHeader()->count(); i++)
+	{
+		if (this->horizontalHeader()->sectionResizeMode(i) != QHeaderView::Interactive)
+		{
 			this->resizeRowsToContentIfNeeded();
 			return;
 		}
@@ -533,15 +614,19 @@ void ot::Table::resizeColumnsToContentIfNeeded() {
 	this->slotResizeColumnToContent(0);
 }
 
-void ot::Table::resizeRowsToContentIfNeeded() {
+void ot::Table::resizeRowsToContentIfNeeded()
+{
 	// Ensure we have any content
-	if (this->verticalHeader()->count() == 0) {
+	if (this->verticalHeader()->count() == 0)
+	{
 		return;
 	}
 
 	// Ensure the content is interactive
-	for (int i = 0; i < this->verticalHeader()->count(); i++) {
-		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive) {
+	for (int i = 0; i < this->verticalHeader()->count(); i++)
+	{
+		if (this->verticalHeader()->sectionResizeMode(i) != QHeaderView::Interactive)
+		{
 			return;
 		}
 	}
@@ -551,11 +636,14 @@ void ot::Table::resizeRowsToContentIfNeeded() {
 	this->slotResizeRowToContent(0);
 }
 
-void ot::Table::setResizeRequired() {
-	if (this->isVisible()) {
+void ot::Table::setResizeRequired()
+{
+	if (this->isVisible())
+	{
 		this->resizeColumnsToContentIfNeeded();
 	}
-	else {
+	else
+	{
 		m_resizeRequired = true;
 	}
 }
@@ -581,7 +669,8 @@ QTableWidgetItem* ot::Table::createHeaderItem(const TableHeaderItemCfg* _cfg) co
 	headerContent.erase(headerContent.begin(), std::find_if(headerContent.begin(), headerContent.end(), [](unsigned char ch) { return !std::isspace(ch); }));
 	headerContent.erase(std::find_if(headerContent.rbegin(), headerContent.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), headerContent.end());
 
-	if (headerContent.size() > 1) {
+	if (headerContent.size() > 1)
+	{
 		if (headerContent[0] == headerContent[headerContent.size() - 1] && headerContent[0] == '"')
 		{
 			headerContent = headerContent.substr(1, headerContent.size() - 2);

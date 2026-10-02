@@ -69,7 +69,7 @@ Q_SIGNALS:
 	// Slots
 
 public Q_SLOTS:
-	void slotViewFocusChanged(ot::WidgetView* _focused, ot::WidgetView* _previousView);
+	void slotViewFocusChanged(ot::WidgetView* _previousView, ot::WidgetView* _focusedView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 
 private:

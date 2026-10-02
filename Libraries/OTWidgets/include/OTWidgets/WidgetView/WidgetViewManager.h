@@ -235,7 +235,7 @@ namespace ot {
 
 	Q_SIGNALS:
 		void viewAdded(WidgetView* _view);
-		void viewFocusChanged(WidgetView* _focusedView, WidgetView* _previousView);
+		void viewFocusChanged(WidgetView* _previousView, WidgetView* _focusedView);
 		void viewCloseRequested(WidgetView* _view);
 		void viewTabClicked(WidgetView* _view);
 		void viewDataModifiedChanged(ot::WidgetView* _view);
@@ -269,8 +269,9 @@ namespace ot {
 		typedef Flags<ManagerState> ManagerStateFlags;
 
 		struct FocusChangeData {
-			ads::CDockWidget* oldFocus = nullptr;
-			ads::CDockWidget* newFocus = nullptr;
+			bool requestQueued = false;
+			ads::CDockWidget* prevFocus = nullptr;
+			ads::CDockWidget* nextFocus = nullptr;
 		};
 
 		struct FocusInfo {

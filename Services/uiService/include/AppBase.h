@@ -596,7 +596,7 @@ public Q_SLOTS:
 
 	QString determineAvailableViewTabText(const QString& _initialTabText);
 	void slotViewAdded(ot::WidgetView* _newView);
-	void slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView);
+	void slotViewFocusChanged(ot::WidgetView* _previousView, ot::WidgetView* _focusedView);
 	void slotViewCloseRequested(ot::WidgetView* _view);
 	void slotViewTabClicked(ot::WidgetView* _view);
 	void slotViewDataModifiedChanged(ot::WidgetView* _view);

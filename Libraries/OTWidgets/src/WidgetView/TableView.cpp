@@ -21,19 +21,30 @@
 #include "OTWidgets/WidgetView/TableView.h"
 #include "OTWidgets/WidgetView/WidgetViewDock.h"
 
+// Qt header
+#include <QtWidgets/qlayout.h>
+
 ot::TableView::TableView(QWidget* _parent) : TableView(nullptr, _parent) {}
 
 ot::TableView::TableView(Table* _table, QWidget* _parent)
 	: WidgetView(WidgetViewBase::ViewTable, _parent), m_table(_table)
 {
+	// Create a custom root widget to wrap the table, this fixes a problem with the
+	// focus handling of the table view when it is in a tabbed dock widget
+	QWidget* rootWidget = getViewDockWidget();
+	QWidget* layoutW = new QWidget(rootWidget);
+	QLayout* layout = new QVBoxLayout(layoutW);
+	layout->setContentsMargins(0, 0, 0, 0);
+	
 	if (!m_table) {
-		m_table = new Table(getViewDockWidget());
+		m_table = new Table(layoutW);
 	}
 	else {
-		m_table->setParent(getViewDockWidget());
+		m_table->setParent(layoutW);
 	}
-
-	this->addWidgetInterfaceToDock(m_table);
+	layout->addWidget(m_table);
+		
+	this->addWidgetToDock(layoutW);
 	this->connect(m_table, &Table::modifiedChanged, this, &TableView::slotModifiedChanged);
 }
 

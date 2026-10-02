@@ -3451,7 +3451,7 @@ void AppBase::slotViewAdded(ot::WidgetView* _newView)
 	}
 }
 
-void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView* _previousView)
+void AppBase::slotViewFocusChanged(ot::WidgetView* _previousView, ot::WidgetView* _focusedView)
 {
 	OT_UI_VIEWSEL_DBG("View focus changed. { \"Previous\": \"" << (_previousView ? _previousView->getViewData().getEntityName() : "<None>") <<
 		"\", \"Focused\": " << (_focusedView ? _focusedView->getViewData().getEntityName() : "<None>") << "\" }");
@@ -3511,6 +3511,9 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			{
 				// Skip entity selection if configured
 				QSignalBlocker sigBlock(tree);
+
+				OT_UI_VIEWSEL_DBG("+ View focus changed: Clearing selection");
+
 				// Reset current selection
 				tree->deselectAllItems(false);
 			}
@@ -3540,6 +3543,12 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 			}
 
 			this->runSelectionHandling(ot::SelectionOrigin::View);
+
+			if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling))
+			{
+				OT_UI_VIEWSEL_DBG("+ View focus changed: Auto closing unpinned views");
+				this->autoCloseUnpinnedViews(true);
+			}
 		}
 
 		// Check if view still exists after selection handling and notify viewer component
@@ -3547,11 +3556,6 @@ void AppBase::slotViewFocusChanged(ot::WidgetView* _focusedView, ot::WidgetView*
 		{
 			OT_UI_VIEWSEL_DBG("+ View focus changed: Notify viewer component");
 			m_viewerComponent->viewerTabChanged(focusedData);
-		}
-
-		if (!(m_viewHandling & ot::ViewHandlingFlag::SkipViewHandling))
-		{
-			this->autoCloseUnpinnedViews(true);
 		}
 	}
 	else
