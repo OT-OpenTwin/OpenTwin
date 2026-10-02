@@ -299,6 +299,12 @@ endfunction()
 # initialize_lib / initialize_app
 # ------------------------------------------------------------
 function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
+    # Projects not listed in OTEnvironment.cmake: OT_FOO_ROOT_PATH comes from OT_FOO_ROOT of SetupEnvironment.py
+    string(REGEX REPLACE "_PATH$" "" _rootEnvVar "${ROOT_PATH_VAR}")
+    if((NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "") AND NOT _rootEnvVar STREQUAL ROOT_PATH_VAR)
+        ot_get_env_path(${ROOT_PATH_VAR} "${_rootEnvVar}")
+    endif()
+
     if(NOT DEFINED ${ROOT_PATH_VAR} OR "${${ROOT_PATH_VAR}}" STREQUAL "")
         message(FATAL_ERROR
             "ot_initialize_lib/bin(${TARGET_NAME} ...): root path var '${ROOT_PATH_VAR}' is not set. "

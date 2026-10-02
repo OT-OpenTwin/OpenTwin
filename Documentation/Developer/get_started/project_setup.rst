@@ -41,8 +41,7 @@ Decide on the names first, because they appear in several files:
 How the project key is made from the variable name: :ref:`The project key<target Project keys>`.
 
 For a new service, ``Templates/ServiceTemplate`` already contains all files of the steps below.
-Copy it into ``Services/``, rename it and follow its ``README.md``. Then check every step here,
-and add the ``set(...)`` line from step 5 to its ``CMakeLists.txt``, the template does not have it yet.
+Copy it into ``Services/``, rename it and follow its ``README.md``. Then check every step here.
 
 
 1. Create the project folder
@@ -135,10 +134,6 @@ The build system in ``Scripts/CMake`` does the rest. For ``OTFoo``:
    cmake_minimum_required(VERSION 3.20)
    project(OTFoo LANGUAGES CXX)
 
-   # The project folder. Older projects get this variable from OTEnvironment.cmake,
-   # a new project sets it here.
-   set(OT_FOO_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-
    # The shared build system, OT_CMAKE_DIR comes from SetupEnvironment.py
    include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
@@ -156,7 +151,8 @@ The build system in ``Scripts/CMake`` does the rest. For ``OTFoo``:
    # Builds the tests/ folder if there is one (step 7)
    ot_add_test(OTFoo)
 
-Without the ``set(...)`` line, CMake stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
+``OT_FOO_ROOT_PATH`` is the project folder, taken from ``OT_FOO_ROOT`` of step 2.
+If CMake stops with "root path var 'OT_FOO_ROOT_PATH' is not set", step 2 is missing or the name differs.
 
 A service is a library as well and uses the same calls. An executable uses ``ot_initialize_bin`` and ``ot_finalize_bin``.
 How each kind looks, and what the dependency tokens are:

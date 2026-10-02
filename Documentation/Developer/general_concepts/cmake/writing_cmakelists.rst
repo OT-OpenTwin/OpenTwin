@@ -21,14 +21,9 @@ root path. ``OTEnvironment.cmake`` derives it from the ``OT_<NAME>_ROOT``
 environment variable, for example ``OT_LOGGER_SERVICE_ROOT`` becomes
 ``OT_LOGGER_SERVICE_ROOT_PATH``.
 
-``OTEnvironment.cmake`` only does this for the projects listed in it. A new project sets the
-variable itself, before the ``include`` of ``OTProject.cmake``:
-
-.. code-block:: cmake
-
-   set(OT_FOO_ROOT_PATH "${CMAKE_CURRENT_SOURCE_DIR}")
-
-Without it, configuring stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
+A project that is not listed in ``OTEnvironment.cmake`` gets the value directly from its
+``OT_<NAME>_ROOT`` variable, so registering the project in ``SetupEnvironment.py`` is enough.
+If neither exists, configuring stops with "root path var 'OT_FOO_ROOT_PATH' is not set".
 See the :ref:`Project Setup Guide<target Project Setup Guide>`.
 
 Preamble
