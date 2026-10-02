@@ -60,10 +60,10 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 		throw std::exception("Values are missing either the imaginary or the real part.");
 	}
 
-	//if (_numberOfParameterValues != dataValues.size())
-	//{
-	//	throw std::exception("Number of real values does not match the number of parameter values.");
-	//}
+	if (_numberOfParameterValues != dataValues.size())
+	{
+		OT_LOG_E("Number of real values does not match the number of parameter values.");
+	}
 	
 	std::vector<ot::Variable>::const_iterator dataValueItt(dataValues.begin());
 
@@ -79,7 +79,10 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 	std::vector<ot::Variable>currentParameterValues{ _constParameterValues.begin(), _constParameterValues.end() };
 	const size_t constCount = currentParameterValues.size();
 
-	for (uint64_t i = 0; i < dataValues.size(); i++)
+	// This situation should not happen, but this works as a safe temporary solution.
+	size_t safeLimit = dataValues.size() < _numberOfParameterValues ? dataValues.size() : _numberOfParameterValues;
+
+	for (uint64_t i = 0; i < safeLimit; i++)
 	{
 		currentParameterValues.resize(constCount);
 		for (auto& changingParameterValueIt : _changingParameterValues)
@@ -101,7 +104,7 @@ void QuantityContainerSerialiser::storeDataPoints(ot::UID _seriesIndex, std::lis
 			addQuantityContainer(_seriesIndex, _parameterIDs, currentParameterValues, quantityID, *dataValueItt);
 		}
 
-		if (i != dataValues.size() - 1)
+		if (i != safeLimit - 1)
 		{
 			dataValueItt++;
 		}
