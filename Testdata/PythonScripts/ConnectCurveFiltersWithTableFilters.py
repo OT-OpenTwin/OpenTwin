@@ -20,33 +20,102 @@ def getAllSeriesMetadataPropertyGroups(aCurveName):
     metadataGroups = [groupName for groupName in propertyGroups if relevantGroupNameBase in groupName]
     return metadataGroups
 
-def setAllFilter(curveNames,propertyGroups,comparisons):    
+def mergeComparisons(comparisons):
+    merged = {}
+
+    for comparison in comparisons:
+        name = comparison.name
+
+        if name not in merged:
+            merged[name] = {
+                "name": name,
+                "values": [],
+                "comparator": comparison.comparator
+            }
+
+        merged[name]["values"].append(str(comparison.value))
+
+    result = []
+
+    for item in merged.values():
+        if len(item["values"]) > 1:
+            comparator = "Any of"
+        else:
+            comparator = item["comparator"]
+
+        result.append({
+            "name": item["name"],
+            "value": ",".join(item["values"]),
+            "comparator": comparator
+        })
+
+    return result
+
+def setAllFilter(curveNames, propertyGroups, comparisons):
     success = True
-    i = 0
+
+    # Merge repeated filter names before writing them to the curve
+    mergedComparisons = mergeComparisons(comparisons)
+
     for curveName in curveNames:
+        # Reset existing filter properties
         for propertyGroup in propertyGroups:
-            success &= OpenTwin.SetPropertyValue(curveName,"Name","",propertyGroup)
-            success &= OpenTwin.SetPropertyValue(curveName,"Value","",propertyGroup)
-            success &= OpenTwin.SetPropertyValue(curveName,"Comparator","",propertyGroup)
+            success &= OpenTwin.SetPropertyValue(
+                curveName, "Name", "", propertyGroup
+            )
+            success &= OpenTwin.SetPropertyValue(
+                curveName, "Value", "", propertyGroup
+            )
+            success &= OpenTwin.SetPropertyValue(
+                curveName, "Comparator", "", propertyGroup
+            )
+
         if not success:
-            raise Exception("Resetting the filter properties was not successful")
-        
-        limit = len(comparisons) if len(comparisons) < len(propertyGroups) else len(propertyGroups)
+            raise Exception(
+                "Resetting the filter properties was not successful"
+            )
+
+        # Only use as many groups as are available
+        limit = min(len(mergedComparisons), len(propertyGroups))
+
         for i in range(limit):
             currentGroup = propertyGroups[i]
-            currentFilter = comparisons[i]
-            
-            name = currentFilter.name
-            comparator = currentFilter.comparator
-            value = currentFilter.value    
+            currentFilter = mergedComparisons[i]
 
-            success &= OpenTwin.SetPropertyValue(curveName,"Name",name,currentGroup)
-            success &= OpenTwin.SetPropertyValue(curveName,"Value",value,currentGroup)
-            success &= OpenTwin.SetPropertyValue(curveName,"Comparator",comparator,currentGroup)
+            success &= OpenTwin.SetPropertyValue(
+                curveName,
+                "Name",
+                currentFilter["name"],
+                currentGroup
+            )
+            success &= OpenTwin.SetPropertyValue(
+                curveName,
+                "Value",
+                currentFilter["value"],
+                currentGroup
+            )
+            success &= OpenTwin.SetPropertyValue(
+                curveName,
+                "Comparator",
+                currentFilter["comparator"],
+                currentGroup
+            )
+
         if not success:
-            raise Exception("Setting new filter properties was not successful")
-        
-        success &= OpenTwin.SetPropertyValue(curveName,"Number of metadata queries",len(comparisons))
+            raise Exception(
+                "Setting new filter properties was not successful"
+            )
+
+        success &= OpenTwin.SetPropertyValue(
+            curveName,
+            "Number of metadata queries",
+            limit,
+        )
+
+        if not success:
+            raise Exception(
+                "Setting the number of metadata queries was not successful"
+            )
 
 def FilterChanged(this, **kwargs):
     print("Handle table filter changed event. Setting filter:")
