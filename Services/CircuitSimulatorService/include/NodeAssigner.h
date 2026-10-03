@@ -62,6 +62,7 @@ private:
 	std::unordered_map<std::string, std::string> m_parent;
 	std::unordered_map<std::string, int> m_rank;
 	std::unordered_map<std::string, bool> m_hasGND;
+	std::unordered_map<std::string, std::string> m_labelName;
 
 	unsigned long long m_currentNodeNumber = 1;
 	std::map<std::pair<ot::UID, std::string>, std::string> m_connectionNodeNumbers;

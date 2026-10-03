@@ -22,6 +22,7 @@
 #include "Application.h"
 
 // Open Twin Header
+#include "OTBlockEntities/Circuit/EntityBlockCircuitLabel.h"
 #include "OTCore/Logging/Logger.h"
 
 void NodeAssigner::reset()
@@ -30,6 +31,7 @@ void NodeAssigner::reset()
 	m_parent.clear();
 	m_rank.clear();
 	m_hasGND.clear();
+	m_labelName.clear();
 }
 
 std::string NodeAssigner::findRoot(const std::string& _connectableName)
@@ -88,10 +90,15 @@ void NodeAssigner::unionConnectables(const std::string& _connectableNameA, const
 	}
 
 	// If either of the roots has GND, mark the new root as having GND
+	std::string newRoot = findRoot(rootA);
 	if(m_hasGND[rootA] || m_hasGND[rootB])
 	{
-		m_hasGND[rootA] = true; // After union, find the new root and mark it
+		m_hasGND[newRoot] = true;
 	}
+
+	// Transfer label name to the new root if available
+	if(!m_labelName[rootA].empty()) m_labelName[newRoot] = m_labelName[rootA];
+	else if(!m_labelName[rootB].empty()) m_labelName[newRoot] = m_labelName[rootB];
 }
 
 std::string NodeAssigner::createConnectableKey(ot::UID _blockUID, const std::string& _connectableName) const
@@ -128,6 +135,24 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 		if(myConn.getDestinationConnectable() == m_gndPole)
 		{
 			m_hasGND[findRoot(destConnectable)] = true;
+		}
+
+		// Find Label and mark
+		if(myConn.getOriginConnectable() == "flagPole")
+		{
+			auto it = _allEntitiesByBlockID.find(myConn.getOriginUid());
+			if (it != _allEntitiesByBlockID.end()) {
+				auto labelEnt = dynamic_cast<EntityBlockCircuitLabel*>(it->second.get());
+				m_labelName[findRoot(originConnectable)] = labelEnt ? labelEnt->getLabelName() : it->second->getName();
+			}
+		}
+		if(myConn.getDestinationConnectable() == "flagPole")
+		{
+			auto it = _allEntitiesByBlockID.find(myConn.getDestinationUid());
+			if (it != _allEntitiesByBlockID.end()) {
+				auto labelEnt = dynamic_cast<EntityBlockCircuitLabel*>(it->second.get());
+				m_labelName[findRoot(destConnectable)] = labelEnt ? labelEnt->getLabelName() : it->second->getName();
+			}
 		}
 	}
 
@@ -206,6 +231,18 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 			if (m_hasGND[root])
 			{
 				rootToNodeNumber[root] = "0";
+			}
+			else if (!m_labelName[root].empty())
+			{
+				std::string label = m_labelName[root];
+				// Extract the actual label name (e.g. remove "Blocks/Circuit/" if present)
+				if (label.find('/') != std::string::npos) {
+					std::string extracted = Application::instance()->extractStringAfterDelimiter(label, '/', 2);
+					if (extracted != "failed" && !extracted.empty()) {
+						label = extracted;
+					}
+				}
+				rootToNodeNumber[root] = label;
 			}
 			else
 			{

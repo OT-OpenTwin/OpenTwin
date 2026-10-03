@@ -53,6 +53,7 @@
 #include "OTBlockEntities/Circuit/EntityBlockCircuitGND.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitBehavioralSource.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitLabel.h"
 
 
 // Third Party Header
@@ -141,7 +142,8 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 	ot::GraphicsPickerCollectionCfg a2("Meter Elements", "Meter Elements");
 	ot::GraphicsPickerCollectionCfg a3("Sources", "Sources");
 	ot::GraphicsPickerCollectionCfg a4("ActiveElements", "Active Elements");
-	
+	ot::GraphicsPickerCollectionCfg a5("OtherElements", "Other Elements");
+
 	a1.addItem(EntityBlockCircuitResistor::className(), "Resistor", "CircuitElementImages/ResistorBG.png");
 	a1.addItem(EntityBlockCircuitCapacitor::className(),"Capacitor", "CircuitElementImages/Capacitor.png");
 	a1.addItem(EntityBlockCircuitInductor::className(), "Inductor", "CircuitElementImages/Inductor.png");
@@ -157,10 +159,13 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 
 	a4.addItem(EntityBlockCircuitDiode::className(), "Diode", "CircuitElementImages/Diod2.png");
 
+	a5.addItem(EntityBlockCircuitLabel::className(), "Net Label", "CircuitElementImages/GND.png");
+
 	a.addChildCollection(std::move(a1));
 	a.addChildCollection(std::move(a2));
 	a.addChildCollection(std::move(a3));
 	a.addChildCollection(std::move(a4));
+	a.addChildCollection(std::move(a5));
 
 	graphicsPicker.addCollection(std::move(a));
 	graphicsPicker.setPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
