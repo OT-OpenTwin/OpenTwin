@@ -15,6 +15,8 @@
 #include "OTDataStorage/DataLakeHelper.h"
 #include "OTCore/EntityName.h"
 
+#include "OTResultDataAccess/JsonQueries/QueryEngine.h"
+
 DataLakeAccessor::DataLakeAccessor(ot::ApplicationBase* _thisApplicationBase)
  : m_applicationBase(_thisApplicationBase)
 {}
@@ -110,28 +112,10 @@ void DataLakeAccessor::createQueryDescriptionsSeries(const std::list<ot::ValueCo
 				auto fieldValue = ot::JSONVectoriser::getValue(metadata, fieldName);
 				if (fieldValue.has_value())
 				{
+					QueryEngine queryEngine;
 					const ot::JsonValue& existingFieldValue = fieldValue.value();
 					const std::string temp = ot::json::toJson(existingFieldValue);
-					if (existingFieldValue.IsString())
-					{
-						if (metadataQuery.getComparator() != "=")
-						{
-							throw std::exception(("Comparison of strings are only possible with an equality check. Field: " + metadataQuery.getName()).c_str());
-						}
-						else
-						{
-							const std::string actualSeriesMetadataValue = existingFieldValue.GetString();
-							match &= actualSeriesMetadataValue == metadataQuery.getValue();
-						}
-					}
-					else if (!existingFieldValue.IsObject() && !existingFieldValue.IsArray())
-					{
-						match &= compare(metadataQuery, existingFieldValue);
-					}
-					else
-					{
-						throw std::exception(("Metadata query targets an object, which is not yet supported. Field: " + metadataQuery.getName()).c_str());
-					}
+					match = queryEngine.matches(metadataQuery, existingFieldValue);
 				}
 				else
 				{
@@ -1191,70 +1175,6 @@ std::optional<BsonViewOrValue> DataLakeAccessor::generateComparisonConsideringUn
 	}
 }
 
-bool DataLakeAccessor::compare(const ot::ValueComparisonDescription& _comparisonDef, const ot::JsonValue& _value)
-{
-	std::string type;
-	if (_value.IsInt())
-	{
-		type = ot::TypeNames::getInt32TypeName();
-	}
-	else if (_value.IsInt64())
-	{
-		type = ot::TypeNames::getInt64TypeName();
-	}
-	else if (_value.IsFloat())
-	{
-		type = ot::TypeNames::getFloatTypeName();
-	}
-	else if (_value.IsDouble())
-	{
-		type = ot::TypeNames::getDoubleTypeName();
-	}
-	else if (_value.IsBool())
-	{
-		type = ot::TypeNames::getBoolTypeName();
-	}
-	else
-	{
-		throw std::exception("Not supported data type for comparison");
-	}
-
-	ot::ExplicitStringValueConverter converter;
-	ot::Variable givenValue = converter.setValueFromString(_comparisonDef.getValue(), type);
-
-	ot::JSONToVariableConverter converterJ;
-	ot::Variable isValue = converterJ(_value);
-
-	if (_comparisonDef.getComparator() == "=")
-	{
-		return givenValue == isValue;
-	}
-	else if (_comparisonDef.getComparator() == "<")
-	{
-		return givenValue < isValue;
-	}
-	else if (_comparisonDef.getComparator() == "<=")
-	{
-		return (givenValue < isValue) || (givenValue == isValue);
-	}
-	else if (_comparisonDef.getComparator() == ">")
-	{
-		return (givenValue > isValue);
-	}
-	else if (_comparisonDef.getComparator() == ">=")
-	{
-		return (givenValue > isValue) || (givenValue == isValue);
-	}
-	else if (_comparisonDef.getComparator() == "!=")
-	{
-		return !(givenValue == isValue);
-	}
-	else
-	{
-		throw std::exception(("Not supported operator for comparison: " + _comparisonDef.getComparator()).c_str());
-	}
-	return false;
-}
 
 void DataLakeAccessor::clear()
 {

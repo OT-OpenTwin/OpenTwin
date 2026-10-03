@@ -98,7 +98,9 @@ namespace ot {
 		bool operator==(const Variable& other) const;
 		bool operator!=(const Variable& other) const;
 		bool operator>(const Variable& other) const;
+		bool operator>=(const Variable& other) const;
 		bool operator<(const Variable& other) const;
+		bool operator<=(const Variable& other) const;
 		
 		Variable operator*(const Variable& o) const;
 		Variable operator+(const Variable& o) const;

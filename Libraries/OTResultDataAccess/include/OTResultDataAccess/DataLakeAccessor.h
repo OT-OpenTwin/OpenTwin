@@ -50,8 +50,6 @@ private:
 	
 	void clear();
 
-	bool compare(const ot::ValueComparisonDescription& _comparisionDef, const ot::JsonValue& _value);
-
 	void addValueDescriptionsParameters(const std::list<ot::QueryDescription>& _queryDescriptions);
 	
 	void createQueries(BsonViewOrValue& _resultCollectionQueries, BsonViewOrValue& _transformedCollectionQueries);

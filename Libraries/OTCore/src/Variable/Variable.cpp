@@ -360,6 +360,11 @@ bool ot::Variable::operator>(const Variable& other) const
 	return larger;
 }
 
+bool ot::Variable::operator>=(const Variable& _other) const
+{
+	return *this > _other || *this == _other;
+}
+
 bool ot::Variable::operator<(const Variable& other) const 
 {
 	const bool smaller =
@@ -370,6 +375,11 @@ bool ot::Variable::operator<(const Variable& other) const
 		other.isInt32() && this->isInt32() && (this->getInt32() < other.getInt32()) ||
 		other.isInt64() && this->isInt64() && (this->getInt64() < other.getInt64());
 	return smaller;
+}
+
+bool ot::Variable::operator<=(const Variable& _other) const
+{
+	return *this < _other || *this == _other;
 }
 
 ot::Variable ot::Variable::operator*(const Variable& o) const
