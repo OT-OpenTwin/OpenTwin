@@ -51,6 +51,9 @@ private:
 	const std::string m_voltMeterConnection = "voltageMeterConnection";
 	const std::string m_subcktType = "SUBCKT";
 
+	// Parameter names collected from global Parameters folder
+	std::set<std::string> m_parameterNames;
+
 	// Helper functions
 
 	// @brief Builds a netlist line for a given circuit element based on its type and the provided simulation strategy.
@@ -76,4 +79,7 @@ private:
 	std::string getCircuitModelType(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::vector<std::string> convertToCircByLine(const std::string& lines);
+
+	// @brief Wraps value in {} if it contains a known parameter name
+	std::string wrapParameterExpression(const std::string& _value) const;
 };

@@ -22,6 +22,9 @@
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityFileText.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTModelAPI/ModelServiceAPI.h"
+#include "OTModelEntities/EntityParameter.h"
+#include "OTModelEntities/EntityAPI.h"
 
 // Service Header
 #include "NetlistGenerator.h"
@@ -31,6 +34,7 @@
 // std Header
 #include <sstream>
 #include <unordered_set>
+#include <set>
 
 NetlistGenerator::NetlistGenerator(ElementNamingRegistry& _elementNamingRegistry)
 	: m_elementNamingRegistry(_elementNamingRegistry)
@@ -43,6 +47,27 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
 
     // 1. Title
     netlist.push_back("circbyline *Test");
+
+    // 1b. Collect all global parameters and inject as .param lines
+    m_parameterNames.clear();
+    ot::UIDList parameterIDs = ot::ModelServiceAPI::getIDsOfFolderItemsOfType("Parameters", "EntityParameter", true);
+    std::list<ot::EntityInformation> currentParameterInfo;
+    ot::ModelServiceAPI::getEntityInformation(parameterIDs, currentParameterInfo);
+
+    for (const auto& paramInfo : currentParameterInfo)
+    {
+        EntityParameter* param = dynamic_cast<EntityParameter*>(ot::EntityAPI::readEntityFromEntityIDandVersion(paramInfo.getEntityID(), paramInfo.getEntityVersion()));
+        if (param)
+        {
+            std::string paramName = param->getName();
+            size_t slashPos = paramName.find_last_of('/');
+            if (slashPos != std::string::npos) paramName = paramName.substr(slashPos + 1);
+
+            m_parameterNames.insert(paramName);
+            netlist.push_back("circbyline .param " + paramName + "=" + std::to_string(param->getNumericValue()));
+            delete param;
+        }
+    }
 
     // 2. Create Simulation-Strategy
 	EntityPropertiesBase* simTypePropBase = _solverEntity->getProperties().getProperty("Simulation Type");
@@ -119,7 +144,7 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
         {
 		    // add value or model depending on whether a model is specified
             if (modelType.empty()) {
-                line += circuitElement->getNetlistValue();
+                line += wrapParameterExpression(circuitElement->getNetlistValue());
             }
             else {
                 line += circuitElement->getModel();
@@ -317,4 +342,35 @@ std::vector<std::string> NetlistGenerator::convertToCircByLine(const std::string
     }
 
     return circLines;
+}
+
+std::string NetlistGenerator::wrapParameterExpression(const std::string& _value) const
+{
+    if (_value.empty() || m_parameterNames.empty()) return _value;
+
+    // Already wrapped in {} by the user -> leave as-is
+    if (_value.front() == '{' && _value.back() == '}') return _value;
+
+    // Check if the value contains any known parameter name as a whole word
+    for (const auto& paramName : m_parameterNames)
+    {
+        size_t pos = 0;
+        while ((pos = _value.find(paramName, pos)) != std::string::npos)
+        {
+            // Check word boundary before
+            bool boundaryBefore = (pos == 0) || !std::isalnum(static_cast<unsigned char>(_value[pos - 1])) && _value[pos - 1] != '_';
+            // Check word boundary after
+            size_t endPos = pos + paramName.size();
+            bool boundaryAfter = (endPos >= _value.size()) || !std::isalnum(static_cast<unsigned char>(_value[endPos])) && _value[endPos] != '_';
+
+            if (boundaryBefore && boundaryAfter)
+            {
+                return "{" + _value + "}";
+            }
+            pos += paramName.size();
+        }
+    }
+
+    // No parameter found -> return as-is (plain number like "1k" or "10u")
+    return _value;
 }
