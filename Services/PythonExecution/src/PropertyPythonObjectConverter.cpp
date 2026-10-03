@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: PropertyPythonObjectConverter.cpp
 // 
 // License:
@@ -19,6 +19,7 @@
 
 #include "PropertyPythonObjectConverter.h"
 #include "PythonObjectBuilder.h"
+#include "Application.h"
 
 PropertyPythonObjectConverter::PropertyPythonObjectConverter(EntityPropertiesBase* property)
 {
@@ -129,7 +130,13 @@ void PropertyPythonObjectConverter::SetValue(const CPythonObject& cpythonObject)
 	else if (_propertySelection != nullptr)
 	{
 		const std::string value = pyObBuilder.getStringValue(cpythonObject, "Parameter");
-		_propertySelection->setValue(value);
+		bool success = _propertySelection->setValue(value);
+		if (!success)
+		{
+			std::string errorMessage = "Failed to set value for selection property: " + _propertySelection->getName() + " to value: " + value;
+			OT_LOG_E(errorMessage);
+			Application::instance().getCommunicationHandler().writeToServer(errorMessage);
+		}
 	}
 	else if (_propertyEntityList != nullptr)
 	{
