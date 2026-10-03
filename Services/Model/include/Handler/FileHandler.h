@@ -3,10 +3,11 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/Visualization/IVisualisationText.h"
-#include "OTModelEntities/Visualization/IVisualisationTable.h"
+#include "OTSystem/FileSystem/File.h"
+#include "OTSystem/FileSystem/TemporaryFile.h"
 #include "OTCore/OTClassHelper.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
+#include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGui/Widgets/ToolBarButtonCfg.h"
 #include "OTGuiAPI/ButtonHandler.h"
@@ -18,14 +19,15 @@
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/EntityPythonManifest.h"
 #include "OTModelEntities/Lms/UserLibraryElement.h"
-#include "OTGui/Dialog/PropertyDialogCfg.h"
+#include "OTModelEntities/Visualization/IVisualisationText.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
 class FileHandler : public BusinessLogicHandler, public ot::TextEditorActionHandler, public ot::TableActionHandler
 {
 	OT_DECL_NOCOPY(FileHandler)
 	OT_DECL_NOMOVE(FileHandler)
 public:
-	static std::string storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize);
+	static ot::TemporaryFile storeTemporaryFile(const std::string& _fileIdentifierName, const std::unique_ptr<uint8_t[]>& _rawData, size_t _dataSize);
 
 	FileHandler();
 	virtual ~FileHandler() = default;
@@ -113,8 +115,7 @@ private:
 
 
 	void parseMDF4FileWorker(ot::JsonDocument&& _document);
-	void parseMDF4File(const std::string& _fileName, const std::string& _fileFilter, std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize, ot::NewModelStateInfo& _newEntityInfos);
-
+	
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Export to library functions

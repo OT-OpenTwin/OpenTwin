@@ -19,16 +19,18 @@
 
 #include "stdafx.h"
 
-// Service header
+// Model service header
 #include "Model.h"
 #include "Application.h"
 #include "QueuingHttpRequestsRAII.h"
 #include "QueuingDatabaseWritingRAII.h"
 #include "Handler/FileHandler.h"
-#include "OTModelEntities/Properties/Bundle/PropertyBundleProductMasterData.h"
+#include "MDF4/MDF4Parser.h"
+
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/DateTime.h"
+#include "OTSystem/FileSystem/TemporaryFile.h"
 
 #include "OTCore/String.h"
 #include "OTCore/FolderNames.h"
@@ -51,6 +53,7 @@
 #include "OTModelEntities/EntityFileText.h"
 #include "OTModelEntities/IEventHandler.h"
 #include "OTModelEntities/EntityPythonManifest.h"
+#include "OTModelEntities/Properties/Bundle/PropertyBundleProductMasterData.h"
 
 #include "OTGui/Dialog/PropertyDialogCfg.h"
 #include "OTGui/Properties/PropertyGroup.h"
@@ -59,20 +62,14 @@
 
 #include "OTGuiAPI/Frontend.h"
 
-// MDF lib
-#include <mdf/mdfreader.h>
-#include <mdf/mdflogstream.h>
-
 // std header
 #include <filesystem>
 
-std::string FileHandler::storeTemporaryFile(std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize)
+ot::TemporaryFile FileHandler::storeTemporaryFile(const std::string& _fileIdentifierName, const std::unique_ptr<uint8_t[]>& _rawData, size_t _dataSize)
 {
 	std::string tmpFileName = DataBase::instance().getTmpFileName();
-
-
-
-	return tmpFileName;
+	std::filesystem::path tmpFilePath(tmpFileName);
+	return ot::TemporaryFile(tmpFilePath, reinterpret_cast<const char*>(_rawData.get()), _dataSize, _fileIdentifierName);
 }
 
 FileHandler::FileHandler()
@@ -97,9 +94,10 @@ FileHandler::FileHandler()
 	m_buttonHandler.connectToolBarButton(m_buttonExportFileToLibrary, this, &FileHandler::handleExportFilesToLibrary);
 	m_buttonHandler.connectToolBarButton(m_buttonExportToUserLibrary, this, &FileHandler::handleExportToUserLibrary);
 
-	m_actionHandler.connectAction(OT_ACTION_CMD_ImportFile, this, &FileHandler::handleImportMDF4);
+	//m_actionHandler.connectAction(OT_ACTION_CMD_ImportFile, this, &FileHandler::handleImportFile);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportTextFile, this, &FileHandler::handleImportTextFile);
 	m_actionHandler.connectAction(OT_ACTION_CMD_ImportPyhtonScript, this, &FileHandler::handleImportPythonScript);
+	m_actionHandler.connectAction(OT_ACTION_CMD_ImportMDF4, this, &FileHandler::handleImportMDF4);
 
 	m_actionHandler.connectAction(OT_ACTION_CMD_UI_RequestTextData, this, &FileHandler::handleRequestTextData);
 
@@ -743,7 +741,7 @@ void FileHandler::storeFileInDataBase(const std::string& _text, const std::strin
 	ot::ProductMasterDataConfiguration config;
 	config.m_zoneTags.insert(ot::ZoneTag::RAW);
 
-	bundle.initialise(textFile.get(),config);
+	bundle.initialise(textFile.get(), config);
 
 	textFile->storeToDataBase();
 	m_entityIDsTopo.push_back(entIDTopo);
@@ -772,15 +770,20 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 	{
 		fileInfos.push_back(ot::GridFSFileInfo(fileInfoObj));
 	}
-	std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
-	std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
+	const std::list<std::string> fileNames = ot::json::getStringList(_document, OT_ACTION_PARAM_FILE_OriginalName);
+	const std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 
 	ot::NewModelStateInfo newEntityInfos;
 
-	assert(fileInfos.size() == fileNames.size());
+	if (fileInfos.size() != fileNames.size())
+	{
+		OT_LOG_E("[FATAL] Mismatch between fileInfos and fileNames sizes. Aborting MDF4 import.");
+		return;
+	}
+	else
 	{
 		//QueuingDatabaseWritingRAII queueDatabase;
-		auto info = fileInfos.begin();
+		auto fileInfosIterator = fileInfos.begin();
 
 		ProgressUpdater updater(uiComponent, "Importing MDF4 files");
 		updater.setTotalNumberOfSteps(fileNames.size());
@@ -788,11 +791,11 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 
 		if (updater.getTotalNumberOfSteps() == 1)
 		{
-			uiComponent->displayMessage("Processing MDF4 file...");
+			uiComponent->displayMessage("Processing MDF4 file...\n");
 		}
 		else
 		{
-			uiComponent->displayMessage("Processing MDF4 files...");
+			uiComponent->displayMessage("Processing MDF4 files...\n");
 		}
 
 		auto startTime = ot::DateTime::msSinceEpoch();
@@ -800,24 +803,35 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 		for (const std::string& fileName : fileNames)
 		{
 			counter++;
+
 			std::string compressedData;
 			{
 				// Read file from GridFS and delete it afterwards to free up space
 				DataStorageAPI::DocumentAPI api;
-				bsoncxx::oid oid_obj{ info->getDocumentId() };
+				bsoncxx::oid oid_obj{ fileInfosIterator->getDocumentId() };
 				bsoncxx::types::value id{ bsoncxx::types::b_oid{oid_obj} };
 				std::vector<uint8_t> dataBuffer;
-				api.GetDocumentUsingGridFs(id, info->getCollectionName(), dataBuffer);
-				api.DeleteGridFSData(id, info->getCollectionName());
+				api.GetDocumentUsingGridFs(id, fileInfosIterator->getCollectionName(), dataBuffer);
+				api.DeleteGridFSData(id, fileInfosIterator->getCollectionName());
 				compressedData = std::string(reinterpret_cast<char*>(dataBuffer.data()), dataBuffer.size());
 			}
 
-			uint64_t dataLen = static_cast<uint64_t>(info->getUncompressedSize());
+			// Decompress the data
+			uint64_t dataLen = static_cast<uint64_t>(fileInfosIterator->getUncompressedSize());
 			std::unique_ptr<uint8_t[]> data(ot::String::decompressBase64(compressedData.c_str(), dataLen));
-			info++;
+			fileInfosIterator++;
 
 			// Parse the file
-			parseMDF4File(fileName, fileFilter, std::move(data), dataLen, newEntityInfos);
+			ot::TemporaryFile tmpFile(storeTemporaryFile(fileName, data, dataLen));
+
+			if (tmpFile.isValid())
+			{
+				ot::MDF4Parser parser = ot::MDF4Parser::parse(std::move(tmpFile));
+			}
+			else
+			{
+				OT_USER_LOG_E("Failed to create temporary MDF4 file for parsing: " + tmpFile.getFilePath().string());
+			}
 
 			updater.triggerUpdate(counter);
 		}
@@ -825,44 +839,12 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 		auto endTime = ot::DateTime::msSinceEpoch();
 		auto elapsedTime = endTime - startTime;
 		uiComponent->displayMessage("MDF4 file processing completed in " + ot::DateTime::intervalToString(elapsedTime) + "\n");
-
 	}
 
 	if (newEntityInfos.hasEntities())
 	{
 		model->addEntitiesToModel(newEntityInfos, "Imported MDF4 file", true, true, true);
 	}
-}
-
-void FileHandler::parseMDF4File(const std::string& _fileName, const std::string& _fileFilter, std::unique_ptr<uint8_t[]>&& _rawData, size_t _dataSize, ot::NewModelStateInfo& _newEntityInfos)
-{
-	std::string tmpFilePath = storeTemporaryFile(std::move(_rawData), _dataSize);
-	OT_LOG_T("Temporary MDF4 file stored at: " + tmpFilePath);
-
-	mdf::MdfReader reader(tmpFilePath);
-
-	if (!reader.IsOk())
-	{
-		OT_USER_LOG_E("Failed to initialize MDF4 file reader: " + _fileName);
-		return;
-	}
-
-	const mdf::MdfFile* readerFile = reader.GetFile();
-	if (!readerFile)
-	{
-		OT_USER_LOG_E("Failed to get MDF4 file object: " + _fileName);
-		return;
-	}
-
-	if (!reader.ReadEverythingButData())
-	{
-		OT_USER_LOG_E("Failed to read MDF4 file: " + _fileName);
-		return;
-	}
-
-	
-
-
 }
 
 FileHandler::DialogExportEntities FileHandler::loadDialogEntities(const ot::PropertyDialogCfg& _dialogCfg, bool _isUserExport)
@@ -1019,7 +1001,6 @@ void FileHandler::handleCircuitExport(const DialogExportEntities& _entities, boo
 		worker.detach();
 	}
 }
-
 
 void FileHandler::handlePythonExport(const DialogExportEntities& _entities, bool _exportToUserLibrary, const ot::PropertyDialogCfg& _dialogCfg)
 {
@@ -1665,9 +1646,9 @@ FileHandler::FileOverwriteStatus FileHandler::checkAndHandleFileOverwrite(const 
 
 				// Check if essential dynamic fields are missing on disk
 				bool missingDynamicFields = !existingMetaDoc.HasMember("LibraryElementID") ||
-											!existingMetaDoc.HasMember("Version") ||
-											!existingMetaDoc.HasMember("Name") ||
-											!existingMetaDoc.HasMember("FileName");
+					!existingMetaDoc.HasMember("Version") ||
+					!existingMetaDoc.HasMember("Name") ||
+					!existingMetaDoc.HasMember("FileName");
 
 				// Only consider metadata changed if MetaData, AdditionalInfos differ, or essential fields are missing
 				metaChanged = (newMetaDataStr != existingMetaDataStr) || (newAdditionalInfosStr != existingAdditionalInfosStr) || missingDynamicFields;
@@ -1776,7 +1757,8 @@ std::string FileHandler::createIncrementedPath(const std::string& _filePath)
 	{
 		newFilePath = directory + baseName + "_" + std::to_string(counter) + extension;
 		counter++;
-	} while (std::filesystem::exists(newFilePath));
+	}
+	while (std::filesystem::exists(newFilePath));
 
 	return newFilePath;
 }
