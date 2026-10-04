@@ -144,7 +144,13 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
         {
 		    // add value or model depending on whether a model is specified
             if (modelType.empty()) {
-                line += wrapParameterExpression(circuitElement->getNetlistValue());
+                // BehavioralSource expressions are natively evaluated by NGSpice - no {} wrapping needed
+                if (circuitElement->type() == "BehavioralSource") {
+                    line += circuitElement->getNetlistValue();
+                }
+                else {
+                    line += wrapParameterExpression(circuitElement->getNetlistValue());
+                }
             }
             else {
                 line += circuitElement->getModel();
