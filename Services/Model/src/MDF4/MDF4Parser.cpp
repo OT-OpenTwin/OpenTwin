@@ -3,35 +3,45 @@
 #include "stdafx.h"
 
 // Model service header
+#include "Model.h"
 #include "Application.h"
 #include "MDF4/MDF4Parser.h"
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTServiceFoundation/UiComponent.h"
+#include "OTModelEntities/MDF/EntityMDFFile.h"
+#include "OTModelEntities/MDF/EntityMDFChannel.h"
+#include "OTModelEntities/MDF/EntityMDFChannelData.h"
 
 // MDF lib
 #include <mdf/mdfreader.h>
 #include <mdf/mdflogstream.h>
 
-ot::MDF4Parser ot::MDF4Parser::parse(ot::TemporaryFile&& _file)
+ot::NewModelStateInfo ot::MDF4Parser::parse(ot::TemporaryFile&& _file, const std::list<std::string>& _existingMDFFileEntities)
 {
-	MDF4Parser parser(std::move(_file));
+	MDF4Parser parser(std::move(_file), _existingMDFFileEntities);
 	try
 	{
-		parser.parse();
+		if (parser.parse())
+		{
+			return parser.getNewEntities();
+		}
+		else
+		{
+			return NewModelStateInfo();
+		}
 	}
 	catch (const std::exception& _e)
 	{
 		OT_LOG_ES("Failed to parse MDF4 file: " << _e.what());
-		return MDF4Parser();
+		return NewModelStateInfo();
 	}
 	catch (...)
 	{
 		OT_LOG_E("Failed to parse MDF4 file: Unknown error");
-		return MDF4Parser();
+		return NewModelStateInfo();
 	}
-	return parser;
 }
 
 void ot::MDF4Parser::log(const StyledTextBuilder& _message)
@@ -63,32 +73,31 @@ void ot::MDF4Parser::logError(const std::string& _message)
 	MDF4Parser::log(StyledTextBuilder() << "[mdf] [" << StyledText::Error << "Error" << StyledText::ClearStyle << "] " << _message);
 }
 
-ot::MDF4Parser::MDF4Parser()
-	: m_file(std::nullopt)
-{}
-
-ot::MDF4Parser::MDF4Parser(TemporaryFile&& _file)
+ot::MDF4Parser::MDF4Parser(TemporaryFile&& _file, const std::list<std::string>& _existingMDFFileEntities)
 	: m_file(std::move(_file))
-{}
-
-void ot::MDF4Parser::parse()
 {
-	// Ensure file is set
-	if (!m_file.has_value())
+
+}
+
+bool ot::MDF4Parser::parse()
+{
+	Application* app = Application::instance();
+	OTAssertNullptr(app);
+	Model* model = app->getModel();
+	if (!model)
 	{
-		OT_LOG_E("No MDF4 file provided for parsing.");
-		return;
+		OT_LOG_E("Cannot parse MDF4 file since model is not available");
+		return false;
 	}
 
 	// Helper
-	TemporaryFile& file = m_file.value();
-	const std::string fileName = file.getUniqueName();
-	const std::filesystem::path tmpFilePath = file.getFilePath();
+	const std::string fileName = m_file.getUniqueName();
+	const std::filesystem::path tmpFilePath = m_file.getFilePath();
 	const std::string tmpFilePathString = tmpFilePath.string();
 
 	this->log("Processing MDF file: \"" + fileName + "\"\n");
 
-	OT_LOG_DS("Starting to parse MDF4 file: \"" << m_file->getUniqueName() << "\"");
+	OT_LOG_DS("Starting to parse MDF4 file: \"" << m_file.getUniqueName() << "\"");
 	OT_LOG_DS("+ Temporary MDF4 file stored at: \"" + tmpFilePathString << "\"");
 
 	// Initialize reader
@@ -96,21 +105,21 @@ void ot::MDF4Parser::parse()
 	if (!reader.IsOk())
 	{
 		OT_USER_LOG_E("Failed to initialize MDF4 file reader: " + tmpFilePathString);
-		return;
+		return false;
 	}
 
 	const mdf::MdfFile* readerFile = reader.GetFile();
 	if (!readerFile)
 	{
 		OT_USER_LOG_E("Failed to get MDF4 file object: " + tmpFilePathString);
-		return;
+		return false;
 	}
 
 	// Read topology and meta-data
 	if (!reader.ReadEverythingButData())
 	{
 		OT_USER_LOG_E("Failed to read MDF4 file: " + tmpFilePathString);
-		return;
+		return false;
 	}
 
 	// Fetch data groups
@@ -128,7 +137,7 @@ void ot::MDF4Parser::parse()
 			continue;
 		}
 
-		std::list<std::pair<MDF4Dataset, mdf::ChannelObserverPtr>> datasets;
+		std::list<std::pair<std::unique_ptr<EntityMDFChannel>, mdf::ChannelObserverPtr>> datasets;
 
 		// Go through all channel groups in the data group
 		for (mdf::IChannelGroup* channelGroup : dataGroup->ChannelGroups())
@@ -148,7 +157,7 @@ void ot::MDF4Parser::parse()
 					continue;
 				}
 
-				MDF4Dataset dataset(channel->Name());
+				//MDF4Dataset dataset(channel->Name());
 
 				// Get the meta-data for the channel
 				/*mdf::IMetaData* metaData = channel->MetaData();
@@ -169,7 +178,7 @@ void ot::MDF4Parser::parse()
 				
 				// Read samples
 				auto obs = mdf::CreateChannelObserver(*dataGroup, *channelGroup, *channel);
-				datasets.emplace_back(std::move(dataset), std::move(obs));
+				//datasets.emplace_back(std::move(dataset), std::move(obs));
 			}
 		}
 
@@ -185,7 +194,7 @@ void ot::MDF4Parser::parse()
 
 		for (auto& dataset : datasets)
 		{
-			MDF4Dataset& datasetRef = dataset.first;
+			//MDF4Dataset& datasetRef = dataset.first;
 			mdf::ChannelObserverPtr& obs = dataset.second;
 			uint64_t nofSamples = obs->NofSamples();
 
@@ -210,20 +219,22 @@ void ot::MDF4Parser::parse()
 				*/
 				else
 				{
-					this->logWarning("Failed to read sample " + std::to_string(sample) + " for channel \"" + datasetRef.getName() + "\" in MDF4 file \"" + fileName + "\". Skipping sample.\n");
+					//this->logWarning("Failed to read sample " + std::to_string(sample) + " for channel \"" + datasetRef.getName() + "\" in MDF4 file \"" + fileName + "\". Skipping sample.\n");
 				}
 				
 			}
 
 			channelValues.shrink_to_fit();
-			datasetRef.setSamples(std::move(channelValues));
+			//datasetRef.setSamples(std::move(channelValues));
 
 			
-			OT_LOG_TS("Dataset created { \"Name\": \"" << datasetRef.getName() << "\", \"Samples\": " << datasetRef.getSamplesSize() << " }");
+			//OT_LOG_TS("Dataset created { \"Name\": \"" << datasetRef.getName() << "\", \"Samples\": " << datasetRef.getSamplesSize() << " }");
 		}
 
 		dataGroup->ClearData();
 	}
+
+	return true;
 }
 
 void ot::MDF4Parser::initializeLogging()

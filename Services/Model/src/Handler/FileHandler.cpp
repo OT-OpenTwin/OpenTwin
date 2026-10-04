@@ -774,6 +774,7 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 	const std::string fileFilter = ot::json::getString(_document, OT_ACTION_PARAM_FILE_Mask);
 
 	ot::NewModelStateInfo newEntityInfos;
+	std::list<std::string> folderContent = model->getListOfFolderItems(ot::FolderNames::MDFFolder, false);
 
 	if (fileInfos.size() != fileNames.size())
 	{
@@ -826,7 +827,8 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 
 			if (tmpFile.isValid())
 			{
-				ot::MDF4Parser parser = ot::MDF4Parser::parse(std::move(tmpFile));
+				ot::NewModelStateInfo newStateInfo = ot::MDF4Parser::parse(std::move(tmpFile), folderContent);
+				newEntityInfos.splice(std::move(newStateInfo));
 			}
 			else
 			{

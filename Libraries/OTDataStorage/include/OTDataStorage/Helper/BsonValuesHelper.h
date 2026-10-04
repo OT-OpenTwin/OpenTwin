@@ -43,6 +43,9 @@ namespace DataStorageAPI
 		static value getDoubleValue(double value);
 		static double getDoubleFromBsonValue(value value);
 
+		static value getUInt64BsonValue(uint64_t value) { return BsonValuesHelper::getInt64BsonValue(static_cast<int64_t>(value)); };
+		static uint64_t getUInt64FromBsonValue(value value) { return static_cast<uint64_t>(BsonValuesHelper::getInt64FromBsonValue(value)); };
+
 		static value getOIdValue(std::string value);
 		static std::string getOIdFromBsonValue(value value);
 
