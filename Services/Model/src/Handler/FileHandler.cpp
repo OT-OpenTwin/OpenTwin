@@ -827,12 +827,25 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 
 			if (tmpFile.isValid())
 			{
-				ot::NewModelStateInfo newStateInfo = ot::MDF4Parser::parse(std::move(tmpFile), folderContent);
-				newEntityInfos.splice(std::move(newStateInfo));
+				try
+				{
+					ot::NewModelStateInfo newStateInfo = ot::MDF4Parser::parse(std::move(tmpFile), folderContent);
+					newEntityInfos.splice(std::move(newStateInfo));
+				}
+				catch (const std::exception& _e)
+				{
+					OT_LOG_E("Failed to parse MDF4 file: " + fileName + " due to error: " + _e.what());
+					OT_USER_LOG_E("Failed to parse MDF4 file: " + fileName + " due to error: " + _e.what());
+				}
+				catch (...)
+				{
+					OT_LOG_E("Failed to parse MDF4 file: " + fileName + " due to an unknown error.");
+					OT_USER_LOG_E("Failed to parse MDF4 file: " + fileName + " due to an unknown error.");
+				}
 			}
 			else
 			{
-				OT_USER_LOG_E("Failed to create temporary MDF4 file for parsing: " + tmpFile.getFilePath().string());
+				OT_LOG_E("Failed to create temporary MDF4 file for parsing: " + tmpFile.getFilePath().string());
 			}
 
 			updater.triggerUpdate(counter);
@@ -845,7 +858,7 @@ void FileHandler::parseMDF4FileWorker(ot::JsonDocument&& _document)
 
 	if (newEntityInfos.hasEntities())
 	{
-		model->addEntitiesToModel(newEntityInfos, "Imported MDF4 file", true, true, true);
+		model->addEntitiesToModel(newEntityInfos, std::string("Imported MDF4 file") + (fileNames.size() == 1 ? "" : "s"), true, true, true);
 	}
 }
 
