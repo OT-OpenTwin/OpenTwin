@@ -12,6 +12,8 @@ ot::EntityMDFFile::EntityMDFFile(UID _ID, EntityBase* _parent, EntityObserver* _
 	treeItem.setVisibleIcon("Tree/MDFFile");
 	treeItem.setHiddenIcon("Tree/MDFFile");
 	setDefaultTreeItem(treeItem);
+
+	setDeletable(true);
 }
 
 bool ot::EntityMDFFile::updateFromProperties()

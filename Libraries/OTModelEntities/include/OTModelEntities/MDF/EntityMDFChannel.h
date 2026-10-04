@@ -4,12 +4,13 @@
 
 // OpenTwin header
 #include "OTModelEntities/EntityContainer.h"
+#include "OTModelEntities/Visualization/IVisualisationTable.h"
 
 namespace ot
 {
 	class EntityMDFChannelData;
 
-	class OT_MODELENTITIES_API_EXPORT EntityMDFChannel : public EntityContainer
+	class OT_MODELENTITIES_API_EXPORT EntityMDFChannel : public EntityContainer, public IVisualisationTable
 	{
 		OT_DECL_NOCOPY(EntityMDFChannel)
 		OT_DECL_NOMOVE(EntityMDFChannel)
@@ -55,6 +56,24 @@ namespace ot
 
 		virtual std::string serialiseAsJSON() override;
 		virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept;
+
+		// ###########################################################################################################################################################################################################################################################################################################################
+
+		// Public: Table interface
+
+		virtual ot::GenericDataStructMatrix getTable() override;
+		virtual void setTable(const ot::GenericDataStructMatrix& _table) override;
+		virtual ot::TableCfg getTableConfig(bool _includeData) override;
+
+		//! @brief Returns the decimal delimiter used for numeric values in the table (e.g., '.' or ',').
+		//! This is important for correctly parsing and displaying numeric values, especially in international contexts where the decimal delimiter may vary.
+		virtual char getDecimalDelimiter() override { return '.'; };
+
+		virtual bool visualiseTable() override { return true; };
+		virtual ot::TableCfg::TableHeaderMode getHeaderMode() override { return TableCfg::TableHeaderMode::Horizontal; };
+
+		virtual void setActiveFilters(const std::list<ValueComparisonDescription>& _filters) override {};
+		virtual std::list<ValueComparisonDescription> getActiveFilters() const override { return {}; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 

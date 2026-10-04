@@ -1,6 +1,7 @@
 // @otlicense
 
 // OpenTwin header
+#include "OTCore/EntityName.h"
 #include "OTDataStorage/Helper/BsonValuesHelper.h"
 #include "OTModelEntities/MDF/EntityMDFChannel.h"
 #include "OTModelEntities/MDF/EntityMDFChannelData.h"
@@ -14,6 +15,12 @@ ot::EntityMDFChannel::EntityMDFChannel(UID _ID, EntityBase* _parent, EntityObser
 	treeItem.setVisibleIcon("Tree/MDFChannel");
 	treeItem.setHiddenIcon("Tree/MDFChannel");
 	setDefaultTreeItem(treeItem);
+
+	setDeletable(true);
+
+	auto vis = getVisualizationTypes();
+	vis.addTableVisualisation();
+	setDefaultVisualizationTypes(vis);
 }	
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -89,6 +96,40 @@ bool ot::EntityMDFChannel::deserialiseFromJSON(const ot::ConstJsonObject& _seria
 		OT_LOG_E("Failed to deserialise " + getClassName() + ". Reason: " + std::string(_e.what()));
 		return false;
 	}
+}
+
+ot::GenericDataStructMatrix ot::EntityMDFChannel::getTable()
+{
+	OT_LOG_E("getTable is not supported for EntityMDFChannel");
+	return ot::GenericDataStructMatrix();
+}
+
+void ot::EntityMDFChannel::setTable(const ot::GenericDataStructMatrix& _table)
+{
+	OT_LOG_E("setTable is not supported for EntityMDFChannel");
+}
+
+ot::TableCfg ot::EntityMDFChannel::getTableConfig(bool _includeData)
+{
+	const auto& samples = getSamples();
+
+	GenericDataStructMatrix matrix(static_cast<uint32_t>(samples.size()), 2);
+	int64_t rowIndex = 0;
+	for (double sample : samples)
+	{
+		matrix.setValue(MatrixEntryPointer(rowIndex, 0), Variable(rowIndex + 1));
+		matrix.setValue(MatrixEntryPointer(rowIndex, 1), Variable(sample));
+
+		rowIndex++;
+	}
+
+	TableCfg cfg(matrix, TableCfg::TableHeaderMode::NoHeader);
+	cfg.setEntityInformation(getBasicEntityInformation());
+	cfg.setColumnHeaderText(0, "Time [t]");
+	cfg.setColumnHeaderText(1, getNameOnly());
+	cfg.setReadOnly(true);
+
+	return cfg;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
