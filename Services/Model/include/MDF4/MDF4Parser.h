@@ -5,10 +5,17 @@
 // OpenTwin header
 #include "OTSystem/FileSystem/TemporaryFile.h"
 #include "OTCore/CoreTypes.h"
+#include "OTModelEntities/MDF/EntityMDFFile.h"
 
 // std header
 #include <list>
 #include <optional>
+
+namespace mdf
+{
+	class MdfReader;
+	class IDataGroup;
+}
 
 namespace ot
 {
@@ -28,9 +35,14 @@ namespace ot
 
 	private:
 		std::list<std::string> m_existingMDFFileEntities;
-		TemporaryFile m_file;
+		std::list<std::string> m_existingFileChildEntities;
+
+		TemporaryFile m_rawFile;
+
 		NewModelStateInfo m_newEntities;
 		const NewModelStateInfo& getNewEntities() const { return m_newEntities; };
+
+		std::unique_ptr<EntityMDFFile> m_fileEntity;
 
 		static void log(const ot::StyledTextBuilder& _message);
 		static void log(const std::string& _message);
@@ -40,7 +52,9 @@ namespace ot
 		MDF4Parser() = delete;
 		MDF4Parser(TemporaryFile&& _file, const std::list<std::string>& _existingMDFFileEntities);
 		bool parse();
+		bool parse(mdf::MdfReader& _reader, mdf::IDataGroup* _dataGroup);
 
+		void initialize();
 		static void initializeLogging();
 
 	};

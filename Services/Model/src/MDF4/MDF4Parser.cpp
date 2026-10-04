@@ -10,7 +10,6 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTServiceFoundation/UiComponent.h"
-#include "OTModelEntities/MDF/EntityMDFFile.h"
 #include "OTModelEntities/MDF/EntityMDFChannel.h"
 #include "OTModelEntities/MDF/EntityMDFChannelData.h"
 
@@ -75,14 +74,14 @@ void ot::MDF4Parser::logError(const std::string& _message)
 }
 
 ot::MDF4Parser::MDF4Parser(TemporaryFile&& _file, const std::list<std::string>& _existingMDFFileEntities)
-	: m_file(std::move(_file))
+	: m_rawFile(std::move(_file))
 {
 
 }
 
 bool ot::MDF4Parser::parse()
 {
-	m_newEntities = NewModelStateInfo();
+	initialize();
 
 	Application* app = Application::instance();
 	OTAssertNullptr(app);
@@ -94,13 +93,13 @@ bool ot::MDF4Parser::parse()
 	}
 
 	// Helper
-	const std::string fileName = m_file.getUniqueName();
-	const std::filesystem::path tmpFilePath = m_file.getFilePath();
+	const std::string fileName = m_rawFile.getUniqueName();
+	const std::filesystem::path tmpFilePath = m_rawFile.getFilePath();
 	const std::string tmpFilePathString = tmpFilePath.string();
 
 	this->log("Processing MDF file: \"" + fileName + "\"\n");
 
-	OT_LOG_DS("Starting to parse MDF4 file: \"" << m_file.getUniqueName() << "\"");
+	OT_LOG_DS("Starting to parse MDF4 file: \"" << m_rawFile.getUniqueName() << "\"");
 	OT_LOG_DS("+ Temporary MDF4 file stored at: \"" + tmpFilePathString << "\"");
 
 	// Initialize reader
@@ -126,7 +125,7 @@ bool ot::MDF4Parser::parse()
 	}
 
 	// Create short file name
-	std::string shortName = m_file.getUniqueName();
+	std::string shortName = m_rawFile.getUniqueName();
 	if (!shortName.empty())
 	{
 		String::replace(shortName, '\\', '/');
@@ -149,12 +148,9 @@ bool ot::MDF4Parser::parse()
 	}
 
 	// Create root entity
-	EntityMDFFile fileEntity;
-	fileEntity.setName(EntityName::createUniqueEntityName(FolderNames::MDFFolder, m_existingMDFFileEntities, shortName));
-	fileEntity.setEntityID(model->createEntityUID());
-
-	// Create local data
-	std::list<std::string> channelEntityNames;
+	m_fileEntity.reset(new EntityMDFFile);
+	m_fileEntity->setName(EntityName::createUniqueEntityName(FolderNames::MDFFolder, m_existingMDFFileEntities, shortName));
+	m_fileEntity->setEntityID(model->createEntityUID());
 
 	// Fetch data groups
 	mdf::DataGroupList dataGroups;
@@ -171,129 +167,153 @@ bool ot::MDF4Parser::parse()
 			continue;
 		}
 
-		std::list<std::pair<std::unique_ptr<EntityMDFChannel>, mdf::ChannelObserverPtr>> datasets;
-
-		// Go through all channel groups in the data group
-		for (mdf::IChannelGroup* channelGroup : dataGroup->ChannelGroups())
-		{
-			if (!channelGroup)
-			{
-				this->logWarning("Encountered null channel group in MDF4 file \"" + fileName + "\". Skipping.\n");
-				continue;
-			}
-			
-			// Go through all channels in the channel group
-			for (mdf::IChannel* channel : channelGroup->Channels())
-			{
-				if (!channel)
-				{
-					this->logWarning("Encountered null channel in MDF4 file \"" + fileName + "\". Skipping.\n");
-					continue;
-				}
-
-				// Create new channel entity
-				std::unique_ptr<EntityMDFChannel> channelEntity(new EntityMDFChannel);
-
-				const std::string channelName = channel->Name();
-
-				std::string channelEntityName = EntityName::createUniqueEntityName(fileEntity.getName(), channelEntityNames, channelName);
-				channelEntity->setName(channelEntityName);
-				channelEntityNames.push_back(channelEntityName);
-
-				channelEntity->setEntityID(model->createEntityUID());
-
-				//MDF4Dataset dataset(channel->Name());
-
-				// Get the meta-data for the channel
-				/*mdf::IMetaData* metaData = channel->MetaData();
-
-				for (const mdf::ETag& tag : metaData->Properties())
-				{
-					std::string tagDescription = tag.Description();
-					std::string tagLanguage = tag.Language();
-					std::string tagName = tag.Name();
-					std::string tagType = tag.Type();
-					std::string tagUnit = tag.Unit();
-					std::string tagValue = tag.Value<std::string>();
-
-					mdf::ETagDataType tagDataType = tag.DataType();
-
-
-				}*/
-				
-				// Read samples
-				auto obs = mdf::CreateChannelObserver(*dataGroup, *channelGroup, *channel);
-				datasets.emplace_back(std::move(channelEntity), std::move(obs));
-			}
-		}
-
-		// Ensure data group is read
-		if (!dataGroup->IsRead())
-		{
-			if (!reader.ReadData(*dataGroup))
-			{
-				this->logWarning("Failed to read data for data group in MDF4 file \"" + fileName + "\". Skipping.\n");
-				continue;
-			}
-		}
-
-		for (auto& dataset : datasets)
-		{
-			EntityMDFChannel* channel = dataset.first.get();
-			mdf::ChannelObserverPtr& obs = dataset.second;
-			uint64_t nofSamples = obs->NofSamples();
-
-			std::vector<double> channelValues;
-			channelValues.reserve(nofSamples);
-
-			double channelValue = 0.0; // Channel value (no scaling)
-			double channelValueScaled = 0.0; // Channel value (scaled)
-			for (size_t sample = 0; sample < obs->NofSamples(); ++sample)
-			{
-				const auto channelValid = obs->GetChannelValue(sample, channelValue);
-				//const auto channelValidScaled = obs->GetEngValue(sample, channelValueScaled);
-
-				if (channelValid)
-				{
-					channelValues.push_back(channelValue);
-				}
-				/*else if (channelValidScaled)
-				{
-					channelValues.push_back(channelValueScaled);
-				}
-				*/
-				else
-				{
-					//this->logWarning("Failed to read sample " + std::to_string(sample) + " for channel \"" + datasetRef.getName() + "\" in MDF4 file \"" + fileName + "\". Skipping sample.\n");
-				}
-				
-			}
-
-			channelValues.shrink_to_fit();
-
-			// Create channel data entity
-			EntityMDFChannelData channelDataEntity;
-			channelDataEntity.setEntityID(model->createEntityUID());
-
-			channelDataEntity.setSamples(std::move(channelValues));
-			channelDataEntity.storeToDataBase();
-			m_newEntities.addDataEntity(*channel, channelDataEntity);
-
-			// Store channel entity
-			channel->setDataEntityID(channelDataEntity.getEntityID());
-			channel->storeToDataBase();
-			m_newEntities.addTopologyEntity(*channel);
-
-			//OT_LOG_TS("Dataset created { \"EntityName\": \"" << channel->getName() << "\", \"Samples\": " << channelDataEntity.getSamples().size() << " }");
-		}
-
-		dataGroup->ClearData();
+		parse(reader, dataGroup);
 	}
 
-	fileEntity.storeToDataBase();
-	m_newEntities.addTopologyEntity(fileEntity);
+	m_fileEntity->storeToDataBase();
+	m_newEntities.addTopologyEntity(*m_fileEntity);
 
 	return true;
+}
+
+bool ot::MDF4Parser::parse(mdf::MdfReader& _reader, mdf::IDataGroup* _dataGroup)
+{
+	OTAssertNullptr(_dataGroup);
+
+	Application* app = Application::instance();
+	OTAssertNullptr(app);
+	Model* model = app->getModel();
+	OTAssertNullptr(model);
+
+	struct ChannelGroupInfo
+	{
+		std::optional<mdf::ChannelObserverPtr> masterChannelObs;
+		std::list<std::pair<std::unique_ptr<EntityMDFChannel>, mdf::ChannelObserverPtr>> datasets;
+	};
+	std::list<ChannelGroupInfo> channelGroups;
+
+	// Go through all channel groups in the data group
+	for (mdf::IChannelGroup* channelGroup : _dataGroup->ChannelGroups())
+	{
+		if (!channelGroup)
+		{
+			this->logWarning("Encountered null channel group in MDF4 file \"" + m_rawFile.getUniqueName() + "\". Skipping.\n");
+			continue;
+		}
+
+		ChannelGroupInfo newChannelGroupInfo;
+
+		// Go through all channels in the channel group
+		for (mdf::IChannel* channel : channelGroup->Channels())
+		{
+			if (!channel)
+			{
+				this->logWarning("Encountered null channel in MDF4 file \"" + m_rawFile.getUniqueName() + "\". Skipping.\n");
+				continue;
+			}
+
+			// Create new channel entity
+			std::unique_ptr<EntityMDFChannel> channelEntity(new EntityMDFChannel);
+
+			const std::string channelName = channel->Name();
+
+			std::string channelEntityName = EntityName::createUniqueEntityName(m_fileEntity->getName(), m_existingFileChildEntities, channelName);
+			channelEntity->setName(channelEntityName);
+			m_existingFileChildEntities.push_back(channelEntityName);
+
+			channelEntity->setEntityID(model->createEntityUID());
+
+			//MDF4Dataset dataset(channel->Name());
+
+			// Get the meta-data for the channel
+			/*mdf::IMetaData* metaData = channel->MetaData();
+
+			for (const mdf::ETag& tag : metaData->Properties())
+			{
+				std::string tagDescription = tag.Description();
+				std::string tagLanguage = tag.Language();
+				std::string tagName = tag.Name();
+				std::string tagType = tag.Type();
+				std::string tagUnit = tag.Unit();
+				std::string tagValue = tag.Value<std::string>();
+
+				mdf::ETagDataType tagDataType = tag.DataType();
+
+
+			}*/
+
+			// Read samples
+			auto obs = mdf::CreateChannelObserver(*_dataGroup, *channelGroup, *channel);
+			newChannelGroupInfo.datasets.emplace_back(std::move(channelEntity), std::move(obs));
+		}
+
+		channelGroups.push_back(std::move(newChannelGroupInfo));
+	}
+
+	// Ensure data group is read
+	if (!_dataGroup->IsRead())
+	{
+		if (!_reader.ReadData(*_dataGroup))
+		{
+			this->logWarning("Failed to read data for data group in MDF4 file \"" + m_rawFile.getUniqueName() + "\". Skipping.\n");
+			return false;
+		}
+	}
+	/*
+	for (auto& dataset : datasets)
+	{
+		EntityMDFChannel* channel = dataset.first.get();
+		mdf::ChannelObserverPtr& obs = dataset.second;
+		uint64_t nofSamples = obs->NofSamples();
+
+		std::vector<double> channelValues;
+		channelValues.reserve(nofSamples);
+
+		double channelValue = 0.0; // Channel value (no scaling)
+		double channelValueScaled = 0.0; // Channel value (scaled)
+		for (size_t sample = 0; sample < obs->NofSamples(); ++sample)
+		{
+			const auto channelValid = obs->GetChannelValue(sample, channelValue);
+			
+			if (channelValid)
+			{
+				channelValues.push_back(channelValue);
+			}
+			//else
+			//{
+				//this->logWarning("Failed to read sample " + std::to_string(sample) + " for channel \"" + datasetRef.getName() + "\" in MDF4 file \"" + fileName + "\". Skipping sample.\n");
+			//}
+
+		}
+
+		channelValues.shrink_to_fit();
+
+		// Create channel data entity
+		EntityMDFChannelData channelDataEntity;
+		channelDataEntity.setEntityID(model->createEntityUID());
+
+		channelDataEntity.setSamples(std::move(channelValues));
+		channelDataEntity.storeToDataBase();
+		m_newEntities.addDataEntity(*channel, channelDataEntity);
+
+		// Store channel entity
+		channel->setDataEntityID(channelDataEntity.getEntityID());
+		channel->storeToDataBase();
+		m_newEntities.addTopologyEntity(*channel);
+
+		//OT_LOG_TS("Dataset created { \"EntityName\": \"" << channel->getName() << "\", \"Samples\": " << channelDataEntity.getSamples().size() << " }");
+	}
+	*/
+	_dataGroup->ClearData();
+
+	return true;
+}
+
+void ot::MDF4Parser::initialize()
+{
+	m_newEntities = NewModelStateInfo();
+	m_existingFileChildEntities.clear();
+	m_fileEntity.reset();
 }
 
 void ot::MDF4Parser::initializeLogging()
