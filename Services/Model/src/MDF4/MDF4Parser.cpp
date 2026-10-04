@@ -17,6 +17,7 @@
 // MDF lib
 #include <mdf/mdfreader.h>
 #include <mdf/mdflogstream.h>
+#include "OTModelEntities/EntityGraphicsScene.h"
 
 ot::NewModelStateInfo ot::MDF4Parser::parse(ot::TemporaryFile&& _file, const std::list<std::string>& _existingMDFFileEntities)
 {
@@ -81,6 +82,8 @@ ot::MDF4Parser::MDF4Parser(TemporaryFile&& _file, const std::list<std::string>& 
 
 bool ot::MDF4Parser::parse()
 {
+	m_newEntities = NewModelStateInfo();
+
 	Application* app = Application::instance();
 	OTAssertNullptr(app);
 	Model* model = app->getModel();
@@ -149,8 +152,6 @@ bool ot::MDF4Parser::parse()
 	EntityMDFFile fileEntity;
 	fileEntity.setName(EntityName::createUniqueEntityName(FolderNames::MDFFolder, m_existingMDFFileEntities, shortName));
 	fileEntity.setEntityID(model->createEntityUID());
-	fileEntity.storeToDataBase();
-	m_newEntities.addTopologyEntity(fileEntity);
 
 	// Create local data
 	std::list<std::string> channelEntityNames;
@@ -193,9 +194,11 @@ bool ot::MDF4Parser::parse()
 				// Create new channel entity
 				std::unique_ptr<EntityMDFChannel> channelEntity(new EntityMDFChannel);
 
-				std::string channelName = EntityName::createUniqueEntityName(fileEntity.getName(), channelEntityNames, channel->Name());
-				channelEntity->setName(channelName);
-				channelEntityNames.push_back(channelName);
+				const std::string channelName = channel->Name();
+
+				std::string channelEntityName = EntityName::createUniqueEntityName(fileEntity.getName(), channelEntityNames, channelName);
+				channelEntity->setName(channelEntityName);
+				channelEntityNames.push_back(channelEntityName);
 
 				channelEntity->setEntityID(model->createEntityUID());
 
@@ -236,7 +239,7 @@ bool ot::MDF4Parser::parse()
 
 		for (auto& dataset : datasets)
 		{
-			std::unique_ptr<EntityMDFChannel>& channel = dataset.first;
+			EntityMDFChannel* channel = dataset.first.get();
 			mdf::ChannelObserverPtr& obs = dataset.second;
 			uint64_t nofSamples = obs->NofSamples();
 
@@ -281,11 +284,14 @@ bool ot::MDF4Parser::parse()
 			channel->storeToDataBase();
 			m_newEntities.addTopologyEntity(*channel);
 
-			//OT_LOG_TS("Dataset created { \"Name\": \"" << datasetRef.getName() << "\", \"Samples\": " << datasetRef.getSamplesSize() << " }");
+			//OT_LOG_TS("Dataset created { \"EntityName\": \"" << channel->getName() << "\", \"Samples\": " << channelDataEntity.getSamples().size() << " }");
 		}
 
 		dataGroup->ClearData();
 	}
+
+	fileEntity.storeToDataBase();
+	m_newEntities.addTopologyEntity(fileEntity);
 
 	return true;
 }

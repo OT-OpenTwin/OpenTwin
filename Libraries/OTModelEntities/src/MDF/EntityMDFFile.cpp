@@ -6,33 +6,33 @@
 static EntityFactoryRegistrar<ot::EntityMDFFile> registrar(ot::EntityMDFFile::className());
 
 ot::EntityMDFFile::EntityMDFFile(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBase(_ID, _parent, _obs, _ms)
+	: EntityContainer(_ID, _parent, _obs, _ms)
 {
 	EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon("Tree/MDFFile.png");
-	treeItem.setHiddenIcon("Tree/MDFFile.png");
+	treeItem.setVisibleIcon("Tree/MDFFile");
+	treeItem.setHiddenIcon("Tree/MDFFile");
 	setDefaultTreeItem(treeItem);
 }
 
 bool ot::EntityMDFFile::updateFromProperties()
 {
-	return EntityBase::updateFromProperties();
+	return EntityContainer::updateFromProperties();
 }
 
 void ot::EntityMDFFile::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
-	EntityBase::addStorageData(_storage);
+	EntityContainer::addStorageData(_storage);
 }
 
 void ot::EntityMDFFile::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap)
 {
-	EntityBase::readSpecificDataFromDataBase(_docView, _entityMap);
+	EntityContainer::readSpecificDataFromDataBase(_docView, _entityMap);
 }
 
 std::string ot::EntityMDFFile::serialiseAsJSON()
 {
 	// Serialize general entity data
-	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	auto docBlock = EntityContainer::serialiseAsMongoDocument();
 	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
 	ot::JsonDocument entireDoc;
 	if (!entireDoc.fromJson(jsonDocBlock))

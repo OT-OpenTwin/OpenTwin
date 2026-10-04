@@ -8,11 +8,11 @@
 static EntityFactoryRegistrar<ot::EntityMDFChannel> registrar(ot::EntityMDFChannel::className());
 
 ot::EntityMDFChannel::EntityMDFChannel(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
-	: EntityBase(_ID, _parent, _obs, _ms)
+	: EntityContainer(_ID, _parent, _obs, _ms)
 {
 	EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon("Tree/MDFChannel.png");
-	treeItem.setHiddenIcon("Tree/MDFChannel.png");
+	treeItem.setVisibleIcon("Tree/MDFChannel");
+	treeItem.setHiddenIcon("Tree/MDFChannel");
 	setDefaultTreeItem(treeItem);
 }	
 
@@ -44,7 +44,7 @@ const std::vector<double>& ot::EntityMDFChannel::getSamples()
 
 bool ot::EntityMDFChannel::updateFromProperties()
 {
-	bool updateGrid = EntityBase::updateFromProperties();
+	bool updateGrid = EntityContainer::updateFromProperties();
 
 	return updateGrid;
 }
@@ -56,7 +56,7 @@ bool ot::EntityMDFChannel::updateFromProperties()
 std::string ot::EntityMDFChannel::serialiseAsJSON()
 {
 	// Serialize general entity data
-	auto docBlock = EntityBase::serialiseAsMongoDocument();
+	auto docBlock = EntityContainer::serialiseAsMongoDocument();
 	const std::string jsonDocBlock = bsoncxx::to_json(docBlock);
 	ot::JsonDocument entireDoc;
 	if (!entireDoc.fromJson(jsonDocBlock))
@@ -97,13 +97,13 @@ bool ot::EntityMDFChannel::deserialiseFromJSON(const ot::ConstJsonObject& _seria
 
 void ot::EntityMDFChannel::addStorageData(bsoncxx::builder::basic::document& _storage)
 {
-	EntityBase::addStorageData(_storage);
+	EntityContainer::addStorageData(_storage);
 	_storage.append(bsoncxx::builder::basic::kvp("DataID", static_cast<int64_t>(m_dataID)));
 }
 
 void ot::EntityMDFChannel::readSpecificDataFromDataBase(const bsoncxx::document::view& _docView, std::map<ot::UID, EntityBase*>& _entityMap)
 {
-	EntityBase::readSpecificDataFromDataBase(_docView, _entityMap);
+	EntityContainer::readSpecificDataFromDataBase(_docView, _entityMap);
 
 	resetDataEntity();
 

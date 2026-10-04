@@ -3,13 +3,13 @@
 #pragma once
 
 // OpenTwin header
-#include "OTModelEntities/EntityBase.h"
+#include "OTModelEntities/EntityContainer.h"
 
 namespace ot
 {
 	class EntityMDFChannelData;
 
-	class OT_MODELENTITIES_API_EXPORT EntityMDFChannel : public EntityBase
+	class OT_MODELENTITIES_API_EXPORT EntityMDFChannel : public EntityContainer
 	{
 		OT_DECL_NOCOPY(EntityMDFChannel)
 		OT_DECL_NOMOVE(EntityMDFChannel)
