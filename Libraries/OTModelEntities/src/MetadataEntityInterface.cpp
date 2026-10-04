@@ -77,7 +77,7 @@ ot::NewModelStateInfo MetadataEntityInterface::storeCampaign(MetadataCampaign& _
 {
 	ot::NewModelStateInfo entInfosCamp = storeCampaign(_metaDataCampaign);
 	ot::NewModelStateInfo entInfosSer = storeCampaign(_seriesMetadata, _saveModel);
-	entInfosCamp.splice(entInfosSer);
+	entInfosCamp.splice(std::move(entInfosSer));
 	return entInfosCamp;
 }
 

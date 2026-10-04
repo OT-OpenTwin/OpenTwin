@@ -97,15 +97,13 @@ void ot::NewModelStateInfo::addDataEntity(const EntityBase& _parentTopoEntity, o
 	m_dataEntityParentIDs.push_back(_parentTopoEntity.getEntityID());
 }
 
-
-void ot::NewModelStateInfo::splice(ot::NewModelStateInfo& _other)
+void ot::NewModelStateInfo::splice(ot::NewModelStateInfo&& _other)
 {
-	m_topologyEntityIDs.splice(m_topologyEntityIDs.end(),_other.m_topologyEntityIDs);
-	m_topologyEntityVersions.splice(m_topologyEntityVersions.end(),_other.m_topologyEntityVersions);
-	m_topologyForceVisible.splice(m_topologyForceVisible.end(),_other.m_topologyForceVisible);
+	m_topologyEntityIDs.splice(m_topologyEntityIDs.end(), std::move(_other.m_topologyEntityIDs));
+	m_topologyEntityVersions.splice(m_topologyEntityVersions.end(), std::move(_other.m_topologyEntityVersions));
+	m_topologyForceVisible.splice(m_topologyForceVisible.end(), std::move(_other.m_topologyForceVisible));
 
-	m_dataEntityIDs.splice(m_dataEntityIDs.end(),_other.m_dataEntityIDs);
-	m_dataEntityVersions.splice(m_dataEntityVersions.end(), _other.m_dataEntityVersions);
-	m_dataEntityParentIDs.splice(m_dataEntityParentIDs.end(), _other.m_dataEntityParentIDs);
-
+	m_dataEntityIDs.splice(m_dataEntityIDs.end(), std::move(_other.m_dataEntityIDs));
+	m_dataEntityVersions.splice(m_dataEntityVersions.end(), std::move(_other.m_dataEntityVersions));
+	m_dataEntityParentIDs.splice(m_dataEntityParentIDs.end(), std::move(_other.m_dataEntityParentIDs));
 }

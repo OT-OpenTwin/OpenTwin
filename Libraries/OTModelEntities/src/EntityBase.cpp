@@ -361,6 +361,12 @@ EntityBase* EntityBase::readEntityFromEntityIDAndVersion(EntityBase* parent, ot:
 	return entity;
 }
 
+EntityBase* EntityBase::readEntityFromEntityID(EntityBase* parent, ot::UID entityID)
+{
+	std::map<ot::UID, EntityBase*> entityMap;
+	return readEntityFromEntityID(parent, entityID, entityMap);
+}
+
 EntityBase* EntityBase::readEntityFromEntityID(EntityBase* parent, ot::UID entityID, std::map<ot::UID, EntityBase*>& entityMap)
 {
 	assert(m_modelState != nullptr);

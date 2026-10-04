@@ -298,6 +298,7 @@ protected:
 	void readDependencyArray(const bsoncxx::document::view& _doc_view, const std::string& _dependencyName, std::list<std::pair<ot::UID, ot::UID>>& _dependencies);
 
 	ot::UID createEntityUID();
+	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID);
 	EntityBase *readEntityFromEntityID(EntityBase *parent, ot::UID entityID, std::map<ot::UID, EntityBase *> &entityMap);
 	EntityBase *readEntityFromEntityIDAndVersion(EntityBase *parent, ot::UID entityID, ot::UID version, std::map<ot::UID, EntityBase *> &entityMap);
 	ot::UID getCurrentEntityVersion(ot::UID entityID);
