@@ -3,6 +3,8 @@
 // OpenTwin header
 #include "OTModelEntities/MDF/EntityMDFFile.h"
 
+static EntityFactoryRegistrar<ot::EntityMDFFile> registrar(ot::EntityMDFFile::className());
+
 ot::EntityMDFFile::EntityMDFFile(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBase(_ID, _parent, _obs, _ms)
 {

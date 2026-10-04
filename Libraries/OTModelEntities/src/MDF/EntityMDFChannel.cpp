@@ -5,6 +5,8 @@
 #include "OTModelEntities/MDF/EntityMDFChannel.h"
 #include "OTModelEntities/MDF/EntityMDFChannelData.h"
 
+static EntityFactoryRegistrar<ot::EntityMDFChannel> registrar(ot::EntityMDFChannel::className());
+
 ot::EntityMDFChannel::EntityMDFChannel(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBase(_ID, _parent, _obs, _ms)
 {

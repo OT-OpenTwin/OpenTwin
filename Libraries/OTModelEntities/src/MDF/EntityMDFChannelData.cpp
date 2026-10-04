@@ -4,6 +4,8 @@
 #include "OTDataStorage/Helper/BsonValuesHelper.h"
 #include "OTModelEntities/MDF/EntityMDFChannelData.h"
 
+static EntityFactoryRegistrar<ot::EntityMDFChannelData> registrar(ot::EntityMDFChannelData::className());
+
 ot::EntityMDFChannelData::EntityMDFChannelData(UID _ID, EntityBase* _parent, EntityObserver* _obs, ModelState* _ms)
 	: EntityBase(_ID, _parent, _obs, _ms)
 {}
