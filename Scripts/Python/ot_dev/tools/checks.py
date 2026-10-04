@@ -24,7 +24,11 @@ from ..core.output import FAILED_BUILD
 from ..core.process import run_program
 
 FAILED_BUILD_MESSAGE = ("Add-Type -AssemblyName PresentationFramework;"
-                        "[System.Windows.MessageBox]::Show('Project(s) have failed in build process')")
+                        "$owner = New-Object System.Windows.Window -Property @{Topmost = $true; ShowInTaskbar = $false;"
+                        " ShowActivated = $false; WindowStyle = 'None'; Width = 0; Height = 0; Left = -10000; Top = -10000};"
+                        "$owner.Show();"
+                        "[System.Windows.MessageBox]::Show($owner, 'Project(s) have failed in build process');"
+                        "$owner.Close()")
 
 
 def check_failed_builds(env: Mapping[str, str]) -> int:
