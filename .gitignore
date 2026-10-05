@@ -8,3 +8,5 @@ DebugFiles
 build/
 .vs/
 
+# Build logs, also the lowercase buildlog_*.txt of older builds
+[bB]uild[lL]og_*.txt

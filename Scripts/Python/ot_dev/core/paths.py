@@ -40,7 +40,7 @@ DOXYGEN_LOG = "DoxygenDocumentation_buildLog.txt"
 
 
 def build_log(config: str) -> str:
-    return f"buildlog_{config.capitalize()}.txt"
+    return f"buildLog_{config.capitalize()}.txt"
 
 
 def test_log(config: str) -> str:

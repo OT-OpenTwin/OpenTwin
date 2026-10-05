@@ -225,7 +225,7 @@ so nothing else is needed. More in :ref:`DeploymentManifest<target DeploymentMan
 Run ``build.bat`` in the project folder with a double-click. At the end the console shows the result.
 
 - **Success:** the DLL is in ``build/windows-debug/Debug`` and ``build/windows-release/Release``.
-- **Failed:** open ``buildlog_Debug.txt`` or ``buildlog_Release.txt`` in the project folder.
+- **Failed:** open ``buildLog_Debug.txt`` or ``buildLog_Release.txt`` in the project folder.
   The first error from the top is usually the real one.
 
 Then check the rest:
@@ -235,4 +235,4 @@ Then check the rest:
 - ``RebuildAll`` builds the project at its place in ``BUILD_ORDER``, if you added it in step 3.
 
 When everything works, commit the project folder and the changed files in ``Scripts/``.
-Leave out ``build/``, ``.vs/`` and the ``buildlog_*.txt`` and ``testlog_*.txt`` files.
+Leave out ``build/``, ``.vs/`` and the ``buildLog_*.txt`` and ``testlog_*.txt`` files.
