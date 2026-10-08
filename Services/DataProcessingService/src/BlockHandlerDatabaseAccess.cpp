@@ -92,8 +92,12 @@ bool BlockHandlerDatabaseAccess::executeSpecialized()
 	std::string log;
 	auto startTime = std::chrono::high_resolution_clock::now();
 	ot::JsonDocument result = dataLakeHelper.executeQuery(m_accessConfig, options, log);
+	
 	auto endTime = std::chrono::high_resolution_clock::now();
-	m_queriedData.setData(std::move(result));
+	if (ot::json::exists(result, "Data"))
+	{
+		m_queriedData.setData(std::move(result["Data"]));
+	}
 	return true;
 
 }

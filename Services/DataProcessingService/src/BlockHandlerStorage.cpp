@@ -319,7 +319,12 @@ bool BlockHandlerStorage::executeSpecialized()
 			if (newSeries.size() == 1)
 			{
 				auto singleNewSeries = *newSeries.begin();
-				seriesName = ot::FolderNames::DatasetFolder + "/" + singleNewSeries->getName();
+				seriesName = singleNewSeries->getName();
+				size_t pos = seriesName.find(ot::FolderNames::DatasetFolder); 
+				if (pos == std::string::npos || pos != 0)
+				{
+					seriesName = ot::FolderNames::DatasetFolder + "/" + seriesName;
+				}
 				const ot::JsonDocument& seriesMetadata = singleNewSeries->getMetadata();
 				auto temp = ot::json::toJson(seriesMetadata);
 				seriesID = resultCollectionExtender.buildSeriesMetadata(datasetDescr, seriesName, seriesMetadata);
