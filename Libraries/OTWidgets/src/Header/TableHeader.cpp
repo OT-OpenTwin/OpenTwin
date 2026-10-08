@@ -115,20 +115,18 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 {
 	QAbstractItemModel* model = m_table->model();
 	
+	QHeaderView* headerView = (orientation() == Qt::Horizontal ? m_table->verticalHeader() : m_table->horizontalHeader());
+
+	const int defaultSectionSize = headerView->defaultSectionSize();
+
 	if (!_filterState.hasActiveFilter())
 	{
-		if (orientation() == Qt::Horizontal)
+		for (int i = 0; i < headerView->count(); i++)
 		{
-			for (int r = 0; r < m_table->rowCount(); r++)
+			headerView->setSectionHidden(i, false);
+			if (headerView->sectionSize(i) == 0)
 			{
-				m_table->setRowHidden(r, false);
-			}
-		}
-		else
-		{
-			for (int c = 0; c < m_table->columnCount(); c++)
-			{
-				m_table->setColumnHidden(c, false);
+				headerView->resizeSection(i, defaultSectionSize);
 			}
 		}
 	}
@@ -136,43 +134,45 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 	{
 		auto filterData = _filterState.getActiveFilters();
 
-		if (orientation() == Qt::Horizontal)
+		for (int i = 0; i < headerView->count(); i++)
 		{
-			for (int r = 0; r < m_table->rowCount(); r++)
+			bool match = true;
+			for (const auto& [logicalIndex, selectedOptions] : filterData)
 			{
-				bool match = true;
-				for (const auto& [logicalIndex, selectedOptions] : filterData)
+				QVariant data;
+				if (orientation() == Qt::Horizontal)
 				{
-					QVariant data = model->data(model->index(r, logicalIndex));
-					if (!data.isValid() || !selectedOptions.contains(data.toString()))
-					{
-						match = false;
-						break;
-					}
+					data = model->data(model->index(i, logicalIndex));
 				}
-
-				m_table->setRowHidden(r, !match);
+				else
+				{
+					data = model->data(model->index(logicalIndex, i));
+				}
+			
+				if (!data.isValid() || !selectedOptions.contains(data.toString()))
+				{
+					match = false;
+					break;
+				}
 			}
-		}
-		else
-		{
-			for (int c = 0; c < m_table->columnCount(); c++)
-			{
-				bool match = true;
-				for (const auto& [logicalIndex, selectedOptions] : filterData)
-				{
-					QVariant data = model->data(model->index(logicalIndex, c));
-					if (!data.isValid() || !selectedOptions.contains(data.toString()))
-					{
-						match = false;
-						break;
-					}
-				}
 
-				m_table->setColumnHidden(c, !match);
+			if (match)
+			{
+				headerView->setSectionHidden(i, false);
+				if (headerView->sectionSize(i) == 0)
+				{
+					headerView->resizeSection(i, defaultSectionSize);
+				}
+			}
+			else
+			{
+				headerView->setSectionHidden(i, true);
 			}
 		}
 	}
+
+	//m_table->doItemsLayout();
+	//m_table->viewport()->update();
 
 	HeaderBase::filterHasChanged(_filterState);
 }
