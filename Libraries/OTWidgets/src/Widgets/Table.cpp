@@ -191,6 +191,10 @@ void ot::Table::setupFromConfig(const TableCfg& _config)
 	// Initialize data
 	{
 		OT_TEST_TABLE_Interval("Setup from config: Set data");
+
+		QAbstractItemModel* dataModel = this->model();
+		QSignalBlocker blocker(dataModel);
+		
 		int rows = _config.getRowCount();
 		int columns = _config.getColumnCount();
 
@@ -198,13 +202,16 @@ void ot::Table::setupFromConfig(const TableCfg& _config)
 		{
 			for (int c = 0; c < columns; c++)
 			{
-				TableItem* newItem = new TableItem(QString::fromStdString(_config.getCellText(r, c)));
-				QColor cellColor = this->getCurrentCellColor(r, c);
+				QModelIndex modelIndex = dataModel->index(r, c);
+
+				const QString cellText = QString::fromStdString(_config.getCellText(r, c));
+				dataModel->setData(modelIndex, cellText);
+
+				const QColor cellColor = this->getCurrentCellColor(r, c);
 				if (cellColor.isValid())
 				{
-					newItem->setBackground(QBrush(cellColor));
+					dataModel->setData(modelIndex, QBrush(cellColor), Qt::BackgroundRole);
 				}
-				this->setItem(r, c, newItem);
 			}
 		}
 	}
@@ -452,23 +459,6 @@ void ot::Table::slotCellDataChanged(int _row, int _column)
 	{
 		QSignalBlocker sigBlock(this);
 		this->resizeRowToContents(_row);
-	}
-
-	if (_row >= 0 && _row < this->rowCount() && _column >= 0 && _column < this->columnCount())
-	{
-		QTableWidgetItem* itm = this->item(_row, _column);
-		if (itm)
-		{
-			QColor cellColor = this->getCurrentCellColor(_row, _column);
-			if (cellColor.isValid())
-			{
-				itm->setBackground(QBrush(cellColor));
-			}
-			else
-			{
-				itm->setBackground(QBrush());
-			}
-		}
 	}
 
 	if (m_contentChanged)
