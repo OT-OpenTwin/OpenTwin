@@ -30,6 +30,9 @@ public:
 	// Only for used for setting curve properties
 	void setMatrixDimensions(const std::vector<uint32_t>& _dimension) { m_dimension = _dimension; }
 	const std::vector<uint32_t>& getMatrixDimensions() const { return m_dimension; }
+
+	bool operator==(const DataLakeQueryCfg& _other) const;
+	bool operator!=(const DataLakeQueryCfg& _other) const;
 private:
 	std::vector<uint32_t> m_dimension;
 	std::string m_seriesLabel;

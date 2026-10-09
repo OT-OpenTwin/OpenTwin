@@ -92,3 +92,18 @@ void DataLakeQueryCfg::setFromJsonObject(const ot::ConstJsonObject& _jsonObject)
 	m_collectionName = ot::json::getString(_jsonObject, "CollectionName");
 	m_dimension =  ot::json::getUIntVector(_jsonObject, "MatrixDimensions");
 }
+
+bool DataLakeQueryCfg::operator==(const DataLakeQueryCfg& _other) const
+{
+	return m_valueDescriptionsParameters == _other.m_valueDescriptionsParameters &&
+		m_valueDescriptionsQuantities == _other.m_valueDescriptionsQuantities &&
+		m_valueDescriptionsSeriesMD == _other.m_valueDescriptionsSeriesMD &&
+		m_seriesLabel == _other.m_seriesLabel &&
+		m_collectionName == _other.m_collectionName &&
+		m_dimension == _other.m_dimension;
+}
+
+bool DataLakeQueryCfg::operator!=(const DataLakeQueryCfg& _other) const
+{
+	return !operator==(_other);
+}
