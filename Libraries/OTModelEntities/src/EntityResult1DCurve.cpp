@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DCurve.cpp
 // 
 // License:
@@ -120,25 +120,26 @@ bool EntityResult1DCurve::updateFromProperties()
 			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
 			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
+			bool refresh = m_queryProperties.updateOptions(this, associatedCampaign.value());
 
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+			bool dataRefreshNeeded = queryCfg != m_queryCfg;
+			if (dataRefreshNeeded)
+			{
+				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			}
+			m_queryCfg = queryCfg;
+			refresh |= dataRefreshNeeded;
+			
 			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Custom Title", "General")->needsUpdate();
 			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Naming Behavior", "General")->needsUpdate();
 			dataRefreshNeeded |= PropertyHelper::getPropertyBase(this, "Display Dependency Diff", "General")->needsUpdate();
-
-			refresh |= dataRefreshNeeded;
-
-			if (dataRefreshNeeded)
-			{
-				DataLakeQueryCfg queryCfg;
-				queryCfg.setCollectionName(collectionName);
-				queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
-				queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
-				queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
-				queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
-
-				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
-			}
 
 			ot::JsonDocument doc;
 			doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UpdateCurvesOfPlot, doc.GetAllocator()), doc.GetAllocator());

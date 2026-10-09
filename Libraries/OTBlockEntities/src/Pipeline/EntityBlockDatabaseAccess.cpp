@@ -112,20 +112,22 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
 			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-			bool dataRefreshNeeded = m_queryProperties.updateOptions(this, associatedCampaign.value());
-			refresh |= dataRefreshNeeded;
+			refresh |= m_queryProperties.updateOptions(this, associatedCampaign.value());
 
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+			
+			bool dataRefreshNeeded = queryCfg != m_queryCfg;
 			if (dataRefreshNeeded)
 			{
-				DataLakeQueryCfg queryCfg;
-				queryCfg.setCollectionName(collectionName);
-				queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
-				queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
-				queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
-				queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
-
 				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
 			}
+			m_queryCfg = queryCfg;
+			refresh |= dataRefreshNeeded;
 		}
 		catch (std::exception& _e)
 		{

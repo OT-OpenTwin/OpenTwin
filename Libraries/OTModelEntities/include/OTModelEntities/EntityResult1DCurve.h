@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: EntityResult1DCurve.h
 // 
 // License:
@@ -22,6 +22,8 @@
 #include "OTModelEntities/Visualization/IVisualisationCurve.h"
 #include "OTModelEntities/Properties/Bundle/PropertyBundleDataLakeQuery.h"
 #include "OTModelEntities/Interfaces/IPropertyHandling.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+
 
 class OT_MODELENTITIES_API_EXPORT EntityResult1DCurve : public EntityBase, public ot::IVisualisationCurve, public IPropertyHandling
 {
@@ -123,6 +125,9 @@ protected:
 private:
 	PropertyBundleDataLakeQuery m_queryProperties;
 	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
+	// Is not being serialised in the entity bson document, which is ok. 
+	// The first updateFrom Property will cause a refresh of the m_dataLakeAccessCfg, afterwards this object is used to determine if it is really necessary.
+	DataLakeQueryCfg m_queryCfg; 
 
 	bsoncxx::builder::basic::document serialise(const ot::DataPointDecoder& _quantityContainerEntryDescription);
 	ot::DataPointDecoder deserialise(bsoncxx::v_noabi::document::view _subDocument);

@@ -24,6 +24,7 @@
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
 #include "OTModelEntities/Properties/Bundle/PropertyBundleDataLakeQuery.h"
 #include "OTBlockEntities/Pipeline/EntityBlockPipelineBase.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
 
 class OT_BLOCKENTITIES_API_EXPORT  EntityBlockDatabaseAccess : public ot::EntityBlockPipelineBase
 {
@@ -61,6 +62,9 @@ private:
 	ot::Connector m_connectorOutput;
 	PropertyBundleDataLakeQuery m_queryProperties;
 	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
+	// Is not being serialised in the entity bson document, which is ok. 
+	// The first updateFrom Property will cause a refresh of the m_dataLakeAccessCfg, afterwards this object is used to determine if it is really necessary.
+	DataLakeQueryCfg m_queryCfg;
 	std::string m_propertyNameLimitNb = "Result limit";
 	std::string m_propertyNameLimit = "Limit results";
 
