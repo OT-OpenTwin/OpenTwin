@@ -2267,6 +2267,9 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		// Convert the field dumps
 		convertAndStoreFieldDumps(resultFolderName, excitationString);
 
+		// Convert and store the farfield
+		convertAndStoreFarfields(resultFolderName, excitationString, result1D);
+
 		++runIndex;
 	}
 
@@ -2297,6 +2300,13 @@ void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, 
 			convertAndStoreTimeDomainDump(resultFolderName, fieldDumpName, fieldType, excitationString, unit, fieldDump);
 		}
 	}
+}
+
+void FDTDSolver::convertAndStoreFarfields(const std::string& resultFolderName, const std::string& excitationString, ResultManager &result1D)
+{
+	std::string fileName = tempDirPath + "\\" + resultFolderName + "farfields.txt";
+
+	result1D.convertFarfield(fileName, excitationString);
 }
 
 void FDTDSolver::convertAndStoreSParameters(ResultManager &result1D)

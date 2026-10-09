@@ -21,6 +21,7 @@
 #include "ResultManager.h"
 
 #include "ParametricCombination.h"
+#include "FarfieldReader.h"
 
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTCore/MetadataHandle/MetadataSeries.h"
@@ -124,6 +125,26 @@ void ResultManager::convert1D(const std::string& resultName, const std::string& 
 	}
 }
 
+void ResultManager::convertFarfield(const std::string& fileName, const std::string& excitationString)
+{
+	std::vector<double> frequency;
+	std::vector<double> theta;
+	std::vector<double> phi;
+	std::vector<double> eAbs;
+
+	std::vector<std::complex<double>> eTheta;
+	std::vector<std::complex<double>> ePhi;
+
+	if (readFarFieldTable(fileName, frequency, theta, phi, eTheta, ePhi, eAbs))
+	{
+		std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
+
+		addFarfieldParameterDescriptions(parameters, frequency, theta, phi, allParameterDescriptions);
+
+		addFarfieldData(excitationString, eTheta, ePhi, eAbs, allParameterDescriptions, allCurveDescriptions);
+	}
+}
+
 void ResultManager::storeResults()
 {
 	storeCurves(allCurveDescriptions);
@@ -134,7 +155,6 @@ std::string ResultManager::getPlotName(const std::string& resultName)
 	size_t pos = resultName.find_last_of('/');
 	if (pos == std::string::npos)
 	{
-		assert(0);
 		return "";
 	}
 
@@ -248,6 +268,53 @@ void ResultManager::addParameterDescriptions(ParametricCombination &currentRun, 
 	}
 }
 
+void ResultManager::addFarfieldParameterDescriptions(ParametricCombination& currentRun, std::vector<double>& frequency, std::vector<double>& theta, std::vector<double>& phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions)
+{
+	std::list<ot::Variable> frequencyList, thetaList, phiList;
+
+	for (auto frequencyValue : frequency) frequencyList.push_back(ot::Variable(frequencyValue));
+	for (auto thetaValue : theta) thetaList.push_back(ot::Variable(thetaValue));
+	for (auto phiValue : phi) phiList.push_back(ot::Variable(phiValue));
+
+	// Add frequency
+	MetadataParameter parameterFrequency;
+	parameterFrequency.parameterName = "Frequency";
+	parameterFrequency.values = std::move(frequencyList);
+	parameterFrequency.unit = "Hz";
+	parameterFrequency.typeName = ot::TypeNames::getDoubleTypeName();
+	std::shared_ptr<ParameterDescription> parameterDescriptionFrequency(std::make_shared<ParameterDescription>(parameterFrequency, false));
+	allParameterDescriptions.push_back(std::move(parameterDescriptionFrequency));
+
+	// Add theta
+	MetadataParameter parameterTheta;
+	parameterTheta.parameterName = "Theta";
+	parameterTheta.values = std::move(thetaList);
+	parameterTheta.unit = "degrees";
+	parameterTheta.typeName = ot::TypeNames::getDoubleTypeName();
+	std::shared_ptr<ParameterDescription> parameterDescriptionTheta(std::make_shared<ParameterDescription>(parameterTheta, false));
+	allParameterDescriptions.push_back(std::move(parameterDescriptionTheta));
+
+	// First add the parameter for the x-axis (Phi)
+	MetadataParameter parameterPhi;
+	parameterPhi.parameterName = "Phi";
+	parameterPhi.values = std::move(phiList);
+	parameterPhi.unit = "degrees";
+	parameterPhi.typeName = ot::TypeNames::getDoubleTypeName();
+	std::shared_ptr<ParameterDescription> parameterPhiDescription(std::make_shared<ParameterDescription>(parameterPhi, false));
+	allParameterDescriptions.push_back(std::move(parameterPhiDescription));
+
+	// Now add the values of all sweep parameters
+	for (auto parameter : currentRun.getParameters())
+	{
+		MetadataParameter parameterStructure;
+		parameterStructure.parameterName = parameter.first;
+		parameterStructure.values = { ot::Variable(parameter.second) };
+		parameterStructure.typeName = ot::TypeNames::getDoubleTypeName();
+		std::shared_ptr<ParameterDescription> parameterDescriptionStructure(std::make_shared<ParameterDescription>(parameterStructure, true));
+		allParameterDescriptions.push_back(std::move(parameterDescriptionStructure));
+	}
+}
+
 void ResultManager::addCurveData(const std::string& resultName, const std::string &quantityName, const std::string &quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions)
 {
 	DatasetDescription newCurveDescription;
@@ -288,6 +355,70 @@ void ResultManager::addCurveData(const std::string& resultName, const std::strin
 	quantityDescription->setName(resultName);
 	newCurveDescription.setQuantityDescription(quantityDescription);
 	allCurveDescriptions.push_back(std::move(newCurveDescription));
+}
+
+void ResultManager::addFarfieldData(const std::string& excitationString, std::vector<std::complex<double>> &eTheta, std::vector<std::complex<double>> &ePhi, std::vector<double> &eAbs,
+									std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions)
+{
+	// Add Etheta quantity
+	{
+		DatasetDescription newCurveDescription;
+		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
+
+		auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
+		quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
+		quantityDescriptionComplex->reserveDatapointSize(eTheta.size());
+		for (size_t index = 0; index < eTheta.size(); index++)
+		{
+			ot::Variable entry(eTheta[index]);
+			quantityDescriptionComplex->addDatapoint(std::move(entry));
+		}
+
+		QuantityDescription *quantityDescription = quantityDescriptionComplex.release();
+		quantityDescription->setName("Farfields/E_Theta" + excitationString);
+		newCurveDescription.setQuantityDescription(quantityDescription);
+		allCurveDescriptions.push_back(std::move(newCurveDescription));
+	}
+
+	// Add Ephi quantity
+	{
+		DatasetDescription newCurveDescription;
+		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
+
+		auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
+		quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
+		quantityDescriptionComplex->reserveDatapointSize(ePhi.size());
+		for (size_t index = 0; index < ePhi.size(); index++)
+		{
+			ot::Variable entry(ePhi[index]);
+			quantityDescriptionComplex->addDatapoint(std::move(entry));
+		}
+
+		QuantityDescription* quantityDescription = quantityDescriptionComplex.release();
+		quantityDescription->setName("Farfields/E_Phi" + excitationString);
+		newCurveDescription.setQuantityDescription(quantityDescription);
+		allCurveDescriptions.push_back(std::move(newCurveDescription));
+	}
+
+	// Add Eabs quantity
+	{
+		DatasetDescription newCurveDescription;
+		newCurveDescription.addParameterDescriptions(allParameterDescriptions);
+
+		auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
+		quantityDescriptionCurve->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "");
+
+		quantityDescriptionCurve->reserveDatapointSize(eAbs.size());
+		for (size_t index = 0; index < eAbs.size(); index++)
+		{
+			quantityDescriptionCurve->addDatapoint(ot::Variable(eAbs[index]));
+		}
+
+		QuantityDescription* quantityDescription = quantityDescriptionCurve.release();
+		quantityDescription->setName("Farfields/E_Abs" + excitationString);
+		newCurveDescription.setQuantityDescription(quantityDescription);
+		allCurveDescriptions.push_back(std::move(newCurveDescription));
+	}
 }
 
 void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescriptions)
@@ -346,7 +477,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 			std::string plotName = getPlotName(fullName);
 			ot::PainterRainbowIterator* plotPainter = rainbowIterators[plotName];
 
-			if (!plotName.empty())
+			if (!plotName.empty() && plotPainter != nullptr)
 			{
 				std::string curveName = resultBasePath + "/1D Results/" + fullName;
 

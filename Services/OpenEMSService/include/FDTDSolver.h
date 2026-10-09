@@ -96,6 +96,7 @@ private:
 	void findPortRange(double position, const std::vector<double>& gridLines, const std::string& minBoundary, const std::string& maxBoundary, double nx, double& from, double& to);
 	void convertAndStoreSParameters(ResultManager& result1D);
 	void convertAndStorePortImpedances(ResultManager& result1D);
+	void convertAndStoreFarfields(const std::string &resultFolderName, const std::string &excitationString, ResultManager &result1D);
 	void convertAndStoreFieldDumps(const std::string& resultFolderName, const std::string& excitationString);
 	bool getFieldDumpTypeAndMode(EntityFieldDump* fieldDump, int& dumpType, int& dumpMode);
 	bool getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string &fieldType, std::string &unit);
