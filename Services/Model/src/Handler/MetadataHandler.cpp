@@ -173,6 +173,7 @@ ot::DataLakeAccessCfg MetadataHandler::createConfig(const MetadataCampaign& _cam
 	DataLakeAccessor dataLakeAccessor(Application::instance());
 	dataLakeAccessor.accessPartition(_campaign,_collectionName);
 	dataLakeAccessor.createQueryDescriptionQuantity(_queryCfg.getValueDescriptionQuantities());
+	// Has to be called after createQueryDescriptionQuantity, because the quantity dependencies are already added as parameter query descriptions.
 	dataLakeAccessor.createQueryDescriptionsParameter(_queryCfg.getValueDescriptionParameters());
 	dataLakeAccessor.createQueryDescriptionsSeries(_queryCfg.getValueDescriptionSeriesMD(), _queryCfg.getSeriesLabel());
 	ot::DataLakeAccessCfg accessConfig = dataLakeAccessor.createConfig();

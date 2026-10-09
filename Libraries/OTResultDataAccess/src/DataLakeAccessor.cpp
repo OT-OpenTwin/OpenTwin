@@ -181,7 +181,20 @@ void DataLakeAccessor::createQueryDescriptionsParameter(const std::list<ot::Valu
 			}
 		}
 	}
-	addValueDescriptionsParameters(allParameterQueries);
+	
+	// We need to override already existing entries, as parameter can already be added as a dependency of a quantity.
+	for (const ot::QueryDescription& queryDescription : allParameterQueries)
+	{
+		for (auto alreadyStoredDescription = m_queryDescriptionsParameters.begin(); alreadyStoredDescription != m_queryDescriptionsParameters.end(); alreadyStoredDescription++)
+		{
+			if (queryDescription.getQueryTargetDescription().getMongoDBFieldName() == alreadyStoredDescription->getQueryTargetDescription().getMongoDBFieldName())
+			{
+				m_queryDescriptionsParameters.erase(alreadyStoredDescription);
+				break;
+			}
+		}
+		m_queryDescriptionsParameters.push_back(queryDescription);
+	}
 }
 
 void DataLakeAccessor::createQueryDescriptionQuantity(const ot::ValueComparisonDescription& _valueComparisons)
@@ -243,6 +256,7 @@ void DataLakeAccessor::createQueryDescriptionQuantity(const ot::ValueComparisonD
 				ot::QueryDescription queryDescription = QueryDescriptionBuilder::create(comparisonDescription, relatedParameter);
 				allRelatedParameterQueries.push_back(queryDescription);
 			}
+			
 			addValueDescriptionsParameters(allRelatedParameterQueries);
 		}
 	}
@@ -877,6 +891,9 @@ std::list<BsonViewOrValue> DataLakeAccessor::generateParameterQueries()
 		};
 	for (ot::QueryDescription& queryDescription : m_queryDescriptionsParameters)
 	{
+		ot::ValueComparisonDescription valueQueryComparison = queryDescription.getValueComparisonDescription();
+		valueQueryComparison.setName(queryDescription.getQueryTargetDescription().getMongoDBFieldName());
+		queryDescription.setComparisonDescription(valueQueryComparison);
 		std::optional<BsonViewOrValue> comparison = generateComparisonConsideringUnits(queryDescription, false, builderWrapper);
 		if (comparison.has_value())
 		{
