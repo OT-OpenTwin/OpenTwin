@@ -34,6 +34,7 @@ public:
 	virtual void createProperties() override;
 	virtual std::string getTypeAbbreviation() override;
 	virtual std::string getFolderName() override;
+	virtual std::string getBlockFolderName() const override { return "Labels"; };
 	std::string getLabelName() const;
 
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;

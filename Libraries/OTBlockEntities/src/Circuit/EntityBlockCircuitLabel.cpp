@@ -42,10 +42,17 @@ EntityBlockCircuitLabel::EntityBlockCircuitLabel(ot::UID ID, EntityBase* parent,
 }
 
 void EntityBlockCircuitLabel::createProperties() {
-	EntityPropertiesString::createProperty("Label-Properties", "Label Name", "MyLabel", "default", getProperties());
+	EntityPropertiesString::createProperty("Label-Properties", "Label Name", "", "default", getProperties());
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Horizontal", false, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Vertical", false, "default", getProperties());
+
+	// Add initial suffix to the name if it does not already have one
+	std::string currentName = getName();
+	if (!currentName.empty() && currentName.rfind(" (") == std::string::npos)
+	{
+		setName(currentName + " ()");
+	}
 }
 
 std::string EntityBlockCircuitLabel::getTypeAbbreviation() {
@@ -62,7 +69,12 @@ std::string EntityBlockCircuitLabel::getLabelName() const {
 	if (propertyName) {
 		return propertyName->getValue();
 	}
-	return getNameOnly();
+	std::string name = getNameOnly();
+	size_t pos = name.rfind(" (");
+	if(pos != std::string::npos && name.back() == ')') {
+		return name.substr(pos + 2,name.size() - pos - 3);
+	}
+	return name;
 }
 
 double EntityBlockCircuitLabel::getRotation() const {
@@ -117,6 +129,39 @@ bool EntityBlockCircuitLabel::updateFromProperties(void)
 	if (labelNameProp && labelNameProp->needsUpdate()) {
 		createBlockItem();
 		refresh = true;
+
+		// 1. Get basic path without suffix
+		std::string currentPath = getName();
+		std::string basePath = currentPath;
+		size_t pos = basePath.rfind(" (");
+		if(pos != std::string::npos && basePath.back() == ')') {
+			basePath = basePath.substr(0, pos);
+		}
+
+		// 2. Merge new Path with suffix
+		auto stringProp = dynamic_cast<EntityPropertiesString*>(labelNameProp); 
+		std::string newLabel = "";
+		if (stringProp)
+		{
+			newLabel = stringProp->getValue();
+		}
+
+		std::string newPath = basePath + " (" + newLabel + ")";
+
+		// 3. Update name if it has changed
+		if(newPath != currentPath) {
+			setName(newPath);
+
+			if (getObserver() != nullptr)
+			{
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(currentPath, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(newPath, doc.GetAllocator()), doc.GetAllocator());
+
+				getObserver()->sendMessageToViewer(doc);
+			}
+		}
 	}
 
 	refresh = EntityBlockCircuitElement::updateFromProperties() || refresh;

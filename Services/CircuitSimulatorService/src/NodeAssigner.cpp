@@ -242,6 +242,21 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 						label = extracted;
 					}
 				}
+
+				size_t pos1 = label.find('(');
+				size_t pos2 = label.rfind(')');
+				if (pos1 != std::string::npos && pos2 != std::string::npos && pos2 > pos1)
+				{
+					std::string inside = label.substr(pos1 + 1, pos2 - pos1 - 1);
+					if(!inside.empty())
+					{
+						label = inside;
+					}
+					else
+					{
+						label = std::to_string(m_currentNodeNumber++);
+					}
+				}
 				rootToNodeNumber[root] = label;
 			}
 			else

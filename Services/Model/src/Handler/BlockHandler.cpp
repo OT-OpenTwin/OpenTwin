@@ -1102,7 +1102,16 @@ std::unique_ptr<ot::EntityBlock> BlockHandler::createBlockEntity(EntityGraphicsS
 	std::string folderName = _editor->getName() + blockFolderName;
 
 	std::list<std::string> blocks = model->getListOfFolderItems(folderName, true);
-	std::string entName = ot::EntityName::createUniqueEntityName(folderName, blocks, blockEnt->getBlockTitle(), blockEnt->getNamingBehavior());
+	std::list<std::string> existingBlockNames = blocks;
+	for (const auto& blockName : blocks)
+	{
+		size_t pos = blockName.rfind(" (");
+		if (pos != std::string::npos && blockName.back() == ')') {
+			existingBlockNames.push_back(blockName.substr(0, pos));
+		}
+	}
+	std::string entName = ot::EntityName::createUniqueEntityName(folderName, existingBlockNames, blockEnt->getBlockTitle(), blockEnt->getNamingBehavior());
+
 
 	// Setup block entity
 	blockEnt->setName(entName);
