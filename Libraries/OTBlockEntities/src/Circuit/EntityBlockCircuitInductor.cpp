@@ -48,7 +48,7 @@ EntityBlockCircuitInductor::EntityBlockCircuitInductor(ot::UID ID, EntityBase* p
 void EntityBlockCircuitInductor::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
-	EntityPropertiesString::createProperty("Element Property", "Inductance", "100mH", "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "Inductance", "100", "default", getProperties());
 }
 
 const double EntityBlockCircuitInductor::getRotation() const {

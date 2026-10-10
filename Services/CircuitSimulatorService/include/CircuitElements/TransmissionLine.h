@@ -35,6 +35,8 @@ public:
 	//Getter
 	const std::string getImpedance() const { return "Z0=" + this->m_impedance; }
 	const std::string getTransmissionDelay() const { return "TD=" + this->m_transmissionDelay; }
+	const std::string& getRawImpedance() const { return this->m_impedance; }
+	const std::string& getRawTransmissionDelay() const { return this->m_transmissionDelay; }
 	std::string getNetlistPrefix() const override { return "T"; }
 	std::string getNetlistValue() const override { return getImpedance() + " " + getTransmissionDelay(); }
 	bool isTransmissionLine() const override { return true; }

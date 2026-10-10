@@ -30,9 +30,12 @@
 #include "NetlistGenerator.h"
 #include "BlockEntityHandler.h"
 #include "CircuitElements/VoltageSource.h"
+#include "CircuitElements/TransmissionLine.h"
+#include "OTModelEntities/EntityUnits.h"
 
 // std Header
 #include <sstream>
+#include <cstdlib>
 #include <unordered_set>
 #include <set>
 
@@ -67,6 +70,22 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
             netlist.push_back("circbyline .param " + paramName + "=" + std::to_string(param->getNumericValue()));
             delete param;
         }
+    }
+
+    // 1c. Load global project units
+    ot::EntityInformation unitsInfo;
+    std::unique_ptr<EntityUnits> entityUnits;
+    if (ot::ModelServiceAPI::getEntityInformation("Units", unitsInfo))
+    {
+		EntityUnits* units = dynamic_cast<EntityUnits*>(ot::EntityAPI::readEntityFromEntityIDandVersion(unitsInfo.getEntityID(), unitsInfo.getEntityVersion()));
+        if(units)
+        {
+            entityUnits.reset(units);
+        }
+        else
+        {
+            OT_LOG_E("Failed to load Units entity");
+		}
     }
 
     // 2. Create Simulation-Strategy
@@ -138,6 +157,18 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
         if (circuitElement->type() == "VoltageSource")
         {
             auto* vs = dynamic_cast<VoltageSource*>(circuitElement);
+            if (!vs)
+            {
+                OT_LOG_E("Failed to cast CircuitElement to VoltageSource");
+            }
+           
+            std::string unit = "V";
+            if (entityUnits) {
+                unit = entityUnits->getVoltageUnit();
+            }
+
+            vs->setValue(formatScaledNetlistValue(vs->getValue(), unit));
+            vs->setAmplitude(formatScaledNetlistValue(vs->getAmplitude(), unit));
             line += strategy->getVoltageSourceNetlistType(vs);
         }
         else
@@ -147,6 +178,50 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
                 // BehavioralSource expressions are natively evaluated by NGSpice - no {} wrapping needed
                 if (circuitElement->type() == "BehavioralSource") {
                     line += circuitElement->getNetlistValue();
+                }
+                else if (circuitElement->type() == "Capacitor") {
+                    std::string unit = "F";
+                    if (entityUnits) 
+                    {
+                        unit = entityUnits->getCapacitanceUnit();
+                    }
+                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
+                }
+                else if (circuitElement->type() == "Inductor") {
+                    std::string unit = "H";
+                    if (entityUnits) 
+                    {
+                        unit = entityUnits->getInductanceUnit();
+                    }
+                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
+                }
+                else if (circuitElement->type() == "Resistor") {
+                    std::string unit = "Ohm";
+                    if (entityUnits) {
+                        unit = entityUnits->getResistanceUnit();
+                    }
+                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
+                }
+                else if (circuitElement->type() == "TransmissionLine") {
+                    auto* tl = dynamic_cast<TransmissionLine*>(circuitElement);
+                    if (tl) {
+                        std::string unitR = "Ohm";
+                        if (entityUnits) 
+                        {
+                            unitR = entityUnits->getResistanceUnit();
+                        }
+
+                        std::string unitT = "s";
+                        if (entityUnits) 
+                        {
+                            unitT = entityUnits->getTimeUnit();
+                        }
+
+                        line += "Z0=" + formatScaledNetlistValue(tl->getRawImpedance(), unitR) + " TD=" + formatScaledNetlistValue(tl->getRawTransmissionDelay(), unitT);
+                    }
+                    else {
+                        line += wrapParameterExpression(circuitElement->getNetlistValue());
+                    }
                 }
                 else {
                     line += wrapParameterExpression(circuitElement->getNetlistValue());
@@ -350,12 +425,14 @@ std::vector<std::string> NetlistGenerator::convertToCircByLine(const std::string
     return circLines;
 }
 
-std::string NetlistGenerator::wrapParameterExpression(const std::string& _value) const
+bool NetlistGenerator::isParameterExpression(const std::string& _value) const
 {
-    if (_value.empty() || m_parameterNames.empty()) return _value;
+    if (_value.empty()) return false;
 
-    // Already wrapped in {} by the user -> leave as-is
-    if (_value.front() == '{' && _value.back() == '}') return _value;
+    // Already wrapped in {} -> it is a parameter expression
+    if (_value.front() == '{' && _value.back() == '}') return true;
+
+    if (m_parameterNames.empty()) return false;
 
     // Check if the value contains any known parameter name as a whole word
     for (const auto& paramName : m_parameterNames)
@@ -364,19 +441,168 @@ std::string NetlistGenerator::wrapParameterExpression(const std::string& _value)
         while ((pos = _value.find(paramName, pos)) != std::string::npos)
         {
             // Check word boundary before
-            bool boundaryBefore = (pos == 0) || !std::isalnum(static_cast<unsigned char>(_value[pos - 1])) && _value[pos - 1] != '_';
+            bool boundaryBefore = (pos == 0) || (!std::isalnum(static_cast<unsigned char>(_value[pos - 1])) && _value[pos - 1] != '_');
             // Check word boundary after
             size_t endPos = pos + paramName.size();
-            bool boundaryAfter = (endPos >= _value.size()) || !std::isalnum(static_cast<unsigned char>(_value[endPos])) && _value[endPos] != '_';
+            bool boundaryAfter = (endPos >= _value.size()) || (!std::isalnum(static_cast<unsigned char>(_value[endPos])) && _value[endPos] != '_');
 
             if (boundaryBefore && boundaryAfter)
             {
-                return "{" + _value + "}";
+                return true;
             }
             pos += paramName.size();
         }
     }
 
-    // No parameter found -> return as-is (plain number like "1k" or "10u")
+    return false;
+}
+
+std::string NetlistGenerator::wrapParameterExpression(const std::string& _value) const
+{
+    if (isParameterExpression(_value))
+    {
+        if (_value.front() == '{' && _value.back() == '}') return _value;
+        return "{" + _value + "}";
+    }
+
     return _value;
+}
+
+std::string NetlistGenerator::getSpiceUnitMultiplier(const std::string& _unit) const
+{
+    if (_unit.empty()) return "";
+
+    // Mega: MOhm, MV, MA, MHz, MS
+    if (_unit.rfind("Meg", 0) == 0 || (_unit.size() > 1 && _unit[0] == 'M'))
+    {
+        return "1Meg";
+    }
+    // Giga: GOhm, GHz
+    if (_unit.size() > 1 && _unit[0] == 'G')
+    {
+        return "1G";
+    }
+    // Kilo: kOhm, kV, kA, kHz, kS
+    if (_unit.size() > 1 && _unit[0] == 'k')
+    {
+        return "1k";
+    }
+    // Milli: mOhm, mV, mA, ms, mH, mF, mS
+    if (_unit.size() > 1 && _unit[0] == 'm')
+    {
+        return "1m";
+    }
+    // Micro: uOhm, uV, uA, us, uH, uF, uS
+    if (_unit.size() > 1 && _unit[0] == 'u')
+    {
+        return "1u";
+    }
+    // Nano: nOhm, nV, nA, ns, nH, nF, nS
+    if (_unit.size() > 1 && _unit[0] == 'n')
+    {
+        return "1n";
+    }
+    // Pico: pH, pF, ps
+    if (_unit.size() > 1 && _unit[0] == 'p')
+    {
+        return "1p";
+    }
+    // Femto: fF, fs
+    if (_unit.size() > 1 && _unit[0] == 'f')
+    {
+        return "1f";
+    }
+
+    // Base units: V, Ohm, F, H, s, Hz, A, S -> no multiplier needed (e.g. for Volt write nothing)
+    return "";
+}
+
+std::string NetlistGenerator::formatScaledNetlistValue(const std::string& _value, const std::string& _unit) const
+{
+    if (_value.empty()) return _value;
+
+    std::string trimmed = _value;
+    size_t first = trimmed.find_first_not_of(" \t\r\n");
+    if (first == std::string::npos) return "";
+    size_t last = trimmed.find_last_not_of(" \t\r\n");
+    trimmed = trimmed.substr(first, last - first + 1);
+
+    std::string multiplier = getSpiceUnitMultiplier(_unit);
+
+    // 1. If it's a parameter or an expression (e.g. "myParam", "{myParam}", "2 * myParam")
+    if (isParameterExpression(trimmed))
+    {
+        std::string expr = trimmed;
+        if (expr.front() == '{' && expr.back() == '}')
+        {
+            expr = expr.substr(1, expr.size() - 2);
+            size_t eFirst = expr.find_first_not_of(" \t\r\n");
+            if (eFirst != std::string::npos)
+            {
+                size_t eLast = expr.find_last_not_of(" \t\r\n");
+                expr = expr.substr(eFirst, eLast - eFirst + 1);
+            }
+        }
+
+        if (multiplier.empty())
+        {
+            // Base unit (e.g. Volt, Ohm, Farad) -> write nothing extra into parameter reference: "{expr}"
+            return "{" + expr + "}";
+        }
+
+        // Non-base unit (e.g. mV, uF, kOhm) -> "{expr * 1m}", "{expr * 1u}", etc.
+        return "{" + expr + " * " + multiplier + "}";
+    }
+
+    // 2. Check if trimmed is a pure number (e.g. "10", "200", "0.5", "0")
+    char* end = nullptr;
+    double val = std::strtod(trimmed.c_str(), &end);
+    if (end != trimmed.c_str() && *end == '\0')
+    {
+        if (val == 0.0)
+        {
+            return "0";
+        }
+        if (multiplier.empty())
+        {
+            return trimmed;
+        }
+        std::string suffix = multiplier.substr(1);
+        return trimmed + suffix;
+    }
+
+    // 3. It already has an existing unit or scale suffix (e.g. "10uF", "100mH", "0.5n", "10u")
+    if (end != trimmed.c_str())
+    {
+        std::string suffix(end);
+        // Normalize physical unit endings like "uF" -> "u", "mH" -> "m", "ns" -> "n"
+        if (suffix == "uF" || suffix == "mF" || suffix == "nF" || suffix == "pF" || suffix == "fF" || suffix == "F")
+        {
+            return trimmed.substr(0, trimmed.size() - 1);
+        }
+        if (suffix == "mH" || suffix == "uH" || suffix == "nH" || suffix == "pH" || suffix == "H")
+        {
+            return trimmed.substr(0, trimmed.size() - 1);
+        }
+        if (suffix == "ms" || suffix == "us" || suffix == "ns" || suffix == "ps" || suffix == "fs")
+        {
+            return trimmed.substr(0, trimmed.size() - 1);
+        }
+        if (suffix == "kOhm" || suffix == "mOhm" || suffix == "uOhm" || suffix == "nOhm" || suffix == "MOhm" || suffix == "GOhm")
+        {
+            std::string numPart(trimmed.c_str(), end - trimmed.c_str());
+            std::string m = getSpiceUnitMultiplier(suffix);
+            if (!m.empty())
+            {
+                return numPart + m.substr(1);
+            }
+            return numPart;
+        }
+        if (suffix == "Ohm")
+        {
+            return std::string(trimmed.c_str(), end - trimmed.c_str());
+        }
+    }
+
+    return trimmed;
 }

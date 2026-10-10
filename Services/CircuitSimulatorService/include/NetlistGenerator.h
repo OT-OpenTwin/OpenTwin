@@ -80,6 +80,15 @@ private:
 	std::string getCircuitModelText(std::shared_ptr<EntityFileText> _circuitModelEntity);
 	std::vector<std::string> convertToCircByLine(const std::string& lines);
 
+	// @brief Checks if a value is enclosed in {} or contains any known parameter name
+	bool isParameterExpression(const std::string& _value) const;
+
 	// @brief Wraps value in {} if it contains a known parameter name
 	std::string wrapParameterExpression(const std::string& _value) const;
+
+	// @brief Determines the SPICE multiplier suffix for a given unit (e.g. "mV" -> "1m", "uF" -> "1u", "V" -> "")
+	std::string getSpiceUnitMultiplier(const std::string& _unit) const;
+
+	// @brief Formats a netlist value applying the global unit (e.g. "myParam" with "mV" -> "{myParam * 1m}", with "V" -> "{myParam}")
+	std::string formatScaledNetlistValue(const std::string& _value, const std::string& _unit) const;
 };

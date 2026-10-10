@@ -56,7 +56,7 @@ EntityBlockCircuitTransmissionLine::EntityBlockCircuitTransmissionLine(ot::UID I
 void EntityBlockCircuitTransmissionLine::createProperties() {
 	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesString::createProperty("Element Property", "Characteristic Impedance", "50", "default", getProperties());
-	EntityPropertiesString::createProperty("Element Property", "Transmission Delay", "10NS", "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "Transmission Delay", "10", "default", getProperties());
 }
 
 std::string EntityBlockCircuitTransmissionLine::getImpedance() {

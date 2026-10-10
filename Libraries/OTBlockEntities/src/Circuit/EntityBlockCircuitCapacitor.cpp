@@ -48,7 +48,7 @@ EntityBlockCircuitCapacitor::EntityBlockCircuitCapacitor(ot::UID ID, EntityBase*
 void EntityBlockCircuitCapacitor::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
-	EntityPropertiesString::createProperty("Element Property", "Capacity", "10uF", "default", getProperties());
+	EntityPropertiesString::createProperty("Element Property", "Capacity", "10", "default", getProperties());
 }
 
 const double EntityBlockCircuitCapacitor::getRotation() const {
