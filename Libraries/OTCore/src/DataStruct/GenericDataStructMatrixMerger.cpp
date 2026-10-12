@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 
 // OpenTwin header
 #include "OTCore/DataStruct/GenericDataStructMatrixMerger.h"
@@ -106,7 +106,7 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 		{
 			while (existingCol.getValueCount() < nextRow)
 			{
-				existingCol.addVariable(Variable());
+				existingCol.addVariable(Variable(""));
 			}
 		}
 
@@ -117,7 +117,9 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 	uint32_t tableRowCount = currentRow + 1;
 
 	GenericDataStructMatrix result(_horizontalHeader ? tableRowCount : tableColumnCount, _horizontalHeader ? tableColumnCount : tableRowCount);
-
+	std::list<ot::Variable> emptyValues(result.getNumberOfEntries(), ot::Variable(""));
+	result.setValues(emptyValues);
+	
 	auto headerIt = result.createHeaderIterator(_horizontalHeader);
 
 	for (intern::TableColumn& column : finalTable)
@@ -129,6 +131,7 @@ ot::GenericDataStructMatrix ot::GenericDataStructMatrixMerger::tableMerge(const 
 		for (Variable& value : column.getValues())
 		{
 			OTAssert(dataIt.isValid(), "Result iterator is not valid. This should never happen, check the logic of the table merger");
+			assert(!value.isNotANumber());
 			(*dataIt) = std::move(value);
 			++dataIt;
 		}
