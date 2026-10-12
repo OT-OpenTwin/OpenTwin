@@ -120,7 +120,7 @@ bool EntityResult1DCurve::updateFromProperties()
 			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
 
 			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
-			bool refresh = m_queryProperties.updateOptions(this, associatedCampaign.value());
+			refresh = m_queryProperties.updateOptions(this, associatedCampaign.value());
 
 			DataLakeQueryCfg queryCfg;
 			queryCfg.setCollectionName(collectionName);
