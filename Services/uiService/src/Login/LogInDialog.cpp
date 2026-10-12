@@ -1018,7 +1018,7 @@ void LogInDialog::initializeGssData(std::shared_ptr<QSettings> _settings)
 	{
 		m_gss->setCurrentIndex(newCurrentIndex);
 	}
-	else if (counter >= 0)
+	else if (counter > 0)
 	{
 		m_gss->setCurrentIndex(0);
 	}
