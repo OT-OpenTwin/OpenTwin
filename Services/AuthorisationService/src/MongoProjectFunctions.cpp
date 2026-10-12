@@ -35,6 +35,24 @@
 * 8) Delete project
 */
 
+
+std::string escape_regex(const std::string& input) {
+	static const std::string special = R"(\.^$*+?()[]{}|)";
+	std::string escaped;
+	escaped.reserve(input.size() * 2);
+
+	for (unsigned char c : input) {
+		if (special.find(static_cast<char>(c)) != std::string::npos) {
+			escaped += '\\';
+		}
+		escaped += static_cast<char>(c);
+	}
+	return escaped;
+}
+
+
+
+
 ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient) {
 	ot::ProjectFilterData filters;
 
@@ -301,7 +319,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	auto inArr = document{} << "$in" << array_builder << finalize;
 
 
-	std::string regexFilter = ".*" + filter + ".*";
+	std::string regexFilter =  ".*" + escape_regex(filter) + ".*";
 	auto regex = bsoncxx::types::b_regex(regexFilter, "i");
 
 
@@ -341,7 +359,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 		p.limit(limit);
 	}
 
-
+	auto temp = bsoncxx::to_json(filterDoc);
 	mongocxx::cursor cursor = projectsCollection.aggregate(p);
 
 	std::vector<Project> projects{};
@@ -464,7 +482,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	if (!_textFilter.empty()) {
 		filterBuilder.append(document{} 
 			<< "project_name" 
-			<< bsoncxx::types::b_regex(std::string(".*" + _textFilter + ".*"), "i") 
+			<< bsoncxx::types::b_regex(std::string(".*" + escape_regex(_textFilter) + ".*"), "i") 
 			<< finalize
 		);
 	}
@@ -509,7 +527,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 }
 
 std::vector<Project> MongoProjectFunctions::getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient) {
-	std::string regexFilter = ".*" + filter + ".*";
+	std::string regexFilter = ".*" + escape_regex(filter) + ".*";
 	auto regex = bsoncxx::types::b_regex(regexFilter, "");
 
 	value filterDoc = document{}
