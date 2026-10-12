@@ -109,7 +109,7 @@ In each file, only the project key in the line that starts the Python script cha
 .. code-block:: bat
 
    REM build.bat
-   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" FOO %1 %2
+   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" FOO %1 %2 %3
 
    REM clean.bat
    "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\clean.py" FOO

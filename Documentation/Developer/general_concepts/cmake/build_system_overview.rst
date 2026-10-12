@@ -170,7 +170,7 @@ All presets are defined once, in ``Scripts/CMake/OTPresets.json``. Every project
 So to change a compiler setting or a build folder for all projects, edit ``OTPresets.json``.
 The project files never need changes, a new project simply copies one from a sibling.
 
-``OTPresets.json`` defines two configure presets:
+``OTPresets.json`` defines two configure presets for Windows and two for Linux:
 
 .. list-table::
    :header-rows: 1
@@ -185,8 +185,19 @@ The project files never need changes, a new project simply copies one from a sib
    * - ``windows-release``
      - ``build/windows-release``
      - ``build-windows-release`` (builds ``Release``)
+   * - ``linux-debug``
+     - ``build/linux-debug``
+     - ``build-linux-debug`` (builds ``Debug``)
+   * - ``linux-release``
+     - ``build/linux-release``
+     - ``build-linux-release`` (builds ``Release``)
 
-Both use the ``Ninja Multi-Config`` generator with the Ninja and the MSVC compiler (``cl.exe``)
+The Linux presets are only offered on Linux and in Visual Studio with a WSL target system.
+In Visual Studio they build directly in the project folder (``forceWSL1Toolset``), so the output lands
+in ``build/linux-debug`` next to the Windows builds. ``build.bat ... WSL`` uses them as well,
+see :ref:`Project batches<target Project batches>`.
+
+The Windows presets use the ``Ninja Multi-Config`` generator with the Ninja and the MSVC compiler (``cl.exe``)
 that come with Visual Studio 2022. They also write a ``compile_commands.json``, which editors such as
 VS Code use for code completion.
 

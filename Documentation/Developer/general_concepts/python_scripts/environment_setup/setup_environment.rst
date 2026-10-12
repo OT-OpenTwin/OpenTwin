@@ -83,7 +83,7 @@ The project batches pass the key to the Python scripts. This is the line in ``Se
 
 .. code-block:: bat
 
-   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" MODEL_SERVICE %1 %2
+   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" MODEL_SERVICE %1 %2 %3
 
 ``build.py`` looks up ``MODEL_SERVICE``, finds the variable ``OT_MODEL_SERVICE_ROOT`` and builds the folder it points to.
 

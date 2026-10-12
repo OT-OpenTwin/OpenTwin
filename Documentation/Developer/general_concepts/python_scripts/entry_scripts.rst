@@ -23,8 +23,9 @@ These are started by the four :ref:`project batches<target Project batches>` in 
 
    * - Script
      - What it does
-   * - ``build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]``
+   * - ``build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD] [WSL]``
      - Configures and builds the project with CMake. Started by ``build.bat``.
+       ``WSL`` builds for Linux in the Windows Subsystem for Linux, see :doc:`environment_setup/build_bat`.
    * - ``test.py <PROJECT> [DEBUG|RELEASE|BOTH]``
      - Runs the tests of the project. Started by ``test.bat``.
    * - ``clean.py <PROJECT>``
@@ -169,7 +170,7 @@ The batch file always looks the same. Keep the ``OPENTWIN_DEV_ROOT`` check and t
    "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\my_script.py" %1 %2
    IF ERRORLEVEL 1 PAUSE
 
-For the Python side, copy an existing entry script of the same kind and change it. ``build.py`` is a good start:
+For the Python side, copy an existing entry script of the same kind and change it. ``test.py`` is a good start:
 
 .. code-block:: python
 
@@ -180,19 +181,18 @@ For the Python side, copy an existing entry script of the same kind and change i
    # Needed: the ThirdParty Python does not add this folder by itself
    sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-   from ot_dev import build_project, cli
+   from ot_dev import cli, test_project
 
 
    def main(argv: Sequence[str]) -> int:
        # Check the arguments, SystemExit prints the text and ends with exit code 1
-       if not 1 <= len(argv) <= 3:
-           raise SystemExit("usage: build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]")
+       if not 1 <= len(argv) <= 2:
+           raise SystemExit("usage: test.py <PROJECT> [DEBUG|RELEASE|BOTH]")
 
        # The environment of SetupEnvironment.py and the folder of the project key
        env, target = cli.prepare(argv[0])
        configurations = cli.configurations(cli.argument(argv, 1))
-       rebuild = cli.build_type(cli.argument(argv, 2))
-       return build_project(env, target, configurations, rebuild)
+       return test_project(env, target, configurations)
 
 
    if __name__ == "__main__":

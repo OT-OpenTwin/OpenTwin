@@ -37,7 +37,7 @@ The ``REM`` lines are only added here for explanation:
    CALL "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
    REM [3] Start the Python script with the project key and the arguments
-   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" MODEL_SERVICE %1 %2
+   "%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\build.py" MODEL_SERVICE %1 %2 %3
 
    REM [4] Keep the window open if something failed
    IF ERRORLEVEL 1 PAUSE
@@ -62,7 +62,8 @@ The ``CALL`` is needed. Without it, the batch jumps into ``set_python.bat`` and 
 
 **[3] Start the Python script.**
 The only line that differs: between the four batches the script name, between projects the project key.
-``%1`` and ``%2`` are the first and second argument given to the batch file, they are passed on unchanged.
+``%1``, ``%2`` and ``%3`` are the first, second and third argument given to the batch file, they are passed on unchanged.
+Each batch passes as many as its script takes.
 The quotes keep paths with spaces working.
 
 **[4] Keep the window open if something failed.**
