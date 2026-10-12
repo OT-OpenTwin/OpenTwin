@@ -29,6 +29,9 @@ ARGUMENT = "WSL"
 # -B: no __pycache__ in the Windows checkout
 COMMAND = 'echo "Building in WSL: $WSL_DISTRO_NAME"; exec python3 -B "$OPENTWIN_DEV_ROOT/Scripts/Python/build.py" "$@"'
 
+# Shell arguments identical to Visual Studio.
+SHELL = ["bash", "-l", "-c"]
+
 
 def build_in_wsl(argv: Sequence[str]) -> int:
     if not WINDOWS:
@@ -41,4 +44,4 @@ def build_in_wsl(argv: Sequence[str]) -> int:
     env["WSLENV"] = wslenv(env, definitions.REQUIRED)
 
     sys.stdout.flush()
-    return subprocess.run([wsl, "--exec", "sh", "-c", COMMAND, "build.py", *argv], env=env).returncode
+    return subprocess.run([wsl, "--exec", *SHELL, COMMAND, "build.py", *argv], env=env).returncode
