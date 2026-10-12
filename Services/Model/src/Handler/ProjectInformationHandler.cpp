@@ -1,4 +1,4 @@
-// @otlicense
+﻿// @otlicense
 // File: ProjectInformationHandler.cpp
 // 
 // License:
@@ -396,7 +396,8 @@ void ProjectInformationHandler::requestProjectInformation(const std::string& _pr
 	docAuth.AddMember(OT_PARAM_AUTH_PROJECT_FILTER, ot::JsonString(_projectName, docAuth.GetAllocator()), docAuth.GetAllocator());
 	docAuth.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(Application::instance()->getDataBaseUserName(), docAuth.GetAllocator()), docAuth.GetAllocator());
 	docAuth.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(Application::instance()->getDataBaseUserPassword(), docAuth.GetAllocator()), docAuth.GetAllocator());
-
+	docAuth.AddMember(OT_PARAM_AUTH_PROJECT_LIMIT, 0, docAuth.GetAllocator());
+	
 	std::string returnMsg;
 	if (ot::msg::send(thisURL, authURL, ot::MessageType::EXECUTE, docAuth.toJson(), returnMsg))
 	{
