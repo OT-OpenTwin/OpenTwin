@@ -20,11 +20,18 @@ from typing import Sequence
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from ot_dev import build_project, cli
+from ot_dev.builds.wsl import ARGUMENT as WSL, build_in_wsl
 
 
 def main(argv: Sequence[str]) -> int:
+    # WSL is always the last word, the arguments before it keep their positions
+    in_wsl = len(argv) > 1 and argv[-1].upper() == WSL
+    if in_wsl:
+        argv = argv[:-1]
     if not 1 <= len(argv) <= 3:
-        raise SystemExit("usage: build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD]")
+        raise SystemExit(f"usage: build.py <PROJECT> [DEBUG|RELEASE|BOTH] [BUILD|REBUILD] [{WSL}]")
+    if in_wsl:
+        return build_in_wsl(argv)
 
     env, target = cli.prepare(argv[0])
     configurations = cli.configurations(cli.argument(argv, 1))

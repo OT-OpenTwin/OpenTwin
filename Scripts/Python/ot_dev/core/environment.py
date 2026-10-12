@@ -76,14 +76,18 @@ def _path(env: dict[str, str]) -> None:
         env["PATH"] = expand(env, f"{native_path(entry)}{os.pathsep}%PATH%")
 
 
-def _wslenv(env: dict[str, str], before: Mapping[str, str]) -> None:
-    # Visual Studio building in WSL starts wsl.exe from this environment: WSLENV makes
-    # wsl.exe pass the variables set here on to Linux, /p converts a path to /mnt/<drive>/...
+def wslenv(env: Mapping[str, str], names: Iterable[str]) -> str:
+    """WSLENV for wsl.exe: passes the named variables on to Linux, /p converts a path to /mnt/<drive>/..."""
+    entries = [f"{name}/p" if WINDOWS_PATH.match(env[name]) else name for name in names]
+    return ":".join(filter(None, [env.get("WSLENV"), *entries]))
+
+
+def _set_wslenv(env: dict[str, str], before: Mapping[str, str]) -> None:
+    # Visual Studio building in WSL starts wsl.exe from this environment
     names = list(definitions.REQUIRED)
     names += [name for name, value in env.items()
               if before.get(name) != value and name not in names and name not in WSLENV_EXCLUDE]
-    entries = [f"{name}/p" if WINDOWS_PATH.match(env[name]) else name for name in names]
-    env["WSLENV"] = ":".join(filter(None, [before.get("WSLENV"), *entries]))
+    env["WSLENV"] = wslenv(env, names)
 
 
 def build_env(base: str | Path | None = None) -> dict[str, str]:
@@ -103,6 +107,6 @@ def build_env(base: str | Path | None = None) -> dict[str, str]:
 
     env[definitions.READY_FLAG] = "1"
     if WINDOWS:
-        _wslenv(env, before)
+        _set_wslenv(env, before)
     print("OpenTwin Developer environment was set up successfully.")
     return env
