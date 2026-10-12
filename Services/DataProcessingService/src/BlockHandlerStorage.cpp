@@ -115,7 +115,7 @@ bool BlockHandlerStorage::executeSpecialized()
 			
 			
 			ot::JsonValue& dataEntries = dataPipeline->getData();
-			
+			std::set<std::string> referredSeriesNames;
 			if (dataEntries.IsArray())
 			{
 				auto dataArray = dataEntries.GetArray();
@@ -141,6 +141,7 @@ bool BlockHandlerStorage::executeSpecialized()
 						alreadyDealtWithFields.push_back(MetadataQuantity::getFieldName());
 						
 						// We ignore the series entry entirely. Any series information is given in the metadata
+						referredSeriesNames.insert(entryObject[MetadataSeries::getFieldName().c_str()].GetString());
 						alreadyDealtWithFields.push_back(MetadataSeries::getFieldName());
 
 						const std::string quantityLabel = std::string(quantityLabelEntry.GetString());
@@ -305,8 +306,11 @@ bool BlockHandlerStorage::executeSpecialized()
 			std::set<const MetadataSeries*> newSeries;
 			for (const MetadataSeries& pipelineSeries : allPipelineSeries)
 			{
-				resultCollectionExtender.findMetadataSeries(pipelineSeries.getLabel());
-				newSeries.insert(&pipelineSeries);
+				if (referredSeriesNames.find(pipelineSeries.getLabel()) != referredSeriesNames.end() || referredSeriesNames.find(pipelineSeries.getName()) != referredSeriesNames.end())
+				{
+					resultCollectionExtender.findMetadataSeries(pipelineSeries.getLabel());
+					newSeries.insert(&pipelineSeries);
+				}
 			}
 
 			if (newSeries.size() > 1)
