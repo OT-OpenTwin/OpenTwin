@@ -14,12 +14,17 @@
 # limitations under the License.
 
 import os
+import re
 from pathlib import Path
-from typing import Iterable
+from typing import Iterable, Mapping
 
 from .config import definitions
 from .expansion import expand, load_module
-from .platform import REQUIRED as PLATFORM_REQUIRED, native_path
+from .platform import REQUIRED as PLATFORM_REQUIRED, WINDOWS, native_path
+
+# WSL has its own PATH
+WSLENV_EXCLUDE = {"PATH"}
+WINDOWS_PATH = re.compile(r"^[A-Za-z]:[\\/][^;]*$")
 
 
 def require(names: Iterable[str]) -> None:
@@ -71,9 +76,20 @@ def _path(env: dict[str, str]) -> None:
         env["PATH"] = expand(env, f"{native_path(entry)}{os.pathsep}%PATH%")
 
 
+def _wslenv(env: dict[str, str], before: Mapping[str, str]) -> None:
+    # Visual Studio building in WSL starts wsl.exe from this environment: WSLENV makes
+    # wsl.exe pass the variables set here on to Linux, /p converts a path to /mnt/<drive>/...
+    names = list(definitions.REQUIRED)
+    names += [name for name, value in env.items()
+              if before.get(name) != value and name not in names and name not in WSLENV_EXCLUDE]
+    entries = [f"{name}/p" if WINDOWS_PATH.match(env[name]) else name for name in names]
+    env["WSLENV"] = ":".join(filter(None, [before.get("WSLENV"), *entries]))
+
+
 def build_env(base: str | Path | None = None) -> dict[str, str]:
     check_required()
     env = os.environ.copy()
+    before = dict(env)
     dev = Path(base or env["OPENTWIN_DEV_ROOT"])
     third = Path(env["OPENTWIN_THIRDPARTY_ROOT"])
 
@@ -86,5 +102,7 @@ def build_env(base: str | Path | None = None) -> dict[str, str]:
     _path(env)
 
     env[definitions.READY_FLAG] = "1"
+    if WINDOWS:
+        _wslenv(env, before)
     print("OpenTwin Developer environment was set up successfully.")
     return env
