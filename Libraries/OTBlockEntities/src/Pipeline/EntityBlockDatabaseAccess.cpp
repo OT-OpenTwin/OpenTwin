@@ -103,6 +103,7 @@ bool EntityBlockDatabaseAccess::updateFromProperties()
 	{
 		PropertyHelper::getIntegerProperty(this, m_propertyNameLimitNb, settingsGroup)->setVisible(propertyLimitResults->getValue());
 	}
+	refresh |= m_queryProperties.updatePropertyVisibility(this);
 	if (getObserver() != nullptr)
 	{
 		try
