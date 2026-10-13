@@ -27,7 +27,15 @@
 #include "OTGui/VersionGraphVersionCfg.h"
 
 // Qt header
+#include <QtCore/qtimer.h>
 #include <QtCore/qobject.h>
+
+#include <QtMultimedia/qsoundeffect.h>
+
+namespace ot
+{
+	class Label;
+}
 
 namespace ot { class VersionGraphManager; }
 

@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "Tools/WidgetTest/WidgetTest.h"
+#include "Tools/WidgetTest/ExerciseWidget.h"
 #include "Tools/WidgetTest/TestToolBar.h"
 #include "Widgets/AdvancedJsonTree.h"
 
@@ -32,6 +33,7 @@
 
 #include "OTWidgets/ToolBar/TabToolBar.h"
 #include "OTWidgets/Version/VersionGraphManager.h"
+#include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/Splitter.h"
 #include "OTWidgets/Widgets/MainWindow.h"
 #include "OTWidgets/Widgets/JsonTreeWidget.h"
@@ -43,10 +45,13 @@
 
 // Qt header
 #include <QtCore/qfile.h>
+#include <QtCore/qrandom.h>
 #include <QtWidgets/qlayout.h>
 #include <QtWidgets/qfiledialog.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qtablewidget.h>
+
+#include <QtCore/qurl.h>
 
 namespace intern
 {
@@ -239,11 +244,17 @@ bool WidgetTest::runTool(QMenu* _rootMenu, otoolkit::ToolWidgets& _content) {
 		_content.addView(this->createCentralWidgetView(man->getDockManager(), "Test Container"));
 	}
 
-	if (true)
+	if (false)
 	{
 		AdvancedJsonTree* advJsonTree = new AdvancedJsonTree(nullptr);
 		_content.addView(this->createCentralWidgetView(advJsonTree, "Test Advanced JSON Tree"));
 		advJsonTree->setFromJsonDocument(intern::testdata::createTestJsonDocument());
+	}
+
+	if (true)
+	{
+		ExerciseWidget* exercise = new ExerciseWidget();
+		_content.addView(this->createCentralWidgetView(exercise->getRootWidget(), "Exercise Randomizer"));
 	}
 
 	if (false) {
