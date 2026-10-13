@@ -21,6 +21,7 @@
 #include "KeyValuesExtractor.h"
 #include "DataCategorizationHandler.h"
 #include "OTSystem/DateTime.h"
+#include "OTCore/String.h"
 #include "OTCore/StringToNumericCheck.h"
 #include "OTCore/Variable/StringToVariableConverter.h"
 #include "OTGui/TableIndexSchemata.h"
@@ -262,11 +263,11 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 					fieldKey += " [" + it->second.m_unit.value() + "]";
 				}
 				if (it->second.m_dataType.has_value()) {
-					type = it->second.m_dataType.value();
+					type = ot::String::toLower(it->second.m_dataType.value());
 				}
 			}
 			
-			_rangeTypesByRangeNames[fieldKey] = type;
+			_rangeTypesByRangeNames[fieldKey] = ot::String::toLower(type);
 			
 			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.setRow(minRow); matrixEntry.getRow() <= maxRow; matrixEntry.moveRow())
@@ -298,11 +299,11 @@ std::vector<std::string> KeyValuesExtractor::extractFieldsFromRange(std::shared_
 					fieldKey += " [" + it->second.m_unit.value() + "]";
 				}
 				if (it->second.m_dataType.has_value()) {
-					type = it->second.m_dataType.value();
+					type = ot::String::toLower(it->second.m_dataType.value());
 				}
 			}
 			
-			_rangeTypesByRangeNames[fieldKey] = type;
+			_rangeTypesByRangeNames[fieldKey] = ot::String::toLower(type);
 			
 			fieldKeys.push_back(fieldKey);
 			for (matrixEntry.setColumn(minColumn); matrixEntry.getColumn() <= maxColumn; matrixEntry.moveColumn())
@@ -327,10 +328,11 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 		const std::string& fieldName = currentField->first;
 		const std::list<ot::Variable>& fieldValuesRaw = currentField->second;
 		std::list<ot::Variable> values;
+		const std::string targetType = ot::String::toLower(_rangeTypesByRangeNames[fieldName]);
 		for (const ot::Variable& fieldValueRaw : fieldValuesRaw)
 		{
 			assert(fieldValueRaw.isConstCharPtr());
-			if (_rangeTypesByRangeNames[fieldName] == ot::TypeNames::getStringTypeName())
+			if (targetType == ot::TypeNames::getStringTypeName())
 			{
 				values.push_back(fieldValueRaw);
 			}
@@ -338,7 +340,6 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 			{
 				std::string fieldValueStringFixed = fieldValueRaw.getConstCharPtr();
 				ot::StringToVariableConverter converter;
-				const std::string& targetType = _rangeTypesByRangeNames[fieldName];
 
 				if (ot::StringToNumericCheck::isNotANumber(fieldValueStringFixed))
 				{
@@ -380,7 +381,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						}
 						else
 						{
-							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + targetType + "\n");
 							allFieldsConverted = false;
 						}
 					}
@@ -394,7 +395,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						}
 						else
 						{
-							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + targetType + "\n");
 							allFieldsConverted = false;
 						}
 					}
@@ -409,7 +410,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						}
 						else
 						{
-							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + targetType + "\n");
 							allFieldsConverted = false;
 						}
 					}
@@ -423,7 +424,7 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						}
 						else
 						{
-							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + targetType + "\n");
 							allFieldsConverted = false;
 						}
 					}
@@ -447,9 +448,14 @@ bool KeyValuesExtractor::transformSelectedDataIntoSelectedDataType(std::map<std:
 						}
 						else
 						{
-							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + _rangeTypesByRangeNames[fieldName] + "\n");
+							Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " intended type: " + targetType + "\n");
 							allFieldsConverted = false;
 						}
+					}
+					else
+					{
+						Documentation::INSTANCE()->AddToDocumentation(errorBase + fieldName + " = " + fieldValueRaw.getConstCharPtr() + " unknown intended type: " + targetType + "\n");
+						allFieldsConverted = false;
 					}
 				}
 			}

@@ -165,11 +165,18 @@ void CSVSchemaImporter::execute()
 			TableOverrides overrides;
 			if (extractedMetadata.has_value()) {
 				parseOverrides(extractedMetadata.value(), overrides);
-				if (extractedMetadata.value().HasMember("$ColumnDefinitions$")) {
-					extractedMetadata.value().RemoveMember("$ColumnDefinitions$");
+				std::vector<std::string> membersToRemove;
+				for (auto it = extractedMetadata.value().MemberBegin(); it != extractedMetadata.value().MemberEnd(); ++it) 
+				{
+					std::string memberName = ot::String::toLower(it->name.GetString());
+					if (memberName == "$columndefinitions$" || memberName == "$rowdefinitions$") 
+					{
+						membersToRemove.push_back(it->name.GetString());
+					}
 				}
-				if (extractedMetadata.value().HasMember("$RowDefinitions$")) {
-					extractedMetadata.value().RemoveMember("$RowDefinitions$");
+				for (const auto& memberName : membersToRemove) 
+				{
+					extractedMetadata.value().RemoveMember(memberName.c_str());
 				}
 			}
 			
@@ -250,7 +257,6 @@ void CSVSchemaImporter::execute()
 			{
 				datasetDescriptions = createDatasetDescription(localSeriesMetadataAssemblyData, (*csvFile).get(), overrides);
 				seriesName = createSeriesName((*csvFile)->getName(), existingDatasetNames, *csvDatasetImporter.get());
-				std::optional<ot::JsonDocument> extractedMetadata = createSeriesMetadata(*csvDatasetImporter.get(), metadataFiles, *(*csvFile).get());
 				
 				if (!extractedMetadata.has_value())
 				{
@@ -687,10 +693,29 @@ void CSVSchemaImporter::parseSection(ot::JsonDocument& doc, const char* sectionN
 			std::string key = it->name.GetString();
 			DataDefinitionOverride def;
 			if (it->value.IsObject()) {
-				if (it->value.HasMember("name") && it->value["name"].IsString()) def.m_Name = it->value["name"].GetString();
-				if (it->value.HasMember("dataType") && it->value["dataType"].IsString()) def.m_dataType = it->value["dataType"].GetString();
-				if (it->value.HasMember("unit") && it->value["unit"].IsString()) def.m_unit = it->value["unit"].GetString();
-				if (it->value.HasMember("classification") && it->value["classification"].IsString()) def.m_classification = it->value["classification"].GetString();
+				for (auto propIt = it->value.MemberBegin(); propIt != it->value.MemberEnd(); ++propIt) 
+				{
+					std::string propName = ot::String::toLower(propIt->name.GetString());
+					if (propName == "name" && propIt->value.IsString()) 
+					{
+						def.m_Name = propIt->value.GetString();
+					}
+					else if (propName == "datatype" && propIt->value.IsString()) 
+					{
+						std::string lowerType = ot::String::toLower(propIt->value.GetString());
+						if (lowerType == "int" || lowerType == "integer") lowerType = ot::TypeNames::getInt32TypeName();
+						else if (lowerType == "long") lowerType = ot::TypeNames::getInt64TypeName();
+						def.m_dataType = lowerType;
+					}
+					else if (propName == "unit" && propIt->value.IsString()) 
+					{
+						def.m_unit = propIt->value.GetString();
+					}
+					else if (propName == "classification" && propIt->value.IsString()) 
+					{
+						def.m_classification = ot::String::toLower(propIt->value.GetString());
+					}
+				}
 			}
 			
 			key.erase(std::remove(key.begin(), key.end(), ' '), key.end());
@@ -715,19 +740,30 @@ void CSVSchemaImporter::parseSection(ot::JsonDocument& doc, const char* sectionN
 
 void CSVSchemaImporter::parseOverrides(ot::JsonDocument& _doc, TableOverrides& _overrides)
 {
-	parseSection(_doc, "$ColumnDefinitions$", _overrides.m_columns, _overrides.m_hasColumnDefintions);
-	parseSection(_doc, "$RowDefinitions$", _overrides.m_rows, _overrides.m_hasRowDefintions);
+	for (auto it = _doc.MemberBegin(); it != _doc.MemberEnd(); ++it) 
+	{
+		std::string memberName = ot::String::toLower(it->name.GetString());
+		if (memberName == "$columndefinitions$") 
+		{
+			parseSection(_doc, it->name.GetString(), _overrides.m_columns, _overrides.m_hasColumnDefintions);
+		}
+		else if (memberName == "$rowdefinitions$") 
+		{
+			parseSection(_doc, it->name.GetString(), _overrides.m_rows, _overrides.m_hasRowDefintions);
+		}
+	}
 }
 
 bool CSVSchemaImporter::jsonHasClassification(TableOverrides& _overrides, const std::string& _classification, bool _isColumn)
 {
+	const std::string targetClassification = ot::String::toLower(_classification);
 	if (_isColumn) 
 	{
 		if(_overrides.m_hasColumnDefintions)
 		{
 			for (const auto& [index, def] : _overrides.m_columns) 
 			{
-				if (def.m_classification.has_value() && def.m_classification.value() == _classification) 
+				if (def.m_classification.has_value() && ot::String::toLower(def.m_classification.value()) == targetClassification) 
 				{
 					return true;
 				}
@@ -740,7 +776,7 @@ bool CSVSchemaImporter::jsonHasClassification(TableOverrides& _overrides, const 
 		{
 			for (const auto& [index, def] : _overrides.m_rows) 
 			{
-				if (def.m_classification.has_value() && def.m_classification.value() == _classification) 
+				if (def.m_classification.has_value() && ot::String::toLower(def.m_classification.value()) == targetClassification) 
 				{
 					return true;
 				} 
@@ -754,7 +790,7 @@ void CSVSchemaImporter::generateRangesOutOfJSON(const std::map<uint32_t, DataDef
 {
 	for (const auto& [index, def] : _defs) {
 		if (def.m_classification.has_value()) {
-			std::string classification = def.m_classification.value();
+			std::string classification = ot::String::toLower(def.m_classification.value());
 			
 			std::shared_ptr<EntityTableSelectedRanges> generatedRange = std::make_shared<EntityTableSelectedRanges>(
 			Application::instance()->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
