@@ -35,6 +35,6 @@ public:
 	//! @param _config The curve config that is adjusted
 	//! @param _appBase Needed for getting the current collection name and the model component. The latter is needed to assemble the current campaign
 	//! @param _access If the series that shall be used for this curve, is not yet added to the model state it is necessary to pass the used ResultCollectionMetadataExtender here as a parameter.
-	static void addToConfig(const MetadataSeries& _series, const MetadataQuantity& _quantity, ot::Plot1DCurveCfg& _config, ot::ApplicationBase* _appBase, ResultCollectionMetadataAccess* _access = nullptr);
+	static void addToConfig(const MetadataSeries& _series, const MetadataQuantity& _quantity, ot::Plot1DCurveCfg& _config, ot::ApplicationBase* _appBase, ResultCollectionMetadataAccess* _access = nullptr, std::list<ot::ValueComparisonDescription>* _parameterFilter = nullptr);
 	//static void addToConfig(ot::Plot1DCurveCfg& _config, ot::ApplicationBase* _appBase, const std::string& _seriesLabel = "");
 };

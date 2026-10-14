@@ -27,7 +27,7 @@
 #include "OTCore/Tuple/TupleDescriptionSingle.h"
 #include "OTResultDataAccess/DataLakeAccessor.h"
 
-void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuantity& _quantity, ot::Plot1DCurveCfg& _config, ot::ApplicationBase* _appBase, ResultCollectionMetadataAccess* _access)
+void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuantity& _quantity, ot::Plot1DCurveCfg& _config, ot::ApplicationBase* _appBase, ResultCollectionMetadataAccess* _access, std::list<ot::ValueComparisonDescription>* _parameterFilter)
 {
 	DataLakeAccessor dataLakeAccessor(_appBase);
 	const std::string collectionName = _appBase->getCollectionName();
@@ -45,6 +45,11 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuan
 	const std::string seriesLabel = _series.getName();
 	
 	dataLakeAccessor.createQueryDescriptionsSeries({}, seriesLabel);
+	
+	if (_parameterFilter != nullptr)
+	{
+		dataLakeAccessor.createQueryDescriptionsParameter(*_parameterFilter);
+	}
 
 	DataLakeQueryCfg queryCfg;
 	queryCfg.setCollectionName(EntityPropertiesProjectList::getCurrentProjectPlaceholder());
@@ -69,7 +74,10 @@ void CurveFactory::addToConfig(const MetadataSeries& _series, const MetadataQuan
 	}
 
 	queryCfg.setParameterOptions({ dependendParameterLabels.begin(), dependendParameterLabels.end() });
-
+	if (_parameterFilter != nullptr)
+	{
+		queryCfg.setValueDescriptionParameters(*_parameterFilter);
+	}
 	queryCfg.setMatrixDimensions(_quantity.dataDimensions);
 
 	ot::DataLakeAccessCfg config = dataLakeAccessor.createConfig();

@@ -776,6 +776,9 @@ bool PropertyBundleDataLakeQuery::setTupleSelectionOptions(EntityBase* _thisObje
 
 void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQueryCfg& _config)
 {
+
+	auto comparators =ot::ComparisonSymbols::g_comparators;
+	comparators.push_front("");
 	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
 	{
 		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
@@ -785,16 +788,18 @@ void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQ
 
 		std::list<std::string> parameterOptions = { _config.getParameterOptions().begin(), _config.getParameterOptions().end() };
 		parameterOptions.push_front("");
-		PropertyHelper::setSelectionPropertyValue(parameterOptions, _thisObject, m_propertyName, groupName);
-		PropertyHelper::setSelectionPropertyValue({ _config.getParameterOptions().begin(), _config.getParameterOptions().end() }, _thisObject, m_propertyName, groupName);
-		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ "" }, _thisObject, m_propertyComparator, groupName);
 
+		PropertyHelper::setSelectionPropertyValue(parameterOptions, _thisObject, m_propertyName, groupName);
+		PropertyHelper::setSelectionPropertyValue(comparators, _thisObject, m_propertyComparator, groupName);
+		
 		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setVisible(false);
 		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setVisible(false);
 		PropertyHelper::getStringProperty( _thisObject, m_propertyValue, groupName)->setVisible(false);
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setVisible(false);
 		PropertyHelper::getSelectionProperty( _thisObject, m_propertyComparator, groupName)->setVisible(false);
 	}
+
+
 	const std::list<ot::ValueComparisonDescription>& paramComp = _config.getValueDescriptionParameters();
 	assert(static_cast<uint32_t>(paramComp.size()) <= m_maxNbOfQueries);
 	
@@ -811,7 +816,7 @@ void PropertyBundleDataLakeQuery::reset(EntityBase* _thisObject, const DataLakeQ
 		PropertyHelper::setStringPropertyValue(tuple.getTupleUnits().front(), _thisObject, m_propertyUnit, groupName);
 		PropertyHelper::setStringPropertyValue(currentParamComp->getValue(), _thisObject, m_propertyValue, groupName);
 		PropertyHelper::setSelectionPropertyValue(currentParamComp->getName(), _thisObject, m_propertyName, groupName);
-		PropertyHelper::setSelectionPropertyValue(std::list<std::string>{ currentParamComp->getComparator() }, _thisObject, m_propertyComparator, groupName);
+		PropertyHelper::setSelectionPropertyValue(currentParamComp->getComparator(), _thisObject, m_propertyComparator, groupName);
 
 		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setVisible(true);
 		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setVisible(true);
@@ -925,7 +930,7 @@ void PropertyBundleDataLakeQuery::lockAllProperties(EntityBase* _thisObject)
 	PropertyHelper::getEntityProjectListProperty(_thisObject, m_propertyNameProjectName, m_groupMetadataFilter)->setReadOnly(true);
 	PropertyHelper::getSelectionProperty(_thisObject, m_propertyNameSeriesMetadata, m_groupMetadataFilter)->setReadOnly(true);
 	PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueriesMetadataSeries, m_groupMetadataFilter)->setReadOnly(true);
-	PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueries, m_groupMetadataFilter)->setReadOnly(true);
+	//PropertyHelper::getIntegerProperty(_thisObject, m_propertyNumberOfQueries, m_groupMetadataFilter)->setReadOnly(true);
 
 	for (uint32_t i = 1; i <= m_maxNbOfQueriesMetadata; i++)
 	{
@@ -935,16 +940,16 @@ void PropertyBundleDataLakeQuery::lockAllProperties(EntityBase* _thisObject)
 		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
 	}
 
-	for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
-	{
-		const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
-		
-		PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setReadOnly(true);
-		PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setReadOnly(true);
-		PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setReadOnly(true);
-		PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setReadOnly(true);
-		PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
-	}
+	//for (uint32_t i = 1; i <= m_maxNbOfQueries; i++)
+	//{
+	//	const std::string groupName = m_groupQuerySettings + "_" + std::to_string(i);
+	//	
+	//	PropertyHelper::getStringProperty(_thisObject, m_propertyDataType, groupName)->setReadOnly(true);
+	//	PropertyHelper::getStringProperty(_thisObject, m_propertyUnit, groupName)->setReadOnly(true);
+	//	PropertyHelper::getStringProperty(_thisObject, m_propertyValue, groupName)->setReadOnly(true);
+	//	PropertyHelper::getSelectionProperty(_thisObject, m_propertyName, groupName)->setReadOnly(true);
+	//	PropertyHelper::getSelectionProperty(_thisObject, m_propertyComparator, groupName)->setReadOnly(true);
+	//}
 }
 
 
