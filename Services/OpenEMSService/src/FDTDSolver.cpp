@@ -2221,7 +2221,8 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	timeStepWidth = readTimeStepWidthFromLogText(logFileText);
 	if (timeStepWidth == 0.0) throw(std::string("Unable to determine time step width."));
 
-	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getName() + "/Results");
+	ResultManager result1D(application->getModelComponent(), tempDirPath, solverEntity->getNameOnly() + " - 1D", solverEntity->getName() + "/Results");
+	ResultManager resultFarfields(application->getModelComponent(), tempDirPath, solverEntity->getNameOnly() + " - Farfields", solverEntity->getName() + "/Results");
 
 	std::size_t runIndex = 1;
 
@@ -2268,7 +2269,7 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		convertAndStoreFieldDumps(resultFolderName, excitationString);
 
 		// Convert and store the farfield
-		convertAndStoreFarfields(resultFolderName, excitationString, result1D);
+		convertAndStoreFarfields(resultFolderName, excitationString, resultFarfields);
 
 		++runIndex;
 	}
@@ -2280,6 +2281,7 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	convertAndStoreSParameters(result1D);
 
 	result1D.storeResults();
+	resultFarfields.storeResults();
 }
 
 void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, const std::string &excitationString)
@@ -2306,7 +2308,7 @@ void FDTDSolver::convertAndStoreFarfields(const std::string& resultFolderName, c
 {
 	std::string fileName = tempDirPath + "\\" + resultFolderName + "farfields.txt";
 
-	result1D.convertFarfield(fileName, excitationString);
+	result1D.convertFarfield(fileName, entityUnits->getFrequencyUnit(), entityUnits->getScaleToSIFrequency(), excitationString);
 }
 
 void FDTDSolver::convertAndStoreSParameters(ResultManager &result1D)

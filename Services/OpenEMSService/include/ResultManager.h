@@ -35,18 +35,18 @@ class MetadataSeries;
 class ResultManager : public BusinessLogicHandler
 {
 public:
-	ResultManager(ot::components::ModelComponent* _modelComponent, const std::string &_tmpDirPath, const std::string &_resultBasePath);
+	ResultManager(ot::components::ModelComponent* _modelComponent, const std::string &_tmpDirPath, const std::string& _resultSeriesName, const std::string &_resultBasePath);
 	virtual ~ResultManager();
 
 	void clear();
 	void loadParameters();
 	void convert1D(const std::string &resultName, const std::string &fileName, const std::string& quantityName, const std::string& quantityUnit, const std::string& xAxis, const std::string& xUnit, double xScale, int readDataColumnOnly = -1);
-	void convertFarfield(const std::string& fileName, const std::string &excitationString);
+	void convertFarfield(const std::string& fileName, const std::string& frequencyUnit, double frequencyScale, const std::string &excitationString);
 	void storeResults();
 
 private:
 	void addParameterDescriptions(ParametricCombination& currentRun, const std::string& xAxis, const std::string& xUnit, std::list<ot::Variable> parameterValuesXAxis, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
-	void addFarfieldParameterDescriptions(ParametricCombination& currentRun, std::vector<double> &frequency, std::vector<double> &theta, std::vector<double> &phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
+	void addFarfieldParameterDescriptions(ParametricCombination& currentRun, const std::string& frequencyUnit, double frequencyScale, std::vector<double> &frequency, std::vector<double> &theta, std::vector<double> &phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
 	void addCurveData(const std::string& resultName, const std::string& quantityName, const std::string& quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions);
 	void storeCurves(std::list<DatasetDescription>& allCurveDescriptions);
 	bool load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale, int readDataColumnOnly);
@@ -56,6 +56,7 @@ private:
 
 	std::string tmpDirPath;
 	std::string resultBasePath;
+	std::string resultSeriesName;
 	ParametricCombination parameters;
 	std::list<DatasetDescription> allCurveDescriptions;
 	std::map<std::string, std::string> plotContainers;

@@ -47,11 +47,12 @@
 #include <complex>
 #include <fstream>
 
-ResultManager::ResultManager(ot::components::ModelComponent* modelComponent, const std::string& _tmpDirPath, const std::string& _resultBasePath)
+ResultManager::ResultManager(ot::components::ModelComponent* modelComponent, const std::string& _tmpDirPath, const std::string &_resultSeriesName, const std::string& _resultBasePath)
 {
 	setModelComponent(modelComponent);
 	tmpDirPath = _tmpDirPath;
 	resultBasePath = _resultBasePath;
+	resultSeriesName = _resultSeriesName;
 
 	clear();
 	loadParameters();
@@ -65,7 +66,7 @@ ResultManager::~ResultManager()
 void ResultManager::clear()
 {
 	// We delete all previous result data (series), since we will recreate it if necessary
-	std::list<std::string> resultEntity{ ot::FolderNames::DatasetFolder + "/OpenEMS Results", resultBasePath + "/1D Results" };
+	std::list<std::string> resultEntity{ ot::FolderNames::DatasetFolder + "/" + resultSeriesName, resultBasePath + "/1D Results" };
 	ot::ModelServiceAPI::deleteEntitiesFromModel(resultEntity, false);
 }
 
@@ -125,7 +126,7 @@ void ResultManager::convert1D(const std::string& resultName, const std::string& 
 	}
 }
 
-void ResultManager::convertFarfield(const std::string& fileName, const std::string& excitationString)
+void ResultManager::convertFarfield(const std::string& fileName, const std::string &frequencyUnit, double frequencyScale, const std::string& excitationString)
 {
 	std::vector<double> frequency;
 	std::vector<double> theta;
@@ -139,7 +140,7 @@ void ResultManager::convertFarfield(const std::string& fileName, const std::stri
 	{
 		std::list<std::shared_ptr<ParameterDescription>> allParameterDescriptions;
 
-		addFarfieldParameterDescriptions(parameters, frequency, theta, phi, allParameterDescriptions);
+		addFarfieldParameterDescriptions(parameters, frequencyUnit, frequencyScale, frequency, theta, phi, allParameterDescriptions);
 
 		addFarfieldData(excitationString, eTheta, ePhi, eAbs, allParameterDescriptions, allCurveDescriptions);
 	}
@@ -268,11 +269,11 @@ void ResultManager::addParameterDescriptions(ParametricCombination &currentRun, 
 	}
 }
 
-void ResultManager::addFarfieldParameterDescriptions(ParametricCombination& currentRun, std::vector<double>& frequency, std::vector<double>& theta, std::vector<double>& phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions)
+void ResultManager::addFarfieldParameterDescriptions(ParametricCombination& currentRun, const std::string &frequencyUnit, double frequencyScale, std::vector<double>& frequency, std::vector<double>& theta, std::vector<double>& phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions)
 {
 	std::list<ot::Variable> frequencyList, thetaList, phiList;
 
-	for (auto frequencyValue : frequency) frequencyList.push_back(ot::Variable(frequencyValue));
+	for (auto frequencyValue : frequency) frequencyList.push_back(ot::Variable(frequencyValue / frequencyScale));
 	for (auto thetaValue : theta) thetaList.push_back(ot::Variable(thetaValue));
 	for (auto phiValue : phi) phiList.push_back(ot::Variable(phiValue));
 
@@ -280,7 +281,7 @@ void ResultManager::addFarfieldParameterDescriptions(ParametricCombination& curr
 	MetadataParameter parameterFrequency;
 	parameterFrequency.parameterName = "Frequency";
 	parameterFrequency.values = std::move(frequencyList);
-	parameterFrequency.unit = "Hz";
+	parameterFrequency.unit = frequencyUnit;
 	parameterFrequency.typeName = ot::TypeNames::getDoubleTypeName();
 	std::shared_ptr<ParameterDescription> parameterDescriptionFrequency(std::make_shared<ParameterDescription>(parameterFrequency, false));
 	allParameterDescriptions.push_back(std::move(parameterDescriptionFrequency));
@@ -435,7 +436,7 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 	);
 	resultCollectionExtender.setSaveModel(false);
 
-	std::string seriesName = createNewUniqueTopologyName(ot::FolderNames::DatasetFolder, "OpenEMS Results");
+	std::string seriesName = createNewUniqueTopologyName(ot::FolderNames::DatasetFolder, resultSeriesName);
 
 	uint64_t seriesMetadataIndex = resultCollectionExtender.buildSeriesMetadata(allCurveDescriptions, seriesName);
 	resultCollectionExtender.storeCampaignChanges();
