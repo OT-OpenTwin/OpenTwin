@@ -26,6 +26,7 @@
 #include "OTResultDataAccess/CurveFactory.h"
 #include "OTCore/MetadataHandle/MetadataSeries.h"
 #include "OTCore/MetadataHandle/MetadataParameter.h"
+#include "OTCore/Tuple/TupleDescriptionSingle.h"
 
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescription.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
@@ -40,6 +41,8 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
+
+#include "OTCADEntities/EntityFarfieldDump.h"
 
 #include <regex>
 #include <filesystem>
@@ -146,9 +149,9 @@ void ResultManager::convertFarfield(const std::string& fileName, const std::stri
 	}
 }
 
-void ResultManager::storeResults()
+void ResultManager::storeResults(const std::list<std::string> &excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList)
 {
-	storeCurves(allCurveDescriptions);
+	storeCurves(excitationStringList, allCurveDescriptions, farfieldDumpList);
 }
 
 std::string ResultManager::getPlotName(const std::string& resultName)
@@ -422,7 +425,7 @@ void ResultManager::addFarfieldData(const std::string& excitationString, std::ve
 	}
 }
 
-void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescriptions)
+void ResultManager::storeCurves(const std::list<std::string>& excitationStringList, std::list<DatasetDescription> &allCurveDescriptions, const std::list<EntityFarfieldDump*>& farfieldDumpList)
 {
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::instance().getCollectionName();
@@ -504,5 +507,96 @@ void ResultManager::storeCurves(std::list<DatasetDescription> &allCurveDescripti
 			OT_LOG_E("Unable to import data: " + dataDescription.getQuantityDescription()->getName() + " (" + e.what() + ")");
 		}
 	}
+
+	createFarfieldPlots(excitationStringList, farfieldDumpList, series, resultCollectionExtender);
+}
+
+void ResultManager::createFarfieldPlots(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender)
+{
+	for (auto farfieldDump : farfieldDumpList)
+	{
+		EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(farfieldDump->getProperties().getProperty("Type"));
+		if (typeProperty == nullptr) continue;
+
+		bool fixedPhi = (typeProperty->getValue() == "1D (Phi constant)");
+		bool fixedTheta = (typeProperty->getValue() == "1D (Theta constant)");
+
+		std::string title = farfieldDump->getNameOnly();
+		std::string plotName = resultBasePath + "/Farfield Results/" + farfieldDump->getNameOnly();
+
+		if (fixedPhi)
+		{
+			EntityPropertiesDouble* cutAngleProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi cut (deg.)"));
+
+			std::string fixedParameter = "Phi";
+			std::string fixedValue = std::to_string(cutAngleProperty->getValue());
+
+			createFarfieldPlot("E_Abs", "Theta", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot("E_Theta", "Theta", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot("E_Phi", "Theta", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+		}
+		else if (fixedTheta)
+		{
+			EntityPropertiesDouble* cutAngleProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta cut (deg.)"));
+
+			std::string fixedParameter = "Theta";
+			std::string fixedValue = std::to_string(cutAngleProperty->getValue());;
+
+			createFarfieldPlot("E_Abs", "Phi", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot("E_Theta", "Phi", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot("E_Phi", "Phi", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
+		}
+	}
+}
+
+void ResultManager::createFarfieldPlot(const std::string &type, const std::string &xAxis, const std::string &fixedParameter, const std::string &fixedValue, const std::string &title, const std::string &plotName, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender)
+{
+	EntityResult1DPlot newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	newPlot.setName(plotName + "/" + type);
+	newPlot.createProperties();
+
+	ot::Plot1DCfg plotCfg;
+	plotCfg.setTitle(title);
+	plotCfg.setXAxisParameter(xAxis);
+	newPlot.setStaticCurveQueryOptions(plotCfg);
+	newPlot.storeToDataBase();
+	_modelComponent->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
+
+	ot::PainterRainbowIterator rainbowIterator;
+
+	for (auto excitationString : excitationStringList)
+	{
+		std::string curveName = plotName + "/" + type + "/" + type + excitationString;
+		const MetadataQuantity* quantity = resultCollectionExtender.findMetadataQuantity("Farfields/" + type + excitationString);
+
+		createFarfieldCurve(curveName, fixedParameter, fixedValue, rainbowIterator, series, quantity, resultCollectionExtender);
+	}
+}
+
+void ResultManager::createFarfieldCurve(const std::string &curveName, const std::string& fixedParameter, const std::string& fixedValue, ot::PainterRainbowIterator &rainbowIterator, const MetadataSeries* series, const MetadataQuantity* quantity, ResultCollectionExtender& resultCollectionExtender)
+{
+	ot::Plot1DCurveCfg curveConfig;
+
+	auto painter = rainbowIterator.getNextPainter();
+	curveConfig.setLinePenPainter(painter.release());
+	curveConfig.setLinePenWidth(2.0);
+
+	ot::ValueComparisonDescription parameterFilter;
+	parameterFilter.setName(fixedParameter);
+	parameterFilter.setComparator("=");
+	parameterFilter.setValue(fixedValue);
+	ot::TupleInstance instance = ot::TupleDescriptionSingle::createInstance("degrees", "double");
+	parameterFilter.setTupleInstance(instance);
+	std::list<ot::ValueComparisonDescription> parameterFilters = { parameterFilter };
+
+	CurveFactory::addToConfig(*series, *quantity, curveConfig, Application::instance(), &resultCollectionExtender, &parameterFilters);
+
+	EntityResult1DCurve newCurve(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+	newCurve.setName(curveName);
+	newCurve.createProperties();
+	newCurve.setStaticCurveQueryOptions(curveConfig);
+	newCurve.storeToDataBase();
+
+	_modelComponent->addNewTopologyEntity(newCurve.getEntityID(), newCurve.getEntityStorageVersion(), false);
 }
 

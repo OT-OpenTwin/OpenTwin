@@ -2226,6 +2226,8 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 
 	std::size_t runIndex = 1;
 
+	std::list<std::string> excitationStringList;
+
 	for (const auto& excitation : excitationList)
 	{
 		std::ostringstream stream;
@@ -2271,6 +2273,8 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 		// Convert and store the farfield
 		convertAndStoreFarfields(resultFolderName, excitationString, resultFarfields);
 
+		excitationStringList.push_back(excitationString);
+
 		++runIndex;
 	}
 
@@ -2280,8 +2284,8 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	// Convert the S-parameters
 	convertAndStoreSParameters(result1D);
 
-	result1D.storeResults();
-	resultFarfields.storeResults();
+	result1D.storeResults({}, {});
+	resultFarfields.storeResults(excitationStringList, farfieldDumpList);
 }
 
 void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, const std::string &excitationString)
