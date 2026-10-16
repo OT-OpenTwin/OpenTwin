@@ -28,8 +28,8 @@ EntityBlockCircuitLabel::EntityBlockCircuitLabel(ot::UID ID, EntityBase* parent,
 	: EntityBlockCircuitElement(ID, parent, obs, ms)
 {
 	ot::EntityTreeItem treeItem = getTreeItem();
-	treeItem.setVisibleIcon("Default/GND");
-	treeItem.setHiddenIcon("Default/GND");
+	treeItem.setVisibleIcon("CircuitElementImages/Label");
+	treeItem.setHiddenIcon("CircuitElementImages/Label");
 	this->setDefaultTreeItem(treeItem);
 
 	setBlockTitle("Label");
@@ -42,7 +42,7 @@ EntityBlockCircuitLabel::EntityBlockCircuitLabel(ot::UID ID, EntityBase* parent,
 }
 
 void EntityBlockCircuitLabel::createProperties() {
-	EntityPropertiesString::createProperty("Label-Properties", "Label Name", "", "default", getProperties());
+	EntityPropertiesString::createProperty("Label-Properties", "Label Name", "label", "default", getProperties());
 	EntityPropertiesDouble::createProperty("Transform-Properties", "Rotation", 0.0, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Horizontal", false, "default", getProperties());
 	EntityPropertiesBoolean::createProperty("Transform-Properties", "Flip Vertical", false, "default", getProperties());
@@ -51,7 +51,7 @@ void EntityBlockCircuitLabel::createProperties() {
 	std::string currentName = getName();
 	if (!currentName.empty() && currentName.rfind(" (") == std::string::npos)
 	{
-		setName(currentName + " ()");
+		setName(currentName + " (" + getLabelName() + ")");
 	}
 }
 
