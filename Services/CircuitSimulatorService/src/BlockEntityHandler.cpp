@@ -54,7 +54,8 @@
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTransmissionLine.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitBehavioralSource.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitLabel.h"
-
+#include "OTBlockEntities/Circuit/EntityBlockCircuitSubcircuit.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 
 // Third Party Header
 
@@ -159,7 +160,9 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 
 	a4.addItem(EntityBlockCircuitDiode::className(), "Diode", "CircuitElementImages/Diod2.png");
 
-	a5.addItem(EntityBlockCircuitLabel::className(), "Net Label", "CircuitElementImages/GND.png");
+	a5.addItem(EntityBlockCircuitLabel::className(), "Net Label", "CircuitElementImages/Label.png");
+	a5.addItem(EntityBlockCircuitSubcircuit::className(), "Subcircuit", "CircuitElementImages/Subcircuit.png");
+	a5.addItem(EntityBlockCircuitTerminal::className(), "Subcircuit Terminal", "CircuitElementImages/Terminal.png");
 
 	a.addChildCollection(std::move(a1));
 	a.addChildCollection(std::move(a2));
