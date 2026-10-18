@@ -50,6 +50,8 @@
 #include "OTCore/EntityName.h"
 #include "OTBlockEntities/BlockHelper.h"
 #include "OTBlockEntities/EntityBlockConnection.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitSubCircuit.h"
+#include "OTGuiAPI/Frontend.h"
 
 // Third Party Header
 #include <ngspice/sharedspice.h>
@@ -89,9 +91,15 @@ Application::~Application() {
 // Trying to create more circuits
 
 void Application::createNewCircuit() {
-	
-	std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
-	std::string circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, existingCircuits, "Circuit");
+	createNewCircuit("");
+}
+
+std::string Application::createNewCircuit(const std::string& _circuitName) {
+	std::string circuitName = _circuitName;
+	if (circuitName.empty()) {
+		std::list<std::string> existingCircuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
+		circuitName = ot::EntityName::createUniqueEntityName(ot::FolderNames::CircuitsFolder, existingCircuits, "Circuit");
+	}
 
 	std::unique_ptr<EntityGraphicsScene> entityCircuitRoot(new EntityGraphicsScene(this->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr));
 	entityCircuitRoot->setGraphicsPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
@@ -102,17 +110,54 @@ void Application::createNewCircuit() {
 	entityCircuitRoot->setHiddenTreeItemIcon("Tree/Circuit");
 	entityCircuitRoot->registerCallbacks(
 		ot::EntityCallbackBase::Callback::Properties |
-		ot::EntityCallbackBase::Callback::Selection,
+		ot::EntityCallbackBase::Callback::Selection |
+		ot::EntityCallbackBase::Callback::DataNotify,
 		getServiceName()
 	);
 
 	entityCircuitRoot->storeToDataBase();
-	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { false }, {}, {}, {}, "Added new circuit");
+	ot::ModelServiceAPI::addEntitiesToModel({ entityCircuitRoot->getEntityID() }, { entityCircuitRoot->getEntityStorageVersion() }, { true }, {}, {}, {}, "Added new circuit");
 	
 	Circuit circuit;
 	circuit.setEditorName(circuitName);
 	circuit.setId(circuitName);
 	Application::instance()->getNGSpice().getMapOfCircuits().insert_or_assign(circuitName, std::move(circuit));
+
+	return circuitName;
+}
+
+ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) {
+	ot::EntityInformation info;
+	if (!ot::ModelServiceAPI::getEntityInformation(_eventData.getItemUid(), info)) {
+		return ot::ReturnMessage::Failed;
+	}
+
+	if (info.getEntityType() == "EntityBlockCircuitSubcircuit") {
+		std::unique_ptr<EntityBase> entity(ot::EntityAPI::readEntityFromEntityIDandVersion(info.getEntityID(), info.getEntityVersion()));
+		auto subcircuit = dynamic_cast<EntityBlockCircuitSubcircuit*>(entity.get());
+		if (subcircuit) {
+			std::string modelName = subcircuit->getSubcircuitName();
+			std::list<std::string> circuits = ot::ModelServiceAPI::getListOfFolderItems(ot::FolderNames::CircuitsFolder);
+
+			std::string circuitPath = modelName;
+			if (!circuitPath.empty() && circuitPath.rfind(getCircuitRootName(), 0) != 0) {
+				circuitPath = getCircuitRootName() + circuitPath;
+			}
+
+			if (circuitPath.empty() || std::find(circuits.begin(), circuits.end(), circuitPath) == circuits.end()) {
+				circuitPath = createNewCircuit("");
+
+				subcircuit->setSubcircuitName(circuitPath);
+				subcircuit->storeToDataBase();
+				ot::ModelServiceAPI::updateTopologyEntities({ subcircuit->getEntityID() }, { subcircuit->getEntityStorageVersion() }, "Assigned circuit to subcircuit block");
+				ot::ModelServiceAPI::updatePropertyGrid();
+			}
+
+			ot::Frontend::setEntitySelected(circuitPath, true, true, true);
+		}
+	}
+
+	return ot::ReturnMessage::Ok;
 }
 
 void Application::createInitialCircuit() {

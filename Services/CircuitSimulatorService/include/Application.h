@@ -73,9 +73,11 @@ public:
 	// Add your custom functions/ members here
 
 	void createNewCircuit();
+	std::string createNewCircuit(const std::string& _circuitName);
 	void createInitialCircuit();
 
 	virtual void modelSelectionChanged() override;
+	virtual ot::ReturnMessage graphicsItemDoubleClicked(const ot::GraphicsDoubleClickEvent& _eventData) override;
 
 	void addSolver();
 	void runCircuitSimulation();
