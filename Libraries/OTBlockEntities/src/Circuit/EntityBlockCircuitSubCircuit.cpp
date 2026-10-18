@@ -24,6 +24,7 @@
 #include "OTGui/Graphics/Builder/GraphicsFlowItemBuilder.h"
 #include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
+#include "OTCore/FolderNames.h"
 
 // Third party header
 #include <bsoncxx/builder/basic/array.hpp>
@@ -55,20 +56,26 @@ EntityBlockCircuitSubcircuit::EntityBlockCircuitSubcircuit(ot::UID ID, EntityBas
 void EntityBlockCircuitSubcircuit::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
-	EntityPropertiesString::createProperty("Subcircuit Properties", "Subcircuit Name", "Subcircuit1", "default", getProperties());
+	EntityPropertiesEntityList::createProperty("Subcircuit Properties", "SubCircuit", ot::FolderNames::CircuitsFolder, ot::invalidUID, "", -1, "default", getProperties());
 }
 
 
 bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 {
 	bool refresh = EntityBlockCircuitElement::updateFromProperties();
-	auto prop = getProperties().getProperty("Subcircuit Name");
+	auto prop = getProperties().getProperty("SubCircuit");
 	if (prop && prop->needsUpdate())
 	{
-		auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
-		if (strProp)
+		auto listProp = dynamic_cast<EntityPropertiesEntityList*>(prop);
+		if (listProp)
 		{
-			setBlockTitle(strProp->getValue());
+			std::string val = listProp->getValueName();
+			std::string displayTitle = val;
+			if (displayTitle.rfind("Circuits/", 0) == 0)
+			{
+				displayTitle = displayTitle.substr(std::string("Circuits/").length());
+			}
+			setBlockTitle(displayTitle.empty() ? "SUBCKT" : displayTitle);
 		}
 		if (getObserver() != nullptr)
 		{
@@ -87,24 +94,36 @@ bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 
 std::string EntityBlockCircuitSubcircuit::getSubcircuitName() const
 {
-	auto prop = getProperties().getProperty("Subcircuit Name");
-	auto strProp = dynamic_cast<const EntityPropertiesString*>(prop);
-	if (strProp)
+	auto prop = getProperties().getProperty("SubCircuit");
+	auto listProp = dynamic_cast<const EntityPropertiesEntityList*>(prop);
+	if (listProp)
 	{
-		return strProp->getValue();
+		return listProp->getValueName();
 	}
-	return getBlockTitle();
+	return "";
 }
 
 void EntityBlockCircuitSubcircuit::setSubcircuitName(const std::string& _name)
 {
-	auto prop = getProperties().getProperty("Subcircuit Name");
-	auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
-	if (strProp)
+	std::string fullName = _name;
+	if (!fullName.empty() && fullName.rfind("Circuits/", 0) != 0)
 	{
-		strProp->setValue(_name);
+		fullName = "Circuits/" + fullName;
 	}
-	setBlockTitle(_name);
+
+	auto prop = getProperties().getProperty("SubCircuit");
+	auto listProp = dynamic_cast<EntityPropertiesEntityList*>(prop);
+	if (listProp)
+	{
+		listProp->setValueName(fullName);
+	}
+
+	std::string displayTitle = fullName;
+	if (displayTitle.rfind("Circuits/", 0) == 0)
+	{
+		displayTitle = displayTitle.substr(std::string("Circuits/").length());
+	}
+	setBlockTitle(displayTitle.empty() ? "SUBCKT" : displayTitle);
 	setModified();
 }
 
@@ -134,24 +153,28 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 	if (getObserver() != nullptr)
 	{
 		std::string modelName = getSubcircuitName();
-		const auto* graphicsItemMap = getObserver()->getGraphicsItemMap(modelName);
-		if (!graphicsItemMap && modelName.rfind("Circuits/", 0) != 0)
+		if (!modelName.empty())
 		{
-			graphicsItemMap = getObserver()->getGraphicsItemMap("Circuits/" + modelName);
-		}
-
-		if (graphicsItemMap != nullptr)
-		{
-			ot::UIDList graphicsItemsUIDs = graphicsItemMap->getAllIDs();
-			for (auto uid : graphicsItemsUIDs)
+			std::string sceneName = modelName;
+			if (sceneName.rfind("Circuits/", 0) != 0)
 			{
-				EntityBase* entity = nullptr;
-				// TODO: Load or get entity for uid once method is available
+				sceneName = "Circuits/" + sceneName;
+			}
 
-				EntityBlockCircuitTerminal* terminal = dynamic_cast<EntityBlockCircuitTerminal*>(entity);
-				if (terminal != nullptr)
+			const auto* graphicsItemMap = getObserver()->getGraphicsItemMap(sceneName);
+			if (graphicsItemMap != nullptr)
+			{
+				ot::UIDList graphicsItemsUIDs = graphicsItemMap->getAllIDs();
+				for (auto uid : graphicsItemsUIDs)
 				{
-					terminals.push_back(terminal->getTerminalName());
+					EntityBase* entity = nullptr;
+					// TODO: Load or get entity for uid once method is available
+
+					EntityBlockCircuitTerminal* terminal = dynamic_cast<EntityBlockCircuitTerminal*>(entity);
+					if (terminal != nullptr)
+					{
+						terminals.push_back(terminal->getTerminalName());
+					}
 				}
 			}
 		}
@@ -181,6 +204,10 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 	block.setName(this->getClassName());
 
 	std::string title = getSubcircuitName();
+	if (title.rfind("Circuits/", 0) == 0)
+	{
+		title = title.substr(std::string("Circuits/").length());
+	}
 	if (title.empty())
 	{
 		title = createBlockHeadline();
