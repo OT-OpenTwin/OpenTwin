@@ -42,7 +42,7 @@ def native_path(value: str) -> str:
     return value if WINDOWS else value.replace("\\", "/")
 
 
-DEFAULT_EDITOR = "VS"
+DEFAULT_EDITOR = "VS" if WINDOWS else "CODE"
 
 EDITORS: dict[str, tuple[str | None, str]] = {
     "VS": ("DEVENV_ROOT_2022", "devenv.exe"),

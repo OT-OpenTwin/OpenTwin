@@ -32,6 +32,9 @@ LDS_KEY = "LOCAL_DIRECTORY_SERVICE"
 
 
 def _rooted(env: Mapping[str, str], root: str, executable: str, target: str) -> int:
+    if not env.get(root):
+        raise SystemExit(f"{root} is not set")
+
     command = Path(env[root]) / executable
     if not command.is_file():
         raise SystemExit(f"{executable} not found: {command}")
