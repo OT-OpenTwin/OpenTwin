@@ -33,14 +33,35 @@ namespace ot {
 	// Serialization keys - no defines
 	inline constexpr const char* c_coloredTableRangeRangeKey = "Range";
 	inline constexpr const char* c_coloredTableRangeColorKey = "Color";
+	inline constexpr const char* c_coloredTableRangeColorToKey = "ColorTo";
+	inline constexpr const char* c_coloredTableRangeHasValueRangeKey = "HasValueRange";
+	inline constexpr const char* c_coloredTableRangeMinValueKey = "MinValue";
+	inline constexpr const char* c_coloredTableRangeMaxValueKey = "MaxValue";
 
 	//! @class ColoredTableRange
-	//! @brief Associates an ot::TableRange (polymorphic) with an ot::Color. Maintains value semantics via deep cloning.
+	//! @brief Associates an ot::TableRange with color information. Supports static colors, single-color value thresholds, and 2-color gradient ranges.
 	class OT_GUI_API_EXPORT ColoredTableRange : public ot::Serializable {
 	public:
 		ColoredTableRange();
+
+		// ---------------------------------------------------------------------
+		// Constructors
+
+		//! @brief Statischer Farbbereich: Alle Zellen im Bereich erhalten unabhängig vom Wert die angegebene Farbe.
 		ColoredTableRange(const TableRange& _range, const Color& _color);
+		//! @brief Statischer Farbbereich (shared pointer): Alle Zellen im Bereich erhalten unabhängig vom Wert die angegebene Farbe.
 		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _color);
+
+		//! @brief Wertbasierter Schwellwert-Bereich (einfarbig): Nur Zellen, deren numerischer Wert in [_min, _max] liegt, erhalten _color.
+		ColoredTableRange(const TableRange& _range, const Color& _color, double _min, double _max);
+		//! @brief Wertbasierter Schwellwert-Bereich (einfarbig, shared pointer): Nur Zellen, deren numerischer Wert in [_min, _max] liegt, erhalten _color.
+		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _color, double _min, double _max);
+
+		//! @brief Farbverlauf / Gradient (Heatmap-Segment): Zellen mit Werten in [_min, _max] werden linear zwischen _minColor und _maxColor interpoliert.
+		ColoredTableRange(const TableRange& _range, const Color& _minColor, const Color& _maxColor, double _min, double _max);
+		//! @brief Farbverlauf / Gradient (Heatmap-Segment, shared pointer): Zellen mit Werten in [_min, _max] werden linear zwischen _minColor und _maxColor interpoliert.
+		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _minColor, const Color& _maxColor, double _min, double _max);
+
 		ColoredTableRange(const ColoredTableRange& _other);
 		ColoredTableRange(ColoredTableRange&& _other) noexcept;
 		virtual ~ColoredTableRange() = default;
@@ -62,13 +83,39 @@ namespace ot {
 		void setRange(const TableRange& _range);
 		void setRange(std::shared_ptr<TableRange> _range);
 
+		// Color access
 		const Color& getColor() const { return m_color; }
 		Color& getColor() { return m_color; }
-		void setColor(const Color& _color) { m_color = _color; }
+		void setColor(const Color& _color) { m_color = _color; m_colorTo = _color; }
+
+		const Color& getColorTo() const { return m_colorTo; }
+		Color& getColorTo() { return m_colorTo; }
+		void setColorTo(const Color& _colorTo) { m_colorTo = _colorTo; }
+
+		const Color& getMinColor() const { return m_color; }
+		const Color& getMaxColor() const { return m_colorTo; }
+		void setColorGradient(const Color& _minColor, const Color& _maxColor) { m_color = _minColor; m_colorTo = _maxColor; }
+
+		// Value range access
+		bool hasValueRange() const { return m_hasValueRange; }
+		double getMinValue() const { return m_minValue; }
+		double getMaxValue() const { return m_maxValue; }
+		void setValueRange(double _min, double _max) { m_minValue = _min; m_maxValue = _max; m_hasValueRange = true; }
+		void removeValueRange() { m_hasValueRange = false; }
+
+		bool isGradient() const { return m_hasValueRange && (m_color != m_colorTo); }
+
+		//! @brief Berechnet die Farbe für einen gegebenen numerischen Wert.
+		//! Gibt false zurück, wenn ein Wertebereich definiert ist und _value außerhalb liegt.
+		bool calculateColor(double _value, Color& _outColor) const;
 
 	private:
 		std::shared_ptr<TableRange> m_range;
 		Color m_color;
+		Color m_colorTo;
+		bool m_hasValueRange;
+		double m_minValue;
+		double m_maxValue;
 	};
 
 }

@@ -58,6 +58,7 @@ public:
 	void testTableMedium();
 	void testTableBig();
 	void testTableColored();
+	void testTableMatrixHeatmap();
 	
 	void createPlotOneComplexCurveMagPhase();
 	void createPlotOneComplexCurveRealImag();

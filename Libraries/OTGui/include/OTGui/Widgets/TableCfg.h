@@ -109,6 +109,9 @@ namespace ot {
 		const std::vector<ColoredTableRange>& getColoredRanges() const { return m_coloredRanges; }
 		std::vector<ColoredTableRange>& getColoredRanges() { return m_coloredRanges; }
 
+		bool calculateDataValueBounds(double& _outMin, double& _outMax) const;
+		bool calculateDataValueBounds(const TableRange& _range, double& _outMin, double& _outMax) const;
+
 	private:
 		void initialize();
 		void initialize(int _rows, int _columns);

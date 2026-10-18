@@ -21,7 +21,9 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/Variable/VariableToStringConverter.h"
+#include "OTCore/String.h"
 #include "OTGui/Widgets/TableCfg.h"
+#include <limits>
 
 #if OT_TESTING_GLOBAL_AllTestsEnabled==true
 #define OT_TESTING_LOCAL_TABLECFG_PERFORMANCETEST_ENABLED OT_TESTING_GLOBAL_AllTestsEnabled
@@ -619,4 +621,35 @@ inline ot::TableHeaderItemCfg* ot::TableCfg::getOrCreateColumnHeaderItem(int _co
 		this->setColumnHeader(_column, itm);
 	}
 	return itm;
+}
+
+bool ot::TableCfg::calculateDataValueBounds(double& _outMin, double& _outMax) const {
+	return calculateDataValueBounds(TableRange(TableRangeType::Table), _outMin, _outMax);
+}
+
+bool ot::TableCfg::calculateDataValueBounds(const TableRange& _range, double& _outMin, double& _outMax) const {
+	bool found = false;
+	double minVal = std::numeric_limits<double>::infinity();
+	double maxVal = -std::numeric_limits<double>::infinity();
+
+	for (int r = 0; r < m_rows; r++) {
+		for (int c = 0; c < m_columns; c++) {
+			if (_range.isInRange(r, c)) {
+				bool failed = false;
+				double val = ot::String::toNumber<double>(m_data[r][c], failed);
+				if (!failed) {
+					found = true;
+					if (val < minVal) minVal = val;
+					if (val > maxVal) maxVal = val;
+				}
+			}
+		}
+	}
+
+	if (found) {
+		_outMin = minVal;
+		_outMax = maxVal;
+		return true;
+	}
+	return false;
 }

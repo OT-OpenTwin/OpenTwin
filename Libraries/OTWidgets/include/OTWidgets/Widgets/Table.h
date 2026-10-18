@@ -30,6 +30,8 @@
 
 // std header
 #include <vector>
+#include <map>
+#include <string>
 
 class QTableWidgetItem;
 
@@ -62,7 +64,7 @@ namespace ot {
 		virtual void setupFromConfig(const TableCfg& _config);
 		virtual TableCfg createConfig() const;
 
-		QColor getCurrentCellColor(int _row, int _column) const;
+		QColor getCurrentCellColor(int _row, int _column, const std::string& _cellText = std::string()) const;
 
 		const std::vector<TableRangeType>& getRangePriority() const { return m_rangePriority; }
 		void setRangePriority(const std::vector<TableRangeType>& _priority) { m_rangePriority = _priority; }
@@ -132,7 +134,6 @@ namespace ot {
 		void setResizeRequired();
 		void clearHeaderConfigs();
 		QTableWidgetItem* createHeaderItem(const TableHeaderItemCfg* _cfg) const;
-
 		TableItemDelegate* m_itemDelegate;
 
 		bool m_multilineCells;
