@@ -39,7 +39,7 @@ EntityBlockCircuitSubcircuit::EntityBlockCircuitSubcircuit(ot::UID ID, EntityBas
 	treeItem.setVisibleIcon("CircuitElementImages/Subcircuit");
 	treeItem.setHiddenIcon("CircuitElementImages/Subcircuit");
 	this->setDefaultTreeItem(treeItem);
-	setBlockTitle("SUBCKT");
+	setBlockTitle("Subckt");
 
 	registerCallbacks(
 		ot::EntityCallbackBase::Callback::DataHandle,
@@ -57,6 +57,17 @@ void EntityBlockCircuitSubcircuit::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
 	EntityPropertiesEntityList::createProperty("Subcircuit Properties", "SubCircuit", ot::FolderNames::CircuitsFolder, ot::invalidUID, "", -1, "default", getProperties());
+
+	std::string currentName = getName();
+	std::string subName = getSubcircuitName();
+	if (subName.rfind("Circuits/", 0) == 0)
+	{
+		subName = subName.substr(std::string("Circuits/").length());
+	}
+	if (!currentName.empty() && !subName.empty() && currentName.rfind(" (") == std::string::npos)
+	{
+		setName(currentName + " (" + subName + ")");
+	}
 }
 
 
@@ -75,7 +86,32 @@ bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 			{
 				displayTitle = displayTitle.substr(std::string("Circuits/").length());
 			}
-			setBlockTitle(displayTitle.empty() ? "SUBCKT" : displayTitle);
+			setBlockTitle(displayTitle.empty() ? "Subckt" : displayTitle);
+
+			std::string currentPath = getName();
+			if (!currentPath.empty())
+			{
+				std::string basePath = currentPath;
+				size_t pos = basePath.rfind(" (");
+				if (pos != std::string::npos && basePath.back() == ')')
+				{
+					basePath = basePath.substr(0, pos);
+				}
+				std::string newPath = displayTitle.empty() ? basePath : (basePath + " (" + displayTitle + ")");
+				if (newPath != currentPath)
+				{
+					setName(newPath);
+					if (getObserver() != nullptr)
+					{
+						ot::JsonDocument doc;
+						doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, doc.GetAllocator()), doc.GetAllocator());
+						doc.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(currentPath, doc.GetAllocator()), doc.GetAllocator());
+						doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(newPath, doc.GetAllocator()), doc.GetAllocator());
+
+						getObserver()->sendMessageToViewer(doc);
+					}
+				}
+			}
 		}
 		if (getObserver() != nullptr)
 		{
@@ -123,7 +159,33 @@ void EntityBlockCircuitSubcircuit::setSubcircuitName(const std::string& _name)
 	{
 		displayTitle = displayTitle.substr(std::string("Circuits/").length());
 	}
-	setBlockTitle(displayTitle.empty() ? "SUBCKT" : displayTitle);
+	setBlockTitle(displayTitle.empty() ? "Subckt" : displayTitle);
+
+	std::string currentPath = getName();
+	if (!currentPath.empty())
+	{
+		std::string basePath = currentPath;
+		size_t pos = basePath.rfind(" (");
+		if (pos != std::string::npos && basePath.back() == ')')
+		{
+			basePath = basePath.substr(0, pos);
+		}
+		std::string newPath = displayTitle.empty() ? basePath : (basePath + " (" + displayTitle + ")");
+		if (newPath != currentPath)
+		{
+			setName(newPath);
+			if (getObserver() != nullptr)
+			{
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(currentPath, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(newPath, doc.GetAllocator()), doc.GetAllocator());
+
+				getObserver()->sendMessageToViewer(doc);
+			}
+		}
+	}
+
 	setModified();
 }
 
@@ -176,6 +238,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 						terminals.push_back(terminal->getTerminalName());
 					}
 				}
+				std::sort(terminals.begin(), terminals.end());
 			}
 		}
 	}

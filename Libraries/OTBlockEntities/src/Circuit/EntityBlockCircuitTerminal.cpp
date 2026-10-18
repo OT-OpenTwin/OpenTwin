@@ -21,6 +21,7 @@
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 #include "OTGui/Graphics/GraphicsItemFileCfg.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
+#include "OTCommunication/ActionTypes.h"
 
 static EntityFactoryRegistrar<EntityBlockCircuitTerminal> registrar(EntityBlockCircuitTerminal::className());
 
@@ -31,7 +32,7 @@ EntityBlockCircuitTerminal::EntityBlockCircuitTerminal(ot::UID ID, EntityBase* p
 	treeItem.setVisibleIcon("CircuitElementImages/Terminal");
 	treeItem.setHiddenIcon("CircuitElementImages/Terminal");
 	this->setDefaultTreeItem(treeItem);
-	setBlockTitle("TERMINAL");
+	setBlockTitle("Terminal");
 	
 	// Exact one connector for terminals. The name of the connector is "pin" and it can be connected to any other connector.
 	const std::string connectorName = "pin";
@@ -45,23 +46,64 @@ void EntityBlockCircuitTerminal::createProperties()
 	EntityBlockCircuitElement::createProperties();
 	// Name of the terminal which connects outside the subcircuit.
 	EntityPropertiesString::createProperty("Terminal Properties", "Terminal Name", "IN", "default", getProperties());
-	// Optional index 
-	EntityPropertiesInteger::createProperty("Terminal Properties", "Terminal Index", 1, "default", getProperties());
+
+	// Add initial suffix to the name if it does not already have one
+	std::string currentName = getName();
+	if (!currentName.empty() && currentName.rfind(" (") == std::string::npos)
+	{
+		setName(currentName + " (" + getTerminalName() + ")");
+	}
 }
 
 bool EntityBlockCircuitTerminal::updateFromProperties(void)
 {
-	bool refresh = EntityBlockCircuitElement::updateFromProperties();
+	bool refresh = false;
+
 	auto prop = getProperties().getProperty("Terminal Name");
 	if (prop && prop->needsUpdate())
 	{
+		createBlockItem();
+		refresh = true;
+
+		// 1. Get basic path without suffix
+		std::string currentPath = getName();
+		std::string basePath = currentPath;
+		size_t pos = basePath.rfind(" (");
+		if (pos != std::string::npos && basePath.back() == ')')
+		{
+			basePath = basePath.substr(0, pos);
+		}
+
+		// 2. Merge new Path with suffix
 		auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
+		std::string newName = "";
 		if (strProp)
 		{
-			setBlockTitle(strProp->getValue());
+			newName = strProp->getValue();
 		}
-		refresh = true;
+		setBlockTitle(newName);
+
+		std::string newPath = basePath + " (" + newName + ")";
+
+		// 3. Update name if it has changed
+		if (newPath != currentPath)
+		{
+			setName(newPath);
+
+			if (getObserver() != nullptr)
+			{
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(currentPath, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(newPath, doc.GetAllocator()), doc.GetAllocator());
+
+				getObserver()->sendMessageToViewer(doc);
+			}
+		}
 	}
+
+	refresh = EntityBlockCircuitElement::updateFromProperties() || refresh;
+
 	if (refresh)
 	{
 		getProperties().forceResetUpdateForAllProperties();
@@ -72,31 +114,61 @@ bool EntityBlockCircuitTerminal::updateFromProperties(void)
 std::string EntityBlockCircuitTerminal::getTerminalName() const
 {
 	auto prop = getProperties().getProperty("Terminal Name");
-	if (!prop)
-	{
-		return getBlockTitle();
-	}
 	auto strProp = dynamic_cast<const EntityPropertiesString*>(prop);
 	if (strProp)
 	{
 		return strProp->getValue();
 	}
+	std::string name = getNameOnly();
+	size_t pos = name.rfind(" (");
+	if (pos != std::string::npos && name.back() == ')')
+	{
+		return name.substr(pos + 2, name.size() - pos - 3);
+	}
 	return getBlockTitle();
 }
 
-int EntityBlockCircuitTerminal::getTerminalIndex() const
+void EntityBlockCircuitTerminal::setTerminalName(const std::string& _name)
 {
-	auto prop = getProperties().getProperty("Terminal Index");
-	if (!prop)
+	auto prop = getProperties().getProperty("Terminal Name");
+	auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
+	if (strProp)
 	{
-		return 1;
+		strProp->setValue(_name);
 	}
-	auto intProp = dynamic_cast<const EntityPropertiesInteger*>(prop);
-	if (intProp)
+	setBlockTitle(_name);
+
+	std::string currentPath = getName();
+	if (!currentPath.empty())
 	{
-		return intProp->getValue();
+		std::string basePath = currentPath;
+		size_t pos = basePath.rfind(" (");
+		if (pos != std::string::npos && basePath.back() == ')')
+		{
+			basePath = basePath.substr(0, pos);
+		}
+		std::string newPath = basePath + " (" + _name + ")";
+		if (newPath != currentPath)
+		{
+			setName(newPath);
+			if (getObserver() != nullptr)
+			{
+				ot::JsonDocument doc;
+				doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_VIEW_RenameEntityName, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_FROM, ot::JsonString(currentPath, doc.GetAllocator()), doc.GetAllocator());
+				doc.AddMember(OT_ACTION_PARAM_PATH_To, ot::JsonString(newPath, doc.GetAllocator()), doc.GetAllocator());
+
+				getObserver()->sendMessageToViewer(doc);
+			}
+		}
 	}
-	return 1;
+
+	if (getObserver() != nullptr)
+	{
+		createBlockItem();
+	}
+
+	setModified();
 }
 
 double EntityBlockCircuitTerminal::getRotation() const

@@ -43,7 +43,7 @@ public:
 
 	// Terminal specific methods
 	std::string getTerminalName() const;
-	int getTerminalIndex() const;
+	void setTerminalName(const std::string& _name);
 
 	double getRotation() const;
 	bool getFlipHorizontal() const;
