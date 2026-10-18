@@ -109,3 +109,8 @@ std::string Circuit::findElement(const ot::UID& key) {
 		return "Not Found!";
 	}
 }
+
+void Circuit::addSubcircuit(const std::string& _modelName, std::shared_ptr<Circuit> _subcircuit)
+{
+	m_subcircuits[_modelName] = _subcircuit;
+}

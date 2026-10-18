@@ -47,6 +47,8 @@ public:
 	// @brief Resets the node assigner state (node counter and node number map).
 	void reset();
 
+	// @brief Assigns node numbers to a subcircuit based on the provided connections and entities.
+	void assignSubcircuitNodes(Circuit& _subcircuit, const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _connections, const std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _entities);
 private:
 
 	std::string findRoot(const std::string& _connectableName);
@@ -63,6 +65,7 @@ private:
 	std::unordered_map<std::string, int> m_rank;
 	std::unordered_map<std::string, bool> m_hasGND;
 	std::unordered_map<std::string, std::string> m_labelName;
+	std::unordered_map<std::string, std::string> m_rootToNodeNumber;
 
 	unsigned long long m_currentNodeNumber = 1;
 	std::map<std::pair<ot::UID, std::string>, std::string> m_connectionNodeNumbers;

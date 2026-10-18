@@ -23,7 +23,9 @@
 
 // Open Twin Header
 #include "OTBlockEntities/Circuit/EntityBlockCircuitLabel.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 #include "OTCore/Logging/Logger.h"
+#include <algorithm>
 
 void NodeAssigner::reset()
 {
@@ -32,6 +34,41 @@ void NodeAssigner::reset()
 	m_rank.clear();
 	m_hasGND.clear();
 	m_labelName.clear();
+	m_rootToNodeNumber.clear();
+}
+
+void NodeAssigner::assignSubcircuitNodes(Circuit& _subcircuit, const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _connections, const std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _entities)
+{
+	// Own node assignment for subcircuits, as they are not part of the main circuit and may have their own internal connections and nodes.
+	reset();
+	std::map<ot::UID, ot::UIDList> dummyMap;
+	assignNodeNumbers(dummyMap, _subcircuit, const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>&>(_connections), const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&>(_entities), _subcircuit.getEditorName());
+	
+	// Collect terminals and sort them by Terminal Name
+	std::vector<std::pair<std::string, std::string>> namedTerminalNodes;
+	for (const auto& [id, blockEntity] : _entities)
+	{
+		auto* terminalEntity = dynamic_cast<EntityBlockCircuitTerminal*>(blockEntity.get());
+		if (terminalEntity)
+		{
+			std::string connectableKey = createConnectableKey(terminalEntity->getEntityID(), "pin");
+			std::string root = findRoot(connectableKey);
+			std::string nodeNumber = m_rootToNodeNumber[root]; 
+			namedTerminalNodes.push_back({ terminalEntity->getTerminalName(), nodeNumber });
+		}
+	}
+
+	std::sort(namedTerminalNodes.begin(), namedTerminalNodes.end(), [](const auto& a, const auto& b) {
+		return a.first < b.first;
+	});
+
+	std::vector<std::string> orderedTerminalNodes;
+	for (const auto& pair : namedTerminalNodes)
+	{
+		orderedTerminalNodes.push_back(pair.second);
+	}
+
+	_subcircuit.setOrderedTerminalNodes(orderedTerminalNodes);
 }
 
 std::string NodeAssigner::findRoot(const std::string& _connectableName)
@@ -221,16 +258,16 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 	}
 
 	// Step 4: Assign node numbers to each unique root
-	std::unordered_map<std::string, std::string> rootToNodeNumber;
+	m_rootToNodeNumber.clear();
 
 	for (const auto& [pinKey, _] : m_parent)
 	{
 		std::string root = findRoot(pinKey);
-		if (rootToNodeNumber.find(root) == rootToNodeNumber.end())
+		if (m_rootToNodeNumber.find(root) == m_rootToNodeNumber.end())
 		{
 			if (m_hasGND[root])
 			{
-				rootToNodeNumber[root] = "0";
+				m_rootToNodeNumber[root] = "0";
 			}
 			else if (!m_labelName[root].empty())
 			{
@@ -257,11 +294,11 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 						label = std::to_string(m_currentNodeNumber++);
 					}
 				}
-				rootToNodeNumber[root] = label;
+				m_rootToNodeNumber[root] = label;
 			}
 			else
 			{
-				rootToNodeNumber[root] = std::to_string(m_currentNodeNumber++);
+				m_rootToNodeNumber[root] = std::to_string(m_currentNodeNumber++);
 			}
 		}
 	}
@@ -273,7 +310,7 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 		ot::GraphicsConnectionCfg cfg = connEntity->getConnectionCfg();
 		Connection myConn(cfg);
 		std::string originPin = createConnectableKey(myConn.getOriginUid(), myConn.getOriginConnectable());
-		std::string nodeNumber = rootToNodeNumber[findRoot(originPin)];
+		std::string nodeNumber = m_rootToNodeNumber[findRoot(originPin)];
 		myConn.setNodeNumber(nodeNumber);
 		_circuit.addConnection(myConn.getOriginConnectable(), myConn.getOriginUid(), myConn);
 		_circuit.addConnection(myConn.getDestinationConnectable(), myConn.getDestinationUid(), myConn);

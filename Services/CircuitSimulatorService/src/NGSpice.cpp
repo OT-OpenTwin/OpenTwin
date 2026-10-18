@@ -24,7 +24,12 @@
 
 // Open Twin Header
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitSubcircuit.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
+#include "CircuitElements/SubCircuit.h"
+#include "BlockEntityHandler.h"
 #include "OTCore/Logging/Logger.h"
+#include <algorithm>
 
 NGSpice::NGSpice()
 	: m_netlistGenerator(m_elementNamingRegistry)
@@ -73,6 +78,103 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 
 		ot::UID uid = blockEntity->getEntityID();
 		circuit.addElement(uid, std::move(elementPtr));
+	}
+
+	// 2b. Load and configure any subcircuits referenced in this circuit
+	for (auto& [blockID, blockEntity] : _allEntitiesByBlockID)
+	{
+		auto* subcircuitBlock = dynamic_cast<EntityBlockCircuitSubcircuit*>(blockEntity.get());
+		if (subcircuitBlock)
+		{
+			std::string modelName = subcircuitBlock->getSubcircuitName();
+			if (modelName.empty()) continue;
+
+			std::string subcircuitFolderPath = modelName;
+			if (subcircuitFolderPath.rfind("Circuits/", 0) != 0)
+			{
+				subcircuitFolderPath = "Circuits/" + subcircuitFolderPath;
+			}
+
+			std::string spiceModelName = subcircuitFolderPath;
+			if (spiceModelName.rfind("Circuits/", 0) == 0)
+			{
+				spiceModelName = spiceModelName.substr(std::string("Circuits/").length());
+			}
+			std::replace(spiceModelName.begin(), spiceModelName.end(), ' ', '_');
+
+			if (circuit.getSubcircuits().find(spiceModelName) == circuit.getSubcircuits().end())
+			{
+				auto subEntities = BlockEntityHandler().findAllBlockEntitiesByBlockID(subcircuitFolderPath);
+				auto subConnections = BlockEntityHandler().findAllEntityBlockConnections(subcircuitFolderPath);
+
+				if (!subEntities.empty())
+				{
+					auto subCircuitPtr = std::make_shared<Circuit>();
+					subCircuitPtr->setEditorName(subcircuitFolderPath);
+					subCircuitPtr->setId(subcircuitFolderPath);
+
+					// Sync terminal names from the subcircuit editor terminals
+					std::vector<std::string> orderedTermNames;
+					for (auto& [subId, subBlock] : subEntities)
+					{
+						auto* term = dynamic_cast<EntityBlockCircuitTerminal*>(subBlock.get());
+						if (term)
+						{
+							orderedTermNames.push_back(term->getTerminalName());
+						}
+					}
+					std::sort(orderedTermNames.begin(), orderedTermNames.end());
+					if (!orderedTermNames.empty())
+					{
+						auto itElem = circuit.getMapOfElements().find(subcircuitBlock->getEntityID());
+						if (itElem != circuit.getMapOfElements().end())
+						{
+							auto* subElem = dynamic_cast<CircuitElementSubcircuit*>(itElem->second.get());
+							if (subElem)
+							{
+								subElem->setOrderedTerminalNames(orderedTermNames);
+							}
+						}
+					}
+
+					// Create subcircuit elements
+					for (auto& [subId, subBlock] : subEntities)
+					{
+						subCircuitPtr->addBlockEntity(subBlock->getClassName(), subBlock);
+
+						CircuitElement* subElem = CircuitElement::createFromClassName(subBlock->getClassName());
+						if (!subElem) continue;
+
+						auto elemPtr = std::unique_ptr<CircuitElement>(subElem);
+						elemPtr->initFromEntity(subBlock, subcircuitFolderPath);
+
+						if (!elemPtr->isMeter())
+						{
+							std::string netlistName = m_elementNamingRegistry.registerElement(subBlock->getNameOnly(), elemPtr->getNetlistPrefix());
+							elemPtr->setNetlistName(netlistName);
+						}
+						elemPtr->setCustomName(subBlock->getNameOnly());
+
+						auto* circuitEntity = dynamic_cast<EntityBlockCircuitElement*>(subBlock.get());
+						if (circuitEntity)
+						{
+							std::string circuitModel = circuitEntity->getCircuitModel();
+							circuitModel = Application::instance()->extractStringAfterDelimiter(circuitModel, '/', 2);
+							elemPtr->setModel(circuitModel);
+							elemPtr->setFolderName(circuitEntity->getFolderName());
+						}
+
+						subCircuitPtr->addElement(subBlock->getEntityID(), std::move(elemPtr));
+					}
+
+					// Assign subcircuit node numbers
+					m_nodeAssigner.assignSubcircuitNodes(*subCircuitPtr, subConnections, subEntities);
+
+					// Register in main circuit
+					circuit.addSubcircuit(spiceModelName, subCircuitPtr);
+				}
+			}
+		}
 	}
 
 	// 3. Assign node numbers via NodeAssigner

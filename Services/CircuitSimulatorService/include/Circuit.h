@@ -56,10 +56,22 @@ public:
 	//additionalFunctions
 	void addConnection(std::string connactable,const ot::UID& key, const Connection& obj);
 	std::string findElement(const ot::UID& key);
+	
+	// Subcircuit management
+	void addSubcircuit(const std::string& _modelName, std::shared_ptr<Circuit> _subcircuit);
+	const std::map<std::string, std::shared_ptr<Circuit>>& getSubcircuits() const { return m_subcircuits; }
+	void setOrderedTerminalNodes(const std::vector<std::string>& _nodes) { m_orderedTerminalNodes = _nodes; }
+	const std::vector<std::string>& getOrderedTerminalNodes() const { return m_orderedTerminalNodes; }
+	void setOrderedPortNodes(const std::vector<std::string>& _nodes) { setOrderedTerminalNodes(_nodes); }
+	const std::vector<std::string>& getOrderedPortNodes() const { return getOrderedTerminalNodes(); }
 		
 private:
 	std::map <ot::UID, std::unique_ptr<CircuitElement>> mapOfElements;
 	std::map <std::string, std::vector<std::shared_ptr<ot::EntityBlock>>> mapOfEntityBlocks;
 	std::string editorName;
 	std::string id;
+
+	// Subcircuit management
+	std::map<std::string, std::shared_ptr<Circuit>> m_subcircuits; 
+	std::vector<std::string> m_orderedTerminalNodes;                   
 };

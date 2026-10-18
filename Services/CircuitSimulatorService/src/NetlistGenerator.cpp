@@ -106,6 +106,28 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
     std::string simulationType = simTypeProp->getValue();
     auto strategy = createSimulationStrategy(simulationType);
 
+    // 2b. Generate .SUBCKT definitions
+    for (const auto& [subName, subCircuit] : _circuit.getSubcircuits())
+    {
+        // 1. Header: .SUBCKT <SubcircuitName> <Terminal1_Node> <Terminal2_Node> ...
+        std::string subcktHeader = "circbyline .SUBCKT " + subName;
+        for (const auto& terminalNode : subCircuit->getOrderedTerminalNodes())
+        {
+            subcktHeader += " " + terminalNode;
+        }
+        netlist.push_back(subcktHeader);
+		// 2. Inner elements of the subcircuit
+        for (const auto& [uid, innerElem] : subCircuit->getMapOfElements())
+        {
+            std::string innerLine = buildElementLine(innerElem.get(), "", *strategy);
+            innerLine += buildNodeNumbers(innerElem.get());
+            innerLine += innerElem->getNetlistValue();
+            netlist.push_back(innerLine);
+        }
+		// 3. End of subcircuit definition
+        netlist.push_back("circbyline .ENDS " + subName);
+    }
+
     // 3. Create Element lines 
     std::vector<MeterData> voltageMeterData;
     std::vector<MeterData> currentMeterData;
@@ -177,6 +199,11 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
             if (modelType.empty()) {
                 // BehavioralSource expressions are natively evaluated by NGSpice - no {} wrapping needed
                 if (circuitElement->type() == "BehavioralSource") {
+                    line += circuitElement->getNetlistValue();
+                }
+                else if (circuitElement->type() == "Subcircuit") {
+					// Writes the subcircuit element line with its model name and node connections
+                    // Result: circbyline X1 <Node1> <Node2> ... <ModelName>
                     line += circuitElement->getNetlistValue();
                 }
                 else if (circuitElement->type() == "Capacitor") {
