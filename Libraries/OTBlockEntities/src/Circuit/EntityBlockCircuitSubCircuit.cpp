@@ -20,11 +20,14 @@
 // OpenTwin header
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitSubcircuit.h"
-#include "OTGui/Graphics/GraphicsItemFileCfg.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
+#include "OTGui/Graphics/Builder/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
 
 // Third party header
 #include <bsoncxx/builder/basic/array.hpp>
+#include <algorithm>
 
 static EntityFactoryRegistrar<EntityBlockCircuitSubcircuit> registrar(EntityBlockCircuitSubcircuit::className());
 
@@ -42,26 +45,35 @@ EntityBlockCircuitSubcircuit::EntityBlockCircuitSubcircuit(ot::UID ID, EntityBas
 		OT_INFO_SERVICE_TYPE_CircuitSimulatorService
 	);
 
+	this->clearConnectors();
+	m_orderedTerminalNames.clear();
+
+	// Initially, subcircuit has no terminals
 	resetModified();
 }
 
 void EntityBlockCircuitSubcircuit::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
-	EntityPropertiesString::createProperty("Subcircuit Properties", "Model Name", "Subcircuit1", "default", getProperties());
+	EntityPropertiesString::createProperty("Subcircuit Properties", "Subcircuit Name", "Subcircuit1", "default", getProperties());
 }
 
 
 bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 {
 	bool refresh = EntityBlockCircuitElement::updateFromProperties();
-	auto prop = getProperties().getProperty("Model Name");
+	auto prop = getProperties().getProperty("Subcircuit Name");
 	if (prop && prop->needsUpdate())
 	{
 		auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
 		if (strProp)
 		{
 			setBlockTitle(strProp->getValue());
+		}
+		if (getObserver() != nullptr)
+		{
+			createBlockItem();
+			getObserver()->connectionChanged(this);
 		}
 		refresh = true;
 	}
@@ -73,9 +85,9 @@ bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 }
 
 
-std::string EntityBlockCircuitSubcircuit::getSubcircuitModelName() const
+std::string EntityBlockCircuitSubcircuit::getSubcircuitName() const
 {
-	auto prop = getProperties().getProperty("Model Name");
+	auto prop = getProperties().getProperty("Subcircuit Name");
 	auto strProp = dynamic_cast<const EntityPropertiesString*>(prop);
 	if (strProp)
 	{
@@ -84,9 +96,9 @@ std::string EntityBlockCircuitSubcircuit::getSubcircuitModelName() const
 	return getBlockTitle();
 }
 
-void EntityBlockCircuitSubcircuit::setSubcircuitModelName(const std::string& _name)
+void EntityBlockCircuitSubcircuit::setSubcircuitName(const std::string& _name)
 {
-	auto prop = getProperties().getProperty("Model Name");
+	auto prop = getProperties().getProperty("Subcircuit Name");
 	auto strProp = dynamic_cast<EntityPropertiesString*>(prop);
 	if (strProp)
 	{
@@ -114,32 +126,118 @@ bool EntityBlockCircuitSubcircuit::getFlipVertical() const
 	auto propertyFlip = dynamic_cast<const EntityPropertiesBoolean*>(propertyBase);
 	return propertyFlip ? propertyFlip->getValue() : false;
 }
-void EntityBlockCircuitSubcircuit::syncConnectors(const std::vector<std::string>& _orderedTerminalNames)
-{
-	m_orderedTerminalNames = _orderedTerminalNames;
-	// Update connectors
-	for (const auto& terminalName : m_orderedTerminalNames)
-	{
-		ot::Connector connector = { ot::ConnectorType::Any, terminalName, terminalName };
-		this->addConnector(connector);
-	}
-	setModified();
-}
-
 
 ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 {
-	ot::GraphicsItemFileCfg* newConfig = new ot::GraphicsItemFileCfg;
-	newConfig->setName("EntityBlockCircuitSubcircuit");
-	newConfig->setGraphicsItemFlags(ot::GraphicsItemCfg::ItemIsMoveable | ot::GraphicsItemCfg::ItemSnapsToGridTopLeft | ot::GraphicsItemCfg::ItemUserTransformEnabled | ot::GraphicsItemCfg::ItemParticipatesInStateHandling | ot::GraphicsItemCfg::ItemForwardsState | ot::GraphicsItemCfg::ItemIsSelectable | ot::GraphicsItemCfg::ItemIsDoubleClickable);
-	newConfig->setFile("Circuit/Subcircuit.ot.json");
-	newConfig->addStringMapEntry("Name", getSubcircuitModelName());
-	ot::Transform transform;
-	transform.setRotation(getRotation());
-	transform.setFlipState(ot::Transform::FlipHorizontally, getFlipHorizontal());
-	transform.setFlipState(ot::Transform::FlipVertically, getFlipVertical());
-	newConfig->setTransform(transform);
-	return newConfig;
+	std::vector<std::string> terminals = m_orderedTerminalNames;
+
+	if (getObserver() != nullptr)
+	{
+		std::string modelName = getSubcircuitName();
+		const auto* graphicsItemMap = getObserver()->getGraphicsItemMap(modelName);
+		if (!graphicsItemMap && modelName.rfind("Circuits/", 0) != 0)
+		{
+			graphicsItemMap = getObserver()->getGraphicsItemMap("Circuits/" + modelName);
+		}
+
+		if (graphicsItemMap != nullptr)
+		{
+			ot::UIDList graphicsItemsUIDs = graphicsItemMap->getAllIDs();
+			for (auto uid : graphicsItemsUIDs)
+			{
+				EntityBase* entity = nullptr;
+				// TODO: Load or get entity for uid once method is available
+
+				EntityBlockCircuitTerminal* terminal = dynamic_cast<EntityBlockCircuitTerminal*>(entity);
+				if (terminal != nullptr)
+				{
+					terminals.push_back(terminal->getTerminalName());
+				}
+			}
+		}
+	}
+
+	if (terminals != m_orderedTerminalNames)
+	{
+		m_orderedTerminalNames = terminals;
+		this->clearConnectors();
+		for (const auto& termName : m_orderedTerminalNames)
+		{
+			this->addConnector(ot::Connector(ot::ConnectorType::Any, termName, ""));
+		}
+		setModified();
+		if (getObserver() != nullptr)
+		{
+			getObserver()->connectionChanged(this);
+		}
+	}
+	else if (m_orderedTerminalNames.empty() && getConnectorCount() > 0)
+	{
+		this->clearConnectors();
+		setModified();
+	}
+
+	ot::GraphicsFlowItemBuilder block;
+	block.setName(this->getClassName());
+
+	std::string title = getSubcircuitName();
+	if (title.empty())
+	{
+		title = createBlockHeadline();
+	}
+	block.setTitle(title);
+
+	const ot::Color colourTitle(ot::RoyalBlue);
+	block.setTitleBackgroundGradientColor(colourTitle);
+	block.setLeftTitleCornerImagePath("CircuitElementImages/Subcircuit");
+
+	size_t numTerminals = terminals.size();
+	std::vector<std::string> leftTerminals;
+	std::vector<std::string> rightTerminals;
+
+	if (numTerminals == 1)
+	{
+		leftTerminals.push_back(terminals[0]);
+	}
+	else if (numTerminals == 2)
+	{
+		leftTerminals.push_back(terminals[0]);
+		rightTerminals.push_back(terminals[1]);
+	}
+	else if (numTerminals > 2)
+	{
+		size_t numLeft = (numTerminals + 1) / 2;
+		for (size_t i = 0; i < numLeft; ++i)
+		{
+			leftTerminals.push_back(terminals[i]);
+		}
+		for (size_t i = numLeft; i < numTerminals; ++i)
+		{
+			rightTerminals.push_back(terminals[i]);
+		}
+	}
+
+	for (const auto& termName : leftTerminals)
+	{
+		block.addLeft(termName, "", ot::GraphicsFlowItemConnector::Circle);
+	}
+	for (const auto& termName : rightTerminals)
+	{
+		block.addRight(termName, "", ot::GraphicsFlowItemConnector::Circle);
+	}
+
+	auto graphicsItemConfig = block.createGraphicsItem();
+	if (graphicsItemConfig)
+	{
+		ot::Transform transform;
+		transform.setRotation(getRotation());
+		transform.setFlipState(ot::Transform::FlipHorizontally, getFlipHorizontal());
+		transform.setFlipState(ot::Transform::FlipVertically, getFlipVertical());
+		graphicsItemConfig->setTransform(transform);
+		graphicsItemConfig->setGraphicsItemFlags(graphicsItemConfig->getGraphicsItemFlags() | ot::GraphicsItemCfg::ItemIsDoubleClickable);
+	}
+
+	return graphicsItemConfig;
 }
 
 
@@ -165,11 +263,9 @@ void EntityBlockCircuitSubcircuit::readSpecificDataFromDataBase(const bsoncxx::d
 			m_orderedTerminalNames.push_back(std::string(terminalElem.get_string().value));
 		}
 	}
-	else if (_doc_view.find("OrderedPorts") != _doc_view.end())
+
+	if (m_orderedTerminalNames.empty())
 	{
-		for (const auto& portElem : _doc_view["OrderedPorts"].get_array().value)
-		{
-			m_orderedTerminalNames.push_back(std::string(portElem.get_string().value));
-		}
+		this->clearConnectors();
 	}
 }

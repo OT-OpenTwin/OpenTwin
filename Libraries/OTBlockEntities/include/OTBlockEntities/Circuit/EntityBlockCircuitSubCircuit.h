@@ -39,18 +39,15 @@ public:
 	virtual std::string getFolderName() override { return "Subcircuits"; };
 	virtual ot::GraphicsItemCfg* createBlockCfg() override;
 
-	// Subcircuit Modelname 
-	std::string getSubcircuitModelName() const;
-	void setSubcircuitModelName(const std::string& _name);
+	// Subcircuit Name
+	std::string getSubcircuitName() const;
+	void setSubcircuitName(const std::string& _name);
 
 	double getRotation() const;
 	bool getFlipHorizontal() const;
 	bool getFlipVertical() const;
 
-	// synchronize dynamic terminals 
-	void syncConnectors(const std::vector<std::string>& _orderedTerminalNames);
 	const std::vector<std::string>& getOrderedTerminalNames() const { return m_orderedTerminalNames; }
-	const std::vector<std::string>& getOrderedPortNames() const { return getOrderedTerminalNames(); }
 protected:
 	virtual void addStorageData(bsoncxx::builder::basic::document& _storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& _doc_view, std::map<ot::UID, EntityBase*>& _entityMap) override;
