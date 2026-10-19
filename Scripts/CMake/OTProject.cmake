@@ -48,7 +48,7 @@ if(MSVC)
         $<$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>:/sdl>
         /W3
         /w34456 /w34457 /w34458 /w34459
-        /wd4996
+        /w34996
         /errorReport:queue
         /FC
         /diagnostics:column
@@ -74,7 +74,8 @@ elseif(OT_TOOLCHAIN_GCC)
     add_compile_options(
         -Wall
         -Wshadow
-        -Wno-deprecated-declarations
+        -Wno-unknown-pragmas
+        -Wno-reorder
         -fstack-protector-strong
         -ffp-contract=off
         # /sdl, not for targets with ot_add_compile_options(<target> NO_SDL)
@@ -348,6 +349,10 @@ function(_ot_initialize_target TARGET_NAME ROOT_PATH_VAR)
 
     add_library(${_core} OBJECT ${_src} ${_hdr})
 
+    if(NOT OT_PLATFORM_WINDOWS)
+        set_property(TARGET ${_core} PROPERTY POSITION_INDEPENDENT_CODE ON)
+    endif()
+
     set_target_properties(${_core} PROPERTIES
         CXX_STANDARD 20
         CXX_STANDARD_REQUIRED ON
@@ -505,7 +510,10 @@ function(_ot_apply_compile_option_internal CORE_TARGET OPTION)
         return()
     endif()
 
-    target_compile_options(${CORE_TARGET} PRIVATE "${OPTION}")
+    ot_platform_compile_option(_flag "${OPTION}")
+    if(NOT "${_flag}" STREQUAL "")
+        target_compile_options(${CORE_TARGET} PRIVATE ${_flag})
+    endif()
 endfunction()
 
 function(ot_add_compile_options TARGET_NAME)
