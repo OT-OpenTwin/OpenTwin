@@ -4,7 +4,6 @@ project(LibraryManagementService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(LibraryManagementService OT_LIBRARY_MANAGEMENT_SERVICE_ROOT_PATH LIBRARYMANAGEMENT_EXPORTS)
-ot_disable_warnings(LibraryManagementService 4996)
 
 ot_add_dependency(LibraryManagementService
     OTSystem

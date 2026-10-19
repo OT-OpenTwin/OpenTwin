@@ -4,7 +4,6 @@ project(PyritService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(PyritService OT_PYRIT_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
-ot_disable_warnings(PyritService 4996)
 
 ot_add_dependency(PyritService
     OTSystem

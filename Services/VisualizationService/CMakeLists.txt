@@ -4,7 +4,6 @@ project(VisualizationService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(VisualizationService OT_VISUALIZATION_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
-ot_disable_warnings(VisualizationService 4996)
 
 ot_add_dependency(VisualizationService
     OTSystem

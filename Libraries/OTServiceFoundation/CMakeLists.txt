@@ -4,7 +4,7 @@ project(OTServiceFoundation LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTServiceFoundation OT_FOUNDATION_ROOT_PATH OPENTWINFOUNDATION_EXPORTS)
-ot_add_compile_options(OTServiceFoundation /wd4996 /wd4828)
+ot_add_compile_options(OTServiceFoundation /wd4828)
 ot_add_dependency(OTServiceFoundation
     OTSystem
     OTCore
