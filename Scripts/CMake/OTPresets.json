@@ -18,6 +18,9 @@
         "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
+      "vendor": {
+          "microsoft.com/VisualStudioSettings/CMake/1.0": { "disableExternalAnalysis": true }
+      },
       "warnings": { "unusedCli": false },
       "environment": {
         "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
@@ -34,6 +37,9 @@
         "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
         "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
         "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+      },
+      "vendor": {
+          "microsoft.com/VisualStudioSettings/CMake/1.0": { "disableExternalAnalysis": true }
       },
       "warnings": { "unusedCli": false },
       "environment": {

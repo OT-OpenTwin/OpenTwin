@@ -103,7 +103,9 @@ every target. The main pieces are:
 * C++20 with compiler extensions disabled.
 * Flags such as ``/permissive-``,
   ``/Zc:__cplusplus``, ``/Zc:preprocessor``, ``/EHsc``, ``/MP`` for parallel
-  compilation, and external header warning suppression.
+  compilation, and external header warning suppression. The background code
+  analysis in Visual Studio skips external headers as well
+  (``disableExternalAnalysis`` in ``OTPresets.json``).
 * The dynamic CRT by default: ``/MD`` in Release, ``/MDd`` in Debug. A target
   overrides this only when it has to.
 * Common definitions everywhere (``WIN32``, ``_WIN32``, ``_WINDOWS``,
