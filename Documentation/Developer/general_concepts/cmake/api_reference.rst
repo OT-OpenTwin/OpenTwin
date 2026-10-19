@@ -71,11 +71,21 @@ Compile options and definitions
     Adds private preprocessor definitions to the core target.
 
 ``ot_add_compile_options(<Target> <opt> ...)``
-    Adds raw compile options to the core target. A bare numeric argument is
-    treated as a warning to disable and becomes ``/wd<number>``.
+    Adds compile options to the core target. A bare numeric argument is
+    an MSVC warning to disable and becomes ``/wd<number>``. With GCC, MSVC
+    flags such as ``/utf-8`` are translated to their GCC equivalent, and so are
+    warning numbers that have one, for example ``4996`` (deprecated functions)
+    becomes ``-Wno-deprecated-declarations``. Other warning numbers have no
+    effect with GCC. An MSVC flag without a GCC equivalent stops the configure
+    on every platform, so it already fails on Windows.
+
+    ``NO_SDL`` builds the target without the global ``/sdl`` security checks,
+    for example ``ot_add_compile_options(OTWidgets NO_SDL)``. It is set for the
+    projects that had no SDL checks in their Visual Studio projects.
 
 ``ot_disable_warnings(<Target> <id> ...)``
-    Convenience wrapper that suppresses warnings by numeric ID. Non-numeric
+    Convenience wrapper that suppresses warnings by numeric ID. With GCC the
+    IDs are translated like in ``ot_add_compile_options``. Non-numeric
     arguments produce an author warning (use ``ot_add_compile_options`` for
     flags).
 

@@ -33,7 +33,8 @@ All of the shared CMake logic lives in ``Scripts/CMake``:
        A Qt outside the ThirdParty folder is rejected, so a system Qt is never picked up by accident.
    * - ``OTPlatform.cmake``
      - Everything that differs between platforms and compilers: the system libraries behind
-       ``OSLibs``, the ``WINLIB:`` tokens, warning IDs and the Qt library file names.
+       ``OSLibs``, the ``WINLIB:`` tokens, warning IDs, the GCC translation of MSVC flags and the
+       Qt library file names.
    * - ``OTPresets.json``
      - The shared ``CMakePresets`` definition that every project includes, so
        the configurations (such as ``windows-debug`` and ``windows-release``)
@@ -108,12 +109,23 @@ every target. The main pieces are:
 * Common definitions everywhere (``WIN32``, ``_WIN32``, ``_WINDOWS``,
   ``UNICODE``, ``_UNICODE``), plus a few Debug only ones.
 * ``/OPT:REF`` and ``/OPT:ICF`` for Release linking.
+* Warning level ``/W3`` plus the shadowing warnings (C4456 to C4459).
+  Deprecation warnings (C4996) stay warnings even with ``/sdl``, a project
+  turns them off with ``ot_disable_warnings(<Target> 4996)``. Third party
+  headers are system headers, so their warnings are not shown.
+* ``/sdl`` security checks, except for targets with
+  ``ot_add_compile_options(<Target> NO_SDL)``.
 * ``_DEBUG`` in Debug and ``NDEBUG`` in Release on the core (Python targets
   differ, see below).
 
 .. note::
-   The overal compiler settings will be adjusted in the future.
-   E.g. ``/W3`` (Warning level 3) will be added globally.
+   With GCC, ``OTProject.cmake`` uses the matching flags: ``-Wall``, ``-Wshadow``,
+   ``-fstack-protector-strong``, ``-ffp-contract=off`` and, instead of ``/sdl``,
+   ``-Wformat-security`` and ``_FORTIFY_SOURCE`` in Release (not for targets with
+   ``NO_SDL``). ``-Wno-unknown-pragmas`` keeps the MSVC ``#pragma warning`` lines in
+   the sources quiet, ``-Wno-reorder`` the member initialization order, which MSVC
+   does not report either. Targets are built as position independent code, which
+   shared libraries need on Linux.
 
 .. _target CMake Runtime Library:
 

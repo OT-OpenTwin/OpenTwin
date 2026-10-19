@@ -85,7 +85,6 @@ A service is a shared library too.
    include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
    ot_initialize_lib(LoggerService OT_LOGGER_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
-   ot_disable_warnings(LoggerService 4996)
 
    ot_add_dependency(LoggerService
        OTSystem
@@ -225,7 +224,8 @@ These act on the core target. Call them after ``ot_initialize_*`` and before
    * - ``ot_add_compile_definitions(T defs…)``
      - Adds private preprocessor definitions.
    * - ``ot_add_compile_options(T opts…)``
-     - Adds raw compile flags (a bare number becomes ``/wd<number>``).
+     - Adds compile flags (a bare number becomes ``/wd<number>``,
+       ``NO_SDL`` turns off the global ``/sdl``).
    * - ``ot_disable_warnings(T ids…)``
      - Suppresses warnings by numeric ID (``/wd<id>``).
    * - ``ot_set_subsystem(T CONSOLE|WINDOWS)``
