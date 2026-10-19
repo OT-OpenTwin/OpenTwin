@@ -1,21 +1,4 @@
 @ECHO OFF
 
-IF DEFINED OT_CERT_SETUP_COMPLETED (
-	goto END
-)
-
-IF DEFINED OPEN_TWIN_CERTS_PATH (
-	SET "OPEN_TWIN_CA_CERT=%OPEN_TWIN_CERTS_PATH%\ca.pem"
-	SET "OPEN_TWIN_CERT_KEY=%OPEN_TWIN_CERTS_PATH%\certificateKeyFile.pem"
-	SET "OPEN_TWIN_SERVER_CERT=%OPEN_TWIN_CERTS_PATH%\server.pem"
-	SET "OPEN_TWIN_SERVER_CERT_KEY=%OPEN_TWIN_CERTS_PATH%\server-key.pem"
-) else (
-	SET OPEN_TWIN_CA_CERT=Certificates\ca.pem
-	SET OPEN_TWIN_CERT_KEY=Certificates\certificateKeyFile.pem
-	SET OPEN_TWIN_SERVER_CERT=Certificates\server.pem
-	SET OPEN_TWIN_SERVER_CERT_KEY=Certificates\server-key.pem
-)
-
-SET OT_CERT_SETUP_COMPLETED=1
-
-:END
+REM ot_launcher prints NAME=VALUE lines; SET makes them variables of the calling batch file.
+FOR /F "delims=" %%V IN ('call "%~dp0python.exe" -B -m ot_launcher setup certificates') DO SET "%%V"

@@ -1,21 +1,19 @@
 @ECHO OFF
 
-REM Shutdown microservices
-taskkill /IM "open_twin.exe" /F 2> nul
-
-taskkill /IM "PythonExecution.exe" /F 2> nul
-
-REM Shutdown ui
-taskkill /IM "uiFrontend.exe" /F 2> nul
-
-REM Shutdown Apache server
-taskkill /IM "httpd.exe" /F 2> nul
-
-:waitloop
-tasklist | find /I "httpd.exe" >nul
-if not errorlevel 1 (
-    timeout /t 1 >nul
-    goto waitloop
+REM Deployment: python.exe and the ot_launcher package are next to this file.
+IF EXIST "%~dp0python.exe" IF EXIST "%~dp0ot_launcher\__main__.py" (
+	"%~dp0python.exe" -B -m ot_launcher shutdown
+	EXIT /B
 )
 
-:END
+REM Repository: Scripts\Launcher, the Python scripts are in Scripts\Python.
+IF EXIST "%~dp0..\Python\shutdown_all.py" (
+	CALL "%~dp0..\Python\set_python.bat"
+) ELSE (
+	ECHO Neither a Deployment nor the OpenTwin repository: "%~dp0"
+	PAUSE
+	EXIT /B 1
+)
+
+"%OT_PYTHON%" "%~dp0..\Python\shutdown_all.py"
+IF ERRORLEVEL 1 PAUSE

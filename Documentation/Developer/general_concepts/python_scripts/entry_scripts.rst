@@ -120,7 +120,7 @@ Other
      - Creates the local certificates in ``Certificates/Generated`` if they are missing.
        Started by ``Certificates/CreateLocalCertificates/CreateLocalCertificates.bat``.
    * - ``shutdown_all.py``
-     - Stops all running OpenTwin processes. Started by ``Scripts/Launcher/ShutdownAll_py.bat``.
+     - Stops all running OpenTwin processes. Started by ``Scripts/Launcher/ShutdownAll.bat``.
    * - ``helpers.py <command> [ARGS...]``
      - Small tools, one command each, see below. Mostly started by the batch files in ``Scripts/Other``.
 
@@ -140,7 +140,7 @@ The ``helpers.py`` commands:
    build-solution <sln> [ARGS...]     build a Visual Studio solution
    run-python [ARGS...]               the ThirdParty Python                   RunPython.bat
    check-failed-builds                report failed builds of BuildAll        CheckForFailedBuilds.bat, BuildAll.bat
-   register-scheme                    register the opentwin:// URL protocol   RegisterOpenTwinScheme_py.bat
+   register-scheme                    register the opentwin:// URL protocol   RegisterOpenTwinScheme.bat
 
 The start scripts in ``Scripts/Launcher`` do not use these entry scripts. They run the ``ot_launcher`` package
 with the Python of the Deployment, because they also have to work on machines without the repository.

@@ -1,7 +1,7 @@
 @ECHO OFF
+
 SETLOCAL
 
 CD /D %~dp0
 
-CALL OpenTwin_admin.bat
-
+"%~dp0python.exe" -B -m ot_launcher admin
