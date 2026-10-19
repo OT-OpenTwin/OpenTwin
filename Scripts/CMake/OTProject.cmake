@@ -70,7 +70,7 @@ if(MSVC)
         $<${_OT_CFG_RELEASE}:/OPT:ICF>
     )
 
-elseif(GCC)
+elseif(OT_TOOLCHAIN_GCC)
     add_compile_options(
         -Wall
         -Wshadow
