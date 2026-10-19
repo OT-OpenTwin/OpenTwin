@@ -5,6 +5,7 @@ include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(ModelingService OT_MODELING_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
 ot_add_compile_options(ModelingService "$<$<CONFIG:Debug>:/source-charset:ascii>")
+ot_disable_warnings(ModelingService 4996)
 
 ot_add_dependency(ModelingService
     OTSystem

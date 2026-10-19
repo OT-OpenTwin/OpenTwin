@@ -4,6 +4,7 @@ project(DebugService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(DebugService OT_DEBUGSERVICE_ROOT_PATH DEBUGSERVICE_EXPORTS)
+ot_disable_warnings(DebugService 4996)
 
 ot_add_dependency(DebugService
     OTSystem

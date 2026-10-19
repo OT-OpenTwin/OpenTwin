@@ -4,6 +4,7 @@ project(CartesianMeshService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(CartesianMeshService OT_CARTESIAN_MESH_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
+ot_disable_warnings(CartesianMeshService 4996)
 
 ot_add_dependency(CartesianMeshService
     OTSystem

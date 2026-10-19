@@ -4,6 +4,7 @@ project(AuthorisationService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(AuthorisationService OT_AUTHORISATION_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
+ot_disable_warnings(AuthorisationService 4996)
 
 ot_add_dependency(AuthorisationService
     OTSystem
