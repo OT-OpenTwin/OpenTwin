@@ -112,8 +112,7 @@ every target. The main pieces are:
   ``UNICODE``, ``_UNICODE``), plus a few Debug only ones.
 * ``/OPT:REF`` and ``/OPT:ICF`` for Release linking.
 * Warning level ``/W3`` plus the shadowing warnings (C4456 to C4459).
-  Deprecation warnings (C4996) stay warnings even with ``/sdl``, a project
-  turns them off with ``ot_disable_warnings(<Target> 4996)``. Third party
+  Deprecation warnings (C4996) are turned off for all targets. Third party
   headers are system headers, so their warnings are not shown.
 * ``/sdl`` security checks, except for targets with
   ``ot_add_compile_options(<Target> NO_SDL)``.
@@ -122,7 +121,7 @@ every target. The main pieces are:
 
 .. note::
    With GCC, ``OTProject.cmake`` uses the matching flags: ``-Wall``, ``-Wshadow``,
-   ``-fstack-protector-strong``, ``-ffp-contract=off`` and, instead of ``/sdl``,
+   ``-Wno-deprecated-declarations``, ``-fstack-protector-strong``, ``-ffp-contract=off`` and, instead of ``/sdl``,
    ``-Wformat-security`` and ``_FORTIFY_SOURCE`` in Release (not for targets with
    ``NO_SDL``). ``-Wno-unknown-pragmas`` keeps the MSVC ``#pragma warning`` lines in
    the sources quiet, ``-Wno-reorder`` the member initialization order, which MSVC

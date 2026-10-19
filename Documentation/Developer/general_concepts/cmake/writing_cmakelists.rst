@@ -151,7 +151,6 @@ release runtime in every configuration so it can link the shipped Python
    include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
    ot_initialize_bin_python(PythonExecution OT_PYTHON_EXECUTION_ROOT_PATH SESSIONSERVICE_EXPORTS)
-   ot_disable_warnings(PythonExecution 4996)
    ot_add_compile_definitions(PythonExecution QT_NO_KEYWORDS)
    ot_set_subsystem(PythonExecution CONSOLE)
 
