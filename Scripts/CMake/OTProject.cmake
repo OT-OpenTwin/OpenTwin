@@ -48,7 +48,7 @@ if(MSVC)
         $<$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>:/sdl>
         /W3
         /w34456 /w34457 /w34458 /w34459
-        /w34996
+        /wd4996
         /errorReport:queue
         /FC
         /diagnostics:column
@@ -74,6 +74,7 @@ elseif(OT_TOOLCHAIN_GCC)
     add_compile_options(
         -Wall
         -Wshadow
+        -Wno-deprecated-declarations
         -Wno-unknown-pragmas
         -Wno-reorder
         -fstack-protector-strong
