@@ -38,12 +38,17 @@ if(MSVC)
         /Gm-
         /external:anglebrackets
         /external:W0
-        /external:templates-
+        /external:env:OPENTWIN_THIRDPARTY_ROOT
         /GS
         /fp:precise
         /EHsc
         /Gd
         /WX-
+        # Not for targets with ot_add_compile_options(<target> NO_SDL)
+        $<$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>:/sdl>
+        /W3
+        /w34456 /w34457 /w34458 /w34459
+        /wd4996
         /errorReport:queue
         /FC
         /diagnostics:column
@@ -65,6 +70,18 @@ if(MSVC)
         $<${_OT_CFG_RELEASE}:/OPT:ICF>
     )
 
+elseif(GCC)
+    add_compile_options(
+        -Wall
+        -Wshadow
+        -Wno-deprecated-declarations
+        -fstack-protector-strong
+        -ffp-contract=off
+        # /sdl, not for targets with ot_add_compile_options(<target> NO_SDL)
+        $<$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>:-Wformat-security>
+        $<$<AND:$<NOT:$<CONFIG:Debug>>,$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>>:-U_FORTIFY_SOURCE>
+        $<$<AND:$<NOT:$<CONFIG:Debug>>,$<NOT:$<BOOL:$<TARGET_PROPERTY:OT_NO_SDL>>>>:-D_FORTIFY_SOURCE=2>
+    )
 endif()
 
 # ------------------------------------------------------------
@@ -220,6 +237,11 @@ function(_ot_get_ot_inc_suffix OUT_VAR)
     endif()
 endfunction()
 
+function(_ot_add_thirdparty_include TARGET_NAME SCOPE)
+    target_include_directories(${TARGET_NAME} SYSTEM ${SCOPE} ${ARGN})
+    set_property(TARGET ${TARGET_NAME} APPEND PROPERTY OT_THIRDPARTY_INCLUDES ${ARGN})
+endfunction()
+
 function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
     ot_get_env_path(_inc  "${TP_NAME}_INC")
     ot_get_env_path(_incd "${TP_NAME}_INCD")
@@ -227,7 +249,7 @@ function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
 
     # Prefer the single include dir if provided
     if(NOT "${_inc}" STREQUAL "")
-        target_include_directories("${CORE_TARGET}" PRIVATE "${_inc}")
+        _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${_inc}")
         return()
     endif()
 
@@ -238,13 +260,13 @@ function(_ot_apply_tp_to_core CORE_TARGET TP_NAME)
     endif()
 
     if(NOT "${_incd}" STREQUAL "")
-        target_include_directories("${CORE_TARGET}" PRIVATE
+        _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE
             $<${_OT_CFG_DEBUG}:${_incd}>
         )
     endif()
 
     if(NOT "${_incr}" STREQUAL "")
-        target_include_directories("${CORE_TARGET}" PRIVATE
+        _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE
             $<${_OT_CFG_RELEASE}:${_incr}>
         )
     endif()
@@ -468,6 +490,12 @@ endfunction()
 # Compiler definitons and options wrappers
 # ------------------------------------------------------------
 function(_ot_apply_compile_option_internal CORE_TARGET OPTION)
+    # NO_SDL: the target is built without the global /sdl
+    if(OPTION STREQUAL "NO_SDL")
+        set_property(TARGET ${CORE_TARGET} PROPERTY OT_NO_SDL TRUE)
+        return()
+    endif()
+
     # A bare number is an MSVC warning ID; anything else is a literal flag.
     if(OPTION MATCHES "^[0-9]+$")
         ot_platform_warning_option(_flag "${OPTION}")
@@ -689,18 +717,20 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     endif()
 
     if(DEP STREQUAL "QtEntryPoint")
-        ot_define_qt6_targets("EntryPoint")
-        target_link_libraries("${CORE_TARGET}" PRIVATE Qt6::EntryPoint)
+        if(MSVC)
+            ot_define_qt6_targets("EntryPoint")
+            target_link_libraries("${CORE_TARGET}" PRIVATE Qt6::EntryPoint)
+        endif()
         return()
     endif()
 
     # RapidJSON headers
     if(DEP STREQUAL "RJSON")
         if(R_JSON_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${R_JSON_INCD_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${R_JSON_INCD_PATH}")
         endif()
         if(R_JSON_INCR_PATH AND NOT R_JSON_INCR_PATH STREQUAL R_JSON_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${R_JSON_INCR_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${R_JSON_INCR_PATH}")
         endif()
         return()
     endif()
@@ -708,10 +738,10 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     # OSG headers
     if(DEP STREQUAL "OSG")
         if(OSG_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OSG_INCD_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OSG_INCD_PATH}")
         endif()
         if(OSG_INCR_PATH AND NOT OSG_INCR_PATH STREQUAL OSG_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OSG_INCR_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OSG_INCR_PATH}")
         endif()
         return()
     endif()
@@ -719,7 +749,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     # ADS headers
     if(DEP STREQUAL "ADS")
         if(QT_ADS_ROOT_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${QT_ADS_ROOT_PATH}/include")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${QT_ADS_ROOT_PATH}/include")
         else()
             message(FATAL_ERROR "ADS token used but QT_ADS_ROOT_PATH is empty (env QT_ADS_ROOT not set?)")
         endif()
@@ -729,20 +759,20 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     # QWT headers
     if(DEP STREQUAL "QWT")
         if(QWT_LIB_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCD_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCD_PATH}")
         endif()
         if(QWT_LIB_INCR_PATH AND NOT QWT_LIB_INCR_PATH STREQUAL QWT_LIB_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCR_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${QWT_LIB_INCR_PATH}")
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "OCCT")
         if(OC_INCD_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OC_INCD_PATH}>)
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE $<${_OT_CFG_DEBUG}:${OC_INCD_PATH}>)
         endif()
         if(OC_INCR_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${OC_INCR_PATH}>)
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE $<${_OT_CFG_RELEASE}:${OC_INCR_PATH}>)
         endif()
         return()
     endif()
@@ -757,7 +787,7 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         set_source_files_properties("${_b64_src}" PROPERTIES LANGUAGE CXX)
 
         target_sources("${CORE_TARGET}" PRIVATE "${_b64_src}")
-        target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{BASE64_ROOT}")
+        _ot_add_thirdparty_include("${CORE_TARGET}" PUBLIC "$ENV{BASE64_ROOT}")
         return()
     endif()
 
@@ -778,9 +808,9 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
         target_sources("${CORE_TARGET}" PRIVATE "${_expr_src}")
 
         if(DEFINED ENV{EXPREVAL_INC} AND NOT "$ENV{EXPREVAL_INC}" STREQUAL "")
-            target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_INC}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_INC}")
         else()
-            target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_ROOT}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PUBLIC "$ENV{EXPREVAL_ROOT}")
         endif()
         return()
     endif()
@@ -788,55 +818,55 @@ function(_ot_apply_dep_to_core CORE_TARGET DEP)
     if(DEP STREQUAL "TINYXML2")
         set(_tinyxml2_src "$ENV{TINYXML2_ROOT}/tinyxml2.cpp")
         target_sources("${CORE_TARGET}" PRIVATE "${_tinyxml2_src}")
-        target_include_directories("${CORE_TARGET}" PUBLIC "$ENV{TINYXML2_ROOT}")
+        _ot_add_thirdparty_include("${CORE_TARGET}" PUBLIC "$ENV{TINYXML2_ROOT}")
         return()
     endif()
 
     if(DEP STREQUAL "MONGO_BOOST")
         ot_get_env_path(_mongo_boost_root "MONGO_BOOST_ROOT")
         if(NOT "${_mongo_boost_root}" STREQUAL "")
-            target_include_directories("${CORE_TARGET}" PRIVATE "${_mongo_boost_root}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${_mongo_boost_root}")
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "GMSH")
         if(GMSH_INC_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${GMSH_INC_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${GMSH_INC_PATH}")
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "NGSPICE")
         if(NGSPICE_ROOT_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${NGSPICE_ROOT_PATH}/src/include")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${NGSPICE_ROOT_PATH}/src/include")
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "VTK")
         if(VTK_INC_LIST)
-            target_include_directories("${CORE_TARGET}" PRIVATE ${VTK_INC_LIST})
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE ${VTK_INC_LIST})
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "PYTHON")
         if(OT_PYTHON_INC_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_PATH}")
         endif()
         if(OT_PYTHON_NUMPY_INC_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_NUMPY_INC_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OT_PYTHON_NUMPY_INC_PATH}")
         endif()
         return()
     endif()
 
     if(DEP STREQUAL "PYTHON_LEGACY")
         if(OT_PYTHON_INC_LEGACY_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_LEGACY_PATH}")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OT_PYTHON_INC_LEGACY_PATH}")
         endif()
         if(OT_PYTHON_ROOT_LEGACY_PATH)
-            target_include_directories("${CORE_TARGET}" PRIVATE "${OT_PYTHON_ROOT_LEGACY_PATH}/Lib/site-packages/numpy/core/include")
+            _ot_add_thirdparty_include("${CORE_TARGET}" PRIVATE "${OT_PYTHON_ROOT_LEGACY_PATH}/Lib/site-packages/numpy/core/include")
         endif()
         return()
     endif()
@@ -935,8 +965,8 @@ function(_ot_apply_dep_to_final FINAL_TARGET DEP)
         if(MSVC)
             ot_define_qt6_targets("EntryPoint")
             target_link_libraries("${FINAL_TARGET}" PRIVATE Qt6::EntryPoint)
-            return()
         endif()
+        return()
     endif()
 
     if(DEP STREQUAL "QtFull")
@@ -1603,12 +1633,16 @@ function(ot_initialize_test TEST_TARGET_NAME MAIN_TARGET_NAME)
         $<TARGET_PROPERTY:${_coreName},INCLUDE_DIRECTORIES>
     )
 
+    if(TARGET ${_coreName})
+        target_include_directories(${TEST_TARGET_NAME} SYSTEM PRIVATE $<GENEX_EVAL:$<TARGET_PROPERTY:${_coreName},OT_THIRDPARTY_INCLUDES>>)
+    endif()
+
     if(MSVC)
         target_link_options(${TEST_TARGET_NAME} PRIVATE "/ignore:4099")
     endif()
 
     if(DEFINED ENV{GOOGLE_TEST_INC} AND NOT "$ENV{GOOGLE_TEST_INC}" STREQUAL "")
-        target_include_directories(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_INC}")
+        _ot_add_thirdparty_include(${TEST_TARGET_NAME} PRIVATE "$ENV{GOOGLE_TEST_INC}")
     endif()
     if(DEFINED ENV{GOOGLE_TEST_LIB} AND NOT "$ENV{GOOGLE_TEST_LIB}" STREQUAL "")
         target_link_libraries(${TEST_TARGET_NAME} PRIVATE $ENV{GOOGLE_TEST_LIB})
