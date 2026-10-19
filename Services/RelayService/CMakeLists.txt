@@ -4,6 +4,7 @@ project(RelayService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(RelayService OT_RELAY_SERVICE_ROOT_PATH RELAYSERVICE_EXPORTS)
+ot_add_compile_options(RelayService NO_SDL)
 
 ot_add_dependency(RelayService
     OTSystem

@@ -4,6 +4,7 @@ project(OToolkit LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OToolkit OT_OTOOLKIT_ROOT_PATH)
+ot_add_compile_options(OToolkit NO_SDL)
 ot_add_qt_resources(OToolkit)
 
 ot_add_dependency(OToolkit

@@ -4,6 +4,7 @@ project(OTRubberbandOSG LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTRubberbandOSG OT_RUBBERBAND_OSG_ROOT_PATH RBE_OSG_WRAPPER_PROJ_BUILD)
+ot_add_compile_options(OTRubberbandOSG NO_SDL)
 
 ot_add_dependency(OTRubberbandOSG
     OTSystem

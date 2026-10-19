@@ -4,7 +4,6 @@ project(PHREECService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(PHREECService OT_PHREEC_SERVICE_ROOT_PATH SESSIONSERVICE_EXPORTS)
-ot_disable_warnings(PHREECService 4996)
 
 ot_add_dependency(PHREECService
     OTSystem

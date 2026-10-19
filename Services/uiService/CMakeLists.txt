@@ -4,6 +4,7 @@ project(uiService LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_bin(uiService OT_UI_SERVICE_ROOT_PATH)
+ot_add_compile_options(uiService NO_SDL)
 ot_add_resources(uiService)
 
 ot_add_dependency(uiService

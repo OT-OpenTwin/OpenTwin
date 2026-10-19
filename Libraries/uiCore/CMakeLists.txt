@@ -4,6 +4,7 @@ project(UICore LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(UICore OT_UICORE_ROOT_PATH UICORE_EXPORT)
+ot_add_compile_options(UICore NO_SDL)
 
 ot_add_dependency(UICore
     OTSystem

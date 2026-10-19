@@ -4,6 +4,7 @@ project(OTViewer LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTViewer OT_VIEWER_ROOT_PATH)
+ot_add_compile_options(OTViewer NO_SDL)
 
 ot_add_dependency(OTViewer
     OTSystem

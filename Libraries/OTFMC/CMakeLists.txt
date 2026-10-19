@@ -4,6 +4,7 @@ project(OTFMC LANGUAGES CXX)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(OTFMC OT_FILE_MANAGER_CONNECTOR_ROOT_PATH OT_FMC_EXPORTS)
+ot_add_compile_options(OTFMC NO_SDL)
 
 ot_add_dependency(OTFMC
     OTSystem

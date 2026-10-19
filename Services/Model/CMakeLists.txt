@@ -4,6 +4,7 @@ project(Model LANGUAGES CXX C)
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
 
 ot_initialize_lib(Model OT_MODEL_SERVICE_ROOT_PATH MODEL_EXPORTS)
+ot_add_compile_options(Model NO_SDL)
 ot_add_compile_definitions(Model
     _SILENCE_ALL_CXX17_DEPRECATION_WARNINGS
 )
