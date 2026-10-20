@@ -1,110 +1,134 @@
 {
-  "version": 7,
-  "cmakeMinimumRequired": {
-    "major": 3,
-    "minor": 28,
-    "patch": 0
-  },
-  "configurePresets": [
-    {
-      "name": "windows-debug",
-      "displayName": "Windows Debug",
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/windows-debug",
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
-        "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
-        "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
-        "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      },
-      "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": { "disableExternalAnalysis": true }
-      },
-      "warnings": { "unusedCli": false },
-      "environment": {
-        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
-      }
+    "version": 7,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 28,
+        "patch": 0
     },
-    {
-      "name": "windows-release",
-      "displayName": "Windows Release",
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/windows-release",
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
-        "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
-        "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
-        "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      },
-      "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": { "disableExternalAnalysis": true }
-      },
-      "warnings": { "unusedCli": false },
-      "environment": {
-        "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
-      }
-    },
-    {
-      "name": "linux-debug",
-      "displayName": "Linux Debug",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/linux-debug",
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
-        "CMAKE_CXX_COMPILER": "g++",
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      },
-      "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
-          "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "forceWSL1Toolset": true }
-      },
-      "warnings": { "unusedCli": false }
-    },
-    {
-      "name": "linux-release",
-      "displayName": "Linux Release",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
-      "generator": "Ninja Multi-Config",
-      "binaryDir": "${sourceDir}/build/linux-release",
-      "cacheVariables": {
-        "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
-        "CMAKE_CXX_COMPILER": "g++",
-        "CMAKE_C_COMPILER": "gcc",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
-      },
-      "vendor": {
-          "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
-          "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "forceWSL1Toolset": true }
-      },
-      "warnings": { "unusedCli": false }
-    }
-  ],
-  "buildPresets": [
-    { "name": "build-windows-debug", "configurePreset": "windows-debug", "configuration": "Debug" },
-    { "name": "build-windows-release", "configurePreset": "windows-release", "configuration": "Release" },
-    { "name": "build-linux-debug", "configurePreset": "linux-debug", "configuration": "Debug",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" } },
-    { "name": "build-linux-release", "configurePreset": "linux-release", "configuration": "Release",
-      "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" } }
-  ],
-  "testPresets": [
-    {
-      "name": "test-windows-debug",
-      "configurePreset": "windows-debug",
-      "environment": {
-        "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
-      }
-    },
-    {
-      "name": "test-windows-release",
-      "configurePreset": "windows-release",
-      "environment": {
-        "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
-      }
-    }
-  ]
+    "configurePresets": [
+        {
+            "name": "windows-debug",
+            "displayName": "Windows Debug",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/windows-debug",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+                "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+                "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+                "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "disableExternalAnalysis": true,
+                    "enableMicrosoftCodeAnalysis": true,
+                    "enableClangTidyCodeAnalysis": true
+                }
+            },
+            "warnings": { "unusedCli": false },
+            "environment": {
+                "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+            }
+        },
+        {
+            "name": "windows-release",
+            "displayName": "Windows Release",
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/windows-release",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+                "CMAKE_MAKE_PROGRAM": "$env{DEVENV_ROOT_2022}/CommonExtensions/Microsoft/CMake/Ninja/ninja.exe",
+                "CMAKE_CXX_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+                "CMAKE_C_COMPILER": "$env{VCToolsInstallDir}bin/Hostx64/x64/cl.exe",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": {
+                    "disableExternalAnalysis": true,
+                    "enableMicrosoftCodeAnalysis": true,
+                    "enableClangTidyCodeAnalysis": true
+                }
+            },
+            "warnings": { "unusedCli": false },
+            "environment": {
+                "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+            }
+        },
+        {
+            "name": "linux-debug",
+            "displayName": "Linux Debug",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/linux-debug",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "forceWSL1Toolset": true }
+            },
+            "warnings": { "unusedCli": false }
+        },
+        {
+            "name": "linux-release",
+            "displayName": "Linux Release",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" },
+            "generator": "Ninja Multi-Config",
+            "binaryDir": "${sourceDir}/build/linux-release",
+            "cacheVariables": {
+                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo;MinSizeRel",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+            },
+            "vendor": {
+                "microsoft.com/VisualStudioSettings/CMake/1.0": { "hostOS": [ "Linux" ] },
+                "microsoft.com/VisualStudioRemoteSettings/CMake/1.0": { "forceWSL1Toolset": true }
+            },
+            "warnings": { "unusedCli": false }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "build-windows-debug",
+            "configurePreset": "windows-debug",
+            "configuration": "Debug"
+        },
+        {
+            "name": "build-windows-release",
+            "configurePreset": "windows-release",
+            "configuration": "Release"
+        },
+        {
+            "name": "build-linux-debug",
+            "configurePreset": "linux-debug",
+            "configuration": "Debug",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+        },
+        {
+            "name": "build-linux-release",
+            "configurePreset": "linux-release",
+            "configuration": "Release",
+            "condition": { "type": "equals", "lhs": "${hostSystemName}", "rhs": "Linux" }
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "test-windows-debug",
+            "configurePreset": "windows-debug",
+            "environment": {
+                "PATH": "$penv{OT_ALL_DLLD};$penv{ZLIB_DLLPATHD};$penv{MONGO_C_DLLD};$penv{MONGO_CXX_DLLD};$penv{OC_DLLD};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+            }
+        },
+        {
+            "name": "test-windows-release",
+            "configurePreset": "windows-release",
+            "environment": {
+                "PATH": "$penv{OT_ALL_DLLR};$penv{MONGO_C_DLLR};$penv{MONGO_CXX_DLLR};$penv{OC_DLLR};$penv{QT_ADS_LIBPATH};$penv{OPENTWIN_DEV_ROOT}/Deployment;$penv{PATH}"
+            }
+        }
+    ]
 }
