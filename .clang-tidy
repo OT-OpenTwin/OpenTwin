@@ -1,0 +1,16 @@
+# Editor diagnostics, mirrors the MSVC and GCC warning flags of OTProject.cmake
+# objc-assert-equals never fires in C++, clang-tidy only needs one check to run
+Checks: '-*,objc-assert-equals,clang-diagnostic-*'
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: '.*[\/](ThirdParty|build)[\/].*'
+ExtraArgs:
+  - -Wno-everything
+  # C4456, C4457, C4458, C4459
+  - -Wshadow
+  - -Wshadow-field
+  # C4715
+  - -Wreturn-type
+  # C4101 for catch parameters
+  - -Wunused-exception-parameter
+  # MSVC's offsetof is not constexpr for clang (Qt qplugin.h)
+  - -D_CRT_USE_BUILTIN_OFFSETOF
