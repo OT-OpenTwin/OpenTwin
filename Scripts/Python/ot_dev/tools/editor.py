@@ -24,6 +24,7 @@ from ot_launcher.environment import lds
 from ..core import paths
 from ..core.expansion import get
 from ..core.platform import DEFAULT_EDITOR, EDITORS, WINDOWS
+from ..core.toolchain import apply_toolchain
 
 EDITOR_VARIABLE = "OT_DEFAULT_EDITOR"
 
@@ -62,11 +63,13 @@ def launch_editor(env: Mapping[str, str], target: str, editor: str | None = None
     if not Path(target).exists():
         raise SystemExit(f"path does not exist: {target}")
 
-    root, executable = EDITORS[key]
+    chosen_editor = EDITORS[key]
     print(f"Launching {key}", flush=True)
-    if root:
-        return _rooted(env, root, executable, target)
-    return _on_path(env, executable, target)
+    if chosen_editor.toolchain:
+        env = apply_toolchain(dict(env))
+    if chosen_editor.root:
+        return _rooted(env, chosen_editor.root, chosen_editor.executable, target)
+    return _on_path(env, chosen_editor.executable, target)
 
 
 def project_environment(env: MutableMapping[str, str], key: str) -> None:

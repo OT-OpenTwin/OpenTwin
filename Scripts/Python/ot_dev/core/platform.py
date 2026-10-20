@@ -20,7 +20,7 @@
 import os
 import shutil
 from pathlib import Path
-from typing import Mapping
+from typing import Mapping, NamedTuple
 
 WINDOWS = os.name == "nt"
 
@@ -44,10 +44,18 @@ def native_path(value: str) -> str:
 
 DEFAULT_EDITOR = "VS" if WINDOWS else "CODE"
 
-EDITORS: dict[str, tuple[str | None, str]] = {
-    "VS": ("DEVENV_ROOT_2022", "devenv.exe"),
-    "CODE": (None, "code"),
-    "NVIM": (None, "nvim"),
+
+class Editor(NamedTuple):
+    root: str | None
+    executable: str
+    # Visual Studio sets up the native toolchain environment itself.
+    toolchain: bool
+
+
+EDITORS: dict[str, Editor] = {
+    "VS": Editor(root="DEVENV_ROOT_2022", executable="devenv.exe", toolchain=False),
+    "CODE": Editor(root=None, executable="code", toolchain=True),
+    "NVIM": Editor(root=None, executable="nvim", toolchain=True),
 }
 
 _CMAKE_BIN = Path("CommonExtensions") / "Microsoft" / "CMake" / "CMake" / "bin"
