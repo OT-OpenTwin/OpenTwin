@@ -2866,7 +2866,7 @@ std::string FDTDSolver::doubleToString(double value) {
 
 std::list<std::map<int, double>> FDTDSolver::parseExcitations(std::string_view input)
 {
-	std::list<std::map<int, double>> excitationList;
+	std::list<std::map<int, double>> excitations;
 	std::size_t pos = 0;
 
 	const auto skipWhitespace = [&]()
@@ -2997,7 +2997,7 @@ std::list<std::map<int, double>> FDTDSolver::parseExcitations(std::string_view i
 			}
 		}
 
-		excitationList.push_back(std::move(excitation));
+		excitations.push_back(std::move(excitation));
 
 		if (pos == input.size())
 			break;
@@ -3010,7 +3010,7 @@ std::list<std::map<int, double>> FDTDSolver::parseExcitations(std::string_view i
 			fail("Trailing comma");
 	}
 
-	return excitationList;
+	return excitations;
 }
 
 bool FDTDSolver::parsePortNumber(const std::string& name, int& portNumber)

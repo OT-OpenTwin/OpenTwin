@@ -55,15 +55,16 @@ public:
 private:
 	void addParameterDescriptions(ParametricCombination& currentRun, const std::string& xAxis, const std::string& xUnit, std::list<ot::Variable> parameterValuesXAxis, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
 	void addFarfieldParameterDescriptions(ParametricCombination& currentRun, const std::string& frequencyUnit, double frequencyScale, std::vector<double> &frequency, std::vector<double> &theta, std::vector<double> &phi, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
-	void addCurveData(const std::string& resultName, const std::string& quantityName, const std::string& quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions);
-	void storeCurves(const std::list<std::string>& excitationStringList, std::list<DatasetDescription>& allCurveDescriptions, const std::list<EntityFarfieldDump*>& farfieldDumpList);
+	void addCurveData(const std::string& resultName, const std::string& quantityName, const std::string& quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
+	void storeCurves(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList);
 	bool load1Ddata(const std::string filePath, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, double xScale, int readDataColumnOnly);
 		 std::string getPlotName(const std::string& resultName);
 	void addFarfieldData(const std::string& excitationString, std::vector<std::complex<double>> &eTheta, std::vector<std::complex<double>> &ePhi, std::vector<double> &eAbs,
-	 	 std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions);
+	 	 std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions);
 	void createFarfieldPlots(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const MetadataSeries* series, ResultCollectionExtender &resultCollectionExtender);
 	void createFarfieldPlot(const std::string& type, const std::string& xAxis, const std::string& fixedParameter, const std::string& fixedValue, const std::string& title, const std::string& plotName, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender);
 	void createFarfieldCurve(const std::string& curveName, const std::string& fixedParameter, const std::string& fixedValue, ot::PainterRainbowIterator& rainbowIterator, const MetadataSeries* series, const MetadataQuantity* quantity, ResultCollectionExtender& resultCollectionExtender);
+	void createFarfieldPlot3D(const std::string& type, bool complex, const std::string& plotName, EntityFarfieldDump* farfieldDump, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender);
 
 	std::string tmpDirPath;
 	std::string resultBasePath;

@@ -41,6 +41,7 @@
 #include "OTModelEntities/EntityAPI.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityResult1DPlot.h"
+#include "OTModelEntities/EntityResultFarfield.h"
 
 #include "OTCADEntities/EntityFarfieldDump.h"
 
@@ -122,7 +123,7 @@ void ResultManager::convert1D(const std::string& resultName, const std::string& 
 		addParameterDescriptions(parameters, xAxis, xUnit, parameterValuesXAxis, allParameterDescriptions);
 		
 		// Add the data of all result curves for the current parameters.
-		addCurveData(resultName, quantityName, quantityUnit, curveData, isComplex, allParameterDescriptions, allCurveDescriptions);
+		addCurveData(resultName, quantityName, quantityUnit, curveData, isComplex, allParameterDescriptions);
 
 		// Add the corresponding plot entry
 		plotContainers[getPlotName(resultName)] = xAxis;
@@ -145,13 +146,13 @@ void ResultManager::convertFarfield(const std::string& fileName, const std::stri
 
 		addFarfieldParameterDescriptions(parameters, frequencyUnit, frequencyScale, frequency, theta, phi, allParameterDescriptions);
 
-		addFarfieldData(excitationString, eTheta, ePhi, eAbs, allParameterDescriptions, allCurveDescriptions);
+		addFarfieldData(excitationString, eTheta, ePhi, eAbs, allParameterDescriptions);
 	}
 }
 
 void ResultManager::storeResults(const std::list<std::string> &excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList)
 {
-	storeCurves(excitationStringList, allCurveDescriptions, farfieldDumpList);
+	storeCurves(excitationStringList, farfieldDumpList);
 }
 
 std::string ResultManager::getPlotName(const std::string& resultName)
@@ -319,7 +320,7 @@ void ResultManager::addFarfieldParameterDescriptions(ParametricCombination& curr
 	}
 }
 
-void ResultManager::addCurveData(const std::string& resultName, const std::string &quantityName, const std::string &quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions)
+void ResultManager::addCurveData(const std::string& resultName, const std::string &quantityName, const std::string &quantityUnit, std::vector<std::pair<double, std::complex<double>>>& curveData, bool& isComplex, std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions)
 {
 	DatasetDescription newCurveDescription;
 	newCurveDescription.addParameterDescriptions(allParameterDescriptions);
@@ -362,7 +363,7 @@ void ResultManager::addCurveData(const std::string& resultName, const std::strin
 }
 
 void ResultManager::addFarfieldData(const std::string& excitationString, std::vector<std::complex<double>> &eTheta, std::vector<std::complex<double>> &ePhi, std::vector<double> &eAbs,
-									std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions, std::list<DatasetDescription>& allCurveDescriptions)
+									std::list<std::shared_ptr<ParameterDescription>>& allParameterDescriptions)
 {
 	// Add Etheta quantity
 	{
@@ -425,7 +426,7 @@ void ResultManager::addFarfieldData(const std::string& excitationString, std::ve
 	}
 }
 
-void ResultManager::storeCurves(const std::list<std::string>& excitationStringList, std::list<DatasetDescription> &allCurveDescriptions, const std::list<EntityFarfieldDump*>& farfieldDumpList)
+void ResultManager::storeCurves(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList)
 {
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::instance().getCollectionName();
@@ -546,8 +547,43 @@ void ResultManager::createFarfieldPlots(const std::list<std::string>& excitation
 			createFarfieldPlot("E_Theta", "Phi", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
 			createFarfieldPlot("E_Phi", "Phi", fixedParameter, fixedValue, title, plotName, excitationStringList, series, resultCollectionExtender);
 		}
+		else
+		{
+			createFarfieldPlot3D("E_Abs", false, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot3D("E_Theta", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender);
+			createFarfieldPlot3D("E_Phi", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender);
+		}
 	}
 }
+
+void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, const std::string& plotName, EntityFarfieldDump *farfieldDump, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender)
+{
+	for (auto excitationString : excitationStringList)
+	{
+		EntityPropertiesDouble* thetaMinProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta min (deg.)"));
+		EntityPropertiesDouble* thetaMaxProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta max (deg.)"));
+		EntityPropertiesInteger* thetaStepsProperty = dynamic_cast<EntityPropertiesInteger*>(farfieldDump->getProperties().getProperty("Theta steps"));
+
+		EntityPropertiesDouble* phiMinProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi min (deg.)"));
+		EntityPropertiesDouble* phiMaxProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Phi max (deg.)"));
+		EntityPropertiesInteger* phiStepsProperty = dynamic_cast<EntityPropertiesInteger*>(farfieldDump->getProperties().getProperty("Phi steps"));
+
+		EntityResultFarfield newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
+		newPlot.setName(plotName + "/" + type + "/" + type + excitationString);
+
+		newPlot.setComplex(complex);
+		newPlot.setFrequencies({ "15", "18" });
+		newPlot.setThetaRange(thetaMinProperty->getValue(), thetaMaxProperty->getValue(), thetaStepsProperty->getValue());
+		newPlot.setPhiRange(phiMinProperty->getValue(), phiMaxProperty->getValue(), phiStepsProperty->getValue());
+
+		newPlot.createProperties();
+		newPlot.setInitiallyHidden(true);
+
+		newPlot.storeToDataBase();
+		_modelComponent->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);
+	}
+}
+
 
 void ResultManager::createFarfieldPlot(const std::string &type, const std::string &xAxis, const std::string &fixedParameter, const std::string &fixedValue, const std::string &title, const std::string &plotName, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender)
 {
