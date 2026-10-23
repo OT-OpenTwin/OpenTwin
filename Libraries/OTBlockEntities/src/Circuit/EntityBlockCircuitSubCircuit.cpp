@@ -226,12 +226,16 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 			const auto* graphicsItemMap = getObserver()->getGraphicsItemMap(sceneName);
 			if (graphicsItemMap != nullptr)
 			{
+				terminals.clear();
 				ot::UIDList graphicsItemsUIDs = graphicsItemMap->getAllIDs();
 				for (auto uid : graphicsItemsUIDs)
 				{
-					EntityBase* entity = nullptr;
-					// TODO: Load or get entity for uid once method is available
-
+					//! @warning Do not store or cache the pointer returned by getTopoEntity. The entity may be modified or destroyed at any time.
+					EntityBase* entity = getObserver()->getTopoEntity(uid);
+					if(!entity)
+					{
+						continue;
+					}
 					EntityBlockCircuitTerminal* terminal = dynamic_cast<EntityBlockCircuitTerminal*>(entity);
 					if (terminal != nullptr)
 					{
@@ -239,7 +243,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 					}
 				}
 				std::sort(terminals.begin(), terminals.end());
+				terminals.erase(std::unique(terminals.begin(), terminals.end()), terminals.end());
 			}
+		}
+		else
+		{
+			terminals.clear();
 		}
 	}
 
@@ -352,6 +361,8 @@ void EntityBlockCircuitSubcircuit::readSpecificDataFromDataBase(const bsoncxx::d
 		{
 			m_orderedTerminalNames.push_back(std::string(terminalElem.get_string().value));
 		}
+		std::sort(m_orderedTerminalNames.begin(), m_orderedTerminalNames.end());
+		m_orderedTerminalNames.erase(std::unique(m_orderedTerminalNames.begin(), m_orderedTerminalNames.end()), m_orderedTerminalNames.end());
 	}
 
 	if (m_orderedTerminalNames.empty())

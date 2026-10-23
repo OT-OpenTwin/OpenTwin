@@ -144,13 +144,20 @@ ot::ReturnMessage Application::graphicsItemDoubleClicked(const ot::GraphicsDoubl
 				circuitPath = getCircuitRootName() + circuitPath;
 			}
 
-			if (circuitPath.empty() || std::find(circuits.begin(), circuits.end(), circuitPath) == circuits.end()) {
-				circuitPath = createNewCircuit("");
+			if (circuitPath.empty()) {
+				if (this->getUiComponent()) {
+					this->getUiComponent()->displayMessage("\n[Subcircuit] No circuit selected. Please select a circuit in the properties of the subcircuit block.\n");
+				}
+				ot::Frontend::displayTemporaryStateMessage("No circuit selected");
+				return ot::ReturnMessage::Ok;
+			}
 
-				subcircuit->setSubcircuitName(circuitPath);
-				subcircuit->storeToDataBase();
-				ot::ModelServiceAPI::updateTopologyEntities({ subcircuit->getEntityID() }, { subcircuit->getEntityStorageVersion() }, "Assigned circuit to subcircuit block");
-				ot::ModelServiceAPI::updatePropertyGrid();
+			if (std::find(circuits.begin(), circuits.end(), circuitPath) == circuits.end()) {
+				if (this->getUiComponent()) {
+					this->getUiComponent()->displayMessage("\n[Subcircuit] The selected circuit \"" + circuitPath + "\" does not exist.\n");
+				}
+				ot::Frontend::displayTemporaryStateMessage("Selected circuit not found");
+				return ot::ReturnMessage::Ok;
 			}
 
 			ot::Frontend::setEntitySelected(circuitPath, true, true, true);

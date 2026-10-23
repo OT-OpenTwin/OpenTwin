@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Model.cpp
 // 
 // License:
@@ -4510,6 +4510,18 @@ const ot::GraphicsItemMap* Model::getGraphicsItemMap(const std::string& _editorE
 {
 	BlockHandler& handler = Application::instance()->getBlockHandler();
 	return handler.getGraphicsItemMap(_editorEntityName);
+}
+
+//! @brief Retrieves a pointer to a topology entity by UID from the model's centralized entity map.
+//! @warning DO NOT store, cache, or delete this pointer! Topology entities are managed by the model and can be modified or destroyed at any time.
+EntityBase* Model::getTopoEntity(ot::UID _entityID)
+{
+	auto it = m_entityMap.find(_entityID);
+	if (it != m_entityMap.end())
+	{
+		return it->second;
+	}
+	return nullptr;
 }
 
 EntityBase *Model::findEntityFromName(const std::string &name)

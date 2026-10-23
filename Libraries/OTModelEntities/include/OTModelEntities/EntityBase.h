@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: EntityBase.h
 // 
 // License:
@@ -85,6 +85,10 @@ public:
 	virtual ot::DataLakeAccessCfg createDataLakeAccessConfig(const MetadataCampaign& _campaign, const std::string& _collectionName, const DataLakeQueryCfg& _queryCfg) { return ot::DataLakeAccessCfg(); };
 	virtual const ot::ModelServiceState& getModelServiceState() const = 0;
 	virtual const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName) const { return nullptr; };
+
+	//! @brief Retrieves a pointer to a topology entity by UID from the model's centralized entity map.
+	//! @warning DO NOT store, cache, or delete this pointer! Topology entities are managed by the model and can be modified or destroyed at any time.
+	virtual EntityBase* getTopoEntity(ot::UID _entityID) { return nullptr; };
 };
 
 // ###########################################################################################################################################################################################################################################################################################################################
