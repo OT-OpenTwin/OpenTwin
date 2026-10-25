@@ -4090,6 +4090,10 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 	AppBase::instance()->addGraphicsPickerPackage(pckg);
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
+	if (!visualisationCfg.getSetAsActiveView())
+	{
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
 	ot::GraphicsViewView* view = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getTitle()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	if (suppressViewHandling)
@@ -4107,6 +4111,10 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
+	if (!visualisationCfg.getSetAsActiveView())
+	{
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (auto graphicsItemCfg : pckg.getItems())
@@ -4121,7 +4129,11 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 		}
 	}
 
-	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+	ot::WidgetView* currentView = ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
+	if (visualisationCfg.getSetAsActiveView() && (currentView == nullptr || currentView == editor))
+	{
+		AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+	}
 }
 
 void ExternalServicesComponent::handleRemoveGraphicsItem(ot::JsonDocument& _document)
@@ -4177,6 +4189,10 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
+	if (!visualisationCfg.getSetAsActiveView())
+	{
+		insertFlags |= ot::WidgetView::KeepCurrentFocus;
+	}
 	ot::GraphicsViewView* editor = AppBase::instance()->findOrCreateGraphicsEditor(pckg.getName(), QString::fromStdString(pckg.getName()), pckg.getPickerKey(), insertFlags, visualisationCfg);
 
 	for (const auto& connection : pckg.getConnections())
@@ -4184,7 +4200,11 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 		editor->getGraphicsView()->addConnection(connection);
 	}
 
-	AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+	ot::WidgetView* currentView = ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
+	if (visualisationCfg.getSetAsActiveView() && (currentView == nullptr || currentView == editor))
+	{
+		AppBase::instance()->makeWidgetViewCurrentWithoutInputFocus(editor, true);
+	}
 }
 
 void ExternalServicesComponent::handleRemoveGraphicsConnection(ot::JsonDocument& _document)
