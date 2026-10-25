@@ -129,7 +129,7 @@ namespace ot {
 
 		//! @brief Set the blue color value.
 		//! @param _b Blue channel value ( 0 - 255 ).
-		constexpr inline void setB(int _b) { m_g = _b; };
+		constexpr inline void setB(int _b) { m_b = _b; };
 
 		//! @brief Set the alpha color value.
 		//! @param _a Alpha channel value ( 0 - 255 ).
