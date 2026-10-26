@@ -452,6 +452,90 @@ ot::Color ot::Color::fromHsv(float _h, float _s, float _v, int _a) {
 }
 
 
+void ot::Color::toHsl(float& _h, float& _s, float& _l) const {
+	const float r = static_cast<float>(m_r) / 255.f;
+	const float g = static_cast<float>(m_g) / 255.f;
+	const float b = static_cast<float>(m_b) / 255.f;
+
+	const float cMax = std::max({ r, g, b });
+	const float cMin = std::min({ r, g, b });
+	const float delta = cMax - cMin;
+
+	_l = (cMax + cMin) / 2.f;
+
+	if (delta <= 1e-6f) {
+		_s = 0.f;
+		_h = 0.f;
+		return;
+	}
+
+	if (_l <= 0.5f) {
+		_s = delta / (cMax + cMin);
+	}
+	else {
+		_s = delta / (2.f - cMax - cMin);
+	}
+
+	if (cMax == r) {
+		_h = 60.f * std::fmod(((g - b) / delta), 6.f);
+	}
+	else if (cMax == g) {
+		_h = 60.f * (((b - r) / delta) + 2.f);
+	}
+	else {
+		_h = 60.f * (((r - g) / delta) + 4.f);
+	}
+
+	if (_h < 0.f) {
+		_h += 360.f;
+	}
+}
+
+ot::Color ot::Color::fromHsl(float _h, float _s, float _l, int _a) {
+	_h = std::fmod(_h, 360.f);
+	if (_h < 0.f) {
+		_h += 360.f;
+	}
+
+	_s = std::max(0.f, std::min(1.f, _s));
+	_l = std::max(0.f, std::min(1.f, _l));
+	_a = std::max(0, std::min(255, _a));
+
+	const float c = (1.f - std::abs(2.f * _l - 1.f)) * _s;
+	const float x = c * (1.f - std::abs(std::fmod(_h / 60.f, 2.f) - 1.f));
+	const float m = _l - c / 2.f;
+
+	float r1 = 0.f, g1 = 0.f, b1 = 0.f;
+	if (_h >= 0.f && _h < 60.f) {
+		r1 = c; g1 = x; b1 = 0.f;
+	}
+	else if (_h >= 60.f && _h < 120.f) {
+		r1 = x; g1 = c; b1 = 0.f;
+	}
+	else if (_h >= 120.f && _h < 180.f) {
+		r1 = 0.f; g1 = c; b1 = x;
+	}
+	else if (_h >= 180.f && _h < 240.f) {
+		r1 = 0.f; g1 = x; b1 = c;
+	}
+	else if (_h >= 240.f && _h < 300.f) {
+		r1 = x; g1 = 0.f; b1 = c;
+	}
+	else {
+		r1 = c; g1 = 0.f; b1 = x;
+	}
+
+	int r = static_cast<int>(std::round((r1 + m) * 255.f));
+	int g = static_cast<int>(std::round((g1 + m) * 255.f));
+	int b = static_cast<int>(std::round((b1 + m) * 255.f));
+
+	r = std::max(0, std::min(255, r));
+	g = std::max(0, std::min(255, g));
+	b = std::max(0, std::min(255, b));
+
+	return Color(r, g, b, _a);
+}
+
 int ot::Color::channelValueFromFloat(float _value) {
 	return static_cast<int>(_value * 255.f);
 }

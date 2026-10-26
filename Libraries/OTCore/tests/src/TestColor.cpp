@@ -122,3 +122,66 @@ TEST(ColorTests, HsvRoundTripArbitrary) {
 	EXPECT_NEAR(original.b(), reconstructed.b(), 1);
 	EXPECT_EQ(original.a(), reconstructed.a());
 }
+
+TEST(ColorTests, HslPureColors) {
+	// Pure Red
+	ot::Color red(255, 0, 0);
+	float h = 0.f, s = 0.f, l = 0.f;
+	red.toHsl(h, s, l);
+	EXPECT_NEAR(0.f, h, 1e-2f);
+	EXPECT_NEAR(1.f, s, 1e-2f);
+	EXPECT_NEAR(0.5f, l, 1e-2f);
+
+	ot::Color fromRed = ot::Color::fromHsl(0.f, 1.f, 0.5f);
+	EXPECT_EQ(red, fromRed);
+
+	// Pure Green
+	ot::Color green(0, 255, 0);
+	green.toHsl(h, s, l);
+	EXPECT_NEAR(120.f, h, 1e-2f);
+	EXPECT_NEAR(1.f, s, 1e-2f);
+	EXPECT_NEAR(0.5f, l, 1e-2f);
+
+	ot::Color fromGreen = ot::Color::fromHsl(120.f, 1.f, 0.5f);
+	EXPECT_EQ(green, fromGreen);
+
+	// Pure Blue
+	ot::Color blue(0, 0, 255);
+	blue.toHsl(h, s, l);
+	EXPECT_NEAR(240.f, h, 1e-2f);
+	EXPECT_NEAR(1.f, s, 1e-2f);
+	EXPECT_NEAR(0.5f, l, 1e-2f);
+
+	ot::Color fromBlue = ot::Color::fromHsl(240.f, 1.f, 0.5f);
+	EXPECT_EQ(blue, fromBlue);
+
+	// Pure Black
+	ot::Color black(0, 0, 0);
+	black.toHsl(h, s, l);
+	EXPECT_NEAR(0.f, l, 1e-2f);
+	EXPECT_NEAR(0.f, s, 1e-2f);
+
+	ot::Color fromBlack = ot::Color::fromHsl(0.f, 0.f, 0.f);
+	EXPECT_EQ(black, fromBlack);
+
+	// Pure White
+	ot::Color white(255, 255, 255);
+	white.toHsl(h, s, l);
+	EXPECT_NEAR(1.f, l, 1e-2f);
+	EXPECT_NEAR(0.f, s, 1e-2f);
+
+	ot::Color fromWhite = ot::Color::fromHsl(0.f, 0.f, 1.f);
+	EXPECT_EQ(white, fromWhite);
+}
+
+TEST(ColorTests, HslRoundTripArbitrary) {
+	ot::Color original(210, 105, 30, 200); // Chocolate
+	float h = 0.f, s = 0.f, l = 0.f;
+	original.toHsl(h, s, l);
+
+	ot::Color reconstructed = ot::Color::fromHsl(h, s, l, original.a());
+	EXPECT_NEAR(original.r(), reconstructed.r(), 1);
+	EXPECT_NEAR(original.g(), reconstructed.g(), 1);
+	EXPECT_NEAR(original.b(), reconstructed.b(), 1);
+	EXPECT_EQ(original.a(), reconstructed.a());
+}
