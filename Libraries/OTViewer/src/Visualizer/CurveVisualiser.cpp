@@ -39,7 +39,6 @@ bool CurveVisualiser::requestVisualization(const VisualiserState& _state, ot::Vi
 		PlotVisualiser* plotVis = dynamic_cast<PlotVisualiser*>(vis);
 		if (plotVis) {
 			VisualiserState plotState = _state;
-			plotState.selected = true;
 			return plotVis->requestVisualization(plotState, _info);
 		}
 	}

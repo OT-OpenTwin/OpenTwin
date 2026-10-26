@@ -30,27 +30,29 @@ TableVisualiser::TableVisualiser(SceneNodeBase* _sceneNode)
 
 }
 
-bool TableVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User) {
-		if (_state.singleSelection) {
-			if (_state.selected) {
-				ot::JsonDocument doc;
-				doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-				
-				doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
+bool TableVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info)
+{
+	if (_state.selectionData.getSelectionOrigin() == ot::SelectionOrigin::User)
+	{
+		if (_state.singleSelection)
+		{
+			ot::JsonDocument doc;
+			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
 
-				ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
-				visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
+			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getSceneNode()->getModelEntityID(), doc.GetAllocator());
 
-				ot::JsonObject visualisationCfgJSon;
-				visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-				doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
+			visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
 
-				FrontendAPI::instance()->messageModelService(doc.toJson());
-				return true;
-			}
+			ot::JsonObject visualisationCfgJSon;
+			visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+
+			FrontendAPI::instance()->messageModelService(doc.toJson());
+			return true;
 		}
-		else {
+		else
+		{
 			OT_LOG_I("Visualisation of a multiselection of tables is turned off for performance reasons.");
 		}
 	}

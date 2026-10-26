@@ -46,11 +46,8 @@ bool TextVisualiser::requestVisualization(const VisualiserState& _state, ot::Vis
 	{
 		if (_state.singleSelection)
 		{
-			if (_state.selected)
-			{
-				FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true, false).toJson());
-				return true;
-			}
+			FrontendAPI::instance()->messageModelService(createRequestDoc(_state, 0, true, false).toJson());
+			return true;
 		}
 	}
 	return false;

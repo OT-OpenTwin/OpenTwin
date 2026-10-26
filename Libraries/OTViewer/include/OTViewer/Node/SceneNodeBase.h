@@ -133,7 +133,7 @@ public:
 protected:
 	osg::ref_ptr<osg::Switch> m_shapeNode = nullptr;
 	//osg::Switch* m_shapeNode = nullptr;
-	float m_transparency = 0.85;
+	float m_transparency = 0.85f;
 
 private:
 	Model* m_model = nullptr;

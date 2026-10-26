@@ -30,7 +30,6 @@ class SceneNodeBase;
 
 struct VisualiserState
 {
-	bool selected = false;
 	bool singleSelection = false;
 	bool setFocus = true;
 	bool anyVisualiserHasFocus = false;

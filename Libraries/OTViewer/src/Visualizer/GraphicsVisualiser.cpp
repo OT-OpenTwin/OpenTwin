@@ -36,45 +36,49 @@ GraphicsVisualiser::GraphicsVisualiser(SceneNodeBase* _sceneNode)
 
 bool GraphicsVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info)
 {
-	if (_state.selected)
+	bool isSingle = _state.singleSelection;
+
+	// Ensure only one graphics visualiser is selected
+	if (!isSingle)
 	{
-		bool isSingle = _state.singleSelection;
+		bool hasGraphics = false;
+		isSingle = true;
 
-		// Ensure only one graphics visualiser is selected
-		if (!isSingle) {
-			bool hasGraphics = false;
-			isSingle = true;
-
-			for (SceneNodeBase* node : _state.selectedNodes) {
-				for (Visualiser* vis : node->getVisualiser()) {
-					if (dynamic_cast<GraphicsVisualiser*>(vis) != nullptr) {
-						if (hasGraphics) {
-							isSingle = false;
-							break;
-						}
-						else {
-							hasGraphics = true;
-						}
+		for (SceneNodeBase* node : _state.selectedNodes)
+		{
+			for (Visualiser* vis : node->getVisualiser())
+			{
+				if (dynamic_cast<GraphicsVisualiser*>(vis) != nullptr)
+				{
+					if (hasGraphics)
+					{
+						isSingle = false;
+						break;
+					}
+					else
+					{
+						hasGraphics = true;
 					}
 				}
 			}
 		}
+	}
 
-		if (isSingle) {
-			ot::JsonDocument doc;
-			doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
+	if (isSingle)
+	{
+		ot::JsonDocument doc;
+		doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
 
-			ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
-			visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
-			
-			ot::JsonObject visualisationCfgJSon;
-			visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
-			doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+		ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
+		visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_CreateGraphicsEditor);
 
-			FrontendAPI::instance()->messageModelService(doc.toJson());
-			return true;
-		}
+		ot::JsonObject visualisationCfgJSon;
+		visualisationCfg.addToJsonObject(visualisationCfgJSon, doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJSon, doc.GetAllocator());
+
+		FrontendAPI::instance()->messageModelService(doc.toJson());
+		return true;
 	}
 
 	return false;

@@ -158,7 +158,6 @@ ot::SelectionHandlingResult SceneNodeBase::setSelected(bool _selected, const ot:
 		const std::list<Visualiser*>& visualisers = getVisualiser();
 
 		VisualiserState state;
-		state.selected = _selected;
 		state.singleSelection = _singleSelection;
 		state.selectionData = _selectionData;
 		state.anyVisualiserHasFocus = false;
@@ -320,7 +319,6 @@ void SceneNodeBase::setViewChange(const ot::ViewChangedState& _state, const ot::
 		// Model state change under the condition that the view is open.
 		VisualiserState state;
 		state.setFocus = false;
-		state.selected = true;
 		state.singleSelection = true;
 		state.selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 		for (Visualiser* visualiser : allVisualiser)
@@ -379,7 +377,6 @@ bool SceneNodeBase::requestVisualizationIfNeeded()
 			OT_VIEWER_SCENENODE_DBG_PTR(this, ": Requesting visualization (1) for visualiser: " << ot::LogMsgPtr(visualiser));
 
 			VisualiserState state;
-			state.selected = m_selected;
 			state.singleSelection = true;
 			state.selectionData.setSelectionOrigin(ot::SelectionOrigin::User);
 			ot::VisualiserInfo info;
