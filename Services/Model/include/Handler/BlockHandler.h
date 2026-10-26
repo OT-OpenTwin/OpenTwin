@@ -78,6 +78,18 @@ public:
 	const ot::GraphicsItemMap* getGraphicsItemMap(ot::UID _editorID);
 	const ot::GraphicsItemMap* getGraphicsItemMap(const std::string& _editorEntityName);
 
+	EntityGraphicsScene* findElementGraphicsScene(const std::string& _graphicsElementName);
+
+	//! @brief Notifies referencing subcircuits when a circuit scene's terminals have changed (added, removed, renamed).
+	//! Triggers a refresh via requestVisualisationIfNeeded on the parent scenes without stealing focus.
+	//! @param _circuitSceneName The name of the circuit scene that changed.
+	void notifySubcircuitsAboutCircuitChange(const std::string& _circuitSceneName);
+
+	//! @brief Notifies referencing subcircuits when a terminal entity changes (renamed or property changed).
+	//! Automatically resolves the containing circuit scene and refreshes parent scenes.
+	//! @param _terminalEntityName The name of the terminal entity that changed.
+	void notifySubcircuitsAboutTerminalChange(const std::string& _terminalEntityName);
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Callbacks
@@ -98,8 +110,6 @@ protected:
 	// Private: Helper
 
 private:
-
-	EntityGraphicsScene* findElementGraphicsScene(const std::string& _graphicsElementName);
 
 	//! @brief Handles the connection of one block to another block.
 	//! @param _scene The graphics scene in which the connection is being made.

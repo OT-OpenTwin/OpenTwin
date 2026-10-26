@@ -40,6 +40,8 @@
 #include "OTModelEntities/EntityGraphicsScene.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitElement.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitConnector.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitSubCircuit.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 
 // std header
 #include <queue>
@@ -263,6 +265,11 @@ void BlockHandler::entityRemoved(EntityBase* _entityToRemove, const std::list<En
 				}
 			}
 		}
+
+		// If a terminal block was removed, notify referencing subcircuits to refresh their terminals
+		if (dynamic_cast<EntityBlockCircuitTerminal*>(blockToRemove) != nullptr) {
+			notifySubcircuitsAboutTerminalChange(blockToRemove->getName());
+		}
 	}
 
 	ot::EntityBlockConnection* connectionToRemove = dynamic_cast<ot::EntityBlockConnection*>(_entityToRemove);
@@ -391,6 +398,50 @@ const ot::GraphicsItemMap* BlockHandler::getGraphicsItemMap(const std::string& _
 	return getGraphicsItemMap(editor->getEntityID());
 }
 
+void BlockHandler::notifySubcircuitsAboutCircuitChange(const std::string& _circuitSceneName)
+{
+	Model* model = Application::instance()->getModel();
+	if (!model) return;
+
+	std::string targetCircuitName = _circuitSceneName;
+	if (targetCircuitName.rfind("Circuits/", 0) != 0) {
+		targetCircuitName = "Circuits/" + targetCircuitName;
+	}
+
+	std::vector<ot::UID> subcircuitsToRefresh;
+
+	for (const auto& it : model->getAllEntitiesByUID())
+	{
+		EntityBlockCircuitSubcircuit* subcircuit = dynamic_cast<EntityBlockCircuitSubcircuit*>(it.second);
+		if (subcircuit)
+		{
+			std::string subcircuitRef = subcircuit->getSubcircuitName();
+			if (!subcircuitRef.empty() && subcircuitRef.rfind("Circuits/", 0) != 0) {
+				subcircuitRef = "Circuits/" + subcircuitRef;
+			}
+
+			if (subcircuitRef == targetCircuitName)
+			{
+				subcircuitsToRefresh.push_back(subcircuit->getEntityID());
+			}
+		}
+	}
+
+	// Request visualization update for referencing subcircuit blocks using GraphicsItemVisualiser
+	for (ot::UID subcircuitID : subcircuitsToRefresh)
+	{
+		model->requestVisualisationIfNeeded(subcircuitID);
+	}
+}
+
+void BlockHandler::notifySubcircuitsAboutTerminalChange(const std::string& _terminalEntityName)
+{
+	EntityGraphicsScene* scene = findElementGraphicsScene(_terminalEntityName);
+	if (scene) {
+		notifySubcircuitsAboutCircuitChange(scene->getName());
+	}
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Callbacks
@@ -476,6 +527,11 @@ ot::ReturnMessage BlockHandler::graphicsItemRequested(const ot::GraphicsItemDrop
 
 	// Add the created block to the model
 	model->addEntitiesToModel(modelStateInfo, "Added block", true, true, true);
+
+	// If a terminal block was added to a circuit scene, notify any referencing subcircuits
+	if (dynamic_cast<EntityBlockCircuitTerminal*>(createdBlock.get()) != nullptr) {
+		notifySubcircuitsAboutCircuitChange(editor->getName());
+	}
 
 	// Check if any service wants to be notified about this change
 	if (!_eventData.isEventFlagSet(ot::GuiEvent::IgnoreNotify)) {

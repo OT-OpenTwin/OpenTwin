@@ -70,6 +70,7 @@
 #include "OTModelEntities/EntityParameterizedDataPreviewTable.h"
 #include "OTModelEntities/EntityParameterizedDataCategorization.h"
 #include "OTModelEntities/EntityCoordinateSystem.h"
+#include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 
 #include "OTCADEntities/EntityGeometry.h"
 #include "OTCADEntities/GeometryOperations.h"
@@ -1670,6 +1671,10 @@ void Model::modelItemRenamed(ot::UID entityID, const std::string &newName)
 	if (blockEntity != nullptr)
 	{
 		blockEntity->createBlockItem();
+		if (dynamic_cast<EntityBlockCircuitTerminal*>(blockEntity) != nullptr)
+		{
+			Application::instance()->getBlockHandler().notifySubcircuitsAboutTerminalChange(blockEntity->getName());
+		}
 	}
 
 	Application::instance()->getVisualisationHandler().handleRenaming(entityID);
@@ -3066,6 +3071,12 @@ void Model::performSpecialUpdates(EntityBase *entity)
 	if (dynamic_cast<EntityCoordinateSystem*>(entity) != nullptr)
 	{
 		updateCoordinateSystem(dynamic_cast<EntityCoordinateSystem*>(entity));
+		return;
+	}
+
+	if (dynamic_cast<EntityBlockCircuitTerminal*>(entity) != nullptr)
+	{
+		Application::instance()->getBlockHandler().notifySubcircuitsAboutTerminalChange(entity->getName());
 		return;
 	}
 } 
