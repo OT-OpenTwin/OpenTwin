@@ -92,13 +92,7 @@ void Circuit::addConnection(std::string connactable,const ot::UID& key, const Co
 
 	if (mapOfElements.find(key) != mapOfElements.end()) {
 		mapOfElements[key]->addConnection(connactable,obj);
-	
-
 	}
-	else if (connactable != "GNDPole") {
-		Application::instance()->getUiComponent()->displayMessage("Element not found");
-	}
-
 }
 
 std::string Circuit::findElement(const ot::UID& key) {

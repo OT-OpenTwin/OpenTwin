@@ -113,17 +113,38 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 					subCircuitPtr->setEditorName(subcircuitFolderPath);
 					subCircuitPtr->setId(subcircuitFolderPath);
 
-					// Sync terminal names from the subcircuit editor terminals
-					std::vector<std::string> orderedTermNames;
-					for (auto& [subId, subBlock] : subEntities)
+					// Sync terminal names from the subcircuit block / editor terminals
+					std::vector<std::string> orderedTermNames = subcircuitBlock->getOrderedTerminalNames();
+					if (orderedTermNames.empty())
 					{
-						auto* term = dynamic_cast<EntityBlockCircuitTerminal*>(subBlock.get());
-						if (term)
+						for (auto& [subId, subBlock] : subEntities)
 						{
-							orderedTermNames.push_back(term->getTerminalName());
+							auto* term = dynamic_cast<EntityBlockCircuitTerminal*>(subBlock.get());
+							if (term)
+							{
+								orderedTermNames.push_back(term->getTerminalName());
+							}
 						}
+						std::sort(orderedTermNames.begin(), orderedTermNames.end());
+
+						std::map<std::string, int> totalCounts;
+						for (const auto& name : orderedTermNames) {
+							totalCounts[name]++;
+						}
+
+						std::map<std::string, int> currentCounts;
+						std::vector<std::string> uniqueOrdered;
+						for (const auto& name : orderedTermNames) {
+							if (totalCounts[name] > 1) {
+								currentCounts[name]++;
+								uniqueOrdered.push_back(name + "_" + std::to_string(currentCounts[name]));
+							}
+							else {
+								uniqueOrdered.push_back(name);
+							}
+						}
+						orderedTermNames = std::move(uniqueOrdered);
 					}
-					std::sort(orderedTermNames.begin(), orderedTermNames.end());
 					if (!orderedTermNames.empty())
 					{
 						auto itElem = circuit.getMapOfElements().find(subcircuitBlock->getEntityID());
@@ -150,7 +171,8 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 
 						if (!elemPtr->isMeter())
 						{
-							std::string netlistName = m_elementNamingRegistry.registerElement(subBlock->getNameOnly(), elemPtr->getNetlistPrefix());
+							std::string uniqueSubName = subcircuitFolderPath + "/" + subBlock->getNameOnly();
+							std::string netlistName = m_elementNamingRegistry.registerElement(uniqueSubName, elemPtr->getNetlistPrefix());
 							elemPtr->setNetlistName(netlistName);
 						}
 						elemPtr->setCustomName(subBlock->getNameOnly());
