@@ -31,7 +31,7 @@ public:
 	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual void setViewIsOpen(bool _viewIsOpen) override;
-
+	virtual void childNodeAdded(SceneNodeBase* _childNode) override;
 protected:
 	virtual std::string getVisualiserTypeString() const override { return "Graphics"; };
 

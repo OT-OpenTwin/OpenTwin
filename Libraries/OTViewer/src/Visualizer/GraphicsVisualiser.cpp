@@ -99,6 +99,13 @@ void GraphicsVisualiser::setViewIsOpen(bool _viewIsOpen) {
 	forwardViewOpenToChildren(_viewIsOpen, getSceneNode());
 }
 
+void GraphicsVisualiser::childNodeAdded(SceneNodeBase* _childNode)
+{
+	if(getViewIsOpen()) {
+		forwardViewOpenToChildren(true, _childNode);
+	}
+}
+
 void GraphicsVisualiser::forwardViewOpenToChildren(bool _isOpen, SceneNodeBase* _parentNode) {
 	OTAssertNullptr(_parentNode);
 	for (SceneNodeBase* childNode : _parentNode->getChildren()) {

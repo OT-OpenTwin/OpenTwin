@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ViewVisualisationHandler.cpp
 // 
 // License:
@@ -166,6 +166,26 @@ void ViewVisualisationHandler::handleVisualisationRequest(ot::UID _entityID, ot:
 			setupGraphicsScene(baseEntity);
 
 			Application::instance()->queuedRequestToFrontend(document);
+		}
+	}
+	else if (_visualisationCfg.getVisualisationType() == OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem)
+	{
+		ot::EntityBlock* blockEntity = dynamic_cast<ot::EntityBlock*>(baseEntity);
+		if (blockEntity != nullptr)
+		{
+			blockEntity->createBlockItem();
+		}
+		else
+		{
+			ot::EntityBlockConnection* connectionEntity = dynamic_cast<ot::EntityBlockConnection*>(baseEntity);
+			if (connectionEntity != nullptr)
+			{
+				connectionEntity->createConnectionItem();
+			}
+			else
+			{
+				OT_LOG_E("Tried visualising an entity as graphics item which is not a block or connection.");
+			}
 		}
 	}
 	else

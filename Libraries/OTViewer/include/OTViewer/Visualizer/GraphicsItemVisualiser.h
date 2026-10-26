@@ -30,11 +30,11 @@ public:
 	bool requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual void showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
 	virtual void hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) override;
-
+	virtual void setViewIsOpen(bool _viewIsOpen) override;
 	virtual std::string getViewEntityName() const override;
 
 protected:
-	virtual std::string getVisualiserTypeString() const override { return "GraphicsConnection"; };
+	virtual std::string getVisualiserTypeString() const override { return "GraphicsItem"; };
 
 	SceneNodeBase* findViewNode(SceneNodeBase* _childNode) const;
 

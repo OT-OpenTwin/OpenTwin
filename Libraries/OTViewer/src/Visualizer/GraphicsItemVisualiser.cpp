@@ -18,8 +18,10 @@
 // @otlicense-end
 
 #include "OTViewer/Node/SceneNodeBase.h"
+#include "OTCommunication/ActionTypes.h"
 #include "OTViewer/Visualizer/GraphicsVisualiser.h"
 #include "OTViewer/Visualizer/GraphicsItemVisualiser.h"
+#include "OTViewer/FrontendAPI.h"
 
 GraphicsItemVisualiser::GraphicsItemVisualiser(SceneNodeBase* _sceneNode) :
 	Visualiser(_sceneNode, ot::WidgetViewBase::ViewGraphics) {
@@ -27,7 +29,21 @@ GraphicsItemVisualiser::GraphicsItemVisualiser(SceneNodeBase* _sceneNode) :
 }
 
 bool GraphicsItemVisualiser::requestVisualization(const VisualiserState& _state, ot::VisualiserInfo& _info) {
-	return false;
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_MODEL_RequestVisualisationData, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_MODEL_EntityID, this->getVisualizationEntity(), doc.GetAllocator());
+
+	ot::VisualisationCfg visualisationCfg = createVisualiserConfig(_state, getSceneNode());
+	visualisationCfg.setVisualisationType(OT_ACTION_CMD_UI_GRAPHICSEDITOR_AddItem);
+
+	ot::JsonObject visualisationCfgJson;
+	visualisationCfg.addToJsonObject(visualisationCfgJson, doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visualisationCfgJson, doc.GetAllocator());
+
+	FrontendAPI::instance()->messageModelService(doc.toJson());
+	return true;
+	
 }
 
 void GraphicsItemVisualiser::showVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
@@ -36,6 +52,11 @@ void GraphicsItemVisualiser::showVisualisation(const VisualiserState& _state, ot
 
 void GraphicsItemVisualiser::hideVisualisation(const VisualiserState& _state, ot::VisualiserInfo& _info) {
 
+}
+
+void GraphicsItemVisualiser::setViewIsOpen(bool _viewIsOpen)
+{
+	Visualiser::setViewIsOpen(_viewIsOpen);
 }
 
 std::string GraphicsItemVisualiser::getViewEntityName() const {
