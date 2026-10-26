@@ -152,6 +152,19 @@ namespace ot {
 
 		ColorF toColorF() const;
 
+		//! @brief Convert this RGBA color to HSV values.
+		//! @param _h Output Hue in degrees [0.0f, 360.0f).
+		//! @param _s Output Saturation [0.0f, 1.0f].
+		//! @param _v Output Value / Brightness [0.0f, 1.0f].
+		void toHsv(float& _h, float& _s, float& _v) const;
+
+		//! @brief Construct a Color from HSV values.
+		//! @param _h Hue in degrees [0.0f, 360.0f) (values outside are wrapped modulo 360).
+		//! @param _s Saturation [0.0f, 1.0f].
+		//! @param _v Value / Brightness [0.0f, 1.0f].
+		//! @param _a Alpha channel [0, 255].
+		static Color fromHsv(float _h, float _s, float _v, int _a = 255);
+
 		static int channelValueFromFloat(float _value);
 
 	private:
