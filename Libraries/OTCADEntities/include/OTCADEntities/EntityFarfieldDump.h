@@ -48,6 +48,7 @@ private:
 	virtual void addStorageData(bsoncxx::builder::basic::document& storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view& doc_view, std::map<ot::UID, EntityBase*>& entityMap) override;
 	bool updatePropertyVisibility(const std::string& propertyName, bool visible);
+	bool updatePropertyReadOnly(const std::string& propertyName, bool readOnly, double fixedValue);
 	bool updatePropertyVisibilities(void);
 
 };

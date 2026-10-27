@@ -42,14 +42,10 @@ public:
 
 	vtkStructuredGrid* GetVtkGrid() { return vtkGrid; };
 
-	double getScaleFactor() { return scaleFactor; }
-
 private:
 	bool loadData(EntityResultFarfield* resultData);
 
 	void FreeMemory();
 
 	vtkStructuredGrid* vtkGrid;
-
-	double scaleFactor = 1.0;
 };

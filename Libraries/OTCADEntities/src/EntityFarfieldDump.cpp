@@ -90,16 +90,7 @@ bool EntityFarfieldDump::updatePropertyVisibilities()
 
 	bool phiRangeVisible = (typeProperty->getValue() == "2D" || typeProperty->getValue() == "1D (Theta constant)");
 	bool thetaRangeVisible = (typeProperty->getValue() == "2D" || typeProperty->getValue() == "1D (Phi constant)");
-
-	EntityPropertiesDouble::createProperty("Phi", "Phi cut (deg.)", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Phi", "Phi min (deg.)", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Phi", "Phi max (deg.)", 360.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesInteger::createProperty("Phi", "Phi steps", 20, "FieldDump", getProperties())->setGroupChanges(true);
-
-	EntityPropertiesDouble::createProperty("Theta", "Theta cut (deg.)", 90.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Theta", "Theta min (deg.)", 0.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesDouble::createProperty("Theta", "Theta max (deg.)", 180.0, "FieldDump", getProperties())->setGroupChanges(true);
-	EntityPropertiesInteger::createProperty("Theta", "Theta steps", 10, "FieldDump", getProperties())->setGroupChanges(true);
+	bool plot2D = (typeProperty->getValue() == "2D");
 
 	visibilityUpdated |= updatePropertyVisibility("Phi cut (deg.)", !phiRangeVisible);
 	visibilityUpdated |= updatePropertyVisibility("Phi min (deg.)", phiRangeVisible);
@@ -110,6 +101,11 @@ bool EntityFarfieldDump::updatePropertyVisibilities()
 	visibilityUpdated |= updatePropertyVisibility("Theta min (deg.)", thetaRangeVisible);
 	visibilityUpdated |= updatePropertyVisibility("Theta max (deg.)", thetaRangeVisible);
 	visibilityUpdated |= updatePropertyVisibility("Theta steps", thetaRangeVisible);
+
+	visibilityUpdated |= updatePropertyReadOnly("Phi min (deg.)", plot2D, 0.0);
+	visibilityUpdated |= updatePropertyReadOnly("Phi max (deg.)", plot2D, 360.0);
+	visibilityUpdated |= updatePropertyReadOnly("Theta min (deg.)", plot2D, 0.0);
+	visibilityUpdated |= updatePropertyReadOnly("Theta max (deg.)", plot2D, 180.0);
 
 	return visibilityUpdated;
 }
@@ -126,6 +122,28 @@ bool EntityFarfieldDump::updatePropertyVisibility(const std::string& propertyNam
 	if (property->getVisible() == visible) return false;
 
 	property->setVisible(visible);
+	return true;
+}
+
+bool EntityFarfieldDump::updatePropertyReadOnly(const std::string& propertyName, bool readOnly, double fixedValue)
+{
+	auto property = getProperties().getProperty(propertyName);
+	if (property == nullptr)
+	{
+		assert(0); // Property not found
+		return false;
+	}
+
+	if (property->getReadOnly() == readOnly) return false;
+
+	EntityPropertiesDouble* doubleProperty = dynamic_cast<EntityPropertiesDouble*>(property);
+
+	if (doubleProperty != nullptr)
+	{
+		doubleProperty->setValue(fixedValue);
+	}
+
+	property->setReadOnly(readOnly);
 	return true;
 }
 

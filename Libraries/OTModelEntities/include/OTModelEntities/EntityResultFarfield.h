@@ -38,6 +38,7 @@ public:
 	void setFrequencies(std::list<std::string> _frequencies) { frequencies = _frequencies; }
 	void setThetaRange(double _min, double _max, int _steps) { thetaMin = _min; thetaMax = _max; thetaSteps = _steps; }
 	void setPhiRange(double _min, double _max, int _steps) { phiMin = _min; phiMax = _max; phiSteps = _steps; }
+	void setStructureDimensions(double _cx, double _cy, double _cz, double _d) { structureCx = _cx; structureCy = _cy; structureCz = _cz; structureD = _d; }
 
 	virtual void storeToDataBase(void) override;
 	
@@ -63,6 +64,10 @@ private:
 	double phiMin = 0.0;
 	double phiMax = 0.0;
 	int phiSteps = 0;
+	double structureCx = 0.0;
+	double structureCy = 0.0;
+	double structureCz = 0.0;
+	double structureD = 0.0;
 };
 
 

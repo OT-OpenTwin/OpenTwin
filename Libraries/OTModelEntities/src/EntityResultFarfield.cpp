@@ -72,6 +72,9 @@ void EntityResultFarfield::createProperties(void)
 	EntityPropertiesSelection::createProperty("General", "Frequency", frequencies, frequencies.empty() ? "" : frequencies.front(), "", getProperties());
 	EntityPropertiesSelection::createProperty("General", "Type", {"Magnitude", "Phase", "Real", "Imaginary"}, "Magnitude", "", getProperties());
 
+	EntityPropertiesDouble::createProperty("Visualization", "Scale factor", 1.0, "", getProperties());
+	EntityPropertiesBoolean::createProperty("Visualization", "Show edges", true, "", getProperties());
+
 	EntityPropertiesDouble::createProperty("Phi", "Phi min (deg.)", phiMin, "", getProperties())->setReadOnly(true);
 	EntityPropertiesDouble::createProperty("Phi", "Phi max (deg.)", phiMax, "", getProperties())->setReadOnly(true);
 	EntityPropertiesInteger::createProperty("Phi", "Phi steps", phiSteps, "", getProperties())->setReadOnly(true);
@@ -79,6 +82,11 @@ void EntityResultFarfield::createProperties(void)
 	EntityPropertiesDouble::createProperty("Theta", "Theta min (deg.)", thetaMin, "", getProperties())->setReadOnly(true);
 	EntityPropertiesDouble::createProperty("Theta", "Theta max (deg.)", thetaMax, "", getProperties())->setReadOnly(true);
 	EntityPropertiesInteger::createProperty("Theta", "Theta steps", thetaSteps, "", getProperties())->setReadOnly(true);
+
+	EntityPropertiesDouble::createProperty("Internal", "Structure center x", structureCx, "", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Internal", "Structure center y", structureCy, "", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Internal", "Structure center z", structureCz, "", getProperties())->setVisible(false);
+	EntityPropertiesDouble::createProperty("Internal", "Structure diagonal", structureD, "", getProperties())->setVisible(false);
 
 	getProperties().forceResetUpdateForAllProperties();
 

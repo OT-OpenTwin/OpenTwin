@@ -2284,8 +2284,28 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	// Convert the S-parameters
 	convertAndStoreSParameters(result1D);
 
-	result1D.storeResults({}, {});
-	resultFarfields.storeResults(excitationStringList, farfieldDumpList);
+	result1D.storeResults({}, {}, 0.0, 0.0, 0.0, 0.0);
+
+	double structureCx = 0.0, structureCy = 0.0, structureCz = 0.0, structureD = 0.0;
+	determineStructureDimensions(structureCx, structureCy, structureCz, structureD);
+
+	resultFarfields.storeResults(excitationStringList, farfieldDumpList, structureCx, structureCy, structureCz, structureD);
+}
+
+void FDTDSolver::determineStructureDimensions(double& structureCx, double& structureCy, double& structureCz, double& structureD)
+{
+	double xmin = xLines.front();
+	double xmax = xLines.back();
+	double ymin = yLines.front();
+	double ymax = yLines.back();
+	double zmin = zLines.front();
+	double zmax = zLines.back();
+	
+	structureCx = 0.5 * (xmin + xmax);
+	structureCy = 0.5 * (ymin + ymax);
+	structureCz = 0.5 * (zmin + zmax);
+
+	structureD = sqrt((xmax - xmin) * (xmax - xmin) + (ymax - ymin) * (ymax - ymin) + (zmax - zmin) * (zmax - zmin));
 }
 
 void FDTDSolver::convertAndStoreFieldDumps(const std::string &resultFolderName, const std::string &excitationString)

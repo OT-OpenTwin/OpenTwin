@@ -116,6 +116,7 @@ private:
 	double snapToMeshLine(double coordinate, const std::vector<double>& meshLines);
 	std::string directionToAxis(const std::string& direction);
 	std::size_t removeNearlyEqualFrequencies(std::set<double>& frequencies, double relativeTolerance = 1e-3, double absoluteTolerance = 0.0);
+	void determineStructureDimensions(double& structureCx, double& structureCy, double& structureCz, double& structureD);
 
 	Application* application;
 	EntityBase *solverEntity;

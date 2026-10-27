@@ -24,6 +24,8 @@
 #include <string>
 #include <ctime>
 
+class vtkStructuredGrid;
+
 class VtkDriverFarfield : public VtkDriver
 {
 public:
@@ -34,5 +36,12 @@ public:
 	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRamp) override;
 
 private:
+	double getFarfieldMaxRadius(vtkStructuredGrid* grid);
 
+	double structureCx = 1.0;
+	double structureCy = 1.0;
+	double structureCz = 1.0;
+	double structureD = 1.0;
+	double scaleFactor = 1.0;
+	bool   showEdges = true;
 };

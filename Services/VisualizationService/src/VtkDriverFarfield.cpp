@@ -35,6 +35,7 @@
 #include <osg/LineWidth>
 #include <osg/LightModel>
 #include <osg/LightSource>
+#include <osg/MatrixTransform>
 
 #include <osg/Image>
 #include <osg/Texture2D>
@@ -82,34 +83,36 @@ VtkDriverFarfield::~VtkDriverFarfield()
 
 void VtkDriverFarfield::setProperties(EntityVis2D3D *visEntity)
 {
-	//// General
-	//EntityPropertiesEntityList *resultProperty = dynamic_cast<EntityPropertiesEntityList*>(visEntity->getProperties().getProperty("Result"));
-	//EntityPropertiesSelection *typeProperty = dynamic_cast<EntityPropertiesSelection*>(visEntity->getProperties().getProperty("Type"));
-	//EntityPropertiesSelection *componentProperty = dynamic_cast<EntityPropertiesSelection*>(visEntity->getProperties().getProperty("Component"));
-	//EntityPropertiesDouble *phaseProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Phase"));
-	//EntityPropertiesDouble *timeProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Time"));
+	EntityPropertiesDouble* cxProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Structure center x"));
+	EntityPropertiesDouble* cyProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Structure center y"));
+	EntityPropertiesDouble* czProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Structure center z"));
 
-	//// Plane
+	EntityPropertiesDouble* dProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Structure diagonal"));
 
-	//EntityPropertiesSelection *normalProperty = dynamic_cast<EntityPropertiesSelection*>(visEntity->getProperties().getProperty("Normal"));
-	//EntityPropertiesDouble *normalXProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Normal X"));
-	//EntityPropertiesDouble *normalYProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Normal Y"));
-	//EntityPropertiesDouble *normalZProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Normal Z"));
-	//EntityPropertiesDouble *centerXProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Center X"));
-	//EntityPropertiesDouble *centerYProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Center Y"));
-	//EntityPropertiesDouble *centerZProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Center Z"));
+	EntityPropertiesDouble* scaleFactorProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Scale factor"));
+	EntityPropertiesBoolean* showEdgesProperty = dynamic_cast<EntityPropertiesBoolean*>(visEntity->getProperties().getProperty("Show edges"));
 
-	//// Scaling
-	//EntityPropertiesBoolean *autoscaleProperty = dynamic_cast<EntityPropertiesBoolean*>(visEntity->getProperties().getProperty("Autoscale"));
-	//EntityPropertiesDouble *minProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Min"));
-	//EntityPropertiesDouble *maxProperty = dynamic_cast<EntityPropertiesDouble*>(visEntity->getProperties().getProperty("Max"));
-	//EntityPropertiesBoolean *logscaleProperty = dynamic_cast<EntityPropertiesBoolean*>(visEntity->getProperties().getProperty("Logscale"));
+	if (cxProperty != nullptr && cyProperty != nullptr && czProperty != nullptr)
+	{
+		structureCx = cxProperty->getValue();
+		structureCy = cyProperty->getValue();
+		structureCz = czProperty->getValue();
+	}
 
+	if (dProperty != nullptr)
+	{
+		structureD = dProperty->getValue();
+	}
 
-	//if (centerXProperty != nullptr && centerYProperty != nullptr && centerZProperty != nullptr)
-	//{
-	//	setCenter(centerXProperty->getValue(), centerYProperty->getValue(), centerZProperty->getValue());
-	//}
+	if (scaleFactorProperty != nullptr)
+	{
+		scaleFactor = scaleFactorProperty->getValue();
+	}
+
+	if (showEdgesProperty != nullptr)
+	{
+		showEdges = showEdgesProperty->getValue();
+	}
 }
 
 std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRamp)
@@ -152,12 +155,25 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	property->SetSpecular(0.03);
 	property->SetSpecularPower(50.0);
 
-	property->EdgeVisibilityOn();
+	property->SetEdgeVisibility(showEdges);
 	property->SetEdgeColor(0.1, 0.1, 0.1);
 	property->SetLineWidth(1.0);
 
 	osg::Node* plotNode = VTKActorToOSG(actor);
-	dynamic_cast<osg::Switch*>(node)->addChild(plotNode);
+
+	// Now we move and scale the farfield visualization to the mesh center and the structure diagonal
+	double maxRadius = getFarfieldMaxRadius(dataSource->GetVtkGrid());
+
+	const double scale = (0.5 * structureD) / maxRadius * scaleFactor;
+
+	osg::ref_ptr<osg::MatrixTransform> farFieldTransform = new osg::MatrixTransform();
+
+	farFieldTransform->setMatrix(osg::Matrix::scale(scale, scale, scale) * osg::Matrix::translate(structureCx, structureCy, structureCz));
+
+	farFieldTransform->addChild(plotNode);
+	farFieldTransform->getOrCreateStateSet()->setMode(GL_NORMALIZE, osg::StateAttribute::ON);
+
+	dynamic_cast<osg::Switch*>(node)->addChild(farFieldTransform);
 
 	reportTime("VTK data converted to OSG data", timer);
 
@@ -174,4 +190,22 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	reportTime("VTK data serialized", timer);
 
 	return dataOut.str();
+}
+
+double VtkDriverFarfield::getFarfieldMaxRadius(vtkStructuredGrid* grid)
+{
+	double maxRadius = 0.0;
+
+	for (vtkIdType i = 0; i < grid->GetNumberOfPoints(); ++i)
+	{
+		double p[3];
+		grid->GetPoint(i, p);
+
+		const double radius =
+			std::hypot(std::hypot(p[0], p[1]), p[2]);
+
+		maxRadius = std::max(maxRadius, radius);
+	}
+
+	return maxRadius;
 }
