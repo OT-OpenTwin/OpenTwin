@@ -1,0 +1,144 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "OpenTwin Python: Create virtual environment",
+            "type": "shell",
+            "command": "if (-not (Test-Path '.venv\\Scripts\\python.exe')) { py -m venv .venv; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE } } else { Write-Host 'Virtual environment already exists: .venv' }",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoProfile",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-Command"
+                    ]
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "OpenTwin Python: Install development dependencies",
+            "type": "shell",
+            "command": ".\\.venv\\Scripts\\python.exe -m pip install --upgrade pip; if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }; .\\.venv\\Scripts\\python.exe -m pip install -e '.[dev]'",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoProfile",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-Command"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "OpenTwin Python: Create virtual environment"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "OpenTwin Python: Run tests",
+            "type": "shell",
+            "command": ".\\.venv\\Scripts\\python.exe -m pytest",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoProfile",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-Command"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "OpenTwin Python: Install development dependencies"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "group": {
+                "kind": "test",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "OpenTwin Python: Build distributions",
+            "type": "shell",
+            "command": ".\\.venv\\Scripts\\python.exe -m build",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoProfile",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-Command"
+                    ]
+                }
+            },
+            "dependsOn": [
+                "OpenTwin Python: Install development dependencies"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "group": "build",
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "OpenTwin Python: Test and build",
+            "dependsOn": [
+                "OpenTwin Python: Run tests",
+                "OpenTwin Python: Build distributions"
+            ],
+            "dependsOrder": "sequence",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        },
+        {
+            "label": "OpenTwin Python: Clean build artifacts",
+            "type": "shell",
+            "command": "if (Test-Path 'build') { Remove-Item -Recurse -Force 'build' }; if (Test-Path 'dist') { Remove-Item -Recurse -Force 'dist' }; Get-ChildItem -Directory -Filter '*.egg-info' | Remove-Item -Recurse -Force",
+            "options": {
+                "shell": {
+                    "executable": "powershell.exe",
+                    "args": [
+                        "-NoProfile",
+                        "-ExecutionPolicy",
+                        "Bypass",
+                        "-Command"
+                    ]
+                }
+            },
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
+        }
+    ]
+}
