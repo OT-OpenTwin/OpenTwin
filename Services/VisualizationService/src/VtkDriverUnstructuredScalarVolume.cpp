@@ -113,7 +113,7 @@ void VtkDriverUnstructuredScalarVolume::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem* dataItem, std::string &colorRampData)
+std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerItem* dataItem, std::string &colorRamp)
 {
 	objectsToDelete.clear();
 
@@ -158,7 +158,7 @@ std::string VtkDriverUnstructuredScalarVolume::buildSceneNode(DataSourceManagerI
 			Assemble2DNode(node);
 		}
 
-		getColorRampData(colorRampData);
+		getColorRampData(colorRamp);
 
 		CheckForModelUpdates();
 	}

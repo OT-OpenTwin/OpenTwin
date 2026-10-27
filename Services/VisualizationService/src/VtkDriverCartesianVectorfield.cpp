@@ -105,7 +105,7 @@ void VtkDriverCartesianVectorfield::DeletePropertyData(void)
 #include <vtkPlaneCutter.h>
 
 
-std::string VtkDriverCartesianVectorfield::buildSceneNode(DataSourceManagerItem *dataItem, std::string &colorRampData) {
+std::string VtkDriverCartesianVectorfield::buildSceneNode(DataSourceManagerItem *dataItem, std::string &colorRamp) {
 	updateTopoEntityID.clear();
 	updateTopoEntityVersion.clear();
 	std::time_t timer = time(nullptr);

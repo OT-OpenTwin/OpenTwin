@@ -121,7 +121,7 @@ void VtkDriverVectorVolumeTime::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverVectorVolumeTime::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData)
+std::string VtkDriverVectorVolumeTime::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRamp)
 {
 	objectsToDelete.clear();
 
@@ -163,7 +163,7 @@ std::string VtkDriverVectorVolumeTime::buildSceneNode(DataSourceManagerItem *dat
 			Assemble2DNode(node);
 		}
 
-		getColorRampData(colorRampData);
+		getColorRampData(colorRamp);
 
 		CheckForModelUpdates();
 	}

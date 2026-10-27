@@ -35,12 +35,28 @@ DataSourceManager::~DataSourceManager()
 	// We do not delete the data items here, since we keep them persistent until they are explicitly deleted.
 }
 
-DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent)
+DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent, EntityBase *visEntity)
 {
-	if (!isDataItemLoaded(sourceID, sourceVersion))
+	ot::UID dataID      = sourceID;
+	ot::UID dataVersion = sourceVersion;
+
+	if (sourceID == 0)
+	{
+		// We do not have a separate source data item. Therefore, we use the actual topology entity to identify the source item
+		dataID = visEntity->getEntityID();
+		dataVersion = visEntity->getEntityStorageVersion();
+	}
+
+	if (!isDataItemLoaded(dataID, dataVersion))
 	{
 		// Now load the data item to determine its type
-		EntityBase *resultEntity = dynamic_cast<EntityBase*>(ot::EntityAPI::readEntityFromEntityIDandVersion(sourceID, sourceVersion));
+		EntityBase* resultEntity = visEntity;
+		
+		if (sourceID > 0)
+		{
+			resultEntity = dynamic_cast<EntityBase*>(ot::EntityAPI::readEntityFromEntityIDandVersion(sourceID, sourceVersion));
+		}
+
 		EntityBase *meshEntity = nullptr;
 
 		if (meshID > 0)
@@ -54,7 +70,7 @@ DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID 
 
 			if (newItem->loadData(resultEntity, meshEntity))
 			{
-				dataItems[std::pair<ot::UID, ot::UID>(sourceID, sourceVersion)] = newItem;
+				dataItems[std::pair<ot::UID, ot::UID>(dataID, dataVersion)] = newItem;
 			}
 			else
 			{
@@ -64,8 +80,8 @@ DataSourceManagerItem *DataSourceManager::getDataItem(ot::UID sourceID, ot::UID 
 	}
 
 	// Now we check whether the item is available (and return nullptr if not).
-	if (!isDataItemLoaded(sourceID, sourceVersion)) return nullptr;
-	return dataItems[std::pair<ot::UID, ot::UID>(sourceID, sourceVersion)];
+	if (!isDataItemLoaded(dataID, dataVersion)) return nullptr;
+	return dataItems[std::pair<ot::UID, ot::UID>(dataID, dataVersion)];
 }
 
 void DataSourceManager::deleteDataItem(ot::UID sourceID, ot::UID sourceVersion)

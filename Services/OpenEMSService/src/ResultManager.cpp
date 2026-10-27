@@ -578,6 +578,12 @@ void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, 
 
 		newPlot.createProperties();
 		newPlot.setInitiallyHidden(true);
+		newPlot.registerCallbacks(
+			ot::EntityCallbackBase::Callback::Properties |
+			ot::EntityCallbackBase::Callback::Selection |
+			ot::EntityCallbackBase::Callback::DataNotify,
+			OT_INFO_SERVICE_TYPE_VisualizationService
+		);
 
 		newPlot.storeToDataBase();
 		_modelComponent->addNewTopologyEntity(newPlot.getEntityID(), newPlot.getEntityStorageVersion(), false);

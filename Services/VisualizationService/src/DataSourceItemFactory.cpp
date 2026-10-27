@@ -27,6 +27,7 @@
 #include "DataSourceUnstructuredMesh.h"
 #include "DataSourceVtkComplex.h"
 #include "DataSourceVtkTime.h"
+#include "DataSourceVtkFarfield.h"
 #include "OTCore/Logging/Logger.h"
 
 DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resultEntity)
@@ -54,6 +55,10 @@ DataSourceManagerItem *DataSourceItemFactory::createSourceItem(EntityBase *resul
 	else if (resultEntity->getClassName() == "EntityResultVtkTime")
 	{
 		return new DataSourceVtkTime;
+	}	
+	else if (resultEntity->getClassName() == "EntityResultFarfield")
+	{
+		return new DataSourceVtkFarfield;
 	}
 	else
 	{

@@ -108,7 +108,7 @@ void VtkDriverUnstructuredScalarSurface::DeletePropertyData(void)
 	}
 }
 
-std::string VtkDriverUnstructuredScalarSurface::buildSceneNode(DataSourceManagerItem* dataItem, std::string& colorRampData)
+std::string VtkDriverUnstructuredScalarSurface::buildSceneNode(DataSourceManagerItem* dataItem, std::string& colorRamp)
 {
 	objectsToDelete.clear();
 
@@ -145,7 +145,7 @@ std::string VtkDriverUnstructuredScalarSurface::buildSceneNode(DataSourceManager
 
 		AssembleNode(node);
 
-		getColorRampData(colorRampData);
+		getColorRampData(colorRamp);
 
 		CheckForModelUpdates();
 	}

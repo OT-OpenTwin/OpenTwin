@@ -129,7 +129,7 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 	vtkDriver->setProperties(visEntity);
 
 	// Load the data item
-	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent());
+	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent(), visEntity);
 
 	// Now build the osg node and convert it to a string
 	std::string nodeString = vtkDriver->buildSceneNode(dataItem, colorRampData);

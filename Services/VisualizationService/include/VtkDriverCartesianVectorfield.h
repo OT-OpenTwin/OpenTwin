@@ -44,7 +44,7 @@ public:
 	virtual ~VtkDriverCartesianVectorfield();
 
 	virtual void setProperties(EntityVis2D3D *visEntity) override;
-	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRampData) override;
+	virtual std::string buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRamp) override;
 	
 private:
 	PropertyBundleDataHandlePlane * planeData = nullptr;

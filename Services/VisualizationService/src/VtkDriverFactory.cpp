@@ -30,6 +30,7 @@
 #include "VtkDriverUnstructuredVectorSurface.h"
 #include "VtkDriverVectorVolumeComplex.h"
 #include "VtkDriverVectorVolumeTime.h"
+#include "VtkDriverFarfield.h"
 
 VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 {
@@ -64,6 +65,10 @@ VtkDriver *VtkDriverFactory::createDriver(EntityVis2D3D *visEntity)
 	else if (visEntity->getClassName() == "EntityVisVtkVectorVolumeTime")
 	{
 		return new VtkDriverVectorVolumeTime;
+	}
+	else if (visEntity->getClassName() == "EntityResultFarfield")
+	{
+		return new VtkDriverFarfield;
 	}
 	else
 	{

@@ -33,8 +33,9 @@ public:
 	DataSourceManager();
 	virtual ~DataSourceManager();
 
-	static DataSourceManagerItem *getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent);
+	static DataSourceManagerItem *getDataItem(ot::UID sourceID, ot::UID sourceVersion, ot::UID meshID, ot::UID meshVersion, ot::components::ModelComponent *modelComponent, EntityBase* visEntity);
 
+private:
 	static void deleteDataItem(ot::UID sourceID, ot::UID sourceVersion);
 	static bool isDataItemLoaded(ot::UID sourceID, ot::UID sourceVersion);
 
