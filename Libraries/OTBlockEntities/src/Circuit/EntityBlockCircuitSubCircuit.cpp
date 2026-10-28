@@ -21,7 +21,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitSubcircuit.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
-#include "OTGui/Graphics/Builder/GraphicsFlowItemBuilder.h"
+#include "OTGui/Graphics/Builder/GraphicsCircuitItemBuilder.h"
 #include "OTGui/Graphics/GraphicsItemMap.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
 #include "OTCore/FolderNames.h"
@@ -90,7 +90,7 @@ void EntityBlockCircuitSubcircuit::createProperties()
 
 bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 {
-	bool refresh = EntityBlockCircuitElement::updateFromProperties();
+	bool refresh = false;
 	auto prop = getProperties().getProperty("SubCircuit");
 	if (prop && prop->needsUpdate())
 	{
@@ -130,6 +130,7 @@ bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 				}
 			}
 		}
+		setModified();
 		if (getObserver() != nullptr)
 		{
 			createBlockItem();
@@ -137,6 +138,9 @@ bool EntityBlockCircuitSubcircuit::updateFromProperties(void)
 		}
 		refresh = true;
 	}
+
+	refresh = EntityBlockCircuitElement::updateFromProperties() || refresh;
+
 	if (refresh)
 	{
 		getProperties().forceResetUpdateForAllProperties();
@@ -228,6 +232,7 @@ bool EntityBlockCircuitSubcircuit::getFlipVertical() const
 ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 {
 	std::vector<std::string> terminals = m_orderedTerminalNames;
+	std::map<std::string, std::string> terminalSides;
 
 	if (getObserver() != nullptr)
 	{
@@ -243,7 +248,12 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 			const auto* graphicsItemMap = getObserver()->getGraphicsItemMap(sceneName);
 			if (graphicsItemMap != nullptr)
 			{
-				std::vector<std::string> rawTerminalNames;
+				struct TerminalInfo {
+					std::string name;
+					std::string side;
+					ot::UID uid;
+				};
+				std::vector<TerminalInfo> rawTerminals;
 				ot::UIDList graphicsItemsUIDs = graphicsItemMap->getAllIDs();
 				for (auto uid : graphicsItemsUIDs)
 				{
@@ -256,26 +266,21 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 					EntityBlockCircuitTerminal* terminal = dynamic_cast<EntityBlockCircuitTerminal*>(entity);
 					if (terminal != nullptr)
 					{
-						rawTerminalNames.push_back(terminal->getTerminalName());
+						rawTerminals.push_back({ terminal->getTerminalName(), terminal->getTerminalSide(), uid });
 					}
 				}
-				std::sort(rawTerminalNames.begin(), rawTerminalNames.end());
-
-				std::map<std::string, int> totalCounts;
-				for (const auto& name : rawTerminalNames) {
-					totalCounts[name]++;
-				}
+				std::sort(rawTerminals.begin(), rawTerminals.end(), [](const TerminalInfo& a, const TerminalInfo& b) {
+					if (a.name != b.name) return a.name < b.name;
+					return a.uid < b.uid;
+				});
 
 				std::map<std::string, int> currentCounts;
 				terminals.clear();
-				for (const auto& name : rawTerminalNames) {
-					if (totalCounts[name] > 1) {
-						currentCounts[name]++;
-						terminals.push_back(name + "_" + std::to_string(currentCounts[name]));
-					}
-					else {
-						terminals.push_back(name);
-					}
+				for (const auto& t : rawTerminals) {
+					currentCounts[t.name]++;
+					std::string uniqueName = (currentCounts[t.name] == 1) ? t.name : (t.name + "_" + std::to_string(currentCounts[t.name]));
+					terminals.push_back(uniqueName);
+					terminalSides[uniqueName] = t.side;
 				}
 			}
 		}
@@ -306,7 +311,7 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 		setModified();
 	}
 
-	ot::GraphicsFlowItemBuilder block;
+	ot::GraphicsCircuitItemBuilder block;
 	block.setName(this->getClassName());
 
 	std::string title = getSubcircuitName();
@@ -320,45 +325,50 @@ ot::GraphicsItemCfg* EntityBlockCircuitSubcircuit::createBlockCfg()
 	}
 	block.setTitle(title);
 
-	const ot::Color colourTitle(ot::RoyalBlue);
-	block.setTitleBackgroundGradientColor(colourTitle);
-	block.setLeftTitleCornerImagePath("CircuitElementImages/Subcircuit");
-
-	size_t numTerminals = m_orderedTerminalNames.size();
 	std::vector<std::string> leftTerminals;
+	std::vector<std::string> topTerminals;
 	std::vector<std::string> rightTerminals;
+	std::vector<std::string> bottomTerminals;
 
-	if (numTerminals == 1)
+	for (const auto& termName : m_orderedTerminalNames)
 	{
-		leftTerminals.push_back(m_orderedTerminalNames[0]);
-	}
-	else if (numTerminals == 2)
-	{
-		leftTerminals.push_back(m_orderedTerminalNames[0]);
-		rightTerminals.push_back(m_orderedTerminalNames[1]);
-	}
-	else if (numTerminals > 2)
-	{
-		size_t numLeft = (numTerminals + 1) / 2;
-		for (size_t i = 0; i < numLeft; ++i)
+		std::string rawName = getTerminalTitleFromConnectorName(termName);
+		std::string side = "Left";
+		if (terminalSides.count(termName))
 		{
-			leftTerminals.push_back(m_orderedTerminalNames[i]);
+			side = terminalSides[termName];
 		}
-		for (size_t i = numLeft; i < numTerminals; ++i)
+		else if (terminalSides.count(rawName))
 		{
-			rightTerminals.push_back(m_orderedTerminalNames[i]);
+			side = terminalSides[rawName];
 		}
+
+		if (side == "Left")        leftTerminals.push_back(termName);
+		else if (side == "Top")    topTerminals.push_back(termName);
+		else if (side == "Right")  rightTerminals.push_back(termName);
+		else if (side == "Bottom") bottomTerminals.push_back(termName);
+		else                       leftTerminals.push_back(termName);
 	}
 
 	for (const auto& termName : leftTerminals)
 	{
-		std::string title = getTerminalTitleFromConnectorName(termName);
-		block.addLeft(termName, title, ot::GraphicsFlowItemConnector::Circle);
+		std::string termTitle = getTerminalTitleFromConnectorName(termName);
+		block.addLeft(termName, termTitle);
+	}
+	for (const auto& termName : topTerminals)
+	{
+		std::string termTitle = getTerminalTitleFromConnectorName(termName);
+		block.addTop(termName, termTitle);
 	}
 	for (const auto& termName : rightTerminals)
 	{
-		std::string title = getTerminalTitleFromConnectorName(termName);
-		block.addRight(termName, title, ot::GraphicsFlowItemConnector::Circle);
+		std::string termTitle = getTerminalTitleFromConnectorName(termName);
+		block.addRight(termName, termTitle);
+	}
+	for (const auto& termName : bottomTerminals)
+	{
+		std::string termTitle = getTerminalTitleFromConnectorName(termName);
+		block.addBottom(termName, termTitle);
 	}
 
 	auto graphicsItemConfig = block.createGraphicsItem();
