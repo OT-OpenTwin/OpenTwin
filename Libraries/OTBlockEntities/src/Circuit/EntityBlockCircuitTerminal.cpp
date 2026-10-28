@@ -44,8 +44,12 @@ EntityBlockCircuitTerminal::EntityBlockCircuitTerminal(ot::UID ID, EntityBase* p
 void EntityBlockCircuitTerminal::createProperties()
 {
 	EntityBlockCircuitElement::createProperties();
+
 	// Name of the terminal which connects outside the subcircuit.
 	EntityPropertiesString::createProperty("Terminal Properties", "Terminal Name", "IN", "default", getProperties());
+
+	// Side of the terminal. This is used to determine the position of the terminal in the subcircuit block.
+	EntityPropertiesSelection::createProperty("Terminal Properties", "Side", { "Left", "Right", "Top", "Bottom" }, "Left", "default", getProperties());
 
 	// Add initial suffix to the name if it does not already have one
 	std::string currentName = getName();
@@ -101,6 +105,18 @@ bool EntityBlockCircuitTerminal::updateFromProperties(void)
 			}
 		}
 	}
+
+	auto sideProp = getProperties().getProperty("Side");
+	if (sideProp && sideProp->needsUpdate())
+	{
+		refresh = true;
+		setModified();
+		if (getObserver() != nullptr)
+		{
+			getObserver()->connectionChanged(this);
+		}
+	}
+
 
 	refresh = EntityBlockCircuitElement::updateFromProperties() || refresh;
 
@@ -169,6 +185,28 @@ void EntityBlockCircuitTerminal::setTerminalName(const std::string& _name)
 	}
 
 	setModified();
+}
+
+std::string EntityBlockCircuitTerminal::getTerminalSide() const
+{
+	auto prop = getProperties().getProperty("Side");
+	auto selProp = dynamic_cast<const EntityPropertiesSelection*>(prop);
+	if (selProp)
+	{
+		return selProp->getValue();
+	}
+	return "Left";
+}
+
+void EntityBlockCircuitTerminal::setTerminalSide(const std::string& _side)
+{
+	auto prop = getProperties().getProperty("Side");
+	auto selProp = dynamic_cast<EntityPropertiesSelection*>(prop);
+	if (selProp)
+	{
+		selProp->setValue(_side);
+		setModified();
+	}
 }
 
 double EntityBlockCircuitTerminal::getRotation() const

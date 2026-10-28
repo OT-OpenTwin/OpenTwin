@@ -45,6 +45,10 @@ public:
 	std::string getTerminalName() const;
 	void setTerminalName(const std::string& _name);
 
+	std::string getTerminalSide() const;
+	void setTerminalSide(const std::string& _side);
+
+
 	double getRotation() const;
 	bool getFlipHorizontal() const;
 	bool getFlipVertical() const;
