@@ -241,9 +241,9 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				ColorStyleIntegerEntry n = stringToColorStyleIntegerEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				ColorStyleIntegerEntry entry = stringToColorStyleIntegerEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
 				int v = json::getInt(vObj, toString(ColorStyleFileValue::ValueValue));
-				this->addInteger(n, v, false);
+				this->addInteger(entry, v, false);
 			}
 		}
 		else if (k.toStdString() == toString(ColorStyleFileKey::DoubleKey)) {
@@ -254,9 +254,9 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				ColorStyleDoubleEntry n = stringToColorStyleDoubleEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				ColorStyleDoubleEntry entry = stringToColorStyleDoubleEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
 				int v = json::getDouble(vObj, toString(ColorStyleFileValue::ValueValue));
-				this->addDouble(n, v, false);
+				this->addDouble(entry, v, false);
 			}
 		}
 		else if (k.toStdString() == toString(ColorStyleFileKey::FileKey)) {
@@ -267,9 +267,9 @@ bool ot::ColorStyle::setupFromFile(QByteArray _data) {
 			}
 			for (JsonSizeType i = 0; i < doc.Size(); i++) {
 				ConstJsonObject vObj = json::getObject(doc, i);
-				ColorStyleFileEntry n = stringToColorStyleFileEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
+				ColorStyleFileEntry entry = stringToColorStyleFileEntry(json::getString(vObj, toString(ColorStyleFileValue::NameValue)));
 				QString p = QString::fromStdString(json::getString(vObj, toString(ColorStyleFileValue::PathValue)));
-				this->addFile(n, p, false);
+				this->addFile(entry, p, false);
 			}
 		}
 		else if (k.toStdString() == toString(ColorStyleFileKey::PainterKey)) {

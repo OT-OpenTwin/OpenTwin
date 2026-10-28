@@ -160,7 +160,7 @@ void ot::HeaderFilter::updateCheckedState(const QStringList& _checkedItems)
 
 QStringList ot::HeaderFilter::saveCheckedState() const
 {
-	QStringList data;
+	QStringList stateText;
 
 	if (m_optionsList)
 	{
@@ -170,7 +170,7 @@ QStringList ot::HeaderFilter::saveCheckedState() const
 			QListWidgetItem* item = m_optionsList->item(i);
 			if (item->checkState() == Qt::Checked)
 			{
-				data.append(item->text());
+				stateText.append(item->text());
 			}
 			else
 			{
@@ -181,11 +181,11 @@ QStringList ot::HeaderFilter::saveCheckedState() const
 		// If all items are checked, clear the selection to indicate no filtering
 		if (!hasUnchecked)
 		{
-			data.clear();
+			stateText.clear();
 		}
 	}
 
-	return data;
+	return stateText;
 }
 
 void ot::HeaderFilter::showAt(const QPoint& _pos)

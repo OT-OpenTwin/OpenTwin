@@ -104,9 +104,9 @@ void ot::CartesianPlot::resetPlotView() {
 			QwtPlotCurve* curve = static_cast<QwtPlotCurve*>(item);
 
 			if (curve && curve->isVisible()) {
-				const QwtSeriesData<QPointF>* data = curve->data();
-				for (size_t i = 0; i < data->size(); ++i) {
-					QPointF p = data->sample(i);
+				const QwtSeriesData<QPointF>* curveData = curve->data();
+				for (size_t i = 0; i < curveData->size(); ++i) {
+					QPointF p = curveData->sample(i);
 					xMin = std::min(xMin, p.x());
 					xMax = std::max(xMax, p.x());
 					yMin = std::min(yMin, p.y());

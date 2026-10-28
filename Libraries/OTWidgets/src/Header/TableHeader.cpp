@@ -139,17 +139,17 @@ void ot::TableHeader::filterHasChanged(const HeaderFilterState& _filterState)
 			bool match = true;
 			for (const auto& [logicalIndex, selectedOptions] : filterData)
 			{
-				QVariant data;
+				QVariant cellData;
 				if (orientation() == Qt::Horizontal)
 				{
-					data = model->data(model->index(i, logicalIndex));
+					cellData = model->data(model->index(i, logicalIndex));
 				}
 				else
 				{
-					data = model->data(model->index(logicalIndex, i));
+					cellData = model->data(model->index(logicalIndex, i));
 				}
 			
-				if (!data.isValid() || !selectedOptions.contains(data.toString()))
+				if (!cellData.isValid() || !selectedOptions.contains(cellData.toString()))
 				{
 					match = false;
 					break;
@@ -187,10 +187,10 @@ QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const
 		options.reserve(m_table->rowCount());
 		for (int r = 0; r < m_table->rowCount(); r++)
 		{
-			QVariant data = model->data(model->index(r, _logicalIndex));
-			if (data.isValid())
+			QVariant cellData = model->data(model->index(r, _logicalIndex));
+			if (cellData.isValid())
 			{
-				options.push_back(data.toString());
+				options.push_back(cellData.toString());
 			}
 		}
 	}
@@ -199,10 +199,10 @@ QStringList ot::TableHeader::getFilterOptionsFromText(int _logicalIndex) const
 		options.reserve(m_table->columnCount());
 		for (int c = 0; c < m_table->columnCount(); c++)
 		{
-			QVariant data = model->data(model->index(_logicalIndex, c));
-			if (data.isValid())
+			QVariant cellData = model->data(model->index(_logicalIndex, c));
+			if (cellData.isValid())
 			{
-				options.push_back(data.toString());
+				options.push_back(cellData.toString());
 			}
 		}
 	}

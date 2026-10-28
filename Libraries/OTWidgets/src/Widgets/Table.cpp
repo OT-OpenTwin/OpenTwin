@@ -187,7 +187,7 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 		OT_TEST_TABLE_Interval("Setup from config: Set data");
 
 		QAbstractItemModel* dataModel = this->model();
-		QSignalBlocker blocker(dataModel);
+		QSignalBlocker dataBlocker(dataModel);
 		
 		int rows = _config.getRowCount();
 		int columns = _config.getColumnCount();

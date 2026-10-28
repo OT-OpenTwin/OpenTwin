@@ -280,8 +280,8 @@ bool ot::TextEditor::saveToFile(const QString& _fileName) {
 		return false;
 	}
 	else {
-		QByteArray data = QByteArray::fromStdString(this->toPlainText().toStdString());
-		result = file.write(data) == data.size();
+		QByteArray raw = QByteArray::fromStdString(this->toPlainText().toStdString());
+		result = file.write(raw) == raw.size();
 		file.close();
 	}
 

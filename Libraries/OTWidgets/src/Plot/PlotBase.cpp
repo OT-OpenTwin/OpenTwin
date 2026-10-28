@@ -156,9 +156,9 @@ void ot::PlotBase::setPlotType(Plot1DCfg::PlotType _type) {
 		}
 	}
 
-	for (auto data : getAllDatasets()) {
-		data->rebuildCurve(true);
-		data->updateCurveVisualization();
+	for (auto* dataset : getAllDatasets()) {
+		dataset->rebuildCurve(true);
+		dataset->updateCurveVisualization();
 	}
 
 	updateAxisTitles(true);
@@ -182,9 +182,9 @@ void ot::PlotBase::resetView() {
 }
 
 void ot::PlotBase::renameDataset(const std::string& _oldEntityPath, const std::string& _newEntityPath) {
-	for (PlotDataset* data : this->getAllDatasets()) {
-		if (data->getEntityName() == _oldEntityPath) {
-			data->setEntityName(_newEntityPath);
+	for (PlotDataset* dataset : this->getAllDatasets()) {
+		if (dataset->getEntityName() == _oldEntityPath) {
+			dataset->setEntityName(_newEntityPath);
 		}
 	}
 }
@@ -253,10 +253,10 @@ void ot::PlotBase::applyConfig()
 	const Plot1DAxisCfg::ValueScaling yValueScaling = m_config.getYAxis().getValueScaling();
 
 	// Apply changes (triggers calculation if needed)
-	for (PlotDataset* data : getAllDatasets())
+	for (PlotDataset* dataset : getAllDatasets())
 	{
-		data->setAxisQuantitiesAndScaling(xAxisQuantityComponent, xValueScaling, yAxisQuantityComponent, yValueScaling);
-		data->updateCurveVisualization();
+		dataset->setAxisQuantitiesAndScaling(xAxisQuantityComponent, xValueScaling, yAxisQuantityComponent, yValueScaling);
+		dataset->updateCurveVisualization();
 	}
 
 	// Legend
