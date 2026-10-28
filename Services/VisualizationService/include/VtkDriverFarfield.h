@@ -19,14 +19,16 @@
 
 #pragma once
 
-#include "VtkDriver.h"
+#include "VtkDriverWithScaling.h"
 
 #include <string>
 #include <ctime>
+#include <complex>
 
 class vtkStructuredGrid;
+class DataSourceVtkFarfield;
 
-class VtkDriverFarfield : public VtkDriver
+class VtkDriverFarfield : public VtkDriverWithScaling
 {
 public:
 	VtkDriverFarfield();
@@ -37,6 +39,11 @@ public:
 
 private:
 	double getFarfieldMaxRadius(vtkStructuredGrid* grid);
+	void buildVtkGrid(DataSourceVtkFarfield* dataSource, vtkStructuredGrid* vtkGrid);
+	inline double getPlotComponent(std::complex<double> &value);
+	void determinePlotType(EntityVis2D3D* visEntity);
+
+	enum plotType { MAGNITUDE, PHASE, REAL, IMAGINARY };
 
 	double structureCx = 1.0;
 	double structureCy = 1.0;
@@ -44,4 +51,5 @@ private:
 	double structureD = 1.0;
 	double scaleFactor = 1.0;
 	bool   showEdges = true;
+	plotType plotComponent = MAGNITUDE;
 };

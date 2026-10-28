@@ -38,15 +38,11 @@
 
 DataSourceVtkFarfield::DataSourceVtkFarfield()
 {
-	vtkGrid = vtkStructuredGrid::New();
 }
 
 DataSourceVtkFarfield::~DataSourceVtkFarfield()
 {
 	FreeMemory();
-
-	vtkGrid->Delete();
-	vtkGrid = nullptr;
 }
 
 bool DataSourceVtkFarfield::loadData(EntityBase* resultEntity, EntityBase* meshEntity)
@@ -75,10 +71,8 @@ bool DataSourceVtkFarfield::loadData(EntityResultFarfield* farfield)
 	const double pi = std::acos(-1.0);
 
 	// including theta = 180 and phi = 360.
-	std::vector<double> theta(thetaSteps + 1);
-	std::vector<double> phi(phiSteps + 1);
-
-	std::vector<std::vector<double>> radius(thetaSteps + 1, std::vector<double>(phiSteps + 1));
+	theta = std::vector<double>(thetaSteps + 1);
+	phi = std::vector<double>(phiSteps + 1);
 
 	// create angle fields in degrees.
 	for (int i = 0; i <= thetaSteps; ++i)
@@ -92,6 +86,8 @@ bool DataSourceVtkFarfield::loadData(EntityResultFarfield* farfield)
 	}
 
 	// test function  <<<<<<<<< to be changed
+	radius = std::vector<std::vector<std::complex<double>>>(thetaSteps + 1, std::vector<std::complex<double>>(phiSteps + 1));
+
 	for (int i = 0; i <= thetaSteps; ++i)
 	{
 		const double t = theta[i] * pi / 180.0;
@@ -101,66 +97,31 @@ bool DataSourceVtkFarfield::loadData(EntityResultFarfield* farfield)
 		{
 			const double p = phi[j] * pi / 180.0;
 
-			radius[i][j] =
+			// Same amplitude pattern as before
+			const double amplitude =
 				1.0
 				+ 0.35 * sinT * sinT * std::cos(2.0 * p)
 				+ 0.20 * std::cos(t);
+
+			// Artificial test phase in radians.
+			// Periodic in phi and independent of phi at the poles.
+			const double phase = 0.75 * pi * sinT * std::cos(p);
+
+			// amplitude * (cos(phase) + i * sin(phase))
+			radius[i][j] = std::polar(amplitude, phase);
 		}
 
-		// Ensure to use the same radius for phi = 360 as for phi = 0 
+		// Same complex value at phi = 360 and phi = 0
 		radius[i][phiSteps] = radius[i][0];
 	}
-
-	// Store the points in the vtk data structure
-	const int nTheta = static_cast<int>(theta.size());
-	const int nPhi = static_cast<int>(phi.size());
-
-	vtkNew<vtkPoints> points;
-	points->SetDataTypeToDouble();
-
-	for (int j = 0; j < nPhi; ++j)
-	{
-		const double p = vtkMath::RadiansFromDegrees(phi[j]);
-
-		for (int i = 0; i < nTheta; ++i)
-		{
-			const double t = vtkMath::RadiansFromDegrees(theta[i]);
-			const double r = radius[i][j];
-
-			points->InsertNextPoint(
-				r * std::sin(t) * std::cos(p),
-				r * std::sin(t) * std::sin(p),
-				r * std::cos(t));
-		}
-	}
-
-	vtkGrid->SetDimensions(nTheta, nPhi, 1);
-	vtkGrid->SetPoints(points);
-
-	vtkNew<vtkDoubleArray> scalars;
-	scalars->SetName("Radius");
-	scalars->SetNumberOfComponents(1);
-
-	for (int j = 0; j < nPhi; ++j)
-	{
-		for (int i = 0; i < nTheta; ++i)
-		{
-			scalars->InsertNextValue(radius[i][j]);
-		}
-	}
-
-	vtkGrid->GetPointData()->SetScalars(scalars);
-
-	//scaleFactor = farfield->getScaleFactor();
 
 	return true;
 }
 
 void DataSourceVtkFarfield::FreeMemory(void)
 {
-	vtkGrid->SetDimensions(0, 0, 0);
-
-	vtkGrid->SetPoints(nullptr);
-	vtkGrid->GetPointData()->SetScalars(nullptr);
+	radius.clear();
+	theta.clear();
+	phi.clear();
 }
 

@@ -40,6 +40,8 @@ public:
 	void setPhiRange(double _min, double _max, int _steps) { phiMin = _min; phiMax = _max; phiSteps = _steps; }
 	void setStructureDimensions(double _cx, double _cy, double _cz, double _d) { structureCx = _cx; structureCy = _cy; structureCz = _cz; structureD = _d; }
 
+	bool getComplex() { return complex; }
+
 	virtual void storeToDataBase(void) override;
 	
 	virtual std::string getClassName(void) const override { return "EntityResultFarfield"; };

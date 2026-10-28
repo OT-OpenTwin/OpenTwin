@@ -22,6 +22,7 @@
 #include "DataSourceManagerItem.h"
 #include "DataSourceVtkFarfield.h"
 #include "OTModelEntities/EntityVis2D3D.h"
+#include "OTModelEntities/EntityResultFarfield.h"
 
 #include <osg/StateSet>
 #include <osg/Node>
@@ -60,6 +61,7 @@
 #include <vtkPolyData.h>
 #include <vtkBandedPolyDataContourFilter.h>
 #include <vtkFloatArray.h>
+#include <vtkDoubleArray.h>
 #include <vtkPointData.h>
 #include <vtkStructuredGridReader.h>
 #include <vtkPlane.h>
@@ -113,6 +115,59 @@ void VtkDriverFarfield::setProperties(EntityVis2D3D *visEntity)
 	{
 		showEdges = showEdgesProperty->getValue();
 	}
+
+	determinePlotType(visEntity);
+}
+
+void VtkDriverFarfield::determinePlotType(EntityVis2D3D* visEntity)
+{
+	EntityResultFarfield* farfield = dynamic_cast<EntityResultFarfield*>(visEntity);
+
+	if (!farfield->getComplex())
+	{
+		plotComponent = MAGNITUDE;
+		unit = "V/m";
+	}
+	else
+	{
+		EntityPropertiesSelection* typeProperty = dynamic_cast<EntityPropertiesSelection*>(visEntity->getProperties().getProperty("Type"));
+
+		if (typeProperty != nullptr)
+		{
+			if (typeProperty->getValue() == "Magnitude")
+			{
+				plotComponent = MAGNITUDE;
+				unit = "V/m";
+			}
+			else if (typeProperty->getValue() == "Phase")
+			{
+				plotComponent = PHASE;
+				unit = "Degrees";
+			}
+			else if (typeProperty->getValue() == "Real")
+			{
+				plotComponent = REAL;
+				unit = "V/m";
+			}
+			else if (typeProperty->getValue() == "Imaginary")
+			{
+				plotComponent = IMAGINARY;
+				unit = "V/m";
+			}
+			else
+			{
+				plotComponent = MAGNITUDE;
+				unit = "V/m";
+				assert(0); // Unknown type set
+			}
+		}
+		else
+		{
+			plotComponent = MAGNITUDE;
+			unit = "V/m";
+			assert(0); // No type property set
+		}
+	}
 }
 
 std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, std::string& colorRamp)
@@ -124,8 +179,11 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 
 	DataSourceVtkFarfield *dataSource = dynamic_cast<DataSourceVtkFarfield*>(dataItem);
 
+	vtkNew<vtkStructuredGrid> vtkGrid;
+	buildVtkGrid(dataSource, vtkGrid);
+
 	vtkNew<vtkGeometryFilter> geometryFilter;
-	geometryFilter->SetInputData(dataSource->GetVtkGrid());
+	geometryFilter->SetInputData(vtkGrid);
 
 	vtkNew<vtkPolyDataNormals> normals;
 	normals->SetInputConnection(geometryFilter->GetOutputPort());
@@ -139,7 +197,19 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	mapper->ScalarVisibilityOn();
 	mapper->SetScalarModeToUsePointData();
 	mapper->SetColorModeToMapScalars();
-	mapper->SetScalarRange(dataSource->GetVtkGrid()->GetScalarRange());
+	mapper->SetScalarRange(vtkGrid->GetScalarRange());
+
+	mapper->Update();
+	mapper->MapScalars(1.0);
+
+	vtkLookupTable* lut = vtkLookupTable::SafeDownCast(mapper->GetLookupTable());
+
+	if (lut != nullptr)
+	{
+		lut->Build();
+		extractColorRampFromLookupTable(lut);
+		colorRamp = colorRampData;
+	}
 
 	vtkNew<vtkActor> actor;
 	actor->SetMapper(mapper);
@@ -162,7 +232,7 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	osg::Node* plotNode = VTKActorToOSG(actor);
 
 	// Now we move and scale the farfield visualization to the mesh center and the structure diagonal
-	double maxRadius = getFarfieldMaxRadius(dataSource->GetVtkGrid());
+	double maxRadius = getFarfieldMaxRadius(vtkGrid);
 
 	const double scale = (0.5 * structureD) / maxRadius * scaleFactor;
 
@@ -192,6 +262,73 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	return dataOut.str();
 }
 
+double VtkDriverFarfield::getPlotComponent(std::complex<double>& value)
+{
+	switch (plotComponent)
+	{
+	case MAGNITUDE:
+		return std::abs(value);
+		break;
+	case PHASE:
+		return vtkMath::DegreesFromRadians(std::arg(value));
+		break;
+	case REAL:
+		return std::real(value);
+		break;
+	case IMAGINARY:
+		return std::imag(value);
+		break;
+	}
+
+	assert(0); // Unknown component
+	return 0.0;
+}
+
+void VtkDriverFarfield::buildVtkGrid(DataSourceVtkFarfield* dataSource, vtkStructuredGrid * vtkGrid)
+{
+	// Store the points in the vtk data structure
+	const int nTheta = static_cast<int>(dataSource->getTheta().size());
+	const int nPhi = static_cast<int>(dataSource->getPhi().size());
+
+	vtkNew<vtkPoints> points;
+	points->SetDataTypeToDouble();
+
+	for (int j = 0; j < nPhi; ++j)
+	{
+		const double p = vtkMath::RadiansFromDegrees(dataSource->getPhi()[j]);
+
+		for (int i = 0; i < nTheta; ++i)
+		{
+			const double t = vtkMath::RadiansFromDegrees(dataSource->getTheta()[i]);
+			const double r = getPlotComponent(dataSource->getRadius()[i][j]);
+
+			points->InsertNextPoint(
+				r * std::sin(t) * std::cos(p),
+				r * std::sin(t) * std::sin(p),
+				r * std::cos(t));
+		}
+	}
+
+	vtkGrid->SetDimensions(nTheta, nPhi, 1);
+	vtkGrid->SetPoints(points);
+
+	vtkNew<vtkDoubleArray> scalars;
+	scalars->SetName("Radius");
+	scalars->SetNumberOfComponents(1);
+
+	for (int j = 0; j < nPhi; ++j)
+	{
+		for (int i = 0; i < nTheta; ++i)
+		{
+			const double r = getPlotComponent(dataSource->getRadius()[i][j]);
+
+			scalars->InsertNextValue(r);
+		}
+	}
+
+	vtkGrid->GetPointData()->SetScalars(scalars);
+}
+
 double VtkDriverFarfield::getFarfieldMaxRadius(vtkStructuredGrid* grid)
 {
 	double maxRadius = 0.0;
@@ -201,8 +338,7 @@ double VtkDriverFarfield::getFarfieldMaxRadius(vtkStructuredGrid* grid)
 		double p[3];
 		grid->GetPoint(i, p);
 
-		const double radius =
-			std::hypot(std::hypot(p[0], p[1]), p[2]);
+		const double radius = std::hypot(std::hypot(p[0], p[1]), p[2]);
 
 		maxRadius = std::max(maxRadius, radius);
 	}

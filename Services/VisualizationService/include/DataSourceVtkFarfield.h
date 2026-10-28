@@ -29,6 +29,7 @@
 
 #include <string>
 #include <vector>
+#include <complex>
 
 class EntityResultFarfield;
 
@@ -40,12 +41,16 @@ public:
 
 	virtual bool loadData(EntityBase *resultEntity, EntityBase *meshEntity) override;
 
-	vtkStructuredGrid* GetVtkGrid() { return vtkGrid; };
+	std::vector<double> &getTheta() { return theta; }
+	std::vector<double> &getPhi() { return phi; }
+	std::vector<std::vector<std::complex<double>>>& getRadius() { return radius; }
 
 private:
 	bool loadData(EntityResultFarfield* resultData);
 
 	void FreeMemory();
 
-	vtkStructuredGrid* vtkGrid;
+	std::vector<double> theta;
+	std::vector<double> phi;
+	std::vector<std::vector<std::complex<double>>> radius;
 };
