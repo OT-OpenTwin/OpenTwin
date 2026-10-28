@@ -30,6 +30,7 @@ ot_add_dependency(OToolkit
     QtNetwork
     QtWidgets
     QtWebSockets
+    QtMultimedia
 )
 
 ot_finalize_lib(OToolkit)

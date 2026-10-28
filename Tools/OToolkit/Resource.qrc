@@ -30,5 +30,7 @@
         <file>images/Tree/Service.png</file>
         <file>images/Tree/Text.png</file>
         <file>images/Tree/Tool.png</file>
+        <file>sounds/tick.wav</file>
+        <file>sounds/winner.wav</file>
     </qresource>
 </RCC>
