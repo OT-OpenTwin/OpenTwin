@@ -53,6 +53,19 @@ namespace  ot {
 	typedef HINSTANCE ExternalLibraryInstance_t;
 }
 
+#elif defined(OT_OS_LINUX)
+
+#include <sys/types.h>
+
+//! @def OT_PROCESS_HANDLE
+//! @brief Process handle
+#define OT_PROCESS_HANDLE pid_t
+
+//! @def OT_INVALID_PROCESS_HANDLE
+//! @brief Invalid process handle
+#define OT_INVALID_PROCESS_HANDLE -1
+
+// TODO(linux): OT_INFINITE_TIMEOUT and ExternalLibraryInstance_t are not defined yet.
 
 #endif
 

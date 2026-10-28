@@ -24,6 +24,8 @@
 
 #ifdef _DEBUG
 
+#if defined(_MSC_VER)
+
 //! @brief Adds the ability to provide a custom text to the cassert macro (assertion only in debug mode).
 //! @param ___expression Expression to check. If false, the assertion will be triggered.
 //! @param ... Custom text to display in the assertion message.
@@ -31,6 +33,16 @@
 
 //! @brief Check if the provided pointer is not a nullptr.
 #define OTAssertNullptr(___ptr) (void)((!!(___ptr != nullptr)) || (_wassert(_CRT_WIDE(#___ptr) _CRT_WIDE("\n\n[Caution]\nnullptr for \"") _CRT_WIDE(#___ptr) _CRT_WIDE("\"provided"), _CRT_WIDE(__FILE__), (unsigned)__LINE__), 0))
+
+#else
+
+//! @brief Adds the ability to provide a custom text to the cassert macro (assertion only in debug mode).
+#define OTAssert(___expression, ...) assert((___expression) && "" __VA_ARGS__)
+
+//! @brief Check if the provided pointer is not a nullptr
+#define OTAssertNullptr(___ptr) assert((___ptr) != nullptr)
+
+#endif // _MSC_VER
 
 #else
 

@@ -23,8 +23,10 @@
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
+#include <locale>
 #include <codecvt>
 #include <algorithm>
+#include <string>
 
 #if defined(OT_OS_WINDOWS)
 // Windows header
@@ -41,6 +43,12 @@
 // Linux header header
 #include <sys/types.h>
 #include <sys/sysinfo.h>
+#include <unistd.h>
+#include <climits>
+#include <filesystem>
+#include <cstring>
+#include <fstream>
+#include <limits>
 #include <cstdlib>
 
 #endif
@@ -71,15 +79,22 @@ unsigned long long ot::OperatingSystem::getAvailablePhysicalMemory(void) {
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
 	return status.ullAvailPhys;
+
 #elif defined (OT_OS_UNIX)
 	assert(0);
 	return 0;
+
 #elif defined (OT_OS_LINUX)
-	struct sysinfo memInfo;
-	sysinfo(&memInfo);
-	long long availablePhysMem = memInfo.freeram;
-	availablePhysMem *= memInfo.mem_unit;
-	return availablePhysMem;
+    std::ifstream memInfo("/proc/meminfo");
+    std::string name;
+    unsigned long long kiloBytes = 0;
+    while (memInfo >> name >> kiloBytes) {
+        if (name == "MemAvailable:") {
+            return kiloBytes * 1024;
+        }
+        memInfo.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    }
+    return 0;
 #endif
 }
 
@@ -89,9 +104,11 @@ unsigned long long ot::OperatingSystem::getTotalVirtualMemory(void) {
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
 	return status.ullTotalVirtual;
+
 #elif defined (OT_OS_UNIX)
 	assert(0);
 	return 0;
+
 #elif defined (OT_OS_LINUX)
 	struct sysinfo memInfo;
 	sysinfo(&memInfo);
@@ -108,9 +125,11 @@ unsigned long long ot::OperatingSystem::getAvailableVirtualMemory(void) {
 	status.dwLength = sizeof(status);
 	GlobalMemoryStatusEx(&status);
 	return status.ullAvailVirtual;
+
 #elif defined (OT_OS_UNIX)
 	assert(0);
 	return 0;
+
 #elif defined (OT_OS_LINUX)
 	struct sysinfo memInfo;
 	sysinfo(&memInfo);
@@ -134,6 +153,9 @@ char * ot::OperatingSystem::getEnvironmentVariable(const char * _variableName) {
 		return nullptr;
 	}
 	return buffer;
+#elif defined(OT_OS_LINUX)
+    const char* value = std::getenv(_variableName);
+    return value ? strdup(value) : nullptr;
 #endif
 }
 
@@ -170,18 +192,34 @@ std::string ot::OperatingSystem::getCurrentExecutableFilePath() {
 }
 
 std::wstring ot::OperatingSystem::getCurrentExecutableFilePathW() {
+#if defined(OT_OS_WINDOWS)
 	WCHAR currentExeFileName[MAX_PATH];
 	GetModuleFileName(NULL, currentExeFileName, MAX_PATH);
 
 	return std::wstring(currentExeFileName);
+#elif defined(OT_OS_LINUX)
+    std::error_code error;
+    const std::filesystem::path currentExeFileName = std::filesystem::read_symlink("/proc/self/exe", error);
+    if (error) {
+        return std::wstring();
+    }
+
+    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
+    return strconverter.from_bytes(currentExeFileName.string());
+#endif
 }
 
 unsigned long long ot::OperatingSystem::getCurrentProcessID() {
 	unsigned long long processID = 0;
+
+#if defined(OT_OS_WINDOWS)
 	HANDLE handle = GetCurrentProcess();
 	if (handle != nullptr) {
 		processID = GetProcessId(handle);
 		CloseHandle(handle);
 	}
+#elif defined (OT_OS_LINUX)
+    processID = static_cast<unsigned long long>(getpid());
+#endif
 	return processID;
 }

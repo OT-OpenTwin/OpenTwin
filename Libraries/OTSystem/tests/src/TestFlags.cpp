@@ -17,6 +17,7 @@
 // limitations under the License.
 // @otlicense-end
 
+#include <cstdint>
 #include <gtest/gtest.h>
 #include "OTSystem/Flags.h"
 
@@ -36,7 +37,7 @@ TEST(FlagsTest, DefaultConstructor) {
 	TestFlags flags;
 	EXPECT_TRUE(flags.none());
 	EXPECT_FALSE(flags.any());
-	EXPECT_EQ(flags.underlying(), 0Ui64);
+	EXPECT_EQ(flags.underlying(), std::uint64_t{ 0 });
 }
 
 TEST(FlagsTest, ConstructFromEnum) {

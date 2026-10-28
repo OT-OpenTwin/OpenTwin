@@ -153,7 +153,7 @@ namespace ot {
 #ifdef OT_OS_WINDOWS
                 gmtime_s(&timeStruct, &timeT);
 #else
-                gmtime_r(&timeStruct, &timeT);
+                gmtime_r(&timeT, &timeStruct);
 #endif
             }
 

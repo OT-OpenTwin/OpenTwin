@@ -29,6 +29,12 @@
 //! @brief If defined the current OS is Windows.
 #define OT_OS_WINDOWS
 
+// LINUX
+#elif defined(__linux__) || defined(linux) || defined(__linux)
+//! @def OT_OS_LINUX
+//! @brief If defined the current OS is Linux.
+#define OT_OS_LINUX
+
 // UNIX
 #elif defined(unix) || defined(__unix) || defined (__unix__)
 //! @def OT_OS_UNIX
@@ -40,12 +46,6 @@
 //! @def OT_OS_MAC
 //! @brief If defined the current OS is Mac.
 #define OT_OS_MAC
-
-// LINUX
-#elif defined(__linux__) || defined(linux) || defined(__linux)
-//! @def OT_OS_LINUX
-//! @brief If defined the current OS is Linux.
-#define OT_OS_LINUX
 
 // FreeBSD
 #elif defined (__FreeBSD__)
@@ -65,7 +65,7 @@
 // Architecture Info
 
 // 64Bit
-#if defined(_WIN64)
+#if defined(_WIN64) || defined(__LP64__)
 //! @def OT_OS_64Bit
 //! @brief If defined the current OS has a 64 bit architecture.
 #define OT_OS_64Bit

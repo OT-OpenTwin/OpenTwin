@@ -25,7 +25,11 @@
 
 namespace ot
 {
-	class __declspec(dllexport) RunResult 
+#if defined(_WIN32)
+	class __declspec(dllexport) RunResult
+#else
+    class RunResult
+#endif
 	{
 	public:
 			const static uint32_t successCode = 0;

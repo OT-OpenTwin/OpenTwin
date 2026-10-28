@@ -24,6 +24,8 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
+#else
+#include <cstring>
 #endif
 
 #ifdef _DEBUG
@@ -50,6 +52,12 @@ std::wstring translateErrorCode(unsigned long _errorCode)
 		delete s;
 		return ret;
 	}
+}
+#else
+std::wstring translateErrorCode(unsigned long _errorCode)
+{
+    const std::string message(std::strerror(static_cast<int>(_errorCode)));
+    return std::wstring(message.begin(), message.end());
 }
 #endif // 
 

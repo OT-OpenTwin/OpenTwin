@@ -23,6 +23,7 @@
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
+#include <cstdint>
 #include <type_traits>
 
 //! @brief Adds bitwise operations for the provided enum.

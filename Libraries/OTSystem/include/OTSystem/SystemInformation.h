@@ -22,7 +22,9 @@
 #include "OTSystem/SystemAPIExport.h"
 #include "OTSystem/SystemTypes.h"
 
+#if defined(OT_OS_WINDOWS)
 #include <pdh.h>
+#endif
 
 #include <string>
 
@@ -53,10 +55,16 @@ namespace ot {
 
 	private:
 		bool m_initialized;
+#if defined(OT_OS_WINDOWS)
 		PDH_HQUERY m_cpuQuery;
 		PDH_HCOUNTER m_cpuTotal;
 		ULARGE_INTEGER m_lastCPU, m_lastSysCPU, m_lastUserCPU;
 		int m_numProcessors;
 		HANDLE m_self;
+#elif defined(OT_OS_LINUX)
+		unsigned long long m_lastTotalTicks, m_lastIdleTicks;
+		long m_lastCPU, m_lastSysCPU, m_lastUserCPU;
+		int m_numProcessors;
+#endif
 	};
 }

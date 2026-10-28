@@ -19,8 +19,12 @@
 
 #pragma once
 
+#if defined(_WIN32)
 #ifdef OPENTWINSYSTEM_EXPORTS
 #define OT_SYS_API_EXPORT __declspec(dllexport)
 #else
 #define OT_SYS_API_EXPORT __declspec(dllimport)
 #endif // OPENTWINSYSTEM_EXPORTS
+#else
+#define OT_SYS_API_EXPORT
+#endif // _WIN32

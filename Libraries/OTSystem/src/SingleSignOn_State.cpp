@@ -1,4 +1,7 @@
-﻿
+﻿#include "OTSystem/ArchitectureInfo.h"
+
+#if defined(OT_OS_WINDOWS)
+
 #include "OTSystem/SingleSignOn/SingleSignOn_State.h"
 #include <cassert>
 
@@ -445,3 +448,5 @@ void ot::SingleSignOn_State::readPackageInfo(LogInInfos& _infos)
 
 
 
+
+#endif // OT_OS_WINDOWS

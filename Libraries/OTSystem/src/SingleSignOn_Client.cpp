@@ -1,4 +1,7 @@
-﻿
+﻿#include "OTSystem/ArchitectureInfo.h"
+
+#if defined(OT_OS_WINDOWS)
+
 #include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 #include <windows.h>
 #include <cassert>
@@ -55,3 +58,5 @@ std::string ot::SingleSignOn_Client::generateToken(const std::string& _receivedT
         return "";
     }
 }
+
+#endif // OT_OS_WINDOWS

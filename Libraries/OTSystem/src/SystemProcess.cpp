@@ -29,7 +29,14 @@
 #include <codecvt>
 #include <sstream>
 
+#if defined(OT_OS_WINDOWS)
 #include <UserEnv.h>
+#elif defined(OT_OS_LINUX)
+#include <spawn.h>
+#include <unistd.h>
+#include <sys/wait.h>
+#include <vector>
+#endif
 
 
 ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const ProcessFlags& _flags) {
@@ -46,6 +53,10 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	OT_PROCESS_HANDLE processHandle;
 	result = runApplication(_applicationPath, commandLine, processHandle, _flags);
 	CloseHandle(processHandle);
+#elif defined(OT_OS_LINUX)
+	// TODO(linux): "CMD.exe /c" has no safe sh -c counterpart without quoting the path for the shell.
+	result.setAsError(RunResult::genericErrorCode);
+	result.setErrorMessage("running an application through the shell is not implemented on Linux");
 #else
 	assert(0); // Not implemented yet
 #endif // OS_WINDOWS
@@ -167,6 +178,139 @@ bool ot::SystemProcess::isApplicationRunning(OT_PROCESS_HANDLE& _processHandle) 
 	else {
 		return false;
 	}
+}
+
+#elif defined(OT_OS_LINUX)
+
+namespace {
+	std::vector<std::string> splitCommandLine(const std::string& _commandLine) {
+		std::vector<std::string> arguments;
+		std::string current;
+		bool inQuotes = false;
+		bool hasArgument = false;
+		size_t backslashes = 0;
+
+		for (const char c : _commandLine) {
+			if (c == '\\') {
+				backslashes++;
+				hasArgument = true;
+				continue;
+			}
+			if (c == '"') {
+				current.append(backslashes / 2, '\\');
+				if (backslashes % 2 == 1) {
+					current.push_back('"');
+				}
+				else {
+					inQuotes = !inQuotes;
+				}
+				backslashes = 0;
+				hasArgument = true;
+				continue;
+			}
+
+			current.append(backslashes, '\\');
+			backslashes = 0;
+
+			if ((c == ' ' || c == '\t') && !inQuotes) {
+				if (hasArgument) {
+					arguments.push_back(current);
+					current.clear();
+					hasArgument = false;
+				}
+				continue;
+			}
+
+			current.push_back(c);
+			hasArgument = true;
+		}
+
+		current.append(backslashes, '\\');
+		if (hasArgument) {
+			arguments.push_back(current);
+		}
+		return arguments;
+	}
+}
+
+ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const std::wstring& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags) {
+	ot::RunResult resultMessage;
+	_processHandle = OT_INVALID_PROCESS_HANDLE;
+
+	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
+	const std::string applicationPath = strconverter.to_bytes(_applicationPath);
+	std::vector<std::string> arguments = splitCommandLine(strconverter.to_bytes(_commandLine));
+	if (arguments.empty()) {
+		arguments.push_back(applicationPath);
+	}
+
+	std::vector<char*> argv;
+	for (std::string& argument : arguments) {
+		argv.push_back(argument.data());
+	}
+	argv.push_back(nullptr);
+
+	posix_spawn_file_actions_t fileActions;
+	int error = posix_spawn_file_actions_init(&fileActions);
+	if (error != 0) {
+		resultMessage.setAsError(static_cast<uint32_t>(error));
+		resultMessage.setErrorMessage("starting a process failed");
+		return resultMessage;
+	}
+
+	posix_spawnattr_t attributes;
+	error = posix_spawnattr_init(&attributes);
+	if (error != 0) {
+		posix_spawn_file_actions_destroy(&fileActions);
+		resultMessage.setAsError(static_cast<uint32_t>(error));
+		resultMessage.setErrorMessage("starting a process failed");
+		return resultMessage;
+	}
+
+	error = posix_spawn_file_actions_addclosefrom_np(&fileActions, STDERR_FILENO + 1);
+
+	if (error == 0 && (_flags & ProcessFlag::DetachedProcess)) {
+		error = posix_spawnattr_setflags(&attributes, POSIX_SPAWN_SETSID);
+	}
+
+	pid_t processID = OT_INVALID_PROCESS_HANDLE;
+	if (error == 0) {
+		error = posix_spawn(&processID, applicationPath.c_str(), &fileActions, &attributes, argv.data(), environ);
+	}
+	posix_spawnattr_destroy(&attributes);
+	posix_spawn_file_actions_destroy(&fileActions);
+
+	if (error == 0) {
+		_processHandle = processID;
+	}
+	else {
+		resultMessage.setAsError(static_cast<uint32_t>(error));
+		resultMessage.setErrorMessage("starting a process failed");
+	}
+
+	return resultMessage;
+}
+
+ot::RunResult ot::SystemProcess::runFileByShell(const std::wstring&, const std::wstring&, const std::wstring&) {
+	// TODO(linux): ShellExecute opens a file with its associated program, there is no direct equivalent.
+	ot::RunResult result;
+	result.setAsError(RunResult::genericErrorCode);
+	result.setErrorMessage("running a file by shell is not implemented on Linux");
+	return result;
+}
+
+bool ot::SystemProcess::isApplicationRunning(OT_PROCESS_HANDLE& _processHandle) {
+	if (_processHandle == OT_INVALID_PROCESS_HANDLE) {
+		return false;
+	}
+
+	int status = 0;
+	if (waitpid(_processHandle, &status, WNOHANG) == 0) {
+		return true;
+	}
+
+	_processHandle = OT_INVALID_PROCESS_HANDLE;
+	return false;
 }
 
 #endif

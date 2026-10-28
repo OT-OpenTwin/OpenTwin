@@ -1,4 +1,7 @@
-﻿#include "OTSystem/SingleSignOn/SingleSignOn_Server.h"
+﻿#include "OTSystem/ArchitectureInfo.h"
+
+#if defined(OT_OS_WINDOWS)
+#include "OTSystem/SingleSignOn/SingleSignOn_Server.h"
 #include <cassert>
 
 ot::SingleSignOn_Server::SingleSignOn_Server(const std::wstring& _servicePrincipleName)
@@ -35,3 +38,5 @@ ot::LogInInfos ot::SingleSignOn_Server::processLoggedInUserInfo()
     return logiInfos;
 }
 
+
+#endif // OT_OS_WINDOWS

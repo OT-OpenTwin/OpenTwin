@@ -22,6 +22,7 @@
 // std header
 #include <string>
 #include <exception>
+#include <stdexcept>
 
 #pragma warning (disable: 4251)
 
@@ -34,8 +35,16 @@ namespace ot {
 	//! @brief Base class for all OpenTwin exceptions.
     class GeneralException : public std::exception {
     public:
+#if defined(_MSC_VER)
         explicit GeneralException(const std::string& _message) : std::exception(_message.c_str()) {};
         explicit GeneralException(const char* _message) : std::exception(_message) {};
+#else
+        explicit GeneralException(const std::string& _message) : m_message(_message) {};
+        explicit GeneralException(const char* _message) : m_message(_message) {};
+        const char* what() const noexcept override { return m_message.what(); }
+    private:
+        std::runtime_error m_message;
+#endif
     };
     namespace Exception { typedef ot::GeneralException General; }
 
