@@ -13,8 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if [ -z "$BASH_VERSION" ]; then
-    echo "otrc needs bash" >&2
+if [ -z "$BASH_VERSION" ] && [ -z "$ZSH_VERSION" ]; then
+    echo "otrc needs bash or zsh" >&2
     return 1
 fi
 
@@ -29,9 +29,26 @@ ot() {
     "$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" "$@"
 }
 
-_ot_complete() {
-    [ -n "$OPENTWIN_DEV_ROOT" ] || return 0
-    mapfile -t COMPREPLY < <("$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" --complete "$COMP_CWORD" "${COMP_WORDS[@]:1}" 2>/dev/null)
-}
+if [ -n "$BASH_VERSION" ]; then
+    _ot_complete() {
+        [ -n "$OPENTWIN_DEV_ROOT" ] || return 0
+        mapfile -t COMPREPLY < <("$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" --complete "$COMP_CWORD" "${COMP_WORDS[@]:1}" 2>/dev/null)
+    }
+    complete -F _ot_complete ot
 
-complete -F _ot_complete ot
+elif [ -n "$ZSH_VERSION" ]; then
+    _ot_complete() {
+        [[ -n $OPENTWIN_DEV_ROOT ]] || return 1
+        local out
+        out=$("$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" \
+            --complete $(( CURRENT - 1 )) "${(@)words[2,-1]}" 2>/dev/null) || return 1
+        [[ -n $out ]] || return 1
+        compadd -- "${(@f)out}"
+    }
+
+    if (( $+functions[compdef] )); then
+        compdef _ot_complete ot
+    else
+        echo "otrc: zsh completion is not initialized (source otrc after compinit); 'ot' works without tab completion" >&2
+    fi
+fi
