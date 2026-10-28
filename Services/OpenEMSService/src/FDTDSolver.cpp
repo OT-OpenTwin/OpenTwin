@@ -445,9 +445,7 @@ std::string FDTDSolver::getFrequencyString(EntityBase* fieldDump)
 		const double value = std::stod(item, &parsedCharacters);
 
 		// Allow whitespace after the number, but no other characters.
-		if (item.find_first_not_of(
-			" \t\r\n",
-			parsedCharacters) != std::string::npos)
+		if (item.find_first_not_of(" \t\r\n", parsedCharacters) != std::string::npos)
 		{
 			return ""; // Invalid double value
 		}
@@ -468,6 +466,37 @@ std::string FDTDSolver::getFrequencyString(EntityBase* fieldDump)
 	}
 
 	return result.str();
+}
+
+std::list<std::string> FDTDSolver::getFrequencyList(EntityBase* fieldDump)
+{
+	EntityPropertiesString* frequencyProperty = dynamic_cast<EntityPropertiesString*>(fieldDump->getProperties().getProperty("Frequencies"));
+	if (frequencyProperty == nullptr) return {};
+
+	std::list<std::string> values;
+	std::istringstream stream(frequencyProperty->getValue());
+	std::string item;
+
+	while (std::getline(stream, item, ','))
+	{
+		if (item.empty()) return {}; // Empty value in frquency list
+
+		std::size_t parsedCharacters = 0;
+		const double value = std::stod(item, &parsedCharacters);
+
+		// Allow whitespace after the number, but no other characters.
+		if (item.find_first_not_of(" \t\r\n", parsedCharacters) != std::string::npos)
+		{
+			return {}; // Invalid double value
+		}
+
+		std::stringstream result;
+		result << std::defaultfloat << std::setprecision(6) << value;
+
+		values.push_back(result.str());
+	}
+
+	return values;
 }
 
 std::string FDTDSolver::getSubsamplingString(EntityFieldDump* fieldDump)
@@ -2117,6 +2146,8 @@ class FarFieldTable:
 		std::string thetaAngles = getThetaAngles(farfieldDump);
 		std::string phiAngles   = getPhiAngles(farfieldDump);
 
+		farfieldDumpFrequencies[farfieldDump->getName()] = getFrequencyList(farfieldDump);;
+
 		runCommand << "    ff_freq = [" << frequencies << "]\n";
 		runCommand << "    theta_deg = [" << thetaAngles << "]\n";
 		runCommand << "    phi_deg = [" << phiAngles << "]\n";
@@ -2284,12 +2315,12 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	// Convert the S-parameters
 	convertAndStoreSParameters(result1D);
 
-	result1D.storeResults({}, {}, 0.0, 0.0, 0.0, 0.0);
+	result1D.storeResults({}, {}, {}, 0.0, 0.0, 0.0, 0.0);
 
 	double structureCx = 0.0, structureCy = 0.0, structureCz = 0.0, structureD = 0.0;
 	determineStructureDimensions(structureCx, structureCy, structureCz, structureD);
 
-	resultFarfields.storeResults(excitationStringList, farfieldDumpList, structureCx, structureCy, structureCz, structureD);
+	resultFarfields.storeResults(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureD);
 }
 
 void FDTDSolver::determineStructureDimensions(double& structureCx, double& structureCy, double& structureCz, double& structureD)

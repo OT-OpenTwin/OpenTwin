@@ -101,6 +101,7 @@ private:
 	bool getFieldDumpTypeAndMode(EntityFieldDump* fieldDump, int& dumpType, int& dumpMode);
 	bool getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string &fieldType, std::string &unit);
 	std::string getFrequencyString(EntityBase* fieldDump);
+	std::list<std::string> getFrequencyList(EntityBase* fieldDump);
 	std::string getSubsamplingString(EntityFieldDump* fieldDump);
 	std::string getResolutionString(EntityFieldDump* fieldDump);
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
@@ -135,6 +136,7 @@ private:
 	std::list<EntityFieldDump*> fieldDumpList;
 	std::list<EntityFarfieldDump*> farfieldDumpList;
 	std::set<int> portList;
+	std::map<std::string, std::list<std::string>> farfieldDumpFrequencies;
 
 	std::string xminBoundary;
 	std::string xmaxBoundary;
