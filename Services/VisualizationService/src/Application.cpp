@@ -130,19 +130,13 @@ std::pair<ot::UID, ot::UID> Application::createDataItems(EntityVis2D3D *visEntit
 
 	// Load the data item
 	DataSourceManagerItem *dataItem = DataSourceManager::getDataItem(visEntity->getSourceID(), visEntity->getSourceVersion(), visEntity->getMeshID(), visEntity->getMeshVersion(), this->getModelComponent(), visEntity);
+	if (dataItem == nullptr)
+	{
+		throw std::exception();
+	}
 
 	// Now build the osg node and convert it to a string
 	std::string nodeString = vtkDriver->buildSceneNode(dataItem, colorRampData);
-
-	//if (vtkDriver->GetUpdateTopoEntityID().size() != 0)
-	//{
-	//	std::list<UID> topologyEntityIDList, topologyEntityVersionList, dataEntityIDList, dataEntityVersionList, dataEntityParentList;
-	//	std::list<bool> topologyEntityForceVisible;
-	//	topologyEntityIDList = vtkDriver->GetUpdateTopoEntityID();
-	//	topologyEntityVersionList = vtkDriver->GetUpdateTopoEntityVersion();
-	//	topologyEntityForceVisible = vtkDriver->GetUpdateTopoEntityForceVisible();
-	//	m_modelComponent->addEntitiesToModel(topologyEntityIDList, topologyEntityVersionList, topologyEntityForceVisible, dataEntityIDList, dataEntityVersionList, dataEntityParentList,"vtk triggered property updates.");
-	//}
 
 	// Delete the driver
 	delete vtkDriver;

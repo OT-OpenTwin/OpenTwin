@@ -20,6 +20,9 @@
 #pragma once
 
 #include "OTCore/CoreTypes.h"
+#include "OTCore/JSON/JSONArray.h"
+#include "OTCore/JSON/JSONObject.h"
+#include "OTCore/JSON/JSONHelper.h"
 
 #include "VisualizationServiceTypes.h"
 #include "DataSourceManagerItem.h"
@@ -30,6 +33,9 @@
 #include <string>
 #include <vector>
 #include <complex>
+#include <map>
+#include <list>
+#include <set>
 
 class EntityResultFarfield;
 
@@ -47,6 +53,14 @@ public:
 
 private:
 	bool loadData(EntityResultFarfield* resultData);
+	static bool equalValues(const ot::JsonValue& a, const ot::JsonValue& b);
+	std::map<std::string, std::list<std::string>> findVaryingParameters(const ot::ConstJsonObject& document, const std::set<std::string>& ignoredFields = { "Theta", "Phi", "Values" });
+	std::map<std::string, std::list<std::string>> findVaryingParameters(const ot::JsonValue& document, const std::set<std::string>& ignoredFields = { "Theta", "Phi", "Values" });
+	double getFiniteRadiusNumber(const ot::ConstJsonObject& object, const char* name, ot::JsonSizeType rowIndex);
+	bool getRadiusGridIndex(double angleDeg, double extentDeg, int steps, double toleranceDeg, std::size_t& index);
+	std::vector<std::vector<std::complex<double>>> readRadius(const ot::ConstJsonObject& document, int thetaSteps, int phiSteps, double angleToleranceDeg, bool complex);
+	std::vector<std::vector<std::complex<double>>> readRadius(const ot::JsonValue& document, int thetaSteps, int phiSteps, double angleToleranceDeg, bool complex);
+
 
 	void FreeMemory();
 

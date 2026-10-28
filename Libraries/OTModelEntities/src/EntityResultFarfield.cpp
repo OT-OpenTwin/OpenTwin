@@ -23,6 +23,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityResultFarfield.h"
+#include "OTModelEntities/Properties/PropertyHelper.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
 
@@ -50,9 +51,12 @@ void EntityResultFarfield::storeToDataBase(void)
 void EntityResultFarfield::addStorageData(bsoncxx::builder::basic::document &storage)
 {
 	EntityVis2D3D::addStorageData(storage);
-	// Now we store the particular information about the current object
+
+	const std::string serialisedDLA = m_dataLakeAccessCfg.toJson();
+
 	storage.append(
-		bsoncxx::builder::basic::kvp("complex", complex)
+		bsoncxx::builder::basic::kvp("complex", complex),
+		bsoncxx::builder::basic::kvp("DataLakeAccessCfg", serialisedDLA)
 	);
 }
 
@@ -63,6 +67,42 @@ void EntityResultFarfield::readSpecificDataFromDataBase(const bsoncxx::document:
 
 	// Here we can load any special information about the entity
 	complex = doc_view["complex"].get_bool();
+
+	const std::string serialisedDLA = doc_view["DataLakeAccessCfg"].get_string().value.data();
+	if (!serialisedDLA.empty())
+	{
+		ot::JsonDocument doc;
+		doc.fromJson(serialisedDLA);
+		m_dataLakeAccessCfg.setFromJsonObject(doc.getConstObject());
+	}
+
+	// During project open this may throw because the model state is not entirely loaded yet. In this case the m_dataLakeAccessCfg should still hold a valid state.
+	if (getObserver() != nullptr && getObserver()->getModelServiceState().getProjectIsOpen())
+	{
+		try
+		{
+			const std::string projectName = m_queryProperties.getSelectedProject(this);
+			std::string collectionName;
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+			ot::DataLakeAccessCfg temp = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			if (temp.getQueriesByCollection() != m_dataLakeAccessCfg.getQueriesByCollection())
+			{
+				m_dataLakeAccessCfg = temp;
+				setModified();
+			}
+		}
+		catch (std::exception& _e)
+		{
+			OT_LOG_E(_e.what());
+		}
+	}
 
 	resetModified();
 }
@@ -88,6 +128,8 @@ void EntityResultFarfield::createProperties(void)
 	EntityPropertiesDouble::createProperty("Internal", "Structure center z", structureCz, "", getProperties())->setVisible(false);
 	EntityPropertiesDouble::createProperty("Internal", "Structure diagonal", structureD, "", getProperties())->setVisible(false);
 
+	m_queryProperties.setProperties(this);
+
 	getProperties().forceResetUpdateForAllProperties();
 
 	updatePropertyVisibilities();
@@ -107,6 +149,8 @@ bool EntityResultFarfield::updatePropertyVisibilities(void)
 		}
 	}
 
+	updatePropertiesGrid |= m_queryProperties.updatePropertyVisibility(this);
+
 	return updatePropertiesGrid;
 }
 
@@ -118,8 +162,43 @@ bool EntityResultFarfield::updateFromProperties(void)
 	// Since there is a change now, we need to set the modified flag
 	setModified();
 
+	bool refresh = this->updatePropertyVisibilities();
+
+	if (getObserver() != nullptr)
+	{
+		try
+		{
+			const std::string projectName = m_queryProperties.getSelectedProject(this);
+			std::string collectionName;
+			auto associatedCampaign = getObserver()->getMetadataCampaign(projectName, collectionName);
+
+			assert(associatedCampaign.has_value()); //Only not the case, if the observer has no implementation of the getter.
+			refresh = m_queryProperties.updateOptions(this, associatedCampaign.value());
+
+			DataLakeQueryCfg queryCfg;
+			queryCfg.setCollectionName(collectionName);
+			queryCfg.setSeriesLabel(m_queryProperties.getSelectedSeries(this));
+			queryCfg.setValueDescriptionParameters(m_queryProperties.getParameterQueries(this));
+			queryCfg.setValueDescriptionSeriesMD(m_queryProperties.getMetadataQueries(this));
+			queryCfg.setValueDescriptionQuantities(m_queryProperties.getQuantityQuery(this));
+
+			bool dataRefreshNeeded = queryCfg != m_queryCfg;
+			if (dataRefreshNeeded)
+			{
+				m_dataLakeAccessCfg = getObserver()->createDataLakeAccessConfig(associatedCampaign.value(), collectionName, queryCfg);
+			}
+			m_queryCfg = queryCfg;
+			refresh |= dataRefreshNeeded;
+		}
+		catch (std::exception& _e)
+		{
+			std::string message = "Failed to use user given comparisons for data lake access: " + std::string(_e.what());
+			OT_LOG_E(message);
+		}
+	}
+
 	getProperties().forceResetUpdateForAllProperties();
 
-	return false; // Notify, whether property grid update is necessary
+	return refresh; // Notify, whether property grid update is necessary
 }
 

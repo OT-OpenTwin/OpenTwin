@@ -22,6 +22,9 @@
 
 #include "OTModelEntities/EntityVis2D3D.h"
 
+#include "OTModelEntities/Properties/Bundle/PropertyBundleDataLakeQuery.h"
+#include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+
 class __declspec(dllexport) EntityResultFarfield : public EntityVis2D3D
 {
 public:
@@ -41,6 +44,7 @@ public:
 	void setStructureDimensions(double _cx, double _cy, double _cz, double _d) { structureCx = _cx; structureCy = _cy; structureCz = _cz; structureD = _d; }
 
 	bool getComplex() { return complex; }
+	ot::DataLakeAccessCfg& getDataLakeAccessCfg() { return m_dataLakeAccessCfg; };
 
 	virtual void storeToDataBase(void) override;
 	
@@ -57,6 +61,10 @@ private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;
 	virtual void readSpecificDataFromDataBase(const bsoncxx::document::view &doc_view, std::map<ot::UID, EntityBase *> &entityMap) override;
+
+	PropertyBundleDataLakeQuery m_queryProperties;
+	ot::DataLakeAccessCfg m_dataLakeAccessCfg;
+	DataLakeQueryCfg m_queryCfg;
 
 	bool complex = false;
 	std::list<std::string> frequencies;
