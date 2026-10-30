@@ -150,9 +150,9 @@ void ResultManager::convertFarfield(const std::string& fileName, const std::stri
 	}
 }
 
-void ResultManager::storeResults(const std::list<std::string> &excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies, double structureCx, double structureCy, double structureCz, double structureDiagonal)
+void ResultManager::storeResults(const std::list<std::string> &excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies, double structureCx, double structureCy, double structureCz, double structureDiagonal, const std::string& frequencyUnit)
 {
-	storeCurves(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal);
+	storeCurves(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal, frequencyUnit);
 }
 
 std::string ResultManager::getPlotName(const std::string& resultName)
@@ -427,7 +427,7 @@ void ResultManager::addFarfieldData(const std::string& excitationString, std::ve
 }
 
 void ResultManager::storeCurves(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const std::map<std::string, std::list<std::string>> &farfieldDumpFrequencies,
-								double structureCx, double structureCy, double structureCz, double structureDiagonal)
+								double structureCx, double structureCy, double structureCz, double structureDiagonal, const std::string& frequencyUnit)
 {
 	//First we access the result collection of the current project
 	std::string collectionName = DataBase::instance().getCollectionName();
@@ -510,12 +510,12 @@ void ResultManager::storeCurves(const std::list<std::string>& excitationStringLi
 		}
 	}
 
-	createFarfieldPlots(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, series, resultCollectionExtender, structureCx, structureCy, structureCz, structureDiagonal);
+	createFarfieldPlots(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, series, resultCollectionExtender, structureCx, structureCy, structureCz, structureDiagonal, frequencyUnit);
 }
 
 void ResultManager::createFarfieldPlots(const std::list<std::string>& excitationStringList, const std::list<EntityFarfieldDump*>& farfieldDumpList, const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies,
 									    const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender,
-										double structureCx, double structureCy, double structureCz, double structureDiagonal)
+										double structureCx, double structureCy, double structureCz, double structureDiagonal, const std::string& frequencyUnit)
 {
 	for (auto farfieldDump : farfieldDumpList)
 	{
@@ -552,15 +552,15 @@ void ResultManager::createFarfieldPlots(const std::list<std::string>& excitation
 		}
 		else
 		{
-			createFarfieldPlot3D("E_Abs", false, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal);
-			createFarfieldPlot3D("E_Theta", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal);
-			createFarfieldPlot3D("E_Phi", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal);
+			createFarfieldPlot3D("E_Abs", false, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal, frequencyUnit);
+			createFarfieldPlot3D("E_Theta", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal, frequencyUnit);
+			createFarfieldPlot3D("E_Phi", true, plotName, farfieldDump, excitationStringList, series, resultCollectionExtender, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureDiagonal, frequencyUnit);
 		}
 	}
 }
 
 void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, const std::string& plotName, EntityFarfieldDump *farfieldDump, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender,
-										 const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies, double structureCx, double structureCy, double structureCz, double structureDiagonal)
+										 const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies, double structureCx, double structureCy, double structureCz, double structureDiagonal, const std::string &frequencyUnit)
 {
 	for (auto excitationString : excitationStringList)
 	{
@@ -575,6 +575,20 @@ void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, 
 		EntityResultFarfield newPlot(_modelComponent->createEntityUID(), nullptr, nullptr, nullptr);
 		newPlot.setName(plotName + "/" + type + "/" + type + excitationString);
 
+		ot::Plot1DCurveCfg curveConfig;
+		auto quantity = resultCollectionExtender.findMetadataQuantity("Farfields/" + type + excitationString);
+
+		ot::ValueComparisonDescription parameterFilter;
+		parameterFilter.setName("Frequency");
+		parameterFilter.setComparator("=");
+		parameterFilter.setValue("15");
+		ot::TupleInstance instance = ot::TupleDescriptionSingle::createInstance(frequencyUnit, "double");
+		parameterFilter.setTupleInstance(instance);
+		std::list<ot::ValueComparisonDescription> parameterFilters = { parameterFilter };
+
+		CurveFactory::addToConfig(*series, *quantity, curveConfig, Application::instance(), &resultCollectionExtender, &parameterFilters);
+		DataLakeQueryCfg queryCfg = curveConfig.getQueryCfg();
+
 		newPlot.setComplex(complex);
 		newPlot.setFrequencies(farfieldDumpFrequencies.at(farfieldDump->getName()));
 		newPlot.setThetaRange(thetaMinProperty->getValue(), thetaMaxProperty->getValue(), thetaStepsProperty->getValue());
@@ -582,6 +596,7 @@ void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, 
 		newPlot.setStructureDimensions(structureCx, structureCy, structureCz, structureDiagonal);
 
 		newPlot.createProperties();
+		newPlot.setStaticQueryOptions(curveConfig.getDataAccessConfig(), queryCfg);
 		newPlot.setInitiallyHidden(true);
 		newPlot.registerCallbacks(
 			ot::EntityCallbackBase::Callback::Properties |

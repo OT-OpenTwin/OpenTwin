@@ -24,6 +24,7 @@
 
 #include "OTModelEntities/Properties/Bundle/PropertyBundleDataLakeQuery.h"
 #include "OTCore/QueryDescription/DataLakeQueryCfg.h"
+#include "OTCore/QueryDescription/DataLakeAccessCfg.h"
 
 class __declspec(dllexport) EntityResultFarfield : public EntityVis2D3D
 {
@@ -45,6 +46,8 @@ public:
 
 	bool getComplex() { return complex; }
 	ot::DataLakeAccessCfg& getDataLakeAccessCfg() { return m_dataLakeAccessCfg; };
+
+	void setStaticQueryOptions(const ot::DataLakeAccessCfg &_accessCfg, const DataLakeQueryCfg& _queryCfg);
 
 	virtual void storeToDataBase(void) override;
 	

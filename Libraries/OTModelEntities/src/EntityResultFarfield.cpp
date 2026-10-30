@@ -202,3 +202,10 @@ bool EntityResultFarfield::updateFromProperties(void)
 	return refresh; // Notify, whether property grid update is necessary
 }
 
+void EntityResultFarfield::setStaticQueryOptions(const ot::DataLakeAccessCfg &_accessCfg, const DataLakeQueryCfg& _queryCfg)
+{
+	m_dataLakeAccessCfg = _accessCfg;
+
+	m_queryProperties.reset(this, _queryCfg);
+	m_queryProperties.lockAllProperties(this);
+}

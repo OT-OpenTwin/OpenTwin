@@ -2315,12 +2315,12 @@ void FDTDSolver::convertAndStoreResults(const std::string& logFileText)
 	// Convert the S-parameters
 	convertAndStoreSParameters(result1D);
 
-	result1D.storeResults({}, {}, {}, 0.0, 0.0, 0.0, 0.0);
+	result1D.storeResults({}, {}, {}, 0.0, 0.0, 0.0, 0.0, std::string());
 
 	double structureCx = 0.0, structureCy = 0.0, structureCz = 0.0, structureD = 0.0;
 	determineStructureDimensions(structureCx, structureCy, structureCz, structureD);
 
-	resultFarfields.storeResults(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureD);
+	resultFarfields.storeResults(excitationStringList, farfieldDumpList, farfieldDumpFrequencies, structureCx, structureCy, structureCz, structureD, entityUnits->getFrequencyUnit());
 }
 
 void FDTDSolver::determineStructureDimensions(double& structureCx, double& structureCy, double& structureCz, double& structureD)
