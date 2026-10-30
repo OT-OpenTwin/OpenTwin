@@ -18,29 +18,40 @@ if [ -z "$BASH_VERSION" ] && [ -z "$ZSH_VERSION" ]; then
     return 1
 fi
 
-#TODO(linux): ThirdParty python interpreter for linux
-: "${OT_PYTHON:=python3}"
+_ot_python() {
+    local python="${OT_PYTHON:-$OPENTWIN_THIRDPARTY_ROOT/Python/Python3_11_9/linux/python/bin/python3.11}"
+    command -v "$python" >/dev/null || return 1
+    printf '%s\n' "$python"
+}
 
 ot() {
     if [ -z "$OPENTWIN_DEV_ROOT" ]; then
         echo "Please set the following environment variables: OPENTWIN_DEV_ROOT" >&2
         return 1
     fi
-    "$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" "$@"
+    local python
+    if ! python=$(_ot_python); then
+        echo "Python interpreter not found. Please check OPENTWIN_THIRDPARTY_ROOT and that Python/Python3_11_9/linux/python is extracted" >&2
+        return 1
+    fi
+    "$python" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" "$@"
 }
 
 if [ -n "$BASH_VERSION" ]; then
     _ot_complete() {
         [ -n "$OPENTWIN_DEV_ROOT" ] || return 0
-        mapfile -t COMPREPLY < <("$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" --complete "$COMP_CWORD" "${COMP_WORDS[@]:1}" 2>/dev/null)
+        local python
+        python=$(_ot_python) || return 0
+        mapfile -t COMPREPLY < <("$python" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" --complete "$COMP_CWORD" "${COMP_WORDS[@]:1}" 2>/dev/null)
     }
     complete -F _ot_complete ot
 
 elif [ -n "$ZSH_VERSION" ]; then
     _ot_complete() {
         [[ -n $OPENTWIN_DEV_ROOT ]] || return 1
-        local out
-        out=$("$OT_PYTHON" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" \
+        local out python
+        python=$(_ot_python) || return 1
+        out=$("$python" -B "$OPENTWIN_DEV_ROOT/Scripts/Python/ot.py" \
             --complete $(( CURRENT - 1 )) "${(@)words[2,-1]}" 2>/dev/null) || return 1
         [[ -n $out ]] || return 1
         compadd -- "${(@f)out}"
