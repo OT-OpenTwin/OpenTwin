@@ -159,6 +159,22 @@ bool EntityResultFarfield::updateFromProperties(void)
 	// Now we need to update the entity after a property change
 	assert(getProperties().anyPropertyNeedsUpdate());
 
+	// Get the frequency selection and apply it to the parameter filter, if necessary
+	EntityPropertiesSelection* frequencyProperty = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Frequency"));
+
+	if (frequencyProperty != nullptr)
+	{
+		EntityPropertiesString* frequencyValueProperty = dynamic_cast<EntityPropertiesString*>(getProperties().getProperty("Value", "Query settings_1"));
+
+		if (frequencyValueProperty != nullptr)
+		{
+			if (frequencyValueProperty->getValue() != frequencyProperty->getValue())
+			{
+				frequencyValueProperty->setValue(frequencyProperty->getValue());
+			}
+		}
+	}
+
 	// Since there is a change now, we need to set the modified flag
 	setModified();
 
