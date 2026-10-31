@@ -1068,7 +1068,8 @@ Section "-Extract Installer Tools (Required)" SEC01
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\MongoDB_Installer\*.*"
 	File /r "..\..\..\..\ThirdParty\Installer_Tools\ThirdParty\shared\RefreshEnv.cmd"
 	
-	File /r "..\helper\*.*"
+	File /r "..\helper\Configuration\*.*"
+	File "..\..\..\Deployment\*.dll"
 	File /r "..\javascript\*.*"
 
 SectionEnd
@@ -1110,6 +1111,15 @@ SectionGroup /e "OpenTwin"
 		
 		SetOutPath "$INSTDIR\Certificates"
 		File /r "..\..\..\Deployment\Certificates\*.*"
+
+		SetOutPath "$INSTDIR"
+		File "..\..\..\Deployment\python.exe"
+		File "..\..\..\Deployment\python311.dll"
+		File "..\..\..\Deployment\python311._pth"
+		File /r "..\..\..\Deployment\ot_launcher"
+		SetOutPath "$INSTDIR\PythonEnvironments\CoreEnvironment"
+		File /r "..\..\..\Deployment\PythonEnvironments\CoreEnvironment\Lib"
+		File /r "..\..\..\Deployment\PythonEnvironments\CoreEnvironment\DLLs"
 		
 		SetOutPath "$INSTDIR\Icons"
 		File /r "..\..\..\Deployment\Icons\*.*"
@@ -1167,7 +1177,13 @@ SectionGroup /e "OpenTwin"
 		##########################################
 		DetailPrint "Running scripts..."
 		# update the mongodB config file without authentication
-		ExecWait '"$TempToolChain\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection "$MONGODB_ADMIN_PASSWORD" "$TempToolChain\db_admin.js"'
+		ClearErrors
+		ExecWait '"$TempToolChain\ConfigMongoDBNoAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$MONGODB_DB_PATH" "$MONGODB_LOG_PATH" $NetworkModeSelection $MONGODB_CUSTOM_PORT "$MONGODB_ADMIN_PASSWORD" "$TempToolChain\db_admin.js"' $1
+		${If} ${Errors}
+		${OrIf} $1 <> 0
+			MessageBox MB_ICONSTOP|MB_OK "Writing the MongoDB configuration failed."
+			Abort
+		${EndIf}
 
 		SendMessage ${HWND_BROADCAST} ${WM_SETTINGCHANGE} 0 "STR:Environment" /TIMEOUT=5000
 
@@ -1181,7 +1197,7 @@ SectionGroup /e "OpenTwin"
 
 		# call for js script to paste admin user creation
 		ExpandEnvStrings $0 %COMSPEC%
-			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$MONGODB_INSTALL_PATH\bin\mongo.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$TempToolChain\db_admin.js_tmp" " "'
+			ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c " "$TempToolChain\mongosh.exe" --host $NetworkModeSelection --port $MONGODB_CUSTOM_PORT < "$TempToolChain\db_admin.js_tmp" " "'
 
 		Delete "$TempToolChain\db_admin.js_tmp"
 
@@ -1193,6 +1209,10 @@ SectionGroup /e "OpenTwin"
 			ExpandEnvStrings $0 %COMSPEC%
 				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$PUBLIC_CERT_PATH\ca.pem"""" '	
 		${Else}
+			IfFileExists "$OPENTWIN_DEV_ROOT\Scripts\Python\certificates.py" 0 +4
+				ExpandEnvStrings $0 %COMSPEC%
+				ExecWait '"$0" /c "set "OPENTWIN_DEV_ROOT=$OPENTWIN_DEV_ROOT" && set "CERT_CREATE_TOOLS=$OPENTWIN_THIRDPARTY_ROOT\CertificateCreation" && "$OPENTWIN_THIRDPARTY_ROOT\Python\Python3_11_9\windows\Interpreter\Release\python.exe" -B "$OPENTWIN_DEV_ROOT\Scripts\Python\certificates.py""'
+				CopyFiles /SILENT "$OPENTWIN_DEV_ROOT\Certificates\Generated\*.pem" "$STANDARD_CERT_PATH"
 			ExecWait '"$TempToolChain\ConfigMongoDBWithAuth.exe" "$MONGODB_INSTALL_PATH\bin\mongod.cfg" "$STANDARD_CERT_PATH\certificateKeyFile.pem" "$MONGODB_CUSTOM_PORT"'
 			ExpandEnvStrings $0 %COMSPEC%
 				ExecWait '"$0" /c "START /WAIT /MIN cmd.exe /c "certutil -addstore root "$STANDARD_CERT_PATH\ca.pem"""" '
