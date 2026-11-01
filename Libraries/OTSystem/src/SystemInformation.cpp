@@ -295,7 +295,7 @@ std::string ot::SystemInformation::getBuildInformation()
 			buildInfo.append(line);
 		}
 	}
-	catch (std::exception)
+	catch (const std::exception&)
 	{
 		// The build info file could not be found, return an empty string
 	}
