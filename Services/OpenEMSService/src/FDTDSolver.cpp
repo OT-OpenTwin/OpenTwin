@@ -334,6 +334,8 @@ bool FDTDSolver::getFieldTypeAndUnit(EntityFieldDump* fieldDump, std::string& fi
 
 void FDTDSolver::addFarfieldDumps(std::stringstream& runCommand)
 {
+	if (farfieldDumpList.empty()) return; // No farfield dumps defined
+
 	// First determine a unique list of all farfield dump frequencies
 	std::set<double> farfieldFrequencyList;
 

@@ -562,6 +562,10 @@ void ResultManager::createFarfieldPlots(const std::list<std::string>& excitation
 void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, const std::string& plotName, EntityFarfieldDump *farfieldDump, const std::list<std::string>& excitationStringList, const MetadataSeries* series, ResultCollectionExtender& resultCollectionExtender,
 										 const std::map<std::string, std::list<std::string>>& farfieldDumpFrequencies, double structureCx, double structureCy, double structureCz, double structureDiagonal, const std::string &frequencyUnit)
 {
+	if (farfieldDumpFrequencies.empty()) return; 
+	if (farfieldDumpFrequencies.count(farfieldDump->getName()) == 0) return;
+	if (farfieldDumpFrequencies.at(farfieldDump->getName()).empty()) return;
+
 	for (auto excitationString : excitationStringList)
 	{
 		EntityPropertiesDouble* thetaMinProperty = dynamic_cast<EntityPropertiesDouble*>(farfieldDump->getProperties().getProperty("Theta min (deg.)"));
@@ -581,7 +585,7 @@ void ResultManager::createFarfieldPlot3D(const std::string& type, bool complex, 
 		ot::ValueComparisonDescription parameterFilter;
 		parameterFilter.setName("Frequency");
 		parameterFilter.setComparator("=");
-		parameterFilter.setValue("15");
+		parameterFilter.setValue(farfieldDumpFrequencies.at(farfieldDump->getName()).front());
 		ot::TupleInstance instance = ot::TupleDescriptionSingle::createInstance(frequencyUnit, "double");
 		parameterFilter.setTupleInstance(instance);
 		std::list<ot::ValueComparisonDescription> parameterFilters = { parameterFilter };
