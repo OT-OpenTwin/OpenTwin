@@ -199,17 +199,25 @@ std::string VtkDriverFarfield::buildSceneNode(DataSourceManagerItem *dataItem, s
 	mapper->SetColorModeToMapScalars();
 	mapper->SetScalarRange(vtkGrid->GetScalarRange());
 
+	vtkNew<vtkLookupTable> lut;
+	lut->SetHueRange(2.0 / 3.0, 0.0);  // Min = blue, max = red
+	lut->Build();
+	mapper->SetLookupTable(lut);
+
 	mapper->Update();
 	mapper->MapScalars(1.0);
 
-	vtkLookupTable* lut = vtkLookupTable::SafeDownCast(mapper->GetLookupTable());
+	extractColorRampFromLookupTable(lut);
+	colorRamp = colorRampData;
 
-	if (lut != nullptr)
-	{
-		lut->Build();
-		extractColorRampFromLookupTable(lut);
-		colorRamp = colorRampData;
-	}
+	//vtkLookupTable* lut = vtkLookupTable::SafeDownCast(mapper->GetLookupTable());
+
+	//if (lut != nullptr)
+	//{
+	//	lut->Build();
+	//	extractColorRampFromLookupTable(lut);
+	//	colorRamp = colorRampData;
+	//}
 
 	vtkNew<vtkActor> actor;
 	actor->SetMapper(mapper);
