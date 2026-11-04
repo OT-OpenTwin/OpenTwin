@@ -178,6 +178,32 @@ namespace ot {
 		//! @param _a Alpha channel [0, 255].
 		static Color fromHsl(float _h, float _s, float _l, int _a = 255);
 
+		//! @brief Convert this RGBA color to Oklab values.
+		//! @param _L Output Lightness [0.0f, 1.0f].
+		//! @param _a Output green-red axis (approx. [-0.4, 0.4]).
+		//! @param _b Output blue-yellow axis (approx. [-0.4, 0.4]).
+		void toOklab(float& _L, float& _a, float& _b) const;
+
+		//! @brief Construct a Color from Oklab values.
+		//! @param _L Lightness [0.0f, 1.0f].
+		//! @param _a Green-red axis.
+		//! @param _b Blue-yellow axis.
+		//! @param _alpha Alpha channel [0, 255].
+		static Color fromOklab(float _L, float _a, float _b, int _alpha = 255);
+
+		//! @brief Convert this RGBA color to Oklch values (cylindrical representation of Oklab).
+		//! @param _L Output Lightness [0.0f, 1.0f].
+		//! @param _C Output Chroma [0.0f, ~0.4f].
+		//! @param _h Output Hue in degrees [0.0f, 360.0f).
+		void toOklch(float& _L, float& _C, float& _h) const;
+
+		//! @brief Construct a Color from Oklch values.
+		//! @param _L Lightness [0.0f, 1.0f].
+		//! @param _C Chroma [0.0f, ~0.4f].
+		//! @param _h Hue in degrees [0.0f, 360.0f) (values outside are wrapped modulo 360).
+		//! @param _alpha Alpha channel [0, 255].
+		static Color fromOklch(float _L, float _C, float _h, int _alpha = 255);
+
 		static int channelValueFromFloat(float _value);
 
 	private:

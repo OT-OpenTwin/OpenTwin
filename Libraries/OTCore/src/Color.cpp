@@ -536,6 +536,106 @@ ot::Color ot::Color::fromHsl(float _h, float _s, float _l, int _a) {
 	return Color(r, g, b, _a);
 }
 
+namespace {
+	constexpr float s_pi = 3.14159265358979323846f;
+
+	inline float sRgbToLinear(float _c) {
+		return (_c <= 0.04045f) ? (_c / 12.92f) : std::pow((_c + 0.055f) / 1.055f, 2.4f);
+	}
+
+	inline float linearToSRgb(float _c) {
+		if (_c <= 0.0031308f) {
+			return (_c <= 0.f) ? 0.f : (12.92f * _c);
+		}
+		if (_c >= 1.0f) {
+			return 1.0f;
+		}
+		return 1.055f * std::pow(_c, 1.0f / 2.4f) - 0.055f;
+	}
+}
+
+void ot::Color::toOklab(float& _L, float& _a, float& _b) const {
+	const float rLin = sRgbToLinear(static_cast<float>(m_r) / 255.f);
+	const float gLin = sRgbToLinear(static_cast<float>(m_g) / 255.f);
+	const float bLin = sRgbToLinear(static_cast<float>(m_b) / 255.f);
+
+	const float l = 0.4122214708f * rLin + 0.5363325363f * gLin + 0.0514459929f * bLin;
+	const float m = 0.2119034982f * rLin + 0.6806995451f * gLin + 0.1073969566f * bLin;
+	const float s = 0.0883024619f * rLin + 0.2817188376f * gLin + 0.6299787005f * bLin;
+
+	const float l_ = std::cbrt(l);
+	const float m_ = std::cbrt(m);
+	const float s_ = std::cbrt(s);
+
+	_L = 0.2104542553f * l_ + 0.7936177850f * m_ - 0.0040720468f * s_;
+	_a = 1.9779984951f * l_ - 2.4285922050f * m_ + 0.4505937099f * s_;
+	_b = 0.0259040371f * l_ + 0.7827717662f * m_ - 0.8086757660f * s_;
+}
+
+ot::Color ot::Color::fromOklab(float _L, float _a, float _b, int _alpha) {
+	if (_L <= 0.f) {
+		return Color(0, 0, 0, std::max(0, std::min(255, _alpha)));
+	}
+
+	const float l_ = _L + 0.3963377774f * _a + 0.2158037573f * _b;
+	const float m_ = _L - 0.1055613458f * _a - 0.0638541728f * _b;
+	const float s_ = _L - 0.0894841775f * _a - 1.2914855480f * _b;
+
+	const float l = l_ * l_ * l_;
+	const float m = m_ * m_ * m_;
+	const float s = s_ * s_ * s_;
+
+	const float rLin = +4.0767416621f * l - 3.3077115913f * m + 0.2309699292f * s;
+	const float gLin = -1.2684380046f * l + 2.6097574011f * m - 0.3413193965f * s;
+	const float bLin = -0.0041960863f * l - 0.7034186147f * m + 1.7076147010f * s;
+
+	const float rSrgb = linearToSRgb(rLin);
+	const float gSrgb = linearToSRgb(gLin);
+	const float bSrgb = linearToSRgb(bLin);
+
+	int r = static_cast<int>(std::round(rSrgb * 255.f));
+	int g = static_cast<int>(std::round(gSrgb * 255.f));
+	int b = static_cast<int>(std::round(bSrgb * 255.f));
+
+	r = std::max(0, std::min(255, r));
+	g = std::max(0, std::min(255, g));
+	b = std::max(0, std::min(255, b));
+	int a = std::max(0, std::min(255, _alpha));
+
+	return Color(r, g, b, a);
+}
+
+void ot::Color::toOklch(float& _L, float& _C, float& _h) const {
+	float a = 0.f, b = 0.f;
+	toOklab(_L, a, b);
+
+	_C = std::sqrt(a * a + b * b);
+	if (_C <= 1e-6f) {
+		_h = 0.f;
+	}
+	else {
+		_h = std::atan2(b, a) * (180.f / s_pi);
+		if (_h < 0.f) {
+			_h += 360.f;
+		}
+	}
+}
+
+ot::Color ot::Color::fromOklch(float _L, float _C, float _h, int _alpha) {
+	_h = std::fmod(_h, 360.f);
+	if (_h < 0.f) {
+		_h += 360.f;
+	}
+
+	_C = std::max(0.f, _C);
+
+	const float rad = _h * (s_pi / 180.f);
+	const float a = _C * std::cos(rad);
+	const float b = _C * std::sin(rad);
+
+	return fromOklab(_L, a, b, _alpha);
+}
+
 int ot::Color::channelValueFromFloat(float _value) {
 	return static_cast<int>(_value * 255.f);
 }

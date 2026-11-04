@@ -185,3 +185,113 @@ TEST(ColorTests, HslRoundTripArbitrary) {
 	EXPECT_NEAR(original.b(), reconstructed.b(), 1);
 	EXPECT_EQ(original.a(), reconstructed.a());
 }
+
+
+TEST(ColorTests, OklabPureAndNeutrals) {
+	// Pure Black
+	ot::Color black(0, 0, 0);
+	float L = 0.f, a = 0.f, b = 0.f;
+	black.toOklab(L, a, b);
+	EXPECT_NEAR(0.f, L, 1e-3f);
+	EXPECT_NEAR(0.f, a, 1e-3f);
+	EXPECT_NEAR(0.f, b, 1e-3f);
+
+	ot::Color fromBlack = ot::Color::fromOklab(0.f, 0.f, 0.f);
+	EXPECT_EQ(black, fromBlack);
+
+	// Pure White
+	ot::Color white(255, 255, 255);
+	white.toOklab(L, a, b);
+	EXPECT_NEAR(1.f, L, 1e-3f);
+	EXPECT_NEAR(0.f, a, 1e-3f);
+	EXPECT_NEAR(0.f, b, 1e-3f);
+
+	ot::Color fromWhite = ot::Color::fromOklab(1.f, 0.f, 0.f);
+	EXPECT_EQ(white, fromWhite);
+
+	// Pure Red (255, 0, 0)
+	ot::Color red(255, 0, 0);
+	red.toOklab(L, a, b);
+	EXPECT_NEAR(0.6279f, L, 1e-2f);
+	EXPECT_NEAR(0.2249f, a, 1e-2f);
+	EXPECT_NEAR(0.1258f, b, 1e-2f);
+
+	ot::Color fromRed = ot::Color::fromOklab(L, a, b);
+	EXPECT_NEAR(red.r(), fromRed.r(), 1);
+	EXPECT_NEAR(red.g(), fromRed.g(), 1);
+	EXPECT_NEAR(red.b(), fromRed.b(), 1);
+}
+
+TEST(ColorTests, OklabRoundTripArbitrary) {
+	const ot::Color colors[] = {
+		ot::Color(210, 105, 30, 200),  // Chocolate
+		ot::Color(65, 105, 225, 255),  // RoyalBlue
+		ot::Color(34, 139, 34, 255),   // ForestGreen
+		ot::Color(255, 215, 0, 255),   // Gold
+		ot::Color(128, 128, 128, 128)  // Gray with alpha
+	};
+
+	for (const auto& original : colors) {
+		float L = 0.f, a = 0.f, b = 0.f;
+		original.toOklab(L, a, b);
+
+		ot::Color reconstructed = ot::Color::fromOklab(L, a, b, original.a());
+		EXPECT_NEAR(original.r(), reconstructed.r(), 1);
+		EXPECT_NEAR(original.g(), reconstructed.g(), 1);
+		EXPECT_NEAR(original.b(), reconstructed.b(), 1);
+		EXPECT_EQ(original.a(), reconstructed.a());
+	}
+}
+
+TEST(ColorTests, OklchPureAndNeutrals) {
+	// Pure Black
+	ot::Color black(0, 0, 0);
+	float L = 0.f, C = 0.f, h = 0.f;
+	black.toOklch(L, C, h);
+	EXPECT_NEAR(0.f, L, 1e-3f);
+	EXPECT_NEAR(0.f, C, 1e-3f);
+
+	ot::Color fromBlack = ot::Color::fromOklch(0.f, 0.f, 0.f);
+	EXPECT_EQ(black, fromBlack);
+
+	// Pure White
+	ot::Color white(255, 255, 255);
+	white.toOklch(L, C, h);
+	EXPECT_NEAR(1.f, L, 1e-3f);
+	EXPECT_NEAR(0.f, C, 1e-3f);
+
+	ot::Color fromWhite = ot::Color::fromOklch(1.f, 0.f, 0.f);
+	EXPECT_EQ(white, fromWhite);
+
+	// Pure Red (255, 0, 0)
+	ot::Color red(255, 0, 0);
+	red.toOklch(L, C, h);
+	EXPECT_NEAR(0.6279f, L, 1e-2f);
+	EXPECT_NEAR(0.2577f, C, 1e-2f);
+	EXPECT_NEAR(29.23f, h, 1e-1f);
+
+	ot::Color fromRed = ot::Color::fromOklch(L, C, h);
+	EXPECT_NEAR(red.r(), fromRed.r(), 1);
+	EXPECT_NEAR(red.g(), fromRed.g(), 1);
+	EXPECT_NEAR(red.b(), fromRed.b(), 1);
+}
+
+TEST(ColorTests, OklchHueWrappingAndRoundTrip) {
+	ot::Color original(210, 105, 30, 200); // Chocolate
+	float L = 0.f, C = 0.f, h = 0.f;
+	original.toOklch(L, C, h);
+
+	ot::Color normalReconstructed = ot::Color::fromOklch(L, C, h, original.a());
+	EXPECT_NEAR(original.r(), normalReconstructed.r(), 1);
+	EXPECT_NEAR(original.g(), normalReconstructed.g(), 1);
+	EXPECT_NEAR(original.b(), normalReconstructed.b(), 1);
+	EXPECT_EQ(original.a(), normalReconstructed.a());
+
+	// Test wrapping with +720 degrees
+	ot::Color wrappedReconstructed = ot::Color::fromOklch(L, C, h + 720.f, original.a());
+	EXPECT_EQ(normalReconstructed, wrappedReconstructed);
+
+	// Test negative hue wrapping with -360 degrees
+	ot::Color negWrappedReconstructed = ot::Color::fromOklch(L, C, h - 360.f, original.a());
+	EXPECT_EQ(normalReconstructed, negWrappedReconstructed);
+}
