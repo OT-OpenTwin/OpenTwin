@@ -81,6 +81,7 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 	}
 
 	// 2b. Load and configure any subcircuits referenced in this circuit
+	std::map<std::string, std::vector<std::string>> subcircuitTerminalNamesByModel;
 	for (auto& [blockID, blockEntity] : _allEntitiesByBlockID)
 	{
 		auto* subcircuitBlock = dynamic_cast<EntityBlockCircuitSubcircuit*>(blockEntity.get());
@@ -113,50 +114,38 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 					subCircuitPtr->setEditorName(subcircuitFolderPath);
 					subCircuitPtr->setId(subcircuitFolderPath);
 
-					// Sync terminal names from the subcircuit block / editor terminals
-					std::vector<std::string> orderedTermNames = subcircuitBlock->getOrderedTerminalNames();
-					if (orderedTermNames.empty())
+					// Build canonical terminal order sorted by (name, uid) and disambiguated as ("IN", "IN_2", ...)
+					// to match EntityBlockCircuitSubcircuit::createBlockCfg and NodeAssigner::assignSubcircuitNodes
+					struct RawTerminalEntry
 					{
-						for (auto& [subId, subBlock] : subEntities)
-						{
-							auto* term = dynamic_cast<EntityBlockCircuitTerminal*>(subBlock.get());
-							if (term)
-							{
-								orderedTermNames.push_back(term->getTerminalName());
-							}
-						}
-						std::sort(orderedTermNames.begin(), orderedTermNames.end());
-
-						std::map<std::string, int> totalCounts;
-						for (const auto& name : orderedTermNames) {
-							totalCounts[name]++;
-						}
-
-						std::map<std::string, int> currentCounts;
-						std::vector<std::string> uniqueOrdered;
-						for (const auto& name : orderedTermNames) {
-							if (totalCounts[name] > 1) {
-								currentCounts[name]++;
-								uniqueOrdered.push_back(name + "_" + std::to_string(currentCounts[name]));
-							}
-							else {
-								uniqueOrdered.push_back(name);
-							}
-						}
-						orderedTermNames = std::move(uniqueOrdered);
-					}
-					if (!orderedTermNames.empty())
+						std::string name;
+						ot::UID uid;
+					};
+					std::vector<RawTerminalEntry> rawTerminals;
+					for (auto& [subId, subBlock] : subEntities)
 					{
-						auto itElem = circuit.getMapOfElements().find(subcircuitBlock->getEntityID());
-						if (itElem != circuit.getMapOfElements().end())
+						auto* term = dynamic_cast<EntityBlockCircuitTerminal*>(subBlock.get());
+						if (term)
 						{
-							auto* subElem = dynamic_cast<CircuitElementSubcircuit*>(itElem->second.get());
-							if (subElem)
-							{
-								subElem->setOrderedTerminalNames(orderedTermNames);
-							}
+							rawTerminals.push_back({ term->getTerminalName(), term->getEntityID() });
 						}
 					}
+					std::sort(rawTerminals.begin(), rawTerminals.end(), [](const RawTerminalEntry& a, const RawTerminalEntry& b) {
+						if (a.name != b.name) return a.name < b.name;
+						return a.uid < b.uid;
+					});
+
+					std::map<std::string, int> currentCounts;
+					std::vector<std::string> computedTermNames;
+					for (const auto& t : rawTerminals)
+					{
+						currentCounts[t.name]++;
+						std::string uniqueName = (currentCounts[t.name] == 1)
+							? t.name
+							: (t.name + "_" + std::to_string(currentCounts[t.name]));
+						computedTermNames.push_back(uniqueName);
+					}
+					subcircuitTerminalNamesByModel[spiceModelName] = std::move(computedTermNames);
 
 					// Create subcircuit elements
 					for (auto& [subId, subBlock] : subEntities)
@@ -194,6 +183,29 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 
 					// Register in main circuit
 					circuit.addSubcircuit(spiceModelName, subCircuitPtr);
+				}
+			}
+
+			// Sync terminal names onto every subcircuit block instance (X1, X2, ...)
+			std::vector<std::string> orderedTermNames = subcircuitBlock->getOrderedTerminalNames();
+			if (orderedTermNames.empty())
+			{
+				auto itTerms = subcircuitTerminalNamesByModel.find(spiceModelName);
+				if (itTerms != subcircuitTerminalNamesByModel.end())
+				{
+					orderedTermNames = itTerms->second;
+				}
+			}
+			if (!orderedTermNames.empty())
+			{
+				auto itElem = circuit.getMapOfElements().find(subcircuitBlock->getEntityID());
+				if (itElem != circuit.getMapOfElements().end())
+				{
+					auto* subElem = dynamic_cast<CircuitElementSubcircuit*>(itElem->second.get());
+					if (subElem)
+					{
+						subElem->setOrderedTerminalNames(orderedTermNames);
+					}
 				}
 			}
 		}

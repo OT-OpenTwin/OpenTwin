@@ -44,8 +44,14 @@ void NodeAssigner::assignSubcircuitNodes(Circuit& _subcircuit, const std::map<ot
 	std::map<ot::UID, ot::UIDList> dummyMap;
 	assignNodeNumbers(dummyMap, _subcircuit, const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>&>(_connections), const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&>(_entities), _subcircuit.getEditorName(), true);
 	
-	// Collect terminals and sort them by Terminal Name
-	std::vector<std::pair<std::string, std::string>> namedTerminalNodes;
+	// Collect terminals and sort them by (Terminal Name, UID) to match EntityBlockCircuitSubcircuit connector ordering
+	struct TerminalNodeInfo
+	{
+		std::string name;
+		ot::UID uid;
+		std::string nodeNumber;
+	};
+	std::vector<TerminalNodeInfo> namedTerminalNodes;
 	for (const auto& [id, blockEntity] : _entities)
 	{
 		auto* terminalEntity = dynamic_cast<EntityBlockCircuitTerminal*>(blockEntity.get());
@@ -53,19 +59,20 @@ void NodeAssigner::assignSubcircuitNodes(Circuit& _subcircuit, const std::map<ot
 		{
 			std::string connectableKey = createConnectableKey(terminalEntity->getEntityID(), "pin");
 			std::string root = findRoot(connectableKey);
-			std::string nodeNumber = m_rootToNodeNumber[root]; 
-			namedTerminalNodes.push_back({ terminalEntity->getTerminalName(), nodeNumber });
+			std::string nodeNumber = m_rootToNodeNumber[root];
+			namedTerminalNodes.push_back({ terminalEntity->getTerminalName(), terminalEntity->getEntityID(), nodeNumber });
 		}
 	}
 
-	std::sort(namedTerminalNodes.begin(), namedTerminalNodes.end(), [](const auto& a, const auto& b) {
-		return a.first < b.first;
+	std::sort(namedTerminalNodes.begin(), namedTerminalNodes.end(), [](const TerminalNodeInfo& a, const TerminalNodeInfo& b) {
+		if (a.name != b.name) return a.name < b.name;
+		return a.uid < b.uid;
 	});
 
 	std::vector<std::string> orderedTerminalNodes;
-	for (const auto& pair : namedTerminalNodes)
+	for (const auto& info : namedTerminalNodes)
 	{
-		orderedTerminalNodes.push_back(pair.second);
+		orderedTerminalNodes.push_back(info.nodeNumber);
 	}
 
 	_subcircuit.setOrderedTerminalNodes(orderedTerminalNodes);

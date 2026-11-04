@@ -402,6 +402,8 @@ std::string NetlistGenerator::buildNodeNumbers(CircuitElement* _element)
     std::unordered_set<std::string> seen;
     bool dedup = !_element->allowDuplicateNodes();
     auto connections = _element->getList();
+    const bool isSubcircuitInstance = (_element->type() == "Subcircuit");
+    size_t poleIndex = 1;
 
     // Use the ordered pole names for correct NGSpice node sequence
     for (const auto& poleName : _element->getOrderedPoleNames())
@@ -418,6 +420,12 @@ std::string NetlistGenerator::buildNodeNumbers(CircuitElement* _element)
                 }
             }
         }
+        else if (isSubcircuitInstance)
+        {
+            // Keep subcircuit port count aligned with .SUBCKT definition if an optional terminal is left open
+            netlistNodeNumbers += "nc_" + _element->getNetlistName() + "_" + std::to_string(poleIndex) + " ";
+        }
+        ++poleIndex;
     }
 
     return netlistNodeNumbers;
