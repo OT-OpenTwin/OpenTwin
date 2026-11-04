@@ -31,11 +31,13 @@
 #include <list>
 #include <string>
 #include <vector>
-#include <memory>	
+#include <memory>
+#include <unordered_set>
 
 
 class EntityBase;
 class EntityFileText;
+class EntityUnits;
 
 class NetlistGenerator
 {
@@ -71,6 +73,9 @@ private:
 		std::vector<std::string> nodeNumbers;
 		std::string customName;
 	};
+
+	// @brief Generates and appends the netlist line(s) (including model lines) for a single circuit element.
+	void appendCircuitElementLines(CircuitElement* _circuitElement, const SimulationStrategy& _strategy, EntityUnits* _entityUnits, std::list<std::string>& _netlist, std::unordered_set<std::string>& _usedModels, std::vector<MeterData>* _voltageMeterData, std::vector<MeterData>* _currentMeterData, int& _rshuntCounter);
 
 	MeterData extractMeterNodes(CircuitElement* element);
 

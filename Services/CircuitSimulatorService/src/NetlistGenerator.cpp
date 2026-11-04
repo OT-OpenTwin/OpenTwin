@@ -113,156 +113,15 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
     int rshuntCounter = 1;
     for (const auto& [uid, elementPtr] : _circuit.getMapOfElements())
     {
-		CircuitElement* circuitElement = elementPtr.get();
-		// Meter Handling: VoltageMeter and CurrentMeter are handled separately
-        if (circuitElement->type() == "VoltageMeter")
-        {
-            voltageMeterData.push_back(extractMeterNodes(circuitElement));
-            continue;
-        }
-        if (circuitElement->type() == "CurrentMeter")
-        {
-            MeterData data = extractMeterNodes(circuitElement);
-			// For CurrentMeter , we create a Rshunt element with a unique name and register it in the naming registry
-            std::string shuntName = "Rshunt" + std::to_string(rshuntCounter++);
-            m_elementNamingRegistry.registerMapping(data.customName,
-                ElementNamingRegistry::toLowercase(shuntName));
-            data.customName = shuntName;  
-            currentMeterData.push_back(data);
-            continue;
-        }
-        // Model-Handling for all element types
-        std::string modelType = "";
-        std::vector<std::string> modelLines;
-        if (circuitElement->getModel() != "failed")
-        {
-            auto modelEntity = getModelEntity(
-                circuitElement->getFolderName(), circuitElement->getModel());
-            modelType = getCircuitModelType(modelEntity);
-            if (usedModels.find(circuitElement->getModel()) == usedModels.end())
-            {
-                modelLines = convertToCircByLine(getCircuitModelText(modelEntity));
-                usedModels.insert(circuitElement->getModel());
-            }
-        }
-        else
-        {
-            circuitElement->setModel("");
-        }
-        // Build element line 
-        std::string line = buildElementLine(circuitElement, modelType, *strategy);
-        // Add node numbers
-        line += buildNodeNumbers(circuitElement);
-		// Add Voltage Source type if applicable
-        if (circuitElement->type() == "VoltageSource")
-        {
-            auto* vs = dynamic_cast<VoltageSource*>(circuitElement);
-            if (!vs)
-            {
-                OT_LOG_E("Failed to cast CircuitElement to VoltageSource");
-            }
-           
-            std::string unit = "V";
-            if (entityUnits) {
-                unit = entityUnits->getVoltageUnit();
-            }
-
-            vs->setValue(formatScaledNetlistValue(vs->getValue(), unit));
-            vs->setAmplitude(formatScaledNetlistValue(vs->getAmplitude(), unit));
-            if (!vs->getFunctionType().empty() && !vs->getFunctionParameters().empty())
-            {
-                std::string functionStr = vs->getFunctionType() + "(";
-                const auto& params = vs->getFunctionParameters();
-                for (size_t i = 0; i < params.size(); ++i)
-                {
-                    std::string param = params[i];
-                    size_t pFirst = param.find_first_not_of(" \t\r\n");
-                    if (pFirst != std::string::npos)
-                    {
-                        size_t pLast = param.find_last_not_of(" \t\r\n");
-                        param = param.substr(pFirst, pLast - pFirst + 1);
-                    }
-                    functionStr += wrapParameterExpression(param);
-                    if (i + 1 < params.size())
-                    {
-                        functionStr += " ";
-                    }
-                }
-                functionStr += ")";
-                vs->setFunction(functionStr);
-            }
-            line += strategy->getVoltageSourceNetlistType(vs);
-        }
-        else
-        {
-		    // add value or model depending on whether a model is specified
-            if (modelType.empty()) {
-                // BehavioralSource expressions are natively evaluated by NGSpice - no {} wrapping needed
-                if (circuitElement->type() == "BehavioralSource") {
-                    line += circuitElement->getNetlistValue();
-                }
-                else if (circuitElement->type() == "Subcircuit") {
-					// Writes the subcircuit element line with its model name and node connections
-                    // Result: circbyline X1 <Node1> <Node2> ... <ModelName>
-                    line += circuitElement->getNetlistValue();
-                }
-                else if (circuitElement->type() == "Capacitor") {
-                    std::string unit = "F";
-                    if (entityUnits) 
-                    {
-                        unit = entityUnits->getCapacitanceUnit();
-                    }
-                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
-                }
-                else if (circuitElement->type() == "Inductor") {
-                    std::string unit = "H";
-                    if (entityUnits) 
-                    {
-                        unit = entityUnits->getInductanceUnit();
-                    }
-                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
-                }
-                else if (circuitElement->type() == "Resistor") {
-                    std::string unit = "Ohm";
-                    if (entityUnits) {
-                        unit = entityUnits->getResistanceUnit();
-                    }
-                    line += formatScaledNetlistValue(circuitElement->getNetlistValue(), unit);
-                }
-                else if (circuitElement->type() == "TransmissionLine") {
-                    auto* tl = dynamic_cast<TransmissionLine*>(circuitElement);
-                    if (tl) {
-                        std::string unitR = "Ohm";
-                        if (entityUnits) 
-                        {
-                            unitR = entityUnits->getResistanceUnit();
-                        }
-
-                        std::string unitT = "s";
-                        if (entityUnits) 
-                        {
-                            unitT = entityUnits->getTimeUnit();
-                        }
-
-                        line += "Z0=" + formatScaledNetlistValue(tl->getRawImpedance(), unitR) + " TD=" + formatScaledNetlistValue(tl->getRawTransmissionDelay(), unitT);
-                    }
-                    else {
-                        line += wrapParameterExpression(circuitElement->getNetlistValue());
-                    }
-                }
-                else {
-                    line += wrapParameterExpression(circuitElement->getNetlistValue());
-                }
-            }
-            else {
-                line += circuitElement->getModel();
-            }
-        }
-        netlist.push_back(line);
-		// Add model lines 
-        for (const auto& modelLine : modelLines) {
-            netlist.push_back(modelLine);
-        }
+        appendCircuitElementLines(
+            elementPtr.get(),
+            *strategy,
+            entityUnits.get(),
+            netlist,
+            usedModels,
+            &voltageMeterData,
+            &currentMeterData,
+            rshuntCounter);
     }
     // 4. CurrentMeter with Rshunt
     std::vector<std::string> shuntNames;
@@ -312,12 +171,18 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
         }
         netlist.push_back(subcktHeader);
         // 2. Inner elements of the subcircuit
+        std::unordered_set<std::string> subUsedModels;
         for (const auto& [uid, innerElem] : subCircuit->getMapOfElements())
         {
-            std::string innerLine = buildElementLine(innerElem.get(), "", *strategy);
-            innerLine += buildNodeNumbers(innerElem.get());
-            innerLine += innerElem->getNetlistValue();
-            netlist.push_back(innerLine);
+            appendCircuitElementLines(
+                innerElem.get(),
+                *strategy,
+                entityUnits.get(),
+                netlist,
+                subUsedModels,
+                nullptr,
+                nullptr,
+                rshuntCounter);
         }
         // 3. End of subcircuit definition
         netlist.push_back("circbyline .ENDS " + subName);
@@ -330,6 +195,184 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
     netlist.push_back("circbyline .endc");
     netlist.push_back("circbyline .end");
     return netlist;
+}
+
+void NetlistGenerator::appendCircuitElementLines(
+    CircuitElement* _circuitElement,
+    const SimulationStrategy& _strategy,
+    EntityUnits* _entityUnits,
+    std::list<std::string>& _netlist,
+    std::unordered_set<std::string>& _usedModels,
+    std::vector<MeterData>* _voltageMeterData,
+    std::vector<MeterData>* _currentMeterData,
+    int& _rshuntCounter)
+{
+    if (!_circuitElement) return;
+
+    // Meter Handling: VoltageMeter and CurrentMeter are handled separately
+    if (_circuitElement->type() == "VoltageMeter")
+    {
+        if (_voltageMeterData != nullptr)
+        {
+            _voltageMeterData->push_back(extractMeterNodes(_circuitElement));
+        }
+        return;
+    }
+    if (_circuitElement->type() == "CurrentMeter")
+    {
+        MeterData data = extractMeterNodes(_circuitElement);
+        // For CurrentMeter , we create a Rshunt element with a unique name and register it in the naming registry
+        std::string shuntName = "Rshunt" + std::to_string(_rshuntCounter++);
+        if (_currentMeterData != nullptr)
+        {
+            m_elementNamingRegistry.registerMapping(data.customName,
+                ElementNamingRegistry::toLowercase(shuntName));
+            data.customName = shuntName;
+            _currentMeterData->push_back(data);
+        }
+        else
+        {
+            std::string nodeString;
+            for (const auto& node : data.nodeNumbers) {
+                nodeString += node + " ";
+            }
+            _netlist.push_back("circbyline " + shuntName + " " + nodeString + "0");
+        }
+        return;
+    }
+    // Model-Handling for all element types
+    std::string modelType = "";
+    std::vector<std::string> modelLines;
+    if (!_circuitElement->getModel().empty() && _circuitElement->getModel() != "failed")
+    {
+        auto modelEntity = getModelEntity(
+            _circuitElement->getFolderName(), _circuitElement->getModel());
+        modelType = getCircuitModelType(modelEntity);
+        if (_usedModels.find(_circuitElement->getModel()) == _usedModels.end())
+        {
+            modelLines = convertToCircByLine(getCircuitModelText(modelEntity));
+            _usedModels.insert(_circuitElement->getModel());
+        }
+    }
+    else
+    {
+        _circuitElement->setModel("");
+    }
+    // Build element line 
+    std::string line = buildElementLine(_circuitElement, modelType, _strategy);
+    // Add node numbers
+    line += buildNodeNumbers(_circuitElement);
+    // Add Voltage Source type if applicable
+    if (_circuitElement->type() == "VoltageSource")
+    {
+        auto* vs = dynamic_cast<VoltageSource*>(_circuitElement);
+        if (!vs)
+        {
+            OT_LOG_E("Failed to cast CircuitElement to VoltageSource");
+            return;
+        }
+
+        std::string unit = "V";
+        if (_entityUnits) {
+            unit = _entityUnits->getVoltageUnit();
+        }
+
+        vs->setValue(formatScaledNetlistValue(vs->getValue(), unit));
+        vs->setAmplitude(formatScaledNetlistValue(vs->getAmplitude(), unit));
+        if (!vs->getFunctionType().empty() && !vs->getFunctionParameters().empty())
+        {
+            std::string functionStr = vs->getFunctionType() + "(";
+            const auto& params = vs->getFunctionParameters();
+            for (size_t i = 0; i < params.size(); ++i)
+            {
+                std::string param = params[i];
+                size_t pFirst = param.find_first_not_of(" \t\r\n");
+                if (pFirst != std::string::npos)
+                {
+                    size_t pLast = param.find_last_not_of(" \t\r\n");
+                    param = param.substr(pFirst, pLast - pFirst + 1);
+                }
+                functionStr += wrapParameterExpression(param);
+                if (i + 1 < params.size())
+                {
+                    functionStr += " ";
+                }
+            }
+            functionStr += ")";
+            vs->setFunction(functionStr);
+        }
+        line += _strategy.getVoltageSourceNetlistType(vs);
+    }
+    else
+    {
+        // add value or model depending on whether a model is specified
+        if (modelType.empty()) {
+            // BehavioralSource expressions are natively evaluated by NGSpice - no {} wrapping needed
+            if (_circuitElement->type() == "BehavioralSource") {
+                line += _circuitElement->getNetlistValue();
+            }
+            else if (_circuitElement->type() == "Subcircuit") {
+                // Writes the subcircuit element line with its model name and node connections
+                // Result: circbyline X1 <Node1> <Node2> ... <ModelName>
+                line += _circuitElement->getNetlistValue();
+            }
+            else if (_circuitElement->type() == "Capacitor") {
+                std::string unit = "F";
+                if (_entityUnits)
+                {
+                    unit = _entityUnits->getCapacitanceUnit();
+                }
+                line += formatScaledNetlistValue(_circuitElement->getNetlistValue(), unit);
+            }
+            else if (_circuitElement->type() == "Inductor") {
+                std::string unit = "H";
+                if (_entityUnits)
+                {
+                    unit = _entityUnits->getInductanceUnit();
+                }
+                line += formatScaledNetlistValue(_circuitElement->getNetlistValue(), unit);
+            }
+            else if (_circuitElement->type() == "Resistor") {
+                std::string unit = "Ohm";
+                if (_entityUnits) {
+                    unit = _entityUnits->getResistanceUnit();
+                }
+                line += formatScaledNetlistValue(_circuitElement->getNetlistValue(), unit);
+            }
+            else if (_circuitElement->type() == "TransmissionLine") {
+                auto* tl = dynamic_cast<TransmissionLine*>(_circuitElement);
+                if (tl) {
+                    std::string unitR = "Ohm";
+                    if (_entityUnits)
+                    {
+                        unitR = _entityUnits->getResistanceUnit();
+                    }
+
+                    std::string unitT = "s";
+                    if (_entityUnits)
+                    {
+                        unitT = _entityUnits->getTimeUnit();
+                    }
+
+                    line += "Z0=" + formatScaledNetlistValue(tl->getRawImpedance(), unitR) + " TD=" + formatScaledNetlistValue(tl->getRawTransmissionDelay(), unitT);
+                }
+                else {
+                    line += wrapParameterExpression(_circuitElement->getNetlistValue());
+                }
+            }
+            else {
+                line += wrapParameterExpression(_circuitElement->getNetlistValue());
+            }
+        }
+        else {
+            line += _circuitElement->getModel();
+        }
+    }
+    _netlist.push_back(line);
+    // Add model lines 
+    for (const auto& modelLine : modelLines) {
+        _netlist.push_back(modelLine);
+    }
 }
 
 std::string NetlistGenerator::buildElementLine(CircuitElement* _element, const std::string& _modelType, const SimulationStrategy& _strategy)
