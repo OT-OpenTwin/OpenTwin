@@ -295,3 +295,58 @@ TEST(ColorTests, OklchHueWrappingAndRoundTrip) {
 	ot::Color negWrappedReconstructed = ot::Color::fromOklch(L, C, h - 360.f, original.a());
 	EXPECT_EQ(normalReconstructed, negWrappedReconstructed);
 }
+
+
+TEST(ColorTests, LuminanceAndContrastWcag22) {
+	ot::Color black(0, 0, 0);
+	ot::Color white(255, 255, 255);
+	ot::Color red(255, 0, 0);
+	ot::Color green(0, 255, 0);
+	ot::Color blue(0, 0, 255);
+
+	// Relative Luminance of primaries
+	EXPECT_NEAR(0.0, black.relativeLuminance(), 1e-4);
+	EXPECT_NEAR(1.0, white.relativeLuminance(), 1e-4);
+	EXPECT_NEAR(0.2126, red.relativeLuminance(), 1e-4);
+	EXPECT_NEAR(0.7152, green.relativeLuminance(), 1e-4);
+	EXPECT_NEAR(0.0722, blue.relativeLuminance(), 1e-4);
+
+	// Contrast ratios
+	// Max contrast Black vs White is exactly 21:1
+	EXPECT_NEAR(21.0, black.contrastRatio(white), 1e-3);
+	EXPECT_NEAR(21.0, white.contrastRatio(black), 1e-3);
+
+	// Same color contrast is 1:1
+	EXPECT_NEAR(1.0, red.contrastRatio(red), 1e-3);
+
+	// Contrast symmetry
+	EXPECT_NEAR(red.contrastRatio(blue), blue.contrastRatio(red), 1e-6);
+
+	// WCAG AA requirement (>= 4.5:1) for Black on White
+	EXPECT_GE(white.contrastRatio(black), 4.5);
+}
+
+TEST(ColorTests, ContrastingTextColorWcag22) {
+	ot::Color white(255, 255, 255);
+	ot::Color black(0, 0, 0);
+	ot::Color yellow(255, 255, 0);
+	ot::Color navy(0, 0, 128);
+	ot::Color darkBlue(10, 20, 80);
+	ot::Color lightCyan(224, 255, 255);
+
+	// Light backgrounds must choose Black text
+	EXPECT_EQ(ot::Color(ot::DefaultColor::Black), white.getContrastingTextColor());
+	EXPECT_EQ(ot::Color(ot::DefaultColor::Black), yellow.getContrastingTextColor());
+	EXPECT_EQ(ot::Color(ot::DefaultColor::Black), lightCyan.getContrastingTextColor());
+
+	// Dark backgrounds must choose White text
+	EXPECT_EQ(ot::Color(ot::DefaultColor::White), black.getContrastingTextColor());
+	EXPECT_EQ(ot::Color(ot::DefaultColor::White), navy.getContrastingTextColor());
+	EXPECT_EQ(ot::Color(ot::DefaultColor::White), darkBlue.getContrastingTextColor());
+
+	// Guaranteed contrast ratio >= 4.5:1 (WCAG 2.2 AA)
+	EXPECT_GE(white.contrastRatio(white.getContrastingTextColor()), 4.5);
+	EXPECT_GE(black.contrastRatio(black.getContrastingTextColor()), 4.5);
+	EXPECT_GE(yellow.contrastRatio(yellow.getContrastingTextColor()), 4.5);
+	EXPECT_GE(navy.contrastRatio(navy.getContrastingTextColor()), 4.5);
+}

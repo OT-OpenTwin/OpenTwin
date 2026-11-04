@@ -204,6 +204,18 @@ namespace ot {
 		//! @param _alpha Alpha channel [0, 255].
 		static Color fromOklch(float _L, float _C, float _h, int _alpha = 255);
 
+		//! @brief Calculate the relative luminance according to WCAG 2.2 in the range [0.0, 1.0].
+		//! Formula: L = 0.2126 * R_lin + 0.7152 * G_lin + 0.0722 * B_lin
+		double relativeLuminance() const;
+
+		//! @brief Calculate the contrast ratio between this color and another color according to WCAG 2.2 in the range [1.0, 21.0].
+		//! Formula: (L1 + 0.05) / (L2 + 0.05) where L1 is the lighter luminance.
+		//! @param _other The color to compare against.
+		double contrastRatio(const Color& _other) const;
+
+		//! @brief Returns either Black or White, whichever provides the maximum contrast against this color (WCAG 2.2 Level AA / AAA).
+		Color getContrastingTextColor() const;
+
 		static int channelValueFromFloat(float _value);
 
 	private:

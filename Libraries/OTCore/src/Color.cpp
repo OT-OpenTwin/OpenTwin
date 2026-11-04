@@ -636,6 +636,35 @@ ot::Color ot::Color::fromOklch(float _L, float _C, float _h, int _alpha) {
 	return fromOklab(_L, a, b, _alpha);
 }
 
+double ot::Color::relativeLuminance() const {
+	const float rLin = sRgbToLinear(static_cast<float>(m_r) / 255.f);
+	const float gLin = sRgbToLinear(static_cast<float>(m_g) / 255.f);
+	const float bLin = sRgbToLinear(static_cast<float>(m_b) / 255.f);
+
+	return 0.2126 * static_cast<double>(rLin) +
+	       0.7152 * static_cast<double>(gLin) +
+	       0.0722 * static_cast<double>(bLin);
+}
+
+double ot::Color::contrastRatio(const Color& _other) const {
+	const double l1 = relativeLuminance();
+	const double l2 = _other.relativeLuminance();
+	const double lighter = std::max(l1, l2);
+	const double darker = std::min(l1, l2);
+	return (lighter + 0.05) / (darker + 0.05);
+}
+
+ot::Color ot::Color::getContrastingTextColor() const {
+	// WCAG 2.2 contrast threshold between black and white:
+	// (L + 0.05) / 0.05 = 1.05 / (L + 0.05) ==> L = sqrt(0.0525) - 0.05 approx 0.1791287847
+	if (relativeLuminance() > 0.1791287847) {
+		return Color(DefaultColor::Black);
+	}
+	else {
+		return Color(DefaultColor::White);
+	}
+}
+
 int ot::Color::channelValueFromFloat(float _value) {
 	return static_cast<int>(_value * 255.f);
 }
