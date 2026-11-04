@@ -238,6 +238,37 @@ namespace ot {
 
     // ###########################################################################################################################################################################################################################################################################################################################
 
+	// Filesystem
+
+    class FileSystemException : public GeneralException
+    {
+    public:
+        explicit FileSystemException() : GeneralException("Filesystem exception") {};
+        explicit FileSystemException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit FileSystemException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::FileSystemException FileSystem; }
+
+    class DirectoryNotFoundException : public FileSystemException
+	{
+	public:
+		explicit DirectoryNotFoundException() : FileSystemException("Directory not found") {};
+		explicit DirectoryNotFoundException(const std::string& _message) : FileSystemException(_message.c_str()) {};
+		explicit DirectoryNotFoundException(const char* _message) : FileSystemException(_message) {};
+	};
+	namespace Exception { typedef ot::DirectoryNotFoundException DirectoryNotFound; }
+
+	class DirectoryAlreadyExistsException : public FileSystemException
+	{
+	public:
+		explicit DirectoryAlreadyExistsException() : FileSystemException("Directory already exists") {};
+		explicit DirectoryAlreadyExistsException(const std::string& _message) : FileSystemException(_message.c_str()) {};
+		explicit DirectoryAlreadyExistsException(const char* _message) : FileSystemException(_message) {};
+	};
+	namespace Exception { typedef ot::DirectoryAlreadyExistsException DirectoryAlreadyExists; }
+
+    // ###########################################################################################################################################################################################################################################################################################################################
+
     // Configuration
 
     //! @brief Basic configuration exception.
@@ -279,6 +310,15 @@ namespace ot {
     };
     namespace Exception { typedef ot::NetworkErrorException NetworkError; }
 
+	class NetworkTimeoutException : public NetworkErrorException
+	{
+	public:
+		explicit NetworkTimeoutException() : NetworkErrorException("Network timeout") {};
+		explicit NetworkTimeoutException(const std::string& _message) : NetworkErrorException(_message.c_str()) {};
+		explicit NetworkTimeoutException(const char* _message) : NetworkErrorException(_message) {};
+	};
+	namespace Exception { typedef ot::NetworkTimeoutException NetworkTimeout; }
+
     //! @brief Basic request failed exception.
     class RequestFailedException : public GeneralException {
     public:
@@ -287,6 +327,65 @@ namespace ot {
         explicit RequestFailedException(const char* _message) : GeneralException(_message) {};
     };
     namespace Exception { typedef ot::RequestFailedException RequestFailed; }
+
+	class RequestTimeoutException : public RequestFailedException
+	{
+	public:
+		explicit RequestTimeoutException() : RequestFailedException("Request timeout") {};
+		explicit RequestTimeoutException(const std::string& _message) : RequestFailedException(_message.c_str()) {};
+		explicit RequestTimeoutException(const char* _message) : RequestFailedException(_message) {};
+	};
+	namespace Exception { typedef ot::RequestTimeoutException RequestTimeout; }
+
+    // ###########################################################################################################################################################################################################################################################################################################################
+
+    // Threading
+
+    //! @brief Basic thread exception.
+    class ThreadException : public GeneralException
+    {
+    public:
+        explicit ThreadException() : GeneralException("Thread exception") {};
+        explicit ThreadException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit ThreadException(const char* _message) : GeneralException(_message) {};
+    };
+    namespace Exception { typedef ot::ThreadException Thread; }
+
+    class ThreadInterruptedException : public ThreadException
+	{
+	public:
+		explicit ThreadInterruptedException() : ThreadException("Thread interrupted") {};
+		explicit ThreadInterruptedException(const std::string& _message) : ThreadException(_message.c_str()) {};
+		explicit ThreadInterruptedException(const char* _message) : ThreadException(_message) {};
+	};
+	namespace Exception { typedef ot::ThreadInterruptedException ThreadInterrupted; }
+
+	class ThreadTimeoutException : public ThreadException
+	{
+	public:
+		explicit ThreadTimeoutException() : ThreadException("Thread timeout") {};
+		explicit ThreadTimeoutException(const std::string& _message) : ThreadException(_message.c_str()) {};
+		explicit ThreadTimeoutException(const char* _message) : ThreadException(_message) {};
+	};
+	namespace Exception { typedef ot::ThreadTimeoutException ThreadTimeout; }
+
+	class ThreadNotFoundException : public ThreadException
+	{
+	public:
+		explicit ThreadNotFoundException() : ThreadException("Thread not found") {};
+		explicit ThreadNotFoundException(const std::string& _message) : ThreadException(_message.c_str()) {};
+		explicit ThreadNotFoundException(const char* _message) : ThreadException(_message) {};
+	};
+	namespace Exception { typedef ot::ThreadNotFoundException ThreadNotFound; }
+
+	class ThreadAlreadyExistsException : public ThreadException
+	{
+	public:
+		explicit ThreadAlreadyExistsException() : ThreadException("Thread already exists") {};
+		explicit ThreadAlreadyExistsException(const std::string& _message) : ThreadException(_message.c_str()) {};
+		explicit ThreadAlreadyExistsException(const char* _message) : ThreadException(_message) {};
+	};
+	namespace Exception { typedef ot::ThreadAlreadyExistsException ThreadAlreadyExists; }
 
     // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -309,13 +408,4 @@ namespace ot {
         explicit GraphicsException(const char* _message) : GeneralException(_message) {};
 	};
 	namespace Exception { typedef ot::GraphicsException Graphics; }
-
-	//! @brief Basic thread exception.
-	class ThreadException : public GeneralException {
-        public:
-        explicit ThreadException() : GeneralException("Thread exception") {};
-        explicit ThreadException(const std::string& _message) : GeneralException(_message.c_str()) {};
-        explicit ThreadException(const char* _message) : GeneralException(_message) {};
-	};
-	namespace Exception { typedef ot::ThreadException Thread; }
 }
