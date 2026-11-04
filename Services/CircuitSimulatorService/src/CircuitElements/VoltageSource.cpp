@@ -49,15 +49,16 @@ void VoltageSource::initFromEntity(const std::shared_ptr<ot::EntityBlock>& _enti
     // VoltageSource-spezifisch: Function-String bauen
     if (m_function == "PULSE" || m_function == "SIN" || m_function == "EXP")
     {
-        std::string functionStr = m_function + "(";
-        std::vector<std::string> parameters;
-        if (m_function == "PULSE") { parameters = myElement->getPulseParameters(); }
-        else if (m_function == "SIN") { parameters = myElement->getSinParameters(); }
-        else { parameters = myElement->getExpParameters(); }
-        for (size_t i = 0; i < parameters.size(); ++i)
+        m_functionType = m_function;
+        if (m_function == "PULSE") { m_functionParameters = myElement->getPulseParameters(); }
+        else if (m_function == "SIN") { m_functionParameters = myElement->getSinParameters(); }
+        else { m_functionParameters = myElement->getExpParameters(); }
+
+        std::string functionStr = m_functionType + "(";
+        for (size_t i = 0; i < m_functionParameters.size(); ++i)
         {
-            functionStr += parameters[i];
-            if (i + 1 < parameters.size())
+            functionStr += m_functionParameters[i];
+            if (i + 1 < m_functionParameters.size())
             {
                 functionStr += " ";
             }

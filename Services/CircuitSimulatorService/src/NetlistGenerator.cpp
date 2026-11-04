@@ -169,6 +169,28 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
 
             vs->setValue(formatScaledNetlistValue(vs->getValue(), unit));
             vs->setAmplitude(formatScaledNetlistValue(vs->getAmplitude(), unit));
+            if (!vs->getFunctionType().empty() && !vs->getFunctionParameters().empty())
+            {
+                std::string functionStr = vs->getFunctionType() + "(";
+                const auto& params = vs->getFunctionParameters();
+                for (size_t i = 0; i < params.size(); ++i)
+                {
+                    std::string param = params[i];
+                    size_t pFirst = param.find_first_not_of(" \t\r\n");
+                    if (pFirst != std::string::npos)
+                    {
+                        size_t pLast = param.find_last_not_of(" \t\r\n");
+                        param = param.substr(pFirst, pLast - pFirst + 1);
+                    }
+                    functionStr += wrapParameterExpression(param);
+                    if (i + 1 < params.size())
+                    {
+                        functionStr += " ";
+                    }
+                }
+                functionStr += ")";
+                vs->setFunction(functionStr);
+            }
             line += strategy->getVoltageSourceNetlistType(vs);
         }
         else

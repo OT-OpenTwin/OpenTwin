@@ -22,6 +22,9 @@
 //Sevice Header
 #include "CircuitElement.h"
 
+// std Header
+#include <vector>
+
 class VoltageSource: public CircuitElement {
 	OT_DECL_NOCOPY(VoltageSource)
 public:
@@ -37,6 +40,8 @@ public:
 	std::string const getValue() const { return m_value; }
 	std::string const getType() const { return m_type; }
 	std::string const getFunction() const { return m_function; }
+	const std::string& getFunctionType() const { return m_functionType; }
+	const std::vector<std::string>& getFunctionParameters() const { return m_functionParameters; }
 	std::string const getAmplitude() const { return m_Amplitude; }
 
 	std::string type() const override { return "VoltageSource"; }
@@ -53,6 +58,8 @@ private:
 	std::string m_value;
 	std::string m_type;
 	std::string m_function;
+	std::string m_functionType;
+	std::vector<std::string> m_functionParameters;
 	std::string m_Amplitude;
 
 };
