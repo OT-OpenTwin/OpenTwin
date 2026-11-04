@@ -268,24 +268,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	OT_LOG_D("BaseParameter created: name=" + baseParameter.parameterName + ", label=" + baseParameter.parameterLabel 
 		+ ", unit=" + baseParameter.unit + ", #values=" + std::to_string(baseParameter.values.size()));
 
-	// Remove specific unwanted vectors
-	auto branchIt = resultVectors.find("v_v1#branch");
-	if (branchIt != resultVectors.end()) {
-		resultVectors.erase(branchIt);
-	}
-
-	// Remove all vectors containing "ediff"
-	for (auto it = resultVectors.begin(); it != resultVectors.end();) {
-		if (it->first.find("ediff") != std::string::npos) {
-			it = resultVectors.erase(it);
-		}
-		else {
-			++it;
-		}
-	}
-
 	if (resultVectors.empty()) {
-		OT_LOG_E("No result vectors remaining after filtering");
+		OT_LOG_E("No result vectors remaining after extracting sweep/time/frequency axis");
 		return;
 	}
 
@@ -311,7 +295,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	auto isCurrentVector = [](const std::string& _vecName) {
 		const std::string lower = ElementNamingRegistry::toLowercase(_vecName);
 		return lower.find("#branch") != std::string::npos ||
-			(lower.rfind("i(", 0) == 0 && lower.back() == ')');
+			(lower.rfind("i(", 0) == 0 && lower.back() == ')') ||
+			(lower.size() >= 3 && (lower.substr(lower.size() - 3) == "#i1" || lower.substr(lower.size() - 3) == "#i2"));
 	};
 	
 	// Process Voltage Curves
