@@ -269,7 +269,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		+ ", unit=" + baseParameter.unit + ", #values=" + std::to_string(baseParameter.values.size()));
 
 	// Remove specific unwanted vectors
-	auto branchIt = resultVectors.find("v1#branch");
+	auto branchIt = resultVectors.find("v_v1#branch");
 	if (branchIt != resultVectors.end()) {
 		resultVectors.erase(branchIt);
 	}
@@ -307,12 +307,18 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	
 	// Collect all dataset descriptions
 	std::list<DatasetDescription> allCurveDescriptions;
+	size_t voltageCurveCount = 0;
+	auto isCurrentVector = [](const std::string& _vecName) {
+		const std::string lower = ElementNamingRegistry::toLowercase(_vecName);
+		return lower.find("#branch") != std::string::npos ||
+			(lower.rfind("i(", 0) == 0 && lower.back() == ')');
+	};
 	
 	// Process Voltage Curves
 	for (auto& resultPair : resultVectors) {
 		if (resultPair.second.empty()) continue;
 
-		bool isVoltage = (resultPair.first.find("V(") != std::string::npos || resultPair.first.find("vd_") != std::string::npos);
+		bool isVoltage = !isCurrentVector(resultPair.first);
 		if (!isVoltage) continue;
 
 		std::unique_ptr<QuantityDescriptionCurve> quantity(new QuantityDescriptionCurve());
@@ -323,14 +329,22 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 		DatasetDescription dataset;
 		dataset.addParameterDescription(sharedParameterDescr);
 
-		std::string delimiter = "#branch";
-		std::size_t pos = resultPair.first.find(delimiter);
-		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
+		std::string key = ElementNamingRegistry::toLowercase(resultPair.first);
+		std::size_t branchPos = key.find("#branch");
+		if (branchPos != std::string::npos) {
+			key = key.substr(0, branchPos);
+		}
+		else if (key.rfind("i(", 0) == 0 && key.back() == ')') {
+			key = key.substr(2, key.size() - 3);
+		}
 		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap.at(key) : resultPair.first;
+		std::replace(displayName.begin(), displayName.end(), '/', '.');
 		std::string curveName = displayName + "-" + normalizedSimType;
+
 
 		quantity->setName(curveName);
 		quantity->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "V");
+		++voltageCurveCount;
 
 		// Set the quantity label for Y-axis display (curve name with unit)
 		quantity->getMetadataQuantity().quantityLabel = curveName + " [V]";
@@ -345,7 +359,7 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	for (auto& resultPair : resultVectors) {
 		if (resultPair.second.empty()) continue;
 
-		bool isVoltage = (resultPair.first.find("V(") != std::string::npos || resultPair.first.find("vd_") != std::string::npos);
+		bool isVoltage = !isCurrentVector(resultPair.first);
 		if (isVoltage) continue;
 
 		std::unique_ptr<QuantityDescriptionCurve> quantity(new QuantityDescriptionCurve());
@@ -355,11 +369,16 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 
 		DatasetDescription dataset;
 		dataset.addParameterDescription(sharedParameterDescr);
-
-		std::string delimiter = "#branch";
-		std::size_t pos = resultPair.first.find(delimiter);
-		std::string key = (pos != std::string::npos) ? resultPair.first.substr(0, pos) : resultPair.first;
+		std::string key = ElementNamingRegistry::toLowercase(resultPair.first);
+		std::size_t branchPos = key.find("#branch");
+		if (branchPos != std::string::npos) {
+			key = key.substr(0, branchPos);
+		}
+		else if (key.rfind("i(", 0) == 0 && key.back() == ')') {
+			key = key.substr(2, key.size() - 3);
+		}
 		std::string displayName = (nameMap.find(key) != nameMap.end()) ? nameMap.at(key) : resultPair.first;
+		std::replace(displayName.begin(), displayName.end(), '/', '.');
 		std::string curveName = displayName + "-" + normalizedSimType;
 
 		quantity->setName(curveName);
@@ -393,13 +412,8 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 
 	const MetadataSeries* series = extender.findMetadataSeries(seriesMetadataIndex);
 
-	bool hasVoltages = false;
-	bool hasCurrents = false;
-	for (auto& ds : allCurveDescriptions) {
-		const std::string& qName = ds.getQuantityDescription()->getName();
-		if (qName.find("V(") != std::string::npos || qName.find("vd_") != std::string::npos) hasVoltages = true;
-		else hasCurrents = true;
-	}
+	const bool hasVoltages = (voltageCurveCount > 0);
+	const bool hasCurrents = (allCurveDescriptions.size() > voltageCurveCount);
 
 	auto modelComponent = Application::instance()->getModelComponent();
 
@@ -434,12 +448,13 @@ void BlockEntityHandler::createResultCurves(std::string solverName, std::string 
 	}
 
 	// Create and push curves
+	size_t curveIdx = 0;
 	for (DatasetDescription& dataDescription : allCurveDescriptions)
 	{
 		extender.processDataPoints(&dataDescription, seriesMetadataIndex);
 
 		std::string fullName = dataDescription.getQuantityDescription()->getName();
-		bool isVoltageCurve = (fullName.find("V(") != std::string::npos || fullName.find("vd_") != std::string::npos);
+		bool isVoltageCurve = (curveIdx++ < voltageCurveCount);
 
 		ot::Plot1DCurveCfg curveConfig;
 		curveConfig.setTitle(fullName);

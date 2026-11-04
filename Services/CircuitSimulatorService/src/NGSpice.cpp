@@ -43,6 +43,10 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 	std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID,
 	std::string _editorname)
 {
+	// Reset naming registry at the start of a new simulation run so mappings remain available
+	// later when asynchronous simulation results arrive in BlockEntityHandler::createResultCurves.
+	m_elementNamingRegistry.reset();
+
 	// 1. Get or create circuit
 	Circuit& circuit = getOrCreateCircuit(_editorname);
 
@@ -231,8 +235,13 @@ Circuit& NGSpice::getOrCreateCircuit(const std::string& _editorname)
 
 void NGSpice::clearBufferStructure(const std::string& _name)
 {
-	this->getMapOfCircuits().find(_name)->second.getMapOfEntityBlcks().clear();
+	auto it = this->getMapOfCircuits().find(_name);
+	if (it != this->getMapOfCircuits().end())
+	{
+		it->second.getMapOfEntityBlcks().clear();
+	}
 	this->getMapOfCircuits().clear();
-	m_elementNamingRegistry.reset();
+	// Keep m_elementNamingRegistry alive until asynchronous createResultCurves finishes;
+	// it is reset at the start of the next ngSpice_Initialize call.
 	m_nodeAssigner.reset();
 }
