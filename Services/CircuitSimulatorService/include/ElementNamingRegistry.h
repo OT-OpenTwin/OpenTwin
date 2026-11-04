@@ -24,6 +24,7 @@
 // std Header
 #include <string>
 #include <map>
+#include <unordered_set>
 
 class ElementNamingRegistry
 {
@@ -32,7 +33,7 @@ public:
 	ElementNamingRegistry() = default;
 
 	//! @brief Registers a new element with a custom name and prefix, returning the generated netlist name.
-	std::string registerElement(const std::string& _customName, const std::string& _prefix);
+	std::string registerElement(const std::string& _customName, const std::string& _prefix, const std::string& _scope = "");
 
 	//! @brief Retrieves the netlist name associated with a given custom name.
 	std::string getNetlistName(const std::string& _customName) const;
@@ -44,7 +45,7 @@ public:
 	std::string generateNextId(const std::string& _prefix);
 
 	//! @brief Registers a mapping between a custom name and a netlist name. Returns true if successful, false if the mapping already exists.
-	bool registerMapping(const std::string& _customName, const std::string& _netlistName);
+	bool registerMapping(const std::string& _customName, const std::string& _netlistName, const std::string& _scope = "");
 
 	//! @brief Resets the registry, clearing all mappings and counters.
 	void reset();
@@ -53,11 +54,13 @@ public:
 	const std::map<std::string, std::string>& getCustomToNetlistMap() const { return m_customToNetlist; }
 	const std::map<std::string, std::string>& getNetlistToCustomMap() const { return m_netlistToCustom; }
 
-
 	//! @brief Converts a string to lowercase.
 	static std::string toLowercase(const std::string& str);
+
+	static std::string sanitizesForSpice(const std::string& _rawName);
 private:
 	std::map<std::string, std::string> m_customToNetlist;
 	std::map<std::string, std::string> m_netlistToCustom;
 	std::map<std::string, int> m_elementCounters;
+	std::map<std::string, std::unordered_set<std::string>> m_usedNetlistNamesByScope;
 };

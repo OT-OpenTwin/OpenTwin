@@ -333,7 +333,7 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 					label = std::to_string(m_currentNodeNumber++);
 				}
 
-				m_rootToNodeNumber[root] = label;
+				m_rootToNodeNumber[root] = ElementNamingRegistry::sanitizesForSpice(label);
 			}
 			else
 			{

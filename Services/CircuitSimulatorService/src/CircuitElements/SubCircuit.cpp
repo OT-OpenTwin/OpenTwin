@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "CircuitElements/SubCircuit.h"
+#include "ElementNamingRegistry.h"
 #include "OTBlockEntities/Circuit/EntityBlockCircuitSubCircuit.h"
 #include <algorithm>
 
@@ -39,7 +40,7 @@ void CircuitElementSubcircuit::initFromEntity(const std::shared_ptr<ot::EntityBl
 	{
 		spiceModelName = spiceModelName.substr(std::string("Circuits/").length());
 	}
-	std::replace(spiceModelName.begin(), spiceModelName.end(), ' ', '_');
+	spiceModelName = ElementNamingRegistry::sanitizesForSpice(spiceModelName);
 	m_modelName = spiceModelName;
 	m_orderedTerminalNames = subcircuitEntity->getOrderedTerminalNames();
 	m_itemName = subcircuitEntity->getBlockTitle();

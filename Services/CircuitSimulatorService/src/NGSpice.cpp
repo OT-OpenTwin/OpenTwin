@@ -101,7 +101,7 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 			{
 				spiceModelName = spiceModelName.substr(std::string("Circuits/").length());
 			}
-			std::replace(spiceModelName.begin(), spiceModelName.end(), ' ', '_');
+			spiceModelName = ElementNamingRegistry::sanitizesForSpice(spiceModelName);
 
 			if (circuit.getSubcircuits().find(spiceModelName) == circuit.getSubcircuits().end())
 			{
@@ -161,7 +161,7 @@ std::list<std::string> NGSpice::ngSpice_Initialize(
 						if (!elemPtr->isMeter())
 						{
 							std::string uniqueSubName = subcircuitFolderPath + "/" + subBlock->getNameOnly();
-							std::string netlistName = m_elementNamingRegistry.registerElement(uniqueSubName, elemPtr->getNetlistPrefix());
+							std::string netlistName = m_elementNamingRegistry.registerElement(uniqueSubName, elemPtr->getNetlistPrefix(), spiceModelName);
 							elemPtr->setNetlistName(netlistName);
 						}
 						elemPtr->setCustomName(subBlock->getNameOnly());
