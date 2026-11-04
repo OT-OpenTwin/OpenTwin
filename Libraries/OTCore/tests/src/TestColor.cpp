@@ -20,6 +20,7 @@
 #include "gtest/gtest.h"
 #include "OTCore/Color.h"
 
+
 TEST(ColorTests, HsvPureColors) {
 	// Pure Red
 	ot::Color red(255, 0, 0);
@@ -349,4 +350,81 @@ TEST(ColorTests, ContrastingTextColorWcag22) {
 	EXPECT_GE(black.contrastRatio(black.getContrastingTextColor()), 4.5);
 	EXPECT_GE(yellow.contrastRatio(yellow.getContrastingTextColor()), 4.5);
 	EXPECT_GE(navy.contrastRatio(navy.getContrastingTextColor()), 4.5);
+}
+
+
+TEST(ColorInterpolationTests, BoundaryAndClamping) {
+	ot::Color c1(255, 0, 0, 100);
+	ot::Color c2(0, 255, 0, 200);
+
+	// Exact boundaries
+	EXPECT_EQ(c1, ot::Color::interpolate(c1, c2, 0.0f));
+	EXPECT_EQ(c2, ot::Color::interpolate(c1, c2, 1.0f));
+	EXPECT_EQ(c1, c1.interpolate(c2, 0.0f));
+	EXPECT_EQ(c2, c1.interpolate(c2, 1.0f));
+
+	// Clamping outside [0.0, 1.0]
+	EXPECT_EQ(c1, ot::Color::interpolate(c1, c2, -0.5f));
+	EXPECT_EQ(c2, ot::Color::interpolate(c1, c2, 1.5f));
+	EXPECT_EQ(c1, c1.interpolate(c2, -0.5f));
+	EXPECT_EQ(c2, c1.interpolate(c2, 1.5f));
+}
+
+TEST(ColorInterpolationTests, AlphaInterpolation) {
+	ot::Color c1(100, 100, 100, 50);
+	ot::Color c2(100, 100, 100, 150);
+
+	ot::Color mid = ot::Color::interpolate(c1, c2, 0.5f, ot::ColorInterpolationSpace::Rgb);
+	EXPECT_EQ(100, mid.a());
+}
+
+TEST(ColorInterpolationTests, RgbInterpolation) {
+	ot::Color black(0, 0, 0);
+	ot::Color white(200, 100, 50);
+
+	ot::Color mid = ot::Color::interpolate(black, white, 0.5f, ot::ColorInterpolationSpace::Rgb);
+	EXPECT_NEAR(100, mid.r(), 1);
+	EXPECT_NEAR(50, mid.g(), 1);
+	EXPECT_NEAR(25, mid.b(), 1);
+}
+
+TEST(ColorInterpolationTests, HsvShortestVsLongest) {
+	ot::Color red(255, 0, 0);    // Hue 0 deg
+	ot::Color green(0, 255, 0);  // Hue 120 deg
+
+	// Shortest arc passes through Yellow (Hue 60 deg)
+	ot::Color shortestMid = ot::Color::interpolate(red, green, 0.5f, ot::ColorInterpolationSpace::HsvShortest);
+	float h = 0.f, s = 0.f, v = 0.f;
+	shortestMid.toHsv(h, s, v);
+	EXPECT_NEAR(60.f, h, 2.0f);
+
+	// Longest arc passes through Blue (Hue 240 deg)
+	ot::Color longestMid = ot::Color::interpolate(red, green, 0.5f, ot::ColorInterpolationSpace::HsvLongest);
+	longestMid.toHsv(h, s, v);
+	EXPECT_NEAR(240.f, h, 2.0f);
+}
+
+TEST(ColorInterpolationTests, OklabSmoothness) {
+	ot::Color blue(0, 0, 255);
+	ot::Color yellow(255, 255, 0);
+
+	// Oklab midpoint between blue and yellow
+	ot::Color mid = ot::Color::interpolate(blue, yellow, 0.5f, ot::ColorInterpolationSpace::Oklab);
+	EXPECT_TRUE(mid.isValid());
+	EXPECT_GT(mid.r(), 0);
+	EXPECT_GT(mid.g(), 0);
+	EXPECT_GT(mid.b(), 0);
+}
+
+TEST(ColorInterpolationTests, OklchShortestArc) {
+	ot::Color red(255, 0, 0);
+	ot::Color green(0, 255, 0);
+
+	ot::Color mid = ot::Color::interpolate(red, green, 0.5f, ot::ColorInterpolationSpace::Oklch);
+	EXPECT_TRUE(mid.isValid());
+
+	float L = 0.f, C = 0.f, h = 0.f;
+	mid.toOklch(L, C, h);
+	EXPECT_GT(L, 0.0f);
+	EXPECT_GT(C, 0.0f);
 }

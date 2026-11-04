@@ -552,6 +552,37 @@ namespace {
 		}
 		return 1.055f * std::pow(_c, 1.0f / 2.4f) - 0.055f;
 	}
+
+	inline float interpolateLinear(float _a, float _b, float _t) {
+		return (1.0f - _t) * _a + _t * _b;
+	}
+
+	inline float interpolateHue(float _h1, float _h2, float _t, bool _shortest) {
+		float delta = _h2 - _h1;
+		delta = std::fmod(delta, 360.0f);
+		if (delta > 180.0f) {
+			delta -= 360.0f;
+		}
+		else if (delta < -180.0f) {
+			delta += 360.0f;
+		}
+
+		if (!_shortest) {
+			if (delta >= 0.0f) {
+				delta -= 360.0f;
+			}
+			else {
+				delta += 360.0f;
+			}
+		}
+
+		float h = _h1 + _t * delta;
+		h = std::fmod(h, 360.0f);
+		if (h < 0.0f) {
+			h += 360.0f;
+		}
+		return h;
+	}
 }
 
 void ot::Color::toOklab(float& _L, float& _a, float& _b) const {
@@ -662,6 +693,108 @@ ot::Color ot::Color::getContrastingTextColor() const {
 	}
 	else {
 		return Color(DefaultColor::White);
+	}
+}
+
+ot::Color ot::Color::interpolate(const Color& _other, float _t, ColorInterpolationSpace _space) const {
+	return interpolate(*this, _other, _t, _space);
+}
+
+ot::Color ot::Color::interpolate(const Color& _c1, const Color& _c2, float _t, ColorInterpolationSpace _space) {
+	if (_t <= 0.0f) {
+		return _c1;
+	}
+	if (_t >= 1.0f) {
+		return _c2;
+	}
+
+	const float alphaF = interpolateLinear(static_cast<float>(_c1.a()), static_cast<float>(_c2.a()), _t);
+	const int alpha = std::clamp(static_cast<int>(std::round(alphaF)), 0, 255);
+
+	switch (_space) {
+	case ColorInterpolationSpace::Rgb: {
+		const float r = interpolateLinear(static_cast<float>(_c1.r()), static_cast<float>(_c2.r()), _t);
+		const float g = interpolateLinear(static_cast<float>(_c1.g()), static_cast<float>(_c2.g()), _t);
+		const float b = interpolateLinear(static_cast<float>(_c1.b()), static_cast<float>(_c2.b()), _t);
+
+		const int rInt = std::clamp(static_cast<int>(std::round(r)), 0, 255);
+		const int gInt = std::clamp(static_cast<int>(std::round(g)), 0, 255);
+		const int bInt = std::clamp(static_cast<int>(std::round(b)), 0, 255);
+
+		return Color(rInt, gInt, bInt, alpha);
+	}
+
+	case ColorInterpolationSpace::HsvShortest:
+	case ColorInterpolationSpace::HsvLongest: {
+		float h1 = 0.0f, s1 = 0.0f, v1 = 0.0f;
+		float h2 = 0.0f, s2 = 0.0f, v2 = 0.0f;
+		_c1.toHsv(h1, s1, v1);
+		_c2.toHsv(h2, s2, v2);
+
+		const bool shortest = (_space == ColorInterpolationSpace::HsvShortest);
+
+		float h = 0.0f;
+		if (s1 < 1e-4f && s2 < 1e-4f) {
+			h = 0.0f;
+		}
+		else if (s1 < 1e-4f) {
+			h = h2;
+		}
+		else if (s2 < 1e-4f) {
+			h = h1;
+		}
+		else {
+			h = interpolateHue(h1, h2, _t, shortest);
+		}
+
+		const float s = interpolateLinear(s1, s2, _t);
+		const float v = interpolateLinear(v1, v2, _t);
+
+		return Color::fromHsv(h, s, v, alpha);
+	}
+
+	case ColorInterpolationSpace::Oklab: {
+		float L1 = 0.0f, a1 = 0.0f, b1 = 0.0f;
+		float L2 = 0.0f, a2 = 0.0f, b2 = 0.0f;
+		_c1.toOklab(L1, a1, b1);
+		_c2.toOklab(L2, a2, b2);
+
+		const float L = interpolateLinear(L1, L2, _t);
+		const float a = interpolateLinear(a1, a2, _t);
+		const float b = interpolateLinear(b1, b2, _t);
+
+		return Color::fromOklab(L, a, b, alpha);
+	}
+
+	case ColorInterpolationSpace::Oklch: {
+		float L1 = 0.0f, C1 = 0.0f, h1 = 0.0f;
+		float L2 = 0.0f, C2 = 0.0f, h2 = 0.0f;
+		_c1.toOklch(L1, C1, h1);
+		_c2.toOklch(L2, C2, h2);
+
+		float h = 0.0f;
+		if (C1 < 1e-4f && C2 < 1e-4f) {
+			h = 0.0f;
+		}
+		else if (C1 < 1e-4f) {
+			h = h2;
+		}
+		else if (C2 < 1e-4f) {
+			h = h1;
+		}
+		else {
+			h = interpolateHue(h1, h2, _t, true);
+		}
+
+		const float L = interpolateLinear(L1, L2, _t);
+		const float C = interpolateLinear(C1, C2, _t);
+
+		return Color::fromOklch(L, C, h, alpha);
+	}
+
+	default:
+		OT_LOG_E("Unknown ColorInterpolationSpace specified, falling back to RGB");
+		return interpolate(_c1, _c2, _t, ColorInterpolationSpace::Rgb);
 	}
 }
 

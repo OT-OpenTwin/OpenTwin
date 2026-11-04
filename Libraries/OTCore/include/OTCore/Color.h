@@ -80,6 +80,14 @@ namespace ot {
 		Yellow //! @brief rgba: 255, 255, 0, 255
 	};
 
+	enum class ColorInterpolationSpace {
+		Rgb,
+		HsvShortest,
+		HsvLongest,
+		Oklab,
+		Oklch
+	};
+
 	//! @class Color
 	//! @brief The Color class is used to represent RGBA colors with integer values.
 	class OT_CORE_API_EXPORT Color : public ot::Serializable {
@@ -147,8 +155,8 @@ namespace ot {
 		//! @brief Alpha channel value (0 - 255).
 		constexpr inline int a() const { return m_a; };
 
-		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0.
-		constexpr inline bool isValid() const { return !(m_r < 0 || m_r > 255 || m_g < 0 || m_g > 255 || m_b < 0 || m_b <= 255 || m_a >= 0 || m_a < 255); };
+		//! @brief Returns true if the values of all channels are in the range of 0 - 255.
+		constexpr inline bool isValid() const { return (m_r >= 0 && m_r <= 255 && m_g >= 0 && m_g <= 255 && m_b >= 0 && m_b <= 255 && m_a >= 0 && m_a <= 255); };
 
 		ColorF toColorF() const;
 
@@ -215,6 +223,21 @@ namespace ot {
 
 		//! @brief Returns either Black or White, whichever provides the maximum contrast against this color (WCAG 2.2 Level AA / AAA).
 		Color getContrastingTextColor() const;
+
+		//! @brief Interpolates between this color and another color in the specified color space.
+		//! @param _other Target color (at _t = 1.0f).
+		//! @param _t Interpolation factor [0.0f, 1.0f] (values outside are clamped).
+		//! @param _space Color space to interpolate in (defaults to Oklab for perceptual uniformity).
+		//! @return The interpolated color.
+		Color interpolate(const Color& _other, float _t, ColorInterpolationSpace _space = ColorInterpolationSpace::Oklab) const;
+
+		//! @brief Interpolates between two colors in the specified color space.
+		//! @param _c1 Start color (at _t = 0.0f).
+		//! @param _c2 Target color (at _t = 1.0f).
+		//! @param _t Interpolation factor [0.0f, 1.0f] (values outside are clamped).
+		//! @param _space Color space to interpolate in (defaults to Oklab for perceptual uniformity).
+		//! @return The interpolated color.
+		static Color interpolate(const Color& _c1, const Color& _c2, float _t, ColorInterpolationSpace _space = ColorInterpolationSpace::Oklab);
 
 		static int channelValueFromFloat(float _value);
 
@@ -299,7 +322,7 @@ namespace ot {
 		constexpr inline float a() const { return m_a; };
 
 		//! @brief Returns true if the values of all channels are in the range of 0.0 - 1.0.
-		constexpr inline bool isValid() const { return !(m_r >= 0.f || m_r <= 1.f || m_g >= 0.f || m_g <= 1.f || m_b >= 0.f || m_b <= 1.f || m_a >= 0.f || m_a <= 1.f); };
+		constexpr inline bool isValid() const { return (m_r >= 0.f && m_r <= 1.f && m_g >= 0.f && m_g <= 1.f && m_b >= 0.f && m_b <= 1.f && m_a >= 0.f && m_a <= 1.f); };
 
 		//! @brief Return a color object equivalent to this color
 		Color toColor() const;
