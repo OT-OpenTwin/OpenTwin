@@ -26,6 +26,7 @@
 #include "OTBlockEntities/Circuit/EntityBlockCircuitTerminal.h"
 #include "OTCore/Logging/Logger.h"
 #include <algorithm>
+#include <unordered_set>
 
 void NodeAssigner::reset()
 {
@@ -40,9 +41,8 @@ void NodeAssigner::reset()
 void NodeAssigner::assignSubcircuitNodes(Circuit& _subcircuit, const std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _connections, const std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _entities)
 {
 	// Own node assignment for subcircuits, as they are not part of the main circuit and may have their own internal connections and nodes.
-	reset();
 	std::map<ot::UID, ot::UIDList> dummyMap;
-	assignNodeNumbers(dummyMap, _subcircuit, const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>&>(_connections), const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&>(_entities), _subcircuit.getEditorName());
+	assignNodeNumbers(dummyMap, _subcircuit, const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>&>(_connections), const_cast<std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>&>(_entities), _subcircuit.getEditorName(), true);
 	
 	// Collect terminals and sort them by Terminal Name
 	std::vector<std::pair<std::string, std::string>> namedTerminalNodes;
@@ -149,8 +149,9 @@ bool NodeAssigner::isConnectorConnectable(const std::string& _connectableName) c
 	return element.find("Connector") != std::string::npos;
 }
 
-void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname)
+void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, bool _isSubcircuit)
 {
+	reset();
 
 	// Step 1: Go through all connections and Union-Find to group connectables
 	for(const auto& [connUID, connEntity] : _allConnectionEntities)
@@ -235,25 +236,50 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 		} 
 	}
 
-	// Step 3: Fallback: No GND found, assign voltage source negative terminal to node 0
-	bool hasAnyGND = false;
-	for (const auto& [root, isGnd] : m_hasGND)
+	// Step 3: Handle GND assignment depending on main circuit vs. subcircuit
+	std::unordered_set<std::string> subcircuitTerminalRoots;
+	if (_isSubcircuit)
 	{
-		if(isGnd)
+		// In SPICE, node '0' is always global ground and must never appear in a .SUBCKT port list.
+		// Register all terminal pins and ensure no terminal net is mapped to global ground '0'.
+		for (const auto& [id, blockEntity] : _allEntitiesByBlockID)
 		{
-			hasAnyGND = true;
-			break;
+			auto* terminalEntity = dynamic_cast<EntityBlockCircuitTerminal*>(blockEntity.get());
+			if (terminalEntity)
+			{
+				std::string termRoot = findRoot(createConnectableKey(terminalEntity->getEntityID(), "pin"));
+				subcircuitTerminalRoots.insert(termRoot);
+				if (m_hasGND[termRoot])
+				{
+					OT_LOG_W("Subcircuit '" + _editorname + "' has a GND block connected to terminal '" +
+						terminalEntity->getTerminalName() + "'. Assigning a local port node instead of global GND '0'.");
+					m_hasGND[termRoot] = false;
+				}
+			}
 		}
 	}
-
-	if (!hasAnyGND)
+	else
 	{
-		auto vecVS = _circuit.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
-		if (vecVS != _circuit.getMapOfEntityBlcks().end() && !vecVS->second.empty())
+		// Fallback (main circuit only): No GND found, assign voltage source negative terminal to node 0
+		bool hasAnyGND = false;
+		for (const auto& [root, isGnd] : m_hasGND)
 		{
-			ot::UID vsUid = vecVS->second.front()->getEntityID();
-			std::string negPin = createConnectableKey(vsUid, "negativePole");
-			m_hasGND[findRoot(negPin)] = true;
+			if (isGnd)
+			{
+				hasAnyGND = true;
+				break;
+			}
+		}
+
+		if (!hasAnyGND)
+		{
+			auto vecVS = _circuit.getMapOfEntityBlcks().find("EntityBlockCircuitVoltageSource");
+			if (vecVS != _circuit.getMapOfEntityBlcks().end() && !vecVS->second.empty())
+			{
+				ot::UID vsUid = vecVS->second.front()->getEntityID();
+				std::string negPin = createConnectableKey(vsUid, "negativePole");
+				m_hasGND[findRoot(negPin)] = true;
+			}
 		}
 	}
 
@@ -294,6 +320,12 @@ void NodeAssigner::assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connection
 						label = std::to_string(m_currentNodeNumber++);
 					}
 				}
+
+				if (_isSubcircuit && label == "0" && subcircuitTerminalRoots.count(root) > 0)
+				{
+					label = std::to_string(m_currentNodeNumber++);
+				}
+
 				m_rootToNodeNumber[root] = label;
 			}
 			else

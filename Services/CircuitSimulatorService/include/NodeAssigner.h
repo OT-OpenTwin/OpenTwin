@@ -42,7 +42,7 @@ public:
 	// @brief Assigns node numbers to connections in a circuit based on the provided connection block map and entity information.
 	// @brief This class uses a union-find algorithm to efficiently manage connected components and assign node numbers accordingly.
 	// @brief How this method works: It goes through all connections and uses union-find to group connectables. It then handles connectors and treats all connectables connected to a connector as one set. Finally, it traverses the graph from GND and voltage sources to assign node numbers.
-	void assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname);
+	void assignNodeNumbers(std::map<ot::UID, ot::UIDList>& _connectionBlockMap, Circuit& _circuit, std::map<ot::UID, std::shared_ptr<ot::EntityBlockConnection>>& _allConnectionEntities, std::map<ot::UID, std::shared_ptr<ot::EntityBlock>>& _allEntitiesByBlockID, const std::string& _editorname, bool _isSubcircuit = false);
 
 	// @brief Resets the node assigner state (node counter and node number map).
 	void reset();
