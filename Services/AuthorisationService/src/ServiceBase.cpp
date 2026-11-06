@@ -209,6 +209,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
 	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
 	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // OT Service foundation and central services. But they have own handlers that do not require euthentication
+	else if (_action == OT_ACTION_CMD_GenerateAccessToken) { return handleGenerateAccessToken(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword).toJson(); }
 	//------------ Group FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); } // Only UI
@@ -537,6 +538,20 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 	}
 
 	return response;
+}
+
+ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword)
+{
+	std::string token;
+	uint64_t expirationTime = 0;
+
+
+	// Create response
+	ot::JsonDocument tokenDoc;
+	tokenDoc.AddMember(OT_ACTION_PARAM_Token, ot::JsonString(token, tokenDoc.GetAllocator()), tokenDoc.GetAllocator());
+	tokenDoc.AddMember(OT_ACTION_PARAM_Expires, expirationTime, tokenDoc.GetAllocator());
+	
+	return ot::ReturnMessage::ok(tokenDoc.toJson());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
