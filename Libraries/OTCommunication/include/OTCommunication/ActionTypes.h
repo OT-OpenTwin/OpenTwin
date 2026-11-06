@@ -77,6 +77,8 @@
 
 #define OT_ACTION_CMD_EditProjectInformation "Project.EditInformation"
 
+#define OT_ACTION_CMD_GenerateAccessToken "Token.Generate"
+
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
 #define OT_ACTION_CMD_SetSpecificLogFlags "Logger.SetSpecific"
@@ -389,12 +391,14 @@
 
 #define OT_ACTION_PARAM_UID "UID"
 #define OT_ACTION_PARAM_Raw "Raw"
+#define OT_ACTION_PARAM_Key "Key"
 #define OT_ACTION_PARAM_JSON "JSON"
 #define OT_ACTION_PARAM_List "List"
 #define OT_ACTION_PARAM_Text "Text"
 #define OT_ACTION_PARAM_Size "Size"
 #define OT_ACTION_PARAM_Data "Data"
 #define OT_ACTION_PARAM_Info "Info"
+#define OT_ACTION_PARAM_Token "Token"
 #define OT_ACTION_PARAM_Alive "Alive"
 #define OT_ACTION_PARAM_State "State"
 #define OT_ACTION_PARAM_Flags "Flags"
@@ -422,6 +426,8 @@
 #define OT_ACTION_PARAM_Package "Package"
 #define OT_ACTION_PARAM_IniData "IniData"
 #define OT_ACTION_PARAM_RunData "RunData"
+#define OT_ACTION_PARAM_Expires "Expires"
+#define OT_ACTION_PARAM_Validity "Validity"
 #define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
@@ -429,6 +435,8 @@
 #define OT_ACTION_PARAM_Requested "Requested"
 #define OT_ACTION_PARAM_ModelType "ModelType"
 #define OT_ACTION_PARAM_ModelInfo "ModelInfo"
+#define OT_ACTION_PARAM_Challenge "Challenge"
+#define OT_ACTION_PARAM_Signature "Signature"
 #define OT_ACTION_PARAM_IsSelected "IsSelected"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
