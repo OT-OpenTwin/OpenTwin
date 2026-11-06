@@ -366,7 +366,7 @@ int main(int _argc, char *_argv[])
 			return ot::AppExitCode::AssetError;
 		}
 
-		//initializeCrypto();
+		initializeCrypto();
 
 		if (!initializeComponents()) {
 			return ot::AppExitCode::ComponentError;
