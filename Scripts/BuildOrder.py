@@ -22,6 +22,7 @@ BUILD_ORDER: list[str] = [
     "SYSTEM",
     "CORE",
     "KEYGENERATOR",
+    "CRYPTO",
     "GUI",
     "COMMUNICATION",
     "GUIAPI",

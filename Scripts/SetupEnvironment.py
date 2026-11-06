@@ -75,6 +75,7 @@ LIBRARIES = {
     "OT_UICORE_ROOT": "uiCore",
     "OT_VIEWER_ROOT": "OTViewer",
     "OT_RESULT_DATA_ACCESS_ROOT": "OTResultDataAccess",
+    "OT_CRYPTO_ROOT": "OTCrypto",
 }
 
 # ===== Tools =====
