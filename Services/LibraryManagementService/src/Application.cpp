@@ -195,24 +195,29 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 	gssDocRegister.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(getServiceURL(), gssDocRegister.GetAllocator()), gssDocRegister.GetAllocator());
 
 
+	ct = 1;
 	do {
 		gssResponseRegister.clear();
-		if (!(ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE, gssDocRegister.toJson(), gssResponseRegister, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))) {
+		ok = ot::msg::send(getServiceURL(), _globalSessionServiceURL, ot::EXECUTE, gssDocRegister.toJson(), gssResponseRegister, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit);
+
+		// The GSS forwards the registration to the LSS, which may not be listening yet during startup
+		if (ok) {
+			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(gssResponseRegister);
+			if (rMsg != ot::ReturnMessage::Ok) {
+				OT_LOG_W("Global Session Service rejected the registration: " + rMsg.getWhat());
+				ok = false;
+			}
+		}
+
+		if (!ok) {
 			OT_LOG_E("Register at Global Session Service failed [Attempt " + std::to_string(ct) + " / " + std::to_string(maxCt) + "]");
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
-
 		}
-	} while ((ot::ReturnMessage::fromJson(gssResponseRegister) != ot::ReturnMessage::Ok || !ok) && ct++ <= maxCt);
+	} while (!ok && ct++ <= maxCt);
 
 	if (!ok) {
 		OT_LOG_E("Registration at Global Session service failed after " + std::to_string(maxCt) + " attempts. Exiting...");
-		exit(ot::AppExitCode::GSSRegistrationFailed);
-	}
-
-	ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(gssResponseRegister);
-	if (rMsg != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Registration failed: " + rMsg.getWhat());
 		exit(ot::AppExitCode::GSSRegistrationFailed);
 	}
 

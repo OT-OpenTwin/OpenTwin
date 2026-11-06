@@ -536,6 +536,7 @@ void ServiceManager::sendInitializeMessage(Service&& _info) {
 }
 
 void ServiceManager::serviceInitializeFailed(Service&& _info) {
+	_info.resetIniAttempt();
 	std::lock_guard<std::mutex> lock(m_mutexRequestedServices);
 	m_requestedServices.push_back(RequestedService(std::move(_info.getInfo()), std::move(_info.getStartupData())));
 }
@@ -829,11 +830,15 @@ void ServiceManager::workerServiceInitializer() {
 						"\"ID\": " + std::to_string(info.getInfo().getServiceID()) + ", \"Name\": \"" + info.getInfo().getServiceName() + "\", \"Type\": \"" +
 						info.getInfo().getServiceType() + "\", \"Url\": \"" + info.getUrl() + "\", \"SessionID\": \"" + info.getInfo().getSessionID() + "\" }");
 
-					if (info.getIniAttempt() > 3) {
-						OT_LOG_W("Failed to ping service 3 times. Moving service back to restart { " + logInfo(info) + " }");
+					if (info.getIniAttempt() > 20) {
+						OT_LOG_W("Failed to ping service 20 times. Moving service back to restart { " + logInfo(info) + " }");
 						this->serviceInitializeFailed(std::move(info));
 					}
 					else {
+						// The service may not be listening yet, give it time for the next ping
+						using namespace std::chrono_literals;
+						std::this_thread::sleep_for(500ms);
+
 						m_mutexInitializingServices.lock();
 						m_initializingServices.push_back(std::move(info));
 						m_mutexInitializingServices.unlock();
