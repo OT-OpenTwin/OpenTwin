@@ -23,10 +23,22 @@
 #include "Debugging/UIDebug.h"
 #include "Helper/StartArgumentParser.h"
 
-// OT header
+// OpenTwin System header
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/OperatingSystem.h"
+
+// OpenTwin Core header
 #include "OTCore/Logging/Logger.h"
+
+// OpenTwin Crypto header
+#include "OTCrypto/Storage/GlobalCryptoKeyStore.h"
+#include "OTCrypto/Storage/CryptoKeyStoreFileSystem.h"
+
+// OpenTwin Communication header
+#include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/ServiceLogNotifier.h"
+
+// OpenTwin Widgets header
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Style/GlobalColorStyle.h"
 #include "OTWidgets/Graphics/GraphicsItemLoader.h"
@@ -34,16 +46,16 @@
 #include "OTWidgets/Properties/ApplicationPropertiesManager.h"
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 #include "OTWidgets/WidgetView/WidgetViewComponentsFactory.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/ServiceLogNotifier.h"
 
 // uiCore
 #include "akAPI/uiAPI.h"
 
 // Qt header
 #include <QtCore/qdir.h>
+#include <QtCore/qstandardpaths.h>
 #include <QtGui/qopenglcontext.h>
 #include <QtGui/qopenglfunctions.h>
+#include <QtGui/qdesktopservices.h>
 #include <QtGui/qoffscreensurface.h>
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qapplication.h>
@@ -153,6 +165,19 @@ QApplication* initializeQt(int &_argc, char* _argv[]) {
 	
 
 	return newApp;
+}
+
+void initializeCrypto() {
+	QString appNameTmp = QCoreApplication::applicationName();
+	QCoreApplication::setApplicationName("OpenTwin");
+
+	std::filesystem::path keyStorePath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation).toStdString() + "/CryptoKeyStore";
+
+	ot::CryptoKeyStoreFileSystem* newKeyStore = new ot::CryptoKeyStoreFileSystem(keyStorePath, true);
+	std::unique_ptr<ot::CryptoKeyStoreFileSystem> keyStore(newKeyStore);
+	ot::GlobalCryptoKeyStore::setKeyStore(std::move(keyStore));
+
+	QCoreApplication::setApplicationName(appNameTmp);
 }
 
 void initializeAppBase() {
@@ -340,6 +365,8 @@ int main(int _argc, char *_argv[])
 		if (!initializeAssets()) {
 			return ot::AppExitCode::AssetError;
 		}
+
+		//initializeCrypto();
 
 		if (!initializeComponents()) {
 			return ot::AppExitCode::ComponentError;

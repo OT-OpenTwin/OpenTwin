@@ -105,6 +105,7 @@ private:
 		ot::UID				gDefault_aSettings;
 		ot::UID				gDefault_aImport;
 		ot::UID				gDefault_aGroup;
+		ot::UID				gDefault_aCreateToken;
 		ot::UID				gDefault_aExportLog;
 	};
 

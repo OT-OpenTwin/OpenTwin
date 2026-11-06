@@ -479,6 +479,8 @@ public Q_SLOTS:
 	void slotRunCustomTimer(const QString& _timerId, int _intervalMs);
 	void queueCustomCallback(const QString& _callbackId);
 
+	void requestTokenCreation();
+
 private Q_SLOTS:
 	void slotCustomQueueCallback(const QString& _callbackId);
 

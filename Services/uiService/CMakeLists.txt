@@ -10,6 +10,7 @@ ot_add_resources(uiService)
 ot_add_dependency(uiService
     OTSystem
     OTCore
+    OTCrypto
     OTGui
     OTGuiAPI
     OTWidgets

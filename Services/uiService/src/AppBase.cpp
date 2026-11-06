@@ -38,10 +38,11 @@
 #include "Component/DevLogger.h"
 #include "Component/ExternalServicesComponent.h"
 #include "Component/ViewerComponent.h"
-#include "CustomWidgets/RenameProjectDialog.h"
-#include "CustomWidgets/CopyProjectDialog.h"
-#include "CustomWidgets/EditProjectInformationDialog.h"
 #include "CustomWidgets/WelcomeWidget.h"
+#include "CustomWidgets/CopyProjectDialog.h"
+#include "CustomWidgets/RenameProjectDialog.h"
+#include "CustomWidgets/TokenGenerationDialog.h"
+#include "CustomWidgets/EditProjectInformationDialog.h"
 #include "Helper/StartArgumentParser.h"
 #include "Login/LogInDialog.h"
 #include "QueueableRequests/UIRunUserSelectionHandlingRequest.h"
@@ -53,12 +54,13 @@
 #include "akWidgets/aWindowManager.h"
 #include "akWidgets/aTreeWidget.h"
 
-// OpenTwin header
+// OpenTwin System header
 #include "OTSystem/Flags.h"
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
 
+// OpenTwin Core header
 #include "OTCore/String.h"
 #include "OTCore/Geometry/Point2D.h"
 #include "OTCore/Debugging/RuntimeTests.h"
@@ -66,6 +68,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
 
+// OpenTwin Gui header
 #include "OTGui/Dialog/MessageDialogCfg.h"
 #include "OTGui/Graphics/GraphicsPackage.h"
 #include "OTGui/Painter/FillPainter2D.h"
@@ -73,10 +76,12 @@
 #include "OTGui/Properties/PropertyStringList.h"
 #include "OTGui/Style/ColorStyleTypes.h"
 
+// OpenTwin Gui API header
 #include "OTGuiAPI/TableActionHandler.h"
 #include "OTGuiAPI/GraphicsActionHandler.h"
 #include "OTGuiAPI/TextEditorActionHandler.h"
 
+// OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"
 #include "OTWidgets/Dialog/CreateProjectDialog.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
@@ -119,12 +124,15 @@
 #include "OTWidgets/WidgetView/GlobalWidgetViewManager.h"
 #include "OTWidgets/WidgetView/VersionGraphManagerView.h"
 
+// OpenTwin Viewer header
 #include "OTViewer/PlotManagerView.h"
 
+// OpenTwin Communication header
 #include "OTCommunication/msg.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 
+// OpenTwin Model Entities header
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
 
@@ -2613,6 +2621,14 @@ void AppBase::slotRunCustomTimer(const QString& _timerId, int _intervalMs)
 void AppBase::queueCustomCallback(const QString& _callbackId)
 {
 	QMetaObject::invokeMethod(this, &AppBase::slotCustomQueueCallback, Qt::QueuedConnection, _callbackId);
+}
+
+void AppBase::requestTokenCreation()
+{
+	ot::TokenGenerationDialog::Config cfg;
+	ot::TokenGenerationDialog dialog(cfg, mainWindow());
+
+	dialog.showDialog();
 }
 
 void AppBase::slotCustomQueueCallback(const QString& _callbackId)
