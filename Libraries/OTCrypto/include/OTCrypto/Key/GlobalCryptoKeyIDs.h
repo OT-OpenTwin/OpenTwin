@@ -11,8 +11,6 @@ namespace ot
 	{
 		GlobalCryptoKeyIDs() = delete;
 	public:
-		static std::string localTokenSignature() { return "opentwin-lcl-tknsig"; };
-
+		static std::string localTokenSignature() { return "opentwin_lcl_tknsig"; };
 	};
-
 }

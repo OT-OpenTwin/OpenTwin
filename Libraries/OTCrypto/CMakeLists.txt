@@ -9,6 +9,7 @@ ot_add_dependency(OTCrypto
     OTSystem
     OTCore
     RJSON
+    OPENSSL
     OSLibs
 )
 

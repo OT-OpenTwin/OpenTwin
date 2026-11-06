@@ -2,6 +2,7 @@
 
 // OpenTwin header
 #include "OTCrypto/Key/CryptoKeyGenerator.h"
+#include "OTCrypto/Signature/SignatureProvider.h"
 #include "OTCrypto/Storage/CryptoKeyStoreFileSystem.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
@@ -63,25 +64,7 @@ std::string ot::CryptoKeyStoreFileSystem::createKey(const std::string& _keyId)
 
 std::vector<uint8_t> ot::CryptoKeyStoreFileSystem::getPublicKey(const std::string& _keyId) const
 {
-	std::ifstream publicKeyFile(keyToPublicKeyPath(_keyId), std::ios::binary);
-	if (!publicKeyFile.is_open())
-	{
-		throw Exception::FileOpen("Failed to open public key file for key ID: " + _keyId);
-	}
-
-	std::vector<uint8_t> publicKeyData((std::istreambuf_iterator<char>(publicKeyFile)), std::istreambuf_iterator<char>());
-
-	if (!publicKeyFile.good())
-	{
-		publicKeyFile.close();
-		throw Exception::FileOpen("Failed to read public key data from file for key ID: " + _keyId);
-	}
-	else
-	{
-		publicKeyFile.close();
-	}
-
-	return publicKeyData;
+	return getKey(_keyId, false);
 }
 
 bool ot::CryptoKeyStoreFileSystem::removeKey(const std::string& _keyId)
@@ -111,13 +94,48 @@ bool ot::CryptoKeyStoreFileSystem::removeKey(const std::string& _keyId)
 
 std::vector<uint8_t> ot::CryptoKeyStoreFileSystem::sign(const std::string& _keyId, const std::vector<uint8_t>& _data) const
 {
-	OT_LOG_E("Signing is not implemented for CryptoKeyStoreFileSystem. Key ID: " + _keyId);
-	return std::vector<uint8_t>();
+	auto privateKey = getPrivateKey(_keyId);
+	return SignatureProvider::sign(privateKey, _data);
+}
+
+bool ot::CryptoKeyStoreFileSystem::verify(const std::string& _keyId, const std::vector<uint8_t>& _data, const std::vector<uint8_t>& _signature) const
+{
+	auto publicKey = getPublicKey(_keyId);
+	return SignatureProvider::verify(publicKey, _data, _signature);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private methods
+
+std::vector<uint8_t> ot::CryptoKeyStoreFileSystem::getPrivateKey(const std::string& _keyId) const
+{
+	return getKey(_keyId, true);
+}
+
+std::vector<uint8_t> ot::CryptoKeyStoreFileSystem::getKey(const std::string& _keyId, bool _private) const
+{
+	std::filesystem::path keyPath = _private ? keyToPrivateKeyPath(_keyId) : keyToPublicKeyPath(_keyId);
+	std::ifstream keyFile(keyPath, std::ios::binary);
+	if (!keyFile.is_open())
+	{
+		throw Exception::FileOpen("Failed to open key file for key ID: " + _keyId);
+	}
+
+	std::vector<uint8_t> publicKeyData((std::istreambuf_iterator<char>(keyFile)), std::istreambuf_iterator<char>());
+
+	if (!keyFile.good())
+	{
+		keyFile.close();
+		throw Exception::FileOpen("Failed to read key data from file for key ID: " + _keyId);
+	}
+	else
+	{
+		keyFile.close();
+	}
+
+	return publicKeyData;
+}
 
 std::filesystem::path ot::CryptoKeyStoreFileSystem::keyToPath(const std::string& _keyName) const
 {

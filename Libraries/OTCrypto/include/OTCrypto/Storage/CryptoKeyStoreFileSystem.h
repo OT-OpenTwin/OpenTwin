@@ -51,7 +51,12 @@ namespace ot
 
 		virtual std::vector<uint8_t> sign(const std::string& _keyId, const std::vector<uint8_t>& _data) const override;
 
+		virtual bool verify(const std::string& _keyId, const std::vector<uint8_t>& _data, const std::vector<uint8_t>& _signature) const override;
+
 	private:
+		std::vector<uint8_t> getPrivateKey(const std::string& _keyId) const;
+		std::vector<uint8_t> getKey(const std::string& _keyId, bool _private) const;
+
 		std::filesystem::path keyToPath(const std::string& _keyName) const;
 		std::filesystem::path keyToPublicKeyPath(const std::string& _keyName) const;
 		std::filesystem::path keyToPrivateKeyPath(const std::string& _keyName) const;

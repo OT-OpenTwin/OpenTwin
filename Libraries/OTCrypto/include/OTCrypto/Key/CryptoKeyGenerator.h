@@ -14,6 +14,7 @@ namespace ot
 	public:
 		//! @brief Generates a new asymmetric key pair.
 		//! @return A CryptoKeyPair object containing the generated public and private keys.
+		//! @throws ot::RuntimeException if key generation fails.
 		OT_DECL_NODISCARD static CryptoKeyPair generateAsymmetricKeyPair();
 	};
 

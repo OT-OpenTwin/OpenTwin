@@ -88,6 +88,9 @@ ot::TokenGenerationDialog::TokenGenerationDialog(const Config& _config, QWidget*
 	m_updateLifetimeTimer.setInterval(1000);
 	m_updateLifetimeTimer.connect(&m_updateLifetimeTimer, &QTimer::timeout, this, &TokenGenerationDialog::updateDesiredLifetimePreview);
 	m_updateLifetimeTimer.start();
+	updateDesiredLifetimePreview();
+
+	resize(340, 200);
 }
 
 ot::TokenGenerationDialog::~TokenGenerationDialog()
@@ -209,6 +212,12 @@ void ot::TokenGenerationDialog::generateTokenWorker()
 		int validity = m_desiredLifetime->value();
 
 		std::vector<uint8_t> publicKey = GlobalCryptoKeyStore::getPublicKey(keyId);
+
+		if (publicKey.empty())
+		{
+			throw Exception::Runtime("Failed to retrieve public key for key ID: " + keyId);
+		}
+
 		std::string publicKeyString(publicKey.begin(), publicKey.end());
 		
 		JsonDocument requestDoc;

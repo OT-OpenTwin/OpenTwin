@@ -66,7 +66,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	m_file.gDefault_aSettings = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Settings", "Settings", "Default");
 	m_file.gDefault_aImport = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Import Project", "Import", "Default");
 	m_file.gDefault_aGroup = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Manage Groups", "Groups", "Default");
-	//m_file.gDefault_aCreateToken = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Create Token", "CreateToken", "ToolBar");
+	m_file.gDefault_aCreateToken = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Create Token", "CreateToken", "ToolBar");
 	m_file.gDefault_aExportLog = uiAPI::createToolButton(cont->getGroup(), m_owner->m_uid, "Export Log", "ExportLog", "Default");
 
 	cont = uiAPI::object::get<aTtbGroup>(m_view.gUserInterface);
@@ -81,7 +81,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aSettings);
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aImport);
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aGroup);
-	//uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aCreateToken);
+	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aCreateToken);
 	uiAPI::container::addObject(m_file.gDefault, m_file.gDefault_aExportLog);
 
 	uiAPI::container::addObject(m_view.gUserInterface, m_view.gUserInterface_aSettings);
@@ -98,7 +98,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::object::setObjectUniqueName(m_file.gDefault_aSettings, "File:Default:Settings");
 	uiAPI::object::setObjectUniqueName(m_file.gDefault_aImport, "File:Default:Import");
 	uiAPI::object::setObjectUniqueName(m_file.gDefault_aGroup, "File:Default:Groups");
-	//uiAPI::object::setObjectUniqueName(m_file.gDefault_aCreateToken, "File:Default:CreateToken");
+	uiAPI::object::setObjectUniqueName(m_file.gDefault_aCreateToken, "File:Default:CreateToken");
 	uiAPI::object::setObjectUniqueName(m_file.gDefault_aExportLog, "File:Default:ExportLog");
 
 	uiAPI::object::setObjectUniqueName(m_view.page, "View");
@@ -109,13 +109,13 @@ ToolBar::ToolBar(AppBase * _owner)
 	ot::LockTypes lockFlags(ot::LockType::All);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup);
-	//m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aCreateToken);
+	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aCreateToken);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aExportLog);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings);
 	m_owner->controlsManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_view.gUserInterface_aSettings);
 	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aImport, lockFlags);
 	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aGroup, lockFlags);
-	//m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aCreateToken, lockFlags);
+	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aCreateToken, lockFlags);
 	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aExportLog, lockFlags);
 	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_file.gDefault_aSettings, lockFlags);
 	m_owner->lockManager()->uiElementCreated(m_owner->getBasicServiceInformation(), m_view.gUserInterface_aSettings, lockFlags);
@@ -125,7 +125,7 @@ ToolBar::ToolBar(AppBase * _owner)
 	uiAPI::registerUidNotifier(m_file.gDefault_aSettings, this);
 	uiAPI::registerUidNotifier(m_file.gDefault_aImport, this);
 	uiAPI::registerUidNotifier(m_file.gDefault_aGroup, this);
-	//uiAPI::registerUidNotifier(m_file.gDefault_aCreateToken, this);
+	uiAPI::registerUidNotifier(m_file.gDefault_aCreateToken, this);
 	uiAPI::registerUidNotifier(m_file.gDefault_aExportLog, this);
 	uiAPI::registerUidNotifier(m_view.gUserInterface_aSettings, this);
 }
@@ -136,24 +136,24 @@ void ToolBar::notify(
 	int				_info1,
 	int				_info2
 ) {
-	if (_sender == m_file.gDefault_aExit && _event == etClicked) {
+	if (_sender == m_file.gDefault_aExit && _event & etClicked) {
 		uiAPI::window::close(m_owner->m_mainWindow);
 	}
-	else if ((_sender == m_file.gDefault_aSettings && _event == etClicked) ||
-		(_sender == m_view.gUserInterface_aSettings && _event == etClicked)) {
+	else if ((_sender == m_file.gDefault_aSettings && _event & etClicked) ||
+		(_sender == m_view.gUserInterface_aSettings && _event & etClicked)) {
 		UserSettings::instance().showDialog();
 	}
-	else if (_sender == m_file.gDefault_aImport && _event == etClicked) {
+	else if (_sender == m_file.gDefault_aImport && _event & etClicked) {
 		m_owner->importProject();
 	}
-	else if (_sender == m_file.gDefault_aGroup && _event == etClicked) {
+	else if (_sender == m_file.gDefault_aGroup && _event & etClicked) {
 		m_owner->manageGroups();
 	}
-	//else if (_sender == m_file.gDefault_aCreateToken && _event & etClicked)
-	//{
-	//	m_owner->requestTokenCreation();
-	//}
-	else if (_sender == m_file.gDefault_aExportLog && _event == etClicked) {
+	else if (_sender == m_file.gDefault_aCreateToken && _event & etClicked)
+	{
+		m_owner->requestTokenCreation();
+	}
+	else if (_sender == m_file.gDefault_aExportLog && _event & etClicked) {
 		m_owner->exportLogs();
 	}
 }

@@ -45,5 +45,11 @@ namespace ot
 		//! @param _data The data to sign.
 		//! @return The signature of the data.
 		virtual std::vector<uint8_t> sign(const std::string& _keyId, const std::vector<uint8_t>& _data) const = 0;
+
+		//! @brief Verifies the given signature of the given data using the key with the given key ID.
+		//! @param _keyId The ID of the key to use for verification.
+		//! @param _data The data to verify.
+		//! @param _signature The signature to verify.
+		virtual bool verify(const std::string& _keyId, const std::vector<uint8_t>& _data, const std::vector<uint8_t>& _signature) const = 0;
 	};
 }
