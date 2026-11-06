@@ -180,6 +180,7 @@ def update_libraries(plan) -> None:
     # Admin panel
     plan.tree(r"%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\build\*.*", r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs", empty=True)
     plan.copy(r"%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\.htaccess", r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs")
+    plan.mkdir(r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra")
     plan.copy(r"%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd.conf", r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf")
     plan.copy(r"%OPENTWIN_DEV_ROOT%\Tools\AdminPanel\Apache_config\httpd-ahssl.conf", r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\conf\extra")
 
@@ -208,6 +209,8 @@ def create_deployment(plan) -> None:
 
     # OpenSceneGraph
     plan.copy(r"%OSG_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
+    # OSG bundles curl 7.61.1 without TLS; OpenTwin uses libcurl-x64.dll from CURL_DLLR
+    plan.remove(r"%OT_DEPLOYMENT_DIR%\libcurl.dll")
     plan.mkdir(r"%OT_DEPLOYMENT_DIR%\osgPlugins-3.6.3")
     plan.tree(r"%OSG_DLLR%\osgPlugins-3.6.3", r"%OT_DEPLOYMENT_DIR%\osgPlugins-3.6.3")
 
@@ -288,7 +291,7 @@ def create_deployment(plan) -> None:
     plan.remove_glob(r"%OT_DEPLOYMENT_DIR%\plugins", "*.pdb")
 
     # OpenSSL websocket
-    plan.copy(r"%OPENSSL_WEBSOCKET_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
+    # plan.copy(r"%OPENSSL_WEBSOCKET_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
 
     # Boost
     plan.copy(r"%BOOST_DLLPATHR%\*.dll", "%OT_DEPLOYMENT_DIR%")
@@ -321,11 +324,11 @@ def create_deployment(plan) -> None:
     plan.copy(r"%GMSH_ROOT_BIN%\gmsh.dll", "%OT_DEPLOYMENT_DIR%")
 
     # Curl
-    plan.copy(r"%CURL_DLLR%\libcurl.dll", "%OT_DEPLOYMENT_DIR%")
+    plan.copy(r"%CURL_DLLR%\libcurl-x64.dll", "%OT_DEPLOYMENT_DIR%")
 
     # OpenSSL
-    plan.copy(r"%OPENSSL_DLL%\libcrypto-1_1-x64.dll", "%OT_DEPLOYMENT_DIR%")
-    plan.copy(r"%OPENSSL_DLL%\libssl-1_1-x64.dll", "%OT_DEPLOYMENT_DIR%")
+    plan.copy(r"%OPENSSL_DLL%\libcrypto-3-x64.dll", "%OT_DEPLOYMENT_DIR%")
+    plan.copy(r"%OPENSSL_DLL%\libssl-3-x64.dll", "%OT_DEPLOYMENT_DIR%")
 
     # MongoDB
     plan.copy(r"%MONGO_CXX_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
@@ -422,7 +425,7 @@ def create_frontend_installer(plan) -> None:
     plan.copy(r"%SYSTEM_32%\vcruntime140_1.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # Curl
-    plan.copy(r"%CURL_DLLR%\libcurl.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
+    plan.copy(r"%CURL_DLLR%\libcurl-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # MongoDB
     plan.copy(r"%MONGO_C_DLLR%\bson-1.0.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
@@ -457,8 +460,8 @@ def create_frontend_installer(plan) -> None:
     plan.tree(r"%OSG_DLLR%\osgPlugins-3.6.3", r"%OPENTWIN_FRONTEND_DEPLOYMENT%\osgPlugins-3.6.3")
 
     # OpenSSL
-    plan.copy(r"%OPENSSL_DLL%\libcrypto-1_1-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
-    plan.copy(r"%OPENSSL_DLL%\libssl-1_1-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
+    plan.copy(r"%OPENSSL_DLL%\libcrypto-3-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
+    plan.copy(r"%OPENSSL_DLL%\libssl-3-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # Qt
     plan.copy(r"%QT_DLLR%\QT6Core.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
