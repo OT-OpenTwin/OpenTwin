@@ -86,6 +86,15 @@ elseif(OT_TOOLCHAIN_GCC)
     )
 endif()
 
+# Editor support only: clangd looks for build/compile_commands.json, not build/<preset>/
+if(OT_TOOLCHAIN_GCC AND CMAKE_EXPORT_COMPILE_COMMANDS)
+    file(CREATE_LINK "${CMAKE_BINARY_DIR}/compile_commands.json"
+         "${PROJECT_SOURCE_DIR}/build/compile_commands.json" SYMBOLIC RESULT _ot_ccdb_result)
+    if(_ot_ccdb_result)
+        message(STATUS "clangd compile_commands.json link skipped (editor diagnostics only): ${_ot_ccdb_result}")
+    endif()
+endif()
+
 # ------------------------------------------------------------
 # internal helpers
 # ------------------------------------------------------------
