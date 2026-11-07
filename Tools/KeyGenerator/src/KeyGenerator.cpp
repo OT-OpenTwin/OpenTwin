@@ -56,7 +56,7 @@ int main(int argc, char **argv)
 
 	keyFile << "\t//! @brief OpenTwin encryption key" << std::endl;
 	keyFile << "\tconst int EncryptionKey[] = {";
-	RandomNumberGeneratorCryptoSecure randomNumberGenerator; 
+	ot::RandomNumberGeneratorCryptoSecure randomNumberGenerator;
 	for (int i = 0; i < keyLength; i++) {
 		unsigned __int64 randomNumber = randomNumberGenerator.createPositiveRandomInt64(255);
 		if (i < keyLength-1) {

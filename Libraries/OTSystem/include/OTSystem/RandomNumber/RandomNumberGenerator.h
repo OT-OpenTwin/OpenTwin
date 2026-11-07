@@ -19,12 +19,20 @@
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/SystemAPIExport.h"
+#include "OTSystem/SystemTypes.h"
 
 // std header
-#include <stdint.h>
+#include <vector>
 
-class OT_SYS_API_EXPORT RandomNumberGenerator {
-public:
-	virtual uint64_t  createPositiveRandomInt64(uint64_t maxValue) = 0;
-};
+namespace ot
+{
+
+	class OT_SYS_API_EXPORT RandomNumberGenerator
+	{
+	public:
+		virtual uint64_t createPositiveRandomInt64(uint64_t _maxValue) = 0;
+
+		virtual std::vector<uint8_t> createRandomBytes(uint64_t _size) = 0;
+	};
+
+}

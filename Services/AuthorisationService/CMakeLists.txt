@@ -8,6 +8,7 @@ ot_initialize_lib(AuthorisationService OT_AUTHORISATION_SERVICE_ROOT_PATH SESSIO
 ot_add_dependency(AuthorisationService
     OTSystem
     OTCore
+    OTCrypto
     OTGui
     OTCommunication
     OTGuiAPI

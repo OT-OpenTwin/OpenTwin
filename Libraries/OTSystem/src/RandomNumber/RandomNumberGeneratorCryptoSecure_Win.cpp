@@ -1,9 +1,14 @@
-﻿#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+﻿// @otlicense
+
 #include "OTSystem/ArchitectureInfo.h"
+
+#ifdef OT_OS_WINDOWS
+
+#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/Exception.h"
 #include <exception>
 #include <cassert>
 
-#ifdef OT_OS_WINDOWS
 #define WIN32_NO_STATUS 
 
 // Windows header
@@ -11,10 +16,11 @@
 #include <bcrypt.h>
 
 #undef WIN32_NO_STATUS 
-
+#undef min
+#undef max
 #include <ntstatus.h>
 
-uint64_t RandomNumberGeneratorCryptoSecure::createPositiveRandomInt64(uint64_t maxValue)
+uint64_t ot::RandomNumberGeneratorCryptoSecure::createPositiveRandomInt64(uint64_t maxValue)
 {
 	if (maxValue == 0) 
 	{
@@ -134,6 +140,27 @@ uint64_t RandomNumberGeneratorCryptoSecure::createPositiveRandomInt64(uint64_t m
 	BCryptCloseAlgorithmProvider(randomAlgorithm, 0);
 
 	return randomNumber;
+}
+
+std::vector<uint8_t> ot::RandomNumberGeneratorCryptoSecure::createRandomBytes(uint64_t _size)
+{
+	OTAssert(_size > 0, "Size must be > 0");
+
+	if (_size > std::numeric_limits<ULONG>::max())
+	{
+		throw Exception::OutOfBounds("Requested buffer is too large");
+	}
+
+	std::vector<uint8_t> randomBytes(_size);
+
+	NTSTATUS status = BCryptGenRandom(nullptr, randomBytes.data(), static_cast<ULONG>(randomBytes.size()), BCRYPT_USE_SYSTEM_PREFERRED_RNG);
+	
+	if (!BCRYPT_SUCCESS(status))
+	{
+		throw Exception::Runtime("Random number generation failed");
+	}
+
+	return randomBytes;
 }
 
 

@@ -16,15 +16,22 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // @otlicense-end
+
 #pragma once
 
 // OpenTwin header
-#include "OTSystem/SystemAPIExport.h"
 #include "OTSystem/RandomNumber/RandomNumberGenerator.h"
 
-class OT_SYS_API_EXPORT RandomNumberGeneratorCryptoSecure :public RandomNumberGenerator
+namespace ot
 {
-public:
-	// Inherited via RandomNumberGenerator
-	uint64_t createPositiveRandomInt64(uint64_t maxValue = UINT64_MAX) override;
-};
+
+	class OT_SYS_API_EXPORT RandomNumberGeneratorCryptoSecure : public RandomNumberGenerator
+	{
+	public:
+		// Inherited via RandomNumberGenerator
+		uint64_t createPositiveRandomInt64(uint64_t maxValue = std::numeric_limits<uint64_t>::max()) override;
+
+		virtual std::vector<uint8_t> createRandomBytes(uint64_t _size) override;
+	};
+
+}
