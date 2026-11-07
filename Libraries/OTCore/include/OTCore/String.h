@@ -239,6 +239,10 @@ namespace ot {
 		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
 		static std::string addEscapeCharacters(const std::string& _str);
 
+		//! @brief Returns a string representation of the provided data.
+		//! @param _data Data to stringify.
+		static std::string toHexString(const std::vector<uint8_t>& _data);
+
 		//! @brief Encodes a UTF-8 string into a hex representation (2 ASCII chars per byte).
 		//! Each byte is converted into two lowercase hex digits.
 		//! @param _string Input string (UTF-8).

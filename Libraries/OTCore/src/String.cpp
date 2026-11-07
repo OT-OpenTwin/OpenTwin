@@ -657,6 +657,22 @@ inline std::string ot::String::addEscapeCharacters(const std::string& _str) {
 	return result;
 }
 
+std::string ot::String::toHexString(const std::vector<uint8_t>& _data)
+{
+	static constexpr char digits[] = "0123456789abcdef";
+	std::string output;
+	output.resize(_data.size() * 2);
+
+	size_t j = 0;
+	for (uint8_t c : _data)
+	{
+		output[j++] = digits[c >> 4];
+		output[j++] = digits[c & 0x0F];
+	}
+
+	return output;
+}
+
 inline std::string ot::String::toHex(const std::string& _string) {
 	static constexpr char digits[] = "0123456789abcdef";
 	std::string output;
