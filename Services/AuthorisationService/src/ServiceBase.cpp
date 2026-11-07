@@ -24,6 +24,8 @@
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/DateTime.h"
+#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -577,9 +579,19 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 
 ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword)
 {
-	std::string token;
-	uint64_t expirationTime = 0;
+	const uint64_t maximumTokenValidity = 30ull * 24ull * 60ull * 60000ull;
 
+	std::string publicUserClientKey = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Key);
+	uint64_t requestedValidityInSeconds = ot::json::getUInt64(_actionDocument, OT_ACTION_PARAM_Validity);
+	
+	ot::RandomNumberGeneratorCryptoSecure generator;
+	std::vector<uint8_t> tokenData = generator.createRandomBytes(32);
+	std::string token = ot::String::toHexString(tokenData);
+	
+	uint64_t currentTime = ot::DateTime::msSinceEpoch();
+
+	uint64_t tokenValidity = std::min(maximumTokenValidity, requestedValidityInSeconds * 1000);
+	uint64_t expirationTime = currentTime + tokenValidity;
 
 	// Create response
 	ot::JsonDocument tokenDoc;
