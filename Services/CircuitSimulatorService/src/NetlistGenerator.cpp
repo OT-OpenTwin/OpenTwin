@@ -65,9 +65,10 @@ std::list<std::string> NetlistGenerator::generate(EntityBase* _solverEntity, Cir
             std::string paramName = param->getName();
             size_t slashPos = paramName.find_last_of('/');
             if (slashPos != std::string::npos) paramName = paramName.substr(slashPos + 1);
-
+            
+            std::string val = ot::String::numberToString(param->getNumericValue(), ot::String::DisplayNumberFormat::Auto, std::numeric_limits<double>::digits10);
             m_parameterNames.insert(paramName);
-            netlist.push_back("circbyline .param " + paramName + "=" + std::to_string(param->getNumericValue()));
+            netlist.push_back("circbyline .param " + paramName + "=" + val);
             delete param;
         }
     }
