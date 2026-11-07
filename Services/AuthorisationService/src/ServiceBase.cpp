@@ -274,16 +274,34 @@ std::string ServiceBase::handleAdminLogIn(const ot::ConstJsonObject& _actionDocu
 	return json.toJson();
 }
 
-
-
 std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument) 
 {
-	bool usePSW = ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD);
+	enum class LoginMode
+	{
+		UsernamePassword,
+		SSO,
+		Token
+	};
+
+	LoginMode loginMode = LoginMode::SSO;
 	std::string username;
 	std::string password;
 	ot::JsonDocument returnDoc;
-	bool ssoAuthenticationSuccess = false;
-	if (usePSW)
+	bool authenticationSuccessfull = false;
+
+	if (ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD))
+	{
+		loginMode = LoginMode::UsernamePassword;
+	}
+	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Token))
+	{
+		loginMode = LoginMode::Token;
+	}
+
+
+	switch (loginMode)
+	{
+	case LoginMode::UsernamePassword:
 	{
 		// In this case we have to use the provided credentials
 		password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
@@ -295,21 +313,23 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 			return json.toJson();
 		}
 		bool encryptedPassword = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
-		
+
 		if (encryptedPassword)
 		{
 			password = ot::UserCredentials::decryptString(password);
 		}
 	}
-	else
+	break;
+
+	case LoginMode::SSO:
 	{
 		// Here we execute the sso authentication process
-		bool initialToken = ot::json::getBool(_actionDocument ,OT_PARAM_AUTH_SSO_Initial); 
+		bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
 		std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
 		std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
 		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons. It also sets the identified user name
-		ssoAuthenticationSuccess = m_ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
-		if (!ssoAuthenticationSuccess)
+		authenticationSuccessfull = m_ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
+		if (!authenticationSuccessfull)
 		{
 			// Here we return if the sequnce is not done yet or it may have failed
 			return returnDoc.toJson();
@@ -318,7 +338,22 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		{
 			password = "";
 		}
-	}	
+	}
+		break;
+
+	case LoginMode::Token:
+		throw ot::Exception::Runtime("No implmented yet");
+
+		// First check if this is the login or challenge response step
+
+		// On login create a random challenge and send a s response
+
+		// On challenge response lookup the token,
+		// validate the signature and then retreive
+		// the actual username and switch to username password auth
+
+		break;
+	}
 
 	// Now we still need to check for a user entry in mongodb, matching the credentials
 	// ! If user permission is being added, look into the successfulMongoAuthenticate else path for sso !
@@ -336,7 +371,7 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		// Fills in the fields about the session user in the mongodb document
 		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
 
-		if (usePSW)
+		if (loginMode == LoginMode::UsernamePassword)
 		{
 			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successfulMongoAuthenticate, returnDoc.GetAllocator());
 			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
@@ -345,7 +380,7 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 	else
 	{
-		if (!usePSW)
+		if (loginMode != LoginMode::UsernamePassword)
 		{
 			// Here we have a sso login that was successful (otherwise the m_ssoBuffer.handleRequest would have returned earlier), but the mongoDB authentication failed.
 			// This is the case when the sso user has not been registered yet. 

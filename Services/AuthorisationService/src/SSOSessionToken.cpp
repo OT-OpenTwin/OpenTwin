@@ -1,7 +1,13 @@
-﻿#include "SessionToken.h"
+﻿// @otlicense
+
+// Auth header
+#include "SSOSessionToken.h"
+
+// OpenTwin header
 #include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
 #include "OTCore/String.h"
-std::string ot::SessionToken::generateToken()
+
+std::string ot::SSOSessionToken::generateToken()
 {
 	RandomNumberGeneratorCryptoSecure generator;
 	uint64_t tokenBase = generator.createPositiveRandomInt64();
@@ -15,12 +21,12 @@ std::string ot::SessionToken::generateToken()
 	return m_token;
 }
 
-const std::string& ot::SessionToken::getToken() const 
+const std::string& ot::SSOSessionToken::getToken() const
 {
 	return m_token;
 }
 
-bool ot::SessionToken::tokenIsValid(bool _useDelta) const
+bool ot::SSOSessionToken::tokenIsValid(bool _useDelta) const
 {
 	auto now = std::chrono::steady_clock::now();
 	std::chrono::minutes passedTime = std::chrono::duration_cast<std::chrono::minutes>(now - m_creationTime);

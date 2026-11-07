@@ -1,17 +1,24 @@
-﻿#pragma once
+﻿// @otlicense
+
+#pragma once
+
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+
+// std header
 #include <optional>
 #include <string>
 #include <chrono>
+
 namespace ot
 {
-	class SessionToken
+	class SSOSessionToken
 	{
+		OT_DECL_NOCOPY(SSOSessionToken)
+		OT_DECL_DEFMOVE(SSOSessionToken)
 	public:
-		SessionToken() = default;
-		SessionToken(const SessionToken& _other) = delete;
-		SessionToken(SessionToken&& _other) = default;
-		SessionToken& operator=(const SessionToken& _other) = delete;
-		SessionToken& operator=(SessionToken&& _other) = default;
+		SSOSessionToken() = default;
+		~SSOSessionToken() = default;
 		
 		std::string generateToken();
 		const std::string& getToken() const;
