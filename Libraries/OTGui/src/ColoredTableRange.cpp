@@ -32,7 +32,9 @@ ot::ColoredTableRange::ColoredTableRange()
 	  m_colorTo(),
 	  m_hasValueRange(false),
 	  m_minValue(0.0),
-	  m_maxValue(0.0)
+	  m_maxValue(0.0),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 
 }
@@ -43,7 +45,9 @@ ot::ColoredTableRange::ColoredTableRange(const TableRange& _range, const Color& 
 	  m_colorTo(_color),
 	  m_hasValueRange(false),
 	  m_minValue(0.0),
-	  m_maxValue(0.0)
+	  m_maxValue(0.0),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 
 }
@@ -54,7 +58,9 @@ ot::ColoredTableRange::ColoredTableRange(std::shared_ptr<TableRange> _range, con
 	  m_colorTo(_color),
 	  m_hasValueRange(false),
 	  m_minValue(0.0),
-	  m_maxValue(0.0)
+	  m_maxValue(0.0),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 	if (!m_range) {
 		m_range = std::make_shared<TableRangeSection>();
@@ -67,7 +73,9 @@ ot::ColoredTableRange::ColoredTableRange(const TableRange& _range, const Color& 
 	  m_colorTo(_color),
 	  m_hasValueRange(true),
 	  m_minValue(_min),
-	  m_maxValue(_max)
+	  m_maxValue(_max),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 
 }
@@ -78,7 +86,9 @@ ot::ColoredTableRange::ColoredTableRange(std::shared_ptr<TableRange> _range, con
 	  m_colorTo(_color),
 	  m_hasValueRange(true),
 	  m_minValue(_min),
-	  m_maxValue(_max)
+	  m_maxValue(_max),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 	if (!m_range) {
 		m_range = std::make_shared<TableRangeSection>();
@@ -91,7 +101,9 @@ ot::ColoredTableRange::ColoredTableRange(const TableRange& _range, const Color& 
 	  m_colorTo(_maxColor),
 	  m_hasValueRange(true),
 	  m_minValue(_min),
-	  m_maxValue(_max)
+	  m_maxValue(_max),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 
 }
@@ -102,10 +114,47 @@ ot::ColoredTableRange::ColoredTableRange(std::shared_ptr<TableRange> _range, con
 	  m_colorTo(_maxColor),
 	  m_hasValueRange(true),
 	  m_minValue(_min),
-	  m_maxValue(_max)
+	  m_maxValue(_max),
+	  m_hasColorMap(false),
+	  m_colorMap()
 {
 	if (!m_range) {
 		m_range = std::make_shared<TableRangeSection>();
+	}
+}
+
+ot::ColoredTableRange::ColoredTableRange(const TableRange& _range, const ColorMap& _colorMap, double _min, double _max)
+	: m_range(_range.clone()),
+	  m_color(),
+	  m_colorTo(),
+	  m_hasValueRange(true),
+	  m_minValue(_min),
+	  m_maxValue(_max),
+	  m_hasColorMap(true),
+	  m_colorMap(_colorMap)
+{
+	if (!m_colorMap.getStops().empty()) {
+		m_color = m_colorMap.getColor(0.0f);
+		m_colorTo = m_colorMap.getColor(1.0f);
+	}
+}
+
+ot::ColoredTableRange::ColoredTableRange(std::shared_ptr<TableRange> _range, const ColorMap& _colorMap, double _min, double _max)
+	: m_range(_range),
+	  m_color(),
+	  m_colorTo(),
+	  m_hasValueRange(true),
+	  m_minValue(_min),
+	  m_maxValue(_max),
+	  m_hasColorMap(true),
+	  m_colorMap(_colorMap)
+{
+	if (!m_range) {
+		m_range = std::make_shared<TableRangeSection>();
+	}
+	if (!m_colorMap.getStops().empty()) {
+		m_color = m_colorMap.getColor(0.0f);
+		m_colorTo = m_colorMap.getColor(1.0f);
 	}
 }
 
@@ -115,7 +164,9 @@ ot::ColoredTableRange::ColoredTableRange(const ColoredTableRange& _other)
 	  m_colorTo(_other.m_colorTo),
 	  m_hasValueRange(_other.m_hasValueRange),
 	  m_minValue(_other.m_minValue),
-	  m_maxValue(_other.m_maxValue)
+	  m_maxValue(_other.m_maxValue),
+	  m_hasColorMap(_other.m_hasColorMap),
+	  m_colorMap(_other.m_colorMap)
 {
 
 }
@@ -126,7 +177,9 @@ ot::ColoredTableRange::ColoredTableRange(ColoredTableRange&& _other) noexcept
 	  m_colorTo(std::move(_other.m_colorTo)),
 	  m_hasValueRange(_other.m_hasValueRange),
 	  m_minValue(_other.m_minValue),
-	  m_maxValue(_other.m_maxValue)
+	  m_maxValue(_other.m_maxValue),
+	  m_hasColorMap(_other.m_hasColorMap),
+	  m_colorMap(std::move(_other.m_colorMap))
 {
 	if (!m_range) {
 		m_range = std::make_shared<TableRangeSection>();
@@ -141,6 +194,8 @@ ot::ColoredTableRange& ot::ColoredTableRange::operator=(const ColoredTableRange&
 		m_hasValueRange = _other.m_hasValueRange;
 		m_minValue = _other.m_minValue;
 		m_maxValue = _other.m_maxValue;
+		m_hasColorMap = _other.m_hasColorMap;
+		m_colorMap = _other.m_colorMap;
 	}
 	return *this;
 }
@@ -153,6 +208,8 @@ ot::ColoredTableRange& ot::ColoredTableRange::operator=(ColoredTableRange&& _oth
 		m_hasValueRange = _other.m_hasValueRange;
 		m_minValue = _other.m_minValue;
 		m_maxValue = _other.m_maxValue;
+		m_hasColorMap = _other.m_hasColorMap;
+		m_colorMap = std::move(_other.m_colorMap);
 		if (!m_range) {
 			m_range = std::make_shared<TableRangeSection>();
 		}
@@ -180,8 +237,18 @@ bool ot::ColoredTableRange::operator==(const ColoredTableRange& _other) const {
 			return false;
 		}
 	}
-	if (m_color != _other.m_color || m_colorTo != _other.m_colorTo) {
+	if (m_hasColorMap != _other.m_hasColorMap) {
 		return false;
+	}
+	if (m_hasColorMap) {
+		if (m_colorMap != _other.m_colorMap) {
+			return false;
+		}
+	}
+	else {
+		if (m_color != _other.m_color || m_colorTo != _other.m_colorTo) {
+			return false;
+		}
 	}
 	if (!m_range && !_other.m_range) {
 		return true;
@@ -202,6 +269,20 @@ bool ot::ColoredTableRange::calculateColor(double _value, Color& _outColor) cons
 		return false;
 	}
 
+	if (m_hasColorMap) {
+		if (std::abs(m_maxValue - m_minValue) < 1e-12) {
+			_outColor = m_colorMap.getColor(0.0f);
+			return true;
+		}
+
+		double t = (_value - m_minValue) / (m_maxValue - m_minValue);
+		if (t < 0.0) t = 0.0;
+		if (t > 1.0) t = 1.0;
+
+		_outColor = m_colorMap.getColor(static_cast<float>(t));
+		return true;
+	}
+
 	if (m_color == m_colorTo) {
 		_outColor = m_color;
 		return true;
@@ -216,17 +297,7 @@ bool ot::ColoredTableRange::calculateColor(double _value, Color& _outColor) cons
 	if (t < 0.0) t = 0.0;
 	if (t > 1.0) t = 1.0;
 
-	int r = static_cast<int>(std::round(static_cast<double>(m_color.r()) + t * static_cast<double>(m_colorTo.r() - m_color.r())));
-	int g = static_cast<int>(std::round(static_cast<double>(m_color.g()) + t * static_cast<double>(m_colorTo.g() - m_color.g())));
-	int b = static_cast<int>(std::round(static_cast<double>(m_color.b()) + t * static_cast<double>(m_colorTo.b() - m_color.b())));
-	int a = static_cast<int>(std::round(static_cast<double>(m_color.a()) + t * static_cast<double>(m_colorTo.a() - m_color.a())));
-
-	r = std::max(0, std::min(255, r));
-	g = std::max(0, std::min(255, g));
-	b = std::max(0, std::min(255, b));
-	a = std::max(0, std::min(255, a));
-
-	_outColor = Color(r, g, b, a);
+	_outColor = m_color.interpolate(m_colorTo, static_cast<float>(t), ColorInterpolationSpace::Oklab);
 	return true;
 }
 
@@ -248,6 +319,13 @@ void ot::ColoredTableRange::addToJsonObject(JsonValue& _object, JsonAllocator& _
 	_object.AddMember(JsonString(c_coloredTableRangeHasValueRangeKey, _allocator), JsonValue(m_hasValueRange), _allocator);
 	_object.AddMember(JsonString(c_coloredTableRangeMinValueKey, _allocator), JsonValue(m_minValue), _allocator);
 	_object.AddMember(JsonString(c_coloredTableRangeMaxValueKey, _allocator), JsonValue(m_maxValue), _allocator);
+
+	_object.AddMember(JsonString(c_coloredTableRangeHasColorMapKey, _allocator), JsonValue(m_hasColorMap), _allocator);
+	if (m_hasColorMap) {
+		JsonObject colorMapObj;
+		m_colorMap.addToJsonObject(colorMapObj, _allocator);
+		_object.AddMember(JsonString(c_coloredTableRangeColorMapKey, _allocator), colorMapObj, _allocator);
+	}
 }
 
 void ot::ColoredTableRange::setFromJsonObject(const ConstJsonObject& _object) {
@@ -290,5 +368,17 @@ void ot::ColoredTableRange::setFromJsonObject(const ConstJsonObject& _object) {
 	}
 	else {
 		m_maxValue = 0.0;
+	}
+
+	if (_object.HasMember(c_coloredTableRangeHasColorMapKey)) {
+		m_hasColorMap = ot::json::getBool(_object, c_coloredTableRangeHasColorMapKey);
+	}
+	else {
+		m_hasColorMap = false;
+	}
+
+	if (m_hasColorMap && _object.HasMember(c_coloredTableRangeColorMapKey)) {
+		ConstJsonObject colorMapObj = ot::json::getObject(_object, c_coloredTableRangeColorMapKey);
+		m_colorMap.setFromJsonObject(colorMapObj);
 	}
 }

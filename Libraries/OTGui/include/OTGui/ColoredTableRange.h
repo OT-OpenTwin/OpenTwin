@@ -23,6 +23,7 @@
 #include "OTCore/Color.h"
 #include "OTCore/Serializable.h"
 #include "OTGui/TableRange.h"
+#include "OTGui/ColorMap.h"
 #include "OTGui/OTGuiAPIExport.h"
 
 // std header
@@ -37,9 +38,11 @@ namespace ot {
 	inline constexpr const char* c_coloredTableRangeHasValueRangeKey = "HasValueRange";
 	inline constexpr const char* c_coloredTableRangeMinValueKey = "MinValue";
 	inline constexpr const char* c_coloredTableRangeMaxValueKey = "MaxValue";
+	inline constexpr const char* c_coloredTableRangeHasColorMapKey = "HasColorMap";
+	inline constexpr const char* c_coloredTableRangeColorMapKey = "ColorMap";
 
 	//! @class ColoredTableRange
-	//! @brief Associates an ot::TableRange with color information. Supports static colors, single-color value thresholds, and 2-color gradient ranges.
+	//! @brief Associates an ot::TableRange with color information. Supports static colors, single-color value thresholds, 2-color gradient ranges, and multi-stop ColorMaps.
 	class OT_GUI_API_EXPORT ColoredTableRange : public ot::Serializable {
 	public:
 		ColoredTableRange();
@@ -47,20 +50,25 @@ namespace ot {
 		// ---------------------------------------------------------------------
 		// Constructors
 
-		//! @brief Statischer Farbbereich: Alle Zellen im Bereich erhalten unabhängig vom Wert die angegebene Farbe.
+		//! @brief Static color range: all cells in the range receive the specified color regardless of value.
 		ColoredTableRange(const TableRange& _range, const Color& _color);
-		//! @brief Statischer Farbbereich (shared pointer): Alle Zellen im Bereich erhalten unabhängig vom Wert die angegebene Farbe.
+		//! @brief Static color range (shared pointer): all cells in the range receive the specified color regardless of value.
 		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _color);
 
-		//! @brief Wertbasierter Schwellwert-Bereich (einfarbig): Nur Zellen, deren numerischer Wert in [_min, _max] liegt, erhalten _color.
+		//! @brief Value-based threshold range (single color): only cells whose numerical value is within [_min, _max] receive _color.
 		ColoredTableRange(const TableRange& _range, const Color& _color, double _min, double _max);
-		//! @brief Wertbasierter Schwellwert-Bereich (einfarbig, shared pointer): Nur Zellen, deren numerischer Wert in [_min, _max] liegt, erhalten _color.
+		//! @brief Value-based threshold range (single color, shared pointer): only cells whose numerical value is within [_min, _max] receive _color.
 		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _color, double _min, double _max);
 
-		//! @brief Farbverlauf / Gradient (Heatmap-Segment): Zellen mit Werten in [_min, _max] werden linear zwischen _minColor und _maxColor interpoliert.
+		//! @brief Color gradient (heatmap segment): cells with values in [_min, _max] are interpolated linearly between _minColor and _maxColor.
 		ColoredTableRange(const TableRange& _range, const Color& _minColor, const Color& _maxColor, double _min, double _max);
-		//! @brief Farbverlauf / Gradient (Heatmap-Segment, shared pointer): Zellen mit Werten in [_min, _max] werden linear zwischen _minColor und _maxColor interpoliert.
+		//! @brief Color gradient (heatmap segment, shared pointer): cells with values in [_min, _max] are interpolated linearly between _minColor and _maxColor.
 		ColoredTableRange(std::shared_ptr<TableRange> _range, const Color& _minColor, const Color& _maxColor, double _min, double _max);
+
+		//! @brief ColorMap-based color range (heatmap): cells with values in [_min, _max] are interpolated using _colorMap (e.g. Viridis, Plasma).
+		ColoredTableRange(const TableRange& _range, const ColorMap& _colorMap, double _min, double _max);
+		//! @brief ColorMap-based color range (heatmap, shared pointer): cells with values in [_min, _max] are interpolated using _colorMap (e.g. Viridis, Plasma).
+		ColoredTableRange(std::shared_ptr<TableRange> _range, const ColorMap& _colorMap, double _min, double _max);
 
 		ColoredTableRange(const ColoredTableRange& _other);
 		ColoredTableRange(ColoredTableRange&& _other) noexcept;
@@ -96,6 +104,13 @@ namespace ot {
 		const Color& getMaxColor() const { return m_colorTo; }
 		void setColorGradient(const Color& _minColor, const Color& _maxColor) { m_color = _minColor; m_colorTo = _maxColor; }
 
+		// ColorMap access
+		bool hasColorMap() const { return m_hasColorMap; }
+		const ColorMap& getColorMap() const { return m_colorMap; }
+		ColorMap& getColorMap() { return m_colorMap; }
+		void setColorMap(const ColorMap& _colorMap) { m_colorMap = _colorMap; m_hasColorMap = true; }
+		void removeColorMap() { m_hasColorMap = false; }
+
 		// Value range access
 		bool hasValueRange() const { return m_hasValueRange; }
 		double getMinValue() const { return m_minValue; }
@@ -103,10 +118,10 @@ namespace ot {
 		void setValueRange(double _min, double _max) { m_minValue = _min; m_maxValue = _max; m_hasValueRange = true; }
 		void removeValueRange() { m_hasValueRange = false; }
 
-		bool isGradient() const { return m_hasValueRange && (m_color != m_colorTo); }
+		bool isGradient() const { return m_hasValueRange && (m_hasColorMap || m_color != m_colorTo); }
 
-		//! @brief Berechnet die Farbe für einen gegebenen numerischen Wert.
-		//! Gibt false zurück, wenn ein Wertebereich definiert ist und _value außerhalb liegt.
+		//! @brief Calculates the color for a given numerical value.
+		//! Returns false if a value range is defined and _value is outside [_min, _max].
 		bool calculateColor(double _value, Color& _outColor) const;
 
 	private:
@@ -116,6 +131,8 @@ namespace ot {
 		bool m_hasValueRange;
 		double m_minValue;
 		double m_maxValue;
+		bool m_hasColorMap;
+		ColorMap m_colorMap;
 	};
 
 }
