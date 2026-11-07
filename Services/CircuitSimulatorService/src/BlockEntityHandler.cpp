@@ -143,7 +143,8 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 	ot::GraphicsPickerCollectionCfg a2("Meter Elements", "Meter Elements");
 	ot::GraphicsPickerCollectionCfg a3("Sources", "Sources");
 	ot::GraphicsPickerCollectionCfg a4("ActiveElements", "Active Elements");
-	ot::GraphicsPickerCollectionCfg a5("OtherElements", "Other Elements");
+	ot::GraphicsPickerCollectionCfg a5("SubcircuitElements", "Subcircuit Elements");
+	ot::GraphicsPickerCollectionCfg a6("Labels", "Labels");
 
 	a1.addItem(EntityBlockCircuitResistor::className(), "Resistor", "CircuitElementImages/ResistorBG.png");
 	a1.addItem(EntityBlockCircuitCapacitor::className(),"Capacitor", "CircuitElementImages/Capacitor.png");
@@ -155,20 +156,22 @@ ot::GraphicsPickerCollectionPackage BlockEntityHandler::buildUpBlockPicker() {
 	a2.addItem(EntityBlockCircuitCurrentMeter::className(), "Current Meter", "CircuitElementImages/CurrentMeter.png");
 
 	a3.addItem(EntityBlockCircuitVoltageSource::className(), "Voltage Source", "CircuitElementImages/VoltageSource.png");
-	a3.addItem(EntityBlockCircuitBehavioralSource::className(), "Behavioral Source (ASRC)", "CircuitElementImages/VoltageSource.png");
+	a3.addItem(EntityBlockCircuitBehavioralSource::className(), "Behavioral Source (ASRC)", "CircuitElementImages/BehavioralSource.png");
 	
 
 	a4.addItem(EntityBlockCircuitDiode::className(), "Diode", "CircuitElementImages/Diod2.png");
-
-	a5.addItem(EntityBlockCircuitLabel::className(), "Net Label", "CircuitElementImages/Label.png");
+	
 	a5.addItem(EntityBlockCircuitSubcircuit::className(), "Subcircuit", "CircuitElementImages/Subcircuit.png");
 	a5.addItem(EntityBlockCircuitTerminal::className(), "Subcircuit Terminal", "CircuitElementImages/Terminal.png");
+
+	a6.addItem(EntityBlockCircuitLabel::className(), "Net Label", "CircuitElementImages/Label.png");
 
 	a.addChildCollection(std::move(a1));
 	a.addChildCollection(std::move(a2));
 	a.addChildCollection(std::move(a3));
 	a.addChildCollection(std::move(a4));
 	a.addChildCollection(std::move(a5));
+	a.addChildCollection(std::move(a6));
 
 	graphicsPicker.addCollection(std::move(a));
 	graphicsPicker.setPickerKey(OT_INFO_SERVICE_TYPE_CircuitSimulatorService);
