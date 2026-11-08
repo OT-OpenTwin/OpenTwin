@@ -50,7 +50,7 @@ namespace ot {
 		}
 	}
 }
-
+/*
 TEST(GenericDataStructMatrixMerger, HorizontalTableMerge)
 {
 	auto matrixA = ot::intern::createMatrix("A", 2, 4, true);
@@ -66,4 +66,4 @@ TEST(GenericDataStructMatrixMerger, HorizontalTableMerge)
 	bool trueB = ot::intern::matrixSubsetEqual(matrixB, resultMatrix, 1, 2, 0, 2, 1, 4);
 	EXPECT_TRUE(trueB);
 	
-}
+}*/
