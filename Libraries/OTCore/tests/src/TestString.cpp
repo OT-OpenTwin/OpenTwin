@@ -355,6 +355,47 @@ TEST(StringTests, StringSmartSplit_NoEscapeSkipEmpty) {
 	EXPECT_EQ(result[1], "String \"containing\nsubstring\\\" with\\nsome escape\\\"\"");
 }
 
+TEST(StringTests, EscapeRegex)
+{
+	// Empty input
+	EXPECT_EQ("", ot::String::escapeRegex(""));
+
+	// Strings without special characters
+	EXPECT_EQ("Hello World", ot::String::escapeRegex("Hello World"));
+	EXPECT_EQ("123456789", ot::String::escapeRegex("123456789"));
+
+	// Individual special characters
+	EXPECT_EQ(R"(\\)", ot::String::escapeRegex(R"(\)"));
+	EXPECT_EQ(R"(\.)", ot::String::escapeRegex("."));
+	EXPECT_EQ(R"(\^)", ot::String::escapeRegex("^"));
+	EXPECT_EQ(R"(\$)", ot::String::escapeRegex("$"));
+	EXPECT_EQ(R"(\*)", ot::String::escapeRegex("*"));
+	EXPECT_EQ(R"(\+)", ot::String::escapeRegex("+"));
+	EXPECT_EQ(R"(\?)", ot::String::escapeRegex("?"));
+	EXPECT_EQ(R"(\()", ot::String::escapeRegex("("));
+	EXPECT_EQ(R"(\))", ot::String::escapeRegex(")"));
+	EXPECT_EQ(R"(\[)", ot::String::escapeRegex("["));
+	EXPECT_EQ(R"(\])", ot::String::escapeRegex("]"));
+	EXPECT_EQ(R"(\{)", ot::String::escapeRegex("{"));
+	EXPECT_EQ(R"(\})", ot::String::escapeRegex("}"));
+	EXPECT_EQ(R"(\|)", ot::String::escapeRegex("|"));
+
+	// Multiple special characters
+	EXPECT_EQ(R"(\.\*\+\?)", ot::String::escapeRegex(".*+?"));
+	EXPECT_EQ(R"(\^\$\\)", ot::String::escapeRegex("^$\\"));
+
+	// Mixed regular and special characters
+	EXPECT_EQ(R"(Hello \.World!)", ot::String::escapeRegex("Hello .World!"));
+	EXPECT_EQ(R"(user\.\*name)", ot::String::escapeRegex("user.*name"));
+	EXPECT_EQ(R"(C:\\Users\\Test)", ot::String::escapeRegex(R"(C:\Users\Test)"));
+
+	// All special characters together
+	EXPECT_EQ(
+		R"(\\\.\^\$\*\+\?\(\)\[\]\{\}\|)",
+		ot::String::escapeRegex(R"(\.^$*+?()[]{}|)")
+	);
+}
+
 TEST(StringTests, Hex_Basic) {
 	const std::string input = "ABC";
 	std::string result = ot::String::toHex(input);

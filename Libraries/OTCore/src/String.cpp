@@ -657,6 +657,26 @@ inline std::string ot::String::addEscapeCharacters(const std::string& _str) {
 	return result;
 }
 
+std::string ot::String::escapeRegex(const std::string& _str)
+{
+	static constexpr std::string_view special = R"(\.^$*+?()[]{}|)";
+
+	std::string escaped;
+	escaped.reserve(_str.size() * 2);
+
+	for (char c : _str)
+	{
+		if (special.find(c) != std::string_view::npos)
+		{
+			escaped += '\\';
+		}
+
+		escaped += c;
+	}
+
+	return escaped;
+}
+
 std::string ot::String::toHexString(const std::vector<uint8_t>& _data)
 {
 	static constexpr char digits[] = "0123456789abcdef";

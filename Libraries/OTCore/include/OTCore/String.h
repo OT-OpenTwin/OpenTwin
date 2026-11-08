@@ -239,6 +239,10 @@ namespace ot {
 		//! E.g. "test\tstr\ning" will result in "test\\tstr\\ning".
 		static std::string addEscapeCharacters(const std::string& _str);
 
+		//! @brief Adds escape characters before general regex special characters in the provided string.
+		//! E.g. "test.str*ing" will result in "test\\.str\\*ing".
+		static std::string escapeRegex(const std::string& _str);
+
 		//! @brief Returns a string representation of the provided data.
 		//! @param _data Data to stringify.
 		static std::string toHexString(const std::vector<uint8_t>& _data);
