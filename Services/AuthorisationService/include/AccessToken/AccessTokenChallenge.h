@@ -7,6 +7,7 @@
 #include "OTCore/JSON/JSON.h"
 
 // std header
+#include <string>
 #include <unordered_map>
 
 class AccessTokenChallenge
@@ -16,6 +17,8 @@ class AccessTokenChallenge
 	OT_DECL_DEFMOVE(AccessTokenChallenge)
 public:
 	static AccessTokenChallenge createNewChallenge(const std::string& _id, const std::string& _token);
+
+	bool operator==(const AccessTokenChallenge& _other) const { return m_id == _other.m_id; };
 
 	bool isValid() const { return !m_id.empty() && !m_token.empty() && !m_challenge.empty(); };
 
@@ -38,3 +41,15 @@ private:
 
 	AccessTokenChallenge(const std::string& _id, const std::string& _token, std::string&& _challenge);
 };
+
+namespace std
+{
+	template<>
+	struct hash<AccessTokenChallenge>
+	{
+		std::size_t operator()(const AccessTokenChallenge& _challenge) const
+		{
+			return std::hash<std::string>()(_challenge.getID());
+		}
+	};
+}

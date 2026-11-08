@@ -85,6 +85,11 @@ private:
 	std::string m_dbPassword; //! @brief The password used for the database connection. This is either the provided password or the default password.
 	
 	mongocxx::instance m_mongoInstance;
+
+	//! @brief The username of the admin user. This is always "admin" for the authorization service.
+	//! @warning If this ever needs to be changed or made configurable, the setup must be performed before the database is initialized.
+	std::string m_adminUserName;
+	
 	mongocxx::client m_adminClient;
 
 	std::mutex m_mutex;
@@ -233,8 +238,9 @@ private:
 
 	// Private: Helper
 
-	bool isAdminUser(User& _loggedInUser);
-	std::string getAdminUserName() { return "admin"; }
+	inline bool isAdminUser(const User& _loggedInUser) const;
+	inline bool isAdminUser(const std::string& _username) const;
+	const std::string& getAdminUserName() const { return m_adminUserName; };
 	std::string createRandomPassword();
 	bool removeOldSessionsWorker();
 	void setDatabaseVersion(int version);

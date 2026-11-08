@@ -83,9 +83,9 @@ public:
 	static std::vector<Project> getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient);
 	static size_t getAllProjectCount(User& loggedInUser, mongocxx::client& userClient);
 
-	static Project changeProjectName(Project& project, std::string newName, mongocxx::client& adminClient);
+	static void changeProjectName(Project& _project, std::string _newName, mongocxx::client& _adminClient);
 
-	static Project changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient);
+	static void changeProjectOwner(Project& project, User& newOwner, mongocxx::client& adminClient);
 
 	static bool addGroupToProject(Group& group, Project& project, mongocxx::client& adminClient);
 

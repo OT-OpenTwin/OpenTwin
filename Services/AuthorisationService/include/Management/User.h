@@ -19,37 +19,34 @@
 
 #pragma once
 
-#include <iostream>
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
+// OpenTwin header
+#include "OTCore/CoreTypes.h"
+
+// MongoDB header
 #include <bsoncxx/document/view.hpp>
 
+// std header
+#include <vector>
+#include <cstdint>
+#include <iostream>
 
 class User
 {
-
+	OT_DECL_DEFCOPY(User)
+	OT_DECL_DEFMOVE(User)
 public:
-	User(const bsoncxx::v_noabi::document::view& _userData)
-	{
-		username = std::string(_userData["user_name"].get_utf8().value.data());
-		userId = std::string(_userData["user_id"].get_utf8().value.data());
-		roleName = std::string(_userData["user_role_name"].get_utf8().value.data());
-		settingsCollectionName = std::string(_userData["settings_collection_name"].get_utf8().value.data());
-	}
-	User() = default;
+	explicit User() = default;
+	explicit User(const std::string& _name);
+	explicit User(const bsoncxx::v_noabi::document::view& _userData);
 
-	std::string userId = "";
-	std::string username = "";
-	std::string settingsCollectionName = "";
-	std::string roleName = "";
+	inline const std::string& getID() const { return m_id; };
+	inline const std::string& getName() const { return m_name; };
+	inline const std::string& getSettingsCollectionName() const { return m_settingsCollectionName; };
+	inline const std::string& getRoleName() const { return m_roleName; };
+
+private:
+	std::string m_id;
+	std::string m_name;
+	std::string m_settingsCollectionName;
+	std::string m_roleName;
 };

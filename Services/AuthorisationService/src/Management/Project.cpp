@@ -57,7 +57,7 @@ ot::ProjectInformation Project::toProjectInformation() const {
 	info.setProjectName(m_name);
 	info.setProjectType(m_type);
 	info.setCollectionName(m_collectionName);
-	info.setUserName(m_creatingUser.username);
+	info.setUserName(m_creatingUser.getName());
 	info.setCreationTime(m_createdOn);
 	info.setLastAccessTime(m_lastAccessedOn);
 	info.setLastModifiedTime(m_lastModifiedOn);
@@ -65,7 +65,7 @@ ot::ProjectInformation Project::toProjectInformation() const {
 	info.setProjectGroup(m_projectGroup);
 
 	for (const Group& group : m_userGroups) {
-		info.addUserGroup(group.name);
+		info.addUserGroup(group.getName());
 	}
 
 	return info;

@@ -49,11 +49,14 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using bsoncxx::document::element;
 
-namespace MongoSessionFunctions
+class MongoSessionFunctions
 {
-	std::string createSession(std::string username, mongocxx::client& adminClient);
-	std::string refreshSession(std::string sessionName, mongocxx::client& adminClient);
-	void removeOldSessions(mongocxx::client& adminClient);
+	OT_DECL_STATICONLY(MongoSessionFunctions)
+public:
+	static std::string createSession(std::string username, mongocxx::client& adminClient);
+	static std::string refreshSession(std::string sessionName, mongocxx::client& adminClient);
+	static void removeOldSessions(mongocxx::client& adminClient);
 
-	std::string generateUniqueSessionName(std::string username, mongocxx::client& adminClient);
-}
+	static std::string generateUniqueSessionName(std::string username, mongocxx::client& adminClient);
+
+};

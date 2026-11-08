@@ -47,6 +47,11 @@ ServiceBase& ServiceBase::instance()
 
 int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const char* _databasePWD)
 {
+	// Initialize the admin user name.
+	// The name is always "admin" for the authorization service.
+	// The password is provided by the user and can be changed later.
+	m_adminUserName = "admin";
+
 	m_serviceURL  = _ownIP;
 	m_databaseURL = _databaseIP;
 	if (m_databaseURL.find("tls@") == 0)
@@ -189,8 +194,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 		}
 	}
 
-	User loggedInUser;
-	loggedInUser.username = loggedInUsername;
+	User loggedInUser(loggedInUsername);
 	
 	if (!isAdminUser(loggedInUser))
 	{
@@ -514,7 +518,7 @@ std::string ServiceBase::handleGetAllUsersCount(const ot::ConstJsonObject& _acti
 
 std::string ServiceBase::handleChangeUserNameByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword) {
 	std::string newUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_NEW_USERNAME);
-	bool successful = MongoUserFunctions::updateUserUsernameByName(_loggedInUser.username, newUsername, m_adminClient);
+	bool successful = MongoUserFunctions::updateUserUsernameByName(_loggedInUser.getName(), newUsername, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -523,7 +527,7 @@ std::string ServiceBase::handleChangeUserNameByUser(const ot::ConstJsonObject& _
 
 std::string ServiceBase::handleChangeUserPasswordByUser(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser, const std::string& _loggedInUserPassword) {
 	std::string password = ot::json::getString(_actionDocument, OT_PARAM_AUTH_PASSWORD);
-	bool successful = MongoUserFunctions::changeUserPassword(_loggedInUser.username, password, m_adminClient);
+	bool successful = MongoUserFunctions::changeUserPassword(_loggedInUser.getName(), password, m_adminClient);
 
 	ot::JsonDocument json;
 	json.AddMember(OT_ACTION_AUTH_SUCCESS, successful, json.GetAllocator());
@@ -537,7 +541,7 @@ std::string ServiceBase::handleDeleteUser(const ot::ConstJsonObject& _actionDocu
 
 	bool successful = false;
 	// Check if the user wants do delete himself or if the call comes from the Admin User
-	if (_loggedInUser.userId == toBeDeletedUser.userId || isAdminUser(_loggedInUser))
+	if (_loggedInUser.getID() == toBeDeletedUser.getID() || isAdminUser(_loggedInUser))
 	{
 		successful = MongoUserFunctions::removeUser(toBeDeletedUser, m_adminClient);
 	}
@@ -674,7 +678,7 @@ std::string ServiceBase::handleChangeGroupName(const ot::ConstJsonObject& _actio
 
 	bool successful = false;
 
-	if (gr.ownerUserId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (gr.getOwnerUserId() == _loggedInUser.getID() || isAdminUser(_loggedInUser))
 	{
 		successful = MongoGroupFunctions::changeGroupName(groupName, newGroupName, m_adminClient);
 	}
@@ -697,7 +701,7 @@ std::string ServiceBase::handleChangeGroupOwner(const ot::ConstJsonObject& _acti
 	Group group = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool successful = false;
-	if (group.ownerUserId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (group.getOwnerUserId() == _loggedInUser.getID() || isAdminUser(_loggedInUser))
 	{
 		successful = MongoGroupFunctions::changeGroupOwner(group, _loggedInUser, newOwner, m_adminClient);
 	}
@@ -718,7 +722,7 @@ std::string ServiceBase::handleAddUserToGroup(const ot::ConstJsonObject& _action
 
 
 	bool successful = false;
-	if (gr.ownerUserId == _loggedInUser.userId)
+	if (gr.getOwnerUserId() == _loggedInUser.getID())
 	{
 		User usr = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
 		successful = MongoGroupFunctions::addUserToGroup(usr, groupName, m_adminClient);
@@ -739,7 +743,7 @@ std::string ServiceBase::handleRemoveUserFromGroup(const ot::ConstJsonObject& _a
 	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool successful = false;
-	if (gr.ownerUserId == _loggedInUser.userId)
+	if (gr.getOwnerUserId() == _loggedInUser.getID())
 	{
 		User usr = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
 		successful = MongoGroupFunctions::removeUserFromGroup(usr, groupName, m_adminClient);
@@ -759,8 +763,8 @@ std::string ServiceBase::handleRemoveGroup(const ot::ConstJsonObject& _actionDoc
 
 	auto group = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
-	auto groupOwnerId = group.ownerUserId;
-	auto requestingUserId = _loggedInUser.userId;
+	auto groupOwnerId = group.getOwnerUserId();
+	auto requestingUserId = _loggedInUser.getID();
 
 	bool successful = false;
 	if (groupOwnerId == requestingUserId || isAdminUser(_loggedInUser))
@@ -887,9 +891,9 @@ std::string ServiceBase::handleChangeProjectName(const ot::ConstJsonObject& _act
 
 	Project proj = MongoProjectFunctions::getProject(projectName, m_adminClient);
 
-	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (proj.getUser().getID() == _loggedInUser.getID() || isAdminUser(_loggedInUser))
 	{
-		proj = MongoProjectFunctions::changeProjectName(proj, newProjectName, m_adminClient);
+		MongoProjectFunctions::changeProjectName(proj, newProjectName, m_adminClient);
 	}
 	else
 	{
@@ -906,9 +910,9 @@ std::string ServiceBase::handleChangeProjectOwner(const ot::ConstJsonObject& _ac
 	Project proj = MongoProjectFunctions::getProject(projectName, m_adminClient);
 	User newOwner = MongoUserFunctions::getUserDataThroughUsername(newOwnerUsername, m_adminClient);
 
-	if (proj.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (proj.getUser().getID() == _loggedInUser.getID() || isAdminUser(_loggedInUser))
 	{
-		proj = MongoProjectFunctions::changeProjectOwner(proj, newOwner, m_adminClient);
+		MongoProjectFunctions::changeProjectOwner(proj, newOwner, m_adminClient);
 	}
 	else
 	{
@@ -924,9 +928,9 @@ std::string ServiceBase::handleAddGroupToProject(const ot::ConstJsonObject& _act
 	Group gr = MongoGroupFunctions::getGroupDataByName(groupName, m_adminClient);
 
 	bool userIsGroupMember = false;
-	for (const auto& groupUser : gr.users)
+	for (const User& groupUser : gr.getUsers())
 	{
-		if (groupUser.userId == _loggedInUser.userId)
+		if (groupUser.getID() == _loggedInUser.getID())
 		{
 			userIsGroupMember = true;
 			break;
@@ -956,7 +960,7 @@ std::string ServiceBase::handleRemoveGroupFromProject(const ot::ConstJsonObject&
 
 	bool successful = false;
 	Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
-	if (pr.getUser().userId == _loggedInUser.userId) {
+	if (pr.getUser().getID() == _loggedInUser.getID()) {
 		successful = MongoProjectFunctions::removeGroupFromProject(gr, pr, m_adminClient);
 	}
 	else {
@@ -974,7 +978,7 @@ std::string ServiceBase::handleRemoveProject(const ot::ConstJsonObject& _actionD
 	Project pr = MongoProjectFunctions::getProject(projectName, m_adminClient);
 
 	bool successful = false;
-	if (pr.getUser().userId == _loggedInUser.userId || isAdminUser(_loggedInUser))
+	if (pr.getUser().getID() == _loggedInUser.getID() || isAdminUser(_loggedInUser))
 	{
 		successful = MongoProjectFunctions::removeProject(pr, m_adminClient);
 	}
@@ -1295,8 +1299,13 @@ void ServiceBase::initializeDatabase() {
 
 // Private: Helper
 
-bool ServiceBase::isAdminUser(User& _loggedInUser) {
-	return (_loggedInUser.username == getAdminUserName());
+inline bool ServiceBase::isAdminUser(const User& _loggedInUser) const {
+	return (_loggedInUser.getName() == getAdminUserName());
+}
+
+inline bool ServiceBase::isAdminUser(const std::string& _username) const
+{
+	return (_username == getAdminUserName());
 }
 
 std::string ServiceBase::createRandomPassword()

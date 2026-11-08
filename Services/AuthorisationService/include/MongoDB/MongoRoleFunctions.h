@@ -50,53 +50,54 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using bsoncxx::document::element;
 
-
-namespace MongoRoleFunctions
+class MongoRoleFunctions
 {
+	OT_DECL_STATICONLY(MongoRoleFunctions)
+public:
 	// Function that creates the Inital Role. To be used only once!
-	bool createInitialProjectRole(mongocxx::client& adminClient);
-	bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient);
+	static bool createInitialProjectRole(mongocxx::client& adminClient);
+	static bool createInitialProjectDbListCollectionsRole(mongocxx::client& adminClient);
 
-	bool createUserPermissionsRole(mongocxx::client& adminClient);
-	bool createInitialUserRole(mongocxx::client& adminClient);
-	bool createInitialUserDbListCollectionsRole(mongocxx::client& adminClient);
+	static bool createUserPermissionsRole(mongocxx::client& adminClient);
+	static bool createInitialUserRole(mongocxx::client& adminClient);
+	static bool createInitialUserDbListCollectionsRole(mongocxx::client& adminClient);
 
-	bool createInitialGroupRole(mongocxx::client& adminClient);
+	static bool createInitialGroupRole(mongocxx::client& adminClient);
 
-	bool createInitialProjectTemplatesRole(mongocxx::client& adminClient);
-	bool createInitialProjectsLargeDataRole(mongocxx::client& adminClient);
-	bool createInitialSystemDbRole(mongocxx::client& adminClient);
-	bool createInitialSettingsDbRole(mongocxx::client& adminClient);
-	bool createInitialLibrariesDbRole(mongocxx::client& adminClient);
+	static bool createInitialProjectTemplatesRole(mongocxx::client& adminClient);
+	static bool createInitialProjectsLargeDataRole(mongocxx::client& adminClient);
+	static bool createInitialSystemDbRole(mongocxx::client& adminClient);
+	static bool createInitialSettingsDbRole(mongocxx::client& adminClient);
+	static bool createInitialLibrariesDbRole(mongocxx::client& adminClient);
 
-	bool createAllAccessibleRole(std::string dbName, std::string roleName, mongocxx::client& adminClient);
+	static bool createAllAccessibleRole(std::string dbName, std::string roleName, mongocxx::client& adminClient);
 
 
 	// When a new project (Collection) is created, a role for it must be created, else, nobody can access it.
-	void createProjectRole(std::string roleName, std::string collectionName, mongocxx::client& adminClient);
+	static void createProjectRole(std::string roleName, std::string collectionName, mongocxx::client& adminClient);
 
 	// When a new user is created, a role for it must be created, else, nobody can access it.
-	void createUserRole(std::string roleName, mongocxx::client& adminClient);
-	void addRoleToUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
-	void addRoleToUserRole(std::string roleName, std::string userRoleName, mongocxx::client& adminClient);
-	void removeRoleFromUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
+	static void createUserRole(std::string roleName, mongocxx::client& adminClient);
+	static void addRoleToUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
+	static void addRoleToUserRole(std::string roleName, std::string userRoleName, mongocxx::client& adminClient);
+	static void removeRoleFromUserRole(std::string roleName, User& user, mongocxx::client& adminClient);
 
 	// Creates a group role which has no privileges at all
-	void createGroupRole(std::string roleName, mongocxx::client& adminClient);
+	static void createGroupRole(std::string roleName, mongocxx::client& adminClient);
 
 	// Adds a role to an already existing group role to inherit 
-	void addRoleToGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
+	static void addRoleToGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
 
-	void removeRoleFromGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
+	static void removeRoleFromGroupRole(std::string roleName, Group& group, mongocxx::client& adminClient);
 
-	void addRoleToUser(std::string roleName, std::string username, mongocxx::client& adminClient);
+	static void addRoleToUser(std::string roleName, std::string username, mongocxx::client& adminClient);
 
-	void removeRoleFromUser(std::string roleName, std::string username, mongocxx::client& adminClient);
+	static void removeRoleFromUser(std::string roleName, std::string username, mongocxx::client& adminClient);
 
-	void removeRole(std::string roleName, mongocxx::client& adminClient);
+	static void removeRole(std::string roleName, mongocxx::client& adminClient);
 
-	void getListOfAllUserRoles(std::set<std::string>& userRoles, mongocxx::client& adminClient);
-	void revokeRoleFromRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
-	void grantRoleToRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
+	static void getListOfAllUserRoles(std::set<std::string>& userRoles, mongocxx::client& adminClient);
+	static void revokeRoleFromRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
+	static void grantRoleToRoles(const std::set<std::string>& roleNames, const std::string& roleName, mongocxx::client& adminClient);
 
-}
+};

@@ -4,6 +4,7 @@
 
 // Auth header
 #include "AccessToken/AccessTokenChallengeManager.h"
+#include "Management/User.h"
 
 // OpenTwin header
 #include "OTCore/CoreTypes.h"
@@ -29,9 +30,9 @@ public:
 	AuthenticationResult handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, std::string& _password, ot::JsonDocument& _responseDoc);
 
 private:
-	struct ChallengeData
-	{
-		
-	};
-	std::unordered_map<std::string, ChallengeData> m_challenges;
+	User getUserByToken(const std::string& _token);
+
+	std::string decryptChallenge(const std::string& _token, const std::string& _challenge);
+
+	AccessTokenChallengeManager m_challengeManager;
 };

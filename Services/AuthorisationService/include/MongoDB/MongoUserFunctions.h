@@ -52,38 +52,44 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using bsoncxx::document::element;
 
-namespace MongoUserFunctions
+class MongoUserFunctions
 {
-	bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName);
+	OT_DECL_STATICONLY(MongoUserFunctions)
+private:
+	static std::string getOriginalUserName(const std::string& username, mongocxx::database& db);
+	static bool checkMongodbLogin(const std::string& username, const std::string& password, const std::string& databaseUrl, std::string& originalUserName);
+public:
+	static bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName);
 
-	bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
+	static bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
 
-	std::string generateUserSettingsCollectionName(mongocxx::client& adminClient);
+	static std::string generateUserSettingsCollectionName(mongocxx::client& adminClient);
 
-	User getUserDataThroughUsername(const std::string& username, mongocxx::client& adminClient);
+	static User getUserDataThroughUsername(const std::string& username, mongocxx::client& adminClient);
 
-	User getUserDataThroughId(std::string userId, mongocxx::client& adminClient);
+	static User getUserDataThroughId(std::string userId, mongocxx::client& adminClient);
 
-	std::vector<User> getAllUsers(mongocxx::client& adminClient);
-	size_t getAllUserCount(mongocxx::client& adminClient);
+	static std::vector<User> getAllUsers(mongocxx::client& adminClient);
+	static size_t getAllUserCount(mongocxx::client& adminClient);
 
-	bool removeUser(User& userToBeDeleted, mongocxx::client& adminClient);
+	static bool removeUser(User& userToBeDeleted, mongocxx::client& adminClient);
 
-	bool updateUserUsernameById(std::string userId, std::string newUsername, mongocxx::client& adminClient);
+	static bool updateUserUsernameById(std::string userId, std::string newUsername, mongocxx::client& adminClient);
 
-	bool updateUserUsernameByName(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
+	static bool updateUserUsernameByName(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
 
-	bool changeUserPassword(std::string username, std::string newPassword, mongocxx::client& adminClient);
+	static bool changeUserPassword(std::string username, std::string newPassword, mongocxx::client& adminClient);
 
-	bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
+	static bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
 
-	std::string userToJson(User& user);
-	std::string usersToJson(std::vector<User>& users);
+	static std::string userToJson(User& user);
+	static 	std::string usersToJson(std::vector<User>& users);
 
-	std::string hashPassword(const std::string &password);
+	static std::string hashPassword(const std::string& password);
 
-	bool doesUserExist(const std::string &userName, mongocxx::client& adminClient);
+	static bool doesUserExist(const std::string& userName, mongocxx::client& adminClient);
 
-	void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument &json);
-	void removeTmpUser(std::string userName, mongocxx::client& adminClient);
-}
+	static void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument& json);
+	static void removeTmpUser(std::string userName, mongocxx::client& adminClient);
+
+};

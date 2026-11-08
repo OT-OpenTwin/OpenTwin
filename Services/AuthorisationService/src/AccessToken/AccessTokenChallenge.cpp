@@ -4,11 +4,14 @@
 #include "AccessToken/AccessTokenChallenge.h"
 
 // OpenTwin header
+#include "OTCore/String.h"
 #include "OTSystem/DateTime.h"
+#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
 
 AccessTokenChallenge AccessTokenChallenge::createNewChallenge(const std::string& _id, const std::string& _token)
-{
-	std::string challenge;
+{	
+	std::vector<uint8_t> challengeRaw = ot::RandomNumberGeneratorCryptoSecure().createRandomBytes(32);
+	std::string challenge = ot::String::toHexString(challengeRaw);
 	return AccessTokenChallenge(_id, _token, std::move(challenge));
 }
 
@@ -18,6 +21,4 @@ AccessTokenChallenge AccessTokenChallenge::createNewChallenge(const std::string&
 
 AccessTokenChallenge::AccessTokenChallenge(const std::string& _id, const std::string& _token, std::string&& _challenge)
 	: m_creationTime(ot::DateTime::msSinceEpoch()), m_id(_id), m_token(_token), m_challenge(std::move(_challenge))
-{
-
-}
+{}

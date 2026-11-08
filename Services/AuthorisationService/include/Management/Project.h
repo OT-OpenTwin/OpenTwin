@@ -39,17 +39,13 @@
 
 class Project
 {
-
+	OT_DECL_NOCOPY(Project)
+	OT_DECL_DEFMOVE(Project)
 public:
-	Project();
-	Project(const bsoncxx::v_noabi::document::view& _view);
-	Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient);
-	Project(const Project&) = default;
-	Project(Project&&) = default;
+	explicit Project();
+	explicit Project(const bsoncxx::v_noabi::document::view& _view);
+	explicit Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient);
 	~Project() {};
-
-	Project& operator = (const Project&) = default;
-	Project& operator = (Project&&) = default;
 
 	void setId(const bsoncxx::oid& _id) { m_id = _id; };
 	const bsoncxx::oid& getId() const { return m_id; };

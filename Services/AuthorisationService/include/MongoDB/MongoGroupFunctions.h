@@ -49,45 +49,38 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using bsoncxx::document::element;
 
-
-/*
-	1) Create Group
-	2) Get All User Groups
-	3) Get Group Data
-	4) Edit group Data
-	5) Add User to group
-	6) Remove User from group
-	7) Remove group
-*/
-namespace MongoGroupFunctions
+class MongoGroupFunctions
 {
-	void createGroup(std::string groupName, User& creatingUser, mongocxx::client& adminClient);
+	OT_DECL_STATICONLY(MongoGroupFunctions)
+public:
+	static void createGroup(std::string groupName, User& creatingUser, mongocxx::client& adminClient);
 
+	static std::vector<Group> getAllUserGroups(const User& loggedInUser, mongocxx::client& userClient);
 
-	std::vector<Group> getAllUserGroups(const User& loggedInUser, mongocxx::client& userClient);
+	static std::vector<Group> getAllGroups(User& loggedInUser, mongocxx::client& userClient);
 
-	std::vector<Group> getAllGroups(User& loggedInUser, mongocxx::client& userClient);
-	size_t getAllGroupCount(User& loggedInUser, mongocxx::client& userClient);
+	static size_t getAllGroupCount(User& loggedInUser, mongocxx::client& userClient);
 
-	Group getGroupDataByName(std::string groupName, mongocxx::client& userClient);
+	static Group getGroupDataByName(std::string groupName, mongocxx::client& userClient);
 
-	Group getGroupDataById(std::string groupId, mongocxx::client& userClient);
+	static Group getGroupDataById(std::string _groupId, mongocxx::client& _userClient);
 
+	static Group getGroupDataFromGroupView(const bsoncxx::v_noabi::document::view& groupView, mongocxx::client& _adminClient);
 
-	bool changeGroupName(std::string oldName, std::string newName, mongocxx::client& adminClient);
+	static bool changeGroupName(std::string oldName, std::string newName, mongocxx::client& adminClient);
 
-	bool changeGroupOwner(Group& group, User& oldUser, User& newUser, mongocxx::client& adminClient);
+	static bool changeGroupOwner(Group& group, User& oldUser, User& newUser, mongocxx::client& adminClient);
 
-	bool addUserToGroup(User& loggedInUser, std::string groupName, mongocxx::client& adminClient);
+	static bool addUserToGroup(User& loggedInUser, std::string groupName, mongocxx::client& adminClient);
 
+	static bool removeUserFromGroup(User& loggedInUser, std::string groupName, mongocxx::client& adminClient);
 
-	bool removeUserFromGroup(User& loggedInUser, std::string groupName, mongocxx::client& adminClient);
+	static bool removeGroup(Group& groupToBeRemoved, mongocxx::client& adminClient);
 
-	bool removeGroup(Group& groupToBeRemoved, mongocxx::client& adminClient);
+	static std::string groupToJson(Group& grp);
 
-	std::string groupToJson(Group& grp);
+	static std::string groupsToJson(std::vector<Group>& groups);
 
-	std::string groupsToJson(std::vector<Group>& groups);
-	std::string generateUniqueGroupName(mongocxx::client& adminClient);
+	static std::string generateUniqueGroupName(mongocxx::client& adminClient);
 
-}
+};
