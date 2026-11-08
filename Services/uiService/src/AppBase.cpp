@@ -4053,8 +4053,8 @@ void AppBase::slotDeleteProject()
 	{
 		txt = "Do you want to delete the selected projects (" + QString::number(lst.size()) + " projects selected)? This operation can not be undone.";
 	}
-	QMessageBox msg(QMessageBox::Warning, "Confirm Delete", txt, QMessageBox::Yes | QMessageBox::No, this->mainWindow());
-	if (msg.exec() != QMessageBox::Yes)
+	QMessageBox msgBox(QMessageBox::Warning, "Confirm Delete", txt, QMessageBox::Yes | QMessageBox::No, this->mainWindow());
+	if (msgBox.exec() != QMessageBox::Yes)
 	{
 		return;
 	}

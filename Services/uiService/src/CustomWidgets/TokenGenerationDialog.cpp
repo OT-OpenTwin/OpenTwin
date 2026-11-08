@@ -24,6 +24,7 @@
 #include <QtCore/qdatetime.h>
 #include <QtGui/qclipboard.h>
 #include <QtGui/qevent.h>
+#include <QtWidgets/qapplication.h>
 
 // std header
 #include <thread>
@@ -50,6 +51,7 @@ ot::TokenGenerationDialog::TokenGenerationDialog(const Config& _config, QWidget*
 	m_desiredLifetimeUnit = new ComboBox(this);
 	m_desiredLifetimeUnit->addItem("Hours", QVariant(static_cast<int32_t>(LifetimeUnit::Hours)));
 	m_desiredLifetimeUnit->addItem("Days", QVariant(static_cast<int32_t>(LifetimeUnit::Days)));
+	m_desiredLifetimeUnit->setCurrentIndex(1);
 	connect(m_desiredLifetimeUnit, qOverload<int>(&ComboBox::currentIndexChanged), this, &TokenGenerationDialog::updateDesiredLifetimePreview);
 	inputLayout->addWidget(m_desiredLifetimeUnit);
 
@@ -59,7 +61,6 @@ ot::TokenGenerationDialog::TokenGenerationDialog(const Config& _config, QWidget*
 	m_desiredLifetimeLabel->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
 	lifetimeLayout->addWidget(m_desiredLifetimeLabel, 1);
 
-
 	m_result.group = new GroupBox("Token", this);
 	mainLayout->addWidget(m_result.group);
 
@@ -67,6 +68,13 @@ ot::TokenGenerationDialog::TokenGenerationDialog(const Config& _config, QWidget*
 	
 	m_result.token = new LineEdit(this);
 	tokenLayout->addWidget(m_result.token);
+
+	m_result.clipboardInfo = new Label(" ", this);
+	QFont clipFont = m_result.clipboardInfo->font();
+	clipFont.setPointSize(clipFont.pointSize() - 1);
+	clipFont.setItalic(true);
+	m_result.clipboardInfo->setFont(clipFont);
+	tokenLayout->addWidget(m_result.clipboardInfo);
 
 	m_result.lifetime = new Label("", this);
 	m_result.lifetime->setAlignment(Qt::AlignRight | Qt::AlignVCenter);
@@ -81,7 +89,7 @@ ot::TokenGenerationDialog::TokenGenerationDialog(const Config& _config, QWidget*
 	buttonLayout->addWidget(m_generateTokenButton);
 	connect(m_generateTokenButton, &PushButton::clicked, this, &TokenGenerationDialog::generateToken);
 
-	m_closeButton = new PushButton("Cancel", this);
+	m_closeButton = new PushButton("Close", this);
 	buttonLayout->addWidget(m_closeButton);
 	connect(m_closeButton, &PushButton::clicked, this, &TokenGenerationDialog::closeCancel);
 
@@ -141,6 +149,9 @@ void ot::TokenGenerationDialog::generateTokenCompleted()
 		m_result.token->setText(m_result.newToken);
 		m_result.lifetime->setText(m_result.newTokenLifetime);
 		m_state.remove(State::Success);
+
+		m_generateTokenButton->setEnabled(false);
+		copyTokenToClipboard();
 	}
 	else if (m_state.has(State::Stopping))
 	{
@@ -157,6 +168,22 @@ void ot::TokenGenerationDialog::updateDesiredLifetimePreview()
 	currentDateTime = currentDateTime.addSecs(getDesiredLifetimeInSeconds());
 
 	m_desiredLifetimeLabel->setText("Expires on the " + currentDateTime.toString("yyyy-MM-dd") + " at " + currentDateTime.toString("hh:mm:ss") + " UTC");
+}
+
+void ot::TokenGenerationDialog::copyTokenToClipboard()
+{
+	QClipboard* clipboard = QApplication::clipboard();
+	if (clipboard)
+	{
+		clipboard->setText(m_result.token->text());
+		m_result.clipboardInfo->setText("Token copied to clipboard");
+		QTimer::singleShot(3000, this, &TokenGenerationDialog::hideClipboardInfo);
+	}
+}
+
+void ot::TokenGenerationDialog::hideClipboardInfo()
+{
+	m_result.clipboardInfo->setText(" ");
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

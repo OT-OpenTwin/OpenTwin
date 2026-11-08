@@ -53,8 +53,8 @@ AccessToken AccessToken::readFromDatabase(mongocxx::client& _adminClient, const 
 	token.m_expirationDate = view["expiration_date"].get_int64();
 	token.m_revocationDate = view["revocation_date"].get_int64();
 
-	const auto& keyView = view["client_public_key"].get_binary();
-	token.m_clientPublicKey = std::vector<uint8_t>(keyView.bytes, keyView.bytes + keyView.size);
+	std::string clientKey64(view["client_public_key"].get_utf8().value);
+	token.m_clientPublicKey = ot::String::bytesFromBase64Url(clientKey64);
 
 	return token;
 }
@@ -67,7 +67,7 @@ void AccessToken::storeToDatabase(mongocxx::client& _adminClient) const
 	bsoncxx::document::value session_value = bsoncxx::builder::stream::document{}
 		<< "token" << m_token
 		<< "user_id" << m_userId
-		<< "client_public_key" << bsoncxx::types::b_binary{ bsoncxx::binary_sub_type::k_binary, static_cast<uint32_t>(m_clientPublicKey.size()), m_clientPublicKey.data() }
+		<< "client_public_key" << ot::String::toBase64Url(m_clientPublicKey)
 		<< "expiration_date" << m_expirationDate
 		<< "revocation_date" << m_revocationDate
 		<< bsoncxx::builder::stream::finalize;

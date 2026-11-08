@@ -52,6 +52,8 @@ namespace ot
 		void generateToken();
 		void generateTokenCompleted();
 		void updateDesiredLifetimePreview();
+		void copyTokenToClipboard();
+		void hideClipboardInfo();
 
 	private:
 		enum class LifetimeUnit : int32_t
@@ -80,6 +82,7 @@ namespace ot
 		{
 			GroupBox* group = nullptr;
 			LineEdit* token = nullptr;
+			Label* clipboardInfo = nullptr;
 			Label* lifetime = nullptr;
 
 			QString newToken;
