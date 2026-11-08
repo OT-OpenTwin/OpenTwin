@@ -519,6 +519,95 @@ TEST(StringTests, Base64Url_Inverse2) {
 	EXPECT_EQ(input, decoded);
 }
 
+TEST(StringTests, BytesToBase64Url)
+{
+	// Empty input
+	EXPECT_EQ("", ot::String::toBase64Url(std::vector<uint8_t>{}));
+
+	// Single characters
+	EXPECT_EQ("Zg", ot::String::toBase64Url(std::vector<uint8_t>{ 'f' }));
+	EXPECT_EQ("Zm8", ot::String::toBase64Url(std::vector<uint8_t>{ 'f', 'o' }));
+	EXPECT_EQ("Zm9v", ot::String::toBase64Url(std::vector<uint8_t>{ 'f', 'o', 'o' }));
+
+	// Multiple characters
+	EXPECT_EQ("Zm9vYg", ot::String::toBase64Url(std::vector<uint8_t>{ 'f', 'o', 'o', 'b' }));
+	EXPECT_EQ("Zm9vYmE", ot::String::toBase64Url(std::vector<uint8_t>{ 'f', 'o', 'o', 'b', 'a' }));
+	EXPECT_EQ("Zm9vYmFy", ot::String::toBase64Url(std::vector<uint8_t>{ 'f', 'o', 'o', 'b', 'a', 'r' }));
+
+	// Special Base64URL characters
+	EXPECT_EQ("_w", ot::String::toBase64Url(std::vector<uint8_t>{ 0xFF }));
+	EXPECT_EQ("__4", ot::String::toBase64Url(std::vector<uint8_t>{ 0xFF, 0xFE }));
+	EXPECT_EQ("___-", ot::String::toBase64Url(std::vector<uint8_t>{ 0xFF, 0xFF, 0xFE }));
+
+	// Binary data
+	EXPECT_EQ("AAECAwQFBgcICQ", ot::String::toBase64Url(std::vector<uint8_t>{
+		0x00, 0x01, 0x02, 0x03, 0x04,
+		0x05, 0x06, 0x07, 0x08, 0x09
+		}));
+}
+
+TEST(StringTests, BytesFromBase64Url)
+{
+	// Empty input
+	EXPECT_EQ(std::vector<uint8_t>{}, ot::String::bytesFromBase64Url(""));
+
+	// Single characters
+	EXPECT_EQ(std::vector<uint8_t>({ 'f' }), ot::String::bytesFromBase64Url("Zg"));
+	EXPECT_EQ(std::vector<uint8_t>({ 'f', 'o'}), ot::String::bytesFromBase64Url("Zm8"));
+	EXPECT_EQ(std::vector<uint8_t>({ 'f', 'o', 'o' }), ot::String::bytesFromBase64Url("Zm9v"));
+
+	// Multiple characters
+	EXPECT_EQ(std::vector<uint8_t>({ 'f', 'o', 'o', 'b' }), ot::String::bytesFromBase64Url("Zm9vYg"));
+	EXPECT_EQ(std::vector<uint8_t>({ 'f', 'o', 'o', 'b', 'a' }), ot::String::bytesFromBase64Url("Zm9vYmE"));
+	EXPECT_EQ(std::vector<uint8_t>({ 'f', 'o', 'o', 'b', 'a', 'r' }), ot::String::bytesFromBase64Url("Zm9vYmFy"));
+
+	// Special Base64URL characters
+	EXPECT_EQ(std::vector<uint8_t>({ 0xFF }), ot::String::bytesFromBase64Url("_w"));
+	EXPECT_EQ(std::vector<uint8_t>({ 0xFF, 0xFE }), ot::String::bytesFromBase64Url("__4"));
+	EXPECT_EQ(std::vector<uint8_t>({ 0xFF, 0xFF, 0xFE }), ot::String::bytesFromBase64Url("___-"));
+
+	// Binary data
+	EXPECT_EQ(std::vector<uint8_t>({0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09}),
+		ot::String::bytesFromBase64Url("AAECAwQFBgcICQ")
+	);
+
+	// Invalid input length
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("A"));
+
+	// Invalid characters
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("TQ!"));
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("TQ="));
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("TQ=="));
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("+w"));
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("/w"));
+
+	// Invalid trailing bits (non-canonical encoding)
+	EXPECT_ANY_THROW(ot::String::bytesFromBase64Url("AB"));
+}
+
+TEST(StringTests, Base64UrlByteRoundTrip)
+{
+	const std::vector<std::vector<uint8_t>> testData = {
+		{},
+		{ 0x00 },
+		{ 0xFF },
+		{ 0x00, 0xFF },
+		{ 0x00, 0x01, 0x02 },
+		{ 0xFF, 0xFE, 0xFD },
+		{ 0x00, 0x01, 0x02, 0x03 },
+		{ 0x00, 0xFF, 0x80, 0x7F, 0xFE, 0x01 },
+		{ 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 }
+	};
+
+	for (const auto& data : testData)
+	{
+		const std::string encoded = ot::String::toBase64Url(data);
+		const std::vector<uint8_t> decoded = ot::String::bytesFromBase64Url(encoded);
+
+		EXPECT_EQ(data, decoded);
+	}
+}
+
 TEST(StringTests, CompressRaw) {
 	std::string input = "This is a test string. This is a test string. This is a test string. This is a test string. This is a test string.";
 	size_t originalSize = input.size();

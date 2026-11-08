@@ -693,6 +693,49 @@ std::string ot::String::toHexString(const std::vector<uint8_t>& _data)
 	return output;
 }
 
+std::vector<uint8_t> ot::String::bytesFromHexString(const std::string& _hexString)
+{
+	if (_hexString.size() % 2 != 0)
+	{
+		OT_LOG_E("Hex string length is not even: \"" + _hexString + "\"");
+		throw Exception::InvalidArgument("Hex string must have even length");
+	}
+
+	std::vector<uint8_t> output;
+	output.reserve(_hexString.size() / 2);
+
+	auto hexCharToValue = [](char _c) -> unsigned char
+		{
+			if ('0' <= _c && _c <= '9')
+			{
+				return _c - '0';
+			}
+			else if ('a' <= _c && _c <= 'f')
+			{
+				return _c - 'a' + 10;
+			}
+			else if ('A' <= _c && _c <= 'F')
+			{
+				return _c - 'A' + 10;
+			}
+			else
+			{
+				char cStr[] = { _c, '\0' };
+				OT_LOG_E("Invalid hex character \"" + std::string(cStr) + "\"");
+				throw Exception::InvalidArgument("Invalid hex character");
+			}
+		};
+
+	for (size_t i = 0; i < _hexString.size(); i += 2)
+	{
+		unsigned char high = hexCharToValue(_hexString[i]);
+		unsigned char low = hexCharToValue(_hexString[i + 1]);
+		output.push_back(static_cast<char>((high << 4) | low));
+	}
+
+	return output;
+}
+
 inline std::string ot::String::toHex(const std::string& _string) {
 	static constexpr char digits[] = "0123456789abcdef";
 	std::string output;
@@ -814,6 +857,113 @@ inline std::string ot::String::fromBase64Url(const std::string& _base64UrlString
 			output.push_back(static_cast<char>((val >> valb) & 0xFF));
 			valb -= 8;
 		}
+	}
+
+	return output;
+}
+
+std::string ot::String::toBase64Url(const std::vector<uint8_t>& _bytes)
+{
+	static constexpr char lookupTable[] =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
+
+	size_t inLen = _bytes.size();
+	size_t outLen = 4 * ((inLen + 2) / 3);
+
+	std::string output;
+	output.resize(outLen);
+
+	size_t i = 0;
+	size_t j = 0;
+
+	while (i + 3 <= inLen)
+	{
+		unsigned int val = (static_cast<unsigned char>(_bytes[i]) << 16) |
+			(static_cast<unsigned char>(_bytes[i + 1]) << 8) |
+			(static_cast<unsigned char>(_bytes[i + 2]));
+		output[j++] = lookupTable[(val >> 18) & 0x3F];
+		output[j++] = lookupTable[(val >> 12) & 0x3F];
+		output[j++] = lookupTable[(val >> 6) & 0x3F];
+		output[j++] = lookupTable[val & 0x3F];
+		i += 3;
+	}
+
+	if (i < inLen)
+	{
+		unsigned int val = static_cast<unsigned char>(_bytes[i]) << 16;
+		if (i + 1 < inLen) val |= static_cast<unsigned char>(_bytes[i + 1]) << 8;
+
+		output[j++] = lookupTable[(val >> 18) & 0x3F];
+		output[j++] = lookupTable[(val >> 12) & 0x3F];
+		if (i + 1 < inLen)
+		{
+			output[j++] = lookupTable[(val >> 6) & 0x3F];
+		}
+	}
+
+	output.resize(j);
+	return output;
+}
+
+std::vector<uint8_t> ot::String::bytesFromBase64Url(const std::string& _base64UrlString)
+{
+	if (_base64UrlString.size() % 4 == 1)
+	{
+		throw Exception::InvalidArgument("Invalid Base64Url string length");
+	}
+
+	std::vector<uint8_t> output;
+	output.reserve(_base64UrlString.size() * 3 / 4);
+
+	uint32_t buffer = 0;
+	unsigned int bits = 0;
+
+	for (char c : _base64UrlString)
+	{
+		uint8_t d;
+
+		if (c == '-')
+		{
+			d = 62;
+		}
+		else if (c == '_')
+		{
+			d = 63;
+		}
+		else if ('A' <= c && c <= 'Z')
+		{
+			d = static_cast<uint8_t>(c - 'A');
+		}
+		else if ('a' <= c && c <= 'z')
+		{
+			d = static_cast<uint8_t>(c - 'a' + 26);
+		}
+		else if ('0' <= c && c <= '9')
+		{
+			d = static_cast<uint8_t>(c - '0' + 52);
+		}
+		else
+		{
+			throw Exception::InvalidArgument("Invalid Base64Url character");
+		}
+
+		buffer = (buffer << 6) | d;
+		bits += 6;
+
+		if (bits >= 8)
+		{
+			bits -= 8;
+			output.push_back(static_cast<uint8_t>((buffer >> bits) & 0xFF));
+
+			// Keep only the remaining, unconsumed bits.
+			buffer &= (1u << bits) - 1;
+		}
+	}
+
+	// Remaining bits must be zero for a canonical encoding.
+	if (buffer != 0)
+	{
+		throw Exception::InvalidArgument("Invalid Base64Url trailing bits");
 	}
 
 	return output;

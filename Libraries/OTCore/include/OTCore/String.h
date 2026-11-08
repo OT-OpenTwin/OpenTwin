@@ -247,6 +247,8 @@ namespace ot {
 		//! @param _data Data to stringify.
 		static std::string toHexString(const std::vector<uint8_t>& _data);
 
+		static std::vector<uint8_t> bytesFromHexString(const std::string& _hexString);
+
 		//! @brief Encodes a UTF-8 string into a hex representation (2 ASCII chars per byte).
 		//! Each byte is converted into two lowercase hex digits.
 		//! @param _string Input string (UTF-8).
@@ -272,6 +274,10 @@ namespace ot {
 		//! @return Original byte string.
 		//! @throws ot::InvalidArgumentException if input contains invalid Base64Url characters.
 		static std::string fromBase64Url(const std::string& _base64UrlString);
+
+		static std::string toBase64Url(const std::vector<uint8_t>& _data);
+
+		static std::vector<uint8_t> bytesFromBase64Url(const std::string& _base64UrlString);
 
 		//! @brief Compresses the provided data using zlib compression.
 		//! @param _data Data to compress.
