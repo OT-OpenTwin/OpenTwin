@@ -17,8 +17,10 @@
 // limitations under the License.
 // @otlicense-end
 
+// Auth header
+#include "Management/Project.h"
+
 // OpenTwin header
-#include "Project.h"
 #include "OTCore/Logging/Logger.h"
 
 Project::Project() : m_createdOn(std::chrono::system_clock::now()), m_lastAccessedOn(std::chrono::system_clock::now()), m_lastModifiedOn(std::chrono::system_clock::now()), m_version(-1) {

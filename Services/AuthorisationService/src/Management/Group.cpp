@@ -1,5 +1,5 @@
 // @otlicense
-// File: MongoURL.h
+// File: Group.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -17,8 +17,5 @@
 // limitations under the License.
 // @otlicense-end
 
-#pragma once
-
-#include <string>
-
-std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword);
+// Auth header
+#include "Management/Group.h"

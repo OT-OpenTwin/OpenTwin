@@ -17,41 +17,16 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "MongoProjectFunctions.h"
-#include "MongoGroupFunctions.h"
-#include "MongoRoleFunctions.h"
-#include "MongoConstants.h"
-#include "MongoUserFunctions.h"
+// Auth header
+#include "MongoDB/MongoProjectFunctions.h"
+#include "MongoDB/MongoGroupFunctions.h"
+#include "MongoDB/MongoRoleFunctions.h"
+#include "MongoDB/MongoConstants.h"
+#include "MongoDB/MongoUserFunctions.h"
+
+// OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
-
-/*
-* The following functionalities have to be implemented
-* 1) Create Project
-* 2) Get all user projects
-* 3) Get all group projects
-* 6) Add group to project
-* 7) Remove group from project
-* 8) Delete project
-*/
-
-
-std::string escape_regex(const std::string& input) {
-	static const std::string special = R"(\.^$*+?()[]{}|)";
-	std::string escaped;
-	escaped.reserve(input.size() * 2);
-
-	for (unsigned char c : input) {
-		if (special.find(static_cast<char>(c)) != std::string::npos) {
-			escaped += '\\';
-		}
-		escaped += static_cast<char>(c);
-	}
-	return escaped;
-}
-
-
-
 
 ot::ProjectFilterData MongoProjectFunctions::getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient) {
 	ot::ProjectFilterData filters;
@@ -319,7 +294,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	auto inArr = document{} << "$in" << array_builder << finalize;
 
 
-	std::string regexFilter =  ".*" + escape_regex(filter) + ".*";
+	std::string regexFilter =  ".*" + ot::String::escapeRegex(filter) + ".*";
 	auto regex = bsoncxx::types::b_regex(regexFilter, "i");
 
 
@@ -482,7 +457,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 	if (!_textFilter.empty()) {
 		filterBuilder.append(document{} 
 			<< "project_name" 
-			<< bsoncxx::types::b_regex(std::string(".*" + escape_regex(_textFilter) + ".*"), "i") 
+			<< bsoncxx::types::b_regex(std::string(".*" + ot::String::escapeRegex(_textFilter) + ".*"), "i")
 			<< finalize
 		);
 	}
@@ -527,7 +502,7 @@ std::vector<Project> MongoProjectFunctions::getAllUserProjects(User& loggedInUse
 }
 
 std::vector<Project> MongoProjectFunctions::getAllProjects(User& loggedInUser, std::string filter, int limit, mongocxx::client& userClient) {
-	std::string regexFilter = ".*" + escape_regex(filter) + ".*";
+	std::string regexFilter = ".*" + ot::String::escapeRegex(filter) + ".*";
 	auto regex = bsoncxx::types::b_regex(regexFilter, "");
 
 	value filterDoc = document{}

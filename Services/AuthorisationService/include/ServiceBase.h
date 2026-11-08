@@ -19,43 +19,42 @@
 
 #pragma once
 
-#include <string>
-#include <mutex>
+// Auth header
+#include "SSO/SSOBuffer.h"
+#include "Management/User.h"
+#include "Management/Group.h"
+#include "Management/Project.h"
+#include "MongoDB/MongoConstants.h"
+#include "MongoDB/MongoUserFunctions.h"
+#include "MongoDB/MongoRoleFunctions.h"
+#include "MongoDB/MongoGroupFunctions.h"
+#include "MongoDB/MongoProjectFunctions.h"
+#include "AccessToken/AccessTokenManager.h"
 
+// OpenTwin header
 #include "OTCommunication/CommunicationTypes.h"
 
+// MongoDB header
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/types.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/stdx.hpp>
 #include <mongocxx/uri.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/client.hpp>
 #include <mongocxx/instance.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
 #include <bsoncxx/builder/stream/helpers.hpp>
 #include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
 
-#include "MongoGroupFunctions.h"
-#include "MongoConstants.h"
-#include "MongoUserFunctions.h"
-#include "MongoProjectFunctions.h"
-#include "MongoRoleFunctions.h"
-#include "Group.h"
-#include "Project.h"
-#include "User.h"
-
-#include "SSOBuffer.h"
+// std header
+#include <mutex>
+#include <string>
 
 class ServiceBase
 {
 	OT_DECL_NOCOPY(ServiceBase)
 	OT_DECL_NOMOVE(ServiceBase)
 public:
-
-	static ServiceBase& instance() {
-		// Allocate with `new` in case Singleton is not trivially destructible.
-		static ServiceBase* serviceBase = new ServiceBase();
-		return *serviceBase;
-	}
+	static ServiceBase& instance();
 
 	int initialize(const char * _ownIP, const char * _databaseIP, const char * _databasePWD);
 	const char *getServiceURL();
@@ -67,7 +66,32 @@ public:
 	mongocxx::client& getAdminClient() { return m_adminClient; }
 	std::string& getDatabaseURL() { return m_databaseURL; }
 private:
+
+	enum class State
+	{
+		None = 0 << 0,
+		Initialized = 1 << 0,
+		DatabaseInitialized = 1 << 1
+	};
+	typedef ot::Flags<State> StateFlags;
+	OT_ADD_FRIEND_FLAG_FUNCTIONS(State, StateFlags)
 	
+	AccessTokenManager m_accessTokenManager;
+	std::string m_serviceURL;
+
+	std::string m_databaseURL;
+	std::string m_providedDbPassword; //! @brief The password provided by the user for the database connection. If no password is provided, the default password is used.
+	std::string m_dbUsername; //! @brief The username used for the database connection. This is always "admin" for the authorization service.
+	std::string m_dbPassword; //! @brief The password used for the database connection. This is either the provided password or the default password.
+	
+	mongocxx::instance m_mongoInstance;
+	mongocxx::client m_adminClient;
+
+	std::mutex m_mutex;
+	const int m_dataBaseVersion = 1;
+
+	SSOBuffer m_ssoBuffer;
+
 	std::string dispatchAction(const std::string& _action, const ot::JsonDocument& _actionDocument, ot::MessageType _messageType);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
@@ -215,18 +239,6 @@ private:
 	bool removeOldSessionsWorker();
 	void setDatabaseVersion(int version);
 	int getDatabaseVersion();
-
-	std::string m_serviceURL;
-	std::string m_databaseURL;
-	std::string m_databasePWD;
-	mongocxx::instance m_mongoInstance;
-	mongocxx::client m_adminClient;
-	std::string m_dbUsername;
-	std::string m_dbPassword;
-	std::mutex m_mutex;
-	const int m_dataBaseVersion = 1;
-
-	SSOBuffer m_ssoBuffer;
 
 	ServiceBase() = default;
 };

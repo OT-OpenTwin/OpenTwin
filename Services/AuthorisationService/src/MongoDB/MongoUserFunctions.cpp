@@ -17,20 +17,24 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "MongoUserFunctions.h"
-#include "MongoRoleFunctions.h"
-#include "MongoGroupFunctions.h"
-#include "MongoProjectFunctions.h"
-#include "MongoConstants.h"
-#include "MongoURL.h"
+// Auth header
+#include "MongoDB/MongoUserFunctions.h"
+#include "MongoDB/MongoRoleFunctions.h"
+#include "MongoDB/MongoGroupFunctions.h"
+#include "MongoDB/MongoProjectFunctions.h"
+#include "MongoDB/MongoConstants.h"
+#include "MongoDB/MongoURL.h"
 
+// OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 
+// Boost header
 #include <boost/uuid/namespaces.hpp>
 #include <boost/uuid/name_generator_md5.hpp>
 #include <boost/uuid/uuid_io.hpp>
 
+// std header
 #include <set>
 
 /*
@@ -82,7 +86,7 @@ namespace MongoUserFunctions
 	bool checkMongodbLogin(const std::string& username, const std::string& password, const std::string &databaseUrl, std::string &originalUserName)
 	{
 		try {
-			const std::string uriStr = getMongoURL(databaseUrl, username, password);
+			const std::string uriStr = MongoURL::getURL(databaseUrl, username, password);
 
 			mongocxx::uri uri{ uriStr };
 			mongocxx::client client{ uri };

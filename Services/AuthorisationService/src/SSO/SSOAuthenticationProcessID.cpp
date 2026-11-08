@@ -1,8 +1,13 @@
-﻿#include "AuthenticationProcessID.h"
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
-#include "OTCore/String.h"
+﻿// @otlicense
 
-ot::AuthenticationProcessID::AuthenticationProcessID()
+// Auth header
+#include "SSO/SSOAuthenticationProcessID.h"
+
+// OpenTwin header
+#include "OTCore/String.h"
+#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+
+ot::SSOAuthenticationProcessID::SSOAuthenticationProcessID()
 {
 	RandomNumberGeneratorCryptoSecure generator;
 	uint64_t tokenBase = generator.createPositiveRandomInt64();
@@ -14,14 +19,13 @@ ot::AuthenticationProcessID::AuthenticationProcessID()
 	m_creationTime = std::chrono::steady_clock::now();
 }
 
-ot::AuthenticationProcessID::AuthenticationProcessID(const std::string& _token)
+ot::SSOAuthenticationProcessID::SSOAuthenticationProcessID(const std::string& _token)
 {
-	m_id= _token;
+	m_id = _token;
 	m_creationTime = std::chrono::steady_clock::now();
 }
 
-
-bool ot::AuthenticationProcessID::isIsExpired() const
+bool ot::SSOAuthenticationProcessID::isIsExpired() const
 {
 	auto now = std::chrono::steady_clock::now();
 	std::chrono::minutes passedTime = std::chrono::duration_cast<std::chrono::minutes>(now - m_creationTime);

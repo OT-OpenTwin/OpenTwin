@@ -19,18 +19,23 @@
 
 #pragma once
 
-#include <iostream>
-#include <cstdint>
-#include <vector>
+// Auth header
+#include "User.h"
+#include "Group.h"
+#include "MongoDB/MongoUserFunctions.h"
+#include "MongoDB/MongoGroupFunctions.h"
+
+// OpenTwin header
+#include "OTCore/ProjectInformation.h"
+
+// MongoDB header
 #include <bsoncxx/json.hpp>
 #include <bsoncxx/types.hpp>
 
-#include "User.h"
-#include "Group.h"
-#include "MongoUserFunctions.h"
-#include "MongoGroupFunctions.h"
-
-#include "OTCore/ProjectInformation.h"
+// std header
+#include <vector>
+#include <cstdint>
+#include <iostream>
 
 class Project
 {

@@ -1,7 +1,7 @@
 ﻿// @otlicense
 
 // Auth header
-#include "SSOSessionToken.h"
+#include "SSO/SSOSessionToken.h"
 
 // OpenTwin header
 #include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"

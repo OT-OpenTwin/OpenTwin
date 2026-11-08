@@ -17,10 +17,13 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "MongoURL.h"
+// Auth header
+#include "MongoDB/MongoURL.h"
+
+// OpenTwin header
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 
-std::string getMongoURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
+std::string MongoURL::getURL(std::string databaseURL, std::string dbUsername, std::string dbPassword)
 {
 	return DataStorageAPI::ConnectionAPI::getMongoURL(databaseURL, dbUsername, dbPassword);
 }

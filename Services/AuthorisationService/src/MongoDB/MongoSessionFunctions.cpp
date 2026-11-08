@@ -17,14 +17,17 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "MongoSessionFunctions.h"
-#include "MongoRoleFunctions.h"
-#include "MongoConstants.h"
-#include "MongoUserFunctions.h"
+// Auth header
+#include "MongoDB/MongoSessionFunctions.h"
+#include "MongoDB/MongoRoleFunctions.h"
+#include "MongoDB/MongoConstants.h"
+#include "MongoDB/MongoUserFunctions.h"
+
+// OpenTwin header
 #include "OTCore/JSON/JSON.h"
 
+// std header
 #include <sstream>
-
 
 namespace MongoSessionFunctions
 {

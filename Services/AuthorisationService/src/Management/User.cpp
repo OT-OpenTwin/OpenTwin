@@ -17,4 +17,5 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "User.h"
+// Auth header
+#include "Management/User.h"

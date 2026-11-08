@@ -1,12 +1,21 @@
-﻿#pragma once
-#include <string>
+﻿// @otlicense
+
+#pragma once
+
+// Auth header
+#include "SSO/SSOUser.h"
+#include "SSO/SSOAuthenticationProcessID.h"
+
+// OpenTwin header
+#include "OTCore/JSON/JSON.h"
+#include "OTSystem/SingleSignOn/SingleSignOn_Server.h"
+
+// std header
 #include <map>
 #include <memory>
-#include "OTSystem/SingleSignOn/SingleSignOn_Server.h"
-#include "SSOUser.h"
-#include "OTCore/JSON/JSON.h"
+#include <string>
 #include <unordered_map>
-#include "AuthenticationProcessID.h"
+
 class SSOBuffer
 {
 public:
@@ -17,8 +26,8 @@ public:
 	bool validate(const std::string& _token);
 private:
 	//! @brief Here we keep the current state of the SSO authentication process per username.
-	std::unordered_map<ot::AuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>> m_serverSignOnByProcessID;
+	std::unordered_map<ot::SSOAuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>> m_serverSignOnByProcessID;
 
 	//! @brief Here we buffer the logged in sso users
-	std::map < std::string, SSOUser> m_loggedInSSOUsersByToken;
+	std::map<std::string, SSOUser> m_loggedInSSOUsersByToken;
 };

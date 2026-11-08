@@ -1,7 +1,12 @@
-﻿#include "SSOBuffer.h"
-#include "OTCore/JSON/JSON.h"
-#include "MongoUserFunctions.h"
+﻿// @otlicense
+
+// Auth header
 #include "ServiceBase.h"
+#include "SSO/SSOBuffer.h"
+#include "MongoDB/MongoUserFunctions.h"
+
+// OpenTwin header
+#include "OTCore/JSON/JSON.h"
 #include "OTCommunication/ActionTypes.h"
 
 bool SSOBuffer::handleRequest(std::string& _determinedUsername, const std::string& _authenticationProcessID,  const std::string& _receivedToken, bool _initialToken, ot::JsonDocument& _returnMessage)
@@ -11,11 +16,11 @@ bool SSOBuffer::handleRequest(std::string& _determinedUsername, const std::strin
 
 	try
 	{
-		ot::AuthenticationProcessID* processID = nullptr;
-		std::unordered_map<ot::AuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>>::iterator serverSignOnByProcessID;
+		ot::SSOAuthenticationProcessID* processID = nullptr;
+		std::unordered_map<ot::SSOAuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>>::iterator serverSignOnByProcessID;
 		if (_initialToken)
 		{
-			auto entry = m_serverSignOnByProcessID.emplace(ot::AuthenticationProcessID(), std::make_unique<ot::SingleSignOn_Server>());
+			auto entry = m_serverSignOnByProcessID.emplace(ot::SSOAuthenticationProcessID(), std::make_unique<ot::SingleSignOn_Server>());
 			assert(entry.second);
 			serverSignOnByProcessID = entry.first;
 		}

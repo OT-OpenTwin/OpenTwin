@@ -19,8 +19,8 @@
 
 // Service header
 #include "ServiceBase.h"
-#include "MongoURL.h"
-#include "MongoSessionFunctions.h"
+#include "MongoDB/MongoURL.h"
+#include "MongoDB/MongoSessionFunctions.h"
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
@@ -33,14 +33,19 @@
 #include "OTServiceFoundation/UserCredentials.h"
 #include "OTDataStorage/Connection/ConnectionAPI.h"
 
-
 // std header
 #include <random>
 #include <iostream>
 
 #define DB_ERROR_MESSAGE_ALREADY_EXISTS "already exists: generic server error"
 
-int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const char* _databasePWD) 
+ServiceBase& ServiceBase::instance()
+{
+	static ServiceBase g_instance;
+	return g_instance;
+}
+
+int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const char* _databasePWD)
 {
 	m_serviceURL  = _ownIP;
 	m_databaseURL = _databaseIP;
@@ -48,7 +53,7 @@ int ServiceBase::initialize(const char* _ownIP, const char* _databaseIP, const c
 	{
 		m_databaseURL = m_databaseURL.substr(4);
 	}
-	m_databasePWD = _databasePWD;
+	m_providedDbPassword = _databasePWD;
 
 	OT_LOG_I("Starting Authorisation Service");
 	OT_LOG_D("Service address : " + m_serviceURL);
@@ -344,8 +349,25 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		break;
 
 	case LoginMode::Token:
-		throw ot::Exception::Runtime("No implmented yet");
+		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, password, returnDoc);
+		switch (result)
+		{
+			case AccessTokenManager::AuthenticationResult::Success:
+				break;
 
+			case AccessTokenManager::AuthenticationResult::ChallengeRequired:
+				return returnDoc.toJson();
+
+			case AccessTokenManager::AuthenticationResult::Failure:
+				returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
+				return returnDoc.toJson();
+
+			default:
+				OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
+				return returnDoc.toJson();
+		}
+
+		
 		// First check if this is the login or challenge response step
 
 		// On login create a random challenge and send a s response
@@ -990,15 +1012,15 @@ void ServiceBase::initializeDatabase() {
 
 	m_dbUsername = getAdminUserName();
 
-	if (!m_databasePWD.empty()) {
-		m_dbPassword = m_databasePWD;
+	if (!m_providedDbPassword.empty()) {
+		m_dbPassword = m_providedDbPassword;
 	}
 	else {
 		m_dbPassword = ot::UserCredentials::encryptString("admin");
 	}
 
 	try {
-		std::string uriStr = getMongoURL(m_databaseURL, m_dbUsername, ot::UserCredentials::decryptString(m_dbPassword));
+		std::string uriStr = MongoURL::getURL(m_databaseURL, m_dbUsername, ot::UserCredentials::decryptString(m_dbPassword));
 		mongocxx::uri uri(uriStr);
 		m_adminClient = mongocxx::client(uri);
 	}

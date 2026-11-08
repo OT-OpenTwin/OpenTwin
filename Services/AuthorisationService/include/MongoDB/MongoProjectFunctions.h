@@ -19,27 +19,31 @@
 
 #pragma once
 
-#include <iostream>
-#include <cstdint>
-#include <iostream>
-#include <vector>
-#include <ctime>
-#include <sstream>
-#include <bsoncxx/json.hpp>
-#include <bsoncxx/types.hpp>
-#include <mongocxx/client.hpp>
-#include <mongocxx/stdx.hpp>
-#include <mongocxx/uri.hpp>
-#include <mongocxx/instance.hpp>
-#include <bsoncxx/builder/stream/helpers.hpp>
-#include <bsoncxx/builder/stream/document.hpp>
-#include <bsoncxx/builder/stream/array.hpp>
+// Auth header
+#include "Management/User.h"
+#include "Management/Project.h"
 
-#include "User.h"
-#include "Project.h"
-
+// OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ProjectFilterData.h"
+
+// MongoDB header
+#include <bsoncxx/json.hpp>
+#include <bsoncxx/types.hpp>
+#include <bsoncxx/builder/stream/array.hpp>
+#include <bsoncxx/builder/stream/helpers.hpp>
+#include <bsoncxx/builder/stream/document.hpp>
+#include <mongocxx/uri.hpp>
+#include <mongocxx/stdx.hpp>
+#include <mongocxx/client.hpp>
+#include <mongocxx/instance.hpp>
+
+// std header
+#include <ctime>
+#include <vector>
+#include <cstdint>
+#include <sstream>
+#include <iostream>
 
 using bsoncxx::builder::stream::close_array;
 using bsoncxx::builder::stream::close_document;
@@ -51,8 +55,8 @@ using bsoncxx::document::value;
 using bsoncxx::document::view;
 using bsoncxx::document::element;
 
-
-class MongoProjectFunctions {
+class MongoProjectFunctions
+{
 	OT_DECL_STATICONLY(MongoProjectFunctions)
 public:
 	static ot::ProjectFilterData getProjectFilterOptions(const User& _loggedInUser, mongocxx::client& _adminClient);

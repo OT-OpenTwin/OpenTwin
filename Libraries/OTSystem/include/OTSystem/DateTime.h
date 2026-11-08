@@ -91,7 +91,7 @@ namespace ot {
 		// Constructor / Destructor
 
 		inline constexpr DateTime() noexcept = default;
-		inline constexpr DateTime(int _year, int _month, int _day, int _hour = 0, int _minute = 0, int _second = 0, int _millisec = 0) noexcept :
+		explicit inline constexpr DateTime(int _year, int _month, int _day, int _hour = 0, int _minute = 0, int _second = 0, int _millisec = 0) noexcept :
 			m_year(_year), m_month(_month), m_day(_day), m_hour(_hour), m_minute(_minute), m_second(_second), m_millisec(_millisec) {
 		};
 		inline constexpr DateTime(const DateTime& _other) noexcept = default;

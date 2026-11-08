@@ -17,10 +17,12 @@
 // limitations under the License.
 // @otlicense-end
 
-#include "MongoRoleFunctions.h"
-#include "MongoUserFunctions.h"
-#include "Group.h"
+// Auth header
+#include "Management/Group.h"
+#include "MongoDB/MongoRoleFunctions.h"
+#include "MongoDB/MongoUserFunctions.h"
 
+// MongoDB header
 #include <mongocxx/exception/operation_exception.hpp>
 
 namespace MongoRoleFunctions

@@ -1,4 +1,7 @@
-﻿#include "SSOUser.h"
+﻿// @otlicense
+
+// OpenTwin header
+#include "SSO/SSOUser.h"
 
 SSOUser::SSOUser(const ot::LogInInfos& _logInInfos)
 	: m_logInInfos(_logInInfos)
