@@ -18,10 +18,10 @@
 // @otlicense-end
 
 // Auth header
-#include "MongoDB/MongoSessionFunctions.h"
-#include "MongoDB/MongoRoleFunctions.h"
 #include "MongoDB/MongoConstants.h"
+#include "MongoDB/MongoRoleFunctions.h"
 #include "MongoDB/MongoUserFunctions.h"
+#include "MongoDB/MongoSessionFunctions.h"
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
@@ -29,12 +29,12 @@
 // std header
 #include <sstream>
 
-std::string MongoSessionFunctions::createSession(std::string username, mongocxx::client& adminClient)
+std::string MongoSessionFunctions::createSession(std::string _username, mongocxx::client& _adminClient)
 {
-	std::string sessionName = generateUniqueSessionName(username, adminClient);
+	std::string sessionName = generateUniqueSessionName(_username, _adminClient);
 	std::time_t currentTime = std::time(nullptr);
 
-	mongocxx::database secondaryDb = adminClient.database(MongoConstants::USER_DB);
+	mongocxx::database secondaryDb = _adminClient.database(MongoConstants::USER_DB);
 	mongocxx::collection sessionsCollection = secondaryDb.collection(MongoConstants::SESSIONS_COLLECTION);
 
 	value session_value = document{}

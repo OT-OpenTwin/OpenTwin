@@ -218,7 +218,7 @@ void ot::TokenGenerationDialog::generateTokenWorker()
 			throw Exception::Runtime("Failed to retrieve public key for key ID: " + keyId);
 		}
 
-		std::string publicKeyString(publicKey.begin(), publicKey.end());
+		std::string publicKeyString = ot::String::toBase64Url(publicKey);
 		
 		JsonDocument requestDoc;
 		requestDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_GenerateAccessToken, requestDoc.GetAllocator()), requestDoc.GetAllocator());

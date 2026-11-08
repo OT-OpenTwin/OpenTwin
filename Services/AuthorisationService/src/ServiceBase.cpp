@@ -19,13 +19,13 @@
 
 // Service header
 #include "ServiceBase.h"
+#include "AccessToken/AccessToken.h"
 #include "MongoDB/MongoURL.h"
 #include "MongoDB/MongoSessionFunctions.h"
 
 // OpenTwin header
 #include "OTSystem/AppExitCodes.h"
 #include "OTSystem/DateTime.h"
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
@@ -605,24 +605,26 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 
 ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword)
 {
-	const uint64_t maximumTokenValidity = 30ull * 24ull * 60ull * 60000ull;
+	const int64_t maximumTokenValidity = 30ll * 24ll * 60ll * 60000ll;
 
-	std::string publicUserClientKey = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Key);
-	uint64_t requestedValidityInSeconds = ot::json::getUInt64(_actionDocument, OT_ACTION_PARAM_Validity);
-	
-	ot::RandomNumberGeneratorCryptoSecure generator;
-	std::vector<uint8_t> tokenData = generator.createRandomBytes(32);
-	std::string token = ot::String::toHexString(tokenData);
-	
-	uint64_t currentTime = ot::DateTime::msSinceEpoch();
+	// Determine token expiration date
+	int64_t requestedValidityInSeconds = ot::json::getInt64(_actionDocument, OT_ACTION_PARAM_Validity);
 
-	uint64_t tokenValidity = std::min(maximumTokenValidity, requestedValidityInSeconds * 1000);
-	uint64_t expirationTime = currentTime + tokenValidity;
+	int64_t tokenValidity = std::min(maximumTokenValidity, requestedValidityInSeconds * 1000);
+	int64_t expirationDate = ot::DateTime::msSinceEpoch() + tokenValidity;
+
+	// Get the public key of the user client
+	std::string publicUserClientKeyString = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Key);
+	std::vector<uint8_t> publicUserClientKey = ot::String::bytesFromBase64Url(publicUserClientKeyString);
+
+	// Generate and store the token
+	AccessToken token = AccessToken::createNewAccessToken(_loggedInUser.getID(), std::move(publicUserClientKey), expirationDate);
+	token.storeToDatabase(m_adminClient);
 
 	// Create response
 	ot::JsonDocument tokenDoc;
-	tokenDoc.AddMember(OT_ACTION_PARAM_Token, ot::JsonString(token, tokenDoc.GetAllocator()), tokenDoc.GetAllocator());
-	tokenDoc.AddMember(OT_ACTION_PARAM_Expires, expirationTime, tokenDoc.GetAllocator());
+	tokenDoc.AddMember(OT_ACTION_PARAM_Token, ot::JsonString(token.getToken(), tokenDoc.GetAllocator()), tokenDoc.GetAllocator());
+	tokenDoc.AddMember(OT_ACTION_PARAM_Expires, token.getExpirationDate(), tokenDoc.GetAllocator());
 	
 	return ot::ReturnMessage::ok(tokenDoc.toJson());
 }
