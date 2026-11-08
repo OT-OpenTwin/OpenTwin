@@ -44,8 +44,8 @@ bool ot::StringToNumericCheck::fitsInFloat(const std::string& str)
 	bool fits = ec == std::errc() && ptr == str.data() + str.size();
 	if (!fits)
 	{
-		auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, std::chars_format::scientific);
-		fits = ec == std::errc() && ptr == str.data() + str.size();
+		auto [ptr2, ec2] = std::from_chars(str.data(), str.data() + str.size(), value, std::chars_format::scientific);
+		fits = ec2 == std::errc() && ptr2 == str.data() + str.size();
 	}
 	return fits;
 }
@@ -57,8 +57,8 @@ bool ot::StringToNumericCheck::fitsInDouble(const std::string& str)
 	bool fits = ec == std::errc() && ptr == str.data() + str.size();
 	if (!fits)
 	{
-		auto [ptr, ec] = std::from_chars(str.data(), str.data() + str.size(), value, std::chars_format::scientific);
-		fits = ec == std::errc() && ptr == str.data() + str.size();
+		auto [ptr2, ec2] = std::from_chars(str.data(), str.data() + str.size(), value, std::chars_format::scientific);
+		fits = ec2 == std::errc() && ptr2 == str.data() + str.size();
 	}
 	return fits;
 }

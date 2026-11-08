@@ -254,7 +254,7 @@ size_t MetadataCampaign::getMemSize()
 		seriesMemPart += 2 * sizeof(void*);     // list node prev/next pointers
 	}
 
-	double seriesMemPartMB = seriesMemPart / (1024 * 1024);
+	double seriesMemPartMB = static_cast<double>(seriesMemPart) / (1024 * 1024);
 	OT_USER_LOG_I("Series Mem in MB: " + std::to_string(seriesMemPartMB));
 	total += seriesMemPart;
 
