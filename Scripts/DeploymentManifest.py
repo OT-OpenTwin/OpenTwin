@@ -290,9 +290,6 @@ def create_deployment(plan) -> None:
     plan.tree(r"%QDIR%\plugins\tls", r"%OT_DEPLOYMENT_DIR%\plugins\tls")
     plan.remove_glob(r"%OT_DEPLOYMENT_DIR%\plugins", "*.pdb")
 
-    # OpenSSL websocket
-    # plan.copy(r"%OPENSSL_WEBSOCKET_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
-
     # Boost
     plan.copy(r"%BOOST_DLLPATHR%\*.dll", "%OT_DEPLOYMENT_DIR%")
 
