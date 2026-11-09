@@ -1,5 +1,5 @@
 // @otlicense
-// File: TestGraphicsLayoutItemCfg.cpp
+// File: TestDummy.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

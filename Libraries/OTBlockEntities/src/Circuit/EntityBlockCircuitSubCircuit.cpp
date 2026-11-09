@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityBlockCircuitSubcircuit.cpp
+// File: EntityBlockCircuitSubCircuit.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

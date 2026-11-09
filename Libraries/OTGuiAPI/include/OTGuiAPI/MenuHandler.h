@@ -1,5 +1,5 @@
 // @otlicense
-// File: ContextMenuHandler.h
+// File: MenuHandler.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

@@ -1,5 +1,5 @@
 // @otlicense
-// File: CartesianPlotDatasetData.cpp
+// File: PlotSeriesData.hpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

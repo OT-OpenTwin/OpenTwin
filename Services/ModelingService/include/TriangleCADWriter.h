@@ -1,5 +1,5 @@
 // @otlicense
-// File: STLWriter.h
+// File: TriangleCADWriter.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

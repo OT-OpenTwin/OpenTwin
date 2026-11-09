@@ -1,5 +1,5 @@
 // @otlicense
-// File: SequenceDiaSelfCall.cpp
+// File: SequenceDiaSelfCallCfg.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

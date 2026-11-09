@@ -1,5 +1,5 @@
 // @otlicense
-// File: EntityWaveGuidePort.h
+// File: EntityWaveguidePort.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: SoftwareRandomNumberGenerator.h
+// File: RandomNumberGeneratorSW.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

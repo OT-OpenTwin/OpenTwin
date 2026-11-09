@@ -1,5 +1,5 @@
 // @otlicense
-// File: LmsElementSelectRequest.h
+// File: LibraryElementSelectionCfg.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

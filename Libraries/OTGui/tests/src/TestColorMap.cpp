@@ -2,7 +2,7 @@
 // File: TestColorMap.cpp
 // 
 // License:
-// Copyright 2026 by OpenTwin
+// Copyright 2025 by OpenTwin
 //  
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

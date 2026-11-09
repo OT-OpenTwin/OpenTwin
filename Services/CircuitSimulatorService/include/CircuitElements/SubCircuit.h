@@ -1,5 +1,5 @@
 // @otlicense
-// File: CircuitElementSubcircuit.h
+// File: SubCircuit.h
 // 
 // License:
 // Copyright 2025 by OpenTwin

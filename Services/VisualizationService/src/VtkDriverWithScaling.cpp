@@ -1,5 +1,5 @@
 // @otlicense
-// File: VtkDriverUnstructuredScalarSurface.cpp
+// File: VtkDriverWithScaling.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

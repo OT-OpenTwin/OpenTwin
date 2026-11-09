@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: ValueComparisionDefinition.cpp
+// File: ValueComparisonDescription.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

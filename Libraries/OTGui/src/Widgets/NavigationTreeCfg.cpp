@@ -1,5 +1,5 @@
 // @otlicense
-// File: NavigationTreePackage.cpp
+// File: NavigationTreeCfg.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin

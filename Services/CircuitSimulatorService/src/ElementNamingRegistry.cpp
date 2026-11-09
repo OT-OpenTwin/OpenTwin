@@ -1,5 +1,5 @@
 // @otlicense
-// File: CircuitElement.h
+// File: ElementNamingRegistry.cpp
 // 
 // License:
 // Copyright 2025 by OpenTwin
