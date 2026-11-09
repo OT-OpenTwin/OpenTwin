@@ -85,14 +85,19 @@ void ProjectHelperBatchHelperCustomItem::slotRun() {
 		PHBH_LOGW("Script is already running: \"" + getItemName() + "\"");
 		return;
 	}
-	m_runner = ScriptRunner::runScript(getItemName(), getFullPath(), {}, getRootPath());
+	m_runner = ScriptRunner::runScript(getItemName(), getFullPath(), m_args, getRootPath());
+
+	QString argsStr = m_args.join(' ');
+	QString runShellStr = getFullPath() + (argsStr.isEmpty() ? QString() : QString(" " + argsStr));
+
 	if (m_runner) {
 		setButtonState(true);
 		connect(m_runner, &ScriptRunner::finished, this, &ProjectHelperBatchHelperCustomItem::slotRunnerFinished);
-		PHBH_LOG("Script executed successfully: \"" + getFullPath() + "\"");
+
+		PHBH_LOG("Script executed successfully: \"" + runShellStr + "\"");
 	}
 	else {
-		PHBH_LOGE("Script execution failed: \"" + getFullPath() + "\"");
+		PHBH_LOGE("Script execution failed: \"" + runShellStr + "\"");
 	}
 }
 

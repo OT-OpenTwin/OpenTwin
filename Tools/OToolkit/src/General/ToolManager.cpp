@@ -41,11 +41,11 @@
 ToolManager::ToolManager(AppBase* _app)
 	: m_ignoreEvents(false)
 {
+	m_settingsManager = new SettingsManager(_app);
 	m_menuManager = new MenuManager;
 	m_statusManager = new StatusManager;
 	m_toolBarManager = new ToolBarManager(_app);
 	m_toolViewManager = new ToolViewManager;
-	m_settingsManager = new SettingsManager(_app);
 
 	this->connect(m_menuManager, &MenuManager::settingsRequested, this, &ToolManager::slotSettingsRequested);
 	this->connect(m_toolViewManager, &ToolViewManager::viewFocused, this, &ToolManager::slotViewFocused);

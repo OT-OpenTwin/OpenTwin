@@ -213,7 +213,7 @@ void BackendInfo::slotAddGSS(const ot::GSSDebugInfo& _info) {
 	QVBoxLayout* sessionLayout = new QVBoxLayout(sessionGroup);
 	sessionLayout->setContentsMargins(0, 10, 0, 0);
 
-	ot::Table* sessionTable = new ot::Table(_info.getSessionToLssList().size(), 2, sessionGroup);
+	ot::Table* sessionTable = new ot::Table(static_cast<int>(_info.getSessionToLssList().size()), 2, sessionGroup);
 	sessionTable->verticalHeader()->setVisible(false);
 	sessionTable->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	sessionTable->setHorizontalHeaderLabels({ "Session", "LSS ID" });
@@ -695,7 +695,10 @@ void BackendInfo::slotAddLDS(const ot::LDSDebugInfo& _info) {
 
 	configLayout->addWidget(new ot::Label("Supported Services:", configContent));
 	QStringList supportedServicesHeader = { "Name", "Type", "Crash Restarts", "Startup Restarts" };
-	ot::Table* supportedServicesTable = new ot::Table(_info.getConfig().supportedServices.size(), supportedServicesHeader.size(), configContent);
+	ot::Table* supportedServicesTable = new ot::Table(
+		static_cast<int>(_info.getConfig().supportedServices.size()), 
+		static_cast<int>(supportedServicesHeader.size())
+		, configContent);
 	configLayout->addWidget(supportedServicesTable, 1);
 	supportedServicesTable->verticalHeader()->setVisible(false);
 	supportedServicesTable->setHorizontalHeaderLabels(supportedServicesHeader);
@@ -1016,7 +1019,7 @@ void BackendInfo::handleAddServiceDebugInfo(ot::JsonDocument& _doc) {
 ot::Table* BackendInfo::createGssSessionTable(const std::list<ot::GSSDebugInfo::SessionData>& _sessionData, QWidget* _parent) {
 	Qt::ItemFlags cellFlags = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
 
-	ot::Table* table = new ot::Table(_sessionData.size(), 3, _parent);
+	ot::Table* table = new ot::Table(static_cast<int>(_sessionData.size()), 3, _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels({ "Session ID", "User Name", "Flags" });
 	table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
@@ -1043,7 +1046,7 @@ ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo:
 	QStringList headers = { "ID", "Name", "Type", "Url", "Websocket Url", "Debug", 
 		"Requested", "Alive", "Running", "Shutting", "Hidden", "Connected Type" };
 
-	ot::Table* table = new ot::Table(_services.size(), headers.count(), _parent);
+	ot::Table* table = new ot::Table(static_cast<int>(_services.size()), headers.count(), _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);
@@ -1080,7 +1083,7 @@ ot::Table* BackendInfo::createLssServicesTable(const std::list<ot::LSSDebugInfo:
 
 ot::Table* BackendInfo::createGdsServicesTable(const std::list<ot::GDSDebugInfo::ServiceInfo>& _services, QWidget* _parent) {
 	QStringList headers = { "ID", "Name", "Type", "Session ID", "LSS Url" };
-	ot::Table* table = new ot::Table(_services.size(), headers.count(), _parent);
+	ot::Table* table = new ot::Table(static_cast<int>(_services.size()), static_cast<int>(headers.count()), _parent);
 	table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);
@@ -1154,7 +1157,7 @@ int BackendInfo::createLDSServiceInfo(const ot::LDSDebugInfo::SessionInfo& _sess
 
 	ot::ExpanderWidget* expander = new ot::ExpanderWidget(expanderTitle, _parent);
 
-	ot::Table* table = new ot::Table(_info.size(), headers.count(), expander);
+	ot::Table* table = new ot::Table(static_cast<int>(_info.size()), static_cast<int>(headers.count()), expander);
 	//table->verticalHeader()->setVisible(false);
 	table->setHorizontalHeaderLabels(headers);
 	table->setSelectionBehavior(ot::Table::SelectRows);

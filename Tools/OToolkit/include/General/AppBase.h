@@ -57,7 +57,9 @@ public:
 
 	// Static functions
 
-	static AppBase * instance(QApplication* _app = (QApplication*)nullptr);
+	static AppBase * instance();
+
+	void initialize(QApplication* _app, const QString& _ownServiceURL);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -93,12 +95,10 @@ public:
 
 	// Setter / Getter
 
-	void setUrl(const QString& _url);
 	const QString& url() const { return m_url; };
 
 	void parseStartArgs(const std::string& _args);
 
-	void setApplicationInstance(QApplication* _app) { m_app = _app; };
 	QApplication* applicationInstance() { return m_app; };
 
 	void setUpdateTransparentColorStyleValueEnabled(bool _enabled);
@@ -134,6 +134,7 @@ private:
 	void appendOutput(const ot::StyledTextBuilder& _text);
 
 	AppBase(QApplication* _app = (QApplication*)nullptr);
+	virtual ~AppBase();
 
 	Qt::HANDLE				m_mainThread;
 

@@ -37,6 +37,8 @@
 SettingsManager::SettingsManager(AppBase* _app)
 	: m_currentColorStyle(ot::ColorStyleName::BrightStyle), m_app(_app)
 {
+	OTAssertNullptr(m_app);
+
 	this->updateGeneralSettings();
 
 	this->connect(&ot::ApplicationPropertiesManager::instance(), &ot::ApplicationPropertiesManager::propertiesChanged, this, &SettingsManager::slotPropertiesChanged);
