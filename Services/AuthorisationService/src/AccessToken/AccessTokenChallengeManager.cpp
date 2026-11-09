@@ -4,7 +4,7 @@
 #include "AccessToken/AccessTokenChallengeManager.h"
 
 // OpenTwin header
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
 
@@ -58,7 +58,7 @@ std::string AccessTokenChallengeManager::generateId()
 
 	do
 	{
-		auto newIdRaw = ot::RandomNumberGeneratorCryptoSecure().createRandomBytes(16);
+		auto newIdRaw = ot::RandomNumberProvider::createRandomBytes(16);
 		newId = ot::String::toHexString(newIdRaw);
 	}
 	while (m_challenges.find(newId) != m_challenges.end());

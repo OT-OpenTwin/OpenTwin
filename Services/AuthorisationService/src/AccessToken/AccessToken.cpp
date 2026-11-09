@@ -7,7 +7,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/String.h"
 
 // MongoDB header
@@ -20,8 +20,7 @@
 AccessToken AccessToken::createNewAccessToken(const std::string& _userId, std::vector<uint8_t>&& _clientPublicKey, int64_t _expirationDate)
 {
 	// Generate a random token
-	ot::RandomNumberGeneratorCryptoSecure generator;
-	std::vector<uint8_t> tokenData = generator.createRandomBytes(32);
+	std::vector<uint8_t> tokenData = ot::RandomNumberProvider::createRandomBytes(32);
 	std::string tokenString = ot::String::toHexString(tokenData);
 
 	return AccessToken(std::move(tokenString), _userId, std::move(_clientPublicKey), _expirationDate);

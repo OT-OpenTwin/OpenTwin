@@ -1,5 +1,5 @@
 ﻿// @otlicense
-// File: RandomNumberGenerator.h
+// File: SoftwareRandomNumberGenerator.h
 // 
 // License:
 // Copyright 2025 by OpenTwin
@@ -25,7 +25,7 @@
 namespace ot
 {
 
-	class OT_SYS_API_EXPORT RandomNumberGeneratorCryptoSecure : public RandomNumberGenerator
+	class OT_SYS_API_EXPORT RandomNumberGeneratorSW : public RandomNumberGenerator
 	{
 	public:
 		virtual uint64_t createPositiveRandomInt64(uint64_t maxValue = std::numeric_limits<uint64_t>::max()) override;

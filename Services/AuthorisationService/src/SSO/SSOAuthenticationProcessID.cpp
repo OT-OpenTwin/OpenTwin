@@ -5,12 +5,11 @@
 
 // OpenTwin header
 #include "OTCore/String.h"
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/RandomNumber/RandomNumberProvider.h"
 
 ot::SSOAuthenticationProcessID::SSOAuthenticationProcessID()
 {
-	RandomNumberGeneratorCryptoSecure generator;
-	uint64_t tokenBase = generator.createPositiveRandomInt64();
+	uint64_t tokenBase = RandomNumberProvider::createPositiveRandomInt64();
 
 	auto* ptr = reinterpret_cast<const uint8_t*>(&tokenBase);
 	std::vector<uint8_t> bytes(ptr, ptr + sizeof(tokenBase));

@@ -290,6 +290,7 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	enum class LoginMode
 	{
 		UsernamePassword,
+		SessionUsernamePassword,
 		SSO,
 		Token
 	};
@@ -353,34 +354,33 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		break;
 
 	case LoginMode::Token:
+	{
 		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, password, returnDoc);
 		switch (result)
 		{
-			case AccessTokenManager::AuthenticationResult::Success:
-				break;
+		case AccessTokenManager::AuthenticationResult::Success:
+			// Here we have a successful token authentication and retreived the credentials,
+			// but we still need to check the user in the database
+			loginMode = LoginMode::UsernamePassword;
+			break;
 
-			case AccessTokenManager::AuthenticationResult::ChallengeRequired:
-				return returnDoc.toJson();
+		case AccessTokenManager::AuthenticationResult::ChallengeRequired:
+			return returnDoc.toJson();
 
-			case AccessTokenManager::AuthenticationResult::Failure:
-				returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
-				return returnDoc.toJson();
+		case AccessTokenManager::AuthenticationResult::Failure:
+			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
+			return returnDoc.toJson();
 
-			default:
-				OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
-				return returnDoc.toJson();
+		default:
+			OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
+			return returnDoc.toJson();
 		}
-
-		
-		// First check if this is the login or challenge response step
-
-		// On login create a random challenge and send a s response
-
-		// On challenge response lookup the token,
-		// validate the signature and then retreive
-		// the actual username and switch to username password auth
-
+	}
 		break;
+
+	default:
+		OT_LOG_ES("Unknown login mode (" << static_cast<int32_t>(loginMode) << ")");
+		throw std::runtime_error("Unknown login mode");
 	}
 
 	// Now we still need to check for a user entry in mongodb, matching the credentials

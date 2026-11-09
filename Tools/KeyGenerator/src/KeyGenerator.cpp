@@ -20,7 +20,7 @@
 // KeyGenerator.cpp : This file contains the 'main' function. Program execution begins and ends there.
 
 // OpenTwin header
-#include "OTSystem/RandomNumber/RandomNumberGeneratorCryptoSecure.h"
+#include "OTSystem/RandomNumber/RandomNumberProvider.h"
 
 // std header
 #include <iostream>
@@ -48,6 +48,8 @@ int main(int argc, char **argv)
 		return -1;
 	}
 	
+	std::vector<uint8_t> encryptionKey = ot::RandomNumberProvider::createRandomBytes(static_cast<size_t>(keyLength));
+
 	keyFile << "#pragma once" << std::endl << std::endl;
 	keyFile << "namespace ot {" << std::endl << std::endl;
 
@@ -56,14 +58,14 @@ int main(int argc, char **argv)
 
 	keyFile << "\t//! @brief OpenTwin encryption key" << std::endl;
 	keyFile << "\tconst int EncryptionKey[] = {";
-	ot::RandomNumberGeneratorCryptoSecure randomNumberGenerator;
-	for (int i = 0; i < keyLength; i++) {
-		unsigned __int64 randomNumber = randomNumberGenerator.createPositiveRandomInt64(255);
-		if (i < keyLength-1) {
-			keyFile << randomNumber << ", ";
-		} else {
-			keyFile << randomNumber;
+	for (size_t i = 0; i < encryptionKey.size(); i++)
+	{
+		if (i > 0)
+		{
+			keyFile << ", ";
 		}
+
+		keyFile << static_cast<unsigned int>(encryptionKey[i]);
 	}
 	keyFile << "};" << std::endl;
 
