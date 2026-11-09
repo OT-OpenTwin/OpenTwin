@@ -107,6 +107,7 @@ def update_libraries(plan) -> None:
     plan.mkdir(r"%OPENTWIN_DEPLOYMENT_DIR%\Apache")
     plan.rmtree(r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs")
     plan.mkdir(r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\htdocs")
+    plan.mkdir(r"%OPENTWIN_DEPLOYMENT_DIR%\Apache\logs")
 
     # Libraries
     plan.copy(r"%OT_CORE_ROOT%\%OT_CDLLR%\OTCore.dll", "%OPENTWIN_DEPLOYMENT_DIR%")
@@ -370,6 +371,7 @@ def create_deployment(plan) -> None:
     # Apache
     plan.mkdir(r"%OT_DEPLOYMENT_DIR%\Apache")
     plan.tree(r"%APACHE_ROOT%\*.*", r"%OT_DEPLOYMENT_DIR%\Apache")
+    plan.mkdir(r"%OT_DEPLOYMENT_DIR%\Apache\logs")
 
     # Visual Studio Redistributables
     plan.mkdir(r"%OT_DEPLOYMENT_DIR%\VC_Redist")
