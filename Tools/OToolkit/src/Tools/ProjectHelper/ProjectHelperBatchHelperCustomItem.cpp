@@ -1,4 +1,21 @@
 // @otlicense
+// File: ProjectHelperBatchHelperCustomItem.cpp
+// 
+// License:
+// Copyright 2025 by OpenTwin
+//  
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//  
+//     http://www.apache.org/licenses/LICENSE-2.0
+//  
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+// @otlicense-end
 
 // OpenTwin header
 #include "External/ScriptRunner.h"
@@ -26,6 +43,7 @@ void ProjectHelperBatchHelperCustomItem::createFromPath(TreeWidget* _tree, TreeW
 		path.chop(1);
 	}
 
+	tryCreate(_tree, _parent, _slotItem, "Edit Python Module", path, "/PythonScripting/OpenTwinPython/edit.bat", {}, true);
 	tryCreate(_tree, _parent, _slotItem, "Build All", path, "/Scripts/BuildAndTest/BuildAll.bat", {}, false);
 	tryCreate(_tree, _parent, _slotItem, "Build Documentation", path, "/Scripts/BuildAndTest/BuildDocumentation.bat", {}, false);
 	tryCreate(_tree, _parent, _slotItem, "Build Sphinx Documentation", path, "/Documentation/Developer/build.bat", {}, false);
@@ -39,6 +57,9 @@ void ProjectHelperBatchHelperCustomItem::createFromPath(TreeWidget* _tree, TreeW
 	tryCreate(_tree, _parent, _slotItem, "Shutdown All", path, "/Scripts/BuildAndTest/ShutdownAll.bat", {}, true);
 	tryCreate(_tree, _parent, _slotItem, "Test All", path, "/Scripts/BuildAndTest/TestAll.bat", {}, false);
 	tryCreate(_tree, _parent, _slotItem, "Update Deployment", path, "/Scripts/BuildAndTest/UpdateDeploymentLibrariesOnly.bat", {}, true);
+	tryCreate(_tree, _parent, _slotItem, "FHU: Check for headers to update", path, "/Scripts/Other/UpdateFileHeaders.bat", { "--dry" }, false);
+	tryCreate(_tree, _parent, _slotItem, "FHU: Update files", path, "/Scripts/Other/UpdateFileHeaders.bat", { "--notifychangeonly" }, false);
+	tryCreate(_tree, _parent, _slotItem, "FHU: Update files (Verbouse)", path, "/Scripts/Other/UpdateFileHeaders.bat", {}, false);
 }
 
 void ProjectHelperBatchHelperCustomItem::createFromScript(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _scriptPath, const QStringList& _args, bool _detached, ProjectHelperBatchHelperCustomItem* _slotItem)
