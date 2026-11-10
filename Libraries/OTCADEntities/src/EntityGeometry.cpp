@@ -199,6 +199,11 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	EntityPropertiesDouble *minCurvRefinementRadius = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Minimum curvature refinement radius"));
 	EntityPropertiesDouble *maximumDeviation = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum deviation of mesh from shape"));
 	EntityPropertiesEntityList *material = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Material"));
+	EntityPropertiesBoolean* anisotropicEdgeLength = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Anisotropic edge length"));
+	EntityPropertiesDouble* maximumEdgeLength = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum edge length"));
+	EntityPropertiesDouble* maximumEdgeLengthX = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum edge length X"));
+	EntityPropertiesDouble* maximumEdgeLengthY = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum edge length Y"));
+	EntityPropertiesDouble* maximumEdgeLengthZ = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum edge length Z"));
 
 	bool showMeshStepWidth = true;
 	bool showMeshPriority = true;
@@ -207,6 +212,7 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	bool showNumStepsPerCircle = true;
 	bool showMinCurvRefinementRadius = true;
 	bool showMaximumDeviation = true;
+	bool showAnisotropicEdgeLength = false;
 
 	if (considerForMeshing != nullptr)
 	{
@@ -244,6 +250,11 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 			showMinCurvRefinementRadius = false;
 			showMaximumDeviation = false;
 		}
+	}
+
+	if (anisotropicEdgeLength != nullptr)
+	{
+		showAnisotropicEdgeLength = anisotropicEdgeLength->getValue();
 	}
 
 	if (meshStepWidth != nullptr)
@@ -309,6 +320,36 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 		}
 	}
 
+	if (maximumEdgeLength != nullptr)
+	{
+		if (maximumEdgeLength->getVisible() == showAnisotropicEdgeLength)
+		{
+			maximumEdgeLength->setVisible(!showAnisotropicEdgeLength);
+			updatePropertiesGrid = true;
+		}
+	}
+
+	if (maximumEdgeLengthX != nullptr && maximumEdgeLengthY != nullptr && maximumEdgeLengthZ != nullptr)
+	{
+		if (maximumEdgeLengthX->getVisible() != showAnisotropicEdgeLength)
+		{
+			maximumEdgeLengthX->setVisible(showAnisotropicEdgeLength);
+			updatePropertiesGrid = true;
+		}
+
+		if (maximumEdgeLengthY->getVisible() != showAnisotropicEdgeLength)
+		{
+			maximumEdgeLengthY->setVisible(showAnisotropicEdgeLength);
+			updatePropertiesGrid = true;
+		}
+
+		if (maximumEdgeLengthZ->getVisible() != showAnisotropicEdgeLength)
+		{
+			maximumEdgeLengthZ->setVisible(showAnisotropicEdgeLength);
+			updatePropertiesGrid = true;
+		}
+	}
+
 	if (meshStepWidth != nullptr) meshStepWidth->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (meshPriority != nullptr) meshPriority->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (considerForMeshing != nullptr) considerForMeshing->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
@@ -318,7 +359,11 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	if (minCurvRefinementRadius != nullptr) minCurvRefinementRadius->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (maximumDeviation != nullptr) maximumDeviation->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (material != nullptr) material->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
-	if (material != nullptr) material->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (anisotropicEdgeLength != nullptr) anisotropicEdgeLength->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (maximumEdgeLength != nullptr) maximumEdgeLength->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (maximumEdgeLengthX != nullptr) maximumEdgeLengthX->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (maximumEdgeLengthY != nullptr) maximumEdgeLengthY->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (maximumEdgeLengthZ != nullptr) maximumEdgeLengthZ->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
 
 	return updatePropertiesGrid;
 }
@@ -701,7 +746,12 @@ void EntityGeometry::createNonMaterialProperties(void)
 	EntityPropertiesBoolean::createProperty("Mesh", "Consider for meshing",											  true, "",     getProperties());
 	EntityPropertiesDouble::createProperty("Mesh", "Mesh priority",													   0.0,	"",     getProperties());
 	EntityPropertiesSelection::createProperty("Mesh", "Mesh refinement", { "Global setting", "Local setting" }, "Global setting", "", getProperties());
-	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length",											   0.0, "",     getProperties());
+
+	EntityPropertiesBoolean::createProperty("Mesh", "Anisotropic edge length",	false, "",     getProperties());
+	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length",		0.0,   "",     getProperties());
+	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length X",		0.0,   "",     getProperties());
+	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length Y",		0.0,   "",     getProperties());
+	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length Z",		0.0,   "",     getProperties());
 
 	EntityPropertiesBoolean::createProperty("Mesh refinement", "Curvature refinement",					true, "Tetrahedral Meshing", getProperties());
 	EntityPropertiesDouble::createProperty("Mesh refinement", "Maximum deviation of mesh from shape", 0.0, "Tetrahedral Meshing", getProperties());

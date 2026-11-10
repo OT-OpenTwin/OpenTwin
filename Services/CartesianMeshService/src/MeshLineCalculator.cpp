@@ -512,7 +512,7 @@ std::vector<MeshLineCalculatorStepRange> MeshLineCalculator::determineDensityRan
 			double xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
 			geometryEntity->getEntityBox(xmin, xmax, ymin, ymax, zmin, zmax);
 
-			double stepWidth = getVolumeMeshStepWidth(geometryEntity, baseStepWidth);
+			double stepWidth = getVolumeMeshStepWidth(direction, geometryEntity, baseStepWidth);
 
 			switch(direction)
 			{
@@ -534,10 +534,28 @@ std::vector<MeshLineCalculatorStepRange> MeshLineCalculator::determineDensityRan
 	return ranges;
 }
 
-double MeshLineCalculator::getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth)
+double MeshLineCalculator::getVolumeMeshStepWidth(int direction, EntityBase* entity, double baseStepWidth)
 {
+
+	EntityPropertiesBoolean* anisotropicEdgeLength = dynamic_cast<EntityPropertiesBoolean*>(entity->getProperties().getProperty("Anisotropic edge length"));
+	bool anisotropicStepSettings = anisotropicEdgeLength == nullptr ? false : anisotropicEdgeLength->getValue();
+
+	std::string edgeLengthPropertyName = "Maximum edge length";
+
+	if (anisotropicStepSettings)
+	{
+		switch (direction)
+		{
+			case 0: edgeLengthPropertyName = "Maximum edge length X"; break;
+			case 1: edgeLengthPropertyName = "Maximum edge length Y"; break;
+			case 2: edgeLengthPropertyName = "Maximum edge length Z"; break;
+			default:
+				assert(0); // Unknown direction
+		}
+	}
+
 	// Determine the base mesh step width for this entity (if specified)
-	EntityPropertiesDouble* meshStepWidth = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty("Maximum edge length"));
+	EntityPropertiesDouble* meshStepWidth = dynamic_cast<EntityPropertiesDouble*>(entity->getProperties().getProperty(edgeLengthPropertyName));
 	if (meshStepWidth == nullptr)
 	{
 		// This is for backward compatibility with oder models only.

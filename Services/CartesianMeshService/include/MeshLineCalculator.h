@@ -72,7 +72,7 @@ private:
 	std::list<MeshLineCalculatorWeightedPoint> mergeWeightedPoints(std::list<MeshLineCalculatorWeightedPoint> input, double tolerance);
 	std::vector<MeshLineCalculatorStepRange> determineDensityRanges(int direction, double boundingBoxMin, double boundingBoxMax, double baseStepWidth);
 	void addRange(std::vector<MeshLineCalculatorStepRange>& ranges, double newMin, double newMax, double newStep);
-	double getVolumeMeshStepWidth(EntityBase* entity, double baseStepWidth);
+	double getVolumeMeshStepWidth(int direction, EntityBase* entity, double baseStepWidth);
 	std::vector<double> createDensityBasedGrid(std::vector<double> fixedLines, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	double findPositionForDensity(double a, double b, double targetDensity, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	double densityIntegral(double a, double b, const std::vector<MeshLineCalculatorStepRange>& ranges);
