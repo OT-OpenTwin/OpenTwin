@@ -18,10 +18,26 @@
 // @otlicense-end
 
 #include "MeshLineCalculator.h"
+
+#include <algorithm>
+#include <cmath>
 #include "CartesianMeshMaterial.h"
 #include "ProblemType.h"
 
 #include "OTCADEntities/EntityGeometry.h"
+
+#include <TopoDS_Edge.hxx>
+#include <TopoDS.hxx>
+#include <TopAbs_ShapeEnum.hxx>
+#include <TopExp.hxx>
+#include <TopTools_IndexedMapOfShape.hxx>
+#include <BRep_Tool.hxx>
+#include <BRepAdaptor_Curve.hxx>
+#include <BRepBndLib.hxx>
+#include <Bnd_Box.hxx>
+#include <GeomAbs_CurveType.hxx>
+#include <gp_Lin.hxx>
+#include <gp_Dir.hxx>
 
 void MeshLineCalculator::updateMeshLines()
 {
@@ -57,6 +73,9 @@ void MeshLineCalculator::updateMeshLines()
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesX = mergeWeightedPoints(mergedFixPlanesX, smallestMeshStep);
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesY = mergeWeightedPoints(mergedFixPlanesY, smallestMeshStep);
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesZ = mergeWeightedPoints(mergedFixPlanesZ, smallestMeshStep);
+
+	// Now we detect all edges of the PEC geometric objects which need refinement
+	determineEdgeRefinments();
 
 	// Next, we determine the stepwidth profile from the objects bounding boxes
 	std::vector<MeshLineCalculatorStepRange> densityRangesX = determineDensityRanges(0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax(), baseStepWidth);
@@ -224,9 +243,9 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlane
 	point.coord = max;
 	weightedFixpointList.push_back(point);
 	
-	for (auto meshEntity : meshEntities)
+	for (auto currentMeshEntity : meshEntities)
 	{
-		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(meshEntity);
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(currentMeshEntity);
 		if (geometryEntity != nullptr)
 		{
 			EntityFacetData* facetData = geometryEntity->getFacets();
@@ -259,12 +278,12 @@ std::list<MeshLineCalculatorWeightedPoint> MeshLineCalculator::determineFixPlane
 						double triangleArea = calculateTriangleArea(n1, n2, n3);
 						double location = (n1.getCoord(direction) + n2.getCoord(direction) + n3.getCoord(direction)) / 3.0;
 
-						MeshLineCalculatorWeightedPoint point;
-						point.area     = triangleArea;
-						point.coord    = location;
-						point.priority = meshPriority;
+						MeshLineCalculatorWeightedPoint fixPoint;
+						fixPoint.area     = triangleArea;
+						fixPoint.coord    = location;
+						fixPoint.priority = meshPriority;
 
-						weightedFixpointList.push_back(point);
+						weightedFixpointList.push_back(fixPoint);
 					}
 				}
 			}
@@ -504,9 +523,9 @@ std::vector<MeshLineCalculatorStepRange> MeshLineCalculator::determineDensityRan
 	addRange(ranges, boundingBoxMin, boundingBoxMax, baseStepWidth);
 
 	// Loop through all solids and determine the bounds and the local stepwidth. Add this as density range
-	for (auto meshEntity : meshEntities)
+	for (auto currentMeshEntity : meshEntities)
 	{
-		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(meshEntity);
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(currentMeshEntity);
 		if (geometryEntity != nullptr)
 		{
 			double xmin(0.0), xmax(0.0), ymin(0.0), ymax(0.0), zmin(0.0), zmax(0.0);
@@ -529,6 +548,32 @@ std::vector<MeshLineCalculatorStepRange> MeshLineCalculator::determineDensityRan
 				assert(0); // Invalid direction
 			}
 		}
+	}
+
+	// Add edge refinements to the existing one-dimensional density profile.
+	for (const auto& edge : edgeRefinements)
+	{
+		const double stepWidth = edge.stepWidth[direction];
+		if (edge.parallelAxis == direction || !(stepWidth > 0.0) || !std::isfinite(stepWidth))
+			continue;
+
+		const BoundingBox& box = edge.boundingBox;
+		const double lower[3] = { box.getXmin(), box.getYmin(), box.getZmin() };
+		const double upper[3] = { box.getXmax(), box.getYmax(), box.getZmax() };
+
+		double rangeMin = lower[direction];
+		double rangeMax = upper[direction];
+
+		// Transverse to an axis-aligned edge, refine one step on either side.
+		// Also give collapsed projections of general edges a nonzero width.
+		if (edge.parallelAxis >= 0 || rangeMax - rangeMin <= geometryTolerance)
+		{
+			rangeMin -= stepWidth;
+			rangeMax += stepWidth;
+		}
+
+		// addRange clips to the existing domain and keeps the smaller step.
+		addRange(ranges, rangeMin, rangeMax, stepWidth);
 	}
 
 	return ranges;
@@ -820,7 +865,7 @@ std::vector<double> MeshLineCalculator::determineMeshLines(const std::list<MeshL
 
 	// Now run the iterative line insertion
 	std::vector<double> meshLines = createDensityBasedGrid(baseMeshLines, densityRanges);
-	//refineUntilValid(meshLines, densityRanges);
+	refineUntilValid(meshLines, densityRanges);
 
 	return meshLines;
 }
@@ -848,7 +893,7 @@ std::vector<double> MeshLineCalculator::splitGrowing(double length, double neigh
 	return stgeometryTolerance;
 }
 
-std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio)
+std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double> meshLines, double meshEquilibrationRatio)
 {
 	if (meshLines.size() < 3)
 		return meshLines;
@@ -870,9 +915,9 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 			double h0 = x1 - x0;
 			double h1 = x2 - x1;
 
-			if (h1 > maximumMeshRatio * h0 + geometryTolerance)
+			if (h1 > meshEquilibrationRatio * h0 + geometryTolerance)
 			{
-				auto stgeometryTolerance = splitGrowing(h1, h0, maximumMeshRatio);
+				auto stgeometryTolerance = splitGrowing(h1, h0, meshEquilibrationRatio);
 
 				std::vector<double> newPoints;
 				double x = x1;
@@ -891,9 +936,9 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 				break;
 			}
 
-			if (h0 > maximumMeshRatio * h1 + geometryTolerance)
+			if (h0 > meshEquilibrationRatio * h1 + geometryTolerance)
 			{
-				auto stgeometryTolerance = splitGrowing(h0, h1, maximumMeshRatio);
+				auto stgeometryTolerance = splitGrowing(h0, h1, meshEquilibrationRatio);
 
 				std::vector<double> newPoints;
 				double x = x1;
@@ -919,4 +964,96 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 	return meshLines;
 }
 
+void MeshLineCalculator::determineEdgeRefinments()
+{
+	edgeRefinements.clear();
 
+	if (problemType == nullptr)
+		return;
+
+	for (auto currentMeshEntity : meshEntities)
+	{
+		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(currentMeshEntity);
+		if (geometryEntity != nullptr)
+		{
+			CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial*>(geometryEntity->getData());
+			if (material != nullptr)
+			{
+				if (problemType->applyEdgeRefinement(material))
+				{
+					// Now we apply the edge refinement to the edges of this shape. Process all edges
+
+					TopoDS_Shape brep = geometryEntity->getBrep();
+
+					double baseStepWidth = problemType->getBaseStepWidth();
+
+					double edgeRefinementFactor = 20.0;
+
+					double edgeStepWidthX = getVolumeMeshStepWidth(0, geometryEntity, baseStepWidth) / edgeRefinementFactor;
+					double edgeStepWidthY = getVolumeMeshStepWidth(1, geometryEntity, baseStepWidth) / edgeRefinementFactor;
+					double edgeStepWidthZ = getVolumeMeshStepWidth(2, geometryEntity, baseStepWidth) / edgeRefinementFactor;
+
+					appendEdgeRefinementsFromBrep(brep, edgeStepWidthX, edgeStepWidthY, edgeStepWidthZ);
+				}
+			}
+		}
+	}
+}
+
+void MeshLineCalculator::appendEdgeRefinementsFromBrep(const TopoDS_Shape& brep, double edgeStepWidthX, double edgeStepWidthY, double edgeStepWidthZ)
+{
+	const std::array<double, 3> stepWidths = { edgeStepWidthX, edgeStepWidthY, edgeStepWidthZ };
+
+	if (brep.IsNull() || std::none_of(stepWidths.begin(), stepWidths.end(),
+		[](double step) { return step > 0.0 && std::isfinite(step); }))
+	{
+		return;
+	}
+
+	const double cosTolerance =
+		std::cos(angleToleranceDeg * std::acos(-1.0) / 180.0);
+
+	TopTools_IndexedMapOfShape edges;
+	TopExp::MapShapes(brep, TopAbs_EDGE, edges);
+
+	for (Standard_Integer i = 1; i <= edges.Extent(); ++i)
+	{
+		const TopoDS_Edge edge = TopoDS::Edge(edges(i));
+
+		if (BRep_Tool::Degenerated(edge))
+			continue;
+
+		// Bounding box of the complete edge geometry.
+		Bnd_Box occBox;
+		BRepBndLib::AddOptimal(edge, occBox, false, false);
+
+		if (occBox.IsVoid() || occBox.IsOpen())
+			continue;
+
+		double xmin, ymin, zmin, xmax, ymax, zmax;
+		occBox.Get(xmin, ymin, zmin, xmax, ymax, zmax);
+
+		MeshLineCalculatorEdgeRefinement refinement;
+		refinement.boundingBox.extend(
+			xmin, xmax, ymin, ymax, zmin, zmax);
+
+		refinement.stepWidth = stepWidths;
+		refinement.parallelAxis = -1;
+
+		const BRepAdaptor_Curve curve(edge);
+
+		if (curve.GetType() == GeomAbs_Line)
+		{
+			const gp_Dir direction = curve.Line().Direction();
+
+			if (std::abs(direction.X()) >= cosTolerance)
+				refinement.parallelAxis = 0;
+			else if (std::abs(direction.Y()) >= cosTolerance)
+				refinement.parallelAxis = 1;
+			else if (std::abs(direction.Z()) >= cosTolerance)
+				refinement.parallelAxis = 2;
+		}
+
+		edgeRefinements.push_back(refinement);
+	}
+}

@@ -184,19 +184,19 @@ void CartesianMeshCreation::updateMesh(Application *app, EntityBase *meshEntity,
 		for (auto entityID : geometryEntitiesID)
 		{
 			ot::UID entityVersion = getApplication()->getPrefetchedEntityVersion(entityID);
-			EntityGeometry* geom = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
+			EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(ot::EntityAPI::readEntityFromEntityIDandVersion(entityID, entityVersion));
 
-			inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(geom->getEntityID(), geom->getEntityStorageVersion()));
+			inputDependencyList.push_back(std::pair<ot::UID, ot::UID>(geometryEntity->getEntityID(), geometryEntity->getEntityStorageVersion()));
 
-			if (geom == nullptr)
+			if (geometryEntity == nullptr)
 			{
-				std::string error = "ERROR: Unable to load geometry entity (" + std::to_string(entityID) + ", " + std::to_string(entityVersion) + ")\n\n";
+				std::string error = "ERROR: Unable to load geometryEntityetry entity (" + std::to_string(entityID) + ", " + std::to_string(entityVersion) + ")\n\n";
 				deleteMesh();
 				throw error;
 			}
 			else
 			{
-				geometryEntities.push_back(geom);
+				geometryEntities.push_back(geometryEntity);
 			}
 		}
 
@@ -2513,7 +2513,7 @@ void CartesianMeshCreation::calcDmuW(double *matrix, long long nu, long long nv,
 	// Middle slices
 
 	#pragma omp parallel for
-	for (long long iw = 1; iw < nw-1; iw++)
+	for (iw = 1; iw < nw-1; iw++)
 	{
 		double ds1 = meshLinesW[iw    ] - meshLinesW[iw - 1];
 		double ds2 = meshLinesW[iw + 1] - meshLinesW[iw    ];

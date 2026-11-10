@@ -19,12 +19,16 @@
 
 #pragma once
 
+#include<array>
 #include<list>
+#include<vector>
 
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/BoundingBox.h"
 #include "OTModelEntities/EntityMeshCartesian.h"
 #include "OTModelEntities/Geometry.h"
+
+#include <TopoDS_Shape.hxx>
 
 class ProblemType;
 
@@ -42,10 +46,17 @@ struct MeshLineCalculatorStepRange
 	double step;
 };
 
+struct MeshLineCalculatorEdgeRefinement
+{
+	BoundingBox boundingBox;
+	std::array<double, 3> stepWidth = { 0.0, 0.0, 0.0 }; // X/Y/Z; non-positive values disable that direction
+	int parallelAxis = -1; // -1: general edge; 0/1/2: straight edge parallel to X/Y/Z
+};
+
 class MeshLineCalculator
 {
 public:
-	MeshLineCalculator() : maximumEdgeLength(0.0), stepsAlongDiagonal(0.0), maximumMeshRatio(0.0), meshEqulibrationRatio(0.0), meshEntity(nullptr) {};
+	MeshLineCalculator() : maximumEdgeLength(0.0), stepsAlongDiagonal(0.0), maximumMeshRatio(0.0), meshEqulibrationRatio(0.0), meshEntity(nullptr), problemType(nullptr) {};
 	~MeshLineCalculator() {};
 
 	void setMesh(EntityMeshCartesian* mesh) { meshEntity = mesh; }
@@ -55,6 +66,8 @@ public:
 	void setMaximumMeshRatio(double value) { maximumMeshRatio = value; }
 	void setMeshEqulibrationRatio(double value) { meshEqulibrationRatio = value; }
 	void setProblemType(ProblemType* _problemType) { problemType = _problemType; }
+
+	void setEdgeRefinements(const std::list<MeshLineCalculatorEdgeRefinement>& refinements) { edgeRefinements = refinements; }
 
 	void updateMeshLines();
 
@@ -79,8 +92,10 @@ private:
 	std::vector<double> determineMeshLines(const std::list<MeshLineCalculatorWeightedPoint>& fixPlanes, const std::vector<MeshLineCalculatorStepRange>& densityRanges);
 	bool intervalViolatesStep(double x0, double x1, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	void refineUntilValid(std::vector<double>& grid, const std::vector<MeshLineCalculatorStepRange>& ranges);
-	std::vector<double> equilibrateMeshLines(std::vector<double> meshLines, double maximumMeshRatio);
+	std::vector<double> equilibrateMeshLines(std::vector<double> meshLines, double meshEquilibrationRatio);
 	std::vector<double> splitGrowing(double length, double neighborStep, double ratio);
+	void determineEdgeRefinments();
+	void appendEdgeRefinementsFromBrep(const TopoDS_Shape& brep, double edgeStepWidthX, double edgeStepWidthY, double edgeStepWidthZ);
 
 	// Data
 	EntityMeshCartesian* meshEntity;
@@ -93,6 +108,7 @@ private:
 	double angleToleranceDeg = 0.1;
 	double geometryTolerance = 1e-5;
 
+	std::list<MeshLineCalculatorEdgeRefinement> edgeRefinements;
 	std::list<EntityBase*> meshEntities;
 	ProblemType* problemType;
 

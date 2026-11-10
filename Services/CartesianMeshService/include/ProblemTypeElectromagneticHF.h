@@ -33,6 +33,7 @@ public:
 
 	virtual double getBaseStepWidth() override;
 	virtual double getMaterialBaseStepWidth(CartesianMeshMaterial* material) override;
+	virtual bool   applyEdgeRefinement(CartesianMeshMaterial* material) override;
 
 private:
 	const double c0 = 299792458;

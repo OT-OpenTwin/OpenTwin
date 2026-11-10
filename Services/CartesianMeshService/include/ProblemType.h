@@ -29,6 +29,7 @@ public:
 
 	virtual double getBaseStepWidth() = 0;
 	virtual double getMaterialBaseStepWidth(CartesianMeshMaterial* material) = 0;
+	virtual bool   applyEdgeRefinement(CartesianMeshMaterial* material) = 0;
 
 private:
 

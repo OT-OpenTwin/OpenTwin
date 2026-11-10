@@ -40,3 +40,9 @@ double ProblemTypeElectromagneticHF::getMaterialBaseStepWidth(CartesianMeshMater
 
 	return baseStep / std::sqrt(material->getEpsilon() * material->getMu());
 }
+
+bool ProblemTypeElectromagneticHF::applyEdgeRefinement(CartesianMeshMaterial* material)
+{
+	return material->getIsPEC();
+}
+
