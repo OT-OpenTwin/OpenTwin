@@ -548,8 +548,6 @@
 #define OT_ACTION_PARAM_PROCESS_CPU_LOAD "Process.CPU.Load"
 #define OT_ACTION_PARAM_PROCESS_MEMORY_LOAD "Process.Memory.Load"
 
-#define OT_ACTION_PARAM_SERVICE_TYPE "Service.Type"
-
 #define OT_ACTION_PARAM_PREFETCH_Documents "Prefetch.Documents"
 #define OT_ACTION_PARAM_PREFETCH_ID "Prefetch.ID"
 #define OT_ACTION_PARAM_PREFETCH_Version "Prefetch.Version"
