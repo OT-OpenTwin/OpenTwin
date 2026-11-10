@@ -24,7 +24,7 @@ from ot_dev import cli
 from ot_dev.tools.archives import compress_all, compress_file, decompress_all, decompress_file
 from ot_dev.tools.checks import check_failed_builds
 from ot_dev.tools.external import (build_solution, run_cmake_gui, run_cmake_gui_qt, run_devenv, run_python,
-                                   run_qtcreator, update_file_headers)
+                                   run_qtcreator, update_file_headers, update_py_constants)
 from ot_dev.tools.scheme import register_scheme
 
 
@@ -38,6 +38,7 @@ COMMANDS: dict[str, Callable[[Mapping[str, str], Sequence[str]], int]] = {
     "compress-all": lambda env, a: compress_all(env),
     "decompress-all": lambda env, a: decompress_all(env),
     "update-file-headers": update_file_headers,
+    "update-py-constants": update_py_constants,
     "run-qtcreator": lambda env, a: run_qtcreator(env),
     "cmake-gui-qt": lambda env, a: run_cmake_gui_qt(env, a, qt6_dir=False),
     "cmake-gui-qt6": lambda env, a: run_cmake_gui_qt(env, a, qt6_dir=True),

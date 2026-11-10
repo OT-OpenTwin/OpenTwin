@@ -28,6 +28,7 @@ DEVENV = "devenv" + EXE
 FILE_HEADER_UPDATER = paths.RELEASE_OUTPUT + ("FileHeaderUpdater" + EXE,)
 FILE_HEADER_LOG = "FHU_Log.txt"
 FILE_HEADER_CONFIG = "OT_FHU_Config.json"
+PYTHON_MODULE_CONSTANTS_UPDATER = paths.RELEASE_OUTPUT + ("PyConstantsUpdater" + EXE,)
 
 QT_DIRS = {"Qt6Core_DIR": "Qt6Core", "Qt6Gui_DIR": "Qt6Gui", "Qt6Widgets_DIR": "Qt6Widgets"}
 
@@ -46,6 +47,9 @@ def update_file_headers(env: Mapping[str, str], arguments: Sequence[str]) -> int
     return run_program(env, [str(root.joinpath(*FILE_HEADER_UPDATER)), "--out", str(root / FILE_HEADER_LOG),
                              "--config", str(root / FILE_HEADER_CONFIG), *arguments[:BATCH_ARGUMENTS]])
 
+def update_py_constants(env: Mapping[str, str], arguments: Sequence[str]) -> int:
+    root = Path(get(env, "OT_PYCONSTANTSUPDATER_ROOT"))
+    return run_program(env, [str(root.joinpath(*PYTHON_MODULE_CONSTANTS_UPDATER)), *arguments[:BATCH_ARGUMENTS]])
 
 def run_qtcreator(env: Mapping[str, str]) -> int:
     creator = Path(get(env, "OPENTWIN_THIRDPARTY_ROOT")).joinpath(*QT_CREATOR)
