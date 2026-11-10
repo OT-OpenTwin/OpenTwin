@@ -3,7 +3,7 @@ from opentwin import OpenTwinClient
 
 def test_login_does_nothing():
     print("Running test...")
-
+ 
     # first read token from env variable OPEN_TWIN_ACCESS_TOKEN
     token = os.environ.get("OPEN_TWIN_ACCESS_TOKEN")
     if token is None:

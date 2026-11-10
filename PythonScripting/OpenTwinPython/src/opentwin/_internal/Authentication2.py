@@ -4,7 +4,7 @@ import base64
 from typing import Any
 
 from opentwin._internal.ActionTypes import *
-from opentwin._internal.Communication import Communication
+from opentwin._internal.Communication2 import Communication
 from opentwin._internal.crypto.GlobalCryptoKeyStore import GlobalCryptoKeyStore
 from opentwin._internal.crypto.GlobalCryptoKeyIDs import *
 from opentwin._internal.system.Encoding import Encoding
