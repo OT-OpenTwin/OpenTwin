@@ -496,6 +496,7 @@ namespace
     // ############################################################################
 
     bool writePythonFile(
+        const std::filesystem::path& source,
         const std::filesystem::path& destination,
         const std::map<std::string, std::string>& constants)
     {
@@ -506,6 +507,11 @@ namespace
             logError("Could not open destination file: " + destination.string());
             return false;
         }
+
+        file << "# ############################################################################\n";
+        file << "# This file was auto generated from the following source header:\n";
+        file << "#     " << source.filename().string() << "\n";
+        file << "# ############################################################################\n\n";
 
         file << "from typing import Final\n\n";
 
@@ -569,7 +575,7 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (!writePythonFile(destination, constants))
+    if (!writePythonFile(source, destination, constants))
     {
         return 1;
     }

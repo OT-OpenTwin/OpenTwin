@@ -19,9 +19,40 @@
 
 #pragma once
 
+
+
+
+
+
+// ##################################################################################################################
+
+//                         R E A D     M E    F I R S T
+
+
+
+
+// Any changes to the action types will result in a new python module being generated.
+// This will lead to a new version of the python module being generated and the old version will no longer be compatible with the new version.
+// Make these changes very carefully and only if absolutely necessary.
+// If you do make changes, please make sure to update the python module accordingly.
+
+
+// ##################################################################################################################
+
+
+
+
+
+
+
+
+
+
+//! @brief This is the key that should be used in every action message to specify the action type.
+//! The value of this key should be one of the OT_ACTION_CMD_... constants defined in this file.
 #define OT_ACTION_MEMBER "action"
 
-//! \brief This should be used in every member key that holds a password.
+//! @brief This should be used in every member key that holds a password.
 //! This is used to filter out log messages containing a password.
 #define OT_ACTION_PASSWORD_SUBTEXT "Password"
 
