@@ -88,6 +88,7 @@ TOOLS = {
     "OT_ENDPOINTDOCPARSER_ROOT": "EndpointDocParser",
     "OT_GITLINECOUNTER_ROOT": "GitLineCounter",
     "OT_KEYGENERATOR_ROOT": "KeyGenerator",
+    "OT_PYCONSTANTSUPDATER_ROOT": "PyConstantsUpdater",
     "OT_OTSYSTEMINFORMATIONTOOL_ROOT": "OTSystemInformationTool",
     "OT_PASSWORDENCRYPTION_ROOT": "PasswordEncryption",
     "OT_SETPERMISSIONS_ROOT": "SetPermissions",
