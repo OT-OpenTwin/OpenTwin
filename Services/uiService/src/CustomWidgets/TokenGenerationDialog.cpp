@@ -238,7 +238,7 @@ void ot::TokenGenerationDialog::generateTokenWorker()
 {
 	try
 	{
-		const std::string keyId = GlobalCryptoKeyIDs::localTokenSignature();
+		const std::string keyId = OT_CRYPTO_GLOBAL_KEY_ID_LOCAL_TOKEN_SIGNATURE;
 
 		if (!GlobalCryptoKeyStore::hasKey(keyId))
 		{

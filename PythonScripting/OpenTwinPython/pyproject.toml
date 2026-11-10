@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "Python client for the OpenTwin platform"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = []
+dependencies = ["platformdirs", "cryptography"]
 
 [project.optional-dependencies]
 dev = ["pytest", "build"]

@@ -20,7 +20,6 @@
 // Auth header
 #include "AccessToken/AccessToken.h"
 #include "MongoDB/MongoConstants.h"
-#include "MongoDB/MongoTokenFunctions.h"
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"

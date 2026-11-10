@@ -20,6 +20,7 @@
 #pragma once
 
 // Auth header
+#include "AccessToken/AccessToken.h"
 #include "AccessToken/AccessTokenChallenge.h"
 
 // std header
@@ -35,13 +36,9 @@ public:
 	AccessTokenChallengeManager();
 	~AccessTokenChallengeManager();
 
-	//! @brief Generates a new challenge for the given token and returns the challenge object.
 	const AccessTokenChallenge& challenge(const std::string& _token);
 
-	//! @brief Checks if the given challenge response is valid for the challenge with the given ID.
-	//! The challenge is removed from the manager after this call, regardless of whether the response is valid or not.
-	//! @return True if the challenge response is valid, false otherwise.
-	bool challengeResponse(const std::string& _id, const std::string& _challenge);
+	bool challengeResponse(const AccessToken& _token, const std::string& _challengeId, const std::string& _signature64url);
 	
 private:
 	std::string generateId();

@@ -1,18 +1,28 @@
-import json
+# @otlicense
 
-from typing import Any
-from urllib.request import Request, urlopen
-from urllib.error import HTTPError, URLError
+from opentwin.config import OpenTwinConfig
+from opentwin._internal.Authentication import Authentication
+from opentwin._internal.Communication import Communication
 
 class OpenTwinClient:
-    """Client interface for communicating with OpenTwin."""
+    def __init__(self, global_session_service_url: str, login_token: str) -> None:
+        self._print("Initializing OpenTwinClient...")
 
-    def login(self, global_session_service_url: str, token: str) -> dict[str, Any]:
-        """Log in to OpenTwin.
+        # Ensure configuration is valid
+        OpenTwinConfig().invariant()
 
-        This method is currently a placeholder.
-        Authentication will be implemented later.
-        """
+        # Initialize communication
+        self._communication = Communication(global_session_service_url)
 
-        print('Hello World!')  # Placeholder for login functionality
-        pass
+        # Initialize authentication
+        self._print(f"Connection established with Global Session Service at {global_session_service_url}.")
+        self._print(f"Attempting to authenticate with login token: {login_token}")
+        self._auth = Authentication(self._communication, login_token)
+
+        self._print("OpenTwinClient initialized successfully.")
+
+    ################################################################################################################################
+
+    @staticmethod
+    def _print(message: str) -> None:
+        print("[OpenTwin] [CLIENT] " + message)

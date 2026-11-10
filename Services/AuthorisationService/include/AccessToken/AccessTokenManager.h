@@ -20,6 +20,7 @@
 #pragma once
 
 // Auth header
+#include "AccessToken/AccessToken.h"
 #include "AccessToken/AccessTokenChallengeManager.h"
 #include "Management/User.h"
 
@@ -44,12 +45,9 @@ public:
 
 	AccessTokenManager();
 
-	AuthenticationResult handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, std::string& _password, ot::JsonDocument& _responseDoc);
+	AuthenticationResult handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, ot::JsonDocument& _responseDoc);
 
 private:
-	User getUserByToken(const std::string& _token);
-
-	std::string decryptChallenge(const std::string& _token, const std::string& _challenge);
-
 	AccessTokenChallengeManager m_challengeManager;
+
 };

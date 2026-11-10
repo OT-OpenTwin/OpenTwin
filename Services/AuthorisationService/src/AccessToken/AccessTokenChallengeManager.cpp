@@ -24,6 +24,7 @@
 #include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTCrypto/Signature/SignatureProvider.h"
 
 AccessTokenChallengeManager::AccessTokenChallengeManager()
 {
@@ -54,16 +55,25 @@ const AccessTokenChallenge& AccessTokenChallengeManager::challenge(const std::st
 	return m_challenges.at(id);
 }
 
-bool AccessTokenChallengeManager::challengeResponse(const std::string& _id, const std::string& _challenge)
+bool AccessTokenChallengeManager::challengeResponse(const AccessToken& _token, const std::string& _challengeId, const std::string& _signature64url)
 {
 	bool valid = false;
 
-	auto it = m_challenges.find(_id);
+	std::vector<uint8_t> signatureBytes = ot::String::bytesFromBase64Url(_signature64url);
+	
+	auto it = m_challenges.find(_challengeId);
 	if (it != m_challenges.end())
 	{
 		AccessTokenChallenge& challenge = it->second;
-		valid = challenge.getChallenge() == _challenge;
-		m_challenges.erase(it);
+
+		if (challenge.getToken() == _token.getToken())
+		{
+			std::string challengeString = challenge.getChallenge();
+			std::vector<uint8_t> challengeBytes(challengeString.begin(), challengeString.end());
+			valid = ot::SignatureProvider::verify(_token.getClientPublicKey(), challengeBytes, signatureBytes);
+
+			m_challenges.erase(it);
+		}
 	}
 
 	return valid;

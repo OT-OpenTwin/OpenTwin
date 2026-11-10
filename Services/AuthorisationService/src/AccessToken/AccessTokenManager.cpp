@@ -18,37 +18,54 @@
 // @otlicense-end
 
 // Auth header
+#include "ServiceBase.h"
+#include "AccessToken/AccessToken.h"
 #include "AccessToken/AccessTokenManager.h"
+#include "MongoDB/MongoUserFunctions.h"
 
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCrypto/Signature/SignatureProvider.h"
 
 AccessTokenManager::AccessTokenManager()
 {
 
 }
 
-AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, std::string& _password, ot::JsonDocument& _responseDoc)
+AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, ot::JsonDocument& _responseDoc)
 {
 	AuthenticationResult result = AuthenticationResult::Failure;
-
+	
 	try
 	{
 		std::string token = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Token);
+		if (token.empty())
+		{
+			OT_LOG_E("Token is empty");
+			return AuthenticationResult::Failure;
+		}
 
-		if (_actionDocument.HasMember(OT_ACTION_PARAM_Challenge))
+		if (_actionDocument.HasMember(OT_ACTION_PARAM_Signature))
 		{
 			std::string challengeID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_ChallengeID);
-			std::string challengeResponse = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Challenge);
-			std::string decryptedChallenge = decryptChallenge(token, challengeResponse);
+			std::string challengeResponse = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Signature);
+			if (challengeResponse.empty())
+			{
+				OT_LOG_E("Challenge response is empty");
+				return AuthenticationResult::Failure;
+			}
+
+			auto& adminClient = ServiceBase::instance().getAdminClient();
+			AccessToken accessToken = AccessToken::readFromDatabase(adminClient, token);
 
 			// Check if the challenge response is valid
-			if (m_challengeManager.challengeResponse(challengeID, decryptedChallenge))
+			if (m_challengeManager.challengeResponse(accessToken, challengeID, challengeResponse))
 			{
-				// Challenge response is valid, proceed with login
-				_username = token; // For demonstration purposes, we use the token as the username
-				_password = decryptedChallenge; // For demonstration purposes, we use the decrypted challenge as the password
+				// Retreive user from credentials
+				User user = MongoUserFunctions::getUserDataThroughId(accessToken.getUserId(), adminClient);
+				_username = user.getName();
+				
 				result = AuthenticationResult::Success;
 			}
 			else
@@ -82,12 +99,3 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 	return result;
 }
 
-User AccessTokenManager::getUserByToken(const std::string& _token)
-{
-	return User();
-}
-
-std::string AccessTokenManager::decryptChallenge(const std::string& _token, const std::string& _challenge)
-{
-	return "";
-}

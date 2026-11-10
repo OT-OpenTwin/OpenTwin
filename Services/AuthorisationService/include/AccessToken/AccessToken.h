@@ -48,6 +48,7 @@ public:
 	// Setter / Getter
 
 	const std::string& getToken() const { return m_token; };
+	const std::string& getUserId() const { return m_userId; };
 	const std::vector<uint8_t>& getClientPublicKey() const { return m_clientPublicKey; };
 	
 	bool isExpired() const;

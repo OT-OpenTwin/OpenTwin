@@ -19,15 +19,4 @@
 
 #pragma once
 
-// std header
-#include <string>
-
-namespace ot
-{
-	class GlobalCryptoKeyIDs
-	{
-		GlobalCryptoKeyIDs() = delete;
-	public:
-		static std::string localTokenSignature() { return "opentwin_lcl_tknsig"; };
-	};
-}
+#define OT_CRYPTO_GLOBAL_KEY_ID_LOCAL_TOKEN_SIGNATURE "opentwin_lcl_tknsig"

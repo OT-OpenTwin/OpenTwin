@@ -299,8 +299,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	std::string username;
 	std::string password;
 	ot::JsonDocument returnDoc;
-	bool authenticationSuccessfull = false;
 
+	bool authenticationSuccessfull = false;
 	if (ot::json::exists(_actionDocument, OT_PARAM_AUTH_PASSWORD))
 	{
 		loginMode = LoginMode::UsernamePassword;
@@ -309,7 +309,15 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		loginMode = LoginMode::Token;
 	}
-
+	else if (ot::json::exists(_actionDocument, OT_PARAM_AUTH_SSO_Initial))
+	{
+		loginMode = LoginMode::SSO;
+	}
+	else
+	{
+		OT_LOG_E("No valid login mode provided");
+		throw std::runtime_error("No valid login mode provided");
+	}
 
 	switch (loginMode)
 	{
@@ -330,6 +338,9 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		{
 			password = ot::UserCredentials::decryptString(password);
 		}
+
+		std::string tmp;
+		authenticationSuccessfull = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient, tmp);
 	}
 	break;
 
@@ -346,22 +357,23 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 			// Here we return if the sequnce is not done yet or it may have failed
 			return returnDoc.toJson();
 		}
-		else
-		{
-			password = "";
-		}
+
+		password.clear();
+		std::string tmp;
+		authenticationSuccessfull = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient, tmp);
 	}
 		break;
 
 	case LoginMode::Token:
 	{
-		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, password, returnDoc);
+		password.clear();
+		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, returnDoc);
 		switch (result)
 		{
 		case AccessTokenManager::AuthenticationResult::Success:
 			// Here we have a successful token authentication and retreived the credentials,
 			// but we still need to check the user in the database
-			loginMode = LoginMode::UsernamePassword;
+			authenticationSuccessfull = true;
 			break;
 
 		case AccessTokenManager::AuthenticationResult::ChallengeRequired:
@@ -385,11 +397,11 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 	// Now we still need to check for a user entry in mongodb, matching the credentials
 	// ! If user permission is being added, look into the successfulMongoAuthenticate else path for sso !
-	std::string originalUserName;
-	bool successfulMongoAuthenticate = MongoUserFunctions::authenticateUser(username, password, m_databaseURL, m_adminClient, originalUserName);
 	
-	if (successfulMongoAuthenticate)
+	if (authenticationSuccessfull)
 	{
+		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, true, returnDoc.GetAllocator());
+
 		// Now we are creating the session user and password. They are valid for the lifetime of a session.
 		std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
 		std::string sessionPWD = createRandomPassword();
@@ -399,16 +411,16 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		// Fills in the fields about the session user in the mongodb document
 		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
 
+
 		if (loginMode == LoginMode::UsernamePassword)
 		{
-			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, successfulMongoAuthenticate, returnDoc.GetAllocator());
 			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
 		// else is a sso login and there everything neccessary was already added by the handleRequest method
 	}
 	else
 	{
-		if (loginMode != LoginMode::UsernamePassword)
+		if (loginMode == LoginMode::SSO)
 		{
 			// Here we have a sso login that was successful (otherwise the m_ssoBuffer.handleRequest would have returned earlier), but the mongoDB authentication failed.
 			// This is the case when the sso user has not been registered yet. 
