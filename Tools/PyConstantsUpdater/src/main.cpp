@@ -301,6 +301,13 @@ namespace
 
                 const std::string identifier = expression.substr(i, end - i);
 
+                if (identifier.rfind("OT", 0) != 0)
+                {
+                    result += identifier;
+                    i = end;
+                    continue;
+                }
+
                 std::string replacement;
 
                 if (!resolveMacro(identifier, macros, resolving, replacement, error))
