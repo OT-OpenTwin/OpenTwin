@@ -92,6 +92,8 @@ void EntityMeshCartesian::createProperties(const std::string materialsFolder, ot
 	// Mesh line distribution
 	EntityPropertiesDouble::createProperty("Mesh lines", "Smallest mesh step ratio", 10.0, "Cartesian Meshing", getProperties());
 	EntityPropertiesDouble::createProperty("Mesh lines", "Mesh equilibration ratio", 2.0, "Cartesian Meshing", getProperties());
+	EntityPropertiesBoolean::createProperty("Mesh lines", "Edge singularity refinement", true, "Cartesian Meshing", getProperties());
+	EntityPropertiesDouble::createProperty("Mesh lines", "Edge refinement factor", 2.0, "Cartesian Meshing", getProperties());
 
 	// Algorithm
 	EntityPropertiesBoolean::createProperty("Algorithm", "Conformal meshing", false, "Cartesian Meshing", getProperties());
@@ -126,6 +128,8 @@ bool EntityMeshCartesian::updatePropertyVisibilities(void)
 	EntityPropertiesSelection *problemType          = dynamic_cast<EntityPropertiesSelection*>(getProperties().getProperty("Problem type")); 
 	EntityPropertiesDouble *maximumFrequency        = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum frequency"));
 	EntityPropertiesDouble *stepsPerWavelength      = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Steps per wavelength"));
+	EntityPropertiesBoolean *edgeRefinement         = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Edge singularity refinement"));
+	EntityPropertiesDouble *edgeRefinementFactor    = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Edge refinement factor"));
 
 	if (backgroundMode != nullptr && extendFlag != nullptr && backgroundMaterial != nullptr && boundaryDistanceAllAbs != nullptr && boundaryDistanceAllRel != nullptr
 		&& boundaryDistanceAbsXmin != nullptr && boundaryDistanceAbsXmax != nullptr && boundaryDistanceAbsYmin != nullptr && boundaryDistanceAbsYmax != nullptr 
@@ -249,6 +253,15 @@ bool EntityMeshCartesian::updatePropertyVisibilities(void)
 		}
 	}
 
+	if (edgeRefinement != nullptr && edgeRefinementFactor != nullptr)
+	{
+		if (edgeRefinementFactor->getVisible() != edgeRefinement->getValue())
+		{
+			edgeRefinementFactor->setVisible(edgeRefinement->getValue());
+			updatePropertiesGrid = true;
+		}
+	}
+		
 	return updatePropertiesGrid;
 }
 

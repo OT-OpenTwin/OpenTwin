@@ -94,7 +94,7 @@ private:
 	void refineUntilValid(std::vector<double>& grid, const std::vector<MeshLineCalculatorStepRange>& ranges);
 	std::vector<double> equilibrateMeshLines(std::vector<double> meshLines, double meshEquilibrationRatio);
 	std::vector<double> splitGrowing(double length, double neighborStep, double ratio);
-	void determineEdgeRefinments();
+	void determineEdgeRefinments(double baseStepWidth);
 	void appendEdgeRefinementsFromBrep(const TopoDS_Shape& brep, double edgeStepWidthX, double edgeStepWidthY, double edgeStepWidthZ);
 
 	// Data

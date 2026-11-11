@@ -197,6 +197,8 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	EntityPropertiesBoolean *curvatureRefinment = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Curvature refinement"));
 	EntityPropertiesInteger *numStepsPerCircle = dynamic_cast<EntityPropertiesInteger*>(getProperties().getProperty("Number of steps per circle"));
 	EntityPropertiesDouble *minCurvRefinementRadius = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Minimum curvature refinement radius"));
+	EntityPropertiesBoolean* edgeSingularityRefinement = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Edge singularity refinement"));
+	EntityPropertiesDouble* edgeRefinementFactor = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Edge refinement factor"));
 	EntityPropertiesDouble *maximumDeviation = dynamic_cast<EntityPropertiesDouble*>(getProperties().getProperty("Maximum deviation of mesh from shape"));
 	EntityPropertiesEntityList *material = dynamic_cast<EntityPropertiesEntityList*>(getProperties().getProperty("Material"));
 	EntityPropertiesBoolean* anisotropicEdgeLength = dynamic_cast<EntityPropertiesBoolean*>(getProperties().getProperty("Anisotropic edge length"));
@@ -211,6 +213,8 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	bool showCurvatureRefinment = true;
 	bool showNumStepsPerCircle = true;
 	bool showMinCurvRefinementRadius = true;
+	bool showEdgeSingularityRefinement = true;
+	bool showEdgeRefinementFactor = true;
 	bool showMaximumDeviation = true;
 	bool showAnisotropicEdgeLength = false;
 
@@ -226,6 +230,8 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 			showNumStepsPerCircle = false;
 			showMinCurvRefinementRadius = false;
 			showMaximumDeviation = false;
+			showEdgeSingularityRefinement = false;
+			showEdgeRefinementFactor = false;
 		}
 	}
 
@@ -238,6 +244,16 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 			showNumStepsPerCircle = false;
 			showMinCurvRefinementRadius = false;
 			showMaximumDeviation = false;
+			showEdgeSingularityRefinement = false;
+			showEdgeRefinementFactor = false;
+		}
+	}
+
+	if (edgeSingularityRefinement != nullptr)
+	{
+		if (!edgeSingularityRefinement->getValue())
+		{
+			showEdgeRefinementFactor = false;
 		}
 	}
 
@@ -350,6 +366,24 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 		}
 	}
 
+	if (edgeSingularityRefinement != nullptr)
+	{
+		if (edgeSingularityRefinement->getVisible() != showEdgeSingularityRefinement)
+		{
+			edgeSingularityRefinement->setVisible(showEdgeSingularityRefinement);
+			updatePropertiesGrid = true;
+		}
+	}
+		
+	if (edgeRefinementFactor != nullptr)
+	{
+		if (edgeRefinementFactor->getVisible() != showEdgeRefinementFactor)
+		{
+			edgeRefinementFactor->setVisible(showEdgeRefinementFactor);
+			updatePropertiesGrid = true;
+		}
+	}
+
 	if (meshStepWidth != nullptr) meshStepWidth->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (meshPriority != nullptr) meshPriority->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
 	if (considerForMeshing != nullptr) considerForMeshing->resetNeedsUpdate(); // This will be used for meshing only, no action necessary here.
@@ -364,6 +398,8 @@ bool EntityGeometry::updatePropertyVisibilities(void)
 	if (maximumEdgeLengthX != nullptr) maximumEdgeLengthX->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
 	if (maximumEdgeLengthY != nullptr) maximumEdgeLengthY->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
 	if (maximumEdgeLengthZ != nullptr) maximumEdgeLengthZ->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (edgeSingularityRefinement != nullptr) edgeSingularityRefinement->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
+	if (edgeRefinementFactor != nullptr) edgeRefinementFactor->resetNeedsUpdate(); // This will be used for meshing and solving only, no action necessary here.
 
 	return updatePropertiesGrid;
 }
@@ -753,10 +789,12 @@ void EntityGeometry::createNonMaterialProperties(void)
 	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length Y",		0.0,   "",     getProperties());
 	EntityPropertiesDouble::createProperty("Mesh", "Maximum edge length Z",		0.0,   "",     getProperties());
 
-	EntityPropertiesBoolean::createProperty("Mesh refinement", "Curvature refinement",					true, "Tetrahedral Meshing", getProperties());
-	EntityPropertiesDouble::createProperty("Mesh refinement", "Maximum deviation of mesh from shape", 0.0, "Tetrahedral Meshing", getProperties());
-	EntityPropertiesInteger::createProperty("Mesh refinement", "Number of steps per circle",			   6, "Tetrahedral Meshing", getProperties());
-	EntityPropertiesDouble::createProperty("Mesh refinement", "Minimum curvature refinement radius",    0.0, "Tetrahedral Meshing",  getProperties());
+	EntityPropertiesBoolean::createProperty("Mesh refinement", "Curvature refinement",					true, "", getProperties());
+	EntityPropertiesDouble::createProperty("Mesh refinement", "Maximum deviation of mesh from shape", 0.0, "", getProperties());
+	EntityPropertiesInteger::createProperty("Mesh refinement", "Number of steps per circle",			   6, "", getProperties());
+	EntityPropertiesDouble::createProperty("Mesh refinement", "Minimum curvature refinement radius",    0.0, "",  getProperties());
+	EntityPropertiesBoolean::createProperty("Mesh refinement", "Edge singularity refinement", true, "", getProperties());
+	EntityPropertiesDouble::createProperty("Mesh refinement", "Edge refinement factor", 2.0, "", getProperties());
 
 	EntityPropertiesBoolean *transformNeedsUpdateProp = new EntityPropertiesBoolean("transformNeedsUpdate", false);
 	transformNeedsUpdateProp->setVisible(false);
@@ -1087,21 +1125,27 @@ std::string EntityGeometry::serialiseAsJSON()
 	// Store the brep information
 	ot::JsonDocument serialisedBrep;
 	std::map<ot::UID, EntityBase*> entityMap;
-	EntityBrep* brep = dynamic_cast<EntityBrep*>(readEntityFromEntityID(this, getBrepStorageObjectID(), entityMap));
+	EntityBrep* brepEntity = dynamic_cast<EntityBrep*>(readEntityFromEntityID(this, getBrepStorageObjectID(), entityMap));
 	if (brep != nullptr)
 	{
-		auto docBrep = brep->serialiseAsJSON();
+		auto docBrep = brepEntity->serialiseAsJSON();
 		serialisedBrep.fromJson(docBrep);
+
+		delete brepEntity;
+		brepEntity = nullptr;
 	}
 
 	// Store the facet information
 	entityMap.clear();
 	ot::JsonDocument serialisedFacets;
-	EntityFacetData* facets = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
-	if (facets != nullptr)
+	EntityFacetData* facetEntity = dynamic_cast<EntityFacetData*>(readEntityFromEntityID(this, getFacetsStorageObjectID(), entityMap));
+	if (facetEntity != nullptr)
 	{
-		auto docFacets = facets->serialiseAsJSON();
+		auto docFacets = facetEntity->serialiseAsJSON();
 		serialisedFacets.fromJson(docFacets);
+
+		delete facetEntity;
+		facetEntity = nullptr;
 	}
 
 	entireDoc.AddMember("SerialisationOfBrep", serialisedBrep, entireDoc.GetAllocator());

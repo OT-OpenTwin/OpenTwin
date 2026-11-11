@@ -75,7 +75,7 @@ void MeshLineCalculator::updateMeshLines()
 	std::list<MeshLineCalculatorWeightedPoint> finalFixPlanesZ = mergeWeightedPoints(mergedFixPlanesZ, smallestMeshStep);
 
 	// Now we detect all edges of the PEC geometric objects which need refinement
-	determineEdgeRefinments();
+	determineEdgeRefinments(baseStepWidth);
 
 	// Next, we determine the stepwidth profile from the objects bounding boxes
 	std::vector<MeshLineCalculatorStepRange> densityRangesX = determineDensityRanges(0, meshBoundingBox.getXmin(), meshBoundingBox.getXmax(), baseStepWidth);
@@ -964,34 +964,50 @@ std::vector<double> MeshLineCalculator::equilibrateMeshLines(std::vector<double>
 	return meshLines;
 }
 
-void MeshLineCalculator::determineEdgeRefinments()
+void MeshLineCalculator::determineEdgeRefinments(double baseStepWidth)
 {
 	edgeRefinements.clear();
 
 	if (problemType == nullptr)
 		return;
 
+	// Determine global settings for edge refinement
+	EntityPropertiesBoolean* globalEdgeRefinementProperty       = dynamic_cast<EntityPropertiesBoolean*>(meshEntity->getProperties().getProperty("Edge singularity refinement"));
+	EntityPropertiesDouble*  globalEdgeRefinementFactorProperty = dynamic_cast<EntityPropertiesDouble*>(meshEntity->getProperties().getProperty("Edge refinement factor"));
+
+	bool globalEdgeRefinement         = globalEdgeRefinementProperty == nullptr ? false : globalEdgeRefinementProperty->getValue();
+	double globalEdgeRefinementFactor = globalEdgeRefinementFactorProperty == nullptr ? 1.0 : globalEdgeRefinementFactorProperty->getValue();
+
 	for (auto currentMeshEntity : meshEntities)
 	{
 		EntityGeometry* geometryEntity = dynamic_cast<EntityGeometry*>(currentMeshEntity);
 		if (geometryEntity != nullptr)
 		{
+			EntityPropertiesSelection* meshRefinement = dynamic_cast<EntityPropertiesSelection*>(geometryEntity->getProperties().getProperty("Mesh refinement"));
+			EntityPropertiesBoolean* localEdgeRefinementProperty = dynamic_cast<EntityPropertiesBoolean*>(geometryEntity->getProperties().getProperty("Edge singularity refinement"));
+			EntityPropertiesDouble* localEdgeRefinementFactorProperty = dynamic_cast<EntityPropertiesDouble*>(geometryEntity->getProperties().getProperty("Edge refinement factor"));
+
+			bool localEdgeRefinement = localEdgeRefinementProperty == nullptr ? false : localEdgeRefinementProperty->getValue();
+			double localEdgeRefinementFactor = localEdgeRefinementFactorProperty == nullptr ? 1.0 : localEdgeRefinementFactorProperty->getValue();
+
+			if (meshRefinement == nullptr || meshRefinement->getValue() == "Global setting")
+			{
+				localEdgeRefinement = globalEdgeRefinement;
+				localEdgeRefinementFactor = globalEdgeRefinementFactor;
+			}
+
 			CartesianMeshMaterial* material = static_cast<CartesianMeshMaterial*>(geometryEntity->getData());
 			if (material != nullptr)
 			{
-				if (problemType->applyEdgeRefinement(material))
+				if (problemType->applyEdgeRefinement(material) && localEdgeRefinement)
 				{
 					// Now we apply the edge refinement to the edges of this shape. Process all edges
 
 					TopoDS_Shape brep = geometryEntity->getBrep();
 
-					double baseStepWidth = problemType->getBaseStepWidth();
-
-					double edgeRefinementFactor = 20.0;
-
-					double edgeStepWidthX = getVolumeMeshStepWidth(0, geometryEntity, baseStepWidth) / edgeRefinementFactor;
-					double edgeStepWidthY = getVolumeMeshStepWidth(1, geometryEntity, baseStepWidth) / edgeRefinementFactor;
-					double edgeStepWidthZ = getVolumeMeshStepWidth(2, geometryEntity, baseStepWidth) / edgeRefinementFactor;
+					double edgeStepWidthX = getVolumeMeshStepWidth(0, geometryEntity, baseStepWidth) / localEdgeRefinementFactor;
+					double edgeStepWidthY = getVolumeMeshStepWidth(1, geometryEntity, baseStepWidth) / localEdgeRefinementFactor;
+					double edgeStepWidthZ = getVolumeMeshStepWidth(2, geometryEntity, baseStepWidth) / localEdgeRefinementFactor;
 
 					appendEdgeRefinementsFromBrep(brep, edgeStepWidthX, edgeStepWidthY, edgeStepWidthZ);
 				}
