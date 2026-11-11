@@ -60,6 +60,7 @@ void ProjectHelperBatchHelperCustomItem::createFromPath(TreeWidget* _tree, TreeW
 	tryCreate(_tree, _parent, _slotItem, "FHU: Check for headers to update", path, "/Scripts/Other/UpdateFileHeaders.bat", { "--dry" }, false);
 	tryCreate(_tree, _parent, _slotItem, "FHU: Update files", path, "/Scripts/Other/UpdateFileHeaders.bat", { "--notifychangeonly" }, false);
 	tryCreate(_tree, _parent, _slotItem, "FHU: Update files (Verbouse)", path, "/Scripts/Other/UpdateFileHeaders.bat", {}, false);
+	tryCreate(_tree, _parent, _slotItem, "Update Python Module Constants", path, "/Scripts/Other/UpdatePythonModuleConstants.bat", {}, false);
 }
 
 void ProjectHelperBatchHelperCustomItem::createFromScript(ot::TreeWidget* _tree, ot::TreeWidgetItem* _parent, const QString& _text, const QString& _rootPath, const QString& _scriptPath, const QStringList& _args, bool _detached, ProjectHelperBatchHelperCustomItem* _slotItem)
