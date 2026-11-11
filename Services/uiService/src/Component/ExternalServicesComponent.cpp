@@ -211,6 +211,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_ServiceSetupCompleted, this, &ExternalServicesComponent::handleServiceSetupCompleted);
 	connectAction(OT_ACTION_CMD_UI_RegisterForModelEvents, this, &ExternalServicesComponent::handleRegisterForModelEvents);
 	connectAction(OT_ACTION_CMD_UI_DeregisterForModelEvents, this, &ExternalServicesComponent::handleDeregisterForModelEvents);
+	connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &ExternalServicesComponent::handleRegisterNewLMS);
 
 	// File handling
 	connectAction(OT_ACTION_CMD_UI_RequestFileForReading, this, &ExternalServicesComponent::handleRequestFileForReading);
@@ -2570,6 +2571,12 @@ void ExternalServicesComponent::handleDeregisterForModelEvents(ot::JsonDocument&
 	this->removeServiceFromList(m_modelViewNotifier, s->second);
 
 	OT_LOG_D("Service with ID \"" + std::to_string(s->second->getServiceID()) + "\" was deregistered from model view events");
+}
+
+void ExternalServicesComponent::handleRegisterNewLMS(ot::JsonDocument& _document)
+{
+	std::string lmsURL = ot::json::getString(_document, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	OT_UNUSED(lmsURL);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

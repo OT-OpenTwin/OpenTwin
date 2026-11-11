@@ -511,8 +511,12 @@ ot::ReturnMessage GlobalSessionService::handleRegisterSessionService(ot::JsonDoc
 ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(ot::JsonDocument& _doc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	m_libraryManagementUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	
+	// Check
+	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	if(m_libraryManagementUrl == lmsUrl) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed,"LibraryManagementService Url is already registered");
+	}
+
 	ot::JsonDocument lssDoc;
 	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
 	lssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
@@ -527,7 +531,7 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 		if (response != ot::ReturnMessage::Ok) {
-			OT_LOG_E("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
+			OT_LOG_W("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
 		}
 	}
 

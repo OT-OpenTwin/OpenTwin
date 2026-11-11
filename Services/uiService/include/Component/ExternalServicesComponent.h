@@ -232,6 +232,7 @@ public:
 	void handleServiceSetupCompleted(ot::JsonDocument& _document);
 	void handleRegisterForModelEvents(ot::JsonDocument& _document);
 	void handleDeregisterForModelEvents(ot::JsonDocument& _document);
+	void handleRegisterNewLMS(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -1161,7 +1161,11 @@ ot::ReturnMessage SessionService::handleRegisterNewGlobalDirectoryService(ot::Js
 ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc) {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	m_lmsUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	std::string newLmsUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
+	if (m_lmsUrl == newLmsUrl) {
+		return ot::ReturnMessage::Failed;
+	}
+	m_lmsUrl = std::move(newLmsUrl);
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, doc.GetAllocator()), doc.GetAllocator());
