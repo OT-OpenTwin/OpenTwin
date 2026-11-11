@@ -1,5 +1,12 @@
 # @otlicense
+ 
+# OpenTwin
+from opentwin.client import OpenTwinClient
+from opentwin.config import Config
+from opentwin.return_message import ReturnMessage, ReturnMessageStatus
 
-from .client import OpenTwinClient
-
-__all__ = ["OpenTwinClient"]
+__all__ = ["OpenTwinClient",
+            "Config",
+            "ReturnMessage",
+            "ReturnMessageStatus"
+            ]

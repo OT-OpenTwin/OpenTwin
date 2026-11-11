@@ -508,16 +508,17 @@ namespace
             return false;
         }
 
-        file << "# ############################################################################\n";
-        file << "# This file was auto generated from the following source header:\n";
-        file << "#     " << source.filename().string() << "\n";
-        file << "# ############################################################################\n\n";
+        file << "# ############################################################################" << std::endl;
+        file << "# This file was auto generated from the following source header:" << std::endl;
+        file << "#     " << source.filename().string() << std::endl;
+        file << "# ############################################################################" << std::endl << std::endl;
 
-        file << "from typing import Final\n\n";
+        file << "# Python standard" << std::endl;
+        file << "from typing import Final" << std::endl << std::endl;
 
         for (const auto& [name, value] : constants)
         {
-            file << name << ": Final[str] = " << value << '\n';
+            file << name << ": Final[str] = " << value << std::endl;
         }
 
         if (!file.good())

@@ -50,7 +50,7 @@
         {
             "label": "OpenTwin Python: Run tests",
             "type": "shell",
-            "command": ".\\.venv\\Scripts\\python.exe -m pytest",
+            "command": ".\\.venv\\Scripts\\python.exe -m pytest -s",
             "options": {
                 "shell": {
                     "executable": "powershell.exe",

@@ -1,15 +1,21 @@
 # @otlicense
 
+# Python standard
 import ssl
 import json
-
+from pathlib import Path
 from typing import Any
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
+import logging
+logger = logging.getLogger("OpenTwin")
 
+# OpenTwin
+from opentwin.config import Config
 from opentwin.return_message import ReturnMessage, ReturnMessageStatus
+
+# OpenTwin internal
 from opentwin._internal.ActionTypes import *
-from opentwin.config import OpenTwinConfig
 
 class Communication:
     """
@@ -19,16 +25,16 @@ class Communication:
 
     Attributes:
         globalSessionServiceUrl (str): The URL of the Global Session Service.
+        config (Config): The configuration object.
     """
-    def __init__(self, globalSessionServiceUrl: str) -> None:
+    def __init__(self, globalSessionServiceUrl: str, config: Config) -> None:
         self._initialized = False
-        self._config = OpenTwinConfig()
         self._gssUrl = globalSessionServiceUrl
-
+        
         # Initialize TLS configuration
-        self._ssl_context = self._create_ssl_context()
+        self._ssl_context = self._create_ssl_context(config.ca_certificate_path)
 
-        self._print(f"Initializing Communication with Global Session Service URL: {self._gssUrl}")
+        logger.debug(f"Initializing Communication with Global Session Service URL: {self._gssUrl}")
 
         # Create a request to the Global Session Service to retrieve the global information
         
@@ -36,6 +42,8 @@ class Communication:
             OT_ACTION_MEMBER: OT_ACTION_CMD_GetGlobalServicesUrl
         }
         globalInfoResponseMessage = self.send_to_return_message(self._gssUrl, globalInfoRequest)
+
+        logger.debug(f"Global information response: {globalInfoResponseMessage}")
 
         if not globalInfoResponseMessage.is_ok():
             raise RuntimeError("Failed to retrieve global information from the Global Session Service: " + globalInfoResponseMessage.what)
@@ -64,12 +72,13 @@ class Communication:
             raise RuntimeError("Global Session Service did not return a logger URL")
 
         self._initialized = True
-        self._print("Initialized Communication successfully with:")
-        self._print(f"  Global Session Service URL: {self._gssUrl}" + " (connection confirmed)")
-        self._print(f"  Database URL: {self._databaseUrl}")
-        self._print(f"  Authorization URL: {self._authUrl}")
-        self._print(f"  Global Directory URL: {self._gdsUrl}")
-        self._print(f"  Logger URL: {self._loggerUrl}")
+        logger.debug("Initialized Communication successfully with:"
+                     f"    Global Session Service URL: {self._gssUrl} (connection confirmed)"
+                     f"    Database URL: {self._databaseUrl}"
+                     f"    Authorization URL: {self._authUrl}"
+                     f"    Global Directory URL: {self._gdsUrl}"
+                     f"    Logger URL: {self._loggerUrl}"
+                     )
 
     @staticmethod
     def _normalize_url(url: str) -> str:
@@ -117,7 +126,7 @@ class Communication:
 
     # General communication methods
 
-    def _create_ssl_context(self) -> ssl.SSLContext:
+    def _create_ssl_context(self, ca_certificate_path: Path) -> ssl.SSLContext:
         """Create an SSL context using the configured CA certificate.
 
         Returns:
@@ -127,14 +136,13 @@ class Communication:
             FileNotFoundError: If the CA certificate does not exist.
             ssl.SSLError: If the CA certificate cannot be loaded.
         """
-        ca_path = self._config.ca_certificate_path
 
-        if not ca_path.is_file():
-            raise FileNotFoundError(f"CA certificate not found: {ca_path}")
+        if not ca_certificate_path.is_file():
+            raise FileNotFoundError(f"CA certificate not found: {ca_certificate_path}")
 
         context = ssl.create_default_context(
             purpose=ssl.Purpose.SERVER_AUTH,
-            cafile=str(ca_path)
+            cafile=str(ca_certificate_path)
         )
 
         return context
@@ -233,9 +241,3 @@ class Communication:
             return ReturnMessage.from_json(response_data)
         except Exception as e:
             return ReturnMessage(status=ReturnMessageStatus.StatusFailed, what=str(e))
-
-    ################################################################################################################################
-    
-    @staticmethod
-    def _print(message: str) -> None:
-        print("[OpenTwin] [COMM] " + message)

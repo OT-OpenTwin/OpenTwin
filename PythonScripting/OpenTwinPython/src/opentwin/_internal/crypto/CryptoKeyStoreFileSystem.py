@@ -2,9 +2,10 @@
 
 """Implements a local file-system-backed cryptographic key store."""
 
-import re
+# Python standard
 from pathlib import Path
 
+# OpenTwin internal
 from opentwin._internal.system.DirectoryManager import DirectoryManager
 from opentwin._internal.crypto.CryptoKeyStore import CryptoKeyStore
 from opentwin._internal.crypto.SignatureProvider import SignatureProvider

@@ -2,6 +2,7 @@
 
 """Defines the abstract interface for signing operations."""
 
+# Python standard
 from abc import ABC, abstractmethod
 
 

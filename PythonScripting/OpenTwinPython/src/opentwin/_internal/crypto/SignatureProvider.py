@@ -2,6 +2,7 @@
 
 """Provides cryptographic signature operations."""
 
+# External dependencies
 from cryptography.hazmat.primitives import serialization
 from cryptography.hazmat.primitives.asymmetric.ed25519 import Ed25519PrivateKey
 

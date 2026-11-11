@@ -2,8 +2,10 @@
 
 """Provides process-wide access to the configured cryptographic key store."""
 
+# Python standard
 from threading import Lock
 
+# OpenTwin internal
 from opentwin._internal.crypto.CryptoKeyStore import CryptoKeyStore
 from opentwin._internal.crypto.CryptoKeyStoreFileSystem import CryptoKeyStoreFileSystem
 

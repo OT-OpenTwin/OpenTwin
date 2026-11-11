@@ -1,8 +1,11 @@
 # @otlicense
 
-import base64
+# Python standard
 from typing import Any
+import logging
+logger = logging.getLogger("OpenTwin")
 
+# OpenTwin internal
 from opentwin._internal.ActionTypes import *
 from opentwin._internal.Communication import Communication
 from opentwin._internal.crypto.GlobalCryptoKeyStore import GlobalCryptoKeyStore
@@ -29,7 +32,7 @@ class Authentication:
             OT_ACTION_PARAM_Token: self._login_token
         }
 
-        self._print("Sending initial login request...")
+        logger.debug("Sending initial login request...")
 
         challengeDoc = self._io.send_to_json(self._io.authentication_url, challengeRequestDocument)
         challengeID = challengeDoc[OT_ACTION_PARAM_ChallengeID]
@@ -43,13 +46,13 @@ class Authentication:
 
         challengeBytes = challenge.encode("utf-8")
 
-        self._print(f"Signing challenge: {challenge}")
+        logger.debug(f"Signing challenge: {challenge}")
 
         # Sign the challenge with the global key store
         store = GlobalCryptoKeyStore.get()
         signature = store.sign(OT_CRYPTO_GLOBAL_KEY_ID_LOCAL_TOKEN_SIGNATURE, challengeBytes)
 
-        self._print(f"Sending login request with signed challenge...")
+        logger.debug(f"Generated signature: {signature}")
 
         # Convert signature to base 64 url safe string
         signature = Encoding.toBase64Url(signature)
@@ -67,16 +70,10 @@ class Authentication:
         success = loginResponseDoc[OT_ACTION_AUTH_SUCCESS]
  
         if not success:
-            print(f"Authentication failed. Response: {loginResponseDoc}")
+            logger.error(f"Authentication failed. Response: {loginResponseDoc}")
             raise RuntimeError("Authentication failed")
         
         dbUser = loginResponseDoc[OT_PARAM_DB_USERNAME]
         dbPassword = loginResponseDoc[OT_PARAM_DB_PASSWORD]
 
-        self._print(f"Authenticated successfully.")
-
-    ################################################################################################################################
-
-    @staticmethod
-    def _print(message: str) -> None:
-        print("[OpenTwin] [AUTH] " + message)
+        logger.debug(f"Authenticated successfully.")

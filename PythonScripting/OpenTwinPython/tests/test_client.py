@@ -1,7 +1,10 @@
 import os
 from opentwin import OpenTwinClient
+from tests.globals import ot_initialize_tests as ini
 
 def test_login_does_nothing():
+    ini()
+
     print("Running test...")
  
     # first read token from env variable OPEN_TWIN_ACCESS_TOKEN
