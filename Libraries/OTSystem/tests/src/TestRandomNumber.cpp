@@ -60,3 +60,60 @@ TEST(RandomNumberTest, ZeroSizeThrows)
     ot::RandomNumberGeneratorSW gen;
     EXPECT_THROW(gen.createRandomBytes(0), ot::Exception::OutOfBounds);
 }
+
+TEST(RandomNumberTest, IntStaysInRange)
+{
+    ot::RandomNumberGeneratorSW gen;
+    std::set<uint64_t> seen;
+
+    for (int i = 0; i < 1000; i++)
+    {
+        uint64_t value = gen.createPositiveRandomInt64(10);
+        ASSERT_LE(value, 10u);
+        seen.insert(value);
+    }
+
+    // All 11 values should appear in 1000 draws
+    EXPECT_EQ(seen.size(), 11u);
+}
+
+TEST(RandomNumberTest, IntMaxValueOne)
+{
+    ot::RandomNumberGeneratorSW gen;
+    std::set<uint64_t> seen;
+    for (int i = 0; i < 100; i++)
+    {
+        uint64_t value = gen.createPositiveRandomInt64(1);
+        ASSERT_LE(value, 1u);
+        seen.insert(value);
+    }
+
+    EXPECT_EQ(seen.size(), 2u);
+}
+
+TEST(RandomNumberTest, IntFullRange)
+{
+    ot::RandomNumberGeneratorSW gen;
+    EXPECT_NE(gen.createPositiveRandomInt64(), gen.createPositiveRandomInt64());
+}
+
+TEST(RandomNumberTest, IntZeroMaxThrows)
+{
+    ot::RandomNumberGeneratorSW gen;
+    EXPECT_THROW(gen.createPositiveRandomInt64(0), ot::Exception::OutOfBounds);
+}
+
+TEST(RandomNumberTest, ProviderUsesDefaultGenerator)
+{
+    ASSERT_NE(ot::RandomNumberProvider::getRandomNumberGenerator(), nullptr);
+    EXPECT_EQ(ot::RandomNumberProvider::createRandomBytes(16).size(), 16u);
+    EXPECT_LE(ot::RandomNumberProvider::createPositiveRandomInt64(5), 5u);
+}
+
+TEST(RandomNumberTest, ProviderRejectsNullGenerator)
+{
+    EXPECT_THROW(ot::RandomNumberProvider::setRandomNumberGenerator(nullptr), ot::Exception::InvalidArgument);
+
+    // Set default generator must still be in place after rejected call
+    EXPECT_NE(ot::RandomNumberProvider::getRandomNumberGenerator(), nullptr);
+}
