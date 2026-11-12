@@ -17,10 +17,11 @@
 // limitations under the License.
 // @otlicense-end
 
-#ifdef OT_OS_LINUX
 
 // OpenTwin Header
 #include "OTSystem/ArchitectureInfo.h"
+
+#ifdef OT_OS_LINUX
 #include "OTSystem/RandomNumber/RandomNumberGeneratorSW.h"
 #include "OTSystem/Exception.h"
 
