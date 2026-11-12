@@ -23,6 +23,7 @@
 
 // std header
 #include <vector>
+#include <limits>
 
 namespace ot
 {
@@ -37,7 +38,7 @@ namespace ot
 		//! @note Use this method if a single random integer is needed.
 		//! For generating multiple random integers, consider using createRandomBytes() for better performance.
 		//! @param _maxValue The maximum value of the random integer to be generated. Must be greater than 0.
-		virtual uint64_t createPositiveRandomInt64(uint64_t _maxValue) = 0;
+		virtual uint64_t createPositiveRandomInt64(uint64_t maxValue = std::numeric_limits<uint64_t>::max());
 
 		//! @brief Creates a vector of random bytes of the specified size.
 		//! @param _size The number of random bytes to generate.

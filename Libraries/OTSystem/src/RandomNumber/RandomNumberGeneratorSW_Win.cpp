@@ -37,46 +37,6 @@
 #undef max
 #include <ntstatus.h>
 
-uint64_t ot::RandomNumberGeneratorSW::createPositiveRandomInt64(uint64_t maxValue)
-{
-	if (maxValue == 0)
-	{
-		throw Exception::OutOfBounds("maxValue must be > 0");
-	}
-
-	auto generateRandomUInt64 = [&]() -> uint64_t
-		{
-			std::vector<uint8_t> bytes = createRandomBytes(sizeof(uint64_t));
-
-			uint64_t result;
-			std::memcpy(&result, bytes.data(), sizeof(result));
-
-			return result;
-		};
-
-	// Special case: the entire uint64_t range
-	if (maxValue == UINT64_MAX)
-	{
-		return generateRandomUInt64();
-	}
-
-	// Calculate the number of possible outcomes
-	const uint64_t range = maxValue + 1;
-
-	// Calculate the rejection threshold to avoid modulo bias
-	const uint64_t threshold = (uint64_t(0) - range) % range;
-
-	uint64_t randomNumber;
-
-	do
-	{
-		randomNumber = generateRandomUInt64();
-	}
-	while (randomNumber < threshold);
-
-	return randomNumber % range;
-}
-
 std::vector<uint8_t> ot::RandomNumberGeneratorSW::createRandomBytes(uint64_t _size)
 {
 	if (_size == 0)
