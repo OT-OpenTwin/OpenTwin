@@ -27,17 +27,10 @@ ot::Painter2DDialogFilter ot::Painter2DDialogFilterDefaults::plotCurve(bool _all
 	result.setStyleReferences(std::list<ColorStyleValueEntry> {
 		ColorStyleValueEntry::PlotCurve,
 		ColorStyleValueEntry::PlotCurveSymbol,
-		ColorStyleValueEntry::Rainbow0,
-		ColorStyleValueEntry::Rainbow1,
-		ColorStyleValueEntry::Rainbow2,
-		ColorStyleValueEntry::Rainbow3,
-		ColorStyleValueEntry::Rainbow4,
-		ColorStyleValueEntry::Rainbow5,
-		ColorStyleValueEntry::Rainbow6,
-		ColorStyleValueEntry::Rainbow7,
-		ColorStyleValueEntry::Rainbow8,
-		ColorStyleValueEntry::Rainbow9,
 	});
+	for (uint32_t entry = static_cast<uint32_t>(ColorStyleValueEntry::RainbowFirst); entry <= static_cast<uint32_t>(ColorStyleValueEntry::RainbowLast); ++entry) {
+		result.addStyleReference(static_cast<ColorStyleValueEntry>(entry));
+	}
 
 	if (_allowTransparent) {
 		result.addStyleReference(ColorStyleValueEntry::Transparent);

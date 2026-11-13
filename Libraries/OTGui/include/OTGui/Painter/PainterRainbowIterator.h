@@ -20,19 +20,29 @@
 #pragma once
 
 // OpenTwin header
+#include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
 
 // std header
+#include <cstdint>
 #include <memory>
 
 namespace ot
 {
+	//! @class PainterRainbowIterator
+	//! @brief Iterates over the 30 theme-dependent rainbow curve painters (Rainbow0..Rainbow29).
 	class OT_GUI_API_EXPORT PainterRainbowIterator
 	{
-		public:
-			PainterRainbowIterator();
-			bool initiateWithOtherPainter(const ot::Painter2D* _painter);
-			std::unique_ptr<ot::StyleRefPainter2D> getNextPainter();
+	public:
+		static constexpr uint32_t c_paletteSize = static_cast<uint32_t>(ColorStyleValueEntry::RainbowLast) - static_cast<uint32_t>(ColorStyleValueEntry::RainbowFirst) + 1;
+
+		PainterRainbowIterator();
+		bool initiateWithOtherPainter(const ot::Painter2D* _painter);
+		std::unique_ptr<ot::Painter2D> getNextPainter();
+
+		uint32_t getCurrentIndex() const { return m_currentColourIndex; }
+		void reset() { m_currentColourIndex = 0; }
+
 	private:
 		uint32_t m_currentColourIndex;
 	};

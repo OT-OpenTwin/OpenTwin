@@ -74,6 +74,7 @@ public:
 	void createFamilyOfCurves3Parameter();
 	void createPlotScatter();
 	void createPlotSinglePoint();
+	void createPlot30CurvesColors();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -131,6 +132,7 @@ private:
 
 	void createManyCurvesPlot(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints);
 	void createManyCurvesPlotWorker(const std::string& _plotName, int _numberOfCurves, float _numberOfPoints);
+	void createPlot30CurvesColorsWorker(const std::string& _plotName);
 
 public:
 

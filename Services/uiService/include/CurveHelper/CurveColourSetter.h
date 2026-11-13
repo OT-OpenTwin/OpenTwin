@@ -34,6 +34,6 @@ public:
 
 private:
 	ot::PainterRainbowIterator m_painterRainbowIterator;
-	std::vector<ot::StyleRefPainter2D*> m_rainbowPainterBuffer;
+	std::vector<ot::Painter2D*> m_rainbowPainterBuffer;
 	bool m_useRainBowItterator = false;
 };

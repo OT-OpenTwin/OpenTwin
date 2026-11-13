@@ -17,42 +17,39 @@
 // limitations under the License.
 // @otlicense-end
 
+// OpenTwin header
 #include "OTGui/Painter/PainterRainbowIterator.h"
 
 ot::PainterRainbowIterator::PainterRainbowIterator()
-	: m_currentColourIndex(static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst))
+	: m_currentColourIndex(0)
 {}
 
 bool ot::PainterRainbowIterator::initiateWithOtherPainter(const ot::Painter2D* _painter)
 {
-	const ot::StyleRefPainter2D*  stylePainter = dynamic_cast<const ot::StyleRefPainter2D*>(_painter);
-	bool isARainbowPainter = false;
+	if (_painter == nullptr)
+	{
+		return false;
+	}
+
+	const ot::StyleRefPainter2D* stylePainter = dynamic_cast<const ot::StyleRefPainter2D*>(_painter);
 	if (stylePainter != nullptr)
 	{
 		ot::ColorStyleValueEntry styleKey = stylePainter->getReferenceKey();
 		if (styleKey >= ot::ColorStyleValueEntry::RainbowFirst && styleKey <= ot::ColorStyleValueEntry::RainbowLast)
 		{
-			m_currentColourIndex = static_cast<uint32_t>(styleKey);
-			isARainbowPainter = true;
+			m_currentColourIndex = static_cast<uint32_t>(styleKey) - static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
+			return true;
 		}
 	}
-	return isARainbowPainter;
+
+	return false;
 }
 
-
-std::unique_ptr<ot::StyleRefPainter2D> ot::PainterRainbowIterator::getNextPainter()
+std::unique_ptr<ot::Painter2D> ot::PainterRainbowIterator::getNextPainter()
 {
-	ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(m_currentColourIndex);
-
-	if (m_currentColourIndex < static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowLast))
-	{
-		m_currentColourIndex++;
-	}
-	else
-	{
-		m_currentColourIndex = static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst); //Restart the rainbow
-	}
-
-	std::unique_ptr<ot::StyleRefPainter2D>stylePainter(new ot::StyleRefPainter2D(styleEntry));
-	return stylePainter;
+	ot::ColorStyleValueEntry styleEntry = static_cast<ot::ColorStyleValueEntry>(
+		static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst) + m_currentColourIndex
+	);
+	m_currentColourIndex = (m_currentColourIndex + 1) % c_paletteSize;
+	return std::make_unique<ot::StyleRefPainter2D>(styleEntry);
 }

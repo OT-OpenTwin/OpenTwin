@@ -25,6 +25,7 @@
 #include "OTSystem/DateTime.h"
 #include "OTSystem/OperatingSystem.h"
 
+#include "OTCore/EntityName.h"
 #include "OTCore/FolderNames.h"
 #include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/ReturnMessage.h"
@@ -164,6 +165,7 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Family of Curves 3P", "Default/Plot1DVisible"), std::bind(&Application::createFamilyOfCurves3Parameter, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Scatter Plot", "Default/Plot1DVisible"), std::bind(&Application::createPlotScatter, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Value Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotSinglePoint, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "30 Curves (Colors)", "Default/Plot1DVisible"), std::bind(&Application::createPlot30CurvesColors, this)));
 
 	// --------------------------------------------------------------------------------------------------------+
 
@@ -454,7 +456,7 @@ void Application::createPlotOneComplexCurveMagPhase()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	plotCfg.setYAxisQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(ot::ComplexNumbers::getComponentMagnitude()));
 	plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 	builder.buildPlot(plotCfg);
@@ -522,7 +524,7 @@ void Application::createPlotOneComplexCurveRealImag()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	plotCfg.setYAxisQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(ot::ComplexNumbers::getComponentMagnitude()));
 	plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 	builder.buildPlot(plotCfg);
@@ -563,7 +565,7 @@ void Application::createPlotOneCurve()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -626,7 +628,7 @@ void Application::createPlotTwoCurves() {
 
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -711,7 +713,7 @@ void Application::createFamilyOfCurves()
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -784,7 +786,7 @@ void Application::createFamilyOfCurves3ParameterConst()
 
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	plotCfg.setEntityName(plotName);
 	builder.buildPlot(plotCfg);
 }
@@ -856,7 +858,7 @@ void Application::createFamilyOfCurves3Parameter()
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -892,7 +894,7 @@ void Application::createPlotScatter() {
 	//Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -956,7 +958,7 @@ void Application::createPlotSinglePoint() {
 	// Here the shared part
 	ot::Plot1DCfg plotCfg;
 	plotCfg.setEntityName(plotName);
-	plotCfg.setXAxisParameter(parameter.parameterLabel);
+	plotCfg.setXAxisParameter(parameterDesc->getMetadataParameter().parameterLabel);
 	builder.buildPlot(plotCfg);
 }
 
@@ -1140,7 +1142,7 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 		description.setQuantityDescription(temp);
 		description.addParameterDescription(parameterDesc);
 
-		ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(_plotName, "/A_Curve" + std::to_string(curveId));
+		ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(_plotName, "A_Curve" + std::to_string(curveId));
 		curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
 
 		builder.addCurve(std::move(description), curveCfg, "Curve" + std::to_string(curveId), temp->getMetadataQuantity());
@@ -1151,8 +1153,101 @@ void Application::createManyCurvesPlotWorker(const std::string& _plotName, int _
 	plotCfg.setEntityName(_plotName);
 
 	ot::RuntimeIntervalTestLog testBuild("\"Application::createManyCurvesPlot - Build plot\" took ");
+	plotCfg.setUseLimitNbOfCurves(false);
+	plotCfg.setLimitOfCurves(_numberOfCurves);
 	plotCfg.setXAxisParameter("Frequency");
 	builder.buildPlot(plotCfg);
+
+	getUiComponent()->unlockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
+}
+
+void Application::createPlot30CurvesColors() {
+	getUiComponent()->lockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
+
+	const std::string baseName = "A_plot_30_Colors";
+	std::string plotEntityName = "Test/" + baseName;
+	int counter = 0;
+	std::list<std::string> existingPlots = ot::ModelServiceAPI::getListOfFolderItems("Test");
+
+	while (ot::ContainerHelper::contains(existingPlots, plotEntityName)) {
+		plotEntityName = "Test/" + baseName + "_" + std::to_string(++counter);
+	}
+
+	std::thread t(&Application::createPlot30CurvesColorsWorker, this, plotEntityName);
+	t.detach();
+}
+
+void Application::createPlot30CurvesColorsWorker(const std::string& _plotName) {
+	constexpr int c_curveCount = 30;
+	constexpr int c_pointCount = 120;
+
+	try {
+		ProgressUpdater progress(getUiComponent(), "Creating (" + _plotName + ")");
+		progress.setTotalNumberOfSteps(static_cast<uint64_t>(c_curveCount));
+		progress.setTriggerFrequency(1);
+
+		ot::PainterRainbowIterator rainbowPainterIt;
+
+		const std::string collName = getCollectionName();
+		ResultCollectionExtender extender(collName, *getModelComponent());
+		PlotBuilder builder(extender, &Application::instance());
+
+		std::string xAxisLabel = "Frequency";
+		for (int curveId = 0; curveId < c_curveCount; ++curveId) {
+			progress.triggerUpdate(static_cast<uint64_t>(curveId));
+
+			DatasetDescription description;
+			MetadataParameter parameter;
+			parameter.parameterName = "Frequency";
+			parameter.typeName = ot::TypeNames::getFloatTypeName();
+			parameter.unit = "kHz";
+
+			std::unique_ptr<QuantityDescriptionCurve> quantDesc(new QuantityDescriptionCurve());
+			quantDesc->setName("Magnitude");
+			quantDesc->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "dB");
+
+			for (int i = 0; i <= c_pointCount; ++i) {
+				const float x = static_cast<float>(i);
+				const double y = std::sin(static_cast<double>(i) * 0.15 + static_cast<double>(curveId) * 0.25) + static_cast<double>(curveId) * 1.5;
+				quantDesc->addDatapoint(ot::Variable(y));
+				parameter.values.push_back(ot::Variable(x));
+			}
+
+			std::shared_ptr<ParameterDescription> parameterDesc(new ParameterDescription(parameter, false));
+
+			auto temp = quantDesc.release();
+			description.setQuantityDescription(temp);
+			description.addParameterDescription(parameterDesc);
+
+			const int curveNumber = curveId + 1;
+			const std::string curveIndexStr = (curveNumber < 10 ? "0" : "") + std::to_string(curveNumber);
+			const std::string curveTitle = "Curve_" + curveIndexStr;
+			const std::string seriesName = ot::EntityName::getSubName(_plotName).value_or("Plot30Colors") + "_" + curveTitle;
+
+			ot::Plot1DCurveCfg curveCfg = EntityResult1DCurve::createDefaultConfig(_plotName, curveTitle);
+			curveCfg.setLinePenPainter(rainbowPainterIt.getNextPainter().release());
+			curveCfg.setLinePenWidth(2.0);
+
+			builder.addCurve(std::move(description), curveCfg, seriesName, temp->getMetadataQuantity());
+
+			if (curveId == 0 && !parameterDesc->getMetadataParameter().parameterLabel.empty()) {
+				xAxisLabel = parameterDesc->getMetadataParameter().parameterLabel;
+			}
+		}
+
+		ot::Plot1DCfg plotCfg;
+		plotCfg.setEntityName(_plotName);
+		plotCfg.setUseLimitNbOfCurves(false);
+		plotCfg.setLimitOfCurves(c_curveCount);
+		plotCfg.setXAxisParameter(xAxisLabel);
+		builder.buildPlot(plotCfg);
+	}
+	catch (const std::exception& _e) {
+		OT_LOG_E("Failed to create 30 curves color plot: " + std::string(_e.what()));
+	}
+	catch (...) {
+		OT_LOG_E("Unknown error while creating 30 curves color plot");
+	}
 
 	getUiComponent()->unlockUI(ot::LockType::ModelRead | ot::LockType::ModelWrite | ot::LockType::Properties);
 }

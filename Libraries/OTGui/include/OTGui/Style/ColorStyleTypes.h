@@ -229,9 +229,29 @@ namespace ot {
 		Rainbow7,
 		Rainbow8,
 		Rainbow9,
+		Rainbow10,
+		Rainbow11,
+		Rainbow12,
+		Rainbow13,
+		Rainbow14,
+		Rainbow15,
+		Rainbow16,
+		Rainbow17,
+		Rainbow18,
+		Rainbow19,
+		Rainbow20,
+		Rainbow21,
+		Rainbow22,
+		Rainbow23,
+		Rainbow24,
+		Rainbow25,
+		Rainbow26,
+		Rainbow27,
+		Rainbow28,
+		Rainbow29,
 
 		RainbowFirst = Rainbow0, //! @brief Helper to iterate over the rainbow. First rainbow entry.
-		RainbowLast = Rainbow9, //! @brief Helper to iterate over the rainbow. Last rainbow entry.
+		RainbowLast = Rainbow29, //! @brief Helper to iterate over the rainbow. Last rainbow entry.
 
 		ToolBarFirstTabBackground,
 		ToolBarFirstTabForeground,
