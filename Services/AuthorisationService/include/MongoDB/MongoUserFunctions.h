@@ -38,6 +38,7 @@
 #include <mongocxx/instance.hpp>
 
 // std header
+#include <set>
 #include <vector>
 #include <cstdint>
 #include <iostream>
@@ -95,7 +96,7 @@ public:
 	static void removeTmpUser(std::string userName, mongocxx::client& adminClient);
 
 private:
-	static std::set<std::string>& getAuthenticatedUserTokens();
-	static std::map<std::string, std::string>& getAuthenticatedUserOriginalName();
+	static std::set<std::string>& getAuthenticatedSessionUserTokens();
+	static std::map<std::string, std::string>& getSessionTokenToOriginalUserNameMap();
 
 };

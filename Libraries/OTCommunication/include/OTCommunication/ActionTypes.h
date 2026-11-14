@@ -109,6 +109,7 @@
 #define OT_ACTION_CMD_EditProjectInformation "Project.EditInformation"
 
 #define OT_ACTION_CMD_GenerateAccessToken "Token.Generate"
+#define OT_ACTION_CMD_GenerateTickets "Ticket.GenerateMultiple"
 
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
@@ -440,6 +441,7 @@
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Event "Event"
 #define OT_ACTION_PARAM_Graph "Graph"
+#define OT_ACTION_PARAM_Ticket "Ticket"
 #define OT_ACTION_PARAM_Hidden "Hidden"
 #define OT_ACTION_PARAM_Prefix "Prefix"
 #define OT_ACTION_PARAM_Suffix "Suffix"
@@ -462,6 +464,7 @@
 #define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
+#define OT_ACTION_PARAM_Username "Username"
 #define OT_ACTION_PARAM_TreeItem "Tree.Item"
 #define OT_ACTION_PARAM_RequestID "RequestID"
 #define OT_ACTION_PARAM_Requested "Requested"
@@ -469,6 +472,7 @@
 #define OT_ACTION_PARAM_ModelInfo "ModelInfo"
 #define OT_ACTION_PARAM_Challenge "Challenge"
 #define OT_ACTION_PARAM_Signature "Signature"
+#define OT_ACTION_PARAM_TicketType "TicketType"
 #define OT_ACTION_PARAM_IsSelected "IsSelected"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
@@ -985,3 +989,5 @@
 
 
 
+#define OT_TICKET_TYPE_Login "Ticket.Type.Login"
+#define OT_TICKET_TYPE_Gateway "Ticket.Type.Gateway"

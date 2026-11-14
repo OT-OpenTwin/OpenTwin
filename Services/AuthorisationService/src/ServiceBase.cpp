@@ -143,7 +143,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
-
+	else if (_action == OT_ACTION_CMD_GenerateTickets) { return handleGenerateTicketsFromToken(_actionDocument.GetObject()).toJson(); }
 	//------------------------------------------------------------------------------------
 
 	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
@@ -313,10 +313,6 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		loginMode = LoginMode::SSO;
 	}
-	else if (ot::json::exists(_actionDocument, OT_PARAM_DB_USERNAME))
-	{
-		loginMode = LoginMode::SessionUsernamePassword;
-	}
 	else
 	{
 		OT_LOG_E("No valid login mode provided");
@@ -371,31 +367,12 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	case LoginMode::Token:
 	{
 		password.clear();
-		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, returnDoc);
-		switch (result)
-		{
-		case AccessTokenManager::AuthenticationResult::Success:
-			// Here we have a successful token authentication and retreived the credentials,
-			// but we still need to check the user in the database
-			authenticationSuccessfull = true;
-			break;
-
-		case AccessTokenManager::AuthenticationResult::ChallengeRequired:
-			return returnDoc.toJson();
-
-		case AccessTokenManager::AuthenticationResult::Failure:
-			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
-			return returnDoc.toJson();
-
-		default:
-			OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
-			return returnDoc.toJson();
-		}
+		
 	}
 		break;
 
 	case LoginMode::SessionUsernamePassword:
-
+		authenticationSuccessfull = true;
 
 		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
 		return returnDoc.toJson();
@@ -650,6 +627,82 @@ ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObje
 	tokenDoc.AddMember(OT_ACTION_PARAM_Expires, token.getExpirationDate(), tokenDoc.GetAllocator());
 	
 	return ot::ReturnMessage::ok(tokenDoc.toJson());
+}
+
+ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJsonObject& _actionDocument)
+{
+	ot::JsonDocument responseDoc;
+
+	std::list<std::string> ticketTypeStrings;
+
+	if (!_actionDocument.HasMember(OT_ACTION_PARAM_TicketType))
+	{
+		return ot::ReturnMessage::failed("Missing \"" OT_ACTION_PARAM_TicketType "\" parameter");
+	}
+
+	const auto& ticketTypesVal = _actionDocument[OT_ACTION_PARAM_TicketType];
+
+	if (ticketTypesVal.IsString())
+	{
+		ticketTypeStrings.push_back(ticketTypesVal.GetString());
+	}
+	else if (ticketTypesVal.IsArray())
+	{
+		ticketTypeStrings = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_TicketType);
+	}
+
+	if (ticketTypeStrings.empty())
+	{
+		return ot::ReturnMessage::failed("No ticket types specified to generate");
+	}
+
+	auto result = m_accessTokenManager.authenticateUser(_actionDocument);
+	switch (result.status)
+	{
+	case AccessTokenManager::AuthenticationStatus::Success:
+		if (!result.username.has_value())
+		{
+			OT_LOG_E("Invalid authentication result (success but no user)");
+			return ot::ReturnMessage::failed("Invalid authentication result");
+		}
+
+		responseDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(result.username.value(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		break;
+
+	case AccessTokenManager::AuthenticationStatus::ChallengeRequired:
+		if (!result.challenge.has_value() || !result.challengeID.has_value())
+		{
+			OT_LOG_E("Invalid authentication result (challenge but no challenge or id)");
+			return ot::ReturnMessage::failed("Invalid authentication result");
+		}
+		responseDoc.AddMember(OT_ACTION_PARAM_Challenge, ot::JsonString(result.challenge.value(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_ChallengeID, ot::JsonString(result.challengeID.value(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
+
+	case AccessTokenManager::AuthenticationStatus::Failure:
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Authentication failed");
+
+	default:
+		OT_LOG_E("Unknown authentication result");
+		return ot::ReturnMessage::failed("Unknown authentication result");
+	}
+
+	OTAssert(result.status == AccessTokenManager::AuthenticationStatus::Success, "Unexpected status");
+
+	for (const auto& ticketType : ticketTypeStrings)
+	{
+		if (ticketType == OT_TICKET_TYPE_Login)
+		{
+
+		}
+		if (ticketType == OT_TICKET_TYPE_Gateway)
+		{
+
+		}
+	}
+
+
+	return ot::ReturnMessage();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
