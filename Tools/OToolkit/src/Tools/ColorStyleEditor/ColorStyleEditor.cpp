@@ -435,10 +435,10 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	
 	// Based on the Okabe-Iko colour palette. Yellow was exchanged with gold for better visibility, and two more colours were added for more variety.
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(0, 92, 92)))); // Substitute for black. If a single curve is focused, black is hard to recognise as the other curves are grayed.
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(230, 159, 0))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(86, 180, 233))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(212, 126, 0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(49, 156, 204))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(0, 158, 115))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(204,153,0))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(169, 146, 0))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0,114,178))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(213,94,0))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(204,121,167))));
@@ -447,13 +447,13 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow10), new PropertyPainter2D(new FillPainter2D(Color(184, 15, 121))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow11), new PropertyPainter2D(new FillPainter2D(Color(97, 114, 28))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow12), new PropertyPainter2D(new FillPainter2D(Color(40, 23, 215))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow13), new PropertyPainter2D(new FillPainter2D(Color(248, 121, 102))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow13), new PropertyPainter2D(new FillPainter2D(Color(234, 108, 90))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow14), new PropertyPainter2D(new FillPainter2D(Color(96, 141, 164))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow15), new PropertyPainter2D(new FillPainter2D(Color(181, 64, 247))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow16), new PropertyPainter2D(new FillPainter2D(Color(197, 10, 0))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow17), new PropertyPainter2D(new FillPainter2D(Color(56, 88, 5))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow18), new PropertyPainter2D(new FillPainter2D(Color(10, 70, 162))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow19), new PropertyPainter2D(new FillPainter2D(Color(248, 82, 240))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow19), new PropertyPainter2D(new FillPainter2D(Color(239, 73, 232))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow20), new PropertyPainter2D(new FillPainter2D(Color(153, 131, 92))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow21), new PropertyPainter2D(new FillPainter2D(Color(113, 45, 239))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow22), new PropertyPainter2D(new FillPainter2D(Color(142, 13, 57))));
@@ -462,8 +462,8 @@ void ColorStyleEditor::initializeBrightStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow25), new PropertyPainter2D(new FillPainter2D(Color(225, 24, 182))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow26), new PropertyPainter2D(new FillPainter2D(Color(99, 64, 87))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow27), new PropertyPainter2D(new FillPainter2D(Color(231, 57, 105))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow28), new PropertyPainter2D(new FillPainter2D(Color(181, 139, 249))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow29), new PropertyPainter2D(new FillPainter2D(Color(196, 154, 131))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow28), new PropertyPainter2D(new FillPainter2D(Color(167, 125, 234))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow29), new PropertyPainter2D(new FillPainter2D(Color(179, 138, 116))));
 
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 215, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::ToolBarFirstTabForeground), new PropertyPainter2D(new FillPainter2D(ot::Black)));
@@ -708,7 +708,7 @@ void ColorStyleEditor::initializeDarkStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(100, 91, 220))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow10), new PropertyPainter2D(new FillPainter2D(Color(201, 96, 170))));
@@ -969,30 +969,30 @@ void ColorStyleEditor::initializeBlueStyleValues(void) {
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleBackground), new PropertyPainter2D(new FillPainter2D(Color(0, 90, 156))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::TitleForeground), new PropertyPainter2D(new FillPainter2D(ot::White)));
 
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(230, 57, 70))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow0), new PropertyPainter2D(new FillPainter2D(Color(255, 84, 91))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow1), new PropertyPainter2D(new FillPainter2D(Color(255, 140, 66))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow2), new PropertyPainter2D(new FillPainter2D(Color(255, 215, 0))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow3), new PropertyPainter2D(new FillPainter2D(Color(80, 200, 120))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(0, 143, 90))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow4), new PropertyPainter2D(new FillPainter2D(Color(64, 164, 100))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow5), new PropertyPainter2D(new FillPainter2D(Color(0, 174, 239))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(70, 130, 180))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(90, 79, 207))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(155, 48, 255))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 20, 147))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow10), new PropertyPainter2D(new FillPainter2D(Color(201, 96, 170))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow6), new PropertyPainter2D(new FillPainter2D(Color(82, 158, 201))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow7), new PropertyPainter2D(new FillPainter2D(Color(151, 125, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow8), new PropertyPainter2D(new FillPainter2D(Color(196, 102, 255))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow9), new PropertyPainter2D(new FillPainter2D(Color(255, 67, 172))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow10), new PropertyPainter2D(new FillPainter2D(Color(214, 108, 182))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow11), new PropertyPainter2D(new FillPainter2D(Color(101, 254, 58))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow12), new PropertyPainter2D(new FillPainter2D(Color(96, 206, 239))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow13), new PropertyPainter2D(new FillPainter2D(Color(214, 105, 25))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow13), new PropertyPainter2D(new FillPainter2D(Color(225, 115, 40))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow14), new PropertyPainter2D(new FillPainter2D(Color(195, 133, 239))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow15), new PropertyPainter2D(new FillPainter2D(Color(4, 161, 155))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow16), new PropertyPainter2D(new FillPainter2D(Color(221, 135, 162))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow17), new PropertyPainter2D(new FillPainter2D(Color(180, 236, 118))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow18), new PropertyPainter2D(new FillPainter2D(Color(123, 125, 234))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow18), new PropertyPainter2D(new FillPainter2D(Color(133, 171, 255))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow19), new PropertyPainter2D(new FillPainter2D(Color(197, 198, 50))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow20), new PropertyPainter2D(new FillPainter2D(Color(248, 82, 240))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow21), new PropertyPainter2D(new FillPainter2D(Color(125, 239, 218))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow22), new PropertyPainter2D(new FillPainter2D(Color(164, 134, 100))));
-	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow23), new PropertyPainter2D(new FillPainter2D(Color(151, 130, 168))));
+	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow23), new PropertyPainter2D(new FillPainter2D(Color(158, 137, 175))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow24), new PropertyPainter2D(new FillPainter2D(Color(107, 158, 31))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow25), new PropertyPainter2D(new FillPainter2D(Color(228, 205, 246))));
 	m_painters.insert_or_assign(toString(ColorStyleValueEntry::Rainbow26), new PropertyPainter2D(new FillPainter2D(Color(191, 161, 76))));
