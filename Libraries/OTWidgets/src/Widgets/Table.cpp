@@ -26,6 +26,7 @@
 #include "OTWidgets/Widgets/Table.h"
 #include "OTWidgets/Widgets/TableItem.h"
 #include "OTCore/String.h"
+#include <cmath>
 #include <limits>
 
 // Qt header
@@ -199,13 +200,19 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			{
 				QModelIndex modelIndex = dataModel->index(r, c);
 
-				const QString cellText = QString::fromStdString(_config.getCellText(r, c));
+				const std::string& cellTextStd = _config.getCellText(r, c);
+				const QString cellText = QString::fromStdString(cellTextStd);
 				dataModel->setData(modelIndex, cellText);
 
-				const QColor cellColor = this->getCurrentCellColor(r, c);
-				if (cellColor.isValid())
+				const QColor cellColor = this->getCurrentCellColor(r, c, cellTextStd);
+				if (cellColor.isValid() && cellColor.alpha() > 0)
 				{
 					dataModel->setData(modelIndex, QBrush(cellColor), Qt::BackgroundRole);
+					const QColor textColor = this->getContrastingCellTextColor(cellColor);
+					if (textColor.isValid())
+					{
+						dataModel->setData(modelIndex, QBrush(textColor), Qt::ForegroundRole);
+					}
 				}
 			}
 		}
@@ -215,10 +222,8 @@ void ot::Table::setupFromConfig(const TableCfg& _config) {
 			for (int c = 0; c < columns; c++) {
 				const std::string& cellText = _config.getCellText(r, c);
 				TableItem* newItem = new TableItem(QString::fromStdString(cellText));
-				QColor cellColor = this->getCurrentCellColor(r, c, cellText);
-				if (cellColor.isValid()) {
-					newItem->setBackground(QBrush(cellColor));
-				}
+				const QColor cellColor = this->getCurrentCellColor(r, c, cellText);
+				this->applyCellBackground(newItem, cellColor);
 				this->setItem(r, c, newItem);
 			}
 		}
@@ -342,7 +347,7 @@ void ot::Table::setSelectedCellsBackground(const QColor& _color) {
 	QSignalBlocker blocker(this);
 	
 	for (QTableWidgetItem* item : this->selectedItems()) {
-		item->setBackground(QBrush(_color));
+		this->applyCellBackground(item, _color);
 	}
 }
 
@@ -460,13 +465,8 @@ void ot::Table::slotCellDataChanged(int _row, int _column) {
 	if (_row >= 0 && _row < this->rowCount() && _column >= 0 && _column < this->columnCount()) {
 		QTableWidgetItem* itm = this->item(_row, _column);
 		if (itm) {
-			QColor cellColor = this->getCurrentCellColor(_row, _column, itm->text().toStdString());
-			if (cellColor.isValid()) {
-				itm->setBackground(QBrush(cellColor));
-			}
-			else {
-				itm->setBackground(QBrush());
-			}
+			const QColor cellColor = this->getCurrentCellColor(_row, _column, itm->text().toStdString());
+			this->applyCellBackground(itm, cellColor);
 		}
 	}
 
@@ -649,4 +649,48 @@ QTableWidgetItem* ot::Table::createHeaderItem(const TableHeaderItemCfg* _cfg) co
 
 	item->setText(QString::fromStdString(headerContent));
 	return item;
+}
+
+QColor ot::Table::getContrastingCellTextColor(const QColor& _background) const {
+	if (!_background.isValid() || _background.alpha() == 0) {
+		return QColor();
+	}
+
+	QColor effectiveBackground = _background;
+	if (_background.alpha() < 255) {
+		// Alpha-blend translucent cell backgrounds over the table base color before evaluating WCAG contrast
+		const QColor baseColor = this->palette().color(QPalette::Base);
+		const double alpha = static_cast<double>(_background.alpha()) / 255.0;
+		const double invAlpha = 1.0 - alpha;
+		effectiveBackground = QColor(
+			static_cast<int>(std::lround(_background.red() * alpha + baseColor.red() * invAlpha)),
+			static_cast<int>(std::lround(_background.green() * alpha + baseColor.green() * invAlpha)),
+			static_cast<int>(std::lround(_background.blue() * alpha + baseColor.blue() * invAlpha)),
+			255
+		);
+	}
+
+	return QtFactory::getContrastingTextColor(effectiveBackground);
+}
+
+void ot::Table::applyCellBackground(QTableWidgetItem* _item, const QColor& _background) const {
+	if (!_item) {
+		return;
+	}
+
+	if (!_background.isValid() || _background.alpha() == 0) {
+		// Clear roles completely so the delegate falls back to the active theme palette
+		_item->setData(Qt::BackgroundRole, QVariant());
+		_item->setData(Qt::ForegroundRole, QVariant());
+		return;
+	}
+
+	_item->setBackground(QBrush(_background));
+	const QColor textColor = this->getContrastingCellTextColor(_background);
+	if (textColor.isValid()) {
+		_item->setForeground(QBrush(textColor));
+	}
+	else {
+		_item->setData(Qt::ForegroundRole, QVariant());
+	}
 }

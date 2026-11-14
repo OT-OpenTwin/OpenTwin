@@ -66,6 +66,14 @@ namespace ot {
 		static inline ot::Color toColor(const QColor& _color) { return ot::Color(_color.red(), _color.green(), _color.blue(), _color.alpha()); };
 		static inline ot::ColorF toColorF(const QColor& _color) { return ot::Color(_color.red(), _color.green(), _color.blue(), _color.alpha()).toColorF(); };
 
+		//! @brief Returns a contrasting foreground text color (black or white) for the given background color using WCAG 2.1 relative luminance.
+		static inline QColor getContrastingTextColor(const QColor& _background) {
+			if (!_background.isValid()) {
+				return QColor();
+			}
+			return toQColor(toColor(_background).getContrastingTextColor());
+		};
+
 		static inline QPoint toQPoint(const Point2D& _pt) noexcept { return QPoint(_pt.getX(), _pt.getY()); };
 		static inline QPointF toQPoint(const Point2DF& _pt) noexcept { return QPointF((qreal)_pt.getX(), (qreal)_pt.getY()); };
 		static inline QPointF toQPoint(const Point2DD& _pt) noexcept { return QPointF((qreal)_pt.getX(), (qreal)_pt.getY()); };

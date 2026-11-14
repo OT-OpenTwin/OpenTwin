@@ -71,7 +71,7 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
 		}
 		else
 		{
-			if (item->background().color().isValid())
+			if (item->background().style() != Qt::NoBrush && item->background().color().isValid())
 			{ // Item has valid color set
 				_painter->fillRect(opt.rect, item->background());
 			}
@@ -80,12 +80,16 @@ void ot::TableItemDelegate::paint(QPainter* _painter, const QStyleOptionViewItem
 				_painter->fillRect(opt.rect, opt.palette.brush(QPalette::Base));
 			}
 
-			// The following snippet does not work:
-			//
-			//if (item->foreground().color().isValid()) {
-			//    textPen.setBrush(item->foreground());
-			//}
-			// reson: foreground color is always valid (default is black) and thus always overrides the color set by the user
+			// Honor explicit foreground brushes while preserving palette defaults when unset
+			const QVariant foregroundData = item->data(Qt::ForegroundRole);
+			if (foregroundData.canConvert<QBrush>())
+			{
+				const QBrush foregroundBrush = qvariant_cast<QBrush>(foregroundData);
+				if (foregroundBrush.style() != Qt::NoBrush && foregroundBrush.color().isValid())
+				{
+					textPen.setBrush(foregroundBrush);
+				}
+			}
 		}
 	}
 	else

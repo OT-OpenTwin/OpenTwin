@@ -134,6 +134,8 @@ namespace ot {
 		void setResizeRequired();
 		void clearHeaderConfigs();
 		QTableWidgetItem* createHeaderItem(const TableHeaderItemCfg* _cfg) const;
+		QColor getContrastingCellTextColor(const QColor& _background) const;
+		void applyCellBackground(QTableWidgetItem* _item, const QColor& _background) const;
 		TableItemDelegate* m_itemDelegate;
 
 		bool m_multilineCells;
