@@ -33,9 +33,10 @@ AccessTokenManager::AccessTokenManager()
 
 }
 
-AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, ot::JsonDocument& _responseDoc)
+AccessTokenManager::AuthenticationResult AccessTokenManager::authenticateUser(const ot::ConstJsonObject& _actionDocument)
 {
-	AuthenticationResult result = AuthenticationResult::Failure;
+	AuthenticationResult result;
+	result.status = AuthenticationStatus::Failure;
 	
 	try
 	{
@@ -43,7 +44,8 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 		if (token.empty())
 		{
 			OT_LOG_E("Token is empty");
-			return AuthenticationResult::Failure;
+			result.status = AuthenticationStatus::Failure;
+			return result;
 		}
 
 		if (_actionDocument.HasMember(OT_ACTION_PARAM_Signature))
@@ -53,7 +55,8 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 			if (challengeResponse.empty())
 			{
 				OT_LOG_E("Challenge response is empty");
-				return AuthenticationResult::Failure;
+				result.status = AuthenticationStatus::Failure;
+				return result;
 			}
 
 			auto& adminClient = ServiceBase::instance().getAdminClient();
@@ -64,15 +67,14 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 			{
 				// Retreive user from credentials
 				User user = MongoUserFunctions::getUserDataThroughId(accessToken.getUserId(), adminClient);
-				_username = user.getName();
-				_responseDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_username, _responseDoc.GetAllocator()), _responseDoc.GetAllocator());
 
-				result = AuthenticationResult::Success;
+				result.username = user.getName();
+				result.status = AuthenticationStatus::Success;
 			}
 			else
 			{
 				// Challenge response is invalid
-				result = AuthenticationResult::Failure;
+				result.status = AuthenticationStatus::Failure;
 			}
 		}
 		else
@@ -80,21 +82,20 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 			// Create new challenge for the given token
 			const auto& challenge = m_challengeManager.challenge(token);
 			
-			_responseDoc.AddMember(OT_ACTION_PARAM_ChallengeID, ot::JsonString(challenge.getID(), _responseDoc.GetAllocator()), _responseDoc.GetAllocator());
-			_responseDoc.AddMember(OT_ACTION_PARAM_Challenge, ot::JsonString(challenge.getChallenge(), _responseDoc.GetAllocator()), _responseDoc.GetAllocator());
-
-			result = AuthenticationResult::ChallengeRequired;
+			result.challenge = challenge.getChallenge();
+			result.challengeID = challenge.getID();
+			result.status = AuthenticationStatus::ChallengeRequired;
 		}
 	}
 	catch (const std::exception& e)
 	{
 		OT_LOG_E("Exception during login: " + std::string(e.what()));
-		result = AuthenticationResult::Failure;
+		result.status = AuthenticationStatus::Failure;
 	}
 	catch (...)
 	{
 		OT_LOG_E("Unknown exception during login");
-		result = AuthenticationResult::Failure;
+		result.status = AuthenticationStatus::Failure;
 	}
 
 	return result;
