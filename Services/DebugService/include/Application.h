@@ -24,6 +24,7 @@
 
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
+#include "OTGui/ColorMap.h"
 #include "OTGuiAPI/ButtonHandler.h"
 #include "OTServiceFoundation/ApplicationBase.h" // Base class
 
@@ -33,6 +34,10 @@
 #include <functional>
 
 class TestCode;
+
+namespace ot {
+	class TableCfg;
+}
 
 class Application : public ot::ApplicationBase, public ot::ButtonHandler {
 private:
@@ -59,6 +64,7 @@ public:
 	void testTableBig();
 	void testTableColored();
 	void testTableMatrixHeatmap();
+	void testTableColorMapHeatmap(ot::ColorMapPreset _preset);
 	
 	void createPlotOneComplexCurveMagPhase();
 	void createPlotOneComplexCurveRealImag();
@@ -83,6 +89,8 @@ public:
 private:
 
 	void sendTableWorker(int _rows, int _columns);
+	ot::TableCfg createHeatmapMatrixConfig(const std::string& _entityName) const;
+	void sendTableConfigToUi(const ot::TableCfg& _cfg);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

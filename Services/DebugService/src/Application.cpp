@@ -44,6 +44,7 @@
 #include "OTGui/Properties/PropertyDouble.h"
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Properties/PropertyPainter2D.h"
+#include "OTGui/ColorMap.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGui/VisualisationCfg.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
@@ -149,6 +150,22 @@ Application::Application() :
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Big (10M)", "Default/RedCircle"), std::bind(&Application::testTableBig, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Colored Table", "Default/Color"), std::bind(&Application::testTableColored, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Table", "Matrix Heatmap", "Default/Color"), std::bind(&Application::testTableMatrixHeatmap, this)));
+
+	// Table ColorMap heatmap tests
+	for (const ot::ColorMapPreset preset : {
+		ot::ColorMapPreset::Viridis,
+		ot::ColorMapPreset::Plasma,
+		ot::ColorMapPreset::Turbo,
+		ot::ColorMapPreset::CoolWarm,
+		ot::ColorMapPreset::OkabeIto,
+		ot::ColorMapPreset::TolVibrant,
+		ot::ColorMapPreset::Rainbow
+	}) {
+		m_testButtons.push_back(ButtonInfo(
+			ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Heatmaps", ot::toString(preset), "Default/Color"),
+			std::bind(&Application::testTableColorMapHeatmap, this, preset)
+		));
+	}
 
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
@@ -317,16 +334,52 @@ void Application::testTableColored(void) {
 void Application::testTableMatrixHeatmap(void) {
 	using namespace ot;
 
-	auto ui = this->getUiComponent();
-	if (!ui) {
-		OT_LOG_E("No ui? How?");
-		return;
-	}
+	TableCfg cfg = this->createHeatmapMatrixConfig("Test (" + std::to_string(m_nameCounter++) + "): Matrix Heatmap");
+
+	// Determine data bounds
+	double minVal = 0.0, maxVal = 100.0;
+	cfg.calculateDataValueBounds(minVal, maxVal);
+	double step = (maxVal - minVal) / 4.0;
+
+	// Configure ranges and colors with priority handling:
+	// a) Table Range: 4-Band Heatmap across entire table (Blue -> Cyan -> Green -> Yellow -> Red)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(0, 50, 255), Color(0, 230, 255), minVal, minVal + step));
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(0, 230, 255), Color(50, 220, 50), minVal + step, minVal + 2.0 * step));
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(50, 220, 50), Color(255, 230, 0), minVal + 2.0 * step, minVal + 3.0 * step));
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(255, 230, 0), Color(255, 30, 30), minVal + 3.0 * step, maxVal));
+
+	// b) Section Range: Rectangular area (rows 3..7, cols 2..6) with single-color threshold (values > 65 get Purple highlight)
+	cfg.addColoredRange(ColoredTableRange(TableRange(3, 2, 7, 6), Color(200, 100, 255), 65.0, 1000.0));
+
+	// c) Column Range: Column 8 with two-color gradient (White to Deep Orange)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Column, 8), Color(255, 255, 255), Color(255, 120, 0), minVal, maxVal));
+
+	// d) Cell Range: Single cell (5, 4) with highest priority accent color (Gold)
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Cell, 5, 4), Color(255, 215, 0)));
+
+	this->sendTableConfigToUi(cfg);
+}
+
+void Application::testTableColorMapHeatmap(ot::ColorMapPreset _preset) {
+	using namespace ot;
+
+	TableCfg cfg = this->createHeatmapMatrixConfig("Test (" + std::to_string(m_nameCounter++) + "): Heatmap (" + toString(_preset) + ")");
+
+	double minVal = 0.0, maxVal = 100.0;
+	cfg.calculateDataValueBounds(minVal, maxVal);
+
+	// Demonstrate a single ColoredTableRange driven by the selected ColorMap preset and WCAG text contrast
+	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), ColorMap(_preset), minVal, maxVal));
+
+	this->sendTableConfigToUi(cfg);
+}
+
+ot::TableCfg Application::createHeatmapMatrixConfig(const std::string& _entityName) const {
+	using namespace ot;
 
 	const uint32_t rows = 16;
 	const uint32_t columns = 11;
 
-	// 1. Create matrix with diverse values
 	GenericDataStructMatrix matrix(rows, columns);
 
 	// Column headers in row 0
@@ -347,45 +400,31 @@ void Application::testTableMatrixHeatmap(void) {
 		}
 	}
 
-	// 2. Transfer matrix to TableCfg
 	TableCfg cfg(matrix, TableCfg::TableHeaderMode::Horizontal);
-	cfg.setEntityName("Test (" + std::to_string(m_nameCounter++) + "): Matrix Heatmap");
+	cfg.setEntityName(_entityName);
+	return cfg;
+}
 
-	// 3. Determine data bounds
-	double minVal = 0.0, maxVal = 100.0;
-	cfg.calculateDataValueBounds(minVal, maxVal);
-	double step = (maxVal - minVal) / 4.0;
+void Application::sendTableConfigToUi(const ot::TableCfg& _cfg) {
+	auto ui = this->getUiComponent();
+	if (!ui) {
+		OT_LOG_E("No ui? How?");
+		return;
+	}
 
-	// 4. Configure ranges and colors with priority handling:
-	// a) Table Range: 4-Band Heatmap across entire table (Blue -> Cyan -> Green -> Yellow -> Red)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(0, 50, 255), Color(0, 230, 255), minVal, minVal + step));
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(0, 230, 255), Color(50, 220, 50), minVal + step, minVal + 2.0 * step));
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(50, 220, 50), Color(255, 230, 0), minVal + 2.0 * step, minVal + 3.0 * step));
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Table), Color(255, 230, 0), Color(255, 30, 30), minVal + 3.0 * step, maxVal));
-
-	// b) Section Range: Rectangular area (rows 3..7, cols 2..6) with single-color threshold (values > 65 get Purple highlight)
-	cfg.addColoredRange(ColoredTableRange(TableRange(3, 2, 7, 6), Color(200, 100, 255), 65.0, 1000.0));
-
-	// c) Column Range: Column 8 with two-color gradient (White to Deep Orange)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Column, 8), Color(255, 255, 255), Color(255, 120, 0), minVal, maxVal));
-
-	// d) Cell Range: Single cell (5, 4) with highest priority accent color (Gold)
-	cfg.addColoredRange(ColoredTableRange(TableRange(TableRangeType::Cell, 5, 4), Color(255, 215, 0)));
-
-	// 5. Create table document and send to UI
-	JsonDocument doc;
+	ot::JsonDocument doc;
 	this->getBasicServiceInformation().addToJsonObject(doc, doc.GetAllocator());
-	doc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_UI_TABLE_Setup, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::VisualisationCfg visCfg;
 	visCfg.setAsActiveView(true);
 	visCfg.setVisualisationType(OT_ACTION_CMD_UI_TABLE_Setup);
-	JsonObject visObj;
+	ot::JsonObject visObj;
 	visCfg.addToJsonObject(visObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_VisualisationConfig, visObj, doc.GetAllocator());
 
-	JsonObject cfgObj;
-	cfg.addToJsonObject(cfgObj, doc.GetAllocator());
+	ot::JsonObject cfgObj;
+	_cfg.addToJsonObject(cfgObj, doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_Config, cfgObj, doc.GetAllocator());
 
 	std::string resp;
