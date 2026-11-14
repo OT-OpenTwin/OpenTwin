@@ -65,7 +65,8 @@ AccessTokenManager::AuthenticationResult AccessTokenManager::handleLogin(const o
 				// Retreive user from credentials
 				User user = MongoUserFunctions::getUserDataThroughId(accessToken.getUserId(), adminClient);
 				_username = user.getName();
-				
+				_responseDoc.AddMember(OT_PARAM_AUTH_USERNAME, ot::JsonString(_username, _responseDoc.GetAllocator()), _responseDoc.GetAllocator());
+
 				result = AuthenticationResult::Success;
 			}
 			else

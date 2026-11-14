@@ -50,7 +50,7 @@ public:
 
 	bool checkUserName(const std::string &userName) const;
 	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validEncryptedPassword) const;
-
+	bool checkSessionUserPassword(const std::string& sessionUser, const std::string& sessionPassword) const;
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);
 	std::string restoreSetting(const std::string &settingName);

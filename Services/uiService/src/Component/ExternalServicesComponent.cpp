@@ -2153,8 +2153,8 @@ std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArr
 void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::vector<Geometry::Node>& result)
 {
 	rapidjson::Value nodeList = doc[itemName.c_str()].GetArray();
-	int numberOfNodes = nodeList.Size() / 8;
-	for (unsigned int i = 0; i < numberOfNodes; i++)
+	uint32_t numberOfNodes = nodeList.Size() / 8;
+	for (uint32_t i = 0; i < numberOfNodes; i++)
 	{
 		Geometry::Node n;
 		n.setCoords(nodeList[i * 8].GetDouble(), nodeList[i * 8 + 1].GetDouble(), nodeList[i * 8 + 2].GetDouble());
@@ -2167,8 +2167,8 @@ void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument& doc,
 void ExternalServicesComponent::getListTriangleFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::list <Geometry::Triangle >& result)
 {
 	rapidjson::Value triangleList = doc[itemName.c_str()].GetArray();
-	int numberOfTriangles = triangleList.Size() / 4;
-	for (unsigned int i = 0; i < numberOfTriangles; i++)
+	uint32_t numberOfTriangles = triangleList.Size() / 4;
+	for (uint32_t i = 0; i < numberOfTriangles; i++)
 	{
 		Geometry::Triangle t(triangleList[i * 4].GetInt64(), triangleList[i * 4 + 1].GetInt64(), triangleList[i * 4 + 2].GetInt64(), triangleList[i * 4 + 3].GetInt64());
 
@@ -2364,13 +2364,13 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document)
 
 	ScopedLockManagerLock uiLock(m_lockManager, AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
-	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
+	ot::UIDVersionPairList prefetchIDs;
 	size_t numberPrefetch = prefetchID.Size();
 	assert(prefetchVersion.Size() == numberPrefetch);
 
 	for (size_t i = 0; i < numberPrefetch; i++)
 	{
-		prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(prefetchID[i].GetInt64(), prefetchVersion[i].GetInt64()));
+		prefetchIDs.push_back(ot::UIDVersionPair(static_cast<ot::UID>(prefetchID[i].GetInt64()), static_cast<ot::UID>(prefetchVersion[i].GetInt64())));
 	}
 
 	if (!prefetchIDs.empty())
@@ -4995,9 +4995,9 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 		// Get the selected model with its collection name
 		const ot::LibraryModel* selectedModel = dia.getSelectedModel();
 		if (selectedModel != nullptr) {
-			std::string collectionName = selectedModel->getCollectionName();
-			if (!collectionName.empty()) {
-				responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			const std::string& selectedCollectionName = selectedModel->getCollectionName();
+			if (!selectedCollectionName.empty()) {
+				responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(selectedCollectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 			}
 			else {
 				OT_LOG_W("Selected model has no collection name");
@@ -5391,8 +5391,6 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 
 			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 
-			DataStorageAPI::DocumentAPI db;
-
 			auto startTime = std::chrono::system_clock::now();
 			for (const QString& fileName : _filesToImport)
 			{
@@ -5419,7 +5417,6 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 
 					// Upload the data to gridFS
 					DataStorageAPI::DocumentAPI db;
-
 					bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size(), info.getCollectionName());
 					info.setDocumentId(result.get_oid().value.to_string());
 

@@ -107,6 +107,7 @@ private:
 		CheckGraphicsShort,
 		LogInData,
 		LogInGss,
+		LogInSession,
 		OpenProject,
 		ProjectVersion,
 		ScriptFile

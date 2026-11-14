@@ -8,22 +8,42 @@ from typing import Optional
 # OpenTwin internal
 from opentwin._internal.system.DirectoryManager import DirectoryManager
 
-class Config:
+class DefaultConfig:
+
+    def __new__(cls) -> "DefaultConfig":
+        if not hasattr(cls, "_instance"):
+            cls._instance = super(DefaultConfig, cls).__new__(cls)
+            cls._instance.__init__()
+        return cls._instance
 
     def __init__(self) -> None:
         self._ca_certificate_path: Path = None
         self._frontend_app_path: Path = None
 
-        self.determine_ca_certificate_path()
-        self.determine_frontend_app_path()
-
     @property
     def ca_certificate_path(self) -> Optional[Path]:
+        if self._ca_certificate_path is None:
+            self._ca_certificate_path = self.determine_ca_certificate_path()
         return self._ca_certificate_path
 
     @property
     def frontend_app_path(self) -> Optional[Path]:
+        if self._frontend_app_path is None:
+            self._frontend_app_path = self.determine_frontend_app_path()
         return self._frontend_app_path
+
+    def is_valid(self) -> bool:
+        caValid = self._ca_certificate_path is not None and self._ca_certificate_path.is_file()
+        frontendValid = self._frontend_app_path is not None and self._frontend_app_path.is_file()
+        return caValid and frontendValid
+
+    ################################################################################################################################
+
+    def __str__(self) -> str:
+        return self.__repr__()
+
+    def __repr__(self) -> str:
+        return f"Config(ca_certificate_path={self._ca_certificate_path}, frontend_app_path={self._frontend_app_path})"
 
     ################################################################################################################################
 

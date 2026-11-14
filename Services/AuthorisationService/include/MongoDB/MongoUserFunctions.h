@@ -61,6 +61,8 @@ private:
 public:
 	static bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName);
 
+	static bool authenticateUserTroughSessionCredentials(const std::string& _originalUserName, const std::string& _sessionUserName, const std::string& _sessionPassword, mongocxx::client& adminClient);
+
 	static bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
 
 	static std::string generateUserSettingsCollectionName(mongocxx::client& adminClient);
@@ -82,8 +84,8 @@ public:
 
 	static bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
 
-	static std::string userToJson(User& user);
-	static 	std::string usersToJson(std::vector<User>& users);
+	static std::string userToJson(const User& user);
+	static std::string usersToJson(const std::vector<User>& users);
 
 	static std::string hashPassword(const std::string& password);
 
@@ -91,5 +93,9 @@ public:
 
 	static void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument& json);
 	static void removeTmpUser(std::string userName, mongocxx::client& adminClient);
+
+private:
+	static std::set<std::string>& getAuthenticatedUserTokens();
+	static std::map<std::string, std::string>& getAuthenticatedUserOriginalName();
 
 };

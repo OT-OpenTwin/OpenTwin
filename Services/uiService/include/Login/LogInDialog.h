@@ -54,7 +54,7 @@ public:
 	};
 	typedef ot::Flags<ConfigFlag> Config;
 
-	LogInDialog();
+	explicit LogInDialog();
 	virtual ~LogInDialog();
 
 	void setControlsEnabled(bool _enabled);
@@ -119,6 +119,7 @@ private:
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 	
+	std::optional<LoginData> m_enforcedLoginData;
 	LogInGSSEntry m_enforcedGSS;
 
 	ot::ComboButton* m_gss;
@@ -176,6 +177,7 @@ private:
 	const int m_maxDefaultHeight = 515;
 	const int m_maxSSOHeight = 460;
 
+	bool setupLoginDataFromCurrent();
 	void saveUserSettings() const;
 	void saveGSSOptions() const;
 	void editGSSEntries();
@@ -204,6 +206,7 @@ private:
 	WorkerError workerConnectToGSS();
 	WorkerError workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerLoginUsernamePassword(const UserManagement& _userManager);
+	WorkerError workerLoginSessionUsernamePassword(const UserManagement& _userManager);
 	WorkerError workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);

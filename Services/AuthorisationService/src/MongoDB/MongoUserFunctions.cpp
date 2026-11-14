@@ -37,9 +37,6 @@
 // std header
 #include <set>
 
-std::set<std::string> authenticatedUserTokens;
-std::map<std::string, std::string> authenticatedUserOriginalName;
-
 std::string MongoUserFunctions::getOriginalUserName(const std::string& username, mongocxx::database& db)
 {
 	auto cmd = bsoncxx::builder::stream::document{}
@@ -109,6 +106,9 @@ bool MongoUserFunctions::checkMongodbLogin(const std::string& username, const st
 
 bool MongoUserFunctions::authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName)
 {
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
+
 	// This authentication may take some time. Therefore, we want to cache the credentials to speed up subsequent checks
 	std::string token = username + "\n" + password + "\n" + databaseUrl;
 	if (authenticatedUserTokens.find(token) != authenticatedUserTokens.end())
@@ -159,6 +159,21 @@ bool MongoUserFunctions::authenticateUser(std::string username, std::string pass
 
 	return true;
 }
+
+bool MongoUserFunctions::authenticateUserTroughSessionCredentials(const std::string& _originalUserName, const std::string& _sessionUserName, const std::string& _sessionPassword, mongocxx::client& adminClient)
+{
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
+
+	value userFilter = document{}
+		<< "user_name" << _originalUserName
+		<< finalize;
+
+	auto sessionUserCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
+
+	return false;
+}
+
 
 bool MongoUserFunctions::registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName)
 {
@@ -404,7 +419,9 @@ bool MongoUserFunctions::removeUser(User& userToBeDeleted, mongocxx::client& adm
 	// Dropping this user's settings collection.
 	adminClient[MongoConstants::SETTINGS_DB][userToBeDeleted.getSettingsCollectionName()].drop();
 
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.clear();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName.clear();
 
 	return true;
@@ -448,7 +465,9 @@ bool MongoUserFunctions::updateUserUsernameById(std::string userId, std::string 
 	auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 	auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.clear();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName.clear();
 
 	if (!result.has_value())
@@ -488,7 +507,9 @@ bool MongoUserFunctions::updateUserUsernameByName(std::string oldUsername, std::
 	auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 	auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.clear();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName.clear();
 
 	if (!result.has_value())
@@ -523,7 +544,9 @@ bool MongoUserFunctions::changeUserPassword(std::string username, std::string ne
 	auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 	auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.clear();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName.clear();
 
 	if (!result.has_value())
@@ -549,7 +572,6 @@ bool MongoUserFunctions::updateUsername(std::string oldUsername, std::string new
 	{
 		return false;
 	}
-
 	value userFilter = document{}
 		<< "user_name" << oldUsername
 		<< finalize;
@@ -564,7 +586,9 @@ bool MongoUserFunctions::updateUsername(std::string oldUsername, std::string new
 	auto usersCollection = adminClient.database(MongoConstants::USER_DB).collection(MongoConstants::USER_CATALOG_COLLECTION);
 	auto result = usersCollection.update_one(userFilter.view(), userUpdate.view());
 
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.clear();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName.clear();
 
 	if (!result.has_value())
@@ -583,7 +607,7 @@ bool MongoUserFunctions::updateUsername(std::string oldUsername, std::string new
 	return false;
 }
 
-std::string MongoUserFunctions::userToJson(User& user)
+std::string MongoUserFunctions::userToJson(const User& user)
 {
 	ot::JsonDocument json;
 	json.AddMember("username", ot::JsonString(user.getName(), json.GetAllocator()), json.GetAllocator());
@@ -592,11 +616,11 @@ std::string MongoUserFunctions::userToJson(User& user)
 	return json.toJson();
 }
 
-std::string MongoUserFunctions::usersToJson(std::vector<User>& users)
+std::string MongoUserFunctions::usersToJson(const std::vector<User>& users)
 {
 	std::list<std::string> jsonUsers{};
 
-	for (auto user : users)
+	for (const auto& user : users)
 	{
 		jsonUsers.push_back(userToJson(user));
 	}
@@ -641,12 +665,18 @@ void MongoUserFunctions::createTmpUser(std::string userName, std::string userPWD
 	}
 
 	std::string token = userName + "\n" + userPWD + "\n" + databaseUrl;
+
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
 	authenticatedUserTokens.insert(token);
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
 	authenticatedUserOriginalName[userName] = _loggedInUser.getName();
 }
 
 void MongoUserFunctions::removeTmpUser(std::string userName, mongocxx::client& adminClient)
 {
+	auto& authenticatedUserTokens = MongoUserFunctions::getAuthenticatedUserTokens();
+	auto& authenticatedUserOriginalName = MongoUserFunctions::getAuthenticatedUserOriginalName();
+
 	// Delete the user completely
 	value drop_user_command = document{} <<
 		"dropUser" << userName
@@ -665,5 +695,17 @@ void MongoUserFunctions::removeTmpUser(std::string userName, mongocxx::client& a
 
 	authenticatedUserTokens.clear();
 	authenticatedUserOriginalName.clear();
+}
+
+std::set<std::string>& MongoUserFunctions::getAuthenticatedUserTokens()
+{
+	static std::set<std::string> tokens;
+	return tokens;
+}
+
+std::map<std::string, std::string>& MongoUserFunctions::getAuthenticatedUserOriginalName()
+{
+	static std::map<std::string, std::string> originalNames;
+	return originalNames;
 }
 

@@ -1,5 +1,5 @@
 import os
-from opentwin import OpenTwinClient
+from opentwin import *
 from tests.globals import ot_initialize_tests as ini
 
 def test_login_does_nothing():
