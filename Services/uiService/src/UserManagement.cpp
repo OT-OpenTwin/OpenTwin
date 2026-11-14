@@ -303,6 +303,11 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	return false; // Login attempt unsuccessful
 }
 
+bool UserManagement::checkSessionUserPassword(const std::string& sessionUser, const std::string& sessionPassword) const
+{
+	return false;
+}
+
 bool UserManagement::hasError(const std::string &response) const {
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -339,7 +344,7 @@ bool UserManagement::initializeDatabaseConnection(void)
 
 		return m_isConnected;
 	}
-	catch (std::exception& _e)
+	catch (const std::exception&)
 	{
 		return false; // Connection failed
 	}
@@ -386,11 +391,16 @@ bool UserManagement::storeSetting(const std::string &settingName, const std::str
 
 			mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_settingsDataBaseName, m_userSettingsCollection);
 
-			bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+			bsoncxx::stdx::optional<mongocxx::result::update> settingsResult = collection.update_many(doc_find.view(), doc_modify.view());
+
+			if (!settingsResult)
+			{
+				OT_LOG_E("Failed to update setting");
+			}
 		}
-		catch (std::exception)
+		catch (const std::exception& _e)
 		{
-			assert(0); // Could not update the documents
+			OT_LOG_E("Error updating setting: " + std::string(_e.what()));
 		}
 	}
 

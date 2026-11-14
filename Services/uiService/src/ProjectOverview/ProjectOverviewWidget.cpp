@@ -243,8 +243,8 @@ void ot::ProjectOverviewWidget::refreshProjects() {
 
 void ot::ProjectOverviewWidget::updateFilterOptions() {
 	ProjectManagement projectManager(AppBase::instance()->getCurrentLoginData());
-	ProjectFilterData data = projectManager.getProjectFilterData();
-	m_header->setProjectFilterData(std::move(data));
+	ProjectFilterData filterData = projectManager.getProjectFilterData();
+	m_header->setProjectFilterData(std::move(filterData));
 }
 
 void ot::ProjectOverviewWidget::sort(int _logicalIndex, Qt::SortOrder _sortOrder) {

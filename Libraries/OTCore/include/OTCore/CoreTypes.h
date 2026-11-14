@@ -29,6 +29,7 @@
 // std header
 #include <list>
 #include <limits>
+#include <utility>
 #include <type_traits>
 
 #undef min
@@ -56,8 +57,17 @@ namespace ot {
 	//! @brief Invalid unique identifier.
 	inline constexpr UID invalidUID = std::numeric_limits<UID>::max();
 
-	//! @brief Unique identifier list
+	//! @brief Unique identifier list.
 	typedef std::list<UID> UIDList;
+
+	//! @brief Unique identifier and version pair.
+	typedef std::pair<UID, UID> UIDVersionPair;
+
+	//! @brief Invalid unique identifier and version pair.
+	inline constexpr UIDVersionPair invalidUIDVersion = std::pair<UID, UID>(invalidUID, invalidUID);
+
+	//! @brief Unique identifier and version pair list.
+	typedef std::list<UIDVersionPair> UIDVersionPairList;
 
 	struct EntityIdentifier
 	{

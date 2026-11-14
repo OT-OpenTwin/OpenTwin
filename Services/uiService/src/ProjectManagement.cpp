@@ -106,9 +106,9 @@ ot::ProjectFilterData ProjectManagement::getProjectFilterData() const {
 
 		ot::ReturnMessage responseMessage = ot::ReturnMessage::fromJson(response);
 		if (responseMessage.isOk()) {
-			ot::JsonDocument doc;
-			doc.fromJson(responseMessage.getWhat());
-			result.setFromJsonObject(doc.getConstObject());
+			ot::JsonDocument responseDoc;
+			responseDoc.fromJson(responseMessage.getWhat());
+			result.setFromJsonObject(responseDoc.getConstObject());
 		}
 		else {
 			OT_LOG_E("Failed to get project filter data: " + responseMessage.getWhat());
@@ -938,13 +938,13 @@ std::string ProjectManagement::exportProject(const std::string &projectName, con
 	// Now we export the result data collection, if any
 	if (numberResultDocuments > 0)
 	{
-		auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
+		auto resultCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 
-		auto cursor = collection.find({});
+		auto resultCursor = resultCollection.find({});
 
 		try
 		{
-			for (auto&& doc : cursor)
+			for (auto&& doc : resultCursor)
 			{
 				// The data is always stored in the data base
 				const uint8_t* buffer = reinterpret_cast<const uint8_t*>(doc.data());
@@ -1182,7 +1182,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 		{
 
 			// Try to load the result data
-			auto collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
+			auto resultCollection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_dataBaseName, collectionName + ".results");
 			
 			// IndexHandler class in the ResultDatabaseAccess lib also creates these indexes
 			DataLakeHelper::createDefaultIndexes(collectionName);
@@ -1205,7 +1205,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 
 				if (cachedDocuments.size() == 100)
 				{
-					flushCachedDocuments(cachedDocuments, collection);
+					flushCachedDocuments(cachedDocuments, resultCollection);
 				}
 
 				docCount++;
@@ -1218,7 +1218,7 @@ std::string ProjectManagement::importProject(const std::string &projectName, con
 				}
 			}
 
-			flushCachedDocuments(cachedDocuments,collection);
+			flushCachedDocuments(cachedDocuments, resultCollection);
 		}
 	}
 	catch (std::exception &e)

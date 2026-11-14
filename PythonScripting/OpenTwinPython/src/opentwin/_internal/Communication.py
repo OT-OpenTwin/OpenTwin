@@ -11,30 +11,25 @@ import logging
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin
-from opentwin.config import Config
-from opentwin.return_message import ReturnMessage, ReturnMessageStatus
+from opentwin._internal.generated.return_message import ReturnMessage, ReturnMessageStatus
 
 # OpenTwin internal
 from opentwin._internal.ActionTypes import *
 
 class Communication:
-    """
-    Central communication wrapper for OpenTwin services.
-    
-    This class is responsible for sending requests to the Global Session Service and handling responses.
 
-    Attributes:
-        globalSessionServiceUrl (str): The URL of the Global Session Service.
-        config (Config): The configuration object.
-    """
-    def __init__(self, globalSessionServiceUrl: str, config: Config) -> None:
-        self._initialized = False
-        self._gssUrl = globalSessionServiceUrl
+    def __init__(self, 
+                 globalSessionServiceUrl: str,
+                 ca_certificate_path: Path
+                 ) -> None:
+        
+        self._initialized: bool = False
+        self._gssUrl: str = globalSessionServiceUrl
         
         # Initialize TLS configuration
-        self._ssl_context = self._create_ssl_context(config.ca_certificate_path)
+        self._ssl_context = self._create_ssl_context(ca_certificate_path)
 
-        logger.debug(f"Initializing Communication with Global Session Service URL: {self._gssUrl}")
+        logger.debug(f"Fetching global information from the Global Session Service at \"{self._gssUrl}\"...")
 
         # Create a request to the Global Session Service to retrieve the global information
         
@@ -43,9 +38,9 @@ class Communication:
         }
         globalInfoResponseMessage = self.send_to_return_message(self._gssUrl, globalInfoRequest)
 
-        logger.debug(f"Global information response: {globalInfoResponseMessage}")
+        logger.debug(f"Global information: {globalInfoResponseMessage}")
 
-        if not globalInfoResponseMessage.is_ok():
+        if globalInfoResponseMessage.status != ReturnMessageStatus.StatusOk:
             raise RuntimeError("Failed to retrieve global information from the Global Session Service: " + globalInfoResponseMessage.what)
 
         globalInfoResponse = json.loads(globalInfoResponseMessage.what)
@@ -72,13 +67,7 @@ class Communication:
             raise RuntimeError("Global Session Service did not return a logger URL")
 
         self._initialized = True
-        logger.debug("Initialized Communication successfully with:"
-                     f"    Global Session Service URL: {self._gssUrl} (connection confirmed)"
-                     f"    Database URL: {self._databaseUrl}"
-                     f"    Authorization URL: {self._authUrl}"
-                     f"    Global Directory URL: {self._gdsUrl}"
-                     f"    Logger URL: {self._loggerUrl}"
-                     )
+        logger.debug(__class__.__name__ + " initialized successfully")
 
     @staticmethod
     def _normalize_url(url: str) -> str:

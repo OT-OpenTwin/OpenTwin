@@ -345,6 +345,12 @@ bool StartArgumentParser::parseCommandLine()
 		"string");
 	parser.addOption(gssLoginOption);
 
+	QCommandLineOption sessionLoginOption(
+		toString(ArgumentKey::LogInSession),
+		"Attempt to log in automatically using the provided session credentials.",
+		"string");
+	parser.addOption(sessionLoginOption);
+
 	QCommandLineOption openProjectOption(
 		toString(ArgumentKey::OpenProject),
 		"Open project with JSON data.",
@@ -427,6 +433,28 @@ bool StartArgumentParser::parseCommandLine()
 		m_loginData = newLoginData;
 	}
 
+	// Check for session login option
+	if (parser.isSet(sessionLoginOption))
+	{
+		const QString sessionDataStr = parser.value(sessionLoginOption);
+		std::string decoded = ot::String::fromBase64Url(sessionDataStr.toStdString());
+		if (decoded.empty())
+		{
+			OT_LOG_E("Session login option set but no data provided");
+			return false;
+		}
+		ot::JsonDocument doc;
+		if (!doc.fromJson(decoded))
+		{
+			OT_LOG_E("Failed to parse session login data from command line argument");
+			return false;
+		}
+
+		LoginData newLoginSessionData;
+		newLoginSessionData.setFromSessionCredentialsJson(doc.getConstObject());
+		m_loginData = newLoginSessionData;
+	}
+
 	// Check for open project option
 	if (parser.isSet(openProjectOption))
 	{
@@ -471,8 +499,9 @@ QString StartArgumentParser::toString(ArgumentKey _key) const
 	case ArgumentKey::Debug: return "debug";
 	case ArgumentKey::CheckGraphics: return "checkgraphics";
 	case ArgumentKey::CheckGraphicsShort: return "c";
-	case ArgumentKey::LogInData: return "login";
+	case ArgumentKey::LogInData	: return "login";
 	case ArgumentKey::LogInGss: return "autologin";
+	case ArgumentKey::LogInSession: return "sessionlogin";
 	case ArgumentKey::OpenProject: return "openproject";
 	case ArgumentKey::ProjectVersion: return "projversion";
 	case ArgumentKey::ScriptFile: return "script";

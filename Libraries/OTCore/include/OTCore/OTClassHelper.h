@@ -27,7 +27,11 @@
 
 //! @def OT_NOTHING
 //! @brief This define does nothing. It may be used to improve code readability.
-#define OT_NOTHING 
+#define OT_NOTHING
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Constructors and assignments
 
 //! @def OT_DECL_NOCOPY
 //! @brief Removes the default copy constructor and assignment operator.
@@ -57,6 +61,10 @@
 //! @ref OT_DECL_NOMOVE
 #define OT_DECL_STATICONLY(___class) OT_DECL_NODEFAULT(___class) OT_DECL_NOCOPY(___class) OT_DECL_NOMOVE(___class)
 
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Miscellaneous
+
 #if defined(OT_COMPILER_MSC)
 
 //! @def OT_DECL_DEPRECATED
@@ -82,3 +90,18 @@
 //! @def OT_FALLTHROUGH
 //! @brief Marks a switch case as fallthrough.
 #define OT_FALLTHROUGH [[fallthrough]];
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Auto-generator markers
+
+#define OT_GEN_START_CLASS(...)
+#define OT_GEN_END_CLASS(...)
+
+#define OT_GEN_START_STRUCT(...)
+#define OT_GEN_END_STRUCT(...)
+
+#define OT_GEN_START_ENUM(...)
+#define OT_GEN_END_ENUM(...)
+
+#define OT_GEN_PROPERTY(...)

@@ -280,9 +280,16 @@ void LogInDialog::initialize()
 		const auto& loginData = args.getLoginData();
 
 		// Apply password and username
-		m_restoredPassword = QString::fromStdString(loginData.getEncryptedUserPassword());
-		m_username->setText(QString::fromStdString(loginData.getUserName()));
-
+		if (loginData.getUseSessionCredentials())
+		{
+			m_enforcedLoginData = loginData;
+		}
+		else
+		{
+			m_restoredPassword = QString::fromStdString(loginData.getEncryptedUserPassword());
+			m_username->setText(QString::fromStdString(loginData.getUserName()));
+		}
+		
 		// Apply GSS
 		this->enforceGSS(loginData.getGss());
 
@@ -360,45 +367,20 @@ void LogInDialog::slotLogIn()
 {
 	OTAssert(!m_state.has(LoginState::WorkerRunning), "Worker already running");
 
-	m_loginData.clear();
-
-	// Check user inputs
-	auto entry = findCurrentGssEntry();
-	if (!entry.has_value())
+	if (m_enforcedLoginData.has_value())
 	{
-		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
-		return;
+		m_loginData = m_enforcedLoginData.value();
 	}
-	const auto& gss = entry.value();
-	
-	LogInGSSEntry gssData = gss;
-	if (!gssData.isValid())
+	else
 	{
-		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
-		return;
+		setupLoginDataFromCurrent();
+
+		// Store settings
+		std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
+		settings->setValue("SessionServiceURL", m_loginData.getGss().getName());
+		settings->setValue("LogInPos.X", this->pos().x());
+		settings->setValue("LogInPos.Y", this->pos().y());
 	}
-
-	if (m_username->text().isEmpty() && !m_isSSOLogin)
-	{
-		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
-		return;
-	}
-
-	if (m_password->text().isEmpty() && !m_isSSOLogin)
-	{
-		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
-		return;
-	}
-
-	this->setControlsEnabled(false);
-
-	m_loginData.setGss(gssData);
-
-	// Store settings
-	std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
-	settings->setValue("SessionServiceURL", gssData.getName());
-	settings->setValue("LogInPos.X", this->pos().x());
-	settings->setValue("LogInPos.Y", this->pos().y());
 
 	// Run worker
 	m_state.set(LoginState::WorkerRunning);
@@ -816,6 +798,41 @@ void LogInDialog::slotWorkerCustomFeedback(const std::string& _title, const std:
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private helper
+
+bool LogInDialog::setupLoginDataFromCurrent()
+{
+	m_loginData.clear();
+
+	// Check user inputs
+	auto entry = findCurrentGssEntry();
+	if (!entry.has_value())
+	{
+		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
+		return false;
+	}
+	const auto& gss = entry.value();
+	if (!gss.isValid())
+	{
+		QToolTip::showText(this->mapToGlobal(m_gss->pos()), "Invalid Global Session Service", m_gss, QRect(), 3000);
+		return false;
+	}
+
+	if (m_username->text().isEmpty() && !m_isSSOLogin)
+	{
+		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
+		return false;
+	}
+
+	if (m_password->text().isEmpty() && !m_isSSOLogin)
+	{
+		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
+		return false;
+	}
+
+	this->setControlsEnabled(false);
+
+	m_loginData.setGss(gss);
+}
 
 void LogInDialog::saveUserSettings() const
 {
@@ -1374,9 +1391,13 @@ LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userMan
 	{
 		return this->workerLoginSSO(_userManager, _customTitle, _customMsg);
 	}
-	else
+	else if (gss.getLoginType() == ot::LoginType::UsernamePassword)
 	{
 		return this->workerLoginUsernamePassword(_userManager);
+	}
+	else
+	{
+		OT_LOG_ES("Unknown login type (" << ot::toString(gss.getLoginType()) << ")");
 	}
 }
 
@@ -1395,6 +1416,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	}
 
 	std::string currentUserName = m_username->text().toStdString();
+
 	if (!_userManager.checkPassword(currentUserName, currentPassword, isCurrentPasswordEncrypted, sessionUser, sessionPassword, validEncryptedPassword))
 	{
 		return WorkerError::InvalidCreadentials;
@@ -1404,13 +1426,25 @@ LogInDialog::WorkerError LogInDialog::workerLoginUsernamePassword(const UserMana
 	m_loginData.setEncryptedUserPassword(validEncryptedPassword);
 	m_loginData.setSessionUser(sessionUser);
 	m_loginData.setSessionPassword(sessionPassword);
-
+	
 	if (!_userManager.checkConnectionDataBase(m_loginData.getSessionUser(), m_loginData.getSessionPassword()))
 	{
 		return WorkerError::DatabaseConnectionFailed;
 	}
 
 	return WorkerError::NoError;
+}
+
+LogInDialog::WorkerError LogInDialog::workerLoginSessionUsernamePassword(const UserManagement& _userManager)
+{
+	if (_userManager.checkSessionUserPassword(m_loginData.getSessionUser(), m_loginData.getSessionPassword()))
+	{
+		return WorkerError::NoError;
+	}
+	else
+	{
+		return WorkerError::InvalidCreadentials;
+	}
 }
 
 LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)

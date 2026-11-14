@@ -6,10 +6,18 @@ import sys
 import subprocess
 from pathlib import Path
 
+import logging
+logger = logging.getLogger("OpenTwin")
+
 class FrontendLauncher:
     
-    def __init__(self, frontend_executable_path: Path) -> None:
+    def __init__(self, 
+                 frontend_executable_path: Path
+                 ) -> None:
+        
         self._frontend_executable_path = Path(frontend_executable_path).resolve()
+
+        logger.debug(f"Initializing " + __class__.__name__ + " with executable path \"{self._frontend_executable_path}\"...")
 
         if not self._frontend_executable_path.is_file():
             raise FileNotFoundError(f"Frontend executable not found: {self._frontend_executable_path}")
@@ -17,11 +25,15 @@ class FrontendLauncher:
         if sys.platform != "win32" and not os.access(self._frontend_executable_path, os.X_OK):
             raise PermissionError(f"Frontend executable is not executable: {self._frontend_executable_path}")
 
+        logger.debug(__class__.__name__ + " initialized successfully")
+
     def launch(self, args: list[str]) -> None:
         if not isinstance(args, list) or not all(isinstance(arg, str) for arg in args):
             raise TypeError("args must be a list of strings")
 
         command = [str(self._frontend_executable_path), *args]
+
+        logger.debug(f"Launching OpenTwin frontend with command: {command}")
 
         try:
             if sys.platform == "win32":

@@ -230,12 +230,11 @@ std::list<ot::Variable> ot::JSONToVariableConverter::operator()(ot::ConstJsonArr
 
 bool ot::JSONToVariableConverter::typeIsCompatible(const JsonValue& value, const ot::TupleInstance& _tupleInstance)
 {
-	auto type =	value.GetType();
 	bool compatible = false;
 	if (_tupleInstance.isSingle())
 	{
-		std::string type = _tupleInstance.getTupleElementDataTypes().front();
-		compatible = typeIsCompatible(value, type);
+		std::string elementType = _tupleInstance.getTupleElementDataTypes().front();
+		compatible = typeIsCompatible(value, elementType);
 	}
 	else
 	{

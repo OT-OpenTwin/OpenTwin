@@ -313,6 +313,10 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		loginMode = LoginMode::SSO;
 	}
+	else if (ot::json::exists(_actionDocument, OT_PARAM_DB_USERNAME))
+	{
+		loginMode = LoginMode::SessionUsernamePassword;
+	}
 	else
 	{
 		OT_LOG_E("No valid login mode provided");
@@ -388,6 +392,13 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 			return returnDoc.toJson();
 		}
 	}
+		break;
+
+	case LoginMode::SessionUsernamePassword:
+
+
+		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
+		return returnDoc.toJson();
 		break;
 
 	default:

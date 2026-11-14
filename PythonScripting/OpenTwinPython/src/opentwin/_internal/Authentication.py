@@ -73,7 +73,23 @@ class Authentication:
             logger.error(f"Authentication failed. Response: {loginResponseDoc}")
             raise RuntimeError("Authentication failed")
         
-        dbUser = loginResponseDoc[OT_PARAM_DB_USERNAME]
-        dbPassword = loginResponseDoc[OT_PARAM_DB_PASSWORD]
+        self._session_user = loginResponseDoc[OT_PARAM_DB_USERNAME]
+        self._session_password = loginResponseDoc[OT_PARAM_DB_PASSWORD]
+        self._original_username = loginResponseDoc[OT_PARAM_AUTH_USERNAME]
 
-        logger.debug(f"Authenticated successfully.")
+        logger.debug(__class__.__name__ + " initialized successfully")
+
+    @property
+    def session_user(self) -> str:
+        return self._session_user
+
+    @property
+    def session_password(self) -> str:
+        return self._session_password
+
+    @property
+    def original_username(self) -> str:
+        return self._original_username
+
+    def is_authenticated(self) -> bool:
+        return self._session_user is not None and self._session_password is not None and self._original_username is not None

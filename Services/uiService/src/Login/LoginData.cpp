@@ -20,6 +20,9 @@
 // Frontend header
 #include "Login/LoginData.h"
 
+// OpenTwin header
+#include "OTCommunication/ActionTypes.h"
+
 void LoginData::addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const {
 	_jsonObject.AddMember("UserName", ot::JsonString(m_username, _allocator), _allocator);
 	_jsonObject.AddMember("UserPassword", ot::JsonString(m_encryptedUserPassword, _allocator), _allocator);
@@ -34,7 +37,27 @@ void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) 
 	m_sessionToken = ot::json::getString(_jsonObject, "SessionToken");
 }
 
-void LoginData::clear(void) {
+void LoginData::setFromSessionCredentialsJson(const ot::ConstJsonObject& _jsonObject)
+{
+	if (_jsonObject.HasMember(OT_ACTION_PARAM_SERVICE_GSSURL))
+	{
+		std::string gssUrl = ot::json::getString(_jsonObject, OT_ACTION_PARAM_SERVICE_GSSURL);
+		m_gss = LogInGSSEntry();
+		m_gss.setLoginType(ot::LoginType::UsernamePassword);
+		m_gss.setUrl(QString::fromStdString(gssUrl));
+	}
+	else
+	{
+		throw ot::Exception::ArgumentMissing("Missing required parameter: " + std::string(OT_ACTION_PARAM_SERVICE_GSSURL));
+	}
+
+	m_username = ot::json::getString(_jsonObject, OT_PARAM_AUTH_USERNAME);
+	m_sessionUser = ot::json::getString(_jsonObject, OT_PARAM_DB_USERNAME);
+	m_sessionPassword = ot::json::getString(_jsonObject, OT_PARAM_DB_PASSWORD);
+	m_useSessionCredentials = true;
+}
+
+void LoginData::clear() {
 	m_gss.clear();
 	m_databaseUrl.clear();
 	m_authorizationUrl.clear();
@@ -46,7 +69,7 @@ void LoginData::clear(void) {
 	m_sessionToken.clear();
 }
 
-bool LoginData::isValid(void) const {
+bool LoginData::isValid() const {
 	bool valid = m_gss.isValid() &&
 		!m_databaseUrl.empty() &&
 		!m_authorizationUrl.empty() &&
