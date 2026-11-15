@@ -85,6 +85,11 @@ bool EntityResult1DPlot::updateFromProperties()
 	auto numberOfCurvesMax = PropertyHelper::getIntegerProperty(this, "Max", "Curve limit");
 	requiresDataToBeFetched |= numberOfCurvesMax->needsUpdate();
 	requiresDataToBeFetched |= PropertyHelper::getSelectionProperty(this, "Parameter", getXAxisPropertyGroupName())->needsUpdate();
+	if (PropertyHelper::hasProperty(this, "Vary line styles (N > 10)", "General"))
+	{
+		auto varyLineStyles = PropertyHelper::getBoolProperty(this, "Vary line styles (N > 10)", "General");
+		requiresDataToBeFetched |= varyLineStyles->needsUpdate();
+	}
 
 	for (uint32_t i = 1; i <= m_numberOfSecondaryParameterSelections; i++)
 	{
@@ -242,6 +247,8 @@ void EntityResult1DPlot::createProperties()
 	EntityPropertiesBoolean::createProperty("General", "Grid", true, "", getProperties());
 	EntityPropertiesGuiPainter::createProperty("General", "Grid color", new ot::StyleRefPainter2D(ot::ColorStyleValueEntry::PlotGrid), "", getProperties());
 	EntityPropertiesBoolean::createProperty("General", "Legend", true, "", getProperties());
+	auto varyLineStylesProp = EntityPropertiesBoolean::createProperty("General", "Vary line styles (N > 10)", false, "", getProperties());
+	varyLineStylesProp->setToolTip("Automatically varies line styles (solid, dashed, dash-dot) and point symbols after the first 10 rainbow curves for colorblind and grayscale accessibility.");
 	auto originProp = EntityPropertiesDouble::createProperty("General", "Origin", 0.0, -359.999, 359.999, "", getProperties());
 	originProp->setAllowCustomValues(false);
 	originProp->setSuffix("deg");
@@ -298,6 +305,9 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	const bool gridVisible = PropertyHelper::getBoolPropertyValue(this, "Grid");
 	const bool legendVisible = PropertyHelper::getBoolPropertyValue(this, "Legend");
+	const bool varyLineStyles = PropertyHelper::hasProperty(this, "Vary line styles (N > 10)", "General")
+		? PropertyHelper::getBoolPropertyValue(this, "Vary line styles (N > 10)", "General")
+		: false;
 
 	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
@@ -320,6 +330,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	config.setGridColor(gridColour->createCopy());
 	config.setGridVisible(gridVisible);
 	config.setLegendVisible(legendVisible);
+	config.setVaryLineStyles(varyLineStyles);
 
 	config.setLimitOfCurves(maxNbOfCurves);
 	config.setUseLimitNbOfCurves(useCurveLimit);
