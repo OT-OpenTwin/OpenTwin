@@ -117,6 +117,7 @@ void ot::Plot1DCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocato
 	_object.AddMember("QueryQuantity", JsonString(m_queryQuantity, _allocator), _allocator);
 
 	_object.AddMember("UseLimitOfCurves", m_useLimit, _allocator);
+	_object.AddMember("VaryLineStyles", m_varyLineStyles, _allocator);
 	_object.AddMember("NbCurveLimit", m_curveLimit, _allocator);
 
 	_object.AddMember("ShowEntireMatrix", m_showEntireMatrix, _allocator);
@@ -187,6 +188,12 @@ void ot::Plot1DCfg::setFromJsonObject(const ConstJsonObject& _object) {
 	}
 
 	m_useLimit = json::getBool(_object,"UseLimitOfCurves");
+	if (_object.HasMember("VaryLineStyles")) {
+		m_varyLineStyles = json::getBool(_object, "VaryLineStyles");
+	}
+	else {
+		m_varyLineStyles = false;
+	}
 	m_curveLimit = json::getInt(_object, "NbCurveLimit");
 
 	m_polarDegreeOrigin = json::getDouble(_object, "PolarDegreeOrigin");
@@ -213,6 +220,7 @@ bool ot::Plot1DCfg::operator==(const Plot1DCfg& _other) const {
 
 		(m_isHidden == _other.m_isHidden) &&
 		(m_legendVisible == _other.m_legendVisible) &&
+		(m_varyLineStyles == _other.m_varyLineStyles) &&
 
 		(m_treeIcons == _other.m_treeIcons) &&
 

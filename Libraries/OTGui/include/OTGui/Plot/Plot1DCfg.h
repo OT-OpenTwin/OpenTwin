@@ -199,6 +199,9 @@ namespace ot {
 		void setUseLimitNbOfCurves(bool _useLimit) { m_useLimit = _useLimit; };
 		bool getUseLimitNbOfCurves() const { return m_useLimit; };
 
+		void setVaryLineStyles(bool _varyLineStyles) { m_varyLineStyles = _varyLineStyles; };
+		bool getVaryLineStyles() const { return m_varyLineStyles; };
+
 		void setLimitOfCurves(int32_t _curveLimit) { m_curveLimit = _curveLimit; };
 		int32_t getLimitOfCurves() const { return m_curveLimit; };
 
@@ -262,6 +265,7 @@ namespace ot {
 		bool m_isHidden = false;
 		bool m_legendVisible = true;
 		bool m_useLimit = true;
+		bool m_varyLineStyles = false;
 		int32_t m_curveLimit = 25;
 
 		NavigationTreeItemIcon m_treeIcons;

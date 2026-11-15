@@ -22,6 +22,8 @@
 // OpenTwin header
 #include "OTGui/Painter/Painter2D.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
+#include "OTGui/Plot/Plot1DCurveCfg.h"
+#include "OTGui/Style/PenCfg.h"
 
 // std header
 #include <cstdint>
@@ -42,6 +44,15 @@ namespace ot
 
 		uint32_t getCurrentIndex() const { return m_currentColourIndex; }
 		void reset() { m_currentColourIndex = 0; }
+
+		//! @brief Extracts the rainbow palette index [0, c_paletteSize) from a StyleRefPainter2D pointing to Rainbow0..Rainbow29.
+		static bool tryGetRainbowIndex(const Painter2D* _painter, uint32_t& _outIndex);
+
+		//! @brief Returns an accessible LineStyle for the given rainbow index (0..9 Solid, 10..19 Dash, 20..29 DashDot).
+		static LineStyle getLineStyleForIndex(uint32_t _index);
+
+		//! @brief Returns a cyclic point symbol for single-point curves so curves remain distinguishable without color.
+		static Plot1DCurveCfg::Symbol getPointSymbolForIndex(uint32_t _index);
 
 	private:
 		uint32_t m_currentColourIndex;

@@ -20,26 +20,20 @@
 // OpenTwin header
 #include "OTGui/Painter/PainterRainbowIterator.h"
 
+// std header
+#include <array>
+
 ot::PainterRainbowIterator::PainterRainbowIterator()
 	: m_currentColourIndex(0)
 {}
 
 bool ot::PainterRainbowIterator::initiateWithOtherPainter(const ot::Painter2D* _painter)
 {
-	if (_painter == nullptr)
+	uint32_t rainbowIndex = 0;
+	if (tryGetRainbowIndex(_painter, rainbowIndex))
 	{
-		return false;
-	}
-
-	const ot::StyleRefPainter2D* stylePainter = dynamic_cast<const ot::StyleRefPainter2D*>(_painter);
-	if (stylePainter != nullptr)
-	{
-		ot::ColorStyleValueEntry styleKey = stylePainter->getReferenceKey();
-		if (styleKey >= ot::ColorStyleValueEntry::RainbowFirst && styleKey <= ot::ColorStyleValueEntry::RainbowLast)
-		{
-			m_currentColourIndex = static_cast<uint32_t>(styleKey) - static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
-			return true;
-		}
+		m_currentColourIndex = rainbowIndex;
+		return true;
 	}
 
 	return false;
@@ -52,4 +46,48 @@ std::unique_ptr<ot::Painter2D> ot::PainterRainbowIterator::getNextPainter()
 	);
 	m_currentColourIndex = (m_currentColourIndex + 1) % c_paletteSize;
 	return std::make_unique<ot::StyleRefPainter2D>(styleEntry);
+}
+
+bool ot::PainterRainbowIterator::tryGetRainbowIndex(const Painter2D* _painter, uint32_t& _outIndex)
+{
+	const ot::StyleRefPainter2D* stylePainter = dynamic_cast<const ot::StyleRefPainter2D*>(_painter);
+	if (stylePainter != nullptr)
+	{
+		const ot::ColorStyleValueEntry styleKey = stylePainter->getReferenceKey();
+		if (styleKey >= ot::ColorStyleValueEntry::RainbowFirst && styleKey <= ot::ColorStyleValueEntry::RainbowLast)
+		{
+			_outIndex = static_cast<uint32_t>(styleKey) - static_cast<uint32_t>(ot::ColorStyleValueEntry::RainbowFirst);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+ot::LineStyle ot::PainterRainbowIterator::getLineStyleForIndex(uint32_t _index)
+{
+	constexpr uint32_t c_blockSize = 10;
+	static constexpr std::array<LineStyle, 3> c_lineStyles = {
+		LineStyle::SolidLine,
+		LineStyle::DashLine,
+		LineStyle::DashDotLine
+	};
+
+	const uint32_t normalized = (_index % c_paletteSize) / c_blockSize;
+	return c_lineStyles[normalized % c_lineStyles.size()];
+}
+
+ot::Plot1DCurveCfg::Symbol ot::PainterRainbowIterator::getPointSymbolForIndex(uint32_t _index)
+{
+	static constexpr std::array<Plot1DCurveCfg::Symbol, 7> c_symbols = {
+		Plot1DCurveCfg::Circle,
+		Plot1DCurveCfg::Square,
+		Plot1DCurveCfg::Diamond,
+		Plot1DCurveCfg::TriangleUp,
+		Plot1DCurveCfg::TriangleDown,
+		Plot1DCurveCfg::Cross,
+		Plot1DCurveCfg::Star6
+	};
+
+	return c_symbols[_index % c_symbols.size()];
 }
