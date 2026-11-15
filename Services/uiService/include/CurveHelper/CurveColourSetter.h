@@ -26,14 +26,17 @@
 class CurveColourSetter
 {
 public:
-	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg);
-	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize);
+	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, bool _varyLineStyles = false);
+	CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize, bool _varyLineStyles = false);
 	
 	void setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint);
-	void setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _bufferIndex ,bool _hasSingleDatapoint);
+	void setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _bufferIndex, bool _hasSingleDatapoint);
 
 private:
+	void applyCurvePainter(ot::Plot1DCurveCfg& _curveCfg, ot::Painter2D* _painter, bool _hasSingleDatapoint) const;
+
 	ot::PainterRainbowIterator m_painterRainbowIterator;
 	std::vector<ot::Painter2D*> m_rainbowPainterBuffer;
 	bool m_useRainBowItterator = false;
+	bool m_varyLineStyles = false;
 };

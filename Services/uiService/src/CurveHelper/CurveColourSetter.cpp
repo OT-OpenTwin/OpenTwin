@@ -19,18 +19,18 @@
 
 #include "CurveHelper/CurveColourSetter.h"
 
-CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg)
+CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, bool _varyLineStyles)
+	: m_varyLineStyles(_varyLineStyles)
 {
 	m_useRainBowItterator = m_painterRainbowIterator.initiateWithOtherPainter(_curveCfg.getLinePen().getPainter());
-	m_painterRainbowIterator.initiateWithOtherPainter(_curveCfg.getLinePen().getPainter());
 }
 
-CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize)
-	:CurveColourSetter(_curveCfg)
+CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32_t _rainbowBufferSize, bool _varyLineStyles)
+	: CurveColourSetter(_curveCfg, _varyLineStyles)
 {
 	m_rainbowPainterBuffer.reserve(_rainbowBufferSize);
 
-	for (int i = 0; i < _rainbowBufferSize; i++)
+	for (uint32_t i = 0; i < _rainbowBufferSize; i++)
 	{
 		m_rainbowPainterBuffer.push_back(m_painterRainbowIterator.getNextPainter().release());
 	}
@@ -38,71 +38,48 @@ CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32
 
 void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, bool _hasSingleDatapoint)
 {
-	if (_hasSingleDatapoint)
-	{
-		_curveCfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
-		_curveCfg.setLinePenStyle(ot::LineStyle::NoLine);
-
-		ot::Painter2D* painter = nullptr;
-		if (m_useRainBowItterator)
-		{
-			painter = m_painterRainbowIterator.getNextPainter().release();
-		}
-		else
-		{
-			painter = _curveCfg.getLinePen().getPainter()->createCopy();
-		}
-		_curveCfg.setPointFillPainter(painter->createCopy());
-		_curveCfg.setPointOutlinePenPainter(painter);
-	}
-	else
-	{
-		ot::Painter2D* painter = nullptr;
-		if (m_useRainBowItterator)
-		{
-			painter = m_painterRainbowIterator.getNextPainter().release();
-		}
-		else
-		{
-			painter = _curveCfg.getLinePen().getPainter()->createCopy();
-		}
-
-		_curveCfg.setLinePenPainter(painter);
-	}
+	ot::Painter2D* painter = m_useRainBowItterator
+		? m_painterRainbowIterator.getNextPainter().release()
+		: _curveCfg.getLinePen().getPainter()->createCopy();
+	this->applyCurvePainter(_curveCfg, painter, _hasSingleDatapoint);
 }
 
 void CurveColourSetter::setPainter(ot::Plot1DCurveCfg& _curveCfg, uint32_t _bufferIndex, bool _hasSingleDatapoint)
 {
+	ot::Painter2D* painter = m_useRainBowItterator
+		? m_rainbowPainterBuffer[_bufferIndex]->createCopy()
+		: _curveCfg.getLinePen().getPainter()->createCopy();
+	this->applyCurvePainter(_curveCfg, painter, _hasSingleDatapoint);
+}
+
+void CurveColourSetter::applyCurvePainter(ot::Plot1DCurveCfg& _curveCfg, ot::Painter2D* _painter, bool _hasSingleDatapoint) const
+{
+	uint32_t rainbowIndex = 0;
+	const bool hasRainbowIndex = m_varyLineStyles && m_useRainBowItterator && ot::PainterRainbowIterator::tryGetRainbowIndex(_painter, rainbowIndex);
+
 	if (_hasSingleDatapoint)
 	{
-		_curveCfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
+		if (hasRainbowIndex && (_curveCfg.getPointSymbol() == ot::Plot1DCurveCfg::NoSymbol || _curveCfg.getPointSymbol() == ot::Plot1DCurveCfg::Circle))
+		{
+			_curveCfg.setPointSymbol(ot::PainterRainbowIterator::getPointSymbolForIndex(rainbowIndex));
+		}
+		else if (_curveCfg.getPointSymbol() == ot::Plot1DCurveCfg::NoSymbol)
+		{
+			_curveCfg.setPointSymbol(ot::Plot1DCurveCfg::Circle);
+		}
 		_curveCfg.setLinePenStyle(ot::LineStyle::NoLine);
 
-		ot::Painter2D* painter = nullptr;
-		if (m_useRainBowItterator)
-		{
-			painter = m_rainbowPainterBuffer[_bufferIndex]->createCopy();
-		}
-		else
-		{
-			painter = _curveCfg.getLinePen().getPainter()->createCopy();
-		}
-		_curveCfg.setPointFillPainter(painter->createCopy());
-		_curveCfg.setPointOutlinePenPainter(painter);
-
+		_curveCfg.setPointFillPainter(_painter->createCopy());
+		_curveCfg.setPointOutlinePenPainter(_painter);
 	}
 	else
 	{
-		ot::Painter2D* painter = nullptr;
-		if (m_useRainBowItterator)
+		// Only assign accessible line styles when enabled and the user has not customized the line style away from SolidLine
+		if (hasRainbowIndex && _curveCfg.getLinePen().getStyle() == ot::LineStyle::SolidLine)
 		{
-			painter = m_rainbowPainterBuffer[_bufferIndex]->createCopy();
-		}
-		else
-		{
-			painter = _curveCfg.getLinePen().getPainter()->createCopy();
+			_curveCfg.setLinePenStyle(ot::PainterRainbowIterator::getLineStyleForIndex(rainbowIndex));
 		}
 
-		_curveCfg.setLinePenPainter(painter);
+		_curveCfg.setLinePenPainter(_painter);
 	}
 }

@@ -92,7 +92,7 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 
 	DependencyInfoList familyOfCurves;
 	
-	CurveColourSetter colourSetting(_curveCfg, numberOfQuantities);
+	CurveColourSetter colourSetting(_curveCfg, numberOfQuantities, _plotCfg.getVaryLineStyles());
 
 	const std::string displayParameterLabel = _plotCfg.getXAxisParameter();
 
@@ -291,7 +291,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 {
 	std::list<ot::PlotDataset*> dataSets;
 
-	CurveColourSetter curveColourSetter(_curveCfg);
+	CurveColourSetter curveColourSetter(_curveCfg, _plotCfg.getVaryLineStyles());
 
 	for (auto& curve : _curveData)
 	{
