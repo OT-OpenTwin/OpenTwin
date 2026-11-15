@@ -174,7 +174,6 @@ bool MongoUserFunctions::authenticateUserTroughSessionCredentials(const std::str
 	return false;
 }
 
-
 bool MongoUserFunctions::registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName)
 {
 	/*

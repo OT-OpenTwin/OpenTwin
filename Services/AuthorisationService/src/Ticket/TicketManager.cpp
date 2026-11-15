@@ -6,58 +6,24 @@
 // OpenTwin header
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/String.h"
-#include "OTCommunication/ActionTypes.h"
 #include "OTSystem/RandomNumber/RandomNumberProvider.h"
-
-std::string TicketManager::toString(TicketType _ticketType)
-{
-	switch (_ticketType)
-	{
-	case TicketManager::Login: return OT_TICKET_TYPE_Login;
-	case TicketManager::Gateway: return OT_TICKET_TYPE_Gateway;
-	default:
-		OT_LOG_ES("Unknown ticket type (" << static_cast<uint32_t>(_ticketType) << ")");
-		return "Invalid";
-	}
-}
-
-TicketManager::TicketType TicketManager::stringToTicketType(const std::string& _ticketTypeString)
-{
-	if (_ticketTypeString == OT_TICKET_TYPE_Gateway)
-	{
-		return TicketType::Gateway;
-	}
-	else if (_ticketTypeString == OT_TICKET_TYPE_Login)
-	{
-		return TicketType::Login;
-	}
-	else
-	{
-		OT_LOG_E("Unknown ticket type \"" + _ticketTypeString + "\"");
-	}
-
-	return TicketType::Invalid;
-}
 
 TicketManager::TicketManager()
 {}
 
-std::optional<std::string> TicketManager::generateTicket(const User & _authenticatedUser, TicketType _ticketType)
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Ticket generation
+
+std::optional<std::string> TicketManager::generateTicket(const User & _authenticatedUser, Ticket::TicketType _ticketType)
 {
-	if (_ticketType == TicketManager::TicketType::Invalid)
-	{
-		return std::nullopt;
-	}
-
-	std::string newTicket = generateNewTicketString();
-
 	switch (_ticketType)
 	{
-	case TicketManager::Invalid: return std::nullopt;
+	case Ticket::Invalid:
+		return std::nullopt;
+	case Ticket::Login:
 		break;
-	case TicketManager::Login:
-		break;
-	case TicketManager::Gateway:
+	case Ticket::Gateway:
 		break;
 	default:
 		break;
@@ -65,6 +31,18 @@ std::optional<std::string> TicketManager::generateTicket(const User & _authentic
 
 	return std::optional<std::string>();
 }
+
+
+
+std::optional<std::string> TicketManager::generateTicket(const User& _authenticatedUser, const std::string& _ticketTypeString)
+{
+	const Ticket::TicketType ticketType = Ticket::stringToTicketType(_ticketTypeString);
+	return generateTicket(_authenticatedUser, ticketType);
+}
+
+// ###########################################################################################################################################################################################################################################################################################################################
+
+// Private: Ticket generation
 
 std::string TicketManager::generateNewTicketString()
 {
