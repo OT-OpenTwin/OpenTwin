@@ -25,6 +25,7 @@
 // std header
 #include <sstream>
 #include <iomanip>
+#include <cmath>
 
 template <class T> T ot::String::toNumber(const std::string& _string, bool& _failed) {
 	T result = static_cast<T>(0);

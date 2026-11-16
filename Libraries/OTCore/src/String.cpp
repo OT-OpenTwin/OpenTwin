@@ -30,6 +30,7 @@
 #include <map>
 #include <locale>
 #include <algorithm>
+#include <memory>
 
 #ifdef OT_OS_WINDOWS
 #include <Windows.h>

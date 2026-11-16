@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: VariableHelper.h
 // 
 // License:
@@ -21,6 +21,7 @@
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/Serializable.h"
 #include "OTCore/CoreAPIExport.h"
+#include "OTSystem/Exception.h"
 
 namespace ot {
 
@@ -52,7 +53,7 @@ namespace ot {
 			}
 			else
 			{
-				throw std::exception("Numerical operation with non-numeric data types intended.");
+				throw ot::GeneralException("Numerical operation with non-numeric data types intended.");
 			}
 		}
 

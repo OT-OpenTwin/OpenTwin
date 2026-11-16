@@ -19,6 +19,7 @@
 
 // OpenTwin header
 #include "OTSystem/DateTime.h"
+#include "OTSystem/Exception.h"
 #include "OTCore/Logging/LogMacros.h"
 #include "OTCore/Logging/LogMessage.h"
 
@@ -74,7 +75,7 @@ void ot::LogMessage::setFromJsonObject(const ConstJsonObject& _object) {
 			return;
 		}
 		else {
-			throw std::exception("Invalid log version");
+			throw ot::GeneralException("Invalid log version");
 		}
 	}
 

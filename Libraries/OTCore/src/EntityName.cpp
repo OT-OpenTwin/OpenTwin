@@ -23,6 +23,9 @@
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/EntityName.h"
 
+// Std header
+#include <algorithm>
+
 std::optional<std::string> ot::EntityName::getSubName(const std::string& _fullEntityName, int32_t _topologyLevel) {
 	if (_topologyLevel == -1) {
 		size_t pos = _fullEntityName.find_last_of("/");

@@ -2,6 +2,7 @@
 #include "OTCore/ValueProcessing/UnitTokenizer.h"
 #include "OTCore/Units/SIUnits.h"
 #include "OTCore/Units/ImperialUnits.h"
+#include "OTSystem/Exception.h"
 #include "OTCore/ValueProcessing/ValueProcessorAdd.h"
 #include "OTCore/ValueProcessing/ValueProcessorLog.h"
 #include "OTCore/ValueProcessing/ValueProcessorPow.h"
@@ -31,7 +32,7 @@ ot::ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitS
                 assert(resolvedTokenCurrent.size() == 1);
                 if (!(resolvedTokenCurrent[0].m_resolvedComponent.m_base.m_dimension == ot::Dimension{}))
                 {
-                    throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
+                    throw ot::GeneralException("Cannot transform a dimensionless unit into a unit with dimension.");
                 }
                 
                 const ot::ValueProcessing processing = buildChain(resolvedTokenCurrent, { dummyToken });
@@ -44,7 +45,7 @@ ot::ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitS
                 assert(resolvedTokenTarget.size() == 1);
                 if (!(resolvedTokenTarget[0].m_resolvedComponent.m_base.m_dimension == ot::Dimension{}))
                 {
-                    throw std::exception("Cannot transform a dimensionless unit into a unit with dimension.");
+                    throw ot::GeneralException("Cannot transform a dimensionless unit into a unit with dimension.");
                 }
 
                 const ot::ValueProcessing processing = buildChain({ dummyToken }, resolvedTokenTarget);
@@ -69,7 +70,7 @@ ot::ValueProcessing ValueProcessingChainBuilder::build(const std::string& _unitS
     catch (std::exception& _e)
     {
         std::string message = "Failed to convert units: " + std::string(_e.what());
-        throw std::exception(message.c_str());
+        throw ot::GeneralException(message.c_str());
     }
 }
 
@@ -149,7 +150,7 @@ std::vector<ResolvedToken> ValueProcessingChainBuilder::resolveTokens(const std:
             resolvedComponent = ot::ImperialUnits::instance().resolve(token.m_symbol);
             if (!resolvedComponent.has_value())
             {
-                throw std::exception(("Failed to assign a imperial or si unit to: " + token.m_symbol).c_str());
+                throw ot::GeneralException(("Failed to assign a imperial or si unit to: " + token.m_symbol).c_str());
             }
         }
         ResolvedToken resolvedToken{ resolvedComponent.value() ,token.m_exponent };
@@ -179,7 +180,7 @@ void ValueProcessingChainBuilder::dimensionCompatibilityGuard(std::vector<Resolv
 
     if (!(srcDim == tgtDim))
     {
-        throw std::exception(("\"" + _tgtExpr + "\" and \"" + _currentExpr + "\" have different dimensions").c_str());
+        throw ot::GeneralException(("\"" + _tgtExpr + "\" and \"" + _currentExpr + "\" have different dimensions").c_str());
     }
 }
 
@@ -224,7 +225,7 @@ ot::ValueProcessing ValueProcessingChainBuilder::buildChain(const std::vector<Re
     if (srcAffine != tgtAffine)
     {
         //Should also be pretected by the dimension check
-        throw std::exception("Affine units must either stand both alone one or be both composed.");
+        throw ot::GeneralException("Affine units must either stand both alone one or be both composed.");
     }
 
     // ----------------------------------------------------------------
@@ -345,7 +346,7 @@ const ResolvedToken* ValueProcessingChainBuilder::findLogToken(const std::vector
             }
             else
             {
-                throw std::exception("Invalid unit conversion attempted.");
+                throw ot::GeneralException("Invalid unit conversion attempted.");
             }
         }
     }

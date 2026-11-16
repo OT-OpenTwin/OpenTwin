@@ -21,6 +21,8 @@
 #include "OTCore/Object/ObjectDestroyNotifier.h"
 #include "OTCore/Object/ObjectWithDestroyNotifier.h"
 
+#include <algorithm>
+
 ot::ObjectDestroyNotifier::ObjectDestroyNotifier()
 {}
 

@@ -29,6 +29,7 @@
 #include <thread>
 #include <iostream>
 #include <exception>
+#include <algorithm>
 
 #define OT_LOGGER_USE_MUTEX false
 

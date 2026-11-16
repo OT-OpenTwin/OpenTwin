@@ -19,6 +19,7 @@
 
 #include "OTCore/Variable/VariableToJSONConverter.h"
 #include "OTCore/ComplexNumbers/SerialisationKeys.h"
+#include "OTSystem/Exception.h"
 
 ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, JsonAllocator& jsonAllocator)
 {
@@ -76,7 +77,7 @@ ot::JsonValue ot::VariableToJSONConverter::operator()(const Variable& value, Jso
 	}
 	else
 	{
-		throw std::exception("Not supported type for variable_t to rapidjson::Value conversion.");
+		throw ot::GeneralException("Not supported type for variable_t to rapidjson::Value conversion.");
 	}
 }
 

@@ -24,6 +24,7 @@
 #include "rapidjson/stringbuffer.h"
 #include "OTCore/TypeNames.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
+#include "OTSystem/Exception.h"
 
 #undef Object
 #undef ObjectW
@@ -1578,7 +1579,7 @@ void ot::json::mergeObjects(rapidjson::Value& _dstObject, const rapidjson::Value
 			if (sourceType!= destType)
 			{
 				if (_secureMerge) {
-					throw std::exception(("Type conflict in the field: " + std::string(srcIt->name.GetString())).c_str());
+					throw ot::GeneralException(("Type conflict in the field: " + std::string(srcIt->name.GetString())).c_str());
 				}
 				else
 				{
@@ -1614,7 +1615,7 @@ void ot::json::mergeArrays(rapidjson::Value& _dstArray, const rapidjson::Value& 
 	if (_dstArray.GetType() != _srcArray.GetType()||!_dstArray.IsArray())
 	{
 		if (_secureMerge) {
-			throw std::exception("Failed array merge");
+			throw ot::GeneralException("Failed array merge");
 		}
 		else
 		{
@@ -1675,7 +1676,7 @@ bool ot::json::isOfType(const JsonValue& _value, const std::string& _typeName)
 	}
 	else
 	{
-		throw std::exception(("Unknown type name: " + _typeName).c_str());
+		throw ot::GeneralException(("Unknown type name: " + _typeName).c_str());
 	}
 }
 
@@ -1721,7 +1722,7 @@ std::string ot::json::getTypeName(const JsonValue& _value)
 	}
 	else
 	{
-		throw std::exception("Unknown JSON value type");
+		throw ot::GeneralException("Unknown JSON value type");
 	}
 }
 

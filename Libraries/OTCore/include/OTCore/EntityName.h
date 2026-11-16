@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: EntityName.h
 // 
 // License:
@@ -33,6 +33,7 @@ namespace ot {
 	public:
 		struct NamingBehavior
 		{
+            NamingBehavior() {}
 			std::string delimiter = "_";
 			bool alwaysNumbered = false;
 			int startNumber = 1;

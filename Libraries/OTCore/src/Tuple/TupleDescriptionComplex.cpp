@@ -21,6 +21,8 @@
 #include "OTCore/Tuple/TupleDescriptionComplex.h"
 #include "OTCore/Units/SIUnits.h"
 
+#include <algorithm>
+
 ot::TupleDescriptionComplex::TupleDescriptionComplex()
 {
 	//Define format names for the complex number tuple.

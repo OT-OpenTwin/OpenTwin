@@ -21,6 +21,8 @@
 #include "OTCore/Debugging/CoreDebug.h"
 #include "OTCore/Object/OTObject.h"
 
+#include <algorithm>
+
 ot::OTObject::OTObject(OTObject* _parentObject)
 	: m_parentObject(_parentObject), m_destroyByParent(true)
 {

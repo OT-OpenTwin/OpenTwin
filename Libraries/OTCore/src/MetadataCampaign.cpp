@@ -21,6 +21,7 @@
 #include "OTCore/MetadataHandle/MetadataCampaign.h"
 #include "OTCore/MetadataHandle/Helper.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTSystem/Exception.h"
 // std header
 #include <cassert>
 
@@ -165,7 +166,7 @@ std::map<std::string, MetadataParameter*> MetadataCampaign::extractParameter()
 				//Label should be unique
 				if (*pipelineCampaignParameterByLabel->second != pipelineParameter)
 				{
-					throw std::exception(("Incosistent parameter with the same label detected: " + pipelineParameter.parameterLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
+					throw ot::GeneralException(("Incosistent parameter with the same label detected: " + pipelineParameter.parameterLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
 				}
 			}
 		}
@@ -193,7 +194,7 @@ std::map<std::string, MetadataQuantity*> MetadataCampaign::extractQuantity()
 				//Label should be unique
 				if (*pipelineCampaignQuantityByLabel->second != pipelineQuantity)
 				{
-					throw std::exception(("Incosistent quantity with the same label detected: " + pipelineQuantity.quantityLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
+					throw ot::GeneralException(("Incosistent quantity with the same label detected: " + pipelineQuantity.quantityLabel + ". Metadata throughout the entire campaign must have the same characteristics, if they have the same label.").c_str());
 				}
 			}
 		}

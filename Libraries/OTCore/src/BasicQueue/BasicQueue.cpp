@@ -26,6 +26,9 @@
 #include "OTCore/BasicQueue/BasicQueue.h"
 #include "OTCore/BasicQueue/BasicQueueObject.h"
 
+#include <memory>
+#include <thread>
+
 ot::BasicQueue::BasicQueue()
 	: m_state(State::None), m_currentObject(nullptr), m_exitCode(AppExitCode::Success)
 {}

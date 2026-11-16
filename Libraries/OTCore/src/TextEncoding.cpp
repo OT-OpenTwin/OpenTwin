@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "OTCore/TextEncoding.h"
+#include "OTSystem/Exception.h"
 #include <codecvt>
 
 
@@ -25,7 +26,7 @@ std::string ot::TextEncoding::getString(ot::TextEncoding::EncodingStandard type)
 {
 	if (_encodingStandardToString.find(type) == _encodingStandardToString.end())
 	{
-		throw std::exception("Encoding standard not found");
+		throw ot::GeneralException("Encoding standard not found");
 	}
 	else
 	{
@@ -37,7 +38,7 @@ ot::TextEncoding::EncodingStandard ot::TextEncoding::getType(const std::string& 
 {
 	if (_stringToEncodingStandard.find(type) == _stringToEncodingStandard.end())
 	{
-		throw std::exception("Encoding standard not found");
+		throw ot::GeneralException("Encoding standard not found");
 	}
 	else
 	{

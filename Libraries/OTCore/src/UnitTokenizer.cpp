@@ -1,5 +1,6 @@
 ﻿#include "OTCore/ValueProcessing/UnitTokenizer.h"
 #include "OTCore/String.h"
+#include "OTSystem/Exception.h"
 
 bool UnitTokenizer::tryParseInt(const std::string& _string, std::size_t& _pos, int& _out)
 {
@@ -70,7 +71,7 @@ UnitToken UnitTokenizer::parseTerm(int _roleSign)
     std::string sym;
     if (!tryParseSymbol(m_expression, m_pos, sym))
     {
-        throw std::exception(("Expected unit symbol at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
+        throw ot::GeneralException(("Expected unit symbol at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
     }
 
     int exp = 1;
@@ -80,14 +81,14 @@ UnitToken UnitTokenizer::parseTerm(int _roleSign)
         ++m_pos;
         if (!tryParseInt(m_expression, m_pos, exp))
         {
-            throw std::exception(("Expected integer after '^' at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
+            throw ot::GeneralException(("Expected integer after '^' at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
         }
     }
     else if (m_pos < m_length && (m_expression[m_pos] == '-' || std::isdigit(m_expression[m_pos]))) {
         // Implicit exponent: "s2", "s-2"  (no caret)
         if (!tryParseInt(m_expression, m_pos, exp))
         {
-            throw std::exception(("Expected integer after symbol at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
+            throw ot::GeneralException(("Expected integer after symbol at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
 
         }
     }
@@ -106,7 +107,7 @@ std::vector<UnitToken> UnitTokenizer::tokenize(const std::string& _expr)
 
     if (m_pos >= m_length)
     {
-        throw std::exception("Empty unit expression");
+        throw ot::GeneralException("Empty unit expression");
     }
     // An expression has the shape:
     //   numerator [ '/' denominator { '/' denominator } ]
@@ -134,14 +135,14 @@ std::vector<UnitToken> UnitTokenizer::tokenize(const std::string& _expr)
 
             if (m_pos >= m_length || m_expression[m_pos] == ')')
             {
-                throw std::exception(("Empty parentheses in denominator in \"" + m_expression + "\"").c_str());
+                throw ot::GeneralException(("Empty parentheses in denominator in \"" + m_expression + "\"").c_str());
             }
 
             parseTermList(-1);
 
             if (m_pos >= m_length || m_expression[m_pos] != ')')
             {
-                throw std::exception(("Missing closing ')' in \"" + m_expression + "\"").c_str());
+                throw ot::GeneralException(("Missing closing ')' in \"" + m_expression + "\"").c_str());
             }
             ++m_pos; // consume ')'
         }
@@ -159,7 +160,7 @@ std::vector<UnitToken> UnitTokenizer::tokenize(const std::string& _expr)
     // Trailing garbage check
     if (m_pos < m_length)
     {
-        throw std::exception(("Unexpected character '" + std::string(1, m_expression[m_pos]) + "' at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
+        throw ot::GeneralException(("Unexpected character '" + std::string(1, m_expression[m_pos]) + "' at position " + std::to_string(m_pos) + " in \"" + m_expression + "\"").c_str());
     }
 
     return m_tokens;

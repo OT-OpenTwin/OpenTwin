@@ -20,6 +20,7 @@
 #include "OTCore/Variable/JSONToVariableConverter.h"
 #include "OTCore/ComplexNumbers/SerialisationKeys.h"
 #include "OTCore/Tuple/TupleDescriptionComplex.h"
+#include "OTSystem/Exception.h"
 
 
 ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
@@ -52,7 +53,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	{
 		if (!json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_real) || !json::exists(value, ot::ComplexNumbers::SerialisationKeys::g_imag))
 		{
-			throw std::exception("Not supported type for rapidjson::Value to variable_t conversion. Object does not contain the required members for complex number conversion.");
+			throw ot::GeneralException("Not supported type for rapidjson::Value to variable_t conversion. Object does not contain the required members for complex number conversion.");
 		}
 		const double realPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_real);
 		const double imagPart = ot::json::getDouble(value, ot::ComplexNumbers::SerialisationKeys::g_imag);
@@ -65,7 +66,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 		double imagPart;
 		if (value.Size() != 2)
 		{
-			throw std::exception("Not supported type for rapidjson::Value to variable_t conversion. Array does not have the required size for complex number conversion.");
+			throw ot::GeneralException("Not supported type for rapidjson::Value to variable_t conversion. Array does not have the required size for complex number conversion.");
 		}
 		if (ot::json::isDouble(value.GetArray(), 0))
 		{
@@ -100,7 +101,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value)
 	}
 	else
 	{
-		throw std::exception("Not supported type for rapidjson::Value to variable_t conversion.");
+		throw ot::GeneralException("Not supported type for rapidjson::Value to variable_t conversion.");
 	}
 }
 
@@ -115,7 +116,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		}
 		else
 		{ 
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 	}
 	else if (_type == ot::TypeNames::getInt32TypeName())
@@ -130,7 +131,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		}
 		else
 		{
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 	}
 	else if (_type == ot::TypeNames::getInt64TypeName())
@@ -145,7 +146,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		}
 		else
 		{
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 	}
 	else if (_type == ot::TypeNames::getFloatTypeName())
@@ -160,7 +161,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		}
 		else
 		{
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 	}
 	else if (_type == ot::TypeNames::getDoubleTypeName())
@@ -175,7 +176,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 		}
 		else
 		{
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 	}
 	else if (_type == ot::TypeNames::getBoolTypeName())
@@ -185,7 +186,7 @@ ot::Variable ot::JSONToVariableConverter::operator()(const JsonValue& value, con
 	else
 	{
 		assert(false);
-		throw std::exception("Cast to variant not possible due to unknown type name");
+		throw ot::GeneralException("Cast to variant not possible due to unknown type name");
 	}
 }
 
@@ -208,7 +209,7 @@ ot::Variable ot::JSONToVariableConverter::operator() (const ot::JsonValue& value
 		}
 		else
 		{
-			throw std::exception("Cast to variant not possible due to type mismatch");
+			throw ot::GeneralException("Cast to variant not possible due to type mismatch");
 		}
 			
 	}

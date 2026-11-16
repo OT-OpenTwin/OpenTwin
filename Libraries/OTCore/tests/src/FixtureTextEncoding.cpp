@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #include "OTSystem/OperatingSystem.h"
+#include "OTSystem/Exception.h"
 #include "FixtureTextEncoding.h"
 #include <fstream>
 
@@ -26,7 +27,7 @@ std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStanda
 	std::string envVal = ot::OperatingSystem::getEnvironmentVariableString("OT_CORE_ROOT");
 
 	if (envVal.empty()) {
-		throw std::exception("Environment variable OT_CORE_ROOT not set.");
+		throw ot::GeneralException("Environment variable OT_CORE_ROOT not set.");
 	}
 
 	std::string projectDir = std::string(envVal) + "\\tests\\TestEncodingTypeFiles\\";
@@ -72,6 +73,6 @@ std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStanda
 	}
 	else
 	{
-		throw std::exception("File could not be opened");
+		throw ot::GeneralException("File could not be opened");
 	}
 }

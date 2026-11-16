@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: TimeFormatter.cpp
 // 
 // License:
@@ -16,7 +16,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 // @otlicense-end
+
 #include "OTCore/TimeFormatter.h"
+
+#include <iomanip>
 
 std::string TimeFormatter::formatDuration(const std::chrono::steady_clock::time_point _begin, const std::chrono::steady_clock::time_point& _end)
 {
