@@ -391,6 +391,16 @@ namespace ot {
 
     // Other
 
+	//! @brief Basic access denied exception.
+	class AccessDeniedException : public GeneralException
+	{
+        public:
+        explicit AccessDeniedException() : GeneralException("Access denied") {};
+        explicit AccessDeniedException(const std::string& _message) : GeneralException(_message.c_str()) {};
+        explicit AccessDeniedException(const char* _message) : GeneralException(_message) {};
+	};
+	namespace Exception { typedef ot::AccessDeniedException AccessDenied; }
+
 	//! @brief Basic script exception.
 	class ScriptException : public GeneralException {
         public:
