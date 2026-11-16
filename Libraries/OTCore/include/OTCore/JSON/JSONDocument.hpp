@@ -22,9 +22,20 @@
 // OpenTwin header
 #include "OTCore/JSON/JSONDocument.h"
 
+inline constexpr rapidjson::Type ot::JsonDocument::getRapidJsonType(JsonDocumentType _type) {
+	switch (_type) {
+	case JsonDocumentType::ObjectType: return rapidjson::kObjectType;
+	case JsonDocumentType::ArrayType:  return rapidjson::kArrayType;
+	case JsonDocumentType::NullType:   OT_FALLTHROUGH
+	default:                           return rapidjson::kNullType;
+	}
+}
+
 inline ot::JsonDocument::JsonDocument() : rapidjson::Document(rapidjson::kObjectType) {};
 
 inline ot::JsonDocument::JsonDocument(rapidjson::Type _type) : rapidjson::Document(_type) {};
+
+inline ot::JsonDocument::JsonDocument(JsonDocumentType _type) : rapidjson::Document(getRapidJsonType(_type)) {};
 
 inline bool ot::JsonDocument::fromJson(const char* _fromJson) {
 	this->SetNull();
