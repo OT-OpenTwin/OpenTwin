@@ -57,6 +57,8 @@ void ot::SystemServiceConfigInfo::setFromJsonObject(const ot::ConstJsonObject& _
 bool ot::SystemServiceConfigInfo::loadSystemServiceConfig(const char* _serviceName) {
     m_serviceName = _serviceName;
 
+#ifdef OT_OS_WINDOWS
+
     // Open SCM
     SC_HANDLE hSCManager = OpenSCManager(nullptr, nullptr, SC_MANAGER_CONNECT);
     if (!hSCManager) {
@@ -139,4 +141,7 @@ bool ot::SystemServiceConfigInfo::loadSystemServiceConfig(const char* _serviceNa
     } // queryOk
 
     return queryOk;
+#else
+    return false;
+#endif
 }

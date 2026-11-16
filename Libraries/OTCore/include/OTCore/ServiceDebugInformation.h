@@ -21,6 +21,7 @@
 
 // OpenTwin header
 #include "OTCore/ServiceBase.h"
+#include <cstdint>
 
 namespace ot {
 
@@ -53,9 +54,9 @@ namespace ot {
 		void setServiceWebsocketUrl(const std::string& _url) { m_websocketUrl = _url; };
 		const std::string& getServiceWebsocketUrl() const { return m_websocketUrl; };
 
-		void setProcessID(unsigned long long _processID) { m_processID = _processID; };
+		void setProcessID(uint64_t _processID) { m_processID = _processID; };
 		void setCurrentProcessID();
-		unsigned long long getProcessID() const { return m_processID; };
+		uint64_t getProcessID() const { return m_processID; };
 
 		std::string getAdditionalInformationJson() const;
 
@@ -64,6 +65,6 @@ namespace ot {
 		std::string m_name;
 		std::string m_url;
 		std::string m_websocketUrl;
-		unsigned long long m_processID;
+		uint64_t m_processID;
 	};
 }

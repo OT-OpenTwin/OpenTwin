@@ -103,11 +103,21 @@ GROUPS = ((SERVICES, "Services"), (LIBRARIES, "Libraries"), (TOOLS, "Tools"))
 RELATIVE = {
     "OT_INC": "include",
     "OT_SRC": "src",
+    "OT_TEST": "test",
+}
+
+RELATIVE_WINDOWS = {
     "OT_CDLLD": r"build\windows-debug\Debug",
     "OT_CDLLR": r"build\windows-release\Release",
     "OT_CLIBD": r"build\windows-debug\Debug",
     "OT_CLIBR": r"build\windows-release\Release",
-    "OT_TEST": "test",
+}
+
+RELATIVE_LINUX = {
+    "OT_CDLLD": r"build\linux-debug\Debug",
+    "OT_CDLLR": r"build\linux-release\Release",
+    "OT_CLIBD": r"build\linux-debug\Debug",
+    "OT_CLIBR": r"build\linux-release\Release",
 }
 
 # ===== Paths below the development root =====

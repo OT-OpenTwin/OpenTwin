@@ -31,11 +31,45 @@
 #include <locale>
 #include <algorithm>
 #include <memory>
+#include <cstring>
+#include <cwchar>
 
 #ifdef OT_OS_WINDOWS
 #include <Windows.h>
 #undef min
 #undef max
+#else
+#include <iconv.h>
+#endif
+
+#ifndef OT_OS_WINDOWS
+namespace {
+
+    //! @brief Converts the input bytes from _fromCode to _toCode encoding.
+    //! @return Number of bytes written or size_t(-1) on invalid input.
+    size_t iconvConvert(const char* _toCode, const char* _fromCode, const char* _in, size_t _inSize, char* _out, size_t _outCapacity)
+    {
+        iconv_t cd = iconv_open(_toCode, _fromCode);
+        if (cd == reinterpret_cast<iconv_t>(-1))
+        {
+            return static_cast<size_t>(-1);
+        }
+
+        char* in = const_cast<char*>(_in);
+        char* out = _out;
+        size_t outLeft = _outCapacity;
+        const size_t rc = iconv(cd, &in, &_inSize, &out, &outLeft);
+
+        iconv_close(cd);
+
+        if (rc == static_cast<size_t>(-1))
+        {
+            return rc;
+        }
+
+        return _outCapacity - outLeft;
+    }
+}
 #endif
 
 std::string ot::String::toString(DisplayNumberFormat _format)
@@ -66,8 +100,10 @@ ot::String::DisplayNumberFormat ot::String::stringToDisplayNumberFormat(const st
 	}
 }
 
-inline std::string ot::String::toString(const std::wstring& _string) {
+std::string ot::String::toString(const std::wstring& _string) {
 	if (_string.empty()) return {};
+
+#ifdef OT_OS_WINDOWS
 
 	// Get required buffer size
 	int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0, nullptr, nullptr);
@@ -77,10 +113,22 @@ inline std::string ot::String::toString(const std::wstring& _string) {
 	std::string result(sizeNeeded - 1, '\0'); // Remove null terminator
 	WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded, nullptr, nullptr);
 	return result;
+#else
+    std::string result(_string.size() * 4, '\0');
+    const size_t written = iconvConvert("UTF-8", "WCHAR_T", reinterpret_cast<const char*>(_string.data()), _string.size() * sizeof(wchar_t), result.data(), result.size() );
+    if (written == static_cast<size_t>(-1)) {
+        return {};
+    }
+
+    result.resize(written);
+    return result;
+#endif
 }
 
-inline std::wstring ot::String::toWString(const std::string& _string) {
+std::wstring ot::String::toWString(const std::string& _string) {
 	if (_string.empty()) return {};
+
+#ifdef OT_OS_WINDOWS
 
 	// Get required buffer size
 	int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0);
@@ -90,9 +138,20 @@ inline std::wstring ot::String::toWString(const std::string& _string) {
 	std::wstring result(sizeNeeded - 1, L'\0'); // Remove null terminator
 	MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded);
 	return result;
+#else
+    std::wstring result(_string.size(), L'\0');
+    const size_t written = iconvConvert("WCHAR_T", "UTF-8", _string.data(), _string.size(), reinterpret_cast<char*>(result.data()), result.size() * sizeof(wchar_t));
+    if (written == static_cast<size_t>(-1))
+    {
+        return {};
+    }
+
+    result.resize(written / sizeof(wchar_t));
+    return result;
+#endif
 }
 
-inline std::string ot::String::toLower(const std::string& _string)
+ std::string ot::String::toLower(const std::string& _string)
 {
 	std::string result = _string;
 	std::transform(result.begin(), result.end(), result.begin(),
@@ -101,7 +160,7 @@ inline std::string ot::String::toLower(const std::string& _string)
 	return result;
 }
 
-inline std::string ot::String::toUpper(const std::string& _string) {
+ std::string ot::String::toUpper(const std::string& _string) {
 	std::string result = _string;
 	std::transform(result.begin(), result.end(), result.begin(),
 		[](unsigned char c) { return std::toupper(c); });
@@ -109,7 +168,7 @@ inline std::string ot::String::toUpper(const std::string& _string) {
 	return result;
 }
 
-inline size_t ot::String::findOccurance(const std::string& _string, char _character, int _occurance) {
+ size_t ot::String::findOccurance(const std::string& _string, char _character, int _occurance) {
 	const size_t size = _string.size();
 	size_t count = 0;
 	for (size_t i = 0; i < size; i++) {
@@ -165,7 +224,7 @@ bool ot::String::endsWith(const std::wstring& _string, const std::wstring& _suff
 	return _string.size() >= _suffix.size() && _string.compare(_string.size() - _suffix.size(), _suffix.size(), _suffix) == 0;
 }
 
-inline std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {
+ std::list<std::string> ot::String::split(const std::string& _str, char _splitBy, bool _skipEmpty) {
 	std::string temp = _str;
 	std::list<std::string> ret;
 
@@ -184,7 +243,7 @@ inline std::list<std::string> ot::String::split(const std::string& _str, char _s
 	return ret;
 }
 
-inline std::list<std::string> ot::String::split(const std::string& _str, const std::string& _splitBy, bool _skipEmpty) {
+ std::list<std::string> ot::String::split(const std::string& _str, const std::string& _splitBy, bool _skipEmpty) {
 	std::string temp = _str;
 	std::list<std::string> ret;
 
@@ -203,7 +262,7 @@ inline std::list<std::string> ot::String::split(const std::string& _str, const s
 	return ret;
 }
 
-inline std::list<std::wstring> ot::String::split(const std::wstring& _str, wchar_t _splitBy, bool _skipEmpty) {
+ std::list<std::wstring> ot::String::split(const std::wstring& _str, wchar_t _splitBy, bool _skipEmpty) {
 	std::wstring temp = _str;
 	std::list<std::wstring> ret;
 
@@ -222,7 +281,7 @@ inline std::list<std::wstring> ot::String::split(const std::wstring& _str, wchar
 	return ret;
 }
 
-inline std::list<std::wstring> ot::String::split(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty) {
+ std::list<std::wstring> ot::String::split(const std::wstring& _str, const std::wstring& _splitBy, bool _skipEmpty) {
 	std::wstring temp = _str;
 	std::list<std::wstring> ret;
 
@@ -241,7 +300,7 @@ inline std::list<std::wstring> ot::String::split(const std::wstring& _str, const
 	return ret;
 }
 
-inline void ot::String::replaced(std::string& _str, const std::string& _what, const std::string& _with) {
+ void ot::String::replaced(std::string& _str, const std::string& _what, const std::string& _with) {
 	size_t startPos = _str.find(_what);
 	while (startPos != std::string::npos) {
 		_str.replace(startPos, _what.length(), _with);
@@ -249,27 +308,27 @@ inline void ot::String::replaced(std::string& _str, const std::string& _what, co
 	}
 }
 
-inline std::string ot::String::replace(const std::string& _str, const std::string& _what, const std::string& _with) {
+ std::string ot::String::replace(const std::string& _str, const std::string& _what, const std::string& _with) {
 	std::string result = _str;
 	String::replaced(result, _what, _with);
 	return result;
 }
 
-inline void ot::String::replaced(std::string& _str, char _what, char _with) {
+ void ot::String::replaced(std::string& _str, char _what, char _with) {
 	std::replace(_str.begin(), _str.end(), _what, _with);
 }
 
-inline std::string ot::String::replace(const std::string& _str, char _what, char _with) {
+ std::string ot::String::replace(const std::string& _str, char _what, char _with) {
 	std::string result = _str;
 	String::replaced(result, _what, _with);
 	return result;
 }
 
-inline void ot::String::replaced(std::wstring& _str, wchar_t _what, wchar_t _with) {
+ void ot::String::replaced(std::wstring& _str, wchar_t _what, wchar_t _with) {
 	std::replace(_str.begin(), _str.end(), _what, _with);
 }
 
-inline void ot::String::replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
+ void ot::String::replaced(std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
 	size_t startPos = _str.find(_what);
 	while (startPos != std::wstring::npos) {
 		_str.replace(startPos, _what.length(), _with);
@@ -277,19 +336,19 @@ inline void ot::String::replaced(std::wstring& _str, const std::wstring& _what, 
 	}
 }
 
-inline std::wstring ot::String::replace(const std::wstring& _str, wchar_t _what, wchar_t _with) {
+ std::wstring ot::String::replace(const std::wstring& _str, wchar_t _what, wchar_t _with) {
 	std::wstring result = _str;
 	String::replaced(result, _what, _with);
 	return result;
 }
 
-inline std::wstring ot::String::replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
+ std::wstring ot::String::replace(const std::wstring& _str, const std::wstring& _what, const std::wstring& _with) {
 	std::wstring result = _str;
 	String::replaced(result, _what, _with);
 	return result;
 }
 
-inline void ot::String::filledPrefix(std::string& _string, size_t _minLength, char _fillChar) {
+ void ot::String::filledPrefix(std::string& _string, size_t _minLength, char _fillChar) {
 	const size_t strLen = _string.length();
 	size_t preLen = std::max(strLen, _minLength) - strLen;
 
@@ -304,13 +363,13 @@ inline void ot::String::filledPrefix(std::string& _string, size_t _minLength, ch
 	}
 }
 
-inline std::string ot::String::fillPrefix(const std::string& _string, size_t _minLength, char _fillChar) {
+ std::string ot::String::fillPrefix(const std::string& _string, size_t _minLength, char _fillChar) {
 	std::string result(_string);
 	String::filledPrefix(result, _minLength, _fillChar);
 	return result;
 }
 
-inline void ot::String::filledSuffix(std::string& _string, size_t _minLength, char _fillChar) {
+ void ot::String::filledSuffix(std::string& _string, size_t _minLength, char _fillChar) {
 	const size_t strLen = _string.length();
 	size_t sufLen = std::max(strLen, _minLength) - strLen;
 
@@ -325,13 +384,13 @@ inline void ot::String::filledSuffix(std::string& _string, size_t _minLength, ch
 	}
 }
 
-inline std::string ot::String::fillSuffix(const std::string& _string, size_t _minLength, char _fillChar) {
+ std::string ot::String::fillSuffix(const std::string& _string, size_t _minLength, char _fillChar) {
 	std::string result(_string);
 	String::filledSuffix(result, _minLength, _fillChar);
 	return result;
 }
 
-inline std::string ot::String::removePrefix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+ std::string ot::String::removePrefix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
 	size_t ix = 0;
 	const size_t len = _string.length();
 	bool hasError = true;
@@ -373,7 +432,7 @@ inline std::string ot::String::removePrefix(const std::string& _string, const st
 	}
 }
 
-inline std::string ot::String::removeSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+ std::string ot::String::removeSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
 	const size_t len = _string.length();
 	
 	if (len == 0) {
@@ -426,29 +485,29 @@ inline std::string ot::String::removeSuffix(const std::string& _string, const st
 	return std::string(_string.substr(0, ix + 1));
 }
 
-inline std::string ot::String::removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
+ std::string ot::String::removePrefixSuffix(const std::string& _string, const std::string& _characterBlacklist, const std::string& _characterWhitelist) {
 	return String::removeSuffix(String::removePrefix(_string, _characterBlacklist, _characterWhitelist), _characterBlacklist, _characterWhitelist);
 }
 
-inline std::string ot::String::trim(const std::string& _string) {
+ std::string ot::String::trim(const std::string& _string) {
 	return String::removePrefixSuffix(_string, " \t\n\r\f\v");
 }
 
-inline char* ot::String::getCStringCopy(const std::string& _str) {
+char* ot::String::getCStringCopy(const std::string& _str) {
 	size_t len = _str.length() + 1;
 	char* retval = new char[len];
-	strcpy_s(retval, len, _str.c_str());
+    std::memcpy(retval, _str.c_str(), len);
 	return retval;
 }
 
-inline wchar_t* ot::String::getCStringCopy(const std::wstring& _str) {
+wchar_t* ot::String::getCStringCopy(const std::wstring& _str) {
 	size_t len = _str.length() + 1;
 	wchar_t* retval = new wchar_t[len];
-	wcscpy_s(retval, len, _str.c_str());
+    std::wmemcpy(retval, _str.c_str(), len);
 	return retval;
 }
 
-inline std::string ot::String::evaluateEscapeCharacters(const std::string& _string) {
+ std::string ot::String::evaluateEscapeCharacters(const std::string& _string) {
 	std::string result;
 	size_t len = _string.length() - 1;
 	result.reserve(len + 1);
@@ -522,7 +581,7 @@ inline std::string ot::String::evaluateEscapeCharacters(const std::string& _stri
 	return result;
 }
 
-inline std::list<std::string> ot::String::smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters, bool _skipEmpty) {
+ std::list<std::string> ot::String::smartSplit(const std::string& _str, const std::string& _splitBy, bool _evaluateEscapeCharacters, bool _skipEmpty) {
 	std::list<std::string> result;
 	// Avoid empty strings
 	if (_str.empty()) {
@@ -641,7 +700,7 @@ inline std::list<std::string> ot::String::smartSplit(const std::string& _str, co
 	return result;
 }
 
-inline std::string ot::String::addEscapeCharacters(const std::string& _str) {
+ std::string ot::String::addEscapeCharacters(const std::string& _str) {
 	std::string result = _str;
 
 	const std::map<std::string, std::string> replacementData({
@@ -737,7 +796,7 @@ std::vector<uint8_t> ot::String::bytesFromHexString(const std::string& _hexStrin
 	return output;
 }
 
-inline std::string ot::String::toHex(const std::string& _string) {
+ std::string ot::String::toHex(const std::string& _string) {
 	static constexpr char digits[] = "0123456789abcdef";
 	std::string output;
 	output.resize(_string.size() * 2);
@@ -751,7 +810,7 @@ inline std::string ot::String::toHex(const std::string& _string) {
 	return output;
 }
 
-inline std::string ot::String::fromHex(const std::string& _hexString) {
+ std::string ot::String::fromHex(const std::string& _hexString) {
 	if (_hexString.size() % 2 != 0) {
 		OT_LOG_E("Hex string length is not even: \"" + _hexString + "\"");
 		throw Exception::InvalidArgument("Hex string must have even length");
@@ -786,7 +845,7 @@ inline std::string ot::String::fromHex(const std::string& _hexString) {
 	return output;
 }
 
-inline std::string ot::String::toBase64Url(const std::string& _string) {
+ std::string ot::String::toBase64Url(const std::string& _string) {
 	static constexpr char lookupTable[] =
 		"ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
 
@@ -826,7 +885,7 @@ inline std::string ot::String::toBase64Url(const std::string& _string) {
 	return output;
 }
 
-inline std::string ot::String::fromBase64Url(const std::string& _base64UrlString) {
+std::string ot::String::fromBase64Url(const std::string& _base64UrlString) {
 	std::string output;
 	output.reserve(_base64UrlString.size() * 3 / 4);
 

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ExplicitStringValueConverter.cpp
 // 
 // License:
@@ -20,6 +20,9 @@
 #include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTCore/ComplexNumbers/ComplexNumberFormat.h"
 #include "OTCore/String.h"
+
+// std header
+#include <cstdint>
 
 ot::Variable ot::ExplicitStringValueConverter::setValueFromString(const std::string& _valueString, const std::string& _valueType)
 {
@@ -51,7 +54,7 @@ ot::Variable ot::ExplicitStringValueConverter::setValueFromString(const std::str
 		value = ot::Variable(std::stoi(_valueString));
 	}
 	else if (_valueType == ot::TypeNames::getInt64TypeName()) {
-		value = ot::Variable(std::stoll(_valueString));
+		value = ot::Variable(static_cast<int64_t>(std::stoll(_valueString)));
 	}
 	return value;
 }

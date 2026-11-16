@@ -54,8 +54,8 @@ namespace ot {
 		// Private: Child management
 
 	private:
-		inline void registerChildObject(OTObject* _object);
-		inline void forgetChildObject(OTObject* _object);
+		void registerChildObject(OTObject* _object);
+		void forgetChildObject(OTObject* _object);
 
 		OTObject* m_parentObject;
 		bool m_destroyByParent;

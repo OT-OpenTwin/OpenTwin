@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: TupleInstance.h
 // 
 // License:
@@ -45,19 +45,19 @@ namespace ot {
 		void addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const override;
 		void setFromJsonObject(const ot::ConstJsonObject& _jsonObject) override;
 
-		inline void setTupleTypeName(const std::string& _tupleTypeName);
-		inline const std::string& getTupleTypeName() const { return m_tupleTypeName; }
+		void setTupleTypeName(const std::string& _tupleTypeName);
+		const std::string& getTupleTypeName() const { return m_tupleTypeName; }
 
-		inline void setTupleFormatName(const std::string& _formatName);
-		inline const std::string& getTupleFormatName() const { return m_tupleFormatName; }
+		void setTupleFormatName(const std::string& _formatName);
+		const std::string& getTupleFormatName() const { return m_tupleFormatName; }
 
-		inline void setTupleUnits(const std::vector<std::string>& _units);
-		inline const std::vector<std::string>& getTupleUnits() const { return m_tupleUnits; }
+		void setTupleUnits(const std::vector<std::string>& _units);
+		const std::vector<std::string>& getTupleUnits() const { return m_tupleUnits; }
 
-		inline void setTupleElementDataTypes(const std::vector<std::string>& _dataTypes);
-		inline const std::vector<std::string>& getTupleElementDataTypes() const { return m_tupleElementDataTypes; }
+		void setTupleElementDataTypes(const std::vector<std::string>& _dataTypes);
+		const std::vector<std::string>& getTupleElementDataTypes() const { return m_tupleElementDataTypes; }
 		
-		inline bool isSingle() const { return m_tupleTypeName.empty(); }
+		bool isSingle() const { return m_tupleTypeName.empty(); }
 
 	private:
 		std::string m_tupleTypeName;

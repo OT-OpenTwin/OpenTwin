@@ -42,7 +42,8 @@ def _thirdparty(env: dict[str, str], third: Path) -> None:
 
 
 def _projects(env: dict[str, str], dev: Path) -> None:
-    env.update({name: native_path(value) for name, value in definitions.RELATIVE.items()})
+    platform_relative = definitions.RELATIVE_WINDOWS if WINDOWS else definitions.RELATIVE_LINUX
+    env.update({name: native_path(value) for name, value in {**definitions.RELATIVE, **platform_relative}.items()})
     for group, folder in definitions.GROUPS:
         for name, project in group.items():
             env[name] = str(dev / folder / project)
