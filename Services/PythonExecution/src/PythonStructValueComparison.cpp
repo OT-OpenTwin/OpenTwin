@@ -91,7 +91,7 @@ PyObject* PythonStructValueComparison_create(const ot::ValueComparisonDescriptio
     if (!PythonStructValueComparisonType.tp_alloc)
     {
         PyErr_SetString(PyExc_RuntimeError,
-            "PythonStructValueComparisonType is not initialized — was registerType called?");
+            "PythonStructValueComparisonType is not initialized - was registerType called?");
         return nullptr;
     }
 
