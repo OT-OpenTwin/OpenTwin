@@ -260,7 +260,6 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	checkCommandDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
 	std::string checkCommandString = checkCommandDoc.toJson();
 
-	int attempt = 0;
 	bool checkOk = false;
 	std::string errorMessage;
 
@@ -283,11 +282,11 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 			}
 
 			// Ensure process is still running
-			ot::RunResult result = newService.checkAlive();
-			if (!result.isOk()) {
+			ot::RunResult checkAliveResult = newService.checkAlive();
+			if (!checkAliveResult.isOk()) {
 				// It is possible that the port was blocked. What happened: The process started but then died.
-				OT_LOG_E("Relay service died while trying to check if it is alive. { \"ExitCode\": " + std::to_string(result.getErrorCode()) + 
-					", \"ExitMessage\": \"" + result.getErrorMessage() + "\", " + logInfo(newService) + " }");
+				OT_LOG_E("Relay service died while trying to check if it is alive. { \"ExitCode\": " + std::to_string(checkAliveResult.getErrorCode()) +
+					", \"ExitMessage\": \"" + checkAliveResult.getErrorMessage() + "\", " + logInfo(newService) + " }");
 				break;
 			}
 		}
@@ -300,9 +299,9 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	if (!checkOk) {
 		// Service start failed
 		OT_LOG_E("Relay Service check alive failed { " + logInfo(newService) + " }");
-		ot::RunResult result = newService.shutdown();
-		OT_LOG_E("Shutting relay service down with error { \"ErrorCode\": " + std::to_string(result.getErrorCode()) + 
-			", \"ErrorMessage\": \"" + result.getErrorMessage() + "\", " + logInfo(newService) + " }");
+		ot::RunResult shutdownResult = newService.shutdown();
+		OT_LOG_E("Shutting relay service down with error { \"ErrorCode\": " + std::to_string(shutdownResult.getErrorCode()) +
+			", \"ErrorMessage\": \"" + shutdownResult.getErrorMessage() + "\", " + logInfo(newService) + " }");
 
 		return RequestResult::FailedOnPing;
 	}
