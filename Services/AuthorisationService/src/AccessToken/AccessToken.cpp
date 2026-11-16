@@ -25,6 +25,7 @@
 #include "OTSystem/DateTime.h"
 #include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/String.h"
+#include "OTCrypto/CryptoDefaults.h"
 
 // MongoDB header
 #include <bsoncxx/builder/stream/document.hpp>
@@ -36,7 +37,7 @@
 AccessToken AccessToken::createNewAccessToken(const std::string& _userId, std::vector<uint8_t>&& _clientPublicKey, int64_t _expirationDate)
 {
 	// Generate a random token
-	std::vector<uint8_t> tokenData = ot::RandomNumberProvider::createRandomBytes(32);
+	std::vector<uint8_t> tokenData = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::accessTokenLength());
 	std::string tokenString = ot::String::toHexString(tokenData);
 
 	return AccessToken(std::move(tokenString), _userId, std::move(_clientPublicKey), _expirationDate);

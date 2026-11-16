@@ -96,6 +96,15 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 		args << toCommandLine(ArgumentKey::LogInGss) << QString::fromStdString(encoded);
 	}
 
+	if (getLoginTicketDataSet())
+	{
+		ot::JsonDocument doc;
+		const auto& loginTicketData = m_loginTicketData.value();
+		loginTicketData.addToJsonObject(doc, doc.GetAllocator());
+		std::string encoded = ot::String::toBase64Url(doc.toJson());
+		args << toCommandLine(ArgumentKey::LogInTicket) << QString::fromStdString(encoded);
+	}
+
 	if (getProjectInfoSet())
 	{
 		ot::JsonDocument doc;
@@ -294,6 +303,13 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 		m_loginGSS = newEntry;
 	}
 
+	// Ticket login
+	if (query.hasQueryItem(toUrl(ArgumentKey::LogInTicket)))
+	{
+		OT_LOG_E("Ticket login data provided in URL");
+		return false;
+	}
+
 	// Open project
 	if (query.hasQueryItem(toUrl(ArgumentKey::OpenProject)))
 	{
@@ -344,6 +360,12 @@ bool StartArgumentParser::parseCommandLine()
 		"Attempt to log in automatically using the initial login data.",
 		"string");
 	parser.addOption(gssLoginOption);
+
+	QCommandLineOption ticketLoginOption(
+		toString(ArgumentKey::LogInTicket),
+		"Attempt to log in automatically using the provided login ticket.",
+		"string");
+	parser.addOption(ticketLoginOption);
 
 	QCommandLineOption openProjectOption(
 		toString(ArgumentKey::OpenProject),
@@ -427,6 +449,28 @@ bool StartArgumentParser::parseCommandLine()
 		m_loginData = newLoginData;
 	}
 
+	// Check for ticket login option
+	if (parser.isSet(ticketLoginOption))
+	{
+		const QString ticketDataStr = parser.value(ticketLoginOption);
+		std::string decoded = ot::String::fromBase64Url(ticketDataStr.toStdString());
+		if (decoded.empty())
+		{
+			OT_LOG_E("Ticket login option set but no data provided");
+			return false;
+		}
+		ot::JsonDocument doc;
+		if (!doc.fromJson(decoded))
+		{
+			OT_LOG_E("Failed to parse ticket login data from command line argument");
+			return false;
+		}
+
+		LoginTicketData newLoginTicketData;
+		newLoginTicketData.setFromJsonObject(doc.getConstObject());
+		m_loginTicketData = newLoginTicketData;
+	}
+
 	// Check for open project option
 	if (parser.isSet(openProjectOption))
 	{
@@ -471,8 +515,9 @@ QString StartArgumentParser::toString(ArgumentKey _key) const
 	case ArgumentKey::Debug: return "debug";
 	case ArgumentKey::CheckGraphics: return "checkgraphics";
 	case ArgumentKey::CheckGraphicsShort: return "c";
-	case ArgumentKey::LogInData: return "login";
+	case ArgumentKey::LogInData	: return "login";
 	case ArgumentKey::LogInGss: return "autologin";
+	case ArgumentKey::LogInTicket: return "login-ticket";
 	case ArgumentKey::OpenProject: return "openproject";
 	case ArgumentKey::ProjectVersion: return "projversion";
 	case ArgumentKey::ScriptFile: return "script";

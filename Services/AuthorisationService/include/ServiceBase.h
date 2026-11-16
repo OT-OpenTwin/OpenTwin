@@ -30,6 +30,7 @@
 #include "MongoDB/MongoGroupFunctions.h"
 #include "MongoDB/MongoProjectFunctions.h"
 #include "AccessToken/AccessTokenManager.h"
+#include "Ticket/TicketManager.h"
 
 // OpenTwin header
 #include "OTCommunication/CommunicationTypes.h"
@@ -76,6 +77,7 @@ private:
 	typedef ot::Flags<State> StateFlags;
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(State, StateFlags)
 	
+	TicketManager m_ticketManager;
 	AccessTokenManager m_accessTokenManager;
 	std::string m_serviceURL;
 
@@ -182,6 +184,8 @@ private:
 	std::string handleChangeUserPasswordByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleGetSystemInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	ot::ReturnMessage handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
+	
+	ot::ReturnMessage handleGenerateTicketsFromToken(const ot::ConstJsonObject& _actionDocument);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

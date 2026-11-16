@@ -21,6 +21,7 @@
 
 // Frontend header
 #include "Login/LoginData.h"
+#include "Login/LoginTicketData.h"
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
@@ -82,6 +83,10 @@ public:
 	bool getLoginGSSSet() const { return m_loginGSS.has_value(); };
 	const LogInGSSEntry& getLoginGSS() const { return m_loginGSS.value(); };
 
+	void setLoginTicketData(const LoginTicketData& _data) { m_loginTicketData = _data; };
+	bool getLoginTicketDataSet() const { return m_loginTicketData.has_value(); };
+	const LoginTicketData& getLoginTicketData() const { return m_loginTicketData.value(); };
+
 	void setProjectInfo(const ot::ProjectInformation& _info) { m_projectInfo = _info; };
 	bool getProjectInfoSet() const { return m_projectInfo.has_value(); };
 	const ot::ProjectInformation& getProjectInfo() const { return m_projectInfo.value(); };
@@ -107,6 +112,7 @@ private:
 		CheckGraphicsShort,
 		LogInData,
 		LogInGss,
+		LogInTicket,
 		OpenProject,
 		ProjectVersion,
 		ScriptFile
@@ -127,6 +133,7 @@ private:
 
 	std::optional<LoginData> m_loginData;
 	std::optional<LogInGSSEntry> m_loginGSS;
+	std::optional<LoginTicketData> m_loginTicketData;
 
 	std::optional<ot::ProjectInformation> m_projectInfo;
 	std::string m_projectVersion;

@@ -30,7 +30,7 @@ CurveColourSetter::CurveColourSetter(const ot::Plot1DCurveCfg& _curveCfg, uint32
 {
 	m_rainbowPainterBuffer.reserve(_rainbowBufferSize);
 
-	for (int i = 0; i < _rainbowBufferSize; i++)
+	for (uint32_t i = 0; i < _rainbowBufferSize; i++)
 	{
 		m_rainbowPainterBuffer.push_back(m_painterRainbowIterator.getNextPainter().release());
 	}

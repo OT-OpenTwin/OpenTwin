@@ -143,7 +143,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
-
+	else if (_action == OT_ACTION_CMD_GenerateTickets) { return handleGenerateTicketsFromToken(_actionDocument.GetObject()).toJson(); }
 	//------------------------------------------------------------------------------------
 
 	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
@@ -290,9 +290,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	enum class LoginMode
 	{
 		UsernamePassword,
-		SessionUsernamePassword,
 		SSO,
-		Token
+		Ticket
 	};
 
 	LoginMode loginMode = LoginMode::SSO;
@@ -305,9 +304,9 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		loginMode = LoginMode::UsernamePassword;
 	}
-	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Token))
+	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Ticket))
 	{
-		loginMode = LoginMode::Token;
+		loginMode = LoginMode::Ticket;
 	}
 	else if (ot::json::exists(_actionDocument, OT_PARAM_AUTH_SSO_Initial))
 	{
@@ -364,29 +363,22 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 		break;
 
-	case LoginMode::Token:
+	case LoginMode::Ticket:
 	{
-		password.clear();
-		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, returnDoc);
-		switch (result)
+		const std::string ticket = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Ticket);
+		auto ticketValidationResult = m_ticketManager.consumeTicket(Ticket::TicketType::Login, ticket);
+		if (!ticketValidationResult)
 		{
-		case AccessTokenManager::AuthenticationResult::Success:
-			// Here we have a successful token authentication and retreived the credentials,
-			// but we still need to check the user in the database
-			authenticationSuccessfull = true;
-			break;
-
-		case AccessTokenManager::AuthenticationResult::ChallengeRequired:
-			return returnDoc.toJson();
-
-		case AccessTokenManager::AuthenticationResult::Failure:
-			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
-			return returnDoc.toJson();
-
-		default:
-			OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
-			return returnDoc.toJson();
+			authenticationSuccessfull = false;
 		}
+		else
+		{
+			authenticationSuccessfull = true;
+			username = ticketValidationResult->getUsername();
+			password.clear();
+		}
+
+		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, authenticationSuccessfull, returnDoc.GetAllocator());
 	}
 		break;
 
@@ -412,7 +404,7 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
 
 
-		if (loginMode == LoginMode::UsernamePassword)
+		if (loginMode == LoginMode::UsernamePassword && !password.empty())
 		{
 			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
@@ -437,7 +429,6 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 
 	return returnDoc.toJson();
-
 }
 
 std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument)
@@ -504,6 +495,139 @@ std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _
 	ot::ConstJsonArray flags = ot::json::getArray(_actionDocument, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
 	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJsonObject& _actionDocument)
+{
+	// First ensure that the request contains the ticket types to generate
+
+	std::list<std::string> ticketTypeStrings;
+
+	if (!_actionDocument.HasMember(OT_ACTION_PARAM_TicketType))
+	{
+		return ot::ReturnMessage::failed("Missing \"" OT_ACTION_PARAM_TicketType "\" parameter");
+	}
+
+	const auto& ticketTypesVal = _actionDocument[OT_ACTION_PARAM_TicketType];
+
+	if (ticketTypesVal.IsString())
+	{
+		// Single ticket type provided as a string
+		ticketTypeStrings.push_back(ticketTypesVal.GetString());
+	}
+	else if (ticketTypesVal.IsArray())
+	{
+		// Multiple ticket types provided as an array
+		ticketTypeStrings = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_TicketType);
+	}
+
+	if (ticketTypeStrings.empty())
+	{
+		return ot::ReturnMessage::failed("No ticket types specified to generate");
+	}
+
+	// Perform token authentication and retrieve the associated username or challenge information
+	auto result = m_accessTokenManager.authenticateUser(_actionDocument);
+
+	ot::JsonDocument responseDoc;
+
+	switch (result.status)
+	{
+	case AccessTokenManager::AuthenticationStatus::Success:
+	{
+		// Successful authentication
+
+		// From here on the user is authenticated and we can proceed to generate tickets
+
+		if (!result.user.has_value())
+		{
+			OT_LOG_E("Invalid authentication result (success but no user)");
+			return ot::ReturnMessage::failed("Invalid authentication result");
+		}
+
+		const User& user = result.user.value();
+		responseDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(user.getName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	}
+	// Proceed to generate tickets
+	break;
+
+	case AccessTokenManager::AuthenticationStatus::ChallengeRequired:
+		// Challenge required
+
+		if (!result.challenge.has_value() || !result.challengeID.has_value())
+		{
+			OT_LOG_E("Invalid authentication result (challenge but no challenge or id)");
+			return ot::ReturnMessage::failed("Invalid authentication result");
+		}
+		responseDoc.AddMember(OT_ACTION_PARAM_Challenge, ot::JsonString(result.challenge.value(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+		responseDoc.AddMember(OT_ACTION_PARAM_ChallengeID, ot::JsonString(result.challengeID.value(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+
+		// Return the challenge
+		return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
+
+	case AccessTokenManager::AuthenticationStatus::Failure:
+		// Authentication failed
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Authentication failed");
+
+	default:
+		// Handle unexpected status
+		OT_LOG_E("Unknown authentication result");
+		return ot::ReturnMessage::failed("Unknown authentication result");
+	}
+
+	OTAssert(result.status == AccessTokenManager::AuthenticationStatus::Success, "Unexpected status");
+
+
+	// At this point the user is successfully authenticated
+
+	const User& authenticatedUser = result.user.value();
+	std::unordered_map<std::string, std::list<std::string>> generatedTickets;
+
+	// Generate the requested tickets
+	for (const auto& ticketTypeString : ticketTypeStrings)
+	{
+		// Convert the ticket type string
+		Ticket::TicketType ticketType = Ticket::stringToTicketType(ticketTypeString);
+		if (ticketType == Ticket::TicketType::Invalid)
+		{
+			return ot::ReturnMessage::failed("Invalid ticket type: \"" + ticketTypeString + "\"");
+		}
+
+		// Find or create the list of generated tickets for this ticket type
+		auto generatedTicketsIt = generatedTickets.find(ticketTypeString);
+		if (generatedTicketsIt == generatedTickets.end())
+		{
+			generatedTicketsIt = generatedTickets.emplace(ticketTypeString, std::list<std::string>()).first;
+		}
+
+		// Generate the ticket
+		auto ticket = m_ticketManager.generateTicket(authenticatedUser, ticketType);
+
+		if (!ticket.has_value())
+		{
+			// If ticket generation fails, clear all previously generated tickets for this user
+			m_ticketManager.clearTicketsForUser(authenticatedUser);
+			return ot::ReturnMessage::failed("Failed to generate ticket \"" + ticketTypeString +
+				"\" #(" + std::to_string(generatedTicketsIt->second.size() + 1) + ")");
+		}
+
+		generatedTicketsIt->second.push_back(ticket.value());
+	}
+
+	// Build the response JSON with the generated tickets
+
+	ot::JsonDocument ticketsDoc;
+	for (const auto& [ticketType, tickets] : generatedTickets)
+	{
+		ot::JsonArray ticketArray;
+		for (const auto& ticket : tickets)
+		{
+			ticketArray.PushBack(ot::JsonString(ticket, ticketsDoc.GetAllocator()), ticketsDoc.GetAllocator());
+		}
+		ticketsDoc.AddMember(ot::JsonString(ticketType, ticketsDoc.GetAllocator()), ticketArray, ticketsDoc.GetAllocator());
+	}
+
+	return ot::ReturnMessage::ok(ticketsDoc.toJson());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

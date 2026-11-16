@@ -99,8 +99,8 @@ ot::GSSDebugInfo GlobalSessionService::getDebugInformation() {
 ot::ReturnMessage GlobalSessionService::handleGetGlobalServicesURL() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDS_URL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
@@ -491,7 +491,7 @@ ot::ReturnMessage GlobalSessionService::handleRegisterSessionService(ot::JsonDoc
 	ot::JsonDocument reply;
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, newId, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, reply.GetAllocator()), reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
 	if (!m_globalDirectoryUrl.empty()) {
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
@@ -538,7 +538,7 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 	// Send DBUrl and AuthUrl
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	// Send Return
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc);
