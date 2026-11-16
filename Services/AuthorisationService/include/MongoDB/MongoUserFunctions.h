@@ -38,6 +38,7 @@
 #include <mongocxx/instance.hpp>
 
 // std header
+#include <set>
 #include <vector>
 #include <cstdint>
 #include <iostream>
@@ -59,6 +60,13 @@ private:
 	static std::string getOriginalUserName(const std::string& username, mongocxx::database& db);
 	static bool checkMongodbLogin(const std::string& username, const std::string& password, const std::string& databaseUrl, std::string& originalUserName);
 public:
+
+	struct TmpUserData
+	{
+		std::string userName;
+		std::string userPWD;
+	};
+
 	static bool authenticateUser(std::string username, std::string password, std::string databaseUrl, mongocxx::client& adminClient, std::string& originalUserName);
 
 	static bool registerUser(std::string username, std::string password, mongocxx::client& adminClient, std::string oldSettingsCollectionName = "");
@@ -82,14 +90,18 @@ public:
 
 	static bool updateUsername(std::string oldUsername, std::string newUsername, mongocxx::client& adminClient);
 
-	static std::string userToJson(User& user);
-	static 	std::string usersToJson(std::vector<User>& users);
+	static std::string userToJson(const User& user);
+	static std::string usersToJson(const std::vector<User>& users);
 
 	static std::string hashPassword(const std::string& password);
 
 	static bool doesUserExist(const std::string& userName, mongocxx::client& adminClient);
 
-	static void createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient, ot::JsonDocument& json);
+	static TmpUserData createTmpUser(std::string userName, std::string userPWD, User& _loggedInUser, std::string databaseUrl, mongocxx::client& adminClient);
 	static void removeTmpUser(std::string userName, mongocxx::client& adminClient);
+
+private:
+	static std::set<std::string>& getAuthenticatedSessionUserTokens();
+	static std::map<std::string, std::string>& getSessionTokenToOriginalUserNameMap();
 
 };

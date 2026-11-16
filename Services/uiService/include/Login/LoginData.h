@@ -32,12 +32,12 @@ class LoginData {
 	OT_DECL_DEFCOPY(LoginData)
 	OT_DECL_DEFMOVE(LoginData)
 public:
-	LoginData() {};
+	explicit LoginData() {};
 	~LoginData() {};
 
 	void addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 	void setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject);
-
+	
 	void setGss(const LogInGSSEntry& _gss) { m_gss = _gss; };
 	const LogInGSSEntry& getGss() const { return m_gss; };
 
@@ -70,16 +70,17 @@ public:
 	bool isValid() const;
 
 	bool loggedInViaSSO() const;
+
 private:
 	LogInGSSEntry m_gss;
 
 	std::string m_databaseUrl;
 	std::string m_authorizationUrl;
-	std::string m_username;
 	std::string m_sessionUser;
 	std::string m_sessionPassword;
 
 	// For user/password login
+	std::string m_username;
 	std::string m_userPassword;
 	std::string m_encryptedUserPassword;
 

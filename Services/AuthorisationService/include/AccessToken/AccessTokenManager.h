@@ -29,6 +29,7 @@
 #include "OTCore/JSON/JSON.h"
 
 // std header
+#include <optional>
 #include <unordered_map>
 
 class AccessTokenManager
@@ -36,16 +37,25 @@ class AccessTokenManager
 	OT_DECL_NOCOPY(AccessTokenManager)
 	OT_DECL_NOMOVE(AccessTokenManager)
 public:
-	enum class AuthenticationResult
+	enum class AuthenticationStatus
 	{
 		Success,
 		ChallengeRequired,
 		Failure
 	};
 
+	struct AuthenticationResult
+	{
+		AuthenticationStatus status = AuthenticationStatus::Failure;
+		std::optional<std::string> challengeID = std::nullopt;
+		std::optional<std::string> challenge = std::nullopt;
+		std::optional<User> user = std::nullopt;
+	};
+
+
 	AccessTokenManager();
 
-	AuthenticationResult handleLogin(const ot::ConstJsonObject& _actionDocument, std::string& _username, ot::JsonDocument& _responseDoc);
+	AuthenticationResult authenticateUser(const ot::ConstJsonObject& _actionDocument);
 
 private:
 	AccessTokenChallengeManager m_challengeManager;

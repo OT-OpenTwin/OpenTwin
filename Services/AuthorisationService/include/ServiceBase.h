@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ServiceBase.h
 // 
 // License:
@@ -20,7 +20,8 @@
 #pragma once
 
 // Auth header
-#include "SSO/SSOBuffer.h"
+#include "Authorization/AuthContext.h"
+#include "Authorization/AuthorizationProvider.h"
 #include "Management/User.h"
 #include "Management/Group.h"
 #include "Management/Project.h"
@@ -29,7 +30,6 @@
 #include "MongoDB/MongoRoleFunctions.h"
 #include "MongoDB/MongoGroupFunctions.h"
 #include "MongoDB/MongoProjectFunctions.h"
-#include "AccessToken/AccessTokenManager.h"
 
 // OpenTwin header
 #include "OTCommunication/CommunicationTypes.h"
@@ -65,6 +65,9 @@ public:
 	std::string dispatchAction(const char * _json, ot::MessageType _messageType);
 	mongocxx::client& getAdminClient() { return m_adminClient; }
 	std::string& getDatabaseURL() { return m_databaseURL; }
+
+	inline bool isAdminUser(const User& _loggedInUser) const;
+
 private:
 
 	enum class State
@@ -76,7 +79,10 @@ private:
 	typedef ot::Flags<State> StateFlags;
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(State, StateFlags)
 	
-	AccessTokenManager m_accessTokenManager;
+	//! @brief Central authorization provider for requests.
+	AuthorizationProvider m_authProvider;
+	AuthContext m_authContext;
+
 	std::string m_serviceURL;
 
 	std::string m_databaseURL;
@@ -95,7 +101,6 @@ private:
 	std::mutex m_mutex;
 	const int m_dataBaseVersion = 1;
 
-	SSOBuffer m_ssoBuffer;
 
 	std::string dispatchAction(const std::string& _action, const ot::JsonDocument& _actionDocument, ot::MessageType _messageType);
 
@@ -182,6 +187,8 @@ private:
 	std::string handleChangeUserPasswordByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleGetSystemInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	ot::ReturnMessage handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
+	
+	ot::ReturnMessage handleGenerateTicketsFromToken(const ot::ConstJsonObject& _actionDocument);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -238,10 +245,8 @@ private:
 
 	// Private: Helper
 
-	inline bool isAdminUser(const User& _loggedInUser) const;
 	inline bool isAdminUser(const std::string& _username) const;
 	const std::string& getAdminUserName() const { return m_adminUserName; };
-	std::string createRandomPassword();
 	bool removeOldSessionsWorker();
 	void setDatabaseVersion(int version);
 	int getDatabaseVersion();

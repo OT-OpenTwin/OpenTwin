@@ -335,7 +335,7 @@ void GlobalSessionService::healthCheck() {
 			GSSRegistrationInfo info;
 			info.setServiceID(ot::json::getUInt(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_ID));
 			info.setDataBaseURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_DATABASE_URL));
-			info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTHURL));
+			info.setAuthURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_SERVICE_AUTH_URL));
 
 			if (registrationResponseDoc.HasMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL)) {
 				info.setGdsURL(ot::json::getString(registrationResponseDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));

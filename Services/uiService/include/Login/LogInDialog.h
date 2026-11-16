@@ -23,6 +23,7 @@
 #include "UserManagement.h"
 #include "Login/LoginData.h"
 #include "Login/LogInGSSEntry.h"
+#include "Login/LoginTicketData.h"
 
 // OpenTwin header
 #include "OTSystem/Flags.h"
@@ -54,7 +55,7 @@ public:
 	};
 	typedef ot::Flags<ConfigFlag> Config;
 
-	LogInDialog();
+	explicit LogInDialog();
 	virtual ~LogInDialog();
 
 	void setControlsEnabled(bool _enabled);
@@ -93,8 +94,12 @@ private:
 		RegisterMode       = 1 << 3,
 		ChangePasswordMode = 1 << 4,
 		SSOMode            = 1 << 5,
+		TicketMode         = 1 << 6,
 
-		EnforcedGSS        = 1 << 6
+		EnforcedGSS        = 1 << 7,
+
+
+		Any_NoSaveDataMode = LoginState::SSOMode | LoginState::TicketMode
 	};
 	typedef ot::Flags<LoginState> LoginStateFlags;
 	OT_ADD_FRIEND_FLAG_FUNCTIONS(LogInDialog::LoginState, LogInDialog::LoginStateFlags)
@@ -119,6 +124,7 @@ private:
 
 	LoginData m_loginData; //! \brief Holds the login data that is set during the login by the worker thread.
 	
+	LoginTicketData m_ticketLoginData;
 	LogInGSSEntry m_enforcedGSS;
 
 	ot::ComboButton* m_gss;
@@ -176,6 +182,7 @@ private:
 	const int m_maxDefaultHeight = 515;
 	const int m_maxSSOHeight = 460;
 
+	bool setupLoginDataFromCurrent();
 	void saveUserSettings() const;
 	void saveGSSOptions() const;
 	void editGSSEntries();
@@ -205,6 +212,7 @@ private:
 	WorkerError workerLogin(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerLoginUsernamePassword(const UserManagement& _userManager);
 	WorkerError workerLoginSSO(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
+	WorkerError workerLoginTicket(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg);
 	WorkerError workerRegister(const UserManagement& _userManager);
 	WorkerError workerChangePassword(const UserManagement& _userManager);
 };

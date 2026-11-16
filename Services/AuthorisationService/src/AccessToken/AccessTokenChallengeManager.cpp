@@ -24,6 +24,7 @@
 #include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/String.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTCrypto/CryptoDefaults.h"
 #include "OTCrypto/Signature/SignatureProvider.h"
 
 AccessTokenChallengeManager::AccessTokenChallengeManager()
@@ -85,7 +86,7 @@ std::string AccessTokenChallengeManager::generateId()
 
 	do
 	{
-		auto newIdRaw = ot::RandomNumberProvider::createRandomBytes(16);
+		auto newIdRaw = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::challengeIDLength());
 		newId = ot::String::toHexString(newIdRaw);
 	}
 	while (m_challenges.find(newId) != m_challenges.end());

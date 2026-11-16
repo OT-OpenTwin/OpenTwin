@@ -653,8 +653,8 @@ ot::ReturnMessage SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(info.getDataBaseURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(info.getAuthURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_gds.getServiceUrl(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(info.getAuthURL(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDS_URL, ot::JsonString(m_gds.getServiceUrl(), doc.GetAllocator()), doc.GetAllocator());
 
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, doc.toJson());
 	}

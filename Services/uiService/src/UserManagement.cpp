@@ -303,6 +303,42 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	return false; // Login attempt unsuccessful
 }
 
+bool UserManagement::loginWithTicket(const std::string& _ticket, std::string& sessionUser, std::string& sessionPassword) const
+{
+	assert(!m_authServerURL.empty());
+
+	// Here we check whether a user exists by getting its data from the authorization service
+
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_ticket, doc.GetAllocator()), doc.GetAllocator());
+
+	std::string response;
+	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	{
+		OT_LOG_E("Failed to send request to authorization service");
+		AppBase::instance()->showErrorPrompt("Network Error", "Failed to send request to Authorization Service.", "Authorization Service url: \"" + m_authServerURL + "\"");
+		exit(ot::AppExitCode::SendFailed);
+		return false;
+	}
+
+	// Now we check the response document
+	if (hasSuccessful(response))
+	{
+		ot::JsonDocument responseDoc;
+		responseDoc.fromJson(response);
+
+		// Login attempt successful -> get encrypted and unencrypted passwords
+		sessionUser = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
+		sessionPassword = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
+		//validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
+
+		return true; // Successful
+	}
+
+	return false; // Login attempt unsuccessful
+}
+
 bool UserManagement::hasError(const std::string &response) const {
 	ot::JsonDocument responseDoc;
 	responseDoc.fromJson(response);
@@ -320,7 +356,7 @@ bool UserManagement::hasSuccessful(const std::string& _response) const {
 		bool success = ot::json::getBool(responseDoc, OT_ACTION_AUTH_SUCCESS);
 		return success;
 	}
-	catch (std::exception)
+	catch (...)
 	{
 		return false; // The return document does not have a success flag
 	}
@@ -339,7 +375,7 @@ bool UserManagement::initializeDatabaseConnection(void)
 
 		return m_isConnected;
 	}
-	catch (std::exception& _e)
+	catch (const std::exception&)
 	{
 		return false; // Connection failed
 	}
@@ -386,11 +422,16 @@ bool UserManagement::storeSetting(const std::string &settingName, const std::str
 
 			mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection(m_settingsDataBaseName, m_userSettingsCollection);
 
-			bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+			bsoncxx::stdx::optional<mongocxx::result::update> settingsResult = collection.update_many(doc_find.view(), doc_modify.view());
+
+			if (!settingsResult)
+			{
+				OT_LOG_E("Failed to update setting");
+			}
 		}
-		catch (std::exception)
+		catch (const std::exception& _e)
 		{
-			assert(0); // Could not update the documents
+			OT_LOG_E("Error updating setting: " + std::string(_e.what()));
 		}
 	}
 

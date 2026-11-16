@@ -35,8 +35,8 @@ class LogInGSSEntry : public ot::Serializable {
 	OT_DECL_DEFCOPY(LogInGSSEntry)
 	OT_DECL_DEFMOVE(LogInGSSEntry)
 public:
-	LogInGSSEntry() = default;
-	LogInGSSEntry(const QString& _name, const QString& _url, const QString& _port);
+	explicit LogInGSSEntry() = default;
+	explicit LogInGSSEntry(const QString& _name, const QString& _url, const QString& _port);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
