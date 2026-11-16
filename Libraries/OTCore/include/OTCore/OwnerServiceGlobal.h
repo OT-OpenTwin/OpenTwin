@@ -19,11 +19,12 @@
 
 #pragma once
 
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/OwnerService.h"
 
 namespace ot
 {
-	class __declspec(dllexport) OwnerServiceGlobal : public OwnerService {
+	class OT_CORE_API_EXPORTONLY OwnerServiceGlobal : public OwnerService {
 	public:
 		static OwnerServiceGlobal& instance(void);
 

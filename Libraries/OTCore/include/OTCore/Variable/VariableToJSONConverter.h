@@ -19,12 +19,13 @@
 
 #pragma once
 
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/JSON/JSON.h"
 #include "Variable.h"
 
 namespace ot
 {
-	class __declspec(dllexport) VariableToJSONConverter
+	class OT_CORE_API_EXPORTONLY VariableToJSONConverter
 	{
 	public:
 		ot::JsonValue operator() (const Variable& value, JsonAllocator& jsonAllocator);

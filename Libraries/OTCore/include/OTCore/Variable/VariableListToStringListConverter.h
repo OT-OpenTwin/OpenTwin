@@ -18,13 +18,14 @@
 // @otlicense-end
 
 #pragma once
+#include "OTCore/CoreAPIExport.h"
 #include "Variable.h"
 #include <list>
 #include <string>
 
 namespace ot
 {
-	class __declspec(dllexport) VariableListToStringListConverter
+	class OT_CORE_API_EXPORTONLY VariableListToStringListConverter
 	{
 	public:
 		std::list<std::string> operator() (const std::list<Variable>& values);

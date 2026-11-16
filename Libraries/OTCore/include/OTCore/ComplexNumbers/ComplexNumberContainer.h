@@ -19,14 +19,16 @@
 
 #pragma once
 #include <vector>
+#include "OTCore/CoreAPIExport.h"
+
 namespace ot
 {
-	struct __declspec(dllexport) ComplexNumberContainer
+	struct OT_CORE_API_EXPORTONLY ComplexNumberContainer
 	{
 		virtual ~ComplexNumberContainer()=default;
 	};
 
-	struct __declspec(dllexport) ComplexNumberContainerPolar : public ComplexNumberContainer
+	struct OT_CORE_API_EXPORTONLY ComplexNumberContainerPolar : public ComplexNumberContainer
 	{
 		~ComplexNumberContainerPolar() override = default;
 		std::vector<double> m_magnitudes;
@@ -34,7 +36,7 @@ namespace ot
 
 	};
 
-	struct __declspec(dllexport) ComplexNumberContainerCartesian : public ComplexNumberContainer
+	struct OT_CORE_API_EXPORTONLY ComplexNumberContainerCartesian : public ComplexNumberContainer
 	{
 		~ComplexNumberContainerCartesian() override = default; 
 		std::vector<double> m_real;

@@ -19,6 +19,8 @@
 
 #pragma once
 
+#include "OTCore/CoreAPIExport.h"
+
 // std header
 #include <string>
 #include <list>
@@ -27,7 +29,7 @@
 namespace ot {
 
 	template <class T>
-	class __declspec(dllexport) Owner {
+	class OT_CORE_API_EXPORTONLY Owner {
 	public:
 		Owner(const T& _id) : m_id(_id) {};
 		Owner(const Owner<T>& _other) : m_id(_other.m_id) {};

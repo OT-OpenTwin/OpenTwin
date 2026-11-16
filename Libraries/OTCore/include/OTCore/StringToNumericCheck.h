@@ -18,17 +18,19 @@
 // @otlicense-end
 
 #pragma once
-#include <string>
 
+#include "OTCore/CoreAPIExport.h"
+
+#include <string>
 
 namespace ot
 {
 	namespace StringToNumericCheck
 	{
-		bool __declspec(dllexport) fitsInInt32(const std::string& str);
-		bool __declspec(dllexport) fitsInInt64(const std::string& str);
-		bool __declspec(dllexport) fitsInFloat(const std::string& str);
-		bool __declspec(dllexport) fitsInDouble(const std::string& str);
-		bool __declspec(dllexport) isNotANumber(const std::string& str);
+		bool OT_CORE_API_EXPORTONLY fitsInInt32(const std::string& str);
+		bool OT_CORE_API_EXPORTONLY fitsInInt64(const std::string& str);
+		bool OT_CORE_API_EXPORTONLY fitsInFloat(const std::string& str);
+		bool OT_CORE_API_EXPORTONLY fitsInDouble(const std::string& str);
+		bool OT_CORE_API_EXPORTONLY isNotANumber(const std::string& str);
 	}
 }

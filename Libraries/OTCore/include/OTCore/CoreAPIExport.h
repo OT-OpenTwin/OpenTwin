@@ -19,6 +19,7 @@
 
 #pragma once
 
+#if defined(_WIN32)
 #ifdef OPENTWINCORE_EXPORTS
 //! @brief Dll export
 #define OT_CORE_API_EXPORT __declspec(dllexport)
@@ -28,3 +29,7 @@
 #endif // OPENTWINCORE_EXPORTS
 
 #define OT_CORE_API_EXPORTONLY __declspec(dllexport)
+#else
+#define OT_CORE_API_EXPORT
+#define OT_CORE_API_EXPORTONLY
+#endif // _WIN32

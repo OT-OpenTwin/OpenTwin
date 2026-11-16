@@ -20,13 +20,14 @@
 #pragma once
 
 // OpenTwin header
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Owner.h"
 #include "OTCore/CoreTypes.h"
 #include "OTCore/JSON/JSON.h"
 
 namespace ot
 {
-	class __declspec(dllexport) OwnerService : public ot::Owner<ot::serviceID_t>
+	class OT_CORE_API_EXPORTONLY OwnerService : public ot::Owner<ot::serviceID_t>
 	{
 	public:
 		OwnerService(ot::serviceID_t id = ot::invalidServiceID) : ot::Owner<ot::serviceID_t>(id) {};

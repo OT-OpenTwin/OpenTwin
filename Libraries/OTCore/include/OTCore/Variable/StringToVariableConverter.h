@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #pragma once
+#include "OTCore/CoreAPIExport.h"
 #include "Variable.h"
 #include <string>
 
@@ -28,7 +29,7 @@ namespace ot
 	/// Strings values that are numbers are only recognised as strings if " characters are added before and after the string value. Example: string = \"4\";
 	/// Boolean values have to be "true" or "false"
 	/// </summary>
-	class __declspec(dllexport)  StringToVariableConverter
+	class OT_CORE_API_EXPORTONLY StringToVariableConverter
 	{
 	public:
 		Variable operator() (const std::string& _value, const char _decimalSeparator);

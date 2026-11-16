@@ -18,6 +18,7 @@
 // @otlicense-end
 
 #pragma once
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/Variable/Variable.h"
 #include "OTCore/JSON/JSON.h"
 
@@ -25,7 +26,7 @@
 
 namespace ot
 {
-	class __declspec(dllexport) ExplicitStringValueConverter
+	class OT_CORE_API_EXPORTONLY ExplicitStringValueConverter
 	{
 	public:
 

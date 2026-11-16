@@ -18,12 +18,13 @@
 // @otlicense-end
 
 #pragma once
+#include "OTCore/CoreAPIExport.h"
 #include "OTCore/JSON/JSON.h"
 #include "Variable.h"
 #include "OTCore/Tuple/TupleInstance.h"
 namespace ot
 {
-	class __declspec(dllexport)  JSONToVariableConverter
+	class OT_CORE_API_EXPORTONLY JSONToVariableConverter
 	{
 	public:
 
