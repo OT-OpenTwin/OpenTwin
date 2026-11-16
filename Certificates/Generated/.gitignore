@@ -3,4 +3,4 @@
 /ca.pem
 /ca-key.pem
 /certificateKeyFile.pem
-/encryptionKey.h
+/OTencryptionKey.h
