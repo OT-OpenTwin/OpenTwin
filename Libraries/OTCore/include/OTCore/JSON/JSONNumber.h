@@ -23,6 +23,9 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/JSON/JSONTypes.h"
 
+#include <climits>
+#include <cstdint>
+
 namespace ot {
 
 	class JsonNumber : public JsonValue {
@@ -36,7 +39,9 @@ namespace ot {
 
 		explicit JsonNumber(int64_t _value) noexcept : JsonValue(_value) {};
 
+#if LONG_MAX != INT64_MAX
 		explicit JsonNumber(long _value) noexcept : JsonValue((int64_t) _value) {};
+#endif
 
 		explicit JsonNumber(uint64_t _value) noexcept : JsonValue(_value) {};
 
