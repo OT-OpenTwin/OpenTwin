@@ -32,6 +32,7 @@ ot::ObjectWithDestroyNotifier::~ObjectWithDestroyNotifier()
 	m_destroyNotifiers.clear();
 	for (auto notifier : notifiers)
 	{
+		notifier->removeRegisteredObject(this);
 		notifier->onObjectDestroyed(this);
 	}
 }

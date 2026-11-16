@@ -26,6 +26,40 @@
 #include <sstream>
 #include <iomanip>
 #include <cmath>
+#include <cctype>
+#include <charconv>
+#include <type_traits>
+
+template <class T> bool ot::String::parseHexFloatingPoint(const std::string& _string, T& _result) {
+	const size_t first = _string.find_first_not_of(" \t\n\r\f\v");
+	if (first == std::string::npos) {
+		return false;
+	}
+	const size_t last = _string.find_last_not_of(" \t\n\r\f\v") + 1;
+
+	size_t pos = first;
+	const bool negative = (_string[pos] == '-');
+	if (_string[pos] == '-' || _string[pos] == '+') {
+		pos++;
+	}
+
+	if (last - pos < 3 || _string[pos] != '0' || (_string[pos + 1] != 'x' && _string[pos + 1] != 'X')) {
+		return false;
+	}
+	pos += 2;
+	if (!std::isxdigit(static_cast<unsigned char>(_string[pos])) && _string[pos] != '.') {
+		return false;
+	}
+
+	T value = static_cast<T>(0);
+	const auto parseResult = std::from_chars(_string.data() + pos, _string.data() + last, value, std::chars_format::hex);
+	if (parseResult.ec != std::errc() || parseResult.ptr != _string.data() + last) {
+		return false;
+	}
+
+	_result = negative ? -value : value;
+	return true;
+}
 
 template <class T> T ot::String::toNumber(const std::string& _string, bool& _failed) {
 	T result = static_cast<T>(0);
@@ -47,7 +81,14 @@ template <class T> T ot::String::toNumber(const std::string& _string, bool& _fai
 			_failed = true;
 		}
 	}
-	
+
+	// Hexadecimal floating-point is only read on MSVC
+	if constexpr (std::is_floating_point_v<T>) {
+		if (_failed && parseHexFloatingPoint(_string, result)) {
+			_failed = false;
+		}
+	}
+
 	return result;
 }
 

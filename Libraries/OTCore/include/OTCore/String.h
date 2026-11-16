@@ -310,6 +310,12 @@ namespace ot {
 		static void removeControlCharacters(std::string& _value);
 
 		static void removeWhitespaces(std::string& _value);
+
+	private:
+		//! @brief Converts a hexadecimal number like "0xFF" to a floating-point value.
+		//! MSVC string streams accept hexadecimal floating-point, libstdc++ streams do not.
+		//! @return False if the string is not a complete hexadecimal floating-point number.
+		template <class T> static bool parseHexFloatingPoint(const std::string& _string, T& _result);
 	};
 }
 

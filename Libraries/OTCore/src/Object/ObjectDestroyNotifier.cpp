@@ -27,7 +27,13 @@ ot::ObjectDestroyNotifier::ObjectDestroyNotifier()
 {}
 
 ot::ObjectDestroyNotifier::~ObjectDestroyNotifier()
-{}
+{
+	// Unregister from all objects so they do not keep a dangling pointer to this notifier
+	while (!m_registeredObjects.empty())
+	{
+		m_registeredObjects.front()->removeDestroyNotifier(this);
+	}
+}
 
 void ot::ObjectDestroyNotifier::addRegisteredObject(ObjectWithDestroyNotifier * _object)
 {

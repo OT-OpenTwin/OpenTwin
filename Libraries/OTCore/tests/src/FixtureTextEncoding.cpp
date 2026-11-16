@@ -30,7 +30,7 @@ std::vector<char> FixtureTextEncoding::ReadFile(ot::TextEncoding::EncodingStanda
 		throw ot::GeneralException("Environment variable OT_CORE_ROOT not set.");
 	}
 
-	std::string projectDir = std::string(envVal) + "\\tests\\TestEncodingTypeFiles\\";
+	std::string projectDir = std::string(envVal) + "/tests/TestEncodingTypeFiles/";
 
 	if (encoding == ot::TextEncoding::ANSI)
 	{
