@@ -1267,19 +1267,28 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 	runCommand << "\n# Define helper function writing normalization data for field dumps\n";
 
 	runCommand <<
-		"def write_field_dump_norm_files(\n"
+		"# Calculate complex normalization factors for one simulation run.\n"
+		"def calculate_normalization_factors(\n"
 		"    run_path,\n"
 		"    ports,\n"
 		"    excitation_settings,\n"
+		"    frequencies,\n"
 		"    peak_power_w=1.0,\n"
 		"    reference_port=None\n"
 		"):\n"
-		"    run_path = Path(run_path)\n"
-		"    arg_files = sorted(run_path.glob(\"*_f=*_arg.vtr\"))\n"
+		"    \"\"\"Normalize total incident peak power and reference-port phase.\n"
 		"\n"
-		"    # No field dumps: nothing to normalize.\n"
-		"    if not arg_files:\n"
-		"        return []\n"
+		"    The incident powers already contain the excitation amplitude factors.\n"
+		"    For the peak-power convention used here, 1 W peak means 0.5 W average.\n"
+		"    The phase reference is the lowest-numbered active port unless specified.\n"
+		"    CalcPort updates the port result arrays at the requested frequencies.\n"
+		"    \"\"\"\n"
+		"    frequencies = np.asarray(frequencies, dtype=float).reshape(-1)\n"
+		"    if frequencies.size == 0:\n"
+		"        return np.empty(0, dtype=np.complex128)\n"
+		"\n"
+		"    if np.any(~np.isfinite(frequencies)) or np.any(frequencies <= 0):\n"
+		"        raise ValueError(\"Frequencies must be finite and positive\")\n"
 		"\n"
 		"    if not np.isfinite(peak_power_w) or peak_power_w <= 0:\n"
 		"        raise ValueError(\"peak_power_w must be finite and positive\")\n"
@@ -1298,22 +1307,6 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 		"\n"
 		"    if reference_port not in active_ports:\n"
 		"        raise ValueError(\"reference_port must be an active port\")\n"
-		"\n"
-		"    # Preserve the frequency spelling of the VTR filenames.\n"
-		"    targets = []\n"
-		"\n"
-		"    for arg_path in arg_files:\n"
-		"        base_name = arg_path.name[:-len(\"_arg.vtr\")]\n"
-		"        frequency = float(base_name.rsplit(\"_f=\", 1)[1])\n"
-		"        norm_path = arg_path.with_name(base_name + \".norm\")\n"
-		"        targets.append((frequency, norm_path))\n"
-		"\n"
-		"    frequencies = np.unique([\n"
-		"        frequency for frequency, _ in targets\n"
-		"    ])\n"
-		"\n"
-		"    if np.any(~np.isfinite(frequencies)) or np.any(frequencies <= 0):\n"
-		"        raise ValueError(\"Dump frequencies must be finite and positive\")\n"
 		"\n"
 		"    # Sum the incident powers of all active ports.\n"
 		"    total_power = np.zeros_like(frequencies, dtype=float)\n"
@@ -1355,14 +1348,53 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 		"    magnitudes = np.sqrt(0.5 * peak_power_w) / np.sqrt(total_power)\n"
 		"    phases = -np.angle(reference_voltage)\n"
 		"\n"
-		"    factors = dict(zip(frequencies, zip(magnitudes, phases)))\n"
+		"    factors = magnitudes * np.exp(1j * phases)\n"
+		"    if np.any(~np.isfinite(factors)):\n"
+		"        raise ValueError(\"Normalization factors must be finite\")\n"
+		"    return factors\n"
+		"\n"
+		"\n"
+		"# Define helper function writing normalization data for field dumps\n"
+		"def write_field_dump_norm_files(\n"
+		"    run_path,\n"
+		"    ports,\n"
+		"    excitation_settings,\n"
+		"    peak_power_w=1.0,\n"
+		"    reference_port=None\n"
+		"):\n"
+		"    run_path = Path(run_path)\n"
+		"    arg_files = sorted(run_path.glob(\"*_f=*_arg.vtr\"))\n"
+		"\n"
+		"    # No field dumps: nothing to normalize.\n"
+		"    if not arg_files:\n"
+		"        return []\n"
+		"\n"
+		"    # Preserve the frequency spelling of the VTR filenames.\n"
+		"    targets = []\n"
+		"    for arg_path in arg_files:\n"
+		"        base_name = arg_path.name[:-len(\"_arg.vtr\")]\n"
+		"        frequency = float(base_name.rsplit(\"_f=\", 1)[1])\n"
+		"        norm_path = arg_path.with_name(base_name + \".norm\")\n"
+		"        targets.append((frequency, norm_path))\n"
+		"\n"
+		"    frequencies = np.unique([\n"
+		"        frequency for frequency, _ in targets\n"
+		"    ])\n"
+		"    norm_factors = calculate_normalization_factors(\n"
+		"        run_path=run_path,\n"
+		"        ports=ports,\n"
+		"        excitation_settings=excitation_settings,\n"
+		"        frequencies=frequencies,\n"
+		"        peak_power_w=peak_power_w,\n"
+		"        reference_port=reference_port\n"
+		"    )\n"
+		"    factors = dict(zip(frequencies, norm_factors))\n"
 		"\n"
 		"    # Write magnitude and phase (radians), one value per line.\n"
 		"    for frequency, norm_path in targets:\n"
-		"        magnitude, phase = factors[frequency]\n"
-		"\n"
+		"        factor = factors[frequency]\n"
 		"        with norm_path.open(\"w\", encoding=\"ascii\", newline=\"\\n\") as stream:\n"
-		"            stream.write(f\"{magnitude:.17e}\\n{phase:.17e}\\n\")\n"
+		"            stream.write(f\"{abs(factor):.17e}\\n{np.angle(factor):.17e}\\n\")\n"
 		"\n"
 		"    return [norm_path for _, norm_path in targets]\n"
 		"\n"
@@ -2134,7 +2166,10 @@ class FarFieldTable:
         self._blocks = []
         self._nrows = 0
 
-    def append(self, ff, frequencies, theta_deg, phi_deg):
+    def append(
+        self, ff, frequencies, theta_deg, phi_deg,
+        normalization_factors=None
+    ):
         frequencies = np.asarray(
             frequencies, dtype=np.float64
         ).reshape(-1)
@@ -2149,6 +2184,24 @@ class FarFieldTable:
 
         nf, nt, np_ = frequencies.size, theta.size, phi.size
 
+        if normalization_factors is None:
+            normalization_factors = np.ones(
+                nf, dtype=np.complex128
+            )
+        else:
+            normalization_factors = np.asarray(
+                normalization_factors, dtype=np.complex128
+            ).reshape(-1)
+
+            if normalization_factors.size != nf:
+                raise ValueError(
+                    "One normalization factor per frequency is required."
+                )
+
+            if np.any(~np.isfinite(normalization_factors)):
+                raise ValueError(
+                    "Normalization factors must be finite."
+                )
         if len(ff.E_theta) != nf or len(ff.E_phi) != nf:
             raise ValueError("Field count does not match frequency count.")
 
@@ -2164,8 +2217,11 @@ class FarFieldTable:
         data[..., 2] = phi[None, None, :]
 
         for k in range(nf):
-            et = np.asarray(ff.E_theta[k])
-            ep = np.asarray(ff.E_phi[k])
+            # Apply the complex factor before extracting magnitude and phase.
+            # This leaves the raw NF2FF result object unchanged.
+            factor = normalization_factors[k]
+            et = np.asarray(ff.E_theta[k], dtype=np.complex128) * factor
+            ep = np.asarray(ff.E_phi[k], dtype=np.complex128) * factor
 
             if et.shape != (nt, np_) or ep.shape != (nt, np_):
                 raise ValueError(
@@ -2255,27 +2311,51 @@ class FarFieldTable:
 		"\n\nfor run_index, excitation_settings in enumerate(excitation_list, start=1):\n"
 		"\n"
 		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
-		"    far_fields = FarFieldTable();\n";
+		"    far_fields = FarFieldTable()\n"
+		"\n";
 
 	for (auto farfieldDump : farfieldDumpList)
 	{
 		std::string frequencies = getFrequencyString(farfieldDump);
 		std::string thetaAngles = getThetaAngles(farfieldDump);
-		std::string phiAngles   = getPhiAngles(farfieldDump);
+		std::string phiAngles = getPhiAngles(farfieldDump);
 
-		farfieldDumpFrequencies[farfieldDump->getName()] = getFrequencyList(farfieldDump);;
+		farfieldDumpFrequencies[farfieldDump->getName()] =
+			getFrequencyList(farfieldDump);
 
 		runCommand << "    ff_freq = [" << frequencies << "]\n";
 		runCommand << "    theta_deg = [" << thetaAngles << "]\n";
 		runCommand << "    phi_deg = [" << phiAngles << "]\n";
-		runCommand << "    ff = nf2ff.CalcNF2FF(run_path, ff_freq, theta_deg, phi_deg)\n";
-		runCommand << "    far_fields.append(ff, ff_freq, theta_deg, phi_deg)\n";
+
+		runCommand <<
+			"\n"
+			"    ff = nf2ff.CalcNF2FF(\n"
+			"        run_path, ff_freq, theta_deg, phi_deg,\n"
+			"        radius=1.0,\n"
+			"        center=[0, 0, 0],\n"
+			"        read_cached=False\n"
+			"    )\n"
+			"\n"
+			"    norm_factors = calculate_normalization_factors(\n"
+			"        run_path=run_path,\n"
+			"        ports=ports,\n"
+			"        excitation_settings=excitation_settings,\n"
+			"        frequencies=ff_freq,\n"
+			"        peak_power_w=1.0\n"
+			"    )\n"
+			"\n"
+			"    far_fields.append(\n"
+			"        ff, ff_freq, theta_deg, phi_deg,\n"
+			"        normalization_factors=norm_factors\n"
+			"    )\n"
+			"\n";
 	}
 
 	// Remove duplicates and write the result to the file farfields.txt
-	runCommand << "    far_fields.remove_duplicates(keep='last', key_decimals=(3, 9, 9))\n";
-	runCommand << "    far_fields.save_txt(os.path.join(run_path, 'farfields.txt'), header=True)\n";
-	runCommand << "\n";
+	runCommand <<
+		"    far_fields.remove_duplicates(keep='last', key_decimals=(3, 9, 9))\n"
+		"    far_fields.save_txt(os.path.join(run_path, 'farfields.txt'), header=True)\n"
+		"\n";
 }
 
 std::string FDTDSolver::getThetaAngles(EntityFarfieldDump* farfieldDump)
