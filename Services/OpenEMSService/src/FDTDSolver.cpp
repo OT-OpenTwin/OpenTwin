@@ -197,7 +197,7 @@ bool FDTDSolver::getFieldDumpTypeAndMode(EntityFieldDump *fieldDump, int &dumpTy
 	else if (typeProperty->getValue() == "Magnetic Field (Frequency Domain)")
 	{
 		dumpType = 11;
-		dumpMode = 1;
+		dumpMode = 2;
 	}
 	else if (typeProperty->getValue() == "Electric Current Density (Frequency Domain)")
 	{
@@ -217,7 +217,7 @@ bool FDTDSolver::getFieldDumpTypeAndMode(EntityFieldDump *fieldDump, int &dumpTy
 	else if (typeProperty->getValue() == "Magnetic Field (Time Domain)")
 	{
 		dumpType = 1;
-		dumpMode = 1;
+		dumpMode = 2;
 	}
 	else if (typeProperty->getValue() == "Electric Current Density (Time Domain)")
 	{
