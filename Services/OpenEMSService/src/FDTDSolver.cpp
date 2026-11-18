@@ -156,7 +156,7 @@ void FDTDSolver::addFieldDumps(std::stringstream& runCommand)
 			std::string subSamplingString = getSubsamplingString(fieldDump);
 			std::string resulutionString = getResolutionString(fieldDump);
 			std::string fieldDumpName = getFieldDumpName(fieldDump);
-			std::string startStopString = getStartStopString(fieldDump);
+			std::string startStopString = getStartStopString(fieldDump, dumpMode);
 
 			runCommand << "dump" << count << " = CSX.AddDump('" << fieldDumpName << "', dump_type=" << dumpType << ", dump_mode=" << dumpMode << ", file_type=0";
 
@@ -559,14 +559,16 @@ std::string FDTDSolver::getFieldDumpName(EntityFieldDump* fieldDump)
 	return name;
 }
 
-std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
+std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump, int dumpMode)
 {
-	double xMin = xLines.front();
-	double xMax = xLines.back();
-	double yMin = yLines.front();
-	double yMax = yLines.back();
-	double zMin = zLines.front();
-	double zMax = zLines.back();
+	int upperOffset = dumpMode == 2 ? 1 : 0;
+
+	double xMin = xLines[0];
+	double xMax = xLines[xLines.size() - 1 - upperOffset];
+	double yMin = yLines[0];
+	double yMax = yLines[yLines.size() - 1 - upperOffset];
+	double zMin = zLines[0];
+	double zMax = zLines[zLines.size() - 1 - upperOffset];
 
 	EntityPropertiesBoolean* subrangeProperty = dynamic_cast<EntityPropertiesBoolean*>(fieldDump->getProperties().getProperty("Subrange"));
 	
@@ -583,12 +585,12 @@ std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
 
 			if (xminProperty != nullptr && xmaxProperty != nullptr && yminProperty != nullptr && ymaxProperty != nullptr && zminProperty != nullptr && zmaxProperty != nullptr)
 			{
-				xMin = xminProperty->getValue();
-				xMax = xmaxProperty->getValue();
-				yMin = yminProperty->getValue();
-				yMax = ymaxProperty->getValue();
-				zMin = zminProperty->getValue();
-				zMax = zmaxProperty->getValue();
+				xMin = std::max(xMin, xminProperty->getValue());
+				xMax = std::min(xMax, xmaxProperty->getValue());
+				yMin = std::max(yMin, yminProperty->getValue());
+				yMax = std::min(yMax, ymaxProperty->getValue());
+				zMin = std::max(zMin, zminProperty->getValue());
+				zMax = std::min(zMax, zmaxProperty->getValue());
 			}
 			else
 			{

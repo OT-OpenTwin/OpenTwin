@@ -106,7 +106,7 @@ private:
 	std::string getSubsamplingString(EntityFieldDump* fieldDump);
 	std::string getResolutionString(EntityFieldDump* fieldDump);
 	std::string getFieldDumpName(EntityFieldDump* fieldDump);
-	std::string getStartStopString(EntityFieldDump* fieldDump);
+	std::string getStartStopString(EntityFieldDump* fieldDump, int dumpMode);
 	std::string getThetaAngles(EntityFarfieldDump* farfieldDump);
 	std::string getPhiAngles(EntityFarfieldDump* farfieldDump);
 	void addFrequencies(EntityFarfieldDump* fieldDump, std::set<double>& farfieldFrequencyList);
