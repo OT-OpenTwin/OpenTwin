@@ -513,20 +513,20 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 
 	// Check
 	std::string lmsUrl = ot::json::getString(_doc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	if(m_libraryManagementUrl == lmsUrl) {
-		return ot::ReturnMessage(ot::ReturnMessage::Failed,"LibraryManagementService Url is already registered");
+	if (m_libraryManagementUrl == lmsUrl) {
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "LibraryManagementService Url is already registered");
 	}
 
 	ot::JsonDocument lssDoc;
 	lssDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_RegisterNewLibraryManagementService, lssDoc.GetAllocator()), lssDoc.GetAllocator());
-	lssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(m_libraryManagementUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
+	lssDoc.AddMember(OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL, ot::JsonString(lmsUrl, lssDoc.GetAllocator()), lssDoc.GetAllocator());
 	std::string lssMessage = lssDoc.toJson();
 
 	for (const auto& lss : m_lssMap) {
 		std::string responseStr;
 		if (!ot::msg::send("", lss.second.getUrl(), ot::EXECUTE, lssMessage, responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 			OT_LOG_E("Failed to send message to Local Session Service (url = " + lss.second.getUrl() + ")");
-			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send message to Local Session Service { \"Lss.Url\": \"" + lss.second.getUrl() + "\" }");
+			return ot::ReturnMessage(ot::ReturnMessage::Retry, "Failed to send message to Local Session Service { \"Lss.Url\": \"" + lss.second.getUrl() + "\" }");
 		}
 
 		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
@@ -534,6 +534,8 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 			OT_LOG_W("Invalid response from LSS { \"Url\": \"" + lss.second.getUrl() + "\", \"Response\": \"" + response.getWhat() + "\" }");
 		}
 	}
+
+	m_libraryManagementUrl = lmsUrl;
 
 	// Send DBUrl and AuthUrl
 	ot::JsonDocument responseDoc;
