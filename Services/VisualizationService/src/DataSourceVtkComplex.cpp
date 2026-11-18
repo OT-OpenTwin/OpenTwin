@@ -78,6 +78,7 @@ bool DataSourceVtkComplex::loadData(EntityResultVtkComplex* resultData)
 
 	resultData->getComplexData(quantityName, quantityType, dataAbs, dataArg);
 	scaleFactor = resultData->getScaleFactor();
+	normalizationFactor = resultData->getNormalizationFactor();
 
 	if (dataAbs.empty() || dataArg.empty()) return false;
 
@@ -88,8 +89,14 @@ bool DataSourceVtkComplex::loadData(EntityResultVtkComplex* resultData)
 	gridReaderAbs->ReadFromInputStringOn();
 	gridReaderAbs->Update();
 
-	vtkGridAbs->Delete();
+	if (vtkGridAbs != nullptr)
+	{
+		vtkGridAbs->Delete();
+	}
+
 	vtkGridAbs = gridReaderAbs->GetOutput();
+	vtkGridAbs->Register(nullptr);
+	gridReaderAbs->Delete();
 
 	vtkXMLRectilinearGridReader* gridReaderArg = vtkXMLRectilinearGridReader::New();
 
@@ -98,8 +105,14 @@ bool DataSourceVtkComplex::loadData(EntityResultVtkComplex* resultData)
 	gridReaderArg->ReadFromInputStringOn();
 	gridReaderArg->Update();
 
-	vtkGridArg->Delete();
+	if (vtkGridArg != nullptr)
+	{
+		vtkGridArg->Delete();
+	}
+
 	vtkGridArg = gridReaderArg->GetOutput();
+	vtkGridArg->Register(nullptr);
+	gridReaderArg->Delete();
 
 	// In the following, we assume that the structure of the abs and the arg data is identical. Therefore it is sufficient to chek the abs part only.
 	for (int index = 0; index < vtkGridAbs->GetCellData()->GetNumberOfArrays(); index++)
@@ -139,6 +152,90 @@ bool DataSourceVtkComplex::loadData(EntityResultVtkComplex* resultData)
 			}
 		}
 	}
+
+	// Incorporate the normalization factor
+
+	const double normalizationMagnitude = std::abs(normalizationFactor);
+	const double normalizationPhase = std::arg(normalizationFactor);  // In radian
+
+	if (!std::isfinite(normalizationMagnitude) ||
+		!std::isfinite(normalizationPhase))
+	{
+		return false;
+	}
+
+	auto normalizeArrays =
+		[&](vtkDataSetAttributes* absData,
+			vtkDataSetAttributes* argData) -> bool
+		{
+			vtkDataArray* absArray =
+				absData->GetArray(quantityName.c_str());
+
+			vtkDataArray* argArray =
+				argData->GetArray(quantityName.c_str());
+
+			// The quantity need not exist in both CellData and PointData.
+			if (absArray == nullptr && argArray == nullptr)
+			{
+				return true;
+			}
+
+			if (absArray == nullptr || argArray == nullptr)
+			{
+				return false;
+			}
+
+			if (absArray->GetNumberOfTuples() != argArray->GetNumberOfTuples() ||
+				absArray->GetNumberOfComponents() != argArray->GetNumberOfComponents())
+			{
+				return false;
+			}
+
+			const vtkIdType numberOfTuples = absArray->GetNumberOfTuples();
+			const int numberOfComponents = absArray->GetNumberOfComponents();
+
+			for (vtkIdType tuple = 0; tuple < numberOfTuples; ++tuple)
+			{
+				for (int component = 0; component < numberOfComponents; ++component)
+				{
+					const double magnitude =
+						absArray->GetComponent(tuple, component);
+
+					const double phase =
+						argArray->GetComponent(tuple, component);
+
+					absArray->SetComponent(
+						tuple, component,
+						magnitude * normalizationMagnitude);
+
+					argArray->SetComponent(
+						tuple, component,
+						phase + normalizationPhase);
+				}
+			}
+
+			absArray->Modified();
+			argArray->Modified();
+
+			return true;
+		};
+
+	if (!normalizeArrays(
+		vtkGridAbs->GetCellData(),
+		vtkGridArg->GetCellData()))
+	{
+		return false;
+	}
+
+	if (!normalizeArrays(
+		vtkGridAbs->GetPointData(),
+		vtkGridArg->GetPointData()))
+	{
+		return false;
+	}
+
+	vtkGridAbs->Modified();
+	vtkGridArg->Modified();
 
 	return true;
 }

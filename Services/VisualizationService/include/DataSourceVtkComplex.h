@@ -26,6 +26,7 @@
 #include <vtkNew.h>
 
 #include <string>
+#include <complex>
 
 class EntityResultVtkComplex;
 
@@ -53,6 +54,7 @@ public:
 	bool GetHasCellVector() { return hasCellVector; }
 
 	double getScaleFactor() { return scaleFactor; }
+	std::complex<double> getNormalizationFactor() { return normalizationFactor; }
 
 private:
 	bool loadData(EntityResultVtkComplex* resultData);
@@ -63,6 +65,7 @@ private:
 	vtkRectilinearGrid* vtkGridArg;
 
 	double scaleFactor = 1.0;
+	std::complex<double> normalizationFactor = 1.0;
 
 	bool hasPointScalar = false;
 	bool hasCellScalar = false;

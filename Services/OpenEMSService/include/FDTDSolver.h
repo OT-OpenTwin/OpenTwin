@@ -24,6 +24,7 @@
 #include <list>
 #include <map>
 #include <set>
+#include <complex>
 
 class Application;
 
@@ -71,7 +72,7 @@ private:
 	std::string escapeBackslashes(const std::string& input);
 	void convertAndStoreFrequencyDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
 	void convertAndStoreTimeDomainDump(const std::string& resultFolder, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
-	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
+	void convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& normFileName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
 	void convertAndStoreSingleTimeDomainDump(std::list<std::string>& resultFileList, const std::string& resultName, const std::string& fieldType, const std::string& postfix, const std::string& unit, EntityFieldDump* fieldDump);
 	std::string toLower(std::string s);
 	std::vector<char> readFile(const std::string& filename);
@@ -118,6 +119,7 @@ private:
 	std::string directionToAxis(const std::string& direction);
 	std::size_t removeNearlyEqualFrequencies(std::set<double>& frequencies, double relativeTolerance = 1e-3, double absoluteTolerance = 0.0);
 	void determineStructureDimensions(double& structureCx, double& structureCy, double& structureCz, double& structureD);
+	std::complex<double> readFieldDumpNormalization(const std::string& normFileName);
 
 	Application* application;
 	EntityBase *solverEntity;

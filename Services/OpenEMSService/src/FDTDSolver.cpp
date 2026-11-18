@@ -1252,7 +1252,9 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 	runCommand << "from pathlib import Path\n";
 	runCommand << "Sim_Path = str(Path(\"" << escapeBackslashes(tempDirPath) << "\").resolve())\n";
 
-	runCommand << "\n"
+	runCommand << "\n# Define helper function for saving xy data in files\n";
+
+	runCommand <<
 		"def save_xy_data(x, y, filename) :\n"
 		"		full_path = os.path.join(Sim_Path, filename)\n"
 		"		with open(full_path, 'w', encoding = 'utf-8') as f :\n"
@@ -1261,6 +1263,110 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 		"					f.write(f'{xi}\t{yi.real}\t{yi.imag}\\n')\n"
 		"				else :\n"
 		"					f.write(f'{xi}\t{yi}\\n')\n\n";
+
+	runCommand << "\n# Define helper function writing normalization data for field dumps\n";
+
+	runCommand <<
+		"def write_field_dump_norm_files(\n"
+		"    run_path,\n"
+		"    ports,\n"
+		"    excitation_settings,\n"
+		"    peak_power_w=1.0,\n"
+		"    reference_port=None\n"
+		"):\n"
+		"    run_path = Path(run_path)\n"
+		"    arg_files = sorted(run_path.glob(\"*_f=*_arg.vtr\"))\n"
+		"\n"
+		"    # No field dumps: nothing to normalize.\n"
+		"    if not arg_files:\n"
+		"        return []\n"
+		"\n"
+		"    if not np.isfinite(peak_power_w) or peak_power_w <= 0:\n"
+		"        raise ValueError(\"peak_power_w must be finite and positive\")\n"
+		"\n"
+		"    active_ports = sorted(\n"
+		"        number\n"
+		"        for number, amplitude in excitation_settings.items()\n"
+		"        if amplitude != 0.0\n"
+		"    )\n"
+		"\n"
+		"    if not active_ports:\n"
+		"        raise ValueError(\"At least one port must be active\")\n"
+		"\n"
+		"    if reference_port is None:\n"
+		"        reference_port = active_ports[0]\n"
+		"\n"
+		"    if reference_port not in active_ports:\n"
+		"        raise ValueError(\"reference_port must be an active port\")\n"
+		"\n"
+		"    # Preserve the frequency spelling of the VTR filenames.\n"
+		"    targets = []\n"
+		"\n"
+		"    for arg_path in arg_files:\n"
+		"        base_name = arg_path.name[:-len(\"_arg.vtr\")]\n"
+		"        frequency = float(base_name.rsplit(\"_f=\", 1)[1])\n"
+		"        norm_path = arg_path.with_name(base_name + \".norm\")\n"
+		"        targets.append((frequency, norm_path))\n"
+		"\n"
+		"    frequencies = np.unique([\n"
+		"        frequency for frequency, _ in targets\n"
+		"    ])\n"
+		"\n"
+		"    if np.any(~np.isfinite(frequencies)) or np.any(frequencies <= 0):\n"
+		"        raise ValueError(\"Dump frequencies must be finite and positive\")\n"
+		"\n"
+		"    # Sum the incident powers of all active ports.\n"
+		"    total_power = np.zeros_like(frequencies, dtype=float)\n"
+		"    reference_voltage = None\n"
+		"\n"
+		"    for number in active_ports:\n"
+		"        port = ports[number]\n"
+		"        port.CalcPort(str(run_path), frequencies, signal_type=\"pulse\")\n"
+		"        power = np.asarray(port.P_inc, dtype=float)\n"
+		"\n"
+		"        invalid = ~np.isfinite(power) | (power < 0)\n"
+		"        if np.any(invalid):\n"
+		"            raise ValueError(\n"
+		"                f\"Invalid incident power at port {number}: \"\n"
+		"                f\"{frequencies[invalid]} Hz\"\n"
+		"            )\n"
+		"\n"
+		"        total_power += power\n"
+		"\n"
+		"        if number == reference_port:\n"
+		"            reference_voltage = np.asarray(\n"
+		"                port.uf_inc, dtype=complex\n"
+		"            ).copy()\n"
+		"\n"
+		"    invalid = (\n"
+		"        ~np.isfinite(total_power)\n"
+		"        | (total_power <= 0)\n"
+		"        | ~np.isfinite(reference_voltage)\n"
+		"        | (np.abs(reference_voltage) == 0)\n"
+		"    )\n"
+		"\n"
+		"    if np.any(invalid):\n"
+		"        raise ValueError(\n"
+		"            \"Invalid total power or phase reference at \"\n"
+		"            f\"{frequencies[invalid]} Hz\"\n"
+		"        )\n"
+		"\n"
+		"    # 1 W peak corresponds to 0.5 W time-averaged total input power.\n"
+		"    magnitudes = np.sqrt(0.5 * peak_power_w) / np.sqrt(total_power)\n"
+		"    phases = -np.angle(reference_voltage)\n"
+		"\n"
+		"    factors = dict(zip(frequencies, zip(magnitudes, phases)))\n"
+		"\n"
+		"    # Write magnitude and phase (radians), one value per line.\n"
+		"    for frequency, norm_path in targets:\n"
+		"        magnitude, phase = factors[frequency]\n"
+		"\n"
+		"        with norm_path.open(\"w\", encoding=\"ascii\", newline=\"\\n\") as stream:\n"
+		"            stream.write(f\"{magnitude:.17e}\\n{phase:.17e}\\n\")\n"
+		"\n"
+		"    return [norm_path for _, norm_path in targets]\n"
+		"\n"
+		"\n";
 }
 
 void FDTDSolver::addUnits(std::stringstream& runCommand)
@@ -1836,6 +1942,15 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 		"        cleanup=False,\n"
 		"        verbose = 0,\n"
 		"        debug_pec = " << std::string(debugFlag ? "True" : "False") << "\n"
+		"    )\n"
+		"\n";
+
+	runCommand << 
+		"    write_field_dump_norm_files(\n"
+		"        run_path = run_path,\n"
+		"        ports = ports,\n"
+		"        excitation_settings = excitation_settings,\n"
+		"        peak_power_w = 1.0\n"
 		"    )\n"
 		"\n";
 }
@@ -2519,19 +2634,20 @@ void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFol
 				// remove "_abs.vtr" (8 characters)
 				std::string base = fullPath.substr(0, fullPath.size() - 8);
 
-				std::string absFile = base + "_abs.vtr";
-				std::string argFile = base + "_arg.vtr";
+				std::string absFile  = base + "_abs.vtr";
+				std::string argFile  = base + "_arg.vtr";
+				std::string normFile = base + ".norm";
 
 				if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
 				{
-					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, postfix, unit, fieldDump);
+					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, normFile, fieldType, postfix, unit, fieldDump);
 				}
 			}
 		}
 	}
 }
 
-void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit, EntityFieldDump* fieldDump)
+void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& normFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit, EntityFieldDump* fieldDump)
 {
 	// Extract result folder name from result file name
 	std::string resultName = parseComplexResultFileName(absFileName);
@@ -2540,6 +2656,9 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 		assert(0);
 		return;
 	}
+
+	// Read scale factor from normalization file
+	std::complex<double> normalizationFactor = readFieldDumpNormalization(normFileName);
 
 	// Load the abs file data and store it as a binary data object
 	std::vector<char> absFileData = readFile(absFileName);
@@ -2570,6 +2689,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	EntityResultVtkComplex* vtkResult = new EntityResultVtkComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkResult->setComplexData(fieldType, EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
 	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
+	vtkResult->setNormalizationFactor(normalizationFactor);
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeComplex* visualizationEntity = new EntityVisVtkVectorVolumeComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
@@ -3505,4 +3625,37 @@ double FDTDSolver::snapToMeshLine(double coordinate, const std::vector<double>& 
 	return coordinate - *lower <= *upper - coordinate
 		? *lower
 		: *upper;
+}
+
+std::complex<double> FDTDSolver::readFieldDumpNormalization(const std::string& normFileName)
+{
+	std::ifstream file(normFileName);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error(
+			"Cannot open normalization file: " + normFileName);
+	}
+
+	// Use a decimal point independently of the system locale.
+	file.imbue(std::locale::classic());
+
+	double magnitude = 0.0;
+	double phase = 0.0;
+
+	if (!(file >> magnitude >> phase))
+	{
+		throw std::runtime_error(
+			"Invalid normalization file format: " + normFileName);
+	}
+
+	if (!std::isfinite(magnitude) ||
+		!std::isfinite(phase) ||
+		magnitude < 0.0)
+	{
+		throw std::runtime_error(
+			"Invalid normalization values: " + normFileName);
+	}
+
+	return std::polar(magnitude, phase);
 }

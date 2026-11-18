@@ -125,7 +125,9 @@ void EntityResultVtkComplex::addStorageData(bsoncxx::builder::basic::document & 
 		bsoncxx::builder::basic::kvp("vtkDataIDArg",		_vtkDataIDArg),
 		bsoncxx::builder::basic::kvp("vtkDataVersionArg",	_vtkDataVersionArg),
 		bsoncxx::builder::basic::kvp("resultType", (long long)getResultType()),
-		bsoncxx::builder::basic::kvp("scaleFactor",			_scaleFactor)
+		bsoncxx::builder::basic::kvp("scaleFactor",			_scaleFactor),
+		bsoncxx::builder::basic::kvp("normFactor_real",    _normalizationFactor.real()),
+		bsoncxx::builder::basic::kvp("normFactor_imag",    _normalizationFactor.imag())
 	);
 }
 
@@ -140,6 +142,18 @@ void EntityResultVtkComplex::readSpecificDataFromDataBase(const bsoncxx::documen
 	_vtkDataIDArg		= doc_view["vtkDataIDArg"].get_int64().value;
 	_vtkDataVersionArg	= doc_view["vtkDataVersionArg"].get_int64().value;
 	_scaleFactor		= doc_view["scaleFactor"].get_double();
+
+	if (doc_view["normFactor_real"])
+	{
+		double normFactorReal = doc_view["normFactor_real"].get_double();
+		double normFactorImag = doc_view["normFactor_imag"].get_double();
+
+		_normalizationFactor = std::complex<double>(normFactorReal, normFactorImag);
+	}
+	else
+	{
+		_normalizationFactor = 1.0;
+	}
 
 	setResultType(static_cast<tResultType>((long long)doc_view["resultType"].get_int64()));
 }
