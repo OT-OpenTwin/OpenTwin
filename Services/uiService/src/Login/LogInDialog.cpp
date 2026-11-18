@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: LogInDialog.cpp
 // 
 // License:
@@ -316,6 +316,12 @@ void LogInDialog::initialize()
 		gss.setUrl(QString::fromStdString(m_ticketLoginData.getGssHost()));
 		gss.setPort(QString::fromStdString(m_ticketLoginData.getGssPort()));
 		this->enforceGSS(gss);
+
+		m_logInButton->setText("Login with Ticket");
+		m_logInButton->setEnabled(false);
+
+		// Queue login request
+		QMetaObject::invokeMethod(this, &LogInDialog::slotLogIn, Qt::QueuedConnection);
 	}
 }
 
@@ -379,10 +385,10 @@ void LogInDialog::slotLogIn()
 {
 	OTAssert(!m_state.has(LoginState::WorkerRunning), "Worker already running");
 
+	setupLoginDataFromCurrent();
+
 	if (!m_state.has(LoginState::TicketMode))
 	{
-		setupLoginDataFromCurrent();
-
 		// Store settings
 		std::shared_ptr<QSettings> settings = AppBase::instance()->createSettingsInstance();
 		settings->setValue("SessionServiceURL", m_loginData.getGss().getName());
@@ -704,6 +710,7 @@ void LogInDialog::slotWorkerError(WorkerError _error)
 
 	// Create error message
 	QString msg;
+	QString detailedMsg = QString::fromStdString(m_curlErrorMessage);
 
 	if (m_state.has(LoginState::RegisterMode))
 	{
@@ -777,11 +784,16 @@ void LogInDialog::slotWorkerError(WorkerError _error)
 		break;
 	}
 
+	if (m_state.has(LoginState::TicketMode))
+	{
+		msg = "Ticket login failed";
+	}
+
 	// Display error message and unlock controls
 	QMessageBox msgBox(QMessageBox::Critical, "Login Error", msg, QMessageBox::Ok);
-	if (!m_curlErrorMessage.empty())
+	if (!detailedMsg.isEmpty())
 	{
-		msgBox.setDetailedText(QString::fromStdString(m_curlErrorMessage));
+		msgBox.setDetailedText(detailedMsg);
 	}
 	msgBox.exec();
 
@@ -825,21 +837,26 @@ bool LogInDialog::setupLoginDataFromCurrent()
 		return false;
 	}
 
-	if (m_username->text().isEmpty() && !m_isSSOLogin)
+	if (!m_state.has(LoginState::SSOMode) && !m_state.has(LoginState::TicketMode))
 	{
-		QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
-		return false;
-	}
+		if (m_username->text().isEmpty())
+		{
+			QToolTip::showText(this->mapToGlobal(m_username->pos()), "No username provided", m_username, QRect(), 3000);
+			return false;
+		}
 
-	if (m_password->text().isEmpty() && !m_isSSOLogin)
-	{
-		QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
-		return false;
+		if (m_password->text().isEmpty())
+		{
+			QToolTip::showText(this->mapToGlobal(m_password->pos()), "No password provided", m_password, QRect(), 3000);
+			return false;
+		}
 	}
 
 	this->setControlsEnabled(false);
 
 	m_loginData.setGss(gss);
+
+	return true;
 }
 
 void LogInDialog::saveUserSettings() const
@@ -1415,6 +1432,7 @@ LogInDialog::WorkerError LogInDialog::workerLogin(const UserManagement& _userMan
 	else
 	{
 		OT_LOG_ES("Unknown login type (" << ot::toString(gss.getLoginType()) << ")");
+		return WorkerError::InvalidGssResponseSyntax;
 	}
 }
 
@@ -1475,9 +1493,19 @@ LogInDialog::WorkerError LogInDialog::workerLoginSSO(const UserManagement& _user
 LogInDialog::WorkerError LogInDialog::workerLoginTicket(const UserManagement& _userManager, std::string& _customTitle, std::string& _customMsg)
 {
 	std::string sessionUser, sessionPassword;
-
-	if (_userManager.loginWithTicket(m_ticketLoginData.getLoginTicket(), sessionUser, sessionPassword))
+	ot::UserSessionToken token;
+	if (_userManager.loginWithTicket(m_ticketLoginData.getLoginTicket(), token, sessionUser, sessionPassword))
 	{
+		if (!token.isValid())
+		{
+			return WorkerError::InvalidCreadentials;
+		}
+
+		m_loginData.setUserName(token.getUserName());
+		m_loginData.setUserSessionToken(std::move(token));
+		m_loginData.setSessionUser(sessionUser);
+		m_loginData.setSessionPassword(sessionPassword);
+
 		return WorkerError::NoError;
 	}
 	else

@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 project(uiService LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
@@ -40,5 +40,12 @@ ot_add_dependency(uiService
 )
 
 ot_finalize_bin(uiService uiFrontend)
+
+#ot_bin_debug_launch(uiService
+#    ARGS "--login-ticket"
+#         "eyJUaWNrZXQiOiAiODYzN2NiODMzMzliZGFhMTMyODM5YjFmMjc2YzBmZmUwMWQzNDJhOWIxYzEzZGY0YzQzZGU3ZDc0ZjA3ZDFhMCIsICJTZXJ2aWNlLkdTUy5VUkwiOiAiaHR0cHM6Ly8xMjcuMC4wLjE6ODA5MSJ9"
+#)
+
 ot_deploy_app_configuration(uiService)
+
 ot_add_test(uiService)

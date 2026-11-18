@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ActionTypes.h
 // 
 // License:
@@ -478,6 +478,8 @@
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
 #define OT_ACTION_PARAM_ChallengeID "ChallengeID"
 #define OT_ACTION_PARAM_ElementType "ElementType"
+#define OT_ACTION_PARAM_SessionName "Session.Name"
+#define OT_ACTION_PARAM_SessionToken "Session.Token"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ExpandParents "ExpandParents"
 #define OT_ACTION_PARAM_CallbackAction "CallbackAction"

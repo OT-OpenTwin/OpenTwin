@@ -43,13 +43,38 @@ UserSessionManager::UserSessionInfo UserSessionManager::createUserSession(const 
 		findOrCreateSessionListForUser(user.getName()).push_back(sessionName);
 	}
 
+	ot::UserSessionToken sessionTokenObj(user.getName(), sessionName, sessionToken);
+
 	UserSessionInfo result;
-	result.sessionName = sessionName;
-	result.loggedInUserName = user.getName();
-	result.sessionToken = sessionToken;
+	result.sessionToken = std::move(sessionTokenObj);
 	result.sessionUserName = newTmpUser.userName;
 	result.sessionUserPWD = newTmpUser.userPWD;
 	return result;
+}
+
+bool UserSessionManager::isSessionValid(const ot::UserSessionToken& _token)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	auto sessionIt = m_sessions.find(_token.getSessionName());
+	if (sessionIt == m_sessions.end())
+	{
+		return false;
+	}
+
+	auto& session = sessionIt->second;
+	if (session.isExpired())
+	{
+		// Remove expired session
+		forgetUserSession(session.getLoggedInUserName(), session.getName());
+		m_sessions.erase(sessionIt);
+
+		return false;
+	}
+
+	return session.getToken() == _token.getToken()
+		&& session.getLoggedInUserName() == _token.getUserName()
+		&& session.getName() == _token.getSessionName();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -92,7 +117,7 @@ void UserSessionManager::cleanupWorker()
 		std::lock_guard<std::mutex> lock(m_mutex);
 		for (auto it = m_sessions.begin(); it != m_sessions.end(); )
 		{
-			if (!it->second.isValid())
+			if (it->second.isExpired())
 			{
 				// Remove expired session
 				forgetUserSession(it->second.getLoggedInUserName(), it->first);

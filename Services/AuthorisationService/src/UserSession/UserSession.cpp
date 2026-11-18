@@ -10,10 +10,10 @@ UserSession::UserSession(const std::string& _sessionName, const std::string& _to
 	: m_name(_sessionName), m_token(_token), m_expirationTime(ot::DateTime::msSinceEpoch() + (_validityInSeconds * 1000))
 {}
 
-bool UserSession::isValid() const
+bool UserSession::isExpired() const
 {
 	int64_t currentTime = ot::DateTime::msSinceEpoch();
-	return currentTime < m_expirationTime && !m_name.empty();
+	return currentTime >= m_expirationTime;
 }
 
 void UserSession::updateExpirationTime(int64_t _validityInSeconds)

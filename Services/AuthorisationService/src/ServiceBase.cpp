@@ -356,8 +356,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		auto& sessionManager = m_authContext.getUserSessionManager();
 		auto newSession = sessionManager.createUserSession(username);
 
-		returnDoc.AddMember(OT_ACTION_PARAM_NAME, ot::JsonString(newSession.sessionName, returnDoc.GetAllocator()), returnDoc.GetAllocator());
-		returnDoc.AddMember(OT_ACTION_PARAM_Token, ot::JsonString(newSession.sessionToken, returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		returnDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(newSession.sessionToken.getUserName(), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		returnDoc.AddMember(OT_ACTION_PARAM_SessionToken, ot::JsonObject(newSession.sessionToken, returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		returnDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(newSession.sessionUserName, returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		returnDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(newSession.sessionUserPWD, returnDoc.GetAllocator()), returnDoc.GetAllocator());
 
@@ -463,33 +463,6 @@ ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJso
 	auto& accessTokenManager = m_authContext.getAccessTokenManager();
 	auto& ticketManager = m_authContext.getTicketManager();
 
-	// First ensure that the request contains the ticket types to generate
-
-	std::list<std::string> ticketTypeStrings;
-
-	if (!_actionDocument.HasMember(OT_ACTION_PARAM_TicketType))
-	{
-		return ot::ReturnMessage::failed("Missing \"" OT_ACTION_PARAM_TicketType "\" parameter");
-	}
-
-	const auto& ticketTypesVal = _actionDocument[OT_ACTION_PARAM_TicketType];
-
-	if (ticketTypesVal.IsString())
-	{
-		// Single ticket type provided as a string
-		ticketTypeStrings.push_back(ticketTypesVal.GetString());
-	}
-	else if (ticketTypesVal.IsArray())
-	{
-		// Multiple ticket types provided as an array
-		ticketTypeStrings = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_TicketType);
-	}
-
-	if (ticketTypeStrings.empty())
-	{
-		return ot::ReturnMessage::failed("No ticket types specified to generate");
-	}
-
 	// Perform token authentication and retrieve the associated username or challenge information
 	auto result = accessTokenManager.authenticateUser(_actionDocument);
 
@@ -539,10 +512,36 @@ ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJso
 		return ot::ReturnMessage::failed("Unknown authentication result");
 	}
 
+	// At this point the user is successfully authenticated
+
 	OTAssert(result.status == AccessTokenManager::AuthenticationStatus::Success, "Unexpected status");
 
+	// Ensure that the request contains the ticket types to generate
 
-	// At this point the user is successfully authenticated
+	std::list<std::string> ticketTypeStrings;
+
+	if (!_actionDocument.HasMember(OT_ACTION_PARAM_TicketType))
+	{
+		return ot::ReturnMessage::failed("Missing \"" OT_ACTION_PARAM_TicketType "\" parameter");
+	}
+
+	const auto& ticketTypesVal = _actionDocument[OT_ACTION_PARAM_TicketType];
+
+	if (ticketTypesVal.IsString())
+	{
+		// Single ticket type provided as a string
+		ticketTypeStrings.push_back(ticketTypesVal.GetString());
+	}
+	else if (ticketTypesVal.IsArray())
+	{
+		// Multiple ticket types provided as an array
+		ticketTypeStrings = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_TicketType);
+	}
+
+	if (ticketTypeStrings.empty())
+	{
+		return ot::ReturnMessage::failed("No ticket types specified to generate");
+	}
 
 	const User& authenticatedUser = result.user.value();
 	std::unordered_map<std::string, std::list<std::string>> generatedTickets;
@@ -572,7 +571,7 @@ ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJso
 			// If ticket generation fails, clear all previously generated tickets for this user
 			ticketManager.clearTicketsForUser(authenticatedUser);
 			return ot::ReturnMessage::failed("Failed to generate ticket \"" + ticketTypeString +
-				"\" #(" + std::to_string(generatedTicketsIt->second.size() + 1) + ")");
+				"\" (#" + std::to_string(generatedTicketsIt->second.size() + 1) + ")");
 		}
 
 		generatedTicketsIt->second.push_back(ticket.value());

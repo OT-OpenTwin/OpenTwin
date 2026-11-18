@@ -13,7 +13,7 @@ class UserSession
 public:
 	UserSession(const std::string& _sessionName, const std::string& _token, int64_t _validityInSeconds);
 
-	bool isValid() const;
+	bool isExpired() const;
 	void updateExpirationTime(int64_t _validityInSeconds);
 	
 	const std::string& getName() const { return m_name; };

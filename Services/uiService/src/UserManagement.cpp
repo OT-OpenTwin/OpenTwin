@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: UserManagement.cpp
 // 
 // License:
@@ -303,7 +303,7 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	return false; // Login attempt unsuccessful
 }
 
-bool UserManagement::loginWithTicket(const std::string& _ticket, std::string& sessionUser, std::string& sessionPassword) const
+bool UserManagement::loginWithTicket(const std::string& _ticket, ot::UserSessionToken& _userSessionToken, std::string& _sessionUser, std::string& _sessionPassword) const
 {
 	assert(!m_authServerURL.empty());
 
@@ -328,9 +328,16 @@ bool UserManagement::loginWithTicket(const std::string& _ticket, std::string& se
 		ot::JsonDocument responseDoc;
 		responseDoc.fromJson(response);
 
+		_userSessionToken.setFromJsonObject(ot::json::getObject(responseDoc, OT_ACTION_PARAM_SessionToken));
+		if (!_userSessionToken.isValid())
+		{
+			OT_LOG_E("Invalid session token received from authorization service");
+			return false;
+		}
+
 		// Login attempt successful -> get encrypted and unencrypted passwords
-		sessionUser = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
-		sessionPassword = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
+		_sessionUser = ot::json::getString(responseDoc, OT_PARAM_DB_USERNAME);
+		_sessionPassword = ot::json::getString(responseDoc, OT_PARAM_DB_PASSWORD);
 		//validEncryptedPassword = ot::json::getString(responseDoc, OT_PARAM_AUTH_PASSWORD);
 
 		return true; // Successful

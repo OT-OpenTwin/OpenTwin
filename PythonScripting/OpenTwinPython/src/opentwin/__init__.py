@@ -2,7 +2,7 @@
  
 # OpenTwin
 from opentwin.client import OpenTwinClient
-from opentwin._internal.generated.return_message import ReturnMessage, ReturnMessageStatus
+from opentwin._internal.return_message import ReturnMessage, ReturnMessageStatus
 
 __all__ = ["OpenTwinClient",
             "ReturnMessage",

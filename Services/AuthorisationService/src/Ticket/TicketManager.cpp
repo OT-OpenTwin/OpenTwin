@@ -9,8 +9,8 @@
 
 TicketManager::TicketManager()
 	: m_ticketTypeToMaxCountMap({
-		{ Ticket::Login, 1 },
-		{ Ticket::Gateway, 5 }
+		{ Ticket::Login, 10 },
+		{ Ticket::Gateway, 50 }
 		})
 	, m_ticketTypeToValiditySMap({ 
 		{ Ticket::Login, ot::msg::defaultTimeout * 10 }, 
@@ -56,7 +56,7 @@ std::optional<std::string> TicketManager::generateTicket(const User & _authentic
 
 	if (countGeneratedTickets(ticketMap, _ticketType) >= maxTicketCount)
 	{
-		OT_LOG_W("Maximum number of tickets for type \"" + Ticket::toString(_ticketType) + "\" reached for user \"" + _authenticatedUser.getName() + "\".");
+		OT_LOG_WS("Maximum number of tickets (" << maxTicketCount << ") for type \"" << Ticket::toString(_ticketType) << "\" reached for user \"" << _authenticatedUser.getName() << "\".");
 		return std::nullopt;
 	}
 

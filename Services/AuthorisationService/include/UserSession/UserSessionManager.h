@@ -5,6 +5,9 @@
 // Auth header
 #include "UserSession/UserSession.h"
 
+// OpenTwin header
+#include "OTCommunication/Token/UserSessionToken.h"
+
 // std header
 #include <mutex>
 #include <thread>
@@ -20,13 +23,13 @@ public:
 
 	struct UserSessionInfo
 	{
-		std::string sessionName;
-		std::string loggedInUserName;
-		std::string sessionToken;
+		ot::UserSessionToken sessionToken;
 		std::string sessionUserName;
 		std::string sessionUserPWD;
 	};
 	UserSessionInfo createUserSession(const std::string& _loggedInUserName);
+
+	bool isSessionValid(const ot::UserSessionToken& _token);
 
 private:
 	std::mutex m_mutex;

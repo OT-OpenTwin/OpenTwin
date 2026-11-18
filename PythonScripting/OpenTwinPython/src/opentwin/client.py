@@ -9,7 +9,7 @@ from opentwin._internal.DefaultConfig import DefaultConfig
 # OpenTwin internal
 from opentwin._internal.Authentication import Authentication
 from opentwin._internal.Communication import Communication
-from opentwin._internal.generated.login_data import LoginData
+from opentwin._internal.launching.ui_launch_data import UiLaunchData
 from opentwin._internal.system.FrontendLauncher import FrontendLauncher
 
 # Logging
@@ -53,34 +53,31 @@ class OpenTwinClient:
         # Initialize default parameters
 
         if certificate_path is None:
-            certificate_path = DefaultConfig().certificate_path
+            certificate_path = DefaultConfig().ca_certificate_path
 
         if frontend_path is None:
-            frontend_path = DefaultConfig().frontend_path
+            frontend_path = DefaultConfig().frontend_app_path
 
         # Initialize the FrontendLauncher
         uiLauncher = FrontendLauncher(frontend_path)
 
         # Initialize communication
-        self._communication = Communication(url, certificate_path)
+        communication = Communication(url, certificate_path)
         
         # Initialize authentication
         logger.debug(f"Attempting to authenticate with login token \"{token}\"...")
-        self._auth = Authentication(self._communication, token)
+
+        LaunchTickets = Authentication.generate_launch_tickets(communication, token)
 
         # Prepare login session data to pass to the frontend
-        login_data = LoginData(
-            original_username=self._auth.original_username,
-            db_user=self._auth.session_user,
-            db_password=self._auth.session_password
+        uiLaunchData = UiLaunchData(
+            ticket=LaunchTickets.ui_launch_ticket,
+            project=project,
+            gss_url=url
         )
 
         # Launch the frontend application
         logger.info("Launching OpenTwin frontend application...")
-        uiLauncher.launch([
-            "--login-session", login_data.to_json()
-        ])
-
-
+        uiLauncher.launch(uiLaunchData)
 
         logger.info("OpenTwinClient initialized successfully.")

@@ -1,6 +1,8 @@
 # @otlicense
 
 # Python standard
+import base64
+import json
 import os
 import sys
 import subprocess
@@ -8,6 +10,10 @@ from pathlib import Path
 
 import logging
 logger = logging.getLogger("OpenTwin")
+
+from opentwin._internal.ActionTypes import *
+from opentwin._internal.launching.ui_launch_data import UiLaunchData
+from opentwin._internal.system.Encoding import Encoding
 
 class FrontendLauncher:
     
@@ -27,14 +33,26 @@ class FrontendLauncher:
 
         logger.debug(__class__.__name__ + " initialized successfully")
 
-    def launch(self, args: list[str]) -> None:
+    def launch(self, launch_data: UiLaunchData) -> None:
+        login_cfg_object = {
+            OT_ACTION_PARAM_Ticket: launch_data.ticket,
+            OT_ACTION_PARAM_SERVICE_GSS_URL: launch_data.gss_url
+        }
+
+        login_cfg_json = json.dumps(login_cfg_object)
+        loing_cfg_base64 : str = Encoding.toBase64Url(login_cfg_json.encode("utf-8"))
+        
+        args = [
+            "--login-ticket", loing_cfg_base64
+        ]
+    
         if not isinstance(args, list) or not all(isinstance(arg, str) for arg in args):
             raise TypeError("args must be a list of strings")
 
         command = [str(self._frontend_executable_path), *args]
 
         logger.debug(f"Launching OpenTwin frontend with command: {command}")
-
+        
         try:
             if sys.platform == "win32":
                 subprocess.Popen(

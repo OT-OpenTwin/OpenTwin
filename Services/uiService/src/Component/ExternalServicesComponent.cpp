@@ -2368,7 +2368,7 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document)
 	size_t numberPrefetch = prefetchID.Size();
 	assert(prefetchVersion.Size() == numberPrefetch);
 
-	for (size_t i = 0; i < numberPrefetch; i++)
+	for (ot::JsonSizeType i = 0; i < static_cast<ot::JsonSizeType>(numberPrefetch); i++)
 	{
 		prefetchIDs.push_back(ot::UIDVersionPair(static_cast<ot::UID>(prefetchID[i].GetInt64()), static_cast<ot::UID>(prefetchVersion[i].GetInt64())));
 	}

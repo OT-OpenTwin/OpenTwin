@@ -11,7 +11,7 @@ import logging
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin
-from opentwin._internal.generated.return_message import ReturnMessage, ReturnMessageStatus
+from opentwin._internal.return_message import ReturnMessage, ReturnMessageStatus
 
 # OpenTwin internal
 from opentwin._internal.ActionTypes import *
@@ -51,13 +51,13 @@ class Communication:
         else:
             raise RuntimeError("Global Session Service did not return a database URL")
         
-        if OT_ACTION_PARAM_SERVICE_AUTHURL in globalInfoResponse:
-            self._authUrl = globalInfoResponse[OT_ACTION_PARAM_SERVICE_AUTHURL]
+        if OT_ACTION_PARAM_SERVICE_AUTH_URL in globalInfoResponse:
+            self._authUrl = globalInfoResponse[OT_ACTION_PARAM_SERVICE_AUTH_URL]
         else:
             raise RuntimeError("Global Session Service did not return an authorization URL")
         
-        if OT_ACTION_PARAM_SERVICE_GDSURL in globalInfoResponse:
-            self._gdsUrl = globalInfoResponse[OT_ACTION_PARAM_SERVICE_GDSURL]
+        if OT_ACTION_PARAM_SERVICE_GDS_URL in globalInfoResponse:
+            self._gdsUrl = globalInfoResponse[OT_ACTION_PARAM_SERVICE_GDS_URL]
         else:
             raise RuntimeError("Global Session Service did not return a global directory URL")
         

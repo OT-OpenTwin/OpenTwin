@@ -14,6 +14,7 @@
 AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthContext& _authContext, const std::string& _action, const std::string& _loggedInUsername, const ot::ConstJsonObject& _actionDocument)
 {
 	AuthResult result;
+	ServiceBase& serviceBase = ServiceBase::instance();
 
 	ActionAuthenticationType authType = ActionAuthenticationType::EncryptedPassword;
 
@@ -21,7 +22,7 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 	{
 		authType = ActionAuthenticationType::SSOToken;
 	}
-	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Token))
+	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_SessionToken))
 	{
 		authType = ActionAuthenticationType::UserSessionToken;
 	}
@@ -30,9 +31,11 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 		throw std::runtime_error("The request does not contain the logged in user password. Please logout and attempt to log in again.");
 	}
 
-	bool passWordAuthentication = ot::json::exists(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	//
 
-	if (passWordAuthentication)
+	switch (authType)
+	{
+	case ActionAuthenticationType::EncryptedPassword:
 	{
 		std::string userPw = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
 
@@ -50,7 +53,9 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 
 		result.loggedInUserPassword = std::move(userPw);
 	}
-	else
+	break;
+
+	case ActionAuthenticationType::SSOToken:
 	{
 		SSOBuffer& ssoBuffer = _authContext.getSSOBuffer();
 
@@ -75,8 +80,36 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 			}
 		}
 	}
+	break;
 
-	ServiceBase& serviceBase = ServiceBase::instance();
+	case ActionAuthenticationType::UserSessionToken:
+	{
+		ot::UserSessionToken sessionToken(ot::json::getObject(_actionDocument, OT_ACTION_PARAM_SessionToken));
+		if (sessionToken.getUserName() != _loggedInUsername)
+		{
+			// Most likely a hacking attempt
+			assert(0);
+			throw ot::Exception::AccessDenied("The provided session token is invalid. Please logout and attempt to log in again.");
+		}
+
+		UserSessionManager& sessionManager = _authContext.getUserSessionManager();
+
+		if (!sessionManager.isSessionValid(sessionToken))
+		{
+			// Most likely a hacking attempt
+			assert(0);
+			throw ot::Exception::AccessDenied("The provided session token is invalid. Please logout and attempt to log in again.");
+		}
+
+		result.isAuthorized = true;
+		result.loggedInUser = MongoUserFunctions::getUserDataThroughUsername(_loggedInUsername, serviceBase.getAdminClient());
+	}
+	break;
+
+	default:
+		assert(0);
+		throw ot::Exception::Runtime("Invalid authentication type");
+	}
 
 	User loggedInUser(_loggedInUsername);
 	std::string loggedInUserPassword = result.loggedInUserPassword.value_or("");

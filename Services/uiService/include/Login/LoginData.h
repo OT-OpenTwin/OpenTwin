@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: LoginData.h
 // 
 // License:
@@ -24,9 +24,11 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCommunication/Token/UserSessionToken.h"
 
 // std header
 #include <string>
+#include <optional>
 
 class LoginData {
 	OT_DECL_DEFCOPY(LoginData)
@@ -65,6 +67,11 @@ public:
 	void setSSOSessionToken(const std::string& _token) { m_sessionToken = _token; }
 	const std::string& getSSOSessionToken() const { return m_sessionToken; }
 
+	void setUserSessionToken(ot::UserSessionToken&& _token) { m_userSessionToken = std::move(_token); };
+	const ot::UserSessionToken& getUserSessionToken() const { return m_userSessionToken.value(); }
+	bool hasUserSessionToken() const { return m_userSessionToken.has_value(); }
+	void clearUserSessionToken() { m_userSessionToken.reset(); }
+
 	void clear();
 
 	bool isValid() const;
@@ -86,4 +93,6 @@ private:
 
 	// For SSO
 	std::string m_sessionToken;
+
+	std::optional<ot::UserSessionToken> m_userSessionToken;
 };

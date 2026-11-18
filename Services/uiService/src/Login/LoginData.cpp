@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: LoginData.cpp
 // 
 // License:
@@ -44,6 +44,7 @@ void LoginData::clear() {
 	m_sessionUser.clear();
 	m_sessionPassword.clear();
 	m_sessionToken.clear();
+	clearUserSessionToken();
 }
 
 bool LoginData::isValid() const {

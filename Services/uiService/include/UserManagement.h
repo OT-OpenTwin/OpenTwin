@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: UserManagement.h
 // 
 // License:
@@ -50,7 +50,7 @@ public:
 
 	bool checkUserName(const std::string &userName) const;
 	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validEncryptedPassword) const;
-	bool loginWithTicket(const std::string& _ticket, std::string& sessionUser, std::string& sessionPassword) const;
+	bool loginWithTicket(const std::string& _ticket, ot::UserSessionToken& _userSessionToken, std::string& sessionUser, std::string& sessionPassword) const;
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);
 	std::string restoreSetting(const std::string &settingName);

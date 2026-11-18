@@ -18,6 +18,10 @@ def test_login_does_nothing():
     if token == "":
         raise ValueError("OPEN_TWIN_ACCESS_TOKEN cannot be an empty string.")
 
-    client = OpenTwinClient("https://127.0.0.1:8091", token)
+    client = OpenTwinClient(
+        url="https://127.0.0.1:8091",
+        token=token, 
+        project="TestProject"
+    )
 
     assert client is not None
