@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: MongoProjectFunctions.cpp
 // 
 // License:
@@ -230,6 +230,17 @@ std::string MongoProjectFunctions::generateProjectCollectionName(mongocxx::clien
 	}
 
 	return collectionName.str();
+}
+
+bool MongoProjectFunctions::canAccessProject(const User& _user, const std::string& _projectName, mongocxx::client& _adminClient)
+{
+	Project project = getProject(_projectName, _adminClient);
+	if (!project.isValid())
+	{
+		return false;
+	}
+
+	return project.getUser() == _user;
 }
 
 Project MongoProjectFunctions::getProject(bsoncxx::oid& projectId, mongocxx::client& userClient)
