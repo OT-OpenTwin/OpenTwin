@@ -483,6 +483,18 @@ ot::ReturnMessage ServiceBase::handleGenerateTicketsFromToken(const ot::ConstJso
 		}
 
 		const User& user = result.user.value();
+
+		// An optional check can be added here to verify if the user has access to a specific project.
+		// This can be done to avoid additional communication if the only intent is to generate tickets for a specific project.		
+		if (_actionDocument.HasMember(OT_ACTION_PARAM_Project))
+		{
+			if (!MongoProjectFunctions::canAccessProject(user, ot::json::getString(_actionDocument, OT_ACTION_PARAM_Project), m_adminClient))
+			{
+				// If the user does not have access, we can return an error message.
+				return ot::ReturnMessage::failed("User is not authorized to access the specified project");
+			}
+		}
+
 		responseDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(user.getName(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
 	// Proceed to generate tickets
