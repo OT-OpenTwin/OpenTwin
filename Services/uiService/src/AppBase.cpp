@@ -396,9 +396,9 @@ bool AppBase::logIn()
 	StartArgumentParser args;
 	if (args.parse())
 	{
-		if (args.getProjectInfoSet())
+		if (args.getProjectNameToOpenSet())
 		{
-			std::string projName = args.getProjectInfo().getProjectName();
+			std::string projName = args.getProjectNameToOpen();
 			std::string projVersion = args.getProjectVersion();
 			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, QString::fromStdString(projName), QString::fromStdString(projVersion));
 		}
@@ -2430,7 +2430,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 
 	StartArgumentParser args;
 	args.setLoginData(m_loginData);
-	args.setProjectInfo(_projectInfo);
+	args.setProjectNameToOpen(_projectInfo.getProjectName());
 	args.setProjectVersion(_customVersion);
 	//args.setDebug();
 

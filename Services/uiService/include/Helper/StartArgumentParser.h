@@ -87,9 +87,9 @@ public:
 	bool getLoginTicketDataSet() const { return m_loginTicketData.has_value(); };
 	const LoginTicketData& getLoginTicketData() const { return m_loginTicketData.value(); };
 
-	void setProjectInfo(const ot::ProjectInformation& _info) { m_projectInfo = _info; };
-	bool getProjectInfoSet() const { return m_projectInfo.has_value(); };
-	const ot::ProjectInformation& getProjectInfo() const { return m_projectInfo.value(); };
+	void setProjectNameToOpen(const std::string& _projectName) { m_openProjectName = _projectName; };
+	bool getProjectNameToOpenSet() const { return m_openProjectName.has_value(); };
+	const std::string& getProjectNameToOpen() const { return m_openProjectName.value(); };
 
 	void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
 	const std::string& getProjectVersion() const { return m_projectVersion; };
@@ -135,7 +135,7 @@ private:
 	std::optional<LogInGSSEntry> m_loginGSS;
 	std::optional<LoginTicketData> m_loginTicketData;
 
-	std::optional<ot::ProjectInformation> m_projectInfo;
+	std::optional<std::string> m_openProjectName;
 	std::string m_projectVersion;
 
 	QString m_scriptFile;

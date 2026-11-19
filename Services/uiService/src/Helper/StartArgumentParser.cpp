@@ -105,18 +105,14 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 		args << toCommandLine(ArgumentKey::LogInTicket) << QString::fromStdString(encoded);
 	}
 
-	if (getProjectInfoSet())
+	if (getProjectNameToOpenSet())
 	{
-		ot::JsonDocument doc;
-		const auto& projectInfo = m_projectInfo.value();
-		projectInfo.addToJsonObject(doc, doc.GetAllocator());
-		std::string encoded = ot::String::toBase64Url(doc.toJson());
-		args << toCommandLine(ArgumentKey::OpenProject) << QString::fromStdString(encoded);
-	}
+		args << toCommandLine(ArgumentKey::OpenProject) << QString::fromStdString(m_openProjectName.value());
 
-	if (!m_projectVersion.empty())
-	{
-		args << toCommandLine(ArgumentKey::ProjectVersion) << QString::fromStdString(m_projectVersion);
+		if (!m_projectVersion.empty())
+		{
+			args << toCommandLine(ArgumentKey::ProjectVersion) << QString::fromStdString(m_projectVersion);
+		}
 	}
 
 	if (!m_scriptFile.isEmpty())
@@ -153,10 +149,9 @@ QString StartArgumentParser::createFrontendUrlLink() const
 		loginGSS.addToQuery(query);
 	}
 
-	if (getProjectInfoSet())
+	if (getProjectNameToOpenSet())
 	{
-		const auto& projectInfo = m_projectInfo.value();
-		query.addQueryItem(toUrl(ArgumentKey::OpenProject), QString::fromStdString(projectInfo.getProjectName()));
+		query.addQueryItem(toUrl(ArgumentKey::OpenProject), QString::fromStdString(m_openProjectName.value()));
 
 		if (!m_projectVersion.empty())
 		{
@@ -235,7 +230,7 @@ void StartArgumentParser::clear()
 	m_loginData = std::nullopt;
 	m_loginGSS = std::nullopt;
 
-	m_projectInfo = std::nullopt;
+	m_openProjectName = std::nullopt;
 	m_projectVersion.clear();
 
 	m_scriptFile.clear();
@@ -315,9 +310,7 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 	{
 		const QString projectName = query.queryItemValue(toUrl(ArgumentKey::OpenProject));
 
-		ot::ProjectInformation newInfo;
-		newInfo.setProjectName(projectName.toStdString());
-		m_projectInfo = newInfo;
+		m_openProjectName = projectName.toStdString();
 
 		// Project version
 		if (query.hasQueryItem(toUrl(ArgumentKey::ProjectVersion)))
@@ -369,7 +362,7 @@ bool StartArgumentParser::parseCommandLine()
 
 	QCommandLineOption openProjectOption(
 		toString(ArgumentKey::OpenProject),
-		"Open project with JSON data.",
+		"Open project by name.",
 		"string");
 	parser.addOption(openProjectOption);
 
@@ -474,23 +467,7 @@ bool StartArgumentParser::parseCommandLine()
 	// Check for open project option
 	if (parser.isSet(openProjectOption))
 	{
-		const QString projectDataStr = parser.value(openProjectOption);
-		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
-		if (decoded.empty())
-		{
-			OT_LOG_E("Open project option set but no data provided");
-			return false;
-		}
-		ot::JsonDocument doc;
-		if (!doc.fromJson(decoded))
-		{
-			OT_LOG_E("Failed to parse project data from command line argument");
-			return false;
-		}
-
-		ot::ProjectInformation newProjectInfo;
-		newProjectInfo.setFromJsonObject(doc.getConstObject());
-		m_projectInfo = newProjectInfo;
+		m_openProjectName = parser.value(openProjectOption).toStdString();
 
 		// Check for project version option
 		if (parser.isSet(projectVersionOption))
