@@ -40,10 +40,10 @@ class FrontendLauncher:
         }
 
         login_cfg_json = json.dumps(login_cfg_object)
-        loing_cfg_base64 : str = Encoding.toBase64Url(login_cfg_json.encode("utf-8"))
+        login_cfg_base64 : str = Encoding.toBase64Url(login_cfg_json.encode("utf-8"))
         
         args = [
-            "--login-ticket", loing_cfg_base64
+            "--login-ticket", login_cfg_base64
         ]
     
         if not isinstance(args, list) or not all(isinstance(arg, str) for arg in args):
@@ -52,7 +52,7 @@ class FrontendLauncher:
         command = [str(self._frontend_executable_path), *args]
 
         logger.debug(f"Launching OpenTwin frontend with command: {command}")
-        
+        return
         try:
             if sys.platform == "win32":
                 subprocess.Popen(

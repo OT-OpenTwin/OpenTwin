@@ -103,6 +103,7 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 
 		result.isAuthorized = true;
 		result.loggedInUser = MongoUserFunctions::getUserDataThroughUsername(_loggedInUsername, serviceBase.getAdminClient());
+		return result;
 	}
 	break;
 
