@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Optional
 
 # OpenTwin internal
-from opentwin._internal.system.DirectoryManager import DirectoryManager
+from opentwin_api._internal.system.directory_manager import DirectoryManager
 
 class DefaultConfig:
 

@@ -6,9 +6,9 @@
 from pathlib import Path
 
 # OpenTwin internal
-from opentwin._internal.system.DirectoryManager import DirectoryManager
-from opentwin._internal.crypto.CryptoKeyStore import CryptoKeyStore
-from opentwin._internal.crypto.SignatureProvider import SignatureProvider
+from opentwin_api._internal.system.directory_manager import DirectoryManager
+from opentwin_api._internal.crypto.crypto_key_store import CryptoKeyStore
+from opentwin_api._internal.crypto.signature_provider import SignatureProvider
 
 class CryptoKeyStoreFileSystem(CryptoKeyStore):
     

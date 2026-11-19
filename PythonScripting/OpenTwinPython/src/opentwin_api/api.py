@@ -2,40 +2,32 @@
 
 # Python standard
 import json
-
-# OpenTwin
-from opentwin._internal.DefaultConfig import DefaultConfig
-
-# OpenTwin internal
-from opentwin._internal.Authentication import Authentication
-from opentwin._internal.Communication import Communication
-from opentwin._internal.launching.ui_launch_data import UiLaunchData
-from opentwin._internal.system.FrontendLauncher import FrontendLauncher
-
-# Logging
 import logging
 logger = logging.getLogger("OpenTwin")
 
+# OpenTwin
+from opentwin_api._internal.io.gateway_communication import GatewayCommunication
+from opentwin_api.project import Project
+
 # OpenTwin internal
-class OpenTwinClient:
+from opentwin_api._internal.authentication import Authentication
+from opentwin_api._internal.io.communication import Communication
+from opentwin_api._internal.default_config import DefaultConfig
+from opentwin_api._internal.launching.ui_launch_data import UiLaunchData
+from opentwin_api._internal.system.frontend_launcher import FrontendLauncher
 
-    """
-    The OpenTwinClient is the main entry point for interacting with OpenTwin.
+# OpenTwin internal
+class OpenTwinAPI:
 
-    Arguments:
-        token (str): The login token for authentication.
-        url (str): The URL of the Global Session Service.
-        project (str): The name of the project to connect to.
-        certificate_path (str, optional): The full path to the CA certificate file for TLS verification. If not provided, the default configuration will be used.
-        frontend_path (str, optional): The full path to the frontend application executable. If not provided, the default configuration will be used.
-    """
-    def __init__(self, 
+    @classmethod
+    def open_project(cls, 
                  token: str,
                  url: str,
-                 project: str,
-                 certificate_path: str = None,
-                 frontend_path: str = None
-                 ) -> None:
+                 name: str,
+                 version: str | None = None,
+                 certificate_path: str | None = None,
+                 frontend_path: str | None = None
+                 ) -> Project:
         
         logger.info("Initializing OpenTwinClient...")
 
@@ -47,8 +39,8 @@ class OpenTwinClient:
         if not url:
             raise ValueError("url must be provided")
 
-        if not project:
-            raise ValueError("project must be provided")
+        if not name:
+            raise ValueError("name must be provided")
 
         # Initialize default parameters
 
@@ -72,7 +64,8 @@ class OpenTwinClient:
         # Prepare login session data to pass to the frontend
         uiLaunchData = UiLaunchData(
             ticket=LaunchTickets.ui_launch_ticket,
-            project=project,
+            project_name=name,
+            project_version=version,
             gss_url=url
         )
 
@@ -80,4 +73,12 @@ class OpenTwinClient:
         logger.info("Launching OpenTwin frontend application...")
         uiLauncher.launch(uiLaunchData)
 
-        logger.info("OpenTwinClient initialized successfully.")
+        #gateway_communication = GatewayCommunication.try_connect(
+        #    project_name=project_name,
+        #    gateway_ticket=LaunchTickets.gateway_launch_ticket,
+        #    communication=communication
+        #)
+
+        project = Project(name)
+
+        return project

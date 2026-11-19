@@ -11,9 +11,9 @@ from pathlib import Path
 import logging
 logger = logging.getLogger("OpenTwin")
 
-from opentwin._internal.ActionTypes import *
-from opentwin._internal.launching.ui_launch_data import UiLaunchData
-from opentwin._internal.system.Encoding import Encoding
+from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.launching.ui_launch_data import UiLaunchData
+from opentwin_api._internal.system.encoding import Encoding
 
 class FrontendLauncher:
     
@@ -43,8 +43,13 @@ class FrontendLauncher:
         login_cfg_base64 : str = Encoding.toBase64Url(login_cfg_json.encode("utf-8"))
         
         args = [
-            "--login-ticket", login_cfg_base64
+            "--login-ticket", login_cfg_base64,
+            "--openproject", launch_data.project_name,
+            "--noninteractive"
         ]
+
+        if launch_data.project_version is not None:
+            args.extend(["--projversion", launch_data.project_version])
     
         if not isinstance(args, list) or not all(isinstance(arg, str) for arg in args):
             raise TypeError("args must be a list of strings")
@@ -52,7 +57,7 @@ class FrontendLauncher:
         command = [str(self._frontend_executable_path), *args]
 
         logger.debug(f"Launching OpenTwin frontend with command: {command}")
-        return
+        
         try:
             if sys.platform == "win32":
                 subprocess.Popen(

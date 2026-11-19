@@ -73,6 +73,11 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 		args << toCommandLine(ArgumentKey::Debug);
 	}
 
+	if (m_nonInteractive)
+	{
+		args << toCommandLine(ArgumentKey::NonInteractive);
+	}
+
 	if (m_checkGraphics)
 	{
 		args << toCommandLine(ArgumentKey::CheckGraphics);
@@ -225,6 +230,7 @@ QString StartArgumentParser::createShareLink() const
 void StartArgumentParser::clear()
 {
 	m_debug = false;
+	m_nonInteractive = false;
 	m_checkGraphics = false;
 
 	m_loginData = std::nullopt;
@@ -269,6 +275,12 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 	if (query.hasQueryItem(toUrl(ArgumentKey::Debug)))
 	{
 		m_debug = true;
+	}
+
+	// Non-interactive
+	if (query.hasQueryItem(toUrl(ArgumentKey::NonInteractive)))
+	{
+		m_nonInteractive = true;
 	}
 
 	// Check graphics
@@ -339,6 +351,9 @@ bool StartArgumentParser::parseCommandLine()
 	QCommandLineOption debugOption(toString(ArgumentKey::Debug), "Run test code.");
 	parser.addOption(debugOption);
 
+	QCommandLineOption nonInteractiveOption(toString(ArgumentKey::NonInteractive), "Run in non-interactive mode.");
+	parser.addOption(nonInteractiveOption);
+
 	QCommandLineOption checkGraphicsOption({ toString(ArgumentKey::CheckGraphicsShort), toString(ArgumentKey::CheckGraphics) }, "Check the graphics settings.");
 	parser.addOption(checkGraphicsOption);
 
@@ -385,6 +400,12 @@ bool StartArgumentParser::parseCommandLine()
 	if (parser.isSet(debugOption))
 	{
 		m_debug = true;
+	}
+
+	// Check for non-interactive option
+	if (parser.isSet(nonInteractiveOption))
+	{
+		m_nonInteractive = true;
 	}
 
 	// Check for graphics check option
@@ -490,6 +511,7 @@ QString StartArgumentParser::toString(ArgumentKey _key) const
 	switch (_key)
 	{
 	case ArgumentKey::Debug: return "debug";
+	case ArgumentKey::NonInteractive: return "noninteractive";
 	case ArgumentKey::CheckGraphics: return "checkgraphics";
 	case ArgumentKey::CheckGraphicsShort: return "c";
 	case ArgumentKey::LogInData	: return "login";

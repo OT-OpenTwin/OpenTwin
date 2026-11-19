@@ -43,7 +43,7 @@ ot_finalize_bin(uiService uiFrontend)
 
 #ot_bin_debug_launch(uiService
 #    ARGS "--login-ticket"
-#         "eyJUaWNrZXQiOiAiODYzN2NiODMzMzliZGFhMTMyODM5YjFmMjc2YzBmZmUwMWQzNDJhOWIxYzEzZGY0YzQzZGU3ZDc0ZjA3ZDFhMCIsICJTZXJ2aWNlLkdTUy5VUkwiOiAiaHR0cHM6Ly8xMjcuMC4wLjE6ODA5MSJ9"
+#         "eyJUaWNrZXQiOiAiOTM2M2Q5NjdiYjk3YTU1NzhmOGVhNWMzZWUxZTdiZDE2Y2Q4NDI0MDI3MzBlMGQ2NDAwYjg0N2M2MjkzY2M0NiIsICJTZXJ2aWNlLkdTUy5VUkwiOiAiaHR0cHM6Ly8xMjcuMC4wLjE6ODA5MSJ9"
 #)
 
 ot_deploy_app_configuration(uiService)

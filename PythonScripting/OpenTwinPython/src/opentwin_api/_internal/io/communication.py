@@ -11,10 +11,10 @@ import logging
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin
-from opentwin._internal.return_message import ReturnMessage, ReturnMessageStatus
+from opentwin_api._internal.return_message import ReturnMessage, ReturnMessageStatus
 
 # OpenTwin internal
-from opentwin._internal.ActionTypes import *
+from opentwin_api._internal.ActionTypes import *
 
 class Communication:
 

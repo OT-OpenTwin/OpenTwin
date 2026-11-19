@@ -6,8 +6,8 @@
 from threading import Lock
 
 # OpenTwin internal
-from opentwin._internal.crypto.CryptoKeyStore import CryptoKeyStore
-from opentwin._internal.crypto.CryptoKeyStoreFileSystem import CryptoKeyStoreFileSystem
+from opentwin_api._internal.crypto.crypto_key_store import CryptoKeyStore
+from opentwin_api._internal.crypto.crypto_key_store_file_system import CryptoKeyStoreFileSystem
 
 class GlobalCryptoKeyStore:
     """Provides lazy, thread-safe access to one key-store implementation.

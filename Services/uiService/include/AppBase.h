@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: AppBase.h
 // 
 // License:
@@ -287,6 +287,9 @@ public:
 	const ot::ViewHandlingFlags& getViewHandlingFlags() const { return m_viewHandling; };
 
 	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
+
+	void enableNonInteractiveMode() { m_state.set(AppState::NonInteractiveState); };
+	bool isNonInteractive() const { return m_state.has(AppState::NonInteractiveState); };
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -775,10 +778,11 @@ protected:
 
 private:
 	enum class AppState {
-		NoState                = 0x00,
-		RestoringSettingsState = 0x01,
-		LoggedInState          = 0x10,
-		ProjectOpenState       = 0x20
+		NoState                = 0 << 0,
+		RestoringSettingsState = 1 << 0,
+		LoggedInState          = 1 << 1,
+		ProjectOpenState       = 1 << 2,
+		NonInteractiveState    = 1 << 3
 	};
 	typedef ot::Flags<AppState> AppStateFlags;
 

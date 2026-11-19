@@ -1,5 +1,5 @@
 import os
-from opentwin import *
+from opentwin_api import *
 from tests.globals import ot_initialize_tests as ini
 
 def test_login_does_nothing():
@@ -18,10 +18,10 @@ def test_login_does_nothing():
     if token == "":
         raise ValueError("OPEN_TWIN_ACCESS_TOKEN cannot be an empty string.")
 
-    client = OpenTwinClient(
+    project = OpenTwinAPI.open_project(
+        token=token,
         url="https://127.0.0.1:8091",
-        token=token, 
-        project="TestProject"
+        name="Dev"
     )
 
-    assert client is not None
+    assert project is not None

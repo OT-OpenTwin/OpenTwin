@@ -69,6 +69,9 @@ public:
 	void setDebug(bool _debug = true) { m_debug = _debug; };
 	bool getDebug() const { return m_debug; };
 
+	void setNonInteractive(bool _nonInteractive = true) { m_nonInteractive = _nonInteractive; };
+	bool getNonInteractive() const { return m_nonInteractive; };
+
 	void setCheckGraphics(bool _check = true) { m_checkGraphics = _check; };
 	bool getCheckGraphics() const { return m_checkGraphics; };
 
@@ -108,6 +111,7 @@ private:
 	enum class ArgumentKey
 	{
 		Debug,
+		NonInteractive,
 		CheckGraphics,
 		CheckGraphicsShort,
 		LogInData,
@@ -128,6 +132,7 @@ private:
 	static QString shareFrontendScheme() { return "opentwin"; };
 	static QString shareFrontendHost() { return "run"; };
 
+	bool m_nonInteractive = false;
 	bool m_debug = false;
 	bool m_checkGraphics = false;
 

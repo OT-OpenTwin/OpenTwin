@@ -7,13 +7,13 @@ import logging
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin internal
-from opentwin._internal.ActionTypes import *
-from opentwin._internal.Communication import Communication
-from opentwin._internal.crypto.GlobalCryptoKeyStore import GlobalCryptoKeyStore
-from opentwin._internal.crypto.GlobalCryptoKeyIDs import *
-from opentwin._internal.system.Encoding import Encoding
-from opentwin._internal.return_message import ReturnMessage, ReturnMessageStatus
-from opentwin._internal.launching.LaunchTickets import LaunchTickets
+from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.communication import Communication
+from opentwin_api._internal.crypto.global_crypto_key_store import GlobalCryptoKeyStore
+from opentwin_api._internal.crypto.global_crypto_key_ids import *
+from opentwin_api._internal.system.encoding import Encoding
+from opentwin_api._internal.return_message import ReturnMessage, ReturnMessageStatus
+from opentwin_api._internal.launching.launch_tickets import LaunchTickets
 
 class Authentication:
 
@@ -28,6 +28,10 @@ class Authentication:
     """
     @classmethod
     def generate_launch_tickets(cls, communication: Communication, login_token: str) -> LaunchTickets:
+        if not isinstance(communication, Communication):
+            raise TypeError("communication must be an instance of Communication")
+        if not isinstance(login_token, str):
+            raise TypeError("login_token must be a string")
 
         challengeRequestDocument = {
             OT_ACTION_MEMBER: OT_ACTION_CMD_GenerateTickets,
