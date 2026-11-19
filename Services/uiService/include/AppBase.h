@@ -353,6 +353,8 @@ public:
 	bool getVisible3D() const { return m_visible3D; }
 	bool getVisibleBlockPicker() const { return m_visibleBlockPicker; }
 
+	QString getDefaultWindowTitle() const;
+
 	// Info text output
 
 	//! @brief Append a log message to the output.

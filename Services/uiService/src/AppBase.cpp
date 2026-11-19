@@ -334,8 +334,13 @@ bool AppBase::logIn()
 	// Create default UI
 	OT_LOG_D("Creating default GUI");
 	m_mainWindow = uiAPI::createWindow(m_uid);
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 	uiAPI::window::setWindowIcon(m_mainWindow, ot::IconManager::getApplicationIcon());
+
+	if (isNonInteractive())
+	{
+		mainWindow()->setEnabled(false);
+	}
 
 	// Create UI
 	this->createUi();
@@ -426,11 +431,11 @@ void AppBase::setCurrentProjectIsModified(bool _isModified)
 	QString title(m_currentProjectInfo.getProjectName().c_str());
 	if (_isModified)
 	{
-		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - OpenTwin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - " + getDefaultWindowTitle()));
 	}
 	else
 	{
-		uiAPI::window::setTitle(m_mainWindow, title.append(" - OpenTwin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" - " + getDefaultWindowTitle()));
 	}
 	m_projectStateIsModified = _isModified;
 }
@@ -1623,7 +1628,7 @@ void AppBase::closeAllViewerTabs()
 void AppBase::clearSessionInformation()
 {
 	m_currentProjectInfo = ot::ProjectInformation();
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 }
 
 void AppBase::restoreSessionState()
@@ -1782,7 +1787,7 @@ bool AppBase::checkForContinue(const std::string& _title)
 		}
 	}
 
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 	return true;
 }
 
@@ -1861,6 +1866,18 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 	OTAssertNullptr(m_propertyGrid);
 
 	m_propertyGrid->getPropertyGrid()->focusProperty(_group, _name);
+}
+
+QString AppBase::getDefaultWindowTitle() const
+{
+	if (isNonInteractive())
+	{
+		return "OpenTwin (Non-Interactive Mode)";
+	}
+	else
+	{
+		return "OpenTwin";
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
