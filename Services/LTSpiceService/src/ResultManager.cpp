@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ResultManager.cpp
 // 
 // License:
@@ -289,7 +289,7 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		if (resultData.isComplex())
 		{
 			auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
-			quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+			quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
 		
 			quantityDescriptionComplex->reserveDatapointSize(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)
@@ -303,7 +303,7 @@ void ResultManager::addCurveData(ltspice::RawData& resultData, std::list<std::sh
 		else
 		{
 			auto quantityDescriptionCurve(std::make_unique<QuantityDescriptionCurve>());
-			quantityDescriptionCurve->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+			quantityDescriptionCurve->defineQuantityAsSingle(ot::TypeNames::getDoubleTypeName(), "");
 			
 			quantityDescriptionCurve->reserveDatapointSize(numberOfXValues);
 			for (size_t index = 0; index < numberOfXValues; index++)

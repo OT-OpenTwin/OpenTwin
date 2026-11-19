@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ParametricResult1DManager.cpp
 // 
 // License:
@@ -355,7 +355,7 @@ std::list<DatasetDescription>  ParametricResult1DManager::extractDataDescription
 					
 				if (hasImValue)
 				{
-					quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+					quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
 				
 					if (hasRealValues)
 					{
@@ -433,7 +433,7 @@ bool ParametricResult1DManager::extractDataDescriptionSParameter(const std::stri
 				
 		//Dangerous? Do all curves guaranteed have the same number of frequency points ? Are real values always existing ?
 		quantityDescription->setName("1D Results/S-Parameters");
-		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+		quantityDescription->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
 		quantityDescription->initiateZeroFilledValueMatrices(numberOfFrequencyPoints);
 
 		ot::MatrixEntryPointer matrixEntry;

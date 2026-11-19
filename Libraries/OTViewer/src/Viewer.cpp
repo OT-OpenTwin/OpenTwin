@@ -2243,7 +2243,24 @@ void Viewer::setActiveColorRamp(ColorRamp* activeColorRamp)
 	}
 
 	// Add the label to the node
-	overlayColorRampNode->addDrawable(createText(osg::Vec2(origin.x() + barWidth / 2.0f, origin.y() + heightBox + 2.0f * labelOffset), textColor, activeColorRamp->getLabel(), maxTextHeight, osgText::TextBase::AlignmentType::CENTER_BOTTOM));
+	if (!activeColorRamp->getLabel().empty())
+	{
+		overlayColorRampNode->addDrawable(createText(osg::Vec2(origin.x() + barWidth / 2.0f, origin.y() + heightBox + 2.0f * labelOffset), textColor, activeColorRamp->getLabel(), maxTextHeight, osgText::TextBase::AlignmentType::CENTER_BOTTOM));
+	}
+
+	// Add a transparent box around the color ramp
+	const osg::BoundingBox bb = overlayColorRampNode->getBoundingBox();
+	double dx = 0.1 * (bb.xMax() - bb.xMin());
+	double dy = dx;
+	osg::Vec4 backgroundColor = osgViewer->getCamera()->getClearColor();
+	backgroundColor.a() = 0.5f;
+	osg::Geometry* backgroundGeometry = createFilledRect(osg::Vec3(bb.xMin() - dx, bb.yMin() - dy, -1.0), bb.xMax() - bb.xMin() + 2 * dx, bb.yMax() - bb.yMin() + 2 * dy, backgroundColor);
+	osg::StateSet* bgss = backgroundGeometry->getOrCreateStateSet();
+	bgss->setAttributeAndModes(new osg::BlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA), osg::StateAttribute::ON);
+	bgss->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+	bgss->setMode(GL_LIGHTING, osg::StateAttribute::OFF);
+
+	overlayColorRampNode->addDrawable(backgroundGeometry);
 
 	// Add the node to the scene
 	osgOverlayCamera->addChild(overlayColorRampNode);

@@ -156,7 +156,7 @@ void FDTDSolver::addFieldDumps(std::stringstream& runCommand)
 			std::string subSamplingString = getSubsamplingString(fieldDump);
 			std::string resulutionString = getResolutionString(fieldDump);
 			std::string fieldDumpName = getFieldDumpName(fieldDump);
-			std::string startStopString = getStartStopString(fieldDump);
+			std::string startStopString = getStartStopString(fieldDump, dumpMode);
 
 			runCommand << "dump" << count << " = CSX.AddDump('" << fieldDumpName << "', dump_type=" << dumpType << ", dump_mode=" << dumpMode << ", file_type=0";
 
@@ -197,7 +197,7 @@ bool FDTDSolver::getFieldDumpTypeAndMode(EntityFieldDump *fieldDump, int &dumpTy
 	else if (typeProperty->getValue() == "Magnetic Field (Frequency Domain)")
 	{
 		dumpType = 11;
-		dumpMode = 1;
+		dumpMode = 2;
 	}
 	else if (typeProperty->getValue() == "Electric Current Density (Frequency Domain)")
 	{
@@ -217,7 +217,7 @@ bool FDTDSolver::getFieldDumpTypeAndMode(EntityFieldDump *fieldDump, int &dumpTy
 	else if (typeProperty->getValue() == "Magnetic Field (Time Domain)")
 	{
 		dumpType = 1;
-		dumpMode = 1;
+		dumpMode = 2;
 	}
 	else if (typeProperty->getValue() == "Electric Current Density (Time Domain)")
 	{
@@ -559,14 +559,16 @@ std::string FDTDSolver::getFieldDumpName(EntityFieldDump* fieldDump)
 	return name;
 }
 
-std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
+std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump, int dumpMode)
 {
-	double xMin = xLines.front();
-	double xMax = xLines.back();
-	double yMin = yLines.front();
-	double yMax = yLines.back();
-	double zMin = zLines.front();
-	double zMax = zLines.back();
+	int upperOffset = dumpMode == 2 ? 1 : 0;
+
+	double xMin = xLines[0];
+	double xMax = xLines[xLines.size() - 1 - upperOffset];
+	double yMin = yLines[0];
+	double yMax = yLines[yLines.size() - 1 - upperOffset];
+	double zMin = zLines[0];
+	double zMax = zLines[zLines.size() - 1 - upperOffset];
 
 	EntityPropertiesBoolean* subrangeProperty = dynamic_cast<EntityPropertiesBoolean*>(fieldDump->getProperties().getProperty("Subrange"));
 	
@@ -583,12 +585,12 @@ std::string FDTDSolver::getStartStopString(EntityFieldDump* fieldDump)
 
 			if (xminProperty != nullptr && xmaxProperty != nullptr && yminProperty != nullptr && ymaxProperty != nullptr && zminProperty != nullptr && zmaxProperty != nullptr)
 			{
-				xMin = xminProperty->getValue();
-				xMax = xmaxProperty->getValue();
-				yMin = yminProperty->getValue();
-				yMax = ymaxProperty->getValue();
-				zMin = zminProperty->getValue();
-				zMax = zmaxProperty->getValue();
+				xMin = std::max(xMin, xminProperty->getValue());
+				xMax = std::min(xMax, xmaxProperty->getValue());
+				yMin = std::max(yMin, yminProperty->getValue());
+				yMax = std::min(yMax, ymaxProperty->getValue());
+				zMin = std::max(zMin, zminProperty->getValue());
+				zMax = std::min(zMax, zmaxProperty->getValue());
 			}
 			else
 			{
@@ -1252,7 +1254,9 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 	runCommand << "from pathlib import Path\n";
 	runCommand << "Sim_Path = str(Path(\"" << escapeBackslashes(tempDirPath) << "\").resolve())\n";
 
-	runCommand << "\n"
+	runCommand << "\n# Define helper function for saving xy data in files\n";
+
+	runCommand <<
 		"def save_xy_data(x, y, filename) :\n"
 		"		full_path = os.path.join(Sim_Path, filename)\n"
 		"		with open(full_path, 'w', encoding = 'utf-8') as f :\n"
@@ -1261,6 +1265,142 @@ void FDTDSolver::addPreparationData(std::stringstream &runCommand)
 		"					f.write(f'{xi}\t{yi.real}\t{yi.imag}\\n')\n"
 		"				else :\n"
 		"					f.write(f'{xi}\t{yi}\\n')\n\n";
+
+	runCommand << "\n# Define helper function writing normalization data for field dumps\n";
+
+	runCommand <<
+		"# Calculate complex normalization factors for one simulation run.\n"
+		"def calculate_normalization_factors(\n"
+		"    run_path,\n"
+		"    ports,\n"
+		"    excitation_settings,\n"
+		"    frequencies,\n"
+		"    peak_power_w=1.0,\n"
+		"    reference_port=None\n"
+		"):\n"
+		"    \"\"\"Normalize total incident peak power and reference-port phase.\n"
+		"\n"
+		"    The incident powers already contain the excitation amplitude factors.\n"
+		"    For the peak-power convention used here, 1 W peak means 0.5 W average.\n"
+		"    The phase reference is the lowest-numbered active port unless specified.\n"
+		"    CalcPort updates the port result arrays at the requested frequencies.\n"
+		"    \"\"\"\n"
+		"    frequencies = np.asarray(frequencies, dtype=float).reshape(-1)\n"
+		"    if frequencies.size == 0:\n"
+		"        return np.empty(0, dtype=np.complex128)\n"
+		"\n"
+		"    if np.any(~np.isfinite(frequencies)) or np.any(frequencies <= 0):\n"
+		"        raise ValueError(\"Frequencies must be finite and positive\")\n"
+		"\n"
+		"    if not np.isfinite(peak_power_w) or peak_power_w <= 0:\n"
+		"        raise ValueError(\"peak_power_w must be finite and positive\")\n"
+		"\n"
+		"    active_ports = sorted(\n"
+		"        number\n"
+		"        for number, amplitude in excitation_settings.items()\n"
+		"        if amplitude != 0.0\n"
+		"    )\n"
+		"\n"
+		"    if not active_ports:\n"
+		"        raise ValueError(\"At least one port must be active\")\n"
+		"\n"
+		"    if reference_port is None:\n"
+		"        reference_port = active_ports[0]\n"
+		"\n"
+		"    if reference_port not in active_ports:\n"
+		"        raise ValueError(\"reference_port must be an active port\")\n"
+		"\n"
+		"    # Sum the incident powers of all active ports.\n"
+		"    total_power = np.zeros_like(frequencies, dtype=float)\n"
+		"    reference_voltage = None\n"
+		"\n"
+		"    for number in active_ports:\n"
+		"        port = ports[number]\n"
+		"        port.CalcPort(str(run_path), frequencies, signal_type=\"pulse\")\n"
+		"        power = np.asarray(port.P_inc, dtype=float)\n"
+		"\n"
+		"        invalid = ~np.isfinite(power) | (power < 0)\n"
+		"        if np.any(invalid):\n"
+		"            raise ValueError(\n"
+		"                f\"Invalid incident power at port {number}: \"\n"
+		"                f\"{frequencies[invalid]} Hz\"\n"
+		"            )\n"
+		"\n"
+		"        total_power += power\n"
+		"\n"
+		"        if number == reference_port:\n"
+		"            reference_voltage = np.asarray(\n"
+		"                port.uf_inc, dtype=complex\n"
+		"            ).copy()\n"
+		"\n"
+		"    invalid = (\n"
+		"        ~np.isfinite(total_power)\n"
+		"        | (total_power <= 0)\n"
+		"        | ~np.isfinite(reference_voltage)\n"
+		"        | (np.abs(reference_voltage) == 0)\n"
+		"    )\n"
+		"\n"
+		"    if np.any(invalid):\n"
+		"        raise ValueError(\n"
+		"            \"Invalid total power or phase reference at \"\n"
+		"            f\"{frequencies[invalid]} Hz\"\n"
+		"        )\n"
+		"\n"
+		"    # 1 W peak corresponds to 0.5 W time-averaged total input power.\n"
+		"    magnitudes = np.sqrt(0.5 * peak_power_w) / np.sqrt(total_power)\n"
+		"    phases = -np.angle(reference_voltage)\n"
+		"\n"
+		"    factors = magnitudes * np.exp(1j * phases)\n"
+		"    if np.any(~np.isfinite(factors)):\n"
+		"        raise ValueError(\"Normalization factors must be finite\")\n"
+		"    return factors\n"
+		"\n"
+		"\n"
+		"# Define helper function writing normalization data for field dumps\n"
+		"def write_field_dump_norm_files(\n"
+		"    run_path,\n"
+		"    ports,\n"
+		"    excitation_settings,\n"
+		"    peak_power_w=1.0,\n"
+		"    reference_port=None\n"
+		"):\n"
+		"    run_path = Path(run_path)\n"
+		"    arg_files = sorted(run_path.glob(\"*_f=*_arg.vtr\"))\n"
+		"\n"
+		"    # No field dumps: nothing to normalize.\n"
+		"    if not arg_files:\n"
+		"        return []\n"
+		"\n"
+		"    # Preserve the frequency spelling of the VTR filenames.\n"
+		"    targets = []\n"
+		"    for arg_path in arg_files:\n"
+		"        base_name = arg_path.name[:-len(\"_arg.vtr\")]\n"
+		"        frequency = float(base_name.rsplit(\"_f=\", 1)[1])\n"
+		"        norm_path = arg_path.with_name(base_name + \".norm\")\n"
+		"        targets.append((frequency, norm_path))\n"
+		"\n"
+		"    frequencies = np.unique([\n"
+		"        frequency for frequency, _ in targets\n"
+		"    ])\n"
+		"    norm_factors = calculate_normalization_factors(\n"
+		"        run_path=run_path,\n"
+		"        ports=ports,\n"
+		"        excitation_settings=excitation_settings,\n"
+		"        frequencies=frequencies,\n"
+		"        peak_power_w=peak_power_w,\n"
+		"        reference_port=reference_port\n"
+		"    )\n"
+		"    factors = dict(zip(frequencies, norm_factors))\n"
+		"\n"
+		"    # Write magnitude and phase (radians), one value per line.\n"
+		"    for frequency, norm_path in targets:\n"
+		"        factor = factors[frequency]\n"
+		"        with norm_path.open(\"w\", encoding=\"ascii\", newline=\"\\n\") as stream:\n"
+		"            stream.write(f\"{abs(factor):.17e}\\n{np.angle(factor):.17e}\\n\")\n"
+		"\n"
+		"    return [norm_path for _, norm_path in targets]\n"
+		"\n"
+		"\n";
 }
 
 void FDTDSolver::addUnits(std::stringstream& runCommand)
@@ -1838,6 +1978,15 @@ void FDTDSolver::addSolverRun(std::stringstream& runCommand)
 		"        debug_pec = " << std::string(debugFlag ? "True" : "False") << "\n"
 		"    )\n"
 		"\n";
+
+	runCommand << 
+		"    write_field_dump_norm_files(\n"
+		"        run_path = run_path,\n"
+		"        ports = ports,\n"
+		"        excitation_settings = excitation_settings,\n"
+		"        peak_power_w = 1.0\n"
+		"    )\n"
+		"\n";
 }
 
 void FDTDSolver::addPostprocessing(std::stringstream& runCommand)
@@ -1876,14 +2025,43 @@ void FDTDSolver::addSparameterPostprocessing(std::stringstream& runCommand)
 		"\n"
 		"        calc_port_arguments = {}\n"
 		"\n"
-		"        # Move the MSL reference plane to the end of the port\n"
+		"        # Determine the propagation axis: 0=x, 1=y, 2=z\n"
+		"        propagation_axis = None\n"
+		"\n"
 		"        if port_type == 'MSLPort':\n"
-		"            propagation_axis = port.prop_ny\n"
-		"            port_length = abs(\n"
-		"                port.stop[propagation_axis]\n"
-		"                - port.start[propagation_axis]\n"
+		"            propagation_axis = int(port.prop_ny)\n"
+		"        elif port_type == 'RectWGPort':\n"
+		"            propagation_axis = int(port.exc_ny)\n"
+		"\n"
+		"        # LumpedPort does not support a reference-plane shift\n"
+		"        if propagation_axis is not None:\n"
+		"            start_pos = float(port.start[propagation_axis])\n"
+		"            stop_pos = float(port.stop[propagation_axis])\n"
+		"\n"
+		"            if stop_pos == start_pos:\n"
+		"                raise ValueError(\n"
+		"                    f'Port {port_number}: cannot determine propagation '\n"
+		"                    'direction because start and stop are identical '\n"
+		"                    'along the propagation axis.'\n"
+		"                )\n"
+		"\n"
+		"            direction = 1 if stop_pos > start_pos else -1\n"
+		"\n"
+		"            # Read the simulation boundaries from the grid\n"
+		"            grid_lines = port.CSX.GetGrid().GetLines(propagation_axis)\n"
+		"\n"
+		"            # Positive direction -> minimum boundary\n"
+		"            # Negative direction -> maximum boundary\n"
+		"            if direction > 0:\n"
+		"                reference_pos = float(min(grid_lines))\n"
+		"            else:\n"
+		"                reference_pos = float(max(grid_lines))\n"
+		"\n"
+		"            # Signed distance from port.start in propagation direction\n"
+		"            # Use drawing units; do not multiply by gunit\n"
+		"            calc_port_arguments['ref_plane_shift'] = (\n"
+		"                direction * (reference_pos - start_pos)\n"
 		"            )\n"
-		"            calc_port_arguments['ref_plane_shift'] = port_length\n"
 		"\n"
 		"        port.CalcPort(\n"
 		"            run_path,\n"
@@ -1983,7 +2161,8 @@ void FDTDSolver::addSparameterPostprocessing(std::stringstream& runCommand)
 		"            freq,\n"
 		"            s_parameter,\n"
 		"            f's{output_port},{input_port}'\n"
-		"        )\n";		//"    save_xy_data(\n"
+		"        )\n";
+	//"    save_xy_data(\n"
 	//"        freq,\n"
 	//"        input_impedance,\n"
 	//"        f'Zin{input_port}'\n"
@@ -2019,7 +2198,10 @@ class FarFieldTable:
         self._blocks = []
         self._nrows = 0
 
-    def append(self, ff, frequencies, theta_deg, phi_deg):
+    def append(
+        self, ff, frequencies, theta_deg, phi_deg,
+        normalization_factors=None
+    ):
         frequencies = np.asarray(
             frequencies, dtype=np.float64
         ).reshape(-1)
@@ -2034,6 +2216,24 @@ class FarFieldTable:
 
         nf, nt, np_ = frequencies.size, theta.size, phi.size
 
+        if normalization_factors is None:
+            normalization_factors = np.ones(
+                nf, dtype=np.complex128
+            )
+        else:
+            normalization_factors = np.asarray(
+                normalization_factors, dtype=np.complex128
+            ).reshape(-1)
+
+            if normalization_factors.size != nf:
+                raise ValueError(
+                    "One normalization factor per frequency is required."
+                )
+
+            if np.any(~np.isfinite(normalization_factors)):
+                raise ValueError(
+                    "Normalization factors must be finite."
+                )
         if len(ff.E_theta) != nf or len(ff.E_phi) != nf:
             raise ValueError("Field count does not match frequency count.")
 
@@ -2049,8 +2249,11 @@ class FarFieldTable:
         data[..., 2] = phi[None, None, :]
 
         for k in range(nf):
-            et = np.asarray(ff.E_theta[k])
-            ep = np.asarray(ff.E_phi[k])
+            # Apply the complex factor before extracting magnitude and phase.
+            # This leaves the raw NF2FF result object unchanged.
+            factor = normalization_factors[k]
+            et = np.asarray(ff.E_theta[k], dtype=np.complex128) * factor
+            ep = np.asarray(ff.E_phi[k], dtype=np.complex128) * factor
 
             if et.shape != (nt, np_) or ep.shape != (nt, np_):
                 raise ValueError(
@@ -2140,27 +2343,51 @@ class FarFieldTable:
 		"\n\nfor run_index, excitation_settings in enumerate(excitation_list, start=1):\n"
 		"\n"
 		"    run_path = os.path.join(Sim_Path, f'run_{run_index}')\n"
-		"    far_fields = FarFieldTable();\n";
+		"    far_fields = FarFieldTable()\n"
+		"\n";
 
 	for (auto farfieldDump : farfieldDumpList)
 	{
 		std::string frequencies = getFrequencyString(farfieldDump);
 		std::string thetaAngles = getThetaAngles(farfieldDump);
-		std::string phiAngles   = getPhiAngles(farfieldDump);
+		std::string phiAngles = getPhiAngles(farfieldDump);
 
-		farfieldDumpFrequencies[farfieldDump->getName()] = getFrequencyList(farfieldDump);;
+		farfieldDumpFrequencies[farfieldDump->getName()] =
+			getFrequencyList(farfieldDump);
 
 		runCommand << "    ff_freq = [" << frequencies << "]\n";
 		runCommand << "    theta_deg = [" << thetaAngles << "]\n";
 		runCommand << "    phi_deg = [" << phiAngles << "]\n";
-		runCommand << "    ff = nf2ff.CalcNF2FF(run_path, ff_freq, theta_deg, phi_deg)\n";
-		runCommand << "    far_fields.append(ff, ff_freq, theta_deg, phi_deg)\n";
+
+		runCommand <<
+			"\n"
+			"    ff = nf2ff.CalcNF2FF(\n"
+			"        run_path, ff_freq, theta_deg, phi_deg,\n"
+			"        radius=1.0,\n"
+			"        center=[0, 0, 0],\n"
+			"        read_cached=False\n"
+			"    )\n"
+			"\n"
+			"    norm_factors = calculate_normalization_factors(\n"
+			"        run_path=run_path,\n"
+			"        ports=ports,\n"
+			"        excitation_settings=excitation_settings,\n"
+			"        frequencies=ff_freq,\n"
+			"        peak_power_w=1.0\n"
+			"    )\n"
+			"\n"
+			"    far_fields.append(\n"
+			"        ff, ff_freq, theta_deg, phi_deg,\n"
+			"        normalization_factors=norm_factors\n"
+			"    )\n"
+			"\n";
 	}
 
 	// Remove duplicates and write the result to the file farfields.txt
-	runCommand << "    far_fields.remove_duplicates(keep='last', key_decimals=(3, 9, 9))\n";
-	runCommand << "    far_fields.save_txt(os.path.join(run_path, 'farfields.txt'), header=True)\n";
-	runCommand << "\n";
+	runCommand <<
+		"    far_fields.remove_duplicates(keep='last', key_decimals=(3, 9, 9))\n"
+		"    far_fields.save_txt(os.path.join(run_path, 'farfields.txt'), header=True)\n"
+		"\n";
 }
 
 std::string FDTDSolver::getThetaAngles(EntityFarfieldDump* farfieldDump)
@@ -2519,19 +2746,20 @@ void FDTDSolver::convertAndStoreFrequencyDomainDump(const std::string& resultFol
 				// remove "_abs.vtr" (8 characters)
 				std::string base = fullPath.substr(0, fullPath.size() - 8);
 
-				std::string absFile = base + "_abs.vtr";
-				std::string argFile = base + "_arg.vtr";
+				std::string absFile  = base + "_abs.vtr";
+				std::string argFile  = base + "_arg.vtr";
+				std::string normFile = base + ".norm";
 
 				if (std::filesystem::exists(absFile) && std::filesystem::exists(argFile))
 				{
-					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, fieldType, postfix, unit, fieldDump);
+					convertAndStoreSingleFrequencyDomainDump(absFile, argFile, normFile, fieldType, postfix, unit, fieldDump);
 				}
 			}
 		}
 	}
 }
 
-void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit, EntityFieldDump* fieldDump)
+void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& absFileName, const std::string& argFileName, const std::string& normFileName, const std::string &fieldType, const std::string& postfix, const std::string &unit, EntityFieldDump* fieldDump)
 {
 	// Extract result folder name from result file name
 	std::string resultName = parseComplexResultFileName(absFileName);
@@ -2540,6 +2768,9 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 		assert(0);
 		return;
 	}
+
+	// Read scale factor from normalization file
+	std::complex<double> normalizationFactor = readFieldDumpNormalization(normFileName);
 
 	// Load the abs file data and store it as a binary data object
 	std::vector<char> absFileData = readFile(absFileName);
@@ -2570,6 +2801,7 @@ void FDTDSolver::convertAndStoreSingleFrequencyDomainDump(const std::string& abs
 	EntityResultVtkComplex* vtkResult = new EntityResultVtkComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
 	vtkResult->setComplexData(fieldType, EntityResultVtkComplex::VECTOR_COMPLEX_MAG_PHASE, vtkAbsData, vtkArgData);
 	vtkResult->setScaleFactor(1.0 / entityUnits->getScaleToSIDimension());
+	vtkResult->setNormalizationFactor(normalizationFactor);
 	vtkResult->storeToDataBase();
 
 	EntityVisVtkVectorVolumeComplex* visualizationEntity = new EntityVisVtkVectorVolumeComplex(application->getModelComponent()->createEntityUID(), nullptr, nullptr, nullptr);
@@ -3505,4 +3737,37 @@ double FDTDSolver::snapToMeshLine(double coordinate, const std::vector<double>& 
 	return coordinate - *lower <= *upper - coordinate
 		? *lower
 		: *upper;
+}
+
+std::complex<double> FDTDSolver::readFieldDumpNormalization(const std::string& normFileName)
+{
+	std::ifstream file(normFileName);
+
+	if (!file.is_open())
+	{
+		throw std::runtime_error(
+			"Cannot open normalization file: " + normFileName);
+	}
+
+	// Use a decimal point independently of the system locale.
+	file.imbue(std::locale::classic());
+
+	double magnitude = 0.0;
+	double phase = 0.0;
+
+	if (!(file >> magnitude >> phase))
+	{
+		throw std::runtime_error(
+			"Invalid normalization file format: " + normFileName);
+	}
+
+	if (!std::isfinite(magnitude) ||
+		!std::isfinite(phase) ||
+		magnitude < 0.0)
+	{
+		throw std::runtime_error(
+			"Invalid normalization values: " + normFileName);
+	}
+
+	return std::polar(magnitude, phase);
 }

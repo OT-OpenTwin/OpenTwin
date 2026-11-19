@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ResultManager.cpp
 // 
 // License:
@@ -331,7 +331,7 @@ void ResultManager::addCurveData(const std::string& resultName, const std::strin
 	if (isComplex)
 	{
 		auto quantityDescriptionComplex(std::make_unique<QuantityDescriptionCurve>());
-		quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), quantityUnit, quantityUnit);
+		quantityDescriptionComplex->defineQuantityAsComplex(ot::ComplexNumberFormat::Cartesian, ot::TypeNames::getDoubleTypeName(), "", "");
 		
 		quantityDescriptionComplex->reserveDatapointSize(curveData.size());
 		for (size_t index = 0; index < curveData.size(); index++)

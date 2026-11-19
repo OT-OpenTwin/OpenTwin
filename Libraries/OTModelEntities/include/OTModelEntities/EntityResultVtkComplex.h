@@ -21,6 +21,7 @@
 #pragma warning(disable : 4251)
 
 #include <list>
+#include <complex>
 
 #include "OTModelEntities/EntityBase.h"
 #include "OTModelEntities/EntityResultBase.h"
@@ -49,6 +50,9 @@ public:
 	void setScaleFactor(double value) { _scaleFactor = value; }
 	double getScaleFactor(void) { return _scaleFactor; }
 
+	void setNormalizationFactor(std::complex<double> value) { _normalizationFactor = value; }
+	std::complex<double> getNormalizationFactor(void) { return _normalizationFactor; }
+
 private:
 	
 	std::string _quantityName;
@@ -64,6 +68,7 @@ private:
 	long long _vtkDataVersionArg = -1;
 
 	double _scaleFactor = 1.0;
+	std::complex<double> _normalizationFactor = 1.0;
 
 	void clearAllBinaryData(void);
 

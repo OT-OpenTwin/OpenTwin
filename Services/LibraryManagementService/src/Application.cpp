@@ -205,22 +205,21 @@ int Application::initialize(const char* _siteID,const char* _ownURL, const char*
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
 		}
-
 		// The GSS forwards the registration to the LSS, which may not be listening yet during startup
 		else {
 			ot::ReturnMessage rMsg = ot::ReturnMessage::fromJson(gssResponseRegister);
 			ok = (rMsg == ot::ReturnMessage::Ok);
-		
-			if(rMsg==ot::ReturnMessage::Failed) 
-			{
-				OT_LOG_W("Global Session Service rejected the registration: " + rMsg.getWhat());
+
+			if (rMsg == ot::ReturnMessage::Failed) {
+				OT_LOG_E("Global Session Service rejected the registration: " + rMsg.getWhat());
+				break;
 			}
-			else if (rMsg != ot::ReturnMessage::Ok)
-			{
-				OT_LOG_W("Global Session Service rejected the registration: " + rMsg.getWhat());				
+			else if (rMsg != ot::ReturnMessage::Ok) {
+				OT_LOG_W("Global Session Service rejected the registration (retrying): " + rMsg.getWhat());
+				using namespace std::chrono_literals;
+				std::this_thread::sleep_for(500ms);
 			}
 		}
-
 	} while (!ok && ct++ <= maxCt);
 
 	if (!ok) {
