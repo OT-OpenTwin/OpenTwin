@@ -2,5 +2,5 @@
 import OpenTwin
 
 def __main__(this):
-    test = OpenTwin.OT_GetTestStruct()
+    test = OpenTwin.GetTestStruct()
     print(test)
