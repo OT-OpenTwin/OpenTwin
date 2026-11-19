@@ -223,7 +223,14 @@ ot::ReturnMessage GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument&
 	else {
 		try {
 			// Get user (may throw if not found...)
-			return ot::ReturnMessage(ot::ReturnMessage::True, this->getLssFromSessionId(projectName).getSessionUser(projectName));
+			auto& lss = this->getLssFromSessionId(projectName);
+			std::string username = lss.getSessionUser(projectName);
+
+			ot::JsonDocument infoDoc;
+			infoDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(username, infoDoc.GetAllocator()), infoDoc.GetAllocator());
+			infoDoc.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(lss.getUrl(), infoDoc.GetAllocator()), infoDoc.GetAllocator());
+
+			return ot::ReturnMessage(ot::ReturnMessage::True, infoDoc.toJson());
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());

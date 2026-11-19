@@ -5,6 +5,8 @@ import ssl
 import json
 from pathlib import Path
 from typing import Any
+from typing import final
+from typing_extensions import override
 from urllib.request import Request, urlopen
 from urllib.error import HTTPError, URLError
 import logging
@@ -15,33 +17,37 @@ from opentwin_api._internal.return_message import ReturnMessage, ReturnMessageSt
 
 # OpenTwin internal
 from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.communication_api import ICommunication
+from opentwin_api._internal.service.gss_api import GSSAPI
+from opentwin_api._internal.service.auth_api import AuthorizationServiceAPI
 
-class Communication:
-
+class Communication(ICommunication):
+    
     def __init__(self, 
                  globalSessionServiceUrl: str,
                  ca_certificate_path: Path
                  ) -> None:
         
         self._initialized: bool = False
-        self._gssUrl: str = globalSessionServiceUrl
         
         # Initialize TLS configuration
         self._ssl_context = self._create_ssl_context(ca_certificate_path)
 
-        logger.debug(f"Fetching global information from the Global Session Service at \"{self._gssUrl}\"...")
+        logger.debug(f"Fetching global information from the Global Session Service at \"{globalSessionServiceUrl}\"...")
 
         # Create a request to the Global Session Service to retrieve the global information
         
         globalInfoRequest = {
             OT_ACTION_MEMBER: OT_ACTION_CMD_GetGlobalServicesUrl
         }
-        globalInfoResponseMessage = self.send_to_return_message(self._gssUrl, globalInfoRequest)
+        globalInfoResponseMessage = self.send_to_return_message(globalSessionServiceUrl, globalInfoRequest)
 
         logger.debug(f"Global information: {globalInfoResponseMessage}")
 
         if globalInfoResponseMessage.status != ReturnMessageStatus.StatusOk:
             raise RuntimeError("Failed to retrieve global information from the Global Session Service: " + globalInfoResponseMessage.what)
+
+        self._gss = GSSAPI(globalSessionServiceUrl, self)
 
         globalInfoResponse = json.loads(globalInfoResponseMessage.what)
 
@@ -52,7 +58,8 @@ class Communication:
             raise RuntimeError("Global Session Service did not return a database URL")
         
         if OT_ACTION_PARAM_SERVICE_AUTH_URL in globalInfoResponse:
-            self._authUrl = globalInfoResponse[OT_ACTION_PARAM_SERVICE_AUTH_URL]
+            auth_url = globalInfoResponse[OT_ACTION_PARAM_SERVICE_AUTH_URL]
+            self._auth = AuthorizationServiceAPI(auth_url, self)
         else:
             raise RuntimeError("Global Session Service did not return an authorization URL")
         
@@ -88,25 +95,11 @@ class Communication:
 
     # Properties
 
-    @property
-    def global_session_service_url(self) -> str:
-        return self._gssUrl
+    def getGSS(self) -> GSSAPI:
+        return self._gss
 
-    @property
-    def authentication_url(self) -> str:
-        return self._authUrl
-
-    @property
-    def global_directory_url(self) -> str:
-        return self._gdsUrl
-
-    @property
-    def gateway_url(self) -> str:
-        return self._gatewayUrl
-    
-    @property
-    def logger_url(self) -> str:
-        return self._loggerUrl
+    def getAuth(self) -> AuthorizationServiceAPI:
+        return self._auth
 
     def is_initialized(self) -> bool:
         return self._initialized
@@ -136,6 +129,8 @@ class Communication:
 
         return context
 
+    @override
+    @final
     def send_to_string(self, url: str, request_data: dict[str, Any]) -> str:
         """Send a JSON POST request and return the response body.
 
@@ -151,6 +146,7 @@ class Communication:
             ConnectionError: If the connection fails.
         """
         request_body = json.dumps(request_data).encode("utf-8")
+        logger.debug(f"Sending request to {url}: {request_body.decode('utf-8')}")
 
         endpoint = self._normalize_url(url) + "/execute-one-way-tls"
 
@@ -169,7 +165,9 @@ class Communication:
                 context=self._ssl_context,
                 timeout=None # No timeout
             ) as response:
-                return response.read().decode("utf-8")
+                response_body = response.read().decode("utf-8")
+                logger.debug(f"Received response from {url}: {response_body}")
+                return response_body
 
         except HTTPError as error:
             raise RuntimeError(
@@ -181,6 +179,8 @@ class Communication:
                 f"Could not connect to service: {error.reason}"
             ) from error
 
+    @override
+    @final
     def send_to_json(self, url: str, request_data: dict[str, Any]) -> dict[str, Any]:
         """Send a JSON request and deserialize the response.
 
@@ -210,6 +210,8 @@ class Communication:
 
         return response_data
 
+    @override
+    @final
     def send_to_return_message(self, url: str, request_data: dict[str, Any]) -> ReturnMessage:
         """Send a JSON request and return a ReturnMessage object.
 

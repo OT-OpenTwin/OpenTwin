@@ -1100,7 +1100,10 @@ bool ExternalServicesComponent::projectIsOpened(const std::string& projectName, 
 	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(response);
 	if (msg == ot::ReturnMessage::True)
 	{
-		projectUser = msg.getWhat();
+		ot::JsonDocument infoDoc;
+		infoDoc.fromJson(msg.getWhat());
+				
+		projectUser = ot::json::getString(infoDoc, OT_ACTION_PARAM_Username);
 		return true;
 	}
 	else

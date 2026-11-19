@@ -11,7 +11,7 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTServiceFoundation/UserCredentials.h"
 
-AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthContext& _authContext, const std::string& _action, const std::string& _loggedInUsername, const ot::ConstJsonObject& _actionDocument)
+AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthContext& _authContext, const std::string& _action, std::string& _loggedInUsername, const ot::ConstJsonObject& _actionDocument)
 {
 	AuthResult result;
 	ServiceBase& serviceBase = ServiceBase::instance();
@@ -37,6 +37,7 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 	{
 	case ActionAuthenticationType::EncryptedPassword:
 	{
+		_loggedInUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USERNAME);
 		std::string userPw = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
 
 		// Check whether the provided password is encrypted and decrypt it if needed
@@ -59,7 +60,9 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 	{
 		SSOBuffer& ssoBuffer = _authContext.getSSOBuffer();
 
+		_loggedInUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USERNAME);
 		std::string sessionToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
+
 		SSOUser* ssoUser = ssoBuffer.getUser(sessionToken);
 		if (ssoUser == nullptr)
 		{
@@ -85,12 +88,7 @@ AuthorizationProvider::AuthResult AuthorizationProvider::authorizeAction(AuthCon
 	case ActionAuthenticationType::UserSessionToken:
 	{
 		ot::UserSessionToken sessionToken(ot::json::getObject(_actionDocument, OT_ACTION_PARAM_SessionToken));
-		if (sessionToken.getUserName() != _loggedInUsername)
-		{
-			// Most likely a hacking attempt
-			assert(0);
-			throw ot::Exception::AccessDenied("The provided session token is invalid. Please logout and attempt to log in again.");
-		}
+		_loggedInUsername = sessionToken.getUserName();
 
 		UserSessionManager& sessionManager = _authContext.getUserSessionManager();
 

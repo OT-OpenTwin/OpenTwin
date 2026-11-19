@@ -186,9 +186,9 @@ private:
 	std::string handleChangeUserNameByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleChangeUserPasswordByAdmin(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	std::string handleGetSystemInformation(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
-	ot::ReturnMessage handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword);
 	
-	ot::ReturnMessage handleGenerateTicketsFromToken(const ot::ConstJsonObject& _actionDocument);
+	ot::ReturnMessage handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser);
+	ot::ReturnMessage handleGenerateTickets(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
