@@ -194,19 +194,12 @@ void ot::GraphicsGroupItem::hoverLeaveEvent(QGraphicsSceneHoverEvent* _event) {
 }
 
 void ot::GraphicsGroupItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (!this->considerItemForPaint())
-	{
-		return;
-	}
+	OT_UNUSED(_painter);
+	OT_UNUSED(_opt);
+	OT_UNUSED(_widget);
 
-	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
-	for (QGraphicsItem* child : childItems()) {
-		QGraphicsItem* childItem = static_cast<QGraphicsItem*>(child);
-		_painter->save();
-		_painter->translate(childItem->pos());
-		childItem->paint(_painter, _opt, _widget);
-		_painter->restore();
-	}
+	// Do NOT call QGraphicsItemGroup::paint to avoid the selection border from being painted.
+    // Child items are painted automatically by QGraphicsScene with their own transforms.
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

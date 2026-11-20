@@ -73,6 +73,9 @@ namespace ot {
 		virtual std::list<GraphicsElement*> getAllGraphicsElements(void) override;
 
 		virtual std::list<GraphicsElement*> getAllDirectChildElements(void) override;
+	
+	protected:
+		virtual void notifyChildsAboutTransformChange(const QTransform& _newTransform) override;
 
 	private:
 		GraphicsLayoutItem* m_owner;

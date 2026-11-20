@@ -168,23 +168,12 @@ std::list<ot::GraphicsElement*> ot::GraphicsStackItem::getAllDirectChildElements
 // Base class functions: QGraphicsItem
 
 void ot::GraphicsStackItem::paint(QPainter* _painter, const QStyleOptionGraphicsItem* _opt, QWidget* _widget) {
-	if (!this->considerItemForPaint())
-	{
-		return;
-	}
-	if (this->adjustChildItems())
-	{
-		return;
-	}
-
-	// Manually paint the grouped items and DON'T call the Qt paint implementation to avoid the selection border from being painted
-	for (QGraphicsItem* child : childItems()) {
-		QGraphicsItem* childItem = static_cast<QGraphicsItem*>(child);
-		_painter->save();
-		_painter->translate(childItem->pos());
-		childItem->paint(_painter, _opt, _widget);
-		_painter->restore();
-	}
+	OT_UNUSED(_painter);
+	OT_UNUSED(_opt);
+	OT_UNUSED(_widget);
+	// Do NOT call QGraphicsItemGroup::paint to avoid the selection border from being painted.
+	// Child items are painted automatically by QGraphicsScene with their own transforms.
+	this->adjustChildItems();
 }
 
 QVariant ot::GraphicsStackItem::itemChange(QGraphicsItem::GraphicsItemChange _change, const QVariant& _value) {

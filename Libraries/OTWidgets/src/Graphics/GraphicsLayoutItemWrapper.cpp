@@ -136,6 +136,16 @@ std::list<ot::GraphicsElement*> ot::GraphicsLayoutItemWrapper::getAllDirectChild
 	return result;
 }
 
+void ot::GraphicsLayoutItemWrapper::notifyChildsAboutTransformChange(const QTransform& _newTransform)
+{
+	for (QGraphicsItem* child : this->childItems()) {
+		ot::GraphicsItem* itm = dynamic_cast<ot::GraphicsItem*>(child);
+		if (itm) {
+			itm->parentItemTransformChanged(_newTransform);
+		}
+	}
+}
+
 void ot::GraphicsLayoutItemWrapper::setGraphicsItemRequestedSize(const QSizeF& _size) {
 	ot::GraphicsItem::setGraphicsItemRequestedSize(_size);
 	this->setMinimumSize(_size);

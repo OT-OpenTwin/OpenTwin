@@ -359,18 +359,20 @@ ot::GraphicsItemCfg* ot::GraphicsCircuitItemBuilder::createGraphicsItem() const
 	titleItem->setName(m_name + "_centerTitle");
 	titleItem->setText(m_title);
 	titleItem->setAlignment(Alignment::Center);
-	titleItem->setMargins(ot::MarginsD(10.0, 6.0, 10.0, 0.0));
+	titleItem->setMargins(ot::MarginsD(10.0, 6.0, 10.0, 6.0));
 	ot::Font titleFont;
 	titleFont.setSize(10);
 	titleFont.setBold(true);
 	titleItem->setTextFont(titleFont);
 	ot::Painter2D* titlePainter = m_titlePainter ? m_titlePainter->createCopy() : new StyleRefPainter2D(ColorStyleValueEntry::GraphicsItemForeground);
 	titleItem->setTextPainter(titlePainter);
+	titleItem->setGraphicsItemFlag(GraphicsItemCfg::ItemIgnoresParentTransform);
 
 	titleHBox->addStrech(1);
 	titleHBox->addChildItem(titleItem);
 	titleHBox->addStrech(1);
 
+	bodyVBox->addStrech(1);
 	bodyVBox->addChildItem(titleHBox);
 	bodyVBox->addStrech(1); // Stretch to fill flexible body height
 

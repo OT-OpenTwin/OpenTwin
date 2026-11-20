@@ -385,6 +385,8 @@ namespace ot {
 
 	private:
 		void updateAcceptHoverEventFlag();
+		void applyGraphicsItemTransform(const QTransform& _parentTransform);
+		QTransform  calculateParentTransform() const;
 
 		GraphicsItemCfg* m_config; //! @brief Configuration used to setup this item. Default 0.
 		
