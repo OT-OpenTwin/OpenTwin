@@ -1,4 +1,4 @@
-﻿#include "OTDataStorage/DataLakeHelper.h"
+#include "OTDataStorage/DataLakeHelper.h"
 #include "OTDataStorage/DataLakeAPI.h"
 #include <bsoncxx/json.hpp>
 
@@ -6,6 +6,9 @@
 #include "OTCore/Variable/ExplicitStringValueConverter.h"
 #include "OTDataStorage/CumulativeLogMessage.h"
 #include "OTCore/JSON/JSONHelper.h"
+#include "OTCore/Units/SIUnits.h"
+
+
 const std::string DataLakeHelper::m_resultDataField = "Data";
 
 ot::JsonDocument DataLakeHelper::executeQuery(const ot::DataLakeAccessCfg& _config, mongocxx::options::find _options, std::string& _log)
@@ -244,12 +247,17 @@ ot::JsonDocument DataLakeHelper::createClearTextResult(const ot::DataLakeAccessC
 				}
 				std::complex<double> transformedComplex(firstValue, secondValue);
 
-				// Tuples shall only be kept in the standardized internal format. In this case Re/Im
+				// Tuples shall only be kept in the standardized internal format. In this case Re/Im.
 				const std::string tupleFormat = quantityTupleInstance.getTupleFormatName();
 				ot::ComplexNumberFormat complexNumberFormat = ot::ComplexNumbers::getFormatFromString(tupleFormat);
 				if (complexNumberFormat == ot::ComplexNumberFormat::Polar)
 				{
-					transformedComplex = ot::ComplexNumberConversion::polarToCartesian(firstValue, secondValue);
+					ot::ComplexNumberDefinition def;
+					// The preceeding value processing turned the value into the SI base unit. In case of the angle that is degree.
+					def.m_angleUnit = ot::SIUnits::getAngleUnitDegrees();
+					def.m_firstValue = firstValue;
+					def.m_secondValue = secondValue;
+					transformedComplex = ot::ComplexNumberConversion::polarToCartesian(def);
 				}
 				
 				ot::JsonValue transformedEntry = variableToJSONConverter(ot::Variable(transformedComplex), clearTextDoc.GetAllocator());
