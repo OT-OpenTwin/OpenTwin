@@ -99,6 +99,7 @@ def update_libraries(plan) -> None:
     plan.remove(r"%OPENTWIN_DEPLOYMENT_DIR%\HierarchicalProjectService.dll")
     plan.remove(r"%OPENTWIN_DEPLOYMENT_DIR%\FileManagementProjectService.dll")
     plan.remove(r"%OPENTWIN_DEPLOYMENT_DIR%\OpenEMSService.dll")
+    plan.remove(r"%OPENTWIN_DEPLOYMENT_DIR%\GatewayService.dll")
 
     # Data folders
     plan.rmtree(r"%OPENTWIN_DEPLOYMENT_DIR%\LibraryData")
@@ -165,6 +166,7 @@ def update_libraries(plan) -> None:
     plan.copy(r"%OT_HIERARCHICAL_PROJECT_SERVICE_ROOT%\%OT_CDLLR%\HierarchicalProjectService.dll", "%OPENTWIN_DEPLOYMENT_DIR%")
     plan.copy(r"%OT_FILEMANAGEMENT_PROJECT_SERVICE_ROOT%\%OT_CDLLR%\FileManagementProjectService.dll", "%OPENTWIN_DEPLOYMENT_DIR%")
     plan.copy(r"%OT_OPENEMS_SERVICE_ROOT%\%OT_CDLLR%\OpenEMSService.dll", "%OPENTWIN_DEPLOYMENT_DIR%")
+    plan.copy(r"%OT_GATEWAY_SERVICE_ROOT%\%OT_CDLLR%\GatewayService.dll", "%OPENTWIN_DEPLOYMENT_DIR%")
 
     # Framework and tools
     plan.copy(r"%OPENTWIN_DEV_ROOT%\Framework\OpenTwin\target\release\open_twin.exe", "%OPENTWIN_DEPLOYMENT_DIR%")

@@ -50,6 +50,7 @@ SERVICES = {
     "OT_PYTHON_EXECUTION_ROOT": "PythonExecution",
     "OT_CIRCUIT_EXECUTION_ROOT": "CircuitExecution",
     "OT_DEBUGSERVICE_ROOT": "DebugService",
+    "OT_GATEWAY_SERVICE_ROOT": "GatewayService",
 }
 
 # ===== Libraries =====
