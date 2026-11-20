@@ -4,7 +4,7 @@ from tests.globals import ot_initialize_tests as ini
 
 def test_login_does_nothing():
     
-    #ini()
+    ini()
 
     print("Running test...")
  

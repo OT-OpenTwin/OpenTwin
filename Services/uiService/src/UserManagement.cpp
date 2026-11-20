@@ -303,7 +303,7 @@ bool UserManagement::checkPassword(const std::string &userName, const std::strin
 	return false; // Login attempt unsuccessful
 }
 
-bool UserManagement::loginWithTicket(const std::string& _ticket, ot::UserSessionToken& _userSessionToken, std::string& _sessionUser, std::string& _sessionPassword) const
+bool UserManagement::loginWithTicket(const LoginTicketData& _ticket, ot::UserSessionToken& _userSessionToken, std::string& _sessionUser, std::string& _sessionPassword) const
 {
 	assert(!m_authServerURL.empty());
 
@@ -311,7 +311,8 @@ bool UserManagement::loginWithTicket(const std::string& _ticket, ot::UserSession
 
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_LOGIN, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_ticket, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_ticket.getLoginTicket(), doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(_ticket.getUsername(), doc.GetAllocator()), doc.GetAllocator());
 
 	std::string response;
 	if (!ot::msg::send("", m_authServerURL, ot::EXECUTE_ONE_WAY_TLS, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))

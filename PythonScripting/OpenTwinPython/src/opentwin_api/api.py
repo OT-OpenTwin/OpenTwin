@@ -114,7 +114,7 @@ class OpenTwinAPI:
         # Prepare login session data to pass to the frontend
         uiLaunchData = UiLaunchData(
             ticket=launchTickets.ui_launch_ticket,
-            username=user_session_token.username,
+            username=user_session_token.user_name,
             project_name=name,
             project_version=version,
             gss_url=url

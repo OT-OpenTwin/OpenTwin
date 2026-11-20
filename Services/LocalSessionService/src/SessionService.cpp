@@ -215,6 +215,8 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_GetGlobalServicesUrl, this, &SessionService::handleGetGlobalServicesURL, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CreateNewSession, this, &SessionService::handleCreateNewSession, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &SessionService::handleShutdownSession, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_CheckSessionRunning, this, &SessionService::handleCheckSessionRunning, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_StartNewGateway, this, &SessionService::handleStartNewGatewayService, ot::ALL_MESSAGE_TYPES);
 
 	connectAction(OT_ACTION_CMD_GetSystemInformation, this, &SessionService::handleGetSystemInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetMandatoryServices, this, &SessionService::handleGetMandatoryServices, ot::SECURE_MESSAGE_TYPES);
@@ -228,13 +230,11 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_ServiceDisableDebug, this, &SessionService::handleDisableServiceDebug, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &SessionService::handleGetDebugInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CheckStartupCompleted, this, &SessionService::handleCheckStartupCompleted, ot::SECURE_MESSAGE_TYPES);
-	connectAction(OT_ACTION_CMD_CheckSessionRunning, this, &SessionService::handleCheckSessionRunning, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_AddMandatoryService, this, &SessionService::handleAddMandatoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RemoveMandatoryService, this, &SessionService::handleRemoveMandatoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, this, &SessionService::handleRegisterNewGlobalDirectoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &SessionService::handleRegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceStartupFailed, this, &SessionService::handleServiceStartupFailed, ot::SECURE_MESSAGE_TYPES);
-	connectAction(OT_ACTION_CMD_StartNewGateway, this, &SessionService::handleStartNewGatewayService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &SessionService::handleSetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES);
 }
 

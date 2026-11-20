@@ -1495,7 +1495,7 @@ LogInDialog::WorkerError LogInDialog::workerLoginTicket(const UserManagement& _u
 {
 	std::string sessionUser, sessionPassword;
 	ot::UserSessionToken token;
-	if (_userManager.loginWithTicket(m_ticketLoginData.getLoginTicket(), token, sessionUser, sessionPassword))
+	if (_userManager.loginWithTicket(m_ticketLoginData, token, sessionUser, sessionPassword))
 	{
 		if (!token.isValid())
 		{
