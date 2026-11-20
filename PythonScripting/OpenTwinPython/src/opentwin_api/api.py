@@ -31,7 +31,8 @@ class OpenTwinAPI:
                  version: str | None = None,
                  certificate_path: str | None = None,
                  frontend_path: str | None = None,
-                 wait_for_project_timeout_sec: int = 300
+                 wait_for_project_timeout_sec: int = 300,
+                 initial_wait_for_project_timeout_sec: int = 5
                  ) -> Project:
         
         logger.info("Initializing OpenTwinClient...")
@@ -87,20 +88,18 @@ class OpenTwinAPI:
         logger.info("Launching OpenTwin frontend application...")
         uiLauncher.launch(uiLaunchData)
 
-        # Wait for the project to be available
+        # Initially sleep since the frontend takes time to open the project
+        if initial_wait_for_project_timeout_sec == 0:
+            initial_wait_for_project_timeout_sec = 5
+        time.sleep(initial_wait_for_project_timeout_sec)
+
+        # Initialize the timeout
         if wait_for_project_timeout_sec == 0:
             wait_for_project_timeout_sec = 300
-
-        if wait_for_project_timeout_sec < 10:
-            wait_for_project_timeout_sec = 10
-
         start_time = time.monotonic()
         deadline_time = start_time + wait_for_project_timeout_sec
 
-        # Sleep for 5 seconds
-        time.sleep(5)
-
-        # Check if the project is available
+        # Determine the Local Session Service (LSS) URL for the project
         lss_url : str | None = None
 
         while time.monotonic() < deadline_time:
@@ -111,11 +110,30 @@ class OpenTwinAPI:
                 time.sleep(2)
 
         if lss_url is None:
-            raise RuntimeError(f"Project \"{name}\" did not become available within the timeout period of {wait_for_project_timeout_sec} seconds")
-        else:
-            logger.info(f"Determined Local Session Service URL: {lss_url}")
+            raise RuntimeError(f"Project \"{name}\" did not become available in the GSS within the timeout period of {wait_for_project_timeout_sec} seconds")
 
-        #lss = LSSAPI(lss_url, communication)
+        logger.info(f"Determined Local Session Service URL: {lss_url}")
+        lss = LSSAPI(lss_url, communication)
+
+        # Wait for project open completed
+        start_time = time.monotonic()
+        deadline_time = start_time + wait_for_project_timeout_sec
+        project_opened = False
+
+        while time.monotonic() < deadline_time:
+            project_opened = lss.check_project_opened(
+                project_id=project_id
+                )
+            
+            if project_opened is True:
+                break
+            else:
+                time.sleep(2)
+
+        if project_opened is False:
+            raise RuntimeError(f"Project \"{name}\" did not become available in the LSS within the timeout period of {wait_for_project_timeout_sec} seconds")
+        
+        
 
         #gateway_communication = GatewayCommunication.try_connect(
         #    project_name=project_name,
@@ -123,6 +141,9 @@ class OpenTwinAPI:
         #    communication=communication
         #)
 
-        project = Project(name)
+        project = Project(
+            name=name,
+            id=project_id
+        )
 
         return project

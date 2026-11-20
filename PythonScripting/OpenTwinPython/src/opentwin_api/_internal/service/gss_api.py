@@ -6,7 +6,7 @@ import logging
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin internal
-from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.action_types import *
 from opentwin_api._internal.io.communication_api import ICommunication
 from opentwin_api._internal.return_message import ReturnMessageStatus
 

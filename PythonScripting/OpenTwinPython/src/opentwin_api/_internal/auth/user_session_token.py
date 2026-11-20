@@ -1,7 +1,7 @@
 # @otlicense
 
 # OpenTwin internal
-from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.action_types import *
 
 class UserSessionToken:
 

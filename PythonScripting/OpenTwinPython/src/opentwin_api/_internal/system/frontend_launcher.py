@@ -11,7 +11,7 @@ from pathlib import Path
 import logging
 logger = logging.getLogger("OpenTwin")
 
-from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.action_types import *
 from opentwin_api._internal.launching.ui_launch_data import UiLaunchData
 from opentwin_api._internal.system.encoding import Encoding
 

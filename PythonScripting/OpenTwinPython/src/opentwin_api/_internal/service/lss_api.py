@@ -19,3 +19,8 @@ class LSSAPI:
     @property
     def url(self) -> str:
         return self._url
+
+    def check_project_opened(self,
+                             project_id: str
+                             ) -> bool:
+        return False

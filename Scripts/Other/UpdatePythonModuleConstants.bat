@@ -35,7 +35,7 @@ rem ====================================================================
 call "%OPENTWIN_DEV_ROOT%\Scripts\Python\set_python.bat"
 
 rem rem Enabled:
-"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" update-py-constants %OPENTWIN_DEV_ROOT%\Libraries\OTCommunication\include\OTCommunication\ActionTypes.h %OPENTWIN_DEV_ROOT%\PythonScripting\OpenTwinPython\src\opentwin\_internal\ActionTypes.py
+"%OT_PYTHON%" "%OPENTWIN_DEV_ROOT%\Scripts\Python\helpers.py" update-py-constants %OPENTWIN_DEV_ROOT%\Libraries\OTCommunication\include\OTCommunication\ActionTypes.h %OPENTWIN_DEV_ROOT%\PythonScripting\OpenTwinPython\src\opentwin_api\_internal\io\action_types.py
 
 if "%1"=="--pause" (
 	goto PAUSE_END

@@ -16,7 +16,7 @@ logger = logging.getLogger("OpenTwin")
 from opentwin_api._internal.return_message import ReturnMessage, ReturnMessageStatus
 
 # OpenTwin internal
-from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.action_types import *
 from opentwin_api._internal.io.communication_api import ICommunication
 from opentwin_api._internal.service.gss_api import GSSAPI
 from opentwin_api._internal.service.auth_api import AuthorizationServiceAPI

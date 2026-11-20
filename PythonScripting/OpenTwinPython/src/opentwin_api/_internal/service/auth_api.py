@@ -9,7 +9,7 @@ logger = logging.getLogger("OpenTwin")
 from opentwin_api._internal.auth.user_session_token import UserSessionToken
 
 # OpenTwin internal
-from opentwin_api._internal.ActionTypes import *
+from opentwin_api._internal.io.action_types import *
 from opentwin_api._internal.crypto.global_crypto_key_store import GlobalCryptoKeyStore
 from opentwin_api._internal.crypto.global_crypto_key_ids import *
 from opentwin_api._internal.io.communication_api import ICommunication
