@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ComplexNumberConversion.h
 // 
 // License:
@@ -34,6 +34,9 @@ namespace ot
 		//! @param _angle 
 		//! @param _angleUnit radians or degrees. Unit string should be taken out of the SIUnits::Derived namespace. If empty, radians will be assumed.
 		static std::complex<double> polarToCartesian(const ComplexNumberDefinition& _complexNumberDefinition);
+		
+		//! @brief 
+		//! @param _angle Expects angle in radians
 		static std::complex<double>  polarToCartesian(double _magnitude, double _angle);
 
 		//! @return Vector of size 2 where element 0 is magnitude and element 1 is angle in radians.

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Variable.h
 // 
 // License:
@@ -64,6 +64,8 @@ namespace ot {
 		void setValue(const char* value);
 		void setValue(const std::string& value);
 		void setValue(std::string&& value);
+		//! @brief 
+		//! @param _value Complex number in the Real/Imaginary format.
 		void setValue(const std::complex<double>& _value);
 		void setValue(std::complex<double>&& _value);
 		
@@ -87,6 +89,8 @@ namespace ot {
 		int64_t getInt64() const;
 		bool getBool() const;
 		const char* getConstCharPtr() const;
+		//! @brief 
+		//! @return Complex number in the Real/Imaginary format. 
 		const std::complex<double> getComplex() const;
 
 		double toDouble() const;
