@@ -130,7 +130,6 @@ private:
 	//api @rparam OT_PARAM_AUTH_ENCRYPTED_PASSWORD String Encrypted password (if successful)
 	std::string handleLogIn(const ot::ConstJsonObject& _actionDocument);
 
-
 	std::string handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument);
 
 	std::string handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument);
@@ -157,6 +156,8 @@ private:
 	//api @param OT_ACTION_PARAM_Flags Array Log flags 
 	//api @rparam OT_ACTION_RETURN_VALUE_OK String Return value OK 
 	std::string handleSetGlobalLoggingMode(const ot::ConstJsonObject& _actionDocument);
+
+	ot::ReturnMessage handleAuthorizeGateway(const ot::ConstJsonObject& _actionDocument);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 	

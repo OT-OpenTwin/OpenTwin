@@ -305,11 +305,12 @@ void LogInDialog::initialize()
 			m_password->setText(LOG_IN_RESTOREDPASSWORD_PLACEHOLDER);
 			m_password->setEnabled(false);
 		}
-		m_username->setEnabled(false);
-		m_username->setText("< Ticket Login >");
 
 		m_ticketLoginData = args.getLoginTicketData();
 		m_state.set(LoginState::TicketMode);
+
+		m_username->setEnabled(false);
+		m_username->setText(QString::fromStdString(m_ticketLoginData.getUsername()));
 
 		// Apply GSS
 		LogInGSSEntry gss;

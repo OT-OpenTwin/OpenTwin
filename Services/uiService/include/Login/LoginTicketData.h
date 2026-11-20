@@ -33,10 +33,14 @@ public:
 	void setLoginTicket(const std::string& _ticket) { m_loginTicket = _ticket; };
 	const std::string& getLoginTicket() const { return m_loginTicket; };
 
+	void setUsername(const std::string& _username) { m_username = _username; };
+	const std::string& getUsername() const { return m_username; };
+
 	bool isValid() const;
 
 private:
 	std::string m_gssHost;
 	std::string m_gssPort;
 	std::string m_loginTicket;
+	std::string m_username;
 };

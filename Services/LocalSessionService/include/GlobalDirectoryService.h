@@ -24,11 +24,14 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/Data/ServiceInitData.h"
 #include "OTCommunication/CommunicationTypes.h"
+#include "OTCommunication/Data/GatewayInitData.h"
+#include "OTCommunication/Data/GatewayConnectionInfo.h"
 
 // std header
 #include <list>
 #include <mutex>
 #include <string>
+#include <optional>
 
 namespace std { class thread; }
 
@@ -85,6 +88,8 @@ public:
 	//! @return Returns true if the relay service was successfully started, false otherwise.
 	bool startRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketURL);
 	
+	std::optional<ot::GatewayConnectionInfo> startGatewayService(const ot::GatewayInitData& _startData);
+
 	void notifySessionShuttingDown(const std::string& _sessionID);
 
 	std::string getServiceUrl();

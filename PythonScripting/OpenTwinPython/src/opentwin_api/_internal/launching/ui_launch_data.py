@@ -10,6 +10,7 @@ class UiLaunchData:
 
     def __init__(self, 
                  ticket: str,
+                 username: str,
                  project_name: str,
                  project_version: str | None,
                  gss_url: str
@@ -18,6 +19,10 @@ class UiLaunchData:
         if not isinstance(ticket, str):
             raise TypeError("ticket must be a string")
         self._ticket: str = ticket
+
+        if not isinstance(username, str):
+            raise TypeError("username must be a string")
+        self._username: str = username
 
         if not isinstance(project_name, str):
             raise TypeError("project_name must be a string")
@@ -34,6 +39,10 @@ class UiLaunchData:
     @property
     def ticket(self) -> str:
         return self._ticket
+
+    @property
+    def username(self) -> str:
+        return self._username
 
     @property
     def project_name(self) -> str:

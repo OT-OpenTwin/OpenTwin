@@ -193,6 +193,12 @@ bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _servi
 	}
 }
 
+std::optional<ot::GatewayConnectionInfo> GlobalDirectoryService::startGatewayService(const ot::GatewayInitData& _startData)
+{
+	
+	return std::nullopt;
+}
+
 void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessionID)
 {
 	ot::JsonDocument requestDoc;

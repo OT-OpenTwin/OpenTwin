@@ -29,10 +29,46 @@ class OpenTwinAPI:
                  version: str | None = None,
                  certificate_path: str | None = None,
                  frontend_path: str | None = None,
+                 initial_wait_for_project_timeout_sec: int = 5,
                  wait_for_project_timeout_sec: int = 300,
-                 gateway_connection_timeout_sec: int = 60,
-                 initial_wait_for_project_timeout_sec: int = 5
+                 gateway_connection_timeout_sec: int = 60
                  ) -> Project:
+
+        """
+        Opens a project in OpenTwin.
+
+        To open a project, the following steps are performed:
+        1. Login to OpenTwin using the provided token and obtain a user session token.
+        2. Determine the project collection for the specified project name.
+        3. Generate launch tickets for the frontend and gateway.
+        4. Launch the OpenTwin frontend application with the necessary login session data.
+        5. Wait for the project to become available in the Local Session Service (LSS).
+        6. Request a gateway for the project.
+        7. Connect to the gateway and return a Project object representing the opened project.
+
+        Parameters:
+        - token (str): The authentication token for logging in to OpenTwin.
+
+        - url (str): The URL of the OpenTwin server.
+
+        - name (str): The name of the project to open.
+
+        - version (str | None): The version of the project to open. If None, the latest version is used.
+
+        - certificate_path (str | None): The path to the CA certificate for the OpenTwin server. 
+        If None, the default path is used.
+
+        - frontend_path (str | None): The path to the OpenTwin frontend application.
+        If None, the default path is used.
+
+        - initial_wait_for_project_timeout_sec (int): The initial wait time in seconds before checking if the project is opened.
+        This is used to avoid checking too early before the frontend has had a chance to open the project.
+        If 0 or negative, a default timeout of 5 seconds is used.
+
+        - wait_for_project_timeout_sec (int): The timeout in seconds for waiting for the project to become available in the LSS. If 0 or negative, a default timeout of 1 hour (3600 seconds) is used.
+
+        - gateway_connection_timeout_sec (int): The timeout in seconds for connecting to the gateway. If 0 or negative, a default timeout of 60 seconds is used.
+        """
         
         logger.info("Initializing OpenTwinClient...")
 
@@ -78,6 +114,7 @@ class OpenTwinAPI:
         # Prepare login session data to pass to the frontend
         uiLaunchData = UiLaunchData(
             ticket=launchTickets.ui_launch_ticket,
+            username=user_session_token.username,
             project_name=name,
             project_version=version,
             gss_url=url
@@ -134,7 +171,9 @@ class OpenTwinAPI:
         logger.info(f"Project \"{name}\" is now open and available in the LSS. Requesting gateway connection...")
 
         gateway_connection_info = lss.request_gateway_launch(
-            project_id=project_id
+            project_id=project_id,
+            gateway_launch_ticket=launchTickets.gateway_launch_ticket,
+            user_session_token=user_session_token
         )
 
         if gateway_connection_info is None:

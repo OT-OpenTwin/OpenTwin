@@ -11,13 +11,16 @@
 
 void LoginTicketData::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const
 {
-	_jsonObject.AddMember(OT_ACTION_PARAM_SERVICE_GSS_Host, ot::JsonString(m_gssHost, _allocator), _allocator);
 	_jsonObject.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(m_loginTicket, _allocator), _allocator);
+	_jsonObject.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(m_gssPort, _allocator), _allocator);
+	_jsonObject.AddMember(OT_ACTION_PARAM_SERVICE_GSS_Host, ot::JsonString(m_gssHost, _allocator), _allocator);
+	_jsonObject.AddMember(OT_ACTION_PARAM_SERVICE_GSS_Port, ot::JsonString(m_gssPort, _allocator), _allocator);
 }
 
 void LoginTicketData::setFromJsonObject(const ot::ConstJsonObject& _jsonObject)
 {
 	m_loginTicket = ot::json::getString(_jsonObject, OT_ACTION_PARAM_Ticket);
+	m_username = ot::json::getString(_jsonObject, OT_ACTION_PARAM_Username);
 
 	if (_jsonObject.HasMember(OT_ACTION_PARAM_SERVICE_GSS_URL))
 	{
@@ -35,5 +38,8 @@ void LoginTicketData::setFromJsonObject(const ot::ConstJsonObject& _jsonObject)
 
 bool LoginTicketData::isValid() const
 {
-	return !m_gssHost.empty() && !m_gssPort.empty() && !m_loginTicket.empty();
+	return !m_gssHost.empty()
+		&& !m_gssPort.empty()
+		&& !m_loginTicket.empty()
+		&& !m_username.empty();
 }

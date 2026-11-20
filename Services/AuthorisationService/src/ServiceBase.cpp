@@ -143,7 +143,8 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
-	
+	else if (_action == OT_ACTION_CMD_AuthorizeGateway) { return handleAuthorizeGateway(_actionDocument.GetObject()).toJson(); }
+
 	//------------------------------------------------------------------------------------
 
 	// Checking whether the logged in user is the one that he claims to be.
@@ -176,6 +177,7 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // OT Service foundation and central services. But they have own handlers that do not require euthentication
 	else if (_action == OT_ACTION_CMD_GenerateAccessToken) { return handleGenerateAccessToken(_actionDocument.GetObject(), loggedInUser).toJson(); }
 	else if (_action == OT_ACTION_CMD_GenerateTickets) { return handleGenerateTickets(_actionDocument.GetObject(), loggedInUser).toJson(); }
+
 	//------------ Group FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); } // Only UI
@@ -330,7 +332,9 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		auto& ticketManager = m_authContext.getTicketManager();
 
 		const std::string ticket = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Ticket);
-		auto ticketValidationResult = ticketManager.consumeTicket(Ticket::TicketType::Login, ticket);
+		username = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Username);
+
+		auto ticketValidationResult = ticketManager.consumeTicket(Ticket::TicketType::Login, ticket, username);
 		if (!ticketValidationResult)
 		{
 			authenticationSuccessfull = false;
@@ -338,7 +342,6 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 		else
 		{
 			authenticationSuccessfull = true;
-			username = ticketValidationResult->getUsername();
 			password.clear();
 		}
 
@@ -519,6 +522,23 @@ std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _
 	ot::ConstJsonArray flags = ot::json::getArray(_actionDocument, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
 	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+ot::ReturnMessage ServiceBase::handleAuthorizeGateway(const ot::ConstJsonObject& _actionDocument)
+{
+	auto& ticketManager = m_authContext.getTicketManager();
+
+	std::string launchTicket = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Ticket);
+	std::string username = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Username);
+	
+	if (ticketManager.consumeTicket(Ticket::TicketType::Gateway, launchTicket, username))
+	{
+		return ot::ReturnMessage::True;
+	}
+	else
+	{
+		return ot::ReturnMessage::False;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

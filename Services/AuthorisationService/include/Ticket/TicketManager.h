@@ -27,17 +27,17 @@ public:
 	std::optional<std::string> generateTicket(const User& _authenticatedUser, Ticket::TicketType _ticketType);
 
 	//! @brief Consumes a ticket of the specified type and returns the corresponding Ticket object if valid, otherwise returns std::nullopt.
-	std::optional<Ticket> consumeTicket(Ticket::TicketType _ticketType, const std::string& _ticket);
+	std::optional<Ticket> consumeTicket(Ticket::TicketType _ticketType, const std::string& _ticket, const std::string& _username);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 private:
-	typedef std::unordered_map<std::string, Ticket> TicketIDToTicketMap;
-	typedef std::unordered_map<std::string, TicketIDToTicketMap> UserIDToTicketMap;
-	typedef std::unordered_map<std::string, std::string> TicketIDToUserIDMap;
+	typedef std::unordered_map<std::string, Ticket> TicketMap;
+	typedef std::unordered_map<std::string, TicketMap> UserNameToTicketMap;
+	typedef std::unordered_map<std::string, std::string> TicketToUserNameMap;
 
-	UserIDToTicketMap m_tickets;
-	TicketIDToUserIDMap m_ticketToUserMap;
+	UserNameToTicketMap m_tickets;
+	TicketToUserNameMap m_ticketToUserMap;
 	std::map<Ticket::TicketType, uint32_t> m_ticketTypeToMaxCountMap;
 	std::map<Ticket::TicketType, uint32_t> m_ticketTypeToValiditySMap;
 
@@ -45,7 +45,7 @@ private:
 
 	// Private: Ticket management
 
-	TicketIDToTicketMap& getTicketMapForUser(const User& _authenticatedUser);
-	uint32_t countGeneratedTickets(const TicketIDToTicketMap& _ticketMap, Ticket::TicketType _ticketType) const;
+	TicketMap& getTicketMapForUser(const User& _authenticatedUser);
+	uint32_t countGeneratedTickets(const TicketMap& _ticketMap, Ticket::TicketType _ticketType) const;
 
 };

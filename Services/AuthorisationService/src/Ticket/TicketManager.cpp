@@ -10,11 +10,11 @@
 TicketManager::TicketManager()
 	: m_ticketTypeToMaxCountMap({
 		{ Ticket::Login, 10 },
-		{ Ticket::Gateway, 50 }
+		{ Ticket::Gateway, 10 }
 		})
 	, m_ticketTypeToValiditySMap({ 
 		{ Ticket::Login, ot::msg::defaultTimeout * 10 }, 
-		{ Ticket::Gateway, std::max((24 * 3600) - 1, ot::msg::defaultTimeout * 1000) } 
+		{ Ticket::Gateway, ot::msg::defaultTimeout * 10 } 
 		})
 {}
 
@@ -35,7 +35,7 @@ void TicketManager::clearTicketsForUser(const User& _authenticatedUser)
 		m_ticketToUserMap.erase(ticketID);
 	}
 
-	m_tickets.erase(_authenticatedUser.getID());
+	m_tickets.erase(_authenticatedUser.getName());
 }
 
 std::optional<std::string> TicketManager::generateTicket(const User & _authenticatedUser, Ticket::TicketType _ticketType)
@@ -67,18 +67,25 @@ std::optional<std::string> TicketManager::generateTicket(const User & _authentic
 	Ticket ticket(_ticketType, validityDurationS, _authenticatedUser.getName());
 
 	// Store the ticket in the user's ticket map and update the ticket-to-user map
-	m_ticketToUserMap[ticket.getTicket()] = _authenticatedUser.getID();
+	m_ticketToUserMap[ticket.getTicket()] = _authenticatedUser.getName();
 	auto result = ticketMap.insert_or_assign(ticket.getTicket(), std::move(ticket));
 	return result.first->second.getTicket();
 }
 
-std::optional<Ticket> TicketManager::consumeTicket(Ticket::TicketType _ticketType, const std::string& _ticket)
+std::optional<Ticket> TicketManager::consumeTicket(Ticket::TicketType _ticketType, const std::string& _ticket, const std::string& _username)
 {
 	// Find the user associated with the ticket
 	auto userIt = m_ticketToUserMap.find(_ticket);
 	if (userIt == m_ticketToUserMap.end())
 	{
 		OT_LOG_D("Ticket \"" + _ticket + "\" not found.");
+		return std::nullopt;
+	}
+
+	// Check if the ticket is associated with the requesting user
+	if (userIt->second != _username)
+	{
+		OT_LOG_E("Ticket \"" + _ticket + "\" is associated with user \"" + userIt->second + "\", but was requested by user \"" + _username + "\".");
 		return std::nullopt;
 	}
 
@@ -121,18 +128,18 @@ std::optional<Ticket> TicketManager::consumeTicket(Ticket::TicketType _ticketTyp
 
 // Private: Ticket management
 
-TicketManager::TicketIDToTicketMap& TicketManager::getTicketMapForUser(const User& _authenticatedUser)
+TicketManager::TicketMap& TicketManager::getTicketMapForUser(const User& _authenticatedUser)
 {
-	const std::string& userID = _authenticatedUser.getID();
+	const std::string& userID = _authenticatedUser.getName();
 	auto it = m_tickets.find(userID);
 	if (it == m_tickets.end())
 	{
-		it = m_tickets.emplace(userID, TicketIDToTicketMap()).first;
+		it = m_tickets.emplace(userID, TicketMap()).first;
 	}
 	return it->second;
 }
 
-uint32_t TicketManager::countGeneratedTickets(const TicketIDToTicketMap& _ticketMap, Ticket::TicketType _ticketType) const
+uint32_t TicketManager::countGeneratedTickets(const TicketMap& _ticketMap, Ticket::TicketType _ticketType) const
 {
 	uint32_t count = 0;
 

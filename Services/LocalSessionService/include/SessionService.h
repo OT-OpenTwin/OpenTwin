@@ -53,9 +53,9 @@ public:
 
 	// Setter / Getter
 
-	const std::string& getUrl() const { return m_url; };
+	const std::string& getAuth() const { return m_authUrl; };
 
-	const std::string& getAuthorisationServiceUrl() const { return m_authUrl; };
+	const std::string& getUrl() const { return m_url; };
 
 	const std::string& getDatabaseUrl() const { return m_dataBaseUrl; };
 
@@ -130,16 +130,17 @@ private:
 	ot::ReturnMessage handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc);
 	ot::ReturnMessage handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc);
 	ot::ReturnMessage handleServiceStartupFailed(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleStartNewGatewayService(ot::JsonDocument& _commandDoc);
 	void handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc);
 
 	std::mutex                                        m_mutex;
 	std::atomic_bool                                  m_workerRunning;
 	std::thread*                                      m_shutdownWorkerThread;
 
+	std::string                                       m_authUrl;
 	GlobalSessionService                              m_gss;
 	GlobalDirectoryService                            m_gds;
-
-	std::string                                       m_authUrl;
+	
 	std::string                                       m_dataBaseUrl;
 	std::string                                       m_siteID; //! @brief Site ID
 	std::string                                       m_lmsUrl;

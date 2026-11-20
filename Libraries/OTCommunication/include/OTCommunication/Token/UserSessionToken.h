@@ -28,6 +28,8 @@ namespace ot
 		const std::string& getToken() const { return m_token; };
 
 		void setSessionName(const std::string& _sessionName) { m_sessionName = _sessionName; };
+
+		//! @brief Name of the user session in the current authenticatio context.
 		const std::string& getSessionName() const { return m_sessionName; };
 
 		void setUserName(const std::string& _userName) { m_userName = _userName; };

@@ -33,6 +33,8 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+#include "OTCommunication/Token/UserSessionToken.h"
+#include "OTCommunication/Data/GatewayConnectionInfo.h"
 
 // std header
 #include <chrono>
@@ -232,6 +234,7 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, this, &SessionService::handleRegisterNewGlobalDirectoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewLibraryManagementService, this, &SessionService::handleRegisterNewLibraryManagementService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ServiceStartupFailed, this, &SessionService::handleServiceStartupFailed, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_StartNewGateway, this, &SessionService::handleStartNewGatewayService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &SessionService::handleSetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES);
 }
 
@@ -1136,17 +1139,17 @@ ot::ReturnMessage SessionService::handleRemoveMandatoryService(ot::JsonDocument&
 
 	OTAssertNullptr(data);
 	bool found = false;
-	for (auto it = data->begin(); it != data->end(); )
+	for (auto dataIt = data->begin(); dataIt != data->end(); )
 	{
-		if (ot::String::toLower(it->getServiceName()) == ot::String::toLower(serviceName) &&
-			ot::String::toLower(it->getServiceType()) == ot::String::toLower(serviceType))
+		if (ot::String::toLower(dataIt->getServiceName()) == ot::String::toLower(serviceName) &&
+			ot::String::toLower(dataIt->getServiceType()) == ot::String::toLower(serviceType))
 		{
-			it = data->erase(it);
+			dataIt = data->erase(dataIt);
 			found = true;
 		}
 		else
 		{
-			++it;
+			++dataIt;
 		}
 	}
 
@@ -1207,6 +1210,53 @@ ot::ReturnMessage SessionService::handleServiceStartupFailed(ot::JsonDocument& _
 	this->serviceFailure(sessionID, serviceID);
 
 	return ot::ReturnMessage::Ok;
+}
+
+ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument& _commandDoc)
+{
+	std::string projectId = ot::json::getString(_commandDoc, OT_ACTION_PARAM_Project);
+	ot::UserSessionToken token(ot::json::getObject(_commandDoc, OT_ACTION_PARAM_SessionToken));
+	std::string launchTicket = ot::json::getString(_commandDoc, OT_ACTION_PARAM_Ticket);
+
+	if (projectId.empty() || !token.isValid() || launchTicket.empty()) {
+		OT_LOG_E("Invalid parameters for starting new gateway service");
+		return ot::ReturnMessage::Failed;
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	// Find the session
+	auto sessionIt = m_sessions.find(projectId);
+	if (sessionIt == m_sessions.end()) {
+		OT_LOG_E("Session not found for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+	auto& session = sessionIt->second;
+
+	// Ensure correct user
+	if (session.getUserName() != token.getUserName()) {
+		OT_LOG_E("User name mismatch for session \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Ensure correct session state
+	if (!session.checkAllServicesAreRunning()) {
+		OT_LOG_E("Not all services are running for session \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::GatewayInitData gatewayInitData;
+	gatewayInitData.setProjectId(projectId);
+
+	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData);
+
+	if (!gatewayInfo.has_value()) {
+		OT_LOG_E("Failed to start gateway service for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	ot::GatewayConnectionInfo& gatewayConnectionInfo = gatewayInfo.value();
+	return ot::ReturnMessage::ok(gatewayConnectionInfo.toJson());
 }
 
 void SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc) {

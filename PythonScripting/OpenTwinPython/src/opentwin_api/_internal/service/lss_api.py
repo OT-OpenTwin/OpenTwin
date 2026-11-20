@@ -63,4 +63,22 @@ class LSSAPI:
                                user_session_token: UserSessionToken
                                ) -> GatewayConnectionInfo:
 
-        pass
+        if not isinstance(project_id, str):
+            raise TypeError("project_id must be a string")
+        if project_id == "":
+            raise ValueError("project_id must not be empty")
+
+        if not isinstance(gateway_launch_ticket, str):
+            raise TypeError("gateway_launch_ticket must be a string")
+        if gateway_launch_ticket == "":
+            raise ValueError("gateway_launch_ticket must not be empty")
+
+        if not isinstance(user_session_token, UserSessionToken):
+            raise TypeError("user_session_token must be an instance of UserSessionToken")
+
+        request_document = {
+            OT_ACTION_MEMBER: OT_ACTION_CMD_StartNewGateway,
+            OT_ACTION_PARAM_Project: project_id,
+            OT_ACTION_PARAM_Ticket: gateway_launch_ticket,
+            OT_ACTION_PARAM_SessionToken: user_session_token.to_json()
+        }

@@ -19,6 +19,7 @@
 
 #pragma once
 
+#include "OTCore/ReturnMessage.h"
 #include "OTSystem/Flags.h"
 #include "OTCommunication/CommunicationTypes.h"
 
@@ -53,6 +54,8 @@ namespace ot {
 		//! @param _timeout Timeout in milliseconds. If 0 or negative the default timeout will be used.
 		//! @param _flags Flags modifying the request behavior.
 		OT_COMMUNICATION_API_EXPORT bool send(const std::string& _senderUrl, const std::string& _receiverUrl, ot::MessageType _type, const std::string& _message, std::string& _response, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
+
+		OT_COMMUNICATION_API_EXPORT bool send(const std::string& _senderUrl, const std::string& _receiverUrl, ot::MessageType _type, const std::string& _message, ReturnMessage& _response, int _timeout = 0, const RequestFlags& _flags = msg::DefaultFlags);
 
 		//! @brief Will send the provided message to the microservice framework. The massage will be send asynchronously
 		//! @param _senderUrl The sender url.

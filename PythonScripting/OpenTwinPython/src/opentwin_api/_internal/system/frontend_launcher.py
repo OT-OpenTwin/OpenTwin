@@ -36,7 +36,8 @@ class FrontendLauncher:
     def launch(self, launch_data: UiLaunchData) -> None:
         login_cfg_object = {
             OT_ACTION_PARAM_Ticket: launch_data.ticket,
-            OT_ACTION_PARAM_SERVICE_GSS_URL: launch_data.gss_url
+            OT_ACTION_PARAM_SERVICE_GSS_URL: launch_data.gss_url,
+            OT_ACTION_PARAM_Username: launch_data.username
         }
 
         login_cfg_json = json.dumps(login_cfg_object)
