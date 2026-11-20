@@ -361,14 +361,32 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getRadiusAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
+		
+		ot::TupleDescriptionComplex complexTuple;
+		std::vector<std::string> quantityElements = complexTuple.getAllTupleElementNames();
+
 		if (!phaseAxisComponent.empty()) 
 		{
-			xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
+			if (std::find(quantityElements.begin(), quantityElements.end(), phaseAxisComponent) == quantityElements.end())
+			{
+				xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::AxisQuantityComponent::XData);
+			}
+			else
+			{
+				xAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(phaseAxisComponent));
+			}
 		}
 		const std::string radiusAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getRadiusAxisPropertyGroupName());
 		if (!radiusAxisComponent.empty()) 
 		{
-			yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
+			if (std::find(quantityElements.begin(), quantityElements.end(), radiusAxisComponent) == quantityElements.end())
+			{
+				yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::AxisQuantityComponent::XData);
+			}
+			else
+			{
+				yAxisCfg.setQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(radiusAxisComponent));
+			}
 		}
 	}
 	else
