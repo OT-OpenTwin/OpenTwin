@@ -49,6 +49,7 @@
 #include "OTGui/VisualisationCfg.h"
 #include "OTCore/DataStruct/GenericDataStructMatrix.h"
 #include <cmath>
+#include <filesystem>
 
 #include "OTGuiAPI/Frontend.h"
 
@@ -69,6 +70,8 @@
 #include "OTResultDataAccess/PlotBuilder.h"
 #include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
 #include "OTResultDataAccess/SerialisationInterfaces/QuantityDescriptionCurve.h"
+
+#include "FarfieldImporter.h"
 
 // std header
 #include <thread>
@@ -170,6 +173,7 @@ Application::Application() :
 	// Plot tests
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Single Curve", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneCurve, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve (real / imag)", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurveRealImag, this)));
+	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Farfield plot", "Default/Plot1DVisible"), std::bind(&Application::createFarFieldPlot, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Complex Curve (mag / phase)", "Default/Plot1DVisible"), std::bind(&Application::createPlotOneComplexCurveMagPhase, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "Two Curves", "Default/Plot1DVisible"), std::bind(&Application::createPlotTwoCurves, this)));
 	m_testButtons.push_back(ButtonInfo(ot::ToolBarButtonCfg(OT_DEBUG_SERVICE_PAGE_NAME, "Plots", "2 Curves x 1M", "Default/Plot1DVisible"), std::bind(&Application::createPlot2_1Mil, this)));
@@ -567,6 +571,104 @@ void Application::createPlotOneComplexCurveRealImag()
 	plotCfg.setYAxisQuantityComponent(ot::Plot1DAxisCfg::stringToAxisQuantityComponent(ot::ComplexNumbers::getComponentMagnitude()));
 	plotCfg.setTupleSettings(ot::ComplexNumbers::getTypeName(), ot::ComplexNumbers::getFormatString(ot::ComplexNumberFormat::Cartesian));
 	builder.buildPlot(plotCfg);
+}
+
+#include "OTResultDataAccess/ResultCollection/ResultCollectionExtender.h"
+
+void Application::createFarFieldPlot()
+{
+	namespace fs = std::filesystem;
+
+	const std::string devPath =
+		ot::OperatingSystem::getEnvironmentVariableString(
+			"OPENTWIN_DEV_ROOT"
+		);
+
+	if (devPath.empty())
+	{
+		throw std::runtime_error(
+			"OPENTWIN_DEV_ROOT environment variable is not set."
+		);
+	}
+
+	const fs::path directory =
+		fs::path(devPath)
+		/ "Services"
+		/ "DebugService"
+		/ "Files"
+		/ "Farfields";
+
+	struct InputFile
+	{
+		const char* name;
+		double frequency;
+	};
+
+
+	const std::array<InputFile, 6> inputFiles = { {
+		{ "512_MHz.txt",   512.0e6 },
+		{ "600_MHz.txt",   600.0e6 },
+		{ "700_MHz.txt",   700.0e6 },
+		{ "800_MHz.txt",   800.0e6 },
+		{ "960_MHz.txt",   960.0e6 },
+		{ "1100_MHz.txt", 1100.0e6 }
+	} };
+
+	ResultCollectionExtender extender(getCollectionName(), *getModelComponent());
+	extender.setSaveModel(false);
+	
+	for (std::size_t fileIndex = 0; fileIndex < 1; ++fileIndex)
+	{
+		const InputFile& input = inputFiles[fileIndex];
+		const fs::path filePath = directory / input.name;
+
+		std::ifstream stream(filePath);
+
+		if (!stream.is_open())
+		{
+			throw std::runtime_error(
+				"Cannot open file: " + filePath.string()
+			);
+		}
+
+		stream.imbue(std::locale::classic());
+		FarfieldImportData importedData = readFarfieldDataset(stream, filePath.string(), fileIndex,input.frequency);
+
+		std::list<DatasetDescription> descriptions;
+		
+		std::shared_ptr <ParameterDescription>theta = std::make_shared<ParameterDescription>(importedData.theta,false);
+		std::shared_ptr <ParameterDescription>phi = std::make_shared<ParameterDescription>(importedData.phi,false);
+		std::shared_ptr <ParameterDescription>frequency = std::make_shared<ParameterDescription>(importedData.frequency, true);
+
+		auto createDatasetDescription = [&](std::unique_ptr<QuantityDescriptionCurve>& _quantity)
+			{
+				DatasetDescription description;
+				description.setQuantityDescription(_quantity.release());
+				description.addParameterDescription(theta);
+				description.addParameterDescription(phi);
+				description.addParameterDescription(frequency);
+				return description;
+			};
+
+		DatasetDescription description = createDatasetDescription(importedData.axialRatio);
+		descriptions.push_back(std::move(description));
+		description = createDatasetDescription(importedData.directivity);
+		descriptions.push_back(std::move(description));
+		description = createDatasetDescription(importedData.phiComponent);
+		descriptions.push_back(std::move(description));
+		description = createDatasetDescription(importedData.thetaComponent);
+		descriptions.push_back(std::move(description));
+
+		ot::UID  seriesID = extender.buildSeriesMetadata(descriptions, ot::FolderNames::DatasetFolder + "/Farfield_" + std::to_string(fileIndex));
+		
+		for (DatasetDescription& desc : descriptions)
+		{
+			extender.processDataPoints(&desc, seriesID);
+		}
+	}
+
+	ot::NewModelStateInfo allSeries = extender.storeCampaignChanges();
+	ot::ModelServiceAPI::addEntitiesToModel(allSeries, "Added new series");
 }
 
 void Application::createPlotOneCurve()

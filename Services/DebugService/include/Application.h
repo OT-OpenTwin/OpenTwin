@@ -68,6 +68,8 @@ public:
 	
 	void createPlotOneComplexCurveMagPhase();
 	void createPlotOneComplexCurveRealImag();
+	void createFarFieldPlot();
+
 	void createPlotOneCurve();
 	void createPlotTwoCurves();
 	void createPlot2_1Mil();
