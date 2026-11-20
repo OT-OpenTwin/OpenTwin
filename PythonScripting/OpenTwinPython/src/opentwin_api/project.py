@@ -1,5 +1,6 @@
 # @otlicense
 
+# OpenTwin internal
 from opentwin_api._internal.io.gateway_communication import GatewayCommunication
 
 class Project:

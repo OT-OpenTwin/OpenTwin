@@ -98,6 +98,8 @@ public:
 	//! @brief Returns true if any of the services in this session is shutting down.
 	bool hasShuttingDownServices();
 
+	bool checkAllServicesAreRunning();
+
 	constexpr bool isShuttingDown() const noexcept { return m_state.has(Session::ShuttingDown); };
 
 	ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Session.cpp
 // 
 // License:
@@ -150,6 +150,26 @@ bool Session::hasShuttingDownServices() {
 	}
 
 	return false;
+}
+
+bool Session::checkAllServicesAreRunning()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	if (m_services.empty())
+	{
+		return false;
+	}
+
+	for (const Service& service : m_services)
+	{
+		if (service.isRequested() || !service.isRunning() || service.isShuttingDown())
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {

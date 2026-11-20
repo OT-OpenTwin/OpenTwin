@@ -71,6 +71,7 @@
 #define OT_ACTION_CMD_Message "Message"
 #define OT_ACTION_CMD_Compound "Compound"
 #define OT_ACTION_CMD_GetFilter "GetFilter"
+
 #define OT_ACTION_CMD_ConfirmService "Service.Confirm"
 #define OT_ACTION_CMD_ServiceClosing "Service.Closing"
 #define OT_ACTION_CMD_RegisterNewService "Service.Register"
@@ -78,16 +79,23 @@
 #define OT_ACTION_CMD_StartNewService "Service.Start.Single"
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
 #define OT_ACTION_CMD_StartNewRelayService "Service.Start.Relay"
-#define OT_ACTION_CMD_CreateNewSession "Session.New"
-#define OT_ACTION_CMD_ConfirmSession "Session.Confirm"
-#define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
-#define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
+
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"
 #define OT_ACTION_CMD_RegisterNewGlobalDirecotoryService "GlobalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLocalDirecotoryService "LocalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLibraryManagementService "LibraryManagementSerivce.New"
 #define OT_ACTION_CMD_UpdateSystemLoad "SystemLoad.Update"
+
+#define OT_ACTION_CMD_CreateNewSession "Session.New"
+#define OT_ACTION_CMD_ConfirmSession "Session.Confirm"
+#define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
+#define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
 #define OT_ACTION_CMD_GetSystemInformation "System.GetInformation"
+
+#define OT_ACTION_CMD_AuthorizeGateway "Gateway.Authorize"
+#define OT_ACTION_CMD_StartNewGateway "Gateway.New"
+
+#define OT_ACTION_CMD_PerformGatewayAction "Gateway.PerformAction"
 
 #define OT_ACTION_CMD_GetSessionExists "Session.GetExists"
 #define OT_ACTION_CMD_ShutdownSession "Session.Shutdown"
@@ -127,6 +135,7 @@
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
 #define OT_ACTION_CMD_CheckStartupCompleted "Service.CheckStartupCompleted"
+#define OT_ACTION_CMD_CheckSessionRunning "Session.CheckRunning"
 #define OT_ACTION_CMD_CheckRelayStartupCompleted "Relay.CheckStartupCompleted"
 #define OT_ACTION_CMD_ServiceShutdown "Shutdown"
 #define OT_ACTION_CMD_ServiceShutdownCompleted "ShutdownCompleted"
@@ -491,6 +500,9 @@
 #define OT_ACTION_PARAM_VisualisationConfig "Visualization.Config"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
 #define OT_ACTION_PARAM_Active "Active"
+
+#define OT_ACTION_PARAM_Gateway_Action "Gateway.Action"
+#define OT_ACTION_PARAM_Gateway_Url "Gateway.Url"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"

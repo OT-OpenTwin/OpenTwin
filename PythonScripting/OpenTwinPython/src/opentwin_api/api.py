@@ -1,22 +1,20 @@
 # @otlicense
 
 # Python standard
-import json
 import time
 import logging
-import token
-
-from opentwin_api._internal.launching.launch_tickets import LaunchTickets
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("OpenTwin")
 
 # OpenTwin
-from opentwin_api._internal.io.gateway_communication import GatewayCommunication
 from opentwin_api.project import Project
 
 # OpenTwin internal
 from opentwin_api._internal.io.communication import Communication
+from opentwin_api._internal.io.gateway_communication import GatewayCommunication
 from opentwin_api._internal.default_config import DefaultConfig
 from opentwin_api._internal.launching.ui_launch_data import UiLaunchData
+from opentwin_api._internal.launching.launch_tickets import LaunchTickets
 from opentwin_api._internal.system.frontend_launcher import FrontendLauncher
 from opentwin_api._internal.service.lss_api import LSSAPI
 
@@ -32,6 +30,7 @@ class OpenTwinAPI:
                  certificate_path: str | None = None,
                  frontend_path: str | None = None,
                  wait_for_project_timeout_sec: int = 300,
+                 gateway_connection_timeout_sec: int = 60,
                  initial_wait_for_project_timeout_sec: int = 5
                  ) -> Project:
         
@@ -89,13 +88,13 @@ class OpenTwinAPI:
         uiLauncher.launch(uiLaunchData)
 
         # Initially sleep since the frontend takes time to open the project
-        if initial_wait_for_project_timeout_sec == 0:
+        if initial_wait_for_project_timeout_sec <= 0:
             initial_wait_for_project_timeout_sec = 5
         time.sleep(initial_wait_for_project_timeout_sec)
 
         # Initialize the timeout
-        if wait_for_project_timeout_sec == 0:
-            wait_for_project_timeout_sec = 300
+        if wait_for_project_timeout_sec <= 0:
+            wait_for_project_timeout_sec = 3600 # Default to 1 hour if not specified
         start_time = time.monotonic()
         deadline_time = start_time + wait_for_project_timeout_sec
 
@@ -112,7 +111,7 @@ class OpenTwinAPI:
         if lss_url is None:
             raise RuntimeError(f"Project \"{name}\" did not become available in the GSS within the timeout period of {wait_for_project_timeout_sec} seconds")
 
-        logger.info(f"Determined Local Session Service URL: {lss_url}")
+        logger.info(f"Determined Local Session Service (LSS: {lss_url}). Waiting for project to become available in the LSS...")
         lss = LSSAPI(lss_url, communication)
 
         # Wait for project open completed
@@ -121,9 +120,7 @@ class OpenTwinAPI:
         project_opened = False
 
         while time.monotonic() < deadline_time:
-            project_opened = lss.check_project_opened(
-                project_id=project_id
-                )
+            project_opened = lss.check_project_opened(project_id=project_id)
             
             if project_opened is True:
                 break
@@ -132,9 +129,18 @@ class OpenTwinAPI:
 
         if project_opened is False:
             raise RuntimeError(f"Project \"{name}\" did not become available in the LSS within the timeout period of {wait_for_project_timeout_sec} seconds")
-        
-        
 
+        # Project is now open and all services running (including ui)
+        logger.info(f"Project \"{name}\" is now open and available in the LSS. Requesting gateway connection...")
+
+        gateway_connection_info = lss.request_gateway_launch(
+            project_id=project_id
+        )
+
+        if gateway_connection_info is None:
+            raise RuntimeError(f"Failed to obtain gateway connection information for project \"{name}\"")
+
+        # Establish connection with gateway
         #gateway_communication = GatewayCommunication.try_connect(
         #    project_name=project_name,
         #    gateway_ticket=LaunchTickets.gateway_launch_ticket,

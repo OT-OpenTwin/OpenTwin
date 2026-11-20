@@ -124,6 +124,7 @@ private:
 	ot::ReturnMessage handleDisableServiceDebug(ot::JsonDocument& _commandDoc);
 	std::string handleGetDebugInformation();
 	ot::ReturnMessage handleCheckStartupCompleted(ot::JsonDocument& _commandDoc);
+	ot::ReturnMessage handleCheckSessionRunning(ot::JsonDocument& _commandDoc);
 	ot::ReturnMessage handleAddMandatoryService(ot::JsonDocument& _commandDoc);
 	ot::ReturnMessage handleRemoveMandatoryService(ot::JsonDocument& _commandDoc);
 	ot::ReturnMessage handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc);

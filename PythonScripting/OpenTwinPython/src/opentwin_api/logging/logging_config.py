@@ -1,5 +1,6 @@
-# logging_config.py
+# @otlicense
 
+# Python standard
 import logging
 from logging.handlers import RotatingFileHandler
 from pathlib import Path

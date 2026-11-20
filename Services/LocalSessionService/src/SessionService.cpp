@@ -226,6 +226,7 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_ServiceDisableDebug, this, &SessionService::handleDisableServiceDebug, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetDebugInformation, this, &SessionService::handleGetDebugInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CheckStartupCompleted, this, &SessionService::handleCheckStartupCompleted, ot::SECURE_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_CheckSessionRunning, this, &SessionService::handleCheckSessionRunning, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_AddMandatoryService, this, &SessionService::handleAddMandatoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RemoveMandatoryService, this, &SessionService::handleRemoveMandatoryService, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_RegisterNewGlobalDirecotoryService, this, &SessionService::handleRegisterNewGlobalDirectoryService, ot::SECURE_MESSAGE_TYPES);
@@ -1053,6 +1054,22 @@ ot::ReturnMessage SessionService::handleCheckStartupCompleted(ot::JsonDocument& 
 	}
 	else {
 		return ot::ReturnMessage::True;
+	}
+}
+
+ot::ReturnMessage SessionService::handleCheckSessionRunning(ot::JsonDocument& _commandDoc)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
+
+	Session& session = this->getSession(sessionID);
+
+	if (session.checkAllServicesAreRunning()) {
+		return ot::ReturnMessage::True;
+	}
+	else {
+		return ot::ReturnMessage::False;
 	}
 }
 
