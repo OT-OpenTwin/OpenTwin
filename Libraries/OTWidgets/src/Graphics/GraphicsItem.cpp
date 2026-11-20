@@ -117,6 +117,7 @@ bool ot::GraphicsItem::setupFromConfig(const GraphicsItemCfg* _cfg) {
 void ot::GraphicsItem::graphicsItemFlagsChanged(const GraphicsItemCfg::GraphicsItemFlags& _flags) {
 	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsMovable, _flags & GraphicsItemCfg::ItemIsMoveable);
 	this->getQGraphicsItem()->setFlag(QGraphicsItem::ItemIsSelectable, _flags & GraphicsItemCfg::ItemIsSelectable);
+	this->applyGraphicsItemTransform();
 }
 
 void ot::GraphicsItem::graphicsItemConfigurationChanged(const GraphicsItemCfg* _config) {
@@ -356,6 +357,10 @@ void ot::GraphicsItem::handleSetItemGeometry(const QRectF& _geom) {
 		if (m_parent->getForwardSizeChanges()) {
 			this->setGraphicsItemRequestedSize(_geom.size());
 		}
+	}
+
+	if(this->getGraphicsItemFlags().has(GraphicsItemCfg::ItemIgnoresParentTransform)) {
+		this->applyGraphicsItemTransform();
 	}
 }
 
@@ -856,21 +861,7 @@ void ot::GraphicsItem::checkConnectionSnapRequest(const QRectF& _connectionConne
 }
 
 void ot::GraphicsItem::parentItemTransformChanged(const QTransform& _parentTransform) {
-	if (!(this->getGraphicsItemFlags() & GraphicsItemCfg::ItemIgnoresParentTransform)) {
-		return;
-	}
-	return;
-
-	// Calculate inverse transform of parent
-	QTransform ownTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
-
-	QTransform invertedParentTransform = _parentTransform.inverted();
-	
-	// Combine with the item's own transformation
-	QTransform newTransform = invertedParentTransform * ownTransform;
-
-	//this->getQGraphicsItem()->setTransformOriginPoint(transformOrigin);
-	this->getQGraphicsItem()->setTransform(newTransform);
+	this->applyGraphicsItemTransform(_parentTransform);
 }
 
 QRectF ot::GraphicsItem::getTriggerBoundingRect() const {
@@ -899,11 +890,7 @@ void ot::GraphicsItem::graphicsElementStateChanged(const GraphicsElementStateFla
 }
 
 void ot::GraphicsItem::applyGraphicsItemTransform() {
-	OTAssertNullptr(this->getQGraphicsItem());
-
-	QTransform newTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
-	this->getQGraphicsItem()->setTransform(newTransform);
-	this->notifyChildsAboutTransformChange(newTransform);
+	applyGraphicsItemTransform(this->calculateParentTransform());
 }
 
 ot::ConnectionDirection ot::GraphicsItem::calculateOutwardsConnectionDirection() const {
@@ -990,4 +977,66 @@ void ot::GraphicsItem::updateAcceptHoverEventFlag()
 {
 	OTAssertNullptr(this->getQGraphicsItem());
 	this->getQGraphicsItem()->setAcceptHoverEvents(!this->getGraphicsItemToolTip().empty());
+}
+
+void ot::GraphicsItem::applyGraphicsItemTransform(const QTransform& _parentTransform)
+{
+	QGraphicsItem* qItem = this->getQGraphicsItem();
+	OTAssertNullptr(qItem);
+
+	const QTransform parentLinear(_parentTransform.m11(), _parentTransform.m12(), _parentTransform.m21(), _parentTransform.m22(), 0., 0.);
+	const QTransform ownTransform = QtFactory::toQTransform(this->getGraphicsItemTransform());
+	if (this->getGraphicsItemFlags().has(GraphicsItemCfg::ItemIgnoresParentTransform) && !parentLinear.isIdentity()) {
+		bool invertible = false;
+		const QTransform invertedParentTransform = parentLinear.inverted(&invertible);
+		if (invertible) {
+			const QRectF boundingRect = qItem->boundingRect();
+			QTransform newTransform;
+
+			if (this->getGraphicsItemAlignment() == Alignment::TopLeft) {
+				// Map the outward normal (0,1) and text tangent (1,0) through the parents linear transform.
+				// Use the outward noraml whenever it has a non-zero component so the label stays on the free side at arbitrary angles 
+				// fall back to the tangent at exact axi-aligned angles / flips 
+
+				const QPointF outward = parentLinear.map(QPointF(0., 1.));
+				const QPointF tangent = parentLinear.map(QPointF(1., 0.));
+				constexpr qreal epsilon = 1e-6;
+				const qreal dirX = (std::abs(outward.x()) > epsilon) ? outward.x() : tangent.x();
+				const qreal dirY = (std::abs(outward.y()) > epsilon) ? outward.y() : tangent.y();
+				const qreal anchorX = (dirX < 0.) ? boundingRect.right() : boundingRect.left();
+				const qreal anchorY = (dirY < 0.) ? boundingRect.bottom() : boundingRect.top();
+
+				QTransform toAnchor;
+				toAnchor.translate(-anchorX, -anchorY);
+				newTransform = toAnchor * ownTransform * invertedParentTransform;
+			}
+			else {
+				const QPointF center = boundingRect.center();
+				QTransform toOrigin;
+				toOrigin.translate(-center.x(), -center.y());
+				QTransform fromOrigin;
+				fromOrigin.translate(center.x(), center.y());
+				newTransform = toOrigin * ownTransform * invertedParentTransform * fromOrigin;
+			}
+			qItem->setTransform(newTransform);
+		}
+		else {
+			qItem->setTransform(ownTransform);
+		}
+		this->notifyChildsAboutTransformChange(ownTransform);
+	}
+	else {
+		qItem->setTransform(ownTransform);
+		this->notifyChildsAboutTransformChange(ownTransform * parentLinear);
+	}
+}
+
+QTransform ot::GraphicsItem::calculateParentTransform() const
+{
+	const QGraphicsItem* qItem = this->getQGraphicsItem();
+	if (qItem && qItem->parentItem()) {
+		const QTransform sceneT = qItem->parentItem()->sceneTransform();
+		return QTransform(sceneT.m11(), sceneT.m12(), sceneT.m21(), sceneT.m22(), 0., 0.);
+	}
+	return QTransform();
 }
