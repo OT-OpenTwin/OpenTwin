@@ -1,4 +1,4 @@
-﻿#include "OTResultDataAccess/DataLakeAccessor.h"
+#include "OTResultDataAccess/DataLakeAccessor.h"
 
 #include "OTResultDataAccess/QueryDescriptionBuilder.h"
 #include "OTCore/QueryDescription/ValueComparisonDescription.h"
@@ -991,13 +991,16 @@ void DataLakeAccessor::generateQuantityQueries(BsonViewOrValue& _resultCollectio
 		else
 		{
 			const auto& units = queryDescription.getValueComparisonDescription().getTupleInstance().getTupleUnits();
-			ValueProcessingChainBuilder builder;
 			for (size_t i = 0; i < units.size(); i++)
 			{
 				if (isTuple)
 				{
-					ot::ValueProcessing transformer = builder.buildToSIChain(units[i]);
+					ot::ValueProcessing transformer = siBuilderWrapper("", units[i]);
 					m_inverseQuantityTransformationsByFieldKey[fieldValue].push_back(transformer);
+					// Internally, we always store complex numbers in Real/Imaginary format. That transformation is done in OTDataStorage::DataLakeHelper::createClearTextResult.
+					// Here we add only a transformer to SI Base units. There must have been a reason, but honestly, I don't remember anymore. The topic is complex. 
+					// Complex numbers are either stored in the format they were imported with or they are stored as SI base units in the transformed collection. The latter happens when a query targets the format that the complex numbers were not stored in.
+
 				}
 				else
 				{
