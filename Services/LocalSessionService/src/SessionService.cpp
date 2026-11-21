@@ -1250,7 +1250,7 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 	ot::GatewayInitData gatewayInitData(session.createServiceInitData(gateway));
 
 	// Request the gateway start
-	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData);
+	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData, launchTicket);
 
 	if (!gatewayInfo.has_value()) {
 		OT_LOG_E("Failed to start gateway service for project \"" + projectId + "\"");

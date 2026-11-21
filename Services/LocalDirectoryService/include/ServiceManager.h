@@ -41,6 +41,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace std { class thread; }
 

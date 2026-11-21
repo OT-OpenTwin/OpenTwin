@@ -103,6 +103,8 @@ class OpenTwinAPI:
         logger.info(f"Logging in with token \"{token}\"...")
         user_session_token = auth.login(token)
 
+        logger.info(f"Welcome {user_session_token.user_name}!")
+
         # Determine project collection
         project_collection = auth.get_project_collection_from_name(user_session_token, name)
         project_id = name + ":" + project_collection
@@ -114,7 +116,7 @@ class OpenTwinAPI:
         # Prepare login session data to pass to the frontend
         uiLaunchData = UiLaunchData(
             ticket=launchTickets.ui_launch_ticket,
-            username=user_session_token.user_name,
+            user_name=user_session_token.user_name,
             project_name=name,
             project_version=version,
             gss_url=url
