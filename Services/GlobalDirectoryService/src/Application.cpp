@@ -57,7 +57,7 @@ Application& Application::instance(void) {
 bool Application::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
-	LocalDirectoryService* lds = leastLoadedDirectoryService(_serviceInfo);
+	LocalDirectoryService* lds = leastLoadedDirectoryService(_serviceInfo.getServiceType());
 
 	if (lds) {
 		// Run service at lds, if failed erase all startup requests from the session with the given ID
@@ -244,7 +244,7 @@ ot::ReturnMessage Application::handleStartRelayService(ot::JsonDocument& _jsonDo
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
 	
-	LocalDirectoryService * lds = leastLoadedDirectoryService(initData);
+	LocalDirectoryService * lds = leastLoadedDirectoryService(initData.getServiceType());
 	if (lds == nullptr) {
 		OT_LOG_E("No LDS available to start relay service");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start relay service");
@@ -263,6 +263,26 @@ ot::ReturnMessage Application::handleStartRelayService(ot::JsonDocument& _jsonDo
 	responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
+}
+
+ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _jsonDocument)
+{
+	ot::GatewayInitData cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	LocalDirectoryService* lds = leastLoadedDirectoryService(OT_INFO_SERVICE_TYPE_GatewayService);
+	if (lds == nullptr)
+	{
+		OT_LOG_E("No LDS available to start relay service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start relay service");
+	}
+
+	
+
+	ot::GatewayConnectionInfo newGatewayInfo;
+	return ot::ReturnMessage::failed(newGatewayInfo.toJson());
 }
 
 void Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
@@ -392,7 +412,7 @@ std::string Application::handleGetDebugInformation() {
 
 // Private methods
 
-LocalDirectoryService* Application::leastLoadedDirectoryService(const ot::ServiceInitData& _info) {
+LocalDirectoryService* Application::leastLoadedDirectoryService(const std::string _serviceType) {
 	if (m_localDirectoryServices.empty()) {
 		OT_LOG_E("Failed to determine least loaded directory service: No LDS connected");
 		return nullptr;
@@ -402,7 +422,7 @@ LocalDirectoryService* Application::leastLoadedDirectoryService(const ot::Servic
 	LocalDirectoryService* leastLoaded = nullptr;
 
 	for (LocalDirectoryService& lds : m_localDirectoryServices) {
-		if (lds.supportsService(_info.getServiceName())) {
+		if (lds.supportsService(_serviceType)) {
 			if (lds.load() < load) {
 				load = lds.load();
 				leastLoaded = &lds;

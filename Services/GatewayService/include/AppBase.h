@@ -17,6 +17,9 @@ public:
 
 	// Action handler
 
+	ot::ReturnMessage handleCheckStartupCompleted(ot::JsonDocument& _doc);
+
+
 private:
 	
 	AppBase();

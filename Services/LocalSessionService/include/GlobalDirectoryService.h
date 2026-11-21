@@ -22,6 +22,7 @@
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
 #include "OTCore/ServiceBase.h"
+#include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Data/ServiceInitData.h"
 #include "OTCommunication/CommunicationTypes.h"
 #include "OTCommunication/Data/GatewayInitData.h"
@@ -109,6 +110,7 @@ private:
 
 	bool ensureConnection();
 	bool sendMessage(ot::MessageType _messageType, const std::string& _message, std::string& _response);
+	bool sendMessage(ot::MessageType _messageType, const std::string& _message, ot::ReturnMessage& _response);
 
 	ConnectionStatus m_connectionStatus;  //! @brief GDS connection status.
 	ot::ServiceBase m_serviceInfo;

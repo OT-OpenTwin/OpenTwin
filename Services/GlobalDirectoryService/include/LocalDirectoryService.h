@@ -27,10 +27,13 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/DebugInfo/GDSDebugInfo.h"
 #include "OTCommunication/Data/ServiceInitData.h"
+#include "OTCommunication/Data/GatewayInitData.h"
+#include "OTCommunication/Data/GatewayConnectionInfo.h"
 
 // std header
-#include <string>
 #include <list>
+#include <string>
+#include <optional>
 
 //! @brief The LocalDirectoryService holds information about the LDS.
 //! It is used to start services, gather information about services started by the LDS, as well as to provide information about the system load of the LDS.
@@ -66,6 +69,8 @@ public:
 	void sessionClosing(const std::string& _sessionID);
 	void sessionClosed(const std::string& _sessionID);
 	void serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID);
+
+	std::optional<ot::GatewayConnectionInfo> requestToRunGatewayService(const ot::GatewayInitData& _iniData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

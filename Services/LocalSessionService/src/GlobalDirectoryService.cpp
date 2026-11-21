@@ -195,8 +195,43 @@ bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _servi
 
 std::optional<ot::GatewayConnectionInfo> GlobalDirectoryService::startGatewayService(const ot::GatewayInitData& _startData)
 {
+	ot::JsonDocument req;
+	auto& alloc = req.GetAllocator();
+	req.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, alloc), alloc);
+	req.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_startData, alloc), alloc);
+
+	if (!this->ensureConnection())
+	{
+		OT_LOG_E("Failed to start gateway. Reson: Failed to establish connection to GDS");
+		return std::nullopt;
+	}
+
+	ot::ReturnMessage response;
+	if (!this->sendMessage(ot::EXECUTE, req.toJson(), response))
+	{
+		OT_LOG_E("Failed to start gateway. Reason: Failed to send message to GDS.");
+		return std::nullopt;
+	}
+
+	if (!response.isOk())
+	{
+		OT_LOG_E("Failed to start gateway. Reason: GDS return error: " + response.getWhat());
+		return std::nullopt;
+	}
+
+	ot::JsonDocument gatewayInfoDoc;
+	gatewayInfoDoc.fromJson(response.getWhat());
+
+	ot::GatewayConnectionInfo newGatewayInfo;
+	newGatewayInfo.setFromJsonObject(gatewayInfoDoc.getConstObject());
+
+	if (!newGatewayInfo.isValid())
+	{
+		OT_LOG_E("Failed to start gateway. Reason: GDS returned invalid gateway connection information");
+		return std::nullopt;
+	}
 	
-	return std::nullopt;
+	return newGatewayInfo;
 }
 
 void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessionID)
@@ -210,10 +245,12 @@ void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessi
 	if (!this->ensureConnection())
 	{
 		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
+		return;
 	}
 	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr))
 	{
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
+		return;
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
@@ -404,4 +441,16 @@ bool GlobalDirectoryService::sendMessage(ot::MessageType _messageType, const std
 	{
 		return true;
 	}
+}
+
+bool GlobalDirectoryService::sendMessage(ot::MessageType _messageType, const std::string& _message, ot::ReturnMessage& _response)
+{
+	std::string responseStr;
+	if (!this->sendMessage(_messageType, _message, responseStr))
+	{
+		return false;
+	}
+
+	_response = ot::ReturnMessage::fromJson(responseStr);
+	return true;
 }

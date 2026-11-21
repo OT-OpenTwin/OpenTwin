@@ -1245,9 +1245,11 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 		return ot::ReturnMessage::Failed;
 	}
 
+	// Registerr gateway at session (as requested service)
 	Service& gateway = session.addGateway();
 	ot::GatewayInitData gatewayInitData(session.createServiceInitData(gateway));
 
+	// Request the gateway start
 	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData);
 
 	if (!gatewayInfo.has_value()) {

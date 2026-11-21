@@ -31,6 +31,8 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Data/GatewayInitData.h"
+#include "OTCommunication/Data/GatewayConnectionInfo.h"
 
 // std header
 #include <thread>
@@ -146,6 +148,45 @@ ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jso
 
 	OT_LOG_E("Failed to start relay service: Maximum number of start attempts reached");
 	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start relay service: Maximum number of start attempts reached");
+}
+
+ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _jsonDocument)
+{
+	ot::GatewayInitData cfg;
+	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
+
+	// Ensure gateway is supported by this LDS
+	auto supportedService = Configuration::instance().getSupportedService(cfg.getServiceName());
+
+	if (!supportedService.has_value())
+	{
+		OT_LOG_E("The service \"" + cfg.getServiceName() + "\" is not supported by this Local Directory Service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + cfg.getServiceName() + "\" is not supported by this Local Directory Service");
+	}
+
+	const unsigned int maxStartupRestarts = supportedService.value().getMaxStartupRestarts();
+
+	for (unsigned int attempt = 0; attempt < maxStartupRestarts; attempt++)
+	{
+		auto result = m_serviceManager.requestToStartGatewayService(cfg);
+
+		if (result.has_value())
+		{
+			const ot::GatewayConnectionInfo& newGatewayInfo = result.value();
+
+			OT_LOG_D("Gateway service started at \"" + newGatewayInfo.getGatewayServiceUrl() + "\"");
+
+			return ot::ReturnMessage::ok(newGatewayInfo.toJson());
+		}
+		else
+		{
+			OT_LOG_W("Gateway start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(maxStartupRestarts));
+		}
+	}
+
+
+	ot::GatewayConnectionInfo newGatewayInfo;
+	return ot::ReturnMessage::failed(newGatewayInfo.toJson());
 }
 
 ot::ReturnMessage Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {

@@ -258,6 +258,40 @@ void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::ser
 	} // while (erased)
 }
 
+std::optional<ot::GatewayConnectionInfo> LocalDirectoryService::requestToRunGatewayService(const ot::GatewayInitData& _iniData)
+{
+	ot::JsonDocument doc;
+	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_iniData, doc.GetAllocator()), doc.GetAllocator());
+
+	ot::ReturnMessage response;
+	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::MessageType::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+	{
+		OT_LOG_E("Failed to start gateway service. Reason: Failed to send message to LDS");
+		return std::nullopt;
+	}
+
+	if (!response.isOk())
+	{
+		OT_LOG_E("Failed to start gateway service. Reson: LDS reported error: " + response.getWhat());
+		return std::nullopt;
+	}
+
+	ot::JsonDocument infoDoc;
+	infoDoc.fromJson(response.getWhat());
+	ot::GatewayConnectionInfo info;
+	info.setFromJsonObject(infoDoc.getConstObject());
+
+	if (!info.isValid())
+	{
+		OT_LOG_E("[FATAL] Gateway start by LDS reported success but returnd an invlid config");
+		return std::nullopt;
+	}
+
+	m_services.push_back(_iniData);
+	return info;
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Serialization

@@ -14,3 +14,9 @@ void ot::GatewayConnectionInfo::setFromJsonObject(const ConstJsonObject & _jsonO
 {
 
 }
+
+bool ot::GatewayConnectionInfo::isValid() const
+{
+	return !m_gatewayServiceUrl.empty() &&
+		!m_gatewayUrl.empty();
+}

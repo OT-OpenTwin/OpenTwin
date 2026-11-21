@@ -21,10 +21,17 @@ AppBase& AppBase::instance() {
 
 // Private: Helper
 
-AppBase::AppBase() 
+ot::ReturnMessage AppBase::handleCheckStartupCompleted(ot::JsonDocument& _doc)
+{
+
+
+	return ot::ReturnMessage::True;
+}
+
+AppBase::AppBase()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GatewayService, OT_INFO_SERVICE_TYPE_GatewayService)
 {
-	
+	connectAction(OT_ACTION_CMD_CheckGatewayReady, this, &AppBase::handleCheckStartupCompleted);
 }
 
 AppBase::~AppBase() 

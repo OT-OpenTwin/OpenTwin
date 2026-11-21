@@ -94,6 +94,7 @@
 
 #define OT_ACTION_CMD_AuthorizeGateway "Gateway.Authorize"
 #define OT_ACTION_CMD_StartNewGateway "Gateway.New"
+#define OT_ACTION_CMD_CheckGatewayReady "Gateway.CheckReady"
 
 #define OT_ACTION_CMD_PerformGatewayAction "Gateway.PerformAction"
 

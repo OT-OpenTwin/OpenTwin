@@ -318,6 +318,113 @@ ServiceManager::RequestResult ServiceManager::requestStartRelayService(const ot:
 	return RequestResult::Success;
 }
 
+std::optional<ot::GatewayConnectionInfo> ServiceManager::requestToStartGatewayService(const ot::GatewayInitData& _iniData)
+{
+	auto supportedService = Configuration::instance().getSupportedService(_iniData.getServiceType());
+	if (!supportedService.has_value())
+	{
+		m_lastError = "The service \"" + _iniData.getServiceName() + "\" is not supported by this Local Directory Service";
+		OT_LOG_E(m_lastError);
+		return std::nullopt;
+	}
+
+	std::lock_guard<std::mutex> requestLock(m_mutexRequestedServices);
+
+	OT_LOG_D("Service start requested { "
+		"\"ServiceID\": " + std::to_string(_iniData.getServiceID()) +
+		", \"Name\": \"" + _iniData.getServiceName() + "\""
+		", \"Type\": \"" + _iniData.getServiceType() + "\""
+		", \"SessionID\": \"" + _iniData.getSessionID() + "\""
+		", \"LssUrl\": \"" + _iniData.getSessionServiceURL() + "\""
+		" }");
+
+	Service newService(this, RequestedService(_iniData, supportedService.value()));
+
+	// Attempt to start service
+
+	ot::RunResult result = newService.run(m_servicesIpAddress, m_portManager.determineAndBlockAvailablePort());
+	if (!result.isOk())
+	{
+		m_portManager.freePort(newService.getPort());
+
+		OT_LOG_E("Service start failed { \"ErrorCode\": " + std::to_string(result.getErrorCode()) + ", \"ErrorMessage\": \"" + result.getErrorMessage() +
+			"\", " + logInfo(newService) + " }");
+
+		return std::nullopt;
+	}
+
+	// The relay could be started, now ensure its alive
+	OT_LOG_D("Gateway started successfully. Now checking if alive");
+	ot::JsonDocument checkCommandDoc;
+	checkCommandDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_CheckGatewayReady, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+	checkCommandDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_iniData, checkCommandDoc.GetAllocator()), checkCommandDoc.GetAllocator());
+	std::string checkCommandString = checkCommandDoc.toJson();
+
+	bool checkOk = false;
+	std::string errorMessage;
+
+	OT_LOG_D("Checking gateway startup completed for gateway at \"" + newService.getUrl() + "\"");
+
+	for (int attempt = 0; attempt < 3; attempt++)
+	{
+		ot::ReturnMessage response;
+		if (ot::msg::send("", newService.getUrl(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		{
+			if (response == ot::ReturnMessage::True)
+			{
+				checkOk = true;
+				break;
+			}
+			else if (response == ot::ReturnMessage::False)
+			{
+				std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			}
+			else
+			{
+				OT_LOG_E("Failed to check gateway startup completed { \"Response\": \"" + response.getWhat() + "\", " + logInfo(newService) + " }");
+				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+			}
+
+			// Ensure process is still running
+			ot::RunResult checkAliveResult = newService.checkAlive();
+			if (!checkAliveResult.isOk())
+			{
+				// It is possible that the port was blocked. What happened: The process started but then died.
+				OT_LOG_E("Gateway service died while trying to check if it is alive. { \"ExitCode\": " + std::to_string(checkAliveResult.getErrorCode()) +
+					", \"ExitMessage\": \"" + checkAliveResult.getErrorMessage() + "\", " + logInfo(newService) + " }");
+				break;
+			}
+		}
+		else
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(500));
+		}
+	}
+
+	// Process started and we tried to ping it repeatedly but the service was not responsive. Consider it dead. 
+	if (!checkOk)
+	{
+		// Service start failed
+		OT_LOG_E("Gateway Service check alive failed { " + logInfo(newService) + " }");
+		ot::RunResult shutdownResult = newService.shutdown();
+		OT_LOG_E("Shutting gateway service down with error { \"ErrorCode\": " + std::to_string(shutdownResult.getErrorCode()) +
+			", \"ErrorMessage\": \"" + shutdownResult.getErrorMessage() + "\", " + logInfo(newService) + " }");
+
+		return std::nullopt;
+	}
+
+	OT_LOG_D("Verified that relay service is alive");
+
+	ot::GatewayConnectionInfo connInfo;
+	connInfo.setGatewayServiceUrl(newService.getUrl());
+
+	// Store information
+	std::lock_guard<std::mutex> sessionLock(m_mutexServices);
+	sessionServices(_iniData).push_back(std::move(newService));
+
+	return connInfo;
+}
+
 void ServiceManager::sessionClosing(const std::string& _sessionID) {
 	this->cleanUpRequestedList(_sessionID);
 	this->cleanUpIniList(_sessionID);

@@ -71,6 +71,7 @@ public:
 	ot::ReturnMessage handleStartService(ot::JsonDocument& _jsonDocument);
 	ot::ReturnMessage handleStartServices(ot::JsonDocument& _jsonDocument);
 	ot::ReturnMessage handleStartRelayService(ot::JsonDocument& _jsonDocument);
+	ot::ReturnMessage handleStartGatewayService(ot::JsonDocument& _jsonDocument);
 	void handleServiceStopped(ot::JsonDocument& _jsonDocument);
 	void handleSessionClosing(ot::JsonDocument& _jsonDocument);
 	void handleSessionClosed(ot::JsonDocument& _jsonDocument);
@@ -86,11 +87,7 @@ public:
 private:
 	const std::vector<LocalDirectoryService>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; };
 
-	//! @brief Determines the least loaded directory service that supports the given service.
-	//! @warning It is expected that the mutex is locked when calling this method.
-	//! @param _info Service information.
-	//! @return A pointer to the least loaded directory service that supports the given service, or nullptr if no such service exists.
-	LocalDirectoryService* leastLoadedDirectoryService(const ot::ServiceInitData& _info);
+	LocalDirectoryService* leastLoadedDirectoryService(const std::string _serviceType);
 
 	bool canStartService(const ot::ServiceInitData& _info) const;
 

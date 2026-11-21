@@ -21,6 +21,8 @@ namespace ot
 		virtual void addToJsonObject(JsonValue& _jsonObject, JsonAllocator& _allocator) const override;
 		virtual void setFromJsonObject(const ConstJsonObject& _jsonObject) override;
 
+		bool isValid() const;
+
 		void setGatewayUrl(const std::string& _gatewayUrl) { m_gatewayUrl = _gatewayUrl; };
 		const std::string& getGatewayUrl() const { return m_gatewayUrl; };
 
