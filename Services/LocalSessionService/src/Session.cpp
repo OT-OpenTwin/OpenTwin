@@ -172,23 +172,19 @@ bool Session::checkAllServicesAreRunning()
 	return true;
 }
 
-ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
+ot::ServiceInitData Session::createServiceInitData(const Service& _service)
+{
 	ot::ServiceInitData initData;
-
 	const SessionService& sessionService = SessionService::instance();
-
-	std::lock_guard<std::mutex> lock(m_mutex);
-	const Service& service = this->getServiceFromID(_serviceID);
-	OTAssert(service.getServiceID() == _serviceID, "Service ID mismatch");
 
 	// Logging
 	initData.setLoggerUrl(ot::ServiceLogNotifier::instance().loggingServiceURL());
 	initData.setLogFlags(ot::LogDispatcher::instance().getLogFlags());
 
 	// Service
-	initData.setServiceName(service.getServiceName());
-	initData.setServiceType(service.getServiceType());
-	initData.setServiceID(_serviceID);
+	initData.setServiceName(_service.getServiceName());
+	initData.setServiceType(_service.getServiceType());
+	initData.setServiceID(_service.getServiceID());
 
 	// Session
 	initData.setAuthorizationUrl(sessionService.getAuth());
@@ -205,6 +201,14 @@ ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	initData.setUserCollection(m_userCollection);
 
 	return initData;
+}
+
+ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
+	std::lock_guard<std::mutex> lock(m_mutex);
+	const Service& service = this->getServiceFromID(_serviceID);
+	OTAssert(service.getServiceID() == _serviceID, "Service ID mismatch");
+
+	return this->createServiceInitData(service);
 }
 
 ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID) {
@@ -283,6 +287,34 @@ Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	Service newService(_serviceInformation, m_id);
+	newService.setRequested(true);
+	newService.setServiceID(this->generateNextServiceID());
+	return this->addService(std::move(newService));
+}
+
+Service& Session::addGateway()
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	std::string newGatewayName;
+	int ct = 0;
+	do
+	{
+		ct++;
+		newGatewayName = OT_INFO_SERVICE_TYPE_GatewayService + std::to_string(ct);
+
+		for (const Service& service : m_services) {
+			if (service.getServiceName() == newGatewayName) {
+				newGatewayName.clear();
+				break;
+			}
+		}
+	}
+	while (newGatewayName.empty());
+
+	ot::ServiceBase serviceInfo(newGatewayName, OT_INFO_SERVICE_TYPE_GatewayService);
+
+	Service newService(serviceInfo, m_id);
 	newService.setRequested(true);
 	newService.setServiceID(this->generateNextServiceID());
 	return this->addService(std::move(newService));
@@ -671,18 +703,19 @@ void Session::healthCheckWorker() {
 
 			// Perform health check
 			for (auto it = m_services.begin(); it != m_services.end() && m_healthCheckRunning; it++) {
-				if (it->isAlive() && !it->isShuttingDown()) {
+				const Service& service = *it;
+				if (service.isAlive() && !service.isShuttingDown()) {
 					std::string response;
-					if (!ot::msg::send(lssUrl, it->getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 						failureDetected = true;
-						failedServiceID = it->getServiceID();
-						OT_LOG_E("Service health check failed { " + it->debugLogString(m_id) + ", \"Reason\": \"Ping message could not be delivered\" }");
+						failedServiceID = service.getServiceID();
+						OT_LOG_E("Service health check failed { " + service.debugLogString(m_id) + ", \"Reason\": \"Ping message could not be delivered\" }");
 						break;
 					}
 					else if (response != OT_ACTION_CMD_Ping) {
 						failureDetected = true;
-						failedServiceID = it->getServiceID();
-						OT_LOG_E("Service health check failed { " + it->debugLogString(m_id) + ", \"Reason\": \"Invalid ping response\", \"PingResponse\": \"" + response + "\" }");
+						failedServiceID = service.getServiceID();
+						OT_LOG_E("Service health check failed { " + service.debugLogString(m_id) + ", \"Reason\": \"Invalid ping response\", \"PingResponse\": \"" + response + "\" }");
 						break;
 					}
 				}

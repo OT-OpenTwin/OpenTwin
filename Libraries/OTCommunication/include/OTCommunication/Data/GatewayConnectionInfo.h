@@ -4,6 +4,7 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCore/BasicServiceInformation.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 
 namespace ot

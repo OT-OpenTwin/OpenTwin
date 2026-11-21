@@ -1245,8 +1245,8 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 		return ot::ReturnMessage::Failed;
 	}
 
-	ot::GatewayInitData gatewayInitData;
-	gatewayInitData.setProjectId(projectId);
+	Service& gateway = session.addGateway();
+	ot::GatewayInitData gatewayInitData(session.createServiceInitData(gateway));
 
 	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData);
 

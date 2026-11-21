@@ -102,9 +102,11 @@ public:
 
 	constexpr bool isShuttingDown() const noexcept { return m_state.has(Session::ShuttingDown); };
 
-	ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);
+	OT_DECL_NODISCARD ot::ServiceInitData createServiceInitData(const Service& _service);
 
-	ot::ServiceRunData createServiceRunData(ot::serviceID_t _serviceID);
+	OT_DECL_NODISCARD ot::ServiceInitData createServiceInitData(ot::serviceID_t _serviceID);
+
+	OT_DECL_NODISCARD ot::ServiceRunData createServiceRunData(ot::serviceID_t _serviceID);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -118,7 +120,9 @@ public:
 
 	// Service management
 
-	Service& addRequestedService(const ot::ServiceBase& _serviceInformation);
+	OT_DECL_NODISCARD Service& addRequestedService(const ot::ServiceBase& _serviceInformation);
+
+	OT_DECL_NODISCARD Service& addGateway();
 	
 	void setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers);
 
@@ -235,7 +239,12 @@ private:
 
 	static void healthCheckFailedNotifier(std::string _sessionID, ot::serviceID_t _failedServiceID);
 
+	//! @brief Session mutex used for the read-only workers.
+	//! @warning Workers that use this mutex must not modify the services list at any time.
+	//! This read-only access is required since references to the services are returned by some methods and
+	//! those references may be invalidated if the services list is modified.
 	std::mutex  			       m_mutex;
+
 	std::thread				       m_healthCheckThread; //! @brief Thread for health checks.
 	std::atomic_bool			   m_healthCheckRunning; //! @brief Flag to indicate if the health check thread is running.
 
@@ -252,6 +261,10 @@ private:
 	ot::UserCredentials            m_dbCredentials;
 	std::string                    m_userCollection;
 
+	//! @brief List of services in this session.
+	//! @warning The mutex must be locked before accessing this list.
+	//! This list may be modified from public calls,
+	//! the worker threads must not modify this list at any time.
 	std::list<Service>             m_services;
 	ot::IDManager<ot::serviceID_t> m_serviceIdManager;
 };
