@@ -89,7 +89,11 @@ public:
 	//! @return Returns true if the relay service was successfully started, false otherwise.
 	bool startRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketURL);
 	
-	std::optional<ot::GatewayConnectionInfo> startGatewayService(const ot::GatewayInitData& _startData);
+	//! @brief Request the GDS to start a gateway service.
+	//! The gateway service start will be performed synchronously.
+	//! @param _startData The Gateway service start configuration.
+	//! @param _launchTicket The gateway launch ticket.
+	std::optional<ot::GatewayConnectionInfo> startGatewayService(const ot::GatewayInitData& _startData, const std::string& _launchTicket);
 
 	void notifySessionShuttingDown(const std::string& _sessionID);
 

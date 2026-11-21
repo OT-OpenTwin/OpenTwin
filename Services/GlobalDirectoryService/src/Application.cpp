@@ -269,6 +269,7 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 {
 	ot::GatewayInitData cfg;
 	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
+	std::string launchTicket = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_Ticket);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -279,6 +280,12 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start relay service");
 	}
 
+	auto gatewayInfo = lds->requestToRunGatewayService(cfg, launchTicket);
+
+	if (!gatewayInfo.has_value())
+	{
+		return ot::ReturnMessage::failed("Failed to request gateway start from LDS");
+	}
 	
 
 	ot::GatewayConnectionInfo newGatewayInfo;

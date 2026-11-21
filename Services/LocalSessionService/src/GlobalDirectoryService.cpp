@@ -193,12 +193,13 @@ bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _servi
 	}
 }
 
-std::optional<ot::GatewayConnectionInfo> GlobalDirectoryService::startGatewayService(const ot::GatewayInitData& _startData)
+std::optional<ot::GatewayConnectionInfo> GlobalDirectoryService::startGatewayService(const ot::GatewayInitData& _startData, const std::string& _launchTicket)
 {
 	ot::JsonDocument req;
 	auto& alloc = req.GetAllocator();
 	req.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, alloc), alloc);
 	req.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_startData, alloc), alloc);
+	req.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_launchTicket, alloc), alloc);
 
 	if (!this->ensureConnection())
 	{

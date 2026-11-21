@@ -155,6 +155,15 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 	ot::GatewayInitData cfg;
 	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
 
+	std::string launchTicket = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_Ticket);
+
+	// Validate launch ticket
+	ot::JsonDocument validationRequest;
+	validationRequest.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_AuthorizeGateway, validationRequest.GetAllocator()), validationRequest.GetAllocator());
+	validationRequest.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(cfg.getUsername(), validationRequest.GetAllocator()), validationRequest.GetAllocator());
+
+	// ....
+
 	// Ensure gateway is supported by this LDS
 	auto supportedService = Configuration::instance().getSupportedService(cfg.getServiceName());
 
