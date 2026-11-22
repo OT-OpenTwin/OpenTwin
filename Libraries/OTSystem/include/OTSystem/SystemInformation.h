@@ -19,27 +19,28 @@
 
 #pragma once
 
+// OpenTwin header
 #include "OTSystem/SystemAPIExport.h"
 #include "OTSystem/SystemTypes.h"
 
-#if defined(OT_OS_WINDOWS)
-#include <pdh.h>
-#endif
-
+// std header
 #include <string>
-
-#undef GetObject
-
-#pragma warning (disable:4251)
+#include <memory>
 
 namespace ot {
 
-	//! @class SystemLoadInformation
-	//! @brief The SystemLoadInformation can be used to determine information about the system (e.g. cpu and memory load, build information).
+	class SystemInformationPrivate;
+
+	//! @brief The SystemInformation can be used to determine information about the system (e.g. cpu and memory load, build information).
 	class OT_SYS_API_EXPORT SystemInformation {
 	public:
 		SystemInformation();
+		SystemInformation(const SystemInformation& _other);
+		SystemInformation(SystemInformation&& _other) noexcept;
 		virtual ~SystemInformation();
+
+		SystemInformation& operator=(const SystemInformation& _other);
+		SystemInformation& operator=(SystemInformation&& _other) noexcept;
 
 		//! @brief Initialize the performance counters. Needs to be called before information can be obtained
 		void initialize();
@@ -54,17 +55,6 @@ namespace ot {
 		std::string getBuildInformation();
 
 	private:
-		bool m_initialized;
-#if defined(OT_OS_WINDOWS)
-		PDH_HQUERY m_cpuQuery;
-		PDH_HCOUNTER m_cpuTotal;
-		ULARGE_INTEGER m_lastCPU, m_lastSysCPU, m_lastUserCPU;
-		int m_numProcessors;
-		HANDLE m_self;
-#elif defined(OT_OS_LINUX)
-		unsigned long long m_lastTotalTicks, m_lastIdleTicks;
-		long m_lastCPU, m_lastSysCPU, m_lastUserCPU;
-		int m_numProcessors;
-#endif
+		std::unique_ptr<SystemInformationPrivate> m_data;
 	};
 }
