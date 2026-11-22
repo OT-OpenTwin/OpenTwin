@@ -153,24 +153,15 @@ ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jso
 ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _jsonDocument)
 {
 	ot::GatewayInitData cfg;
-	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_Config));
-
-	std::string launchTicket = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_Ticket);
-
-	// Validate launch ticket
-	ot::JsonDocument validationRequest;
-	validationRequest.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_AuthorizeGateway, validationRequest.GetAllocator()), validationRequest.GetAllocator());
-	validationRequest.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(cfg.getUsername(), validationRequest.GetAllocator()), validationRequest.GetAllocator());
-
-	// ....
+	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
 	// Ensure gateway is supported by this LDS
-	auto supportedService = Configuration::instance().getSupportedService(cfg.getServiceName());
+	auto supportedService = Configuration::instance().getSupportedService(cfg.getServiceType());
 
 	if (!supportedService.has_value())
 	{
-		OT_LOG_E("The service \"" + cfg.getServiceName() + "\" is not supported by this Local Directory Service");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + cfg.getServiceName() + "\" is not supported by this Local Directory Service");
+		OT_LOG_E("The service type \"" + cfg.getServiceType() + "\" is not supported by this Local Directory Service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + cfg.getServiceType() + "\" is not supported by this Local Directory Service");
 	}
 
 	const unsigned int maxStartupRestarts = supportedService.value().getMaxStartupRestarts();
@@ -193,9 +184,7 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 		}
 	}
 
-
-	ot::GatewayConnectionInfo newGatewayInfo;
-	return ot::ReturnMessage::failed(newGatewayInfo.toJson());
+	return ot::ReturnMessage::failed("Max startup attempts reached");
 }
 
 ot::ReturnMessage Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
@@ -273,6 +262,7 @@ Application::Application() :
 
 	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartNewService);
 	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartNewRelayService);
+	connectAction(OT_ACTION_CMD_StartNewGateway, this, &Application::handleStartGatewayService);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
 	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);
 	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceClosed);

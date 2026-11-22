@@ -23,14 +23,10 @@ namespace ot
 
 		bool isValid() const;
 
-		void setGatewayUrl(const std::string& _gatewayUrl) { m_gatewayUrl = _gatewayUrl; };
-		const std::string& getGatewayUrl() const { return m_gatewayUrl; };
-
 		void setGatewayServiceUrl(const std::string& _gatewayServiceUrl) { m_gatewayServiceUrl = _gatewayServiceUrl; };
 		const std::string& getGatewayServiceUrl() const { return m_gatewayServiceUrl; };
 
 	private:
-		std::string m_gatewayUrl;
 		std::string m_gatewayServiceUrl;
 
 	};

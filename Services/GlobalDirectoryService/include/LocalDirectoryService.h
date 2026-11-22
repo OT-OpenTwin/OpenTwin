@@ -70,7 +70,7 @@ public:
 	void sessionClosed(const std::string& _sessionID);
 	void serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID);
 
-	std::optional<ot::GatewayConnectionInfo> requestToRunGatewayService(const ot::GatewayInitData& _iniData, const std::string& _launchTicket);
+	std::optional<ot::GatewayConnectionInfo> requestToRunGatewayService(const ot::GatewayInitData& _iniData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

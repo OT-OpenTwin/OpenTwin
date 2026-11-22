@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: PythonServiceInterface.cpp
 // 
 // License:
@@ -104,8 +104,7 @@ ot::JsonDocument ot::PythonServiceInterface::assembleMessage()
 {
 	JsonDocument doc;
 	JsonArray allParameter, scripts, functionNames;
-	ot::VariableToJSONConverter converter;
-
+	
 	for (auto& order : m_executionOrders)
 	{
 		

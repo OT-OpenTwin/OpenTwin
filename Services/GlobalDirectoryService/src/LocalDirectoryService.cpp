@@ -258,13 +258,12 @@ void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::ser
 	} // while (erased)
 }
 
-std::optional<ot::GatewayConnectionInfo> LocalDirectoryService::requestToRunGatewayService(const ot::GatewayInitData& _iniData, const std::string& _launchTicket)
+std::optional<ot::GatewayConnectionInfo> LocalDirectoryService::requestToRunGatewayService(const ot::GatewayInitData& _iniData)
 {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_iniData, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_launchTicket, doc.GetAllocator()), doc.GetAllocator());
-
+	
 	ot::ReturnMessage response;
 	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::MessageType::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
 	{

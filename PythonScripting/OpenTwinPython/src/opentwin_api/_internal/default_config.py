@@ -17,8 +17,8 @@ class DefaultConfig:
         return cls._instance
 
     def __init__(self) -> None:
-        self._ca_certificate_path: Path = None
-        self._frontend_app_path: Path = None
+        self._ca_certificate_path: Path | None = None
+        self._frontend_app_path: Path | None = None
 
     @property
     def ca_certificate_path(self) -> Optional[Path]:
@@ -74,7 +74,11 @@ class DefaultConfig:
 
         # 1: Check for dedicated environment
         if os.environ.get("OPEN_TWIN_FRONTEND_PATH"):
-            self._frontend_app_path = Path(os.environ.get("OPEN_TWIN_FRONTEND_PATH"))
+            frontend_path_str = os.environ.get("OPEN_TWIN_FRONTEND_PATH")
+            if frontend_path_str is not None:
+                self._frontend_app_path = Path(frontend_path_str)
+            else:
+                raise ValueError("Environment variable OPEN_TWIN_FRONTEND_PATH is set but empty.")
         else:
             # 2: Check for development environment
             self._frontend_app_path = DirectoryManager.get_existing_opentwin_dev_frontend_file()

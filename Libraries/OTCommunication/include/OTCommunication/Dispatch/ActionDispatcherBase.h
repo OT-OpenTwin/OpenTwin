@@ -51,22 +51,27 @@ namespace ot {
 		ActionDispatcherBase();
 		virtual ~ActionDispatcherBase();
 
+		//! @brief Sets the default message type used for all [\ref ActionHandleConnector "handlers"] that are added to this dispatcher if no custom type is specified.
+		//! Default is [\ref ot::SECURE_MESSAGE_TYPES "SECURE_MESSAGE_TYPES"].
 		void setDefaultMessageTypes(const MessageTypeFlags& _type);
+
+		//! @brief Returns the default message type used for all [\ref ActionHandleConnector "handlers"] that are added to this dispatcher if no custom type is specified.
+		//! Default is [\ref ot::SECURE_MESSAGE_TYPES "SECURE_MESSAGE_TYPES"].
 		const MessageTypeFlags& getDefaultMessageTypes() const { return m_defaultMessageType; };
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
 		// Connector management
 
-		//! @brief Add the provided [\ref ActionHandleConnector "handler"] to this ActionDispatcherBase.
+		//! @brief Add the provided \ref ActionHandleConnector ["handler"] to this ActionDispatcherBase.
 		//! The handler will be used for all specified actions.
 		//! @param _handler New handler to add for all actions set in the [\ref ActionHandleConnector "handler"].
 		//! The caller keeps ownership of the handler.
 		//! @param _insertFlags Flags to control the insert behavior.
 		bool add(ActionHandleConnector* _handler, const InsertFlags& _insertFlags = InsertFlag::NoFlags);
 
-		//! @brief Removes the [\ref ActionHandleConnector "handler"] from the list.
-		//! This must be called when the [\ref ActionHandleConnector "handler"] is destroyed.
+		//! @brief Removes the \ref ActionHandleConnector ["handler"] from the list.
+		//! This must be called when the \ref ActionHandleConnector ["handler"] is destroyed.
 		//! @param _handler Handler to remove from the lists.
 		void remove(ActionHandleConnector* _handler);
 

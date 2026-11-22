@@ -269,18 +269,17 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 {
 	ot::GatewayInitData cfg;
 	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
-	std::string launchTicket = ot::json::getString(_jsonDocument, OT_ACTION_PARAM_Ticket);
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	LocalDirectoryService* lds = leastLoadedDirectoryService(OT_INFO_SERVICE_TYPE_GatewayService);
 	if (lds == nullptr)
 	{
-		OT_LOG_E("No LDS available to start relay service");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start relay service");
+		OT_LOG_E("No LDS available to start gateway service");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start gateway service");
 	}
 
-	auto gatewayInfo = lds->requestToRunGatewayService(cfg, launchTicket);
+	auto gatewayInfo = lds->requestToRunGatewayService(cfg);
 
 	if (!gatewayInfo.has_value())
 	{
@@ -461,6 +460,7 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartService);
 	connectAction(OT_ACTION_CMD_StartNewServices, this, &Application::handleStartServices);
 	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartRelayService);
+	connectAction(OT_ACTION_CMD_StartNewGateway, this, &Application::handleStartGatewayService);
 	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceStopped);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
 	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);

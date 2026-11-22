@@ -17,21 +17,13 @@
 // limitations under the License.
 // @otlicense-end
 
-// Service header
-#include "AppBase.h"
+// DebugService header
+#include "Application.h"
 
 // OpenTwin header
-#include "OTSystem/AppExitCodes.h"
-#include "OTCore/JSON/JSON.h"
-#include "OTCore/Logging/Logger.h"
-#include "OTCore/String.h"
-#include "OTCommunication/Msg.h"
-#include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/IpConverter.h"
-#include "OTCommunication/Dispatch/ActionDispatcher.h"
+#include "OTServiceFoundation/Foundation.h"
 
 // std header
-#include <string>
 #include <Windows.h>
 
 BOOL APIENTRY DllMain( HMODULE hModule,
@@ -50,118 +42,32 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-namespace ot {
-	namespace intern {
-		
-		std::string dispatchActionWrapper(const char* _json, ot::MessageType _messageType) {
-			try {
-				ot::JsonDocument actionDoc;
-				actionDoc.fromJson(_json);
-				if (actionDoc.IsObject()) {
-
-					std::string action = ot::json::getString(actionDoc, OT_ACTION_MEMBER);
-
-					// Messages that can be processed directly
-					if (action == OT_ACTION_CMD_Ping) {
-						return OT_ACTION_CMD_Ping;
-					}
-					else if (action == OT_ACTION_CMD_ServiceShutdown) {
-						OT_LOG_D("Shutting down logger service");
-						exit(ot::AppExitCode::Success);
-					}
-					else if (action == OT_ACTION_CMD_ServiceEmergencyShutdown) {
-						OT_LOG_D("Logger service emergency shutdown");
-						exit(ot::AppExitCode::EmergencyShutdown);
-					}
-					else {
-						bool handlerFound = false;
-						std::string result = ot::ActionDispatcher::instance().dispatch(action, actionDoc, handlerFound, _messageType);
-						if (handlerFound) {
-							return result;
-						}
-						else {
-							return OT_ACTION_RETURN_UnknownAction;
-						}
-					}
-					
-				}
-				else {
-					return OT_ACTION_RETURN_INDICATOR_Error "Ivalid action format";
-				}
-			}
-			catch (const std::exception& _e) {
-				OT_LOG_E(_e.what());
-				return OT_ACTION_RETURN_INDICATOR_Error + std::string(_e.what());
-			}
-			catch (...) {
-				OT_LOG_E("Unknown error");
-				return OT_ACTION_RETURN_UnknownError;
-			}
-		}
-
-		char* dispatchAction(const char* _json, ot::MessageType _messageType) {
-			return ot::String::getCStringCopy(dispatchActionWrapper(_json, _messageType));
-		}
-	}
-}
-
-// ###########################################################################################################################################################################################################################################################################################################################
-
-// Microservice Calls
-
-extern "C"
-{
-	_declspec(dllexport) int init(const char * _unused1, const char * _serviceURL, const char * _unused2, const char * _unused3)
-	{
-		try {
-			if (_serviceURL == nullptr) {
-				OTAssert(0, "Service URL not set");
-				exit(ot::AppExitCode::ServiceUrlMissing);
-			}
-
-			// Initialize log dispatcher
-#ifdef _DEBUG
-			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
-#else
-			ot::LogDispatcher::initialize(OT_INFO_SERVICE_TYPE_LOGGER, false);
-#endif
-
-			AppBase::instance().setServiceURL(_serviceURL);
-
-			OT_LOG_D("GatewayService starting");
-		}
-		catch (const std::exception & _e) {
-			OT_LOG_E(_e.what());
-			exit(ot::AppExitCode::GeneralError);
-		}
-		catch (...) {
-			OT_LOG_E("Unknown error");
-			exit(ot::AppExitCode::UnknownError);
-		}
-		return ot::AppExitCode::Success;
-	};
-
-	_declspec(dllexport) const char *getServiceURL() {
-		return ot::String::getCStringCopy(AppBase::instance().getServiceURL());
-	};
+extern "C" {
 
 	_declspec(dllexport) const char *performAction(const char * _json, const char * _senderIP) {
-		return ot::intern::dispatchAction(_json, ot::EXECUTE);
+		return ot::foundation::performAction(_json, _senderIP);
 	};
 
-	_declspec(dllexport) const char *performActionOneWayTLS(const char * _json, const char * _senderIP) {
-		return ot::intern::dispatchAction(_json, ot::EXECUTE_ONE_WAY_TLS);
-	};
-
-	// The logger service is not queueing actions
 	_declspec(dllexport) const char *queueAction(const char * _json, const char * _senderIP) {
-		return ot::intern::dispatchAction(_json, ot::QUEUE);
+		return performAction(_json, _senderIP);
 	};
+
+	_declspec(dllexport) const char *getServiceURL(void) {
+		return ot::foundation::getServiceURL();
+	}
 
 	_declspec(dllexport) void deallocateData(const char * _data) {
-		// Destroy data (e.g. return value form performAction)
+		// *****************
+		// This code will deallocate the memory of the return values from the perform- and queueAction calls
 		if (_data != nullptr) {
 			delete[] _data;
 		}
+		// *****************
 	};
+
+	// This function is called once upon startup of this service
+	_declspec(dllexport) int init(const char* _ownUrl, const char* _ownName, const char* _unused1, const char* _unused2)
+	{
+		return ot::foundation::init(_ownUrl, _ownName, _unused1, _unused2, &Application::instance(), false);
+	}
 }

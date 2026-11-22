@@ -64,10 +64,14 @@ namespace ot {
 		//! Afterwards ot::ExternalServicesComponent::init will be called.
 		//! 
 		//! In Release mode only ot::ExternalServicesComponent::startup will be called.
-		//! @param _ownURL The URL of this service.
+		//! @param _ownURL This service URL.
+		//! @param _ownName This service name.
+		//! @param _unused1 Placeholder for future use. Should be an empty string.
+		//! @param _unused2 Placeholder for future use. Should be an empty string.
 		//! @param _application Pointer to the application instance. The caller keeps ownership of this instance.
 		//! @param _explicitDebug If set to true the component will be started in debug mode even if the service is not started in debug mode.
-		OT_SERVICEFOUNDATION_API_EXPORTONLY int init(const std::string& _ownURL, ApplicationBase* _application, bool _explicitDebug);
+		OT_SERVICEFOUNDATION_API_EXPORTONLY int init(const std::string& _ownURL, const std::string& _ownName,
+			const std::string& _unused1, const std::string& _unused2, ApplicationBase* _application, bool _explicitDebug);
 
 	} // namespace foundation
 

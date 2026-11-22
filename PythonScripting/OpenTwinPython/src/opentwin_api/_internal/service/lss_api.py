@@ -1,6 +1,8 @@
 # @otlicense
 
 # OpenTwin internal
+import json
+
 from opentwin_api._internal.auth.user_session_token import UserSessionToken
 from opentwin_api._internal.io.action_types import *
 from opentwin_api._internal.io.communication_api import ICommunication
@@ -82,3 +84,24 @@ class LSSAPI:
             OT_ACTION_PARAM_Ticket: gateway_launch_ticket,
             OT_ACTION_PARAM_SessionToken: user_session_token.to_json()
         }
+
+        response_message: ReturnMessage = self.communication.send_to_return_message(self._url, request_document)
+        if response_message.status != ReturnMessageStatus.StatusOk:
+            raise RuntimeError(f"Failed to request gateway launch for project \"{project_id}\". Reason: {response_message.what}")
+
+        reponse_document = json.loads(response_message.what)
+
+        gateway_url: str = reponse_document.get(OT_ACTION_PARAM_Gateway_Url)
+        if gateway_url is None or not isinstance(gateway_url, str) or gateway_url == "":
+            raise RuntimeError(f"Invalid gateway URL received from LSS for project \"{project_id}\"")
+        
+        gateway_ticket: str = reponse_document.get(OT_ACTION_PARAM_Ticket)
+        if gateway_ticket is None or not isinstance(gateway_ticket, str) or gateway_ticket == "":
+            raise RuntimeError(f"Invalid gateway ticket received from LSS for project \"{project_id}\"")
+
+        return GatewayConnectionInfo(
+            gateway_url=gateway_url,
+            gateway_ticket=gateway_ticket
+        )
+
+        

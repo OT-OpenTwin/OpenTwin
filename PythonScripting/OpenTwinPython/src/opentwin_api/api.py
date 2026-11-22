@@ -2,6 +2,7 @@
 
 # Python standard
 import time
+from pathlib import Path
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("OpenTwin")
@@ -27,8 +28,8 @@ class OpenTwinAPI:
                  url: str,
                  name: str,
                  version: str | None = None,
-                 certificate_path: str | None = None,
-                 frontend_path: str | None = None,
+                 certificate_path: Path | None = None,
+                 frontend_path: Path | None = None,
                  initial_wait_for_project_timeout_sec: int = 5,
                  wait_for_project_timeout_sec: int = 300,
                  gateway_connection_timeout_sec: int = 60
@@ -55,10 +56,10 @@ class OpenTwinAPI:
 
         - version (str | None): The version of the project to open. If None, the latest version is used.
 
-        - certificate_path (str | None): The path to the CA certificate for the OpenTwin server. 
+        - certificate_path (Path | None): The path to the CA certificate for the OpenTwin server. 
         If None, the default path is used.
 
-        - frontend_path (str | None): The path to the OpenTwin frontend application.
+        - frontend_path (Path | None): The path to the OpenTwin frontend application.
         If None, the default path is used.
 
         - initial_wait_for_project_timeout_sec (int): The initial wait time in seconds before checking if the project is opened.
@@ -87,9 +88,13 @@ class OpenTwinAPI:
 
         if certificate_path is None:
             certificate_path = DefaultConfig().ca_certificate_path
+            if certificate_path is None:
+                raise FileNotFoundError("CA certificate file not found. Please ensure that the CA certificate is installed and the path is correctly set.")
 
         if frontend_path is None:
             frontend_path = DefaultConfig().frontend_app_path
+            if frontend_path is None:
+                raise FileNotFoundError("OpenTwin frontend application not found. Please ensure that the frontend is installed and the path is correctly set.")
 
         # Initialize the FrontendLauncher
         uiLauncher = FrontendLauncher(frontend_path)
@@ -180,6 +185,8 @@ class OpenTwinAPI:
 
         if gateway_connection_info is None:
             raise RuntimeError(f"Failed to obtain gateway connection information for project \"{name}\"")
+
+        logger.info(f"Gateway launched for project \"{name}\". Establishing connection to gateway...")
 
         # Establish connection with gateway
         #gateway_communication = GatewayCommunication.try_connect(

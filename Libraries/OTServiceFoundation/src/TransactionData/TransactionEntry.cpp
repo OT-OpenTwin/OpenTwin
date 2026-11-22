@@ -1,4 +1,4 @@
-﻿#include "OTServiceFoundation/TransactionData/TransactionEntry.h"
+#include "OTServiceFoundation/TransactionData/TransactionEntry.h"
 
 #include <chrono>
 #include <bsoncxx/builder/basic/document.hpp>
@@ -42,7 +42,7 @@ void ot::TransactionEntry::setFromJsonObject(const ConstJsonObject& _jsonObject)
 	m_transactionType = ot::Transaction::fromInt(temp);
 
 	ot::ConstJsonArray from = ot::json::getArray(_jsonObject, "from");
-	for (int i = 0 ; i < from.Size() ; i++)
+	for (rapidjson::SizeType i = 0; i < from.Size() ; i++)
 	{
 		ot::ConstJsonArray identifier = ot::json::getArray(from, i);
 		ot::EntityIdentifier ident;
@@ -52,7 +52,7 @@ void ot::TransactionEntry::setFromJsonObject(const ConstJsonObject& _jsonObject)
 	}
 	
 	ot::ConstJsonArray to = ot::json::getArray(_jsonObject, "to");
-	for (int i = 0; i < to.Size(); i++)
+	for (rapidjson::SizeType i = 0; i < to.Size(); i++)
 	{
 		ot::ConstJsonArray identifier = ot::json::getArray(to, i);
 		ot::EntityIdentifier ident;

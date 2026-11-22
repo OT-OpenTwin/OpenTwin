@@ -521,7 +521,7 @@ bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config,
 
 				mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("UserSettings", _userCollection);
 
-				bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+				bsoncxx::stdx::optional<mongocxx::result::update> updateResult = collection.update_many(doc_find.view(), doc_modify.view());
 			}
 			catch (std::exception _e)
 			{
