@@ -31,6 +31,7 @@
 #include "OTGui/CopyInformation.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTBlockEntities/EntityBlock.h"
+#include "OTModelEntities/EntityParameter.h"
 
 #pragma warning(disable:4996)
 
@@ -177,6 +178,7 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 	// Now we add all new entities (including children and data entities) to the storage
 	ot::UIDList topoEntID, topoEntVers, dataEntID, dataEntVers, dataEntParent;
 	std::list<bool> forceVis;
+	ot::UIDList pastedParameterIDs;
 
 	for (auto& newEntityByName : _newEntitiesByName)
 	{
@@ -203,6 +205,10 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 			topoEntID.push_back(newEntity->getEntityID());
 			topoEntVers.push_back(newEntity->getEntityStorageVersion());
 			forceVis.push_back(false);
+			if(dynamic_cast<EntityParameter*>(newEntity) != nullptr)
+			{
+				pastedParameterIDs.push_back(newEntity->getEntityID());
+			}
 		}
 		else
 		{
@@ -214,7 +220,15 @@ void CopyPasteHandler::storeEntities(std::map<ot::UID, EntityBase*>& _newEntitie
 		}
 	}
 
-	model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true,false,true);
+	if (pastedParameterIDs.empty()) {
+		model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", true, false, true);
+	}
+	else {
+		model->addEntitiesToModel(topoEntID, topoEntVers, forceVis, dataEntID, dataEntVers, dataEntParent, "Copy+Paste Entities", false, false, true);
+		model->evaluateParameterExpressions(pastedParameterIDs);
+		model->modelChangeOperationCompleted("Copy+Paste Entities",false);
+	}
+	
 }
 
 std::string CopyPasteHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& _document) {
@@ -248,6 +262,20 @@ std::string CopyPasteHandler::selectedEntitiesSerialiseAction(ot::JsonDocument& 
 			if (container) {
 				for (EntityBase* child : container->getChildrenList()) {
 					if (child->getClassName() == "EntityResult1DCurve") {
+						entitiesToCopy.insert(child->getEntityID());
+					}
+				}
+			}
+		}
+		else if (entity->getName() == model->getParameterRootName()) {
+			// Top-level "Parameters" folder itself is not serialized
+			// copy all contained parameters instead
+
+			entitiesToCopy.erase(uid);
+			EntityContainer* container = dynamic_cast<EntityContainer*>(entity);
+			if (container) {
+				for(EntityBase* child : container->getChildrenList()) {
+					if (child->getClassName() == "EntityParameter") {
 						entitiesToCopy.insert(child->getEntityID());
 					}
 				}

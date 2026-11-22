@@ -59,6 +59,9 @@ public:
 
 	std::map<ot::UID, std::map<std::string, bool>> getDependencies(void) { return dependencyMap; }
 
+	virtual std::string serialiseAsJSON(void) override;
+	virtual bool deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map <ot::UID, EntityBase*>& _entityMap) noexcept override;
+
 private:
 	virtual int getSchemaVersion(void) override { return 1; };
 	virtual void addStorageData(bsoncxx::builder::basic::document &storage) override;

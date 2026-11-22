@@ -196,6 +196,7 @@ public:
 
 	void addEntitiesToModel(const ot::NewModelStateInfo& _modelStateInfo, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch, bool _considerVisualization);
 	void addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, const std::list<ot::UID>& _topologyEntityVersionList, const std::list<bool>& _topologyEntityForceVisible, const std::list<ot::UID>& _dataEntityIDList, const std::list<ot::UID>& _dataEntityVersionList, const std::list<ot::UID>& _dataEntityParentList, const std::string& _description, bool _saveModel, bool _askForCreationOfBranch, bool _considerVisualization);
+	void evaluateParameterExpressions(const ot::UIDList& parameterIDs);
 	void addGeometryOperation(ot::UID geomEntityID, ot::UID geomEntityVersion, const std::string &geomEntityName, std::list<ot::UID> &dataEntityIDList, std::list<ot::UID> &dataEntityVersionList, std::list<ot::UID> &dataEntityParentList, std::list<std::string> &childrenList, const std::string &description);
 	void deleteEntitiesFromModel(const ot::UIDList& _entityIDList, bool _saveModel);
 	void deleteEntitiesFromModel(const std::list<std::string>& _entityNameList, bool _saveModel);

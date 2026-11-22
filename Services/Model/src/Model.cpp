@@ -116,6 +116,7 @@
 #include <iostream>
 #include <set>
 #include <memory>
+#include <cmath>
 
 #include <tinyexpr.h>
 
@@ -4834,6 +4835,77 @@ void Model::addEntitiesToModel(const std::list<ot::UID>& _topologyEntityIDList, 
 	if (_saveModel)
 	{
 		modelChangeOperationCompleted(_description, _askForCreationOfBranch);
+	}
+}
+
+void Model::evaluateParameterExpressions(const ot::UIDList& parameterIDs)
+{
+	// Mark all pasted parameters as modified, so that they will be evaluated in the next step
+	for(ot::UID parameterID : parameterIDs)
+	{
+		EntityBase* entity = getEntityByID(parameterID);
+		if(entity == nullptr)
+		{
+			OT_LOG_E("Could not find Entity with ID: " + std::to_string(parameterID));
+			continue;
+		}
+
+		EntityParameter* parameter = dynamic_cast<EntityParameter*>(getEntityByID(parameterID));
+		if(parameter == nullptr)
+		{
+			continue;
+		}
+
+		EntityPropertiesBase* valueProp = parameter->getProperties().getProperty("Value", "General");
+		if(valueProp == nullptr)
+		{
+			OT_LOG_E("Could not find Value property for parameter with ID: " + std::to_string(parameterID));
+			continue;
+		}
+		valueProp->setNeedsUpdate();
+		setEntityOutdated(parameter);
+	}
+
+	// Evluate queued parameters and propagate changed numeric values to dependent parameters
+	while (!m_pendingEntityUpdates.empty())
+	{
+		EntityBase* entity = nullptr;
+		for (auto& ent : m_pendingEntityUpdates) {
+			if (dynamic_cast<EntityParameter*>(ent.first) != nullptr) {
+				entity = ent.first;
+				break;
+			}
+		}
+
+		if (entity == nullptr) {
+			entity = m_pendingEntityUpdates.begin()->first;
+		}
+
+		EntityParameter* parameter = dynamic_cast<EntityParameter*>(entity);
+		const double oldValue = (parameter != nullptr) ? parameter->getNumericValue() : 0.0;
+
+		updateEntity(entity);
+		setEntityUpdated(entity);
+
+		if (parameter != nullptr && std::isfinite(parameter->getNumericValue()) && parameter->getNumericValue() != oldValue) {
+			for (const auto& entityDependency : parameter->getDependencies()) {
+				EntityBase* dependentEntity = getEntityByID(entityDependency.first);
+				if (dependentEntity == nullptr)
+				{
+					continue;
+				}
+				for (const auto& propertyDependency : entityDependency.second)
+				{
+					EntityPropertiesBase* prop = dependentEntity->getProperties().getProperty(propertyDependency.first);
+					if (prop != nullptr)
+					{
+						prop->setNeedsUpdate();
+					}
+				}
+				dependentEntity->setModified();
+				setEntityOutdated(dependentEntity);
+			}
+		}
 	}
 }
 

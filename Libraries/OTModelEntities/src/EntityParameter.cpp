@@ -22,10 +22,11 @@
 
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/EntityParameter.h"
-
+#include "OTCore/Logging/Logger.h"
 #include "OTCommunication/ActionTypes.h"
 
 #include <bsoncxx/builder/basic/array.hpp>
+#include <bsoncxx/json.hpp>
 
 static EntityFactoryRegistrar<EntityParameter> registrar("EntityParameter");
 
@@ -246,5 +247,40 @@ void EntityParameter::removeAllDependencies(void)
 {
 	dependencyMap.clear();
 	setModified();
+}
+
+std::string EntityParameter::serialiseAsJSON(void)
+{
+	auto docParameter = EntityBase::serialiseAsMongoDocument();
+	const std::string jsonDocParameter = bsoncxx::to_json(docParameter);
+	ot::JsonDocument entireDoc;
+	entireDoc.fromJson(jsonDocParameter);
+
+	return entireDoc.toJson();
+
+}
+
+bool EntityParameter::deserialiseFromJSON(const ot::ConstJsonObject& _serialisation, const ot::CopyInformation& _copyInformation, std::map<ot::UID, EntityBase*>& _entityMap) noexcept
+{
+	try {
+		const std::string serialsationString = ot::json::toJson(_serialisation);
+		std::string_view serialisedEntityJSONView(serialsationString);
+		auto serialisedEntityBSON = bsoncxx::from_json(serialisedEntityJSONView);
+		auto serialisedEntityBSONView = serialisedEntityBSON.view();
+
+		readSpecificDataFromDataBase(serialisedEntityBSONView, _entityMap);
+
+		removeAllDependencies();
+
+		setEntityID(createEntityUID());
+		_entityMap[getEntityID()] = this;
+
+		return true;
+	}
+	catch (const std::exception& _e)
+	{
+		OT_LOG_E("Failed to deserialise " + getClassName() + " because: " + std::string(_e.what()));
+		return false;
+	}
 }
 
