@@ -55,9 +55,9 @@ namespace ot {
     }
 }
 
-bool ot::FileSystem::readFile(const std::string& _filePath, std::string& _outputContent, uint64_t& _fileSize, std::ifstream::iostate _exceptionMask) {
+bool ot::FileSystem::readFile(const std::string& _filePath, std::string& _outputContent, uint64_t* _fileSize, std::ifstream::iostate _exceptionMask) {
     _outputContent.clear();
-    _fileSize = 0;
+	uint64_t fileSize = 0;
 
     std::ifstream file;
     file.exceptions(_exceptionMask);
@@ -80,31 +80,39 @@ bool ot::FileSystem::readFile(const std::string& _filePath, std::string& _output
             return false;
         }
 
-        _fileSize = static_cast<uint64_t>(sizeOff);
+        fileSize = static_cast<uint64_t>(sizeOff);
 
         // Guard against std::string size overflow
-        if (_fileSize > _outputContent.max_size()) {
+        if (fileSize > _outputContent.max_size()) {
             return false;
         }
 
         // Read file
-        _outputContent.resize(static_cast<std::size_t>(_fileSize));
+        _outputContent.resize(static_cast<std::size_t>(fileSize));
         file.seekg(0, std::ios::beg);
 
-        if (_fileSize > 0) {
-            file.read(&_outputContent[0], static_cast<std::streamsize>(_fileSize));
+        if (fileSize > 0) {
+            file.read(&_outputContent[0], static_cast<std::streamsize>(fileSize));
             if (!file) {
                 _outputContent.clear();
-                _fileSize = 0;
+                fileSize = 0;
                 return false;
             }
         }
 
+		// Close file
+		file.close();
+
+		// Set file size if requested
+        if (_fileSize)
+        {
+			*_fileSize = fileSize;
+        }
+
         return true;
     }
-    catch (const std::ios_base::failure&) {
+    catch (const std::exception&) {
         _outputContent.clear();
-        _fileSize = 0;
         return false;
     }
 }
@@ -187,7 +195,6 @@ ot::DateTime ot::FileSystem::getLastModifiedTime(const std::string& _path, bool 
 #endif
     return modifiedTime;
 }
-
 
 ot::DateTime ot::FileSystem::getLastAccessTime(const std::string& _path, bool _useLocalTime) {
     DateTime accessTime;

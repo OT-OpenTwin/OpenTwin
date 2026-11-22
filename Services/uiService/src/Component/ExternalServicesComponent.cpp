@@ -1967,7 +1967,7 @@ bool ExternalServicesComponent::readFileContent(const std::string& fileName, std
 	*/
 
 	std::string uncompressedContent;
-	if (!ot::FileSystem::readFile(fileName, uncompressedContent, uncompressedDataLength))
+	if (!ot::FileSystem::readFile(fileName, uncompressedContent, &uncompressedDataLength))
 	{
 		OT_LOG_E("Failed to read file content: \"" + fileName + "\"");
 		return false;
