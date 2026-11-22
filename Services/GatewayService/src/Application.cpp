@@ -60,8 +60,6 @@ Application::~Application()
 void Application::initialize()
 {
 	OT_LOG_T("Ini");
-	this->connectAction(OT_ACTION_CMD_CheckGatewayReady, this, &Application::handleCheckReady, ot::SECURE_MESSAGE_TYPES);
-	this->connectAction(OT_ACTION_CMD_GatewayRun, this, &Application::handleRunGateway, ot::SECURE_MESSAGE_TYPES);
 }
 
 
@@ -90,4 +88,8 @@ Application::Application() :
 		new ot::AbstractUiNotifier(),
 		new ot::AbstractModelNotifier()
 	)
-{}
+{
+	// Connect actions (except gateway actions)
+	this->connectAction(OT_ACTION_CMD_CheckGatewayReady, this, &Application::handleCheckReady, ot::SECURE_MESSAGE_TYPES);
+	this->connectAction(OT_ACTION_CMD_GatewayRun, this, &Application::handleRunGateway, ot::SECURE_MESSAGE_TYPES);
+}

@@ -285,10 +285,10 @@ ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _json
 	{
 		return ot::ReturnMessage::failed("Failed to request gateway start from LDS");
 	}
-	
-
-	ot::GatewayConnectionInfo newGatewayInfo;
-	return ot::ReturnMessage::failed(newGatewayInfo.toJson());
+	else
+	{
+		return ot::ReturnMessage::ok(gatewayInfo->toJson());
+	}
 }
 
 void Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
