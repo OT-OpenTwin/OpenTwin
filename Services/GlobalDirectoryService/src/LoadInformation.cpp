@@ -78,7 +78,7 @@ LoadInformation& LoadInformation::operator=(LoadInformation&& _other) noexcept {
 	return *this;
 }
 
-LoadInformation::load_t LoadInformation::load(void) const {
+LoadInformation::load_t LoadInformation::load() const {
 	// Determine max load value
 	load_t l = m_currentPhysicalMemoryLoad;
 	if (m_currentVirtualMemoryLoad > l) {

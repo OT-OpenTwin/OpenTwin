@@ -69,21 +69,21 @@ public:
 
 	void setStateFlag(SessionStateFlag _flag, bool _active = true) { m_state.set(_flag, _active); };
 	void setState(const SessionState& _state) { m_state = _state; };
-	const SessionState& getState(void) const { return m_state; };
+	const SessionState& getState() const { return m_state; };
 
 	//! @brief Set the session id.
 	//! @param _id ID to set.
 	void setId(const std::string& _id) { m_id = _id; };
 
 	//! @brief Returns the session id.
-	const std::string& getId(void) const { return m_id; };
+	const std::string& getId() const { return m_id; };
 
 	//! @brief Set the session user name.
 	//! @param _name User name to set.
 	void setUserName(const std::string& _name) { m_userName = _name; };
 
 	//! @brief Returns the session user name.
-	const std::string& getUserName(void) const { return m_userName; };
+	const std::string& getUserName() const { return m_userName; };
 
 	ot::GSSDebugInfo::SessionData getDebugInformation() const;
 

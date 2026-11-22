@@ -56,10 +56,10 @@ namespace ot {
 		virtual void setFromJsonObject(const ConstJsonObject& _object) override;
 
 		void setServiceName(const std::string& _serviceName) { m_name = _serviceName; };
-		const std::string& serviceName(void) const { return m_name; };
+		const std::string& serviceName() const { return m_name; };
 
 		void setServiceType(const std::string& _serviceType) { m_type = _serviceType; };
-		const std::string& serviceType(void) const { return m_type; };
+		const std::string& serviceType() const { return m_type; };
 
 	private:
 		std::string m_name; //! @brief Service name.

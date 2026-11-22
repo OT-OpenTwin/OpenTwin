@@ -172,128 +172,6 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 	return 0;
 }
 
-ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData) {
-	OTAssertNullptr(m_application);
-
-	if (m_componentState != WaitForInit) {
-		OT_LOG_E("Component already initialized");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Component already initialized");
-	}
-
-	// First set the log flags
-	ot::LogDispatcher::instance().setLogFlags(_initData.getLogFlags());
-	ot::LogDispatcher::instance().setUserName(_initData.getUsername());
-	m_application->logFlagsChanged(_initData.getLogFlags());
-
-	OT_LOG_D("Starting Foundation initialization");
-
-	// Set service parameters
-	m_application->setSessionServiceURL(_initData.getSessionServiceURL());
-	m_application->setSessionIDPrivate(_initData.getSessionID());
-	m_application->setProjectType(_initData.getSessionType());
-	m_application->setServiceID(_initData.getServiceID());
-	m_application->m_lmsUrl = _initData.getLMSUrl();
-
-	ot::ThisService::instance().setServiceID(m_application->getServiceID());
-	ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
-
-	// Setup database parameters
-	m_application->setDataBaseURL(_initData.getDatabaseUrl());
-	m_application->m_dbUserCollection = _initData.getUserCollection();
-	m_application->m_loggedInUserName = _initData.getUsername();
-	m_application->m_dataBaseUserName = _initData.getDatabaseUsername();
-	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
-
-	// Initialize database api (project name will be set by the setSessionIDPrivate call above)
-	DataBase& db = DataBase::instance();
-	db.setDataBaseServerURL(_initData.getDatabaseUrl());
-	db.setSiteIDString("1");
-	db.setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
-
-	ot::DebugHelper::serviceSetupCompleted(*m_application);
-
-	// Register this service as a service in the session service
-	JsonDocument newServiceCommandDoc;
-	newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-
-	// In debug mode add the process ID to the confirmation request
-
-	unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
-	if (handleID == 0) {
-		OT_LOG_E("Failed to get current process id");
-	}
-	else {
-		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	}
-
-	// Send request
-	std::string responseStr;
-	if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), responseStr)) {
-		OT_LOG_E("Failed to send http request to LSS at \"" + m_application->getSessionServiceURL() + "\"");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
-	}
-
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-	if (response != ot::ReturnMessage::Ok) {
-		OT_LOG_E("Failed to register service at LSS: " + response.getWhat());
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to register service at LSS");
-	}
-
-	// Ensure database connection
-	if (!m_application->initializeDataBaseConnectionPrivate()) {
-		OT_LOG_E("Failed to ensure database connection");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to ensure database connection");
-	}
-
-	// Initialize default template
-	m_application->initializeDefaultTemplate();
-
-	// Get the settings from the database
-	PropertyGridCfg settingsConfig = m_application->createSettings();
-	this->updateSettingsFromDataBase(settingsConfig);
-
-	OT_LOG_D("Foundation setup completed with { "
-		"\"LSS.Url\": \"" + _initData.getSessionServiceURL() + "\", "
-		"\"Service.ID\": " + std::to_string(m_application->getServiceID()) + ", "
-		"\"Session.ID\": \"" + m_application->getSessionID() + "\", "
-		"\"Database.Url\": \"" + _initData.getDatabaseUrl() + "\", "
-		"\"Site.ID\": \"" + DataBase::instance().getSiteIDString() + "\""
-		" }"
-	);
-
-	JsonDocument reply;
-	reply.fromJson(response.getWhat());
-
-	m_componentState = Ready;
-
-	// Start session service health check
-	std::thread t{ ot::intern::sessionServiceHealthChecker, m_application->getSessionServiceURL() };
-	t.detach();
-
-	OT_LOG_D("Initialization completed");
-
-	// Initialize the application
-	m_application->initialize();
-
-	// Notify the application about all services currently connected to the session if provided
-	if (reply.HasMember(OT_ACTION_PARAM_RunData)) {
-		ot::ServiceRunData runData;
-		runData.setFromJsonObject(json::getObject(reply, OT_ACTION_PARAM_RunData));
-
-		for (const ot::ServiceBase& service : runData.getServices()) {
-			m_application->serviceConnectedPrivate(service);
-		}
-	}
-
-	// Initialize the performance counters
-	m_systemLoad.initialize();
-
-	return ot::ReturnMessage(ot::ReturnMessage::Ok);
-}
-
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	const std::string &					_json,
 	const std::string &					_sender,
@@ -338,6 +216,61 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 	}
 }
 
+// #####################################################################################################################################
+
+void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand)
+{
+
+	OT_LOG_D("Shutdown requested");
+
+	m_application->shuttingDownPrivate(_requestedAsCommand);
+
+	// Notify the session service about the service shutting down
+	if (!_requestedAsCommand)
+	{
+		// Create a document to notify the session service about the fact that this service is closing
+		JsonDocument commandDoc;
+		commandDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceClosing, commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), commandDoc.GetAllocator());
+		commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), commandDoc.GetAllocator()), commandDoc.GetAllocator());
+		std::string response;
+
+		OT_LOG_D("Sending shutdown notification to LSS");
+
+		if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, commandDoc.toJson(), response))
+		{
+			assert(0); // Failed to send http request
+		}
+	}
+
+	std::thread t(ot::intern::exitWorker, ot::AppExitCode::Success);
+	t.detach();
+}
+
+void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyGridCfg& _config)
+{
+	if (_config.isEmpty()) return;
+
+	OTAssertNullptr(m_application);
+
+	DataBase& db = DataBase::instance();
+	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(db.getDataBaseServerURL(), db.getSiteIDString(), db.getUserName(), db.getUserPassword(), m_application->m_dbUserCollection);
+
+	if (!oldConfig.isEmpty())
+	{
+		_config.mergeWith(oldConfig, ot::PropertyBase::FullMerge);
+	}
+
+	m_application->settingsSynchronized(_config);
+}
+
+void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad)
+{
+	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCPULoad, globalMemoryLoad);
+
+	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCPULoad, processMemoryLoad);
+}
+
 std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation() 
 {
 	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
@@ -358,52 +291,10 @@ std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation()
 
 	return reply.toJson();
 }
-// #####################################################################################################################################
-
-void ot::intern::ExternalServicesComponent::shutdown(bool _requestedAsCommand) {
-
-	OT_LOG_D("Shutdown requested");
-
-	m_application->shuttingDownPrivate(_requestedAsCommand);
-	
-	// Notify the session service about the service shutting down
-	if (!_requestedAsCommand) {
-		// Create a document to notify the session service about the fact that this service is closing
-		JsonDocument commandDoc;
-		commandDoc.AddMember(OT_ACTION_MEMBER, OT_ACTION_CMD_ServiceClosing, commandDoc.GetAllocator());
-		commandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), commandDoc.GetAllocator());
-		commandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), commandDoc.GetAllocator()), commandDoc.GetAllocator());
-		std::string response;
-
-		OT_LOG_D("Sending shutdown notification to LSS");
-
-		if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, commandDoc.toJson(), response)) {
-			assert(0); // Failed to send http request
-		}
-	}
-
-	std::thread t(ot::intern::exitWorker, ot::AppExitCode::Success);
-	t.detach();
-}
-
-void ot::intern::ExternalServicesComponent::updateSettingsFromDataBase(PropertyGridCfg& _config) {
-	if (_config.isEmpty()) return;
-
-	OTAssertNullptr(m_application);
-
-	DataBase& db = DataBase::instance();
-	PropertyGridCfg oldConfig = m_application->getSettingsFromDataBase(db.getDataBaseServerURL(), db.getSiteIDString(), db.getUserName(), db.getUserPassword(), m_application->m_dbUserCollection);
-
-	if (!oldConfig.isEmpty()) {
-		_config.mergeWith(oldConfig, ot::PropertyBase::FullMerge);
-	}
-
-	m_application->settingsSynchronized(_config);
-}
 
 // #####################################################################################################################################
 
-// Private functions
+// Private: Acition handler
 
 void ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
 	ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
@@ -464,9 +355,137 @@ void ot::intern::ExternalServicesComponent::handleEmergencyShutdown() {
 	t.detach();
 }
 
-void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCPULoad, double& globalMemoryLoad, double& processCPULoad, double& processMemoryLoad)
-{
-	m_systemLoad.getGlobalCPUAndMemoryLoad(globalCPULoad, globalMemoryLoad);
+// #####################################################################################################################################
 
-	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCPULoad, processMemoryLoad);
+// Private: Helper
+
+ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceInitData& _initData)
+{
+	OTAssertNullptr(m_application);
+
+	if (m_componentState != WaitForInit)
+	{
+		OT_LOG_E("Component already initialized");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Component already initialized");
+	}
+
+	// First set the log flags
+	ot::LogDispatcher::instance().setLogFlags(_initData.getLogFlags());
+	ot::LogDispatcher::instance().setUserName(_initData.getUsername());
+	m_application->logFlagsChanged(_initData.getLogFlags());
+
+	OT_LOG_D("Starting Foundation initialization");
+
+	// Set service parameters
+	m_application->setSessionServiceURL(_initData.getSessionServiceURL());
+	m_application->setSessionIDPrivate(_initData.getSessionID());
+	m_application->setProjectType(_initData.getSessionType());
+	m_application->setServiceID(_initData.getServiceID());
+	m_application->m_lmsUrl = _initData.getLMSUrl();
+
+	ot::ThisService::instance().setServiceID(m_application->getServiceID());
+	ot::OwnerServiceGlobal::instance().setId(m_application->getServiceID());
+
+	// Setup database parameters
+	m_application->setDataBaseURL(_initData.getDatabaseUrl());
+	m_application->m_dbUserCollection = _initData.getUserCollection();
+	m_application->m_loggedInUserName = _initData.getUsername();
+	m_application->m_dataBaseUserName = _initData.getDatabaseUsername();
+	m_application->m_dataBaseUserPassword = _initData.getDatabasePassword();
+
+	// Initialize database api (project name will be set by the setSessionIDPrivate call above)
+	DataBase& db = DataBase::instance();
+	db.setDataBaseServerURL(_initData.getDatabaseUrl());
+	db.setSiteIDString("1");
+	db.setUserCredentials(_initData.getDatabaseUsername(), _initData.getDatabasePassword());
+
+	ot::DebugHelper::serviceSetupCompleted(*m_application);
+
+	// Register this service as a service in the session service
+	JsonDocument newServiceCommandDoc;
+	newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
+	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+
+	// In debug mode add the process ID to the confirmation request
+
+	unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
+	if (handleID == 0)
+	{
+		OT_LOG_E("Failed to get current process id");
+	}
+	else
+	{
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+	}
+
+	// Send request
+	std::string responseStr;
+	if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), responseStr))
+	{
+		OT_LOG_E("Failed to send http request to LSS at \"" + m_application->getSessionServiceURL() + "\"");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
+	}
+
+	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+	if (response != ot::ReturnMessage::Ok)
+	{
+		OT_LOG_E("Failed to register service at LSS: " + response.getWhat());
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to register service at LSS");
+	}
+
+	// Ensure database connection
+	if (!m_application->initializeDataBaseConnectionPrivate())
+	{
+		OT_LOG_E("Failed to ensure database connection");
+		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to ensure database connection");
+	}
+
+	// Initialize default template
+	m_application->initializeDefaultTemplate();
+
+	// Get the settings from the database
+	PropertyGridCfg settingsConfig = m_application->createSettings();
+	this->updateSettingsFromDataBase(settingsConfig);
+
+	OT_LOG_D("Foundation setup completed with { "
+		"\"LSS.Url\": \"" + _initData.getSessionServiceURL() + "\", "
+		"\"Service.ID\": " + std::to_string(m_application->getServiceID()) + ", "
+		"\"Session.ID\": \"" + m_application->getSessionID() + "\", "
+		"\"Database.Url\": \"" + _initData.getDatabaseUrl() + "\", "
+		"\"Site.ID\": \"" + DataBase::instance().getSiteIDString() + "\""
+		" }"
+	);
+
+	JsonDocument reply;
+	reply.fromJson(response.getWhat());
+
+	m_componentState = Ready;
+
+	// Start session service health check
+	std::thread t{ ot::intern::sessionServiceHealthChecker, m_application->getSessionServiceURL() };
+	t.detach();
+
+	OT_LOG_D("Initialization completed");
+
+	// Initialize the application
+	m_application->initialize();
+
+	// Notify the application about all services currently connected to the session if provided
+	if (reply.HasMember(OT_ACTION_PARAM_RunData))
+	{
+		ot::ServiceRunData runData;
+		runData.setFromJsonObject(json::getObject(reply, OT_ACTION_PARAM_RunData));
+
+		for (const ot::ServiceBase& service : runData.getServices())
+		{
+			m_application->serviceConnectedPrivate(service);
+		}
+	}
+
+	// Initialize the performance counters
+	m_systemLoad.initialize();
+
+	return ot::ReturnMessage(ot::ReturnMessage::Ok);
 }

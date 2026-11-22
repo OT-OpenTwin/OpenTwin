@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ManageGroups.cpp
 // 
 // License:
@@ -195,7 +195,7 @@ AddGroupDialog::~AddGroupDialog() {
 
 }
 
-QString AddGroupDialog::groupName(void) const {
+QString AddGroupDialog::groupName() const {
 	return m_input->text();
 }
 
@@ -301,7 +301,7 @@ RenameGroupDialog::~RenameGroupDialog() {
 
 }
 
-QString RenameGroupDialog::groupName(void) const
+QString RenameGroupDialog::groupName() const
 { 
 	return m_input->text(); 
 }
@@ -529,7 +529,7 @@ ManageGroups::~ManageGroups() {
 
 // Slots
 
-void ManageGroups::slotAddGroup(void)
+void ManageGroups::slotAddGroup()
 {
 	AddGroupDialog dialog(m_authServerURL, this);
 
@@ -539,7 +539,7 @@ void ManageGroups::slotAddGroup(void)
 	}
 }
 
-void ManageGroups::slotRenameGroup(void)
+void ManageGroups::slotRenameGroup()
 {
 	QTableWidgetItem *groupNameItem = nullptr;
 	QTableWidgetItem *groupOwnerItem = nullptr;
@@ -556,7 +556,7 @@ void ManageGroups::slotRenameGroup(void)
 	}
 }
 
-void ManageGroups::slotChangeGroupOwner(void)
+void ManageGroups::slotChangeGroupOwner()
 {
 	QTableWidgetItem *groupNameItem = nullptr;
 	QTableWidgetItem *groupOwnerItem = nullptr;
@@ -574,7 +574,7 @@ void ManageGroups::slotChangeGroupOwner(void)
 	slotFillGroupsList();
 }
 
-void ManageGroups::slotDeleteGroup(void)
+void ManageGroups::slotDeleteGroup()
 {
 	QTableWidgetItem *groupNameItem = nullptr;
 	QTableWidgetItem *groupOwnerItem = nullptr;
@@ -691,7 +691,7 @@ bool ManageGroups::hasSuccessful(const std::string &response) {
 	}
 }
 
-void ManageGroups::slotFillGroupsList(void) {
+void ManageGroups::slotFillGroupsList() {
 	// Store selection
 
 	// Clear list
@@ -788,7 +788,7 @@ void ManageGroups::slotFillGroupsList(void) {
 	}
 }
 
-void ManageGroups::slotFillMembersList(void) {
+void ManageGroups::slotFillMembersList() {
 	// Store selection
 
 	// Clear list
@@ -940,7 +940,7 @@ void ManageGroups::slotFillMembersList(void) {
 
 }
 
-void ManageGroups::readUserList(void)
+void ManageGroups::readUserList()
 {
 	m_userList.clear();
 	m_userInGroup.clear();

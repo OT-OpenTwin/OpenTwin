@@ -51,7 +51,7 @@ public:
 	explicit SelectEntitiesDialog(const ot::SelectEntitiesDialogCfg& _config, QWidget* _parent);
 	virtual ~SelectEntitiesDialog();
 
-	bool selectionHasChanged(void) const;
+	bool selectionHasChanged() const;
 
 	//! @brief Returns the paths of the selected items
 	//! @param _pathDelimiter The character used to separete the item names

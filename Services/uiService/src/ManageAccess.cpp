@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ManageAccess.cpp
 // 
 // License:
@@ -250,17 +250,17 @@ ManageAccess::~ManageAccess() {
 
 // Slots
 
-void ManageAccess::slotShowGroupsWithAccessOnly(void)
+void ManageAccess::slotShowGroupsWithAccessOnly()
 {
 	fillGroupsList();
 }
 
-void ManageAccess::slotGroupsFilter(void)
+void ManageAccess::slotGroupsFilter()
 {
 	fillGroupsList();
 }
 
-void ManageAccess::slotGroupsSelection(void)
+void ManageAccess::slotGroupsSelection()
 {
 
 }
@@ -330,7 +330,7 @@ std::string ManageAccess::tolower(std::string s)
 	return s;
 }
 
-void ManageAccess::fillGroupsList(void)
+void ManageAccess::fillGroupsList()
 {
 	// Store selection
 
@@ -440,7 +440,7 @@ void ManageAccess::fillGroupsList(void)
 
 }
 
-void ManageAccess::readGroupsList(void)
+void ManageAccess::readGroupsList()
 {
 	m_groupList.clear();
 	m_groupHasAccess.clear();

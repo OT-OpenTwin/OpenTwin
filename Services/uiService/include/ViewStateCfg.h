@@ -34,11 +34,11 @@ public:
 
 	ViewStateCfg& operator = (ViewStateCfg&& _other) noexcept = delete;
 
-	std::string toJson(void) const;
+	std::string toJson() const;
 	static ViewStateCfg fromJson(const std::string& _json);
 
 	void setViewConfig(const std::string& _cfgString) { m_viewConfig = _cfgString; };
-	const std::string& getViewConfig(void) const { return m_viewConfig; };
+	const std::string& getViewConfig() const { return m_viewConfig; };
 
 private:
 	std::string m_viewConfig;

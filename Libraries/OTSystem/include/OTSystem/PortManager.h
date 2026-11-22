@@ -59,7 +59,7 @@ namespace ot {
 		bool isPortInUse(ot::port_t _portNumber) const;
 
 		//! @brief Determines the next available port and blocks it.
-		ot::port_t determineAndBlockAvailablePort(void);
+		ot::port_t determineAndBlockAvailablePort();
 
 		bool hasPortRanges() const { return !m_ranges.empty(); };
 

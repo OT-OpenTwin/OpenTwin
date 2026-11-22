@@ -316,7 +316,7 @@ namespace ot {
 			void setProgress(int percentage);
 
 			//! @brief Will hide the progress bar
-			void closeProgressInformation(void);
+			void closeProgressInformation();
 
 			//! @brief Will switch current menu tab to the one provided
 			//! @param _pageName The name of the page
@@ -325,17 +325,17 @@ namespace ot {
 			) const;
 
 			//! @brief Will register for model events at the UI
-			void registerForModelEvents(void) const;
+			void registerForModelEvents() const;
 
 			//! @brief Will deregister from the model events at the UI
-			void deregisterForModelEvents(void) const;
+			void deregisterForModelEvents() const;
 
 			//! @brief Will add the provided path to the uiService icon manager
 			//! This function has no effect when running in release mode
 			void addIconSearchPath(const std::string& _iconPath);
 
 			//! @brief Will notify the ui that this service completed its frontend setup
-			void notifyUiSetupCompleted(void);
+			void notifyUiSetupCompleted();
 
 			// #####################################################################################################################
 
@@ -399,7 +399,7 @@ namespace ot {
 			void removeUIElements(const std::list<std::string> & _itemList);
 
 			//! @brief Will remove all UI elements this service has created
-			void removeAllUIElements(void);
+			void removeAllUIElements();
 
 			// #####################################################################################################################
 
@@ -421,7 +421,7 @@ namespace ot {
 			void freeze3DView(UID _visualizationModelUID, bool _flag);
 			void refreshSelection(UID _visualizationModelUID);
 			void refreshAllViews(UID visualizationModelID);
-			void sendUpdatedControlState(void);
+			void sendUpdatedControlState();
 			void setControlState(const std::string controlName, bool enabled);
 			void selectEntity(UID _visualizationModelUID, const std::string& _entityName);
 

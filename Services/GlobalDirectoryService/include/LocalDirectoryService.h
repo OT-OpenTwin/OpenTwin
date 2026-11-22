@@ -51,8 +51,8 @@ public:
 
 	// Load information
 
-	const LoadInformation& loadInformation(void) const { return m_loadInformation; }
-	LoadInformation::load_t load(void) const;
+	const LoadInformation& loadInformation() const { return m_loadInformation; }
+	LoadInformation::load_t load() const;
 
 	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
 

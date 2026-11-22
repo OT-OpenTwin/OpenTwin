@@ -36,6 +36,6 @@ namespace ot {
 		OT_SYS_API_EXPORT unsigned long checkTCPConnection(port_t _port, const char * _ip);
 
 		//! @brief Will return the last error text
-		OT_SYS_API_EXPORT std::wstring getLastError(void);
+		OT_SYS_API_EXPORT std::wstring getLastError();
 	}
 }

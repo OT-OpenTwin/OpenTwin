@@ -636,7 +636,7 @@ std::string LockManager::getDebugInformationString() const {
 
 // Private functions
 
-std::map<ot::LockType, int> * LockManager::generateDefaultLockMap(void) const {
+std::map<ot::LockType, int> * LockManager::generateDefaultLockMap() const {
 	// Create new entry
 	std::map<ot::LockType, int> * newMap{ new std::map<ot::LockType, int> };
 
@@ -712,7 +712,7 @@ ScopedLockManagerLock::~ScopedLockManagerLock() {
 	}
 }
 
-void ScopedLockManagerLock::setNoUnlock(void) {
+void ScopedLockManagerLock::setNoUnlock() {
 	m_skipUnlock = true;
 }
 

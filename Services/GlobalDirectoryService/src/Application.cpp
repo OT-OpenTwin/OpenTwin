@@ -45,7 +45,7 @@
 
 // Static methods
 
-Application& Application::instance(void) {
+Application& Application::instance() {
 	static Application g_instance;
 	return g_instance;
 }

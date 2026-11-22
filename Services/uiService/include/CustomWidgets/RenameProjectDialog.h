@@ -35,10 +35,10 @@ public:
 	explicit RenameProjectDialog(const QString& _projectToRename, ProjectManagement &projectManager, QWidget* _parent);
 	virtual ~RenameProjectDialog();
 
-	QString getProjectName(void) const;
+	QString getProjectName() const;
 
 private Q_SLOTS:
-	void slotConfirm(void);
+	void slotConfirm();
 
 private:
 	QString       m_projectToRename;

@@ -41,7 +41,7 @@ public:
 
 	void addRow(const std::array<QTableWidgetItem *, 2> &_columns);
 
-	void Clear(void);
+	void Clear();
 
 	virtual void mouseMoveEvent(QMouseEvent * _event) override;
 
@@ -71,16 +71,16 @@ public:
 	virtual ~ManageAccess();
 
 public Q_SLOTS:
-	void slotShowGroupsWithAccessOnly(void);
-	void slotGroupsFilter(void);
-	void slotGroupsSelection(void);
+	void slotShowGroupsWithAccessOnly();
+	void slotGroupsFilter();
+	void slotGroupsSelection();
 	void slotGroupCheckBoxChanged(bool state, int row);
 
 private:
-	void fillGroupsList(void);
+	void fillGroupsList();
 	std::string tolower(std::string s);
 	bool hasSuccessful(const std::string &response);
-	void readGroupsList(void);
+	void readGroupsList();
 
 	ot::LineEdit*								m_filterGroups;
 	ManageAccessTable *							m_groupsList;

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ProjectManagement.cpp
 // 
 // License:
@@ -584,7 +584,7 @@ bool ProjectManagement::createNewCollection(const std::string &collectionName, c
 	return true;
 }
 
-bool ProjectManagement::InitializeConnection(void)
+bool ProjectManagement::InitializeConnection()
 {
 	if (m_isConnected) {
 		return true;
@@ -753,7 +753,7 @@ bool ProjectManagement::copyCollection(const std::string& sourceCollectionName, 
 	}
 }
 
-std::vector<std::string> ProjectManagement::getDefaultTemplateList(void)
+std::vector<std::string> ProjectManagement::getDefaultTemplateList()
 {
 	std::vector<std::string> templateList;
 	if (!InitializeConnection()) return templateList;

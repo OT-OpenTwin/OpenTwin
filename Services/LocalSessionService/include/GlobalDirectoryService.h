@@ -62,7 +62,7 @@ public:
 
 	//! @brief Checks if the Global Directory Service is connected.
 	//! Will return true if the connection status is Connected, otherwise false.
-	bool isConnected(void);
+	bool isConnected();
 
 	//! @brief Requests the GDS to start a service.
 	//! The service start will be performed asynchronously.

@@ -104,7 +104,7 @@ const char* ot::foundation::queueAction(const std::string& _json, const std::str
 	return intern::dispatchActionWrapper(_json, _senderIP, ot::QUEUE);
 };
 
-const char* ot::foundation::getServiceURL(void)
+const char* ot::foundation::getServiceURL()
 {
 	try
 	{

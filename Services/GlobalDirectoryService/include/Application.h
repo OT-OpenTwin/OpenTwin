@@ -53,7 +53,7 @@ public:
 
 	// Static methods
 
-	static Application& instance(void);
+	static Application& instance();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -85,7 +85,7 @@ public:
 	// Private methods
 
 private:
-	const std::vector<LocalDirectoryService>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; };
+	const std::vector<LocalDirectoryService>& getLocalDirectoryServices() const { return m_localDirectoryServices; };
 
 	LocalDirectoryService* leastLoadedDirectoryService(const std::string _serviceType);
 

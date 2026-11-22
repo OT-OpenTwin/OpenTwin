@@ -58,7 +58,7 @@ public:
 	// Setter / Getter
 
 	void setWebsocketUrl(const std::string& _websocketUrl) { m_websocketUrl = _websocketUrl; };
-	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
+	const std::string& getWebsocketUrl() const { return m_websocketUrl; };
 
 	void setIsDebug(bool _isDebug = true) { m_state.set(Service::IsDebug, _isDebug); };
 	bool isDebug() const { return m_state & Service::IsDebug; };
@@ -79,7 +79,7 @@ public:
 	bool isHidden() const { return m_state & Service::Hidden; };
 
 	//! @brief Will return the port numbers used by this service.
-	std::list<ot::port_t> getPortNumbers(void) const;
+	std::list<ot::port_t> getPortNumbers() const;
 
 	static std::string debugLogString(const ot::ServiceBase& _serviceInfo, const std::string& _sessionID);
 	std::string debugLogString(const std::string& _sessionID) const;

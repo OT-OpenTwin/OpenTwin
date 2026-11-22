@@ -61,16 +61,16 @@ namespace ot {
 		OT_SYS_API_EXPORT bool isApplicationRunning(OT_PROCESS_HANDLE& _processHandle);
 
 		//! \brief Will return a string containing the current directory where the current executable is located at.
-		OT_SYS_API_EXPORT std::string getCurrentExecutableDirectory(void);
+		OT_SYS_API_EXPORT std::string getCurrentExecutableDirectory();
 
 		//! \brief Will return a wide string containing the current directory where the current executable is located at.
-		OT_SYS_API_EXPORT std::wstring getCurrentExecutableDirectoryW(void);
+		OT_SYS_API_EXPORT std::wstring getCurrentExecutableDirectoryW();
 
 		//! \brief Will return a string containing the path of the current executable.
-		OT_SYS_API_EXPORT std::string getCurrentExecutableFilePath(void);
+		OT_SYS_API_EXPORT std::string getCurrentExecutableFilePath();
 
 		//! \brief Will return a wide string containing the path of the current executable.
-		OT_SYS_API_EXPORT std::wstring getCurrentExecutableFilePathW(void);
+		OT_SYS_API_EXPORT std::wstring getCurrentExecutableFilePathW();
 
 	}
 }

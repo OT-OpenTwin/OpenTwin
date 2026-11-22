@@ -39,7 +39,7 @@ extern "C" {
 		return ot::foundation::performAction(_json, _senderIP);
 	};
 
-	_declspec(dllexport) const char* getServiceURL(void)
+	_declspec(dllexport) const char* getServiceURL()
 	{
 		return ot::foundation::getServiceURL();
 	}

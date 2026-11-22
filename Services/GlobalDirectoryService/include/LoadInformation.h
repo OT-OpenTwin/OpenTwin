@@ -27,7 +27,7 @@ class LoadInformation {
 public:
 	typedef unsigned long long memory_t;
 	typedef double load_t;
-	static load_t maxLoadValue(void) { return DBL_MAX; }
+	static load_t maxLoadValue() { return DBL_MAX; }
 
 	LoadInformation();
 	LoadInformation(const LoadInformation& _other);
@@ -37,7 +37,7 @@ public:
 	LoadInformation& operator = (const LoadInformation& _other);
 	LoadInformation& operator = (LoadInformation&& _other) noexcept;
 
-	load_t load(void) const;
+	load_t load() const;
 	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
 
 private:

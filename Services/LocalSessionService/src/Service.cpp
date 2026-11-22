@@ -48,7 +48,7 @@ Service::~Service() {
 
 // Setter / Getter
 
-std::list<ot::port_t> Service::getPortNumbers(void) const {
+std::list<ot::port_t> Service::getPortNumbers() const {
 	std::list<ot::port_t> ports;
 
 	size_t colonIndex = this->getServiceURL().rfind(':');

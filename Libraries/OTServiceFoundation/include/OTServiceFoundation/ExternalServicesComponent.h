@@ -50,7 +50,7 @@ namespace ot {
 
 			//! @brief Will return the global instance of this component since it should exist only once in the service.
 			//todo: replace with reference instead of pointer
-			static ExternalServicesComponent& instance(void);
+			static ExternalServicesComponent& instance();
 
 			// ##########################################################################################################################################
 
@@ -61,9 +61,6 @@ namespace ot {
 			//! @param _ownURL The URL of this service.
 			//! @return 0 if successful, otherwise an error code.
 			int startup(ApplicationBase* _application, const std::string& _ownURL);
-
-			//! @brief Will initialize the service.
-			ot::ReturnMessage init(const ot::ServiceInitData& _initData);
 
 			//! @brief Will perform the provided action
 			//! @param _json The JSON type string containing the action and required parameter
@@ -82,9 +79,9 @@ namespace ot {
 			void shutdown(bool _requestedAsCommand);
 
 			//! @brief Will return the application
-			ApplicationBase * application(void) const { return m_application; };
+			ApplicationBase * application() const { return m_application; };
 
-			ComponentState componentState(void) const { return m_componentState; };
+			ComponentState componentState() const { return m_componentState; };
 
 			void updateSettingsFromDataBase(PropertyGridCfg& _config);
 
@@ -93,9 +90,16 @@ namespace ot {
 			std::string handleGetSystemInformation();
 
 		private:
+
+			std::mutex m_actionDispatching;
+
+			ApplicationBase* m_application;			// The application object
+			ComponentState    m_componentState;
+			SystemInformation m_systemLoad;
+
 			// #####################################################################################################################################
 
-			// Private functions
+			// Private: Action handler
 
 			ActionHandler m_actionHandler;
 
@@ -111,15 +115,16 @@ namespace ot {
 
 			// #####################################################################################################################################
 
-			// Private member
-			std::mutex m_actionDispatching;
+			// Private: Helper
 
-			ApplicationBase * m_application;			// The application object
-			ComponentState    m_componentState;
-			SystemInformation m_systemLoad;
+			//! @brief Will initialize the service.
+			ot::ReturnMessage init(const ot::ServiceInitData& _initData);
+
+			// #####################################################################################################################################
 			
 			ExternalServicesComponent();
 			virtual ~ExternalServicesComponent();
+
 		}; // Class external services component
 
 	} // namespace intern

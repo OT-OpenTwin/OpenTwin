@@ -54,7 +54,7 @@
 #endif
 
 
-unsigned long long ot::OperatingSystem::getTotalPhysicalMemory(void) {
+unsigned long long ot::OperatingSystem::getTotalPhysicalMemory() {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -73,7 +73,7 @@ unsigned long long ot::OperatingSystem::getTotalPhysicalMemory(void) {
 #endif
 }
 
-unsigned long long ot::OperatingSystem::getAvailablePhysicalMemory(void) {
+unsigned long long ot::OperatingSystem::getAvailablePhysicalMemory() {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -98,7 +98,7 @@ unsigned long long ot::OperatingSystem::getAvailablePhysicalMemory(void) {
 #endif
 }
 
-unsigned long long ot::OperatingSystem::getTotalVirtualMemory(void) {
+unsigned long long ot::OperatingSystem::getTotalVirtualMemory() {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);
@@ -119,7 +119,7 @@ unsigned long long ot::OperatingSystem::getTotalVirtualMemory(void) {
 #endif
 }
 
-unsigned long long ot::OperatingSystem::getAvailableVirtualMemory(void) {
+unsigned long long ot::OperatingSystem::getAvailableVirtualMemory() {
 #if defined(OT_OS_WINDOWS)
 	MEMORYSTATUSEX status;
 	status.dwLength = sizeof(status);

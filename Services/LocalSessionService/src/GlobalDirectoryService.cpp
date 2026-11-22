@@ -85,7 +85,7 @@ bool GlobalDirectoryService::connect(const std::string& _url, bool _waitForConne
 	return true;
 }
 
-bool GlobalDirectoryService::isConnected(void)
+bool GlobalDirectoryService::isConnected()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_connectionStatus == Connected;
@@ -308,7 +308,7 @@ void GlobalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::Jso
 
 // Private
 
-void GlobalDirectoryService::startHealthCheck(void)
+void GlobalDirectoryService::startHealthCheck()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -352,7 +352,7 @@ void GlobalDirectoryService::stopHealthCheck()
 	}
 }
 
-void GlobalDirectoryService::healthCheck(void)
+void GlobalDirectoryService::healthCheck()
 {
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());

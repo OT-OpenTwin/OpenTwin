@@ -63,8 +63,8 @@ namespace ot {
 
 		class UiDevLogger : public ot::AbstractLogNotifier {
 		public:
-			static UiDevLogger& instance(void);
-			static void initialize(void);
+			static UiDevLogger& instance();
+			static void initialize();
 
 			virtual void log(const ot::LogMessage& _message) override;
 

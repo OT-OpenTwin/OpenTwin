@@ -112,6 +112,6 @@ unsigned long ot::net::checkTCPConnection(port_t _port, const char * _ip) {
 }
 #endif // OS_WINDOWS
 
-std::wstring ot::net::getLastError(void) {
+std::wstring ot::net::getLastError() {
 	return translateErrorCode(c_lastErrorCode);
 }

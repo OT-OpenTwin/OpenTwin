@@ -56,7 +56,7 @@ LocalDirectoryService& LocalDirectoryService::operator=(LocalDirectoryService&& 
 
 // Load information
 
-LoadInformation::load_t LocalDirectoryService::load(void) const {
+LoadInformation::load_t LocalDirectoryService::load() const {
 	return m_loadInformation.load();
 }
 

@@ -52,7 +52,7 @@ ot::ModalCommandBase::~ModalCommandBase()
 	application->getUiComponent()->activateMenuPage(actionMenuID);
 }
 
-void ot::ModalCommandBase::setupUI(void)
+void ot::ModalCommandBase::setupUI()
 {
 	// Add the specific commands
 	application->enableMessageQueuing(application->getUiComponent()->getServiceName(), true);

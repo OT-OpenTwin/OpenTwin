@@ -63,30 +63,30 @@ public:
 	explicit LogInGSSEditDialogEntry(const LogInGSSEntry& _entry, LogInGSSEditDialog* _dialog);
 	virtual ~LogInGSSEditDialogEntry();
 
-	LogInGSSEntry createEntry(void) const;
+	LogInGSSEntry createEntry() const;
 	
 	void setRow(int _row) { m_row = _row; };
-	int getRow(void) const { return m_row; };
-	bool getDataChanged(void) const { return m_dataChanged; };
+	int getRow() const { return m_row; };
+	bool getDataChanged() const { return m_dataChanged; };
 	ot::LineEdit* getNameInput() const { return m_name; };
 	ot::LineEdit* getUrlInput() const { return m_url; };
 	ot::LineEdit* getPortInput() const { return m_port; };
 	ot::ComboButton* getLoginTypeInput() const { return m_loginType; };
 
-	bool isEmpty(void) const;
-	bool isValid(void) const;
+	bool isEmpty() const;
+	bool isValid() const;
 
-	void prepareDestroy(void);
+	void prepareDestroy();
 
 private Q_SLOTS:
-	void slotDataChanged(void);
+	void slotDataChanged();
 	void slotDeleteItem(QTableWidgetItem* _item);
 
 private:
-	void updateErrorState(void);
-	bool isValidIpV4(void) const;
-	bool isValidIpV6(void) const;
-	bool isValidPort(void) const;
+	void updateErrorState();
+	bool isValidIpV4() const;
+	bool isValidIpV6() const;
+	bool isValidPort() const;
 
 	int m_row;
 	bool m_dataChanged;
@@ -117,13 +117,13 @@ public:
 	explicit LogInGSSEditDialog(const std::vector<LogInGSSEntry>& _entries, QWidget* _parent);
 	virtual ~LogInGSSEditDialog() {};
 
-	std::vector<LogInGSSEntry> getEntries(void) const;
+	std::vector<LogInGSSEntry> getEntries() const;
 
-	bool hasChangedData(void) const;
+	bool hasChangedData() const;
 
 private Q_SLOTS:
-	void slotAdd(void);
-	void slotSave(void);
+	void slotAdd();
+	void slotSave();
 	void slotDeleteEntry(int _row);
 
 private:
@@ -133,7 +133,7 @@ private:
 
 	void requestDeleteEntry(int _row);
 
-	QTableWidget* getTable(void) const { return m_table; };
+	QTableWidget* getTable() const { return m_table; };
 
 	bool m_dataChanged;
 	QTableWidget* m_table;

@@ -77,7 +77,7 @@ void UserManagement::setDatabaseURL(const std::string &url)
 	m_databaseURL = url;
 }
 
-bool UserManagement::checkConnection(void) const {
+bool UserManagement::checkConnection() const {
 	AppBase * app{ AppBase::instance() };
 
 	if (!checkConnectionAuthorizationService()) return false;
@@ -86,7 +86,7 @@ bool UserManagement::checkConnection(void) const {
 	return true;
 }
 
-bool UserManagement::checkConnectionAuthorizationService(void) const {
+bool UserManagement::checkConnectionAuthorizationService() const {
 	assert(!m_authServerURL.empty());
 
 	// Here send a ping to the authorization service to check whether the server is up and running
@@ -128,7 +128,7 @@ bool UserManagement::checkConnectionDataBase(const std::string &userName, const 
 
 	return true;
 }
-void UserManagement::initializeNewSession(void)
+void UserManagement::initializeNewSession()
 {
 	m_userSettingsCollection.clear();
 }
@@ -370,7 +370,7 @@ bool UserManagement::hasSuccessful(const std::string& _response) const {
 	}
 }
 
-bool UserManagement::initializeDatabaseConnection(void)
+bool UserManagement::initializeDatabaseConnection()
 {
 	if (m_isConnected) return true;
 
@@ -481,7 +481,7 @@ std::string UserManagement::restoreSetting(const std::string &settingName)
 	return "";
 }
 
-bool UserManagement::ensureSettingsCollectionCanBeAccessed(void)
+bool UserManagement::ensureSettingsCollectionCanBeAccessed()
 {
 	if (m_userSettingsCollection.empty())
 	{
@@ -512,7 +512,7 @@ bool UserManagement::ensureSettingsCollectionCanBeAccessed(void)
 	return collectionExists;
 }
 
-std::string UserManagement::getUserSettingsCollection(void)
+std::string UserManagement::getUserSettingsCollection()
 {
 	assert(!m_authServerURL.empty());
 

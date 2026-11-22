@@ -45,6 +45,6 @@ namespace sys {
 			HANDLE						   &_hProcess
 		);
 
-		std::string getCurrentExecutableDirectory(void);
+		std::string getCurrentExecutableDirectory();
 	}
 }

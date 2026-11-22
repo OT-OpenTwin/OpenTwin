@@ -53,13 +53,13 @@ namespace ot {
 
 		void setEntityName(const std::string& _entityName) { m_entityName = _entityName; };
 		void setEntityName(std::string&& _entityName) { m_entityName = std::move(_entityName); };
-		const std::string& getEntityName(void) const { return m_entityName; };
+		const std::string& getEntityName() const { return m_entityName; };
 
 		void setEntityID(UID _entityId) { m_entityId = _entityId; };
-		UID getEntityID(void) const { return m_entityId; };
+		UID getEntityID() const { return m_entityId; };
 
 		void setEntityVersion(UID _entityVersion) { m_entityVersion = _entityVersion; };
-		UID getEntityVersion(void) const { return m_entityVersion; };
+		UID getEntityVersion() const { return m_entityVersion; };
 
 	private:
 		std::string m_entityName; //! @brief Name of entity that is displayed in the widget view.

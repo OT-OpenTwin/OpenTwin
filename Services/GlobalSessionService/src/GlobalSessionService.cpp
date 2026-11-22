@@ -53,7 +53,7 @@
 #include <iostream>
 #include <filesystem>
 
-GlobalSessionService& GlobalSessionService::instance(void) {
+GlobalSessionService& GlobalSessionService::instance() {
 	static GlobalSessionService g_instance;
 	return g_instance;
 }
@@ -799,7 +799,7 @@ const LocalSessionService& GlobalSessionService::getLssFromSessionId(const std::
 	return lss->second;
 }
 
-LocalSessionService* GlobalSessionService::determineLeastLoadedLSS(void) {
+LocalSessionService* GlobalSessionService::determineLeastLoadedLSS() {
 	LocalSessionService* leastLoadedSessionService{ nullptr };
 	size_t minLoad{ UINT64_MAX };
 	for (auto& it : m_lssMap) {
@@ -979,7 +979,7 @@ void GlobalSessionService::loadFrontendInstallerFile() {
 
 // Worker
 
-void GlobalSessionService::workerHealthCheck(void) {
+void GlobalSessionService::workerHealthCheck() {
 	const static int limit{ 60 }; // 1 min
 	int counter{ 0 };
 
@@ -1040,7 +1040,7 @@ void GlobalSessionService::workerHealthCheck(void) {
 	}
 }
 
-void GlobalSessionService::workerSessionIni(void) {
+void GlobalSessionService::workerSessionIni() {
 	while (m_workerRunning) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);

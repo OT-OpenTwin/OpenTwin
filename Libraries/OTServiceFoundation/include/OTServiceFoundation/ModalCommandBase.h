@@ -45,7 +45,7 @@ namespace ot {
 	protected:
 		virtual std::string initializeAndCreateUI(const LockTypes& modelRead, const LockTypes& modelWrite) = 0;
 
-		void setupUI(void);
+		void setupUI();
 		void addMenuPage(const std::string &menu);
 		void addMenuGroup(const std::string &menu, const std::string &group);
 		void addMenuSubgroup(const std::string &menu, const std::string &group, const std::string &subgroup);

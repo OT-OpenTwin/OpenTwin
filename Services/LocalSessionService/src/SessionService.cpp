@@ -44,7 +44,7 @@
 #include <fstream>
 
 
-SessionService& SessionService::instance(void)
+SessionService& SessionService::instance()
 {
 	static SessionService g_instance;
 	return g_instance;

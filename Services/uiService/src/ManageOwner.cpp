@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ManageOwner.cpp
 // 
 // License:
@@ -242,17 +242,17 @@ ManageOwner::~ManageOwner() {
 
 // Slots
 
-void ManageOwner::slotShowGroupsWithAccessOnly(void)
+void ManageOwner::slotShowGroupsWithAccessOnly()
 {
 	fillOwnerList();
 }
 
-void ManageOwner::slotGroupsFilter(void)
+void ManageOwner::slotGroupsFilter()
 {
 	fillOwnerList();
 }
 
-void ManageOwner::slotGroupsSelection(void)
+void ManageOwner::slotGroupsSelection()
 {
 
 }
@@ -288,7 +288,7 @@ std::string ManageOwner::tolower(std::string s)
 	return s;
 }
 
-void ManageOwner::readUserList(void)
+void ManageOwner::readUserList()
 {
 	m_userList.clear();
 
@@ -339,7 +339,7 @@ void ManageOwner::readUserList(void)
 }
 
 
-void ManageOwner::fillOwnerList(void)
+void ManageOwner::fillOwnerList()
 {
 	// Store selection
 

@@ -39,7 +39,7 @@
 #include <cstdlib>
 #include <iostream>
 
-Application& Application::instance(void) {
+Application& Application::instance() {
 	static Application g_instance;
 	return g_instance;
 }
@@ -84,12 +84,12 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	return ot::AppExitCode::Success;
 }
 
-void Application::globalDirectoryServiceCrashed(void) {
+void Application::globalDirectoryServiceCrashed() {
 	OT_LOG_E("GDS crash not handled yet");
 	exit(ot::AppExitCode::GDSNotRunning);
 }
 
-std::list<std::string> Application::getSupportedServices(void) const {
+std::list<std::string> Application::getSupportedServices() const {
 	std::list<std::string> lst;
 	for (auto& s : Configuration::instance().getSupportedServices()) {
 		lst.push_back(s.getName());

@@ -30,7 +30,7 @@
 #include <thread>
 #include <chrono>
 
-StartupDispatcher::StartupDispatcher(void) : 
+StartupDispatcher::StartupDispatcher() : 
 	m_isStopping(false), m_workerThread(nullptr)
 {}
 
@@ -101,7 +101,7 @@ void StartupDispatcher::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllo
 
 // Private methods
 
-void StartupDispatcher::run(void) {
+void StartupDispatcher::run() {
 	if (m_workerThread) {
 		return;
 	}
@@ -110,7 +110,7 @@ void StartupDispatcher::run(void) {
 	m_workerThread = new std::thread(&StartupDispatcher::workerFunction, this);
 }
 
-void StartupDispatcher::stop(void) {
+void StartupDispatcher::stop() {
 	if (m_workerThread == nullptr) {
 		return;
 	}
@@ -123,7 +123,7 @@ void StartupDispatcher::stop(void) {
 	m_workerThread = nullptr;
 }
 
-void StartupDispatcher::workerFunction(void) {
+void StartupDispatcher::workerFunction() {
 	while (!m_isStopping) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);

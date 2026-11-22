@@ -70,7 +70,7 @@ CopyProjectDialog::~CopyProjectDialog() {
 
 }
 
-QString CopyProjectDialog::getProjectName(void) const { return m_edit->text(); }
+QString CopyProjectDialog::getProjectName() const { return m_edit->text(); }
 
 void CopyProjectDialog::slotConfirm() { 
 	if (this->getProjectName() == m_projectToCopy) {
