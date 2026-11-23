@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 project(OTSystem LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
@@ -7,6 +7,7 @@ ot_initialize_lib(OTSystem OT_SYSTEM_ROOT_PATH)
 
 ot_add_dependency(OTSystem
     OSLibs
+    BOOST
     WINLIB:Crypt32
 )
 

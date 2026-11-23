@@ -25,6 +25,8 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <Windows.h>
 #else
+#define BOOST_NOWIDE_NO_LIB
+#include <boost/nowide/convert.hpp>
 #include <cstring>
 #endif
 
@@ -56,8 +58,7 @@ std::wstring translateErrorCode(unsigned long _errorCode)
 #else
 std::wstring translateErrorCode(unsigned long _errorCode)
 {
-    const std::string message(std::strerror(static_cast<int>(_errorCode)));
-    return std::wstring(message.begin(), message.end());
+	return boost::nowide::widen(std::strerror(static_cast<int>(_errorCode)));
 }
 #endif // 
 

@@ -19,14 +19,14 @@
 
 #include "OTSystem/SystemProcess.h"
 
+#define BOOST_NOWIDE_NO_LIB
+#include <boost/nowide/convert.hpp>
+
 #include <assert.h>
 #include <string>
 #include <iostream>
-#include <string>
 #include <fstream>
 #include <cassert>
-#include <locale>
-#include <codecvt>
 #include <sstream>
 
 #if defined(OT_OS_WINDOWS)
@@ -40,8 +40,7 @@
 
 
 ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const ProcessFlags& _flags) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return runApplication(strconverter.from_bytes(_applicationPath), _flags);
+	return runApplication(boost::nowide::widen(_applicationPath), _flags);
 }
 
 ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _applicationPath, const ProcessFlags& _flags) {
@@ -65,13 +64,11 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 }
 
 ot::RunResult ot::SystemProcess::runApplication(const std::string& _applicationPath, const std::string& _commandLine, OT_PROCESS_HANDLE& _processHandle, const ProcessFlags& _flags) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return runApplication(strconverter.from_bytes(_applicationPath), strconverter.from_bytes(_commandLine), _processHandle, _flags);
+	return runApplication(boost::nowide::widen(_applicationPath), boost::nowide::widen(_commandLine), _processHandle, _flags);
 }
 
 ot::RunResult ot::SystemProcess::runFileByShell(const std::string& _filePath, const std::string& _args, const std::string& _workingDir) {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return runFileByShell(strconverter.from_bytes(_filePath), strconverter.from_bytes(_args), strconverter.from_bytes(_workingDir));
+	return runFileByShell(boost::nowide::widen(_filePath), boost::nowide::widen(_args), boost::nowide::widen(_workingDir));
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -237,9 +234,8 @@ ot::RunResult ot::SystemProcess::runApplication(const std::wstring& _application
 	ot::RunResult resultMessage;
 	_processHandle = OT_INVALID_PROCESS_HANDLE;
 
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	const std::string applicationPath = strconverter.to_bytes(_applicationPath);
-	std::vector<std::string> arguments = splitCommandLine(strconverter.to_bytes(_commandLine));
+	const std::string applicationPath = boost::nowide::narrow(_applicationPath);
+	std::vector<std::string> arguments = splitCommandLine(boost::nowide::narrow(_commandLine));
 	if (arguments.empty()) {
 		arguments.push_back(applicationPath);
 	}

@@ -23,10 +23,12 @@
 #include "OTSystem/ArchitectureInfo.h"
 
 // std header
-#include <locale>
-#include <codecvt>
 #include <algorithm>
 #include <string>
+
+// Boost header
+#define BOOST_NOWIDE_NO_LIB
+#include <boost/nowide/convert.hpp>
 
 #if defined(OT_OS_WINDOWS)
 // Windows header
@@ -170,8 +172,7 @@ std::string ot::OperatingSystem::getEnvironmentVariableString(const char* _varia
 }
 
 std::string ot::OperatingSystem::getCurrentExecutableDirectory() {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return strconverter.to_bytes(getCurrentExecutableDirectoryW());
+    return boost::nowide::narrow(getCurrentExecutableDirectoryW());
 }
 
 std::wstring ot::OperatingSystem::getCurrentExecutableDirectoryW() {
@@ -187,8 +188,7 @@ std::wstring ot::OperatingSystem::getCurrentExecutableDirectoryW() {
 }
 
 std::string ot::OperatingSystem::getCurrentExecutableFilePath() {
-	std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-	return strconverter.to_bytes(getCurrentExecutableFilePathW());
+    return boost::nowide::narrow(getCurrentExecutableFilePathW());
 }
 
 std::wstring ot::OperatingSystem::getCurrentExecutableFilePathW() {
@@ -204,8 +204,8 @@ std::wstring ot::OperatingSystem::getCurrentExecutableFilePathW() {
         return std::wstring();
     }
 
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> strconverter;
-    return strconverter.from_bytes(currentExeFileName.string());
+    return boost::nowide::widen(currentExeFileName.string());
+
 #endif
 }
 

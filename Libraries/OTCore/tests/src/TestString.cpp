@@ -629,3 +629,28 @@ TEST(StringTests, CompressBase64String) {
 	std::string output(reinterpret_cast<char*>(decompressed.get()), decompressedSize);
 	EXPECT_EQ(input, output);
 }
+
+TEST(StringTests, WideStringConversion) {
+	EXPECT_EQ("", ot::String::toString(std::wstring{}));
+	EXPECT_EQ(L"", ot::String::toWString(std::string{}));
+
+	EXPECT_EQ(L"OpenTwin 123", ot::String::toWString("OpenTwin 123"));
+	EXPECT_EQ("OpenTwin 123", ot::String::toString(L"OpenTwin 123"));
+
+	const std::string utf8_2b = "\xC3\x84\xC3\x9C\xC3\x9F";
+	const std::wstring wide_2b = L"\u00C4\u00DC\u00DF";
+	EXPECT_EQ(wide_2b, ot::String::toWString(utf8_2b));
+	EXPECT_EQ(utf8_2b, ot::String::toString(wide_2b));
+
+	const std::string utf8_3b = "\xE2\x82\xAC\xE4\xB8\xAD";
+	const std::wstring wide_3b = L"\u20AC\u4E2D";
+	EXPECT_EQ(wide_3b, ot::String::toWString(utf8_3b));
+	EXPECT_EQ(utf8_3b, ot::String::toString(wide_3b));
+
+	const std::string utf8_4b = "\xF0\x9F\x98\x80";
+	const std::wstring wide_4b = L"\U0001F600";
+	EXPECT_EQ(wide_4b, ot::String::toWString(utf8_4b));
+	EXPECT_EQ(utf8_4b, ot::String::toString(wide_4b));
+
+	EXPECT_EQ(L"\uFFFD", ot::String::toWString("\xFF"));
+}

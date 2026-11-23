@@ -23,7 +23,7 @@
 #include "OTCore/CoreTypes.h"
 #include "OTCore/JSON/JSONTypes.h"
 
-#include <climits>
+#include <concepts>
 #include <cstdint>
 
 namespace ot {
@@ -39,9 +39,14 @@ namespace ot {
 
 		explicit JsonNumber(int64_t _value) noexcept : JsonValue(_value) {};
 
-// #if LONG_MAX != INT64_MAX
-// 		explicit JsonNumber(long _value) noexcept : JsonValue((int64_t) _value) {};
-// #endif
+        //! @brief Handles long / long long when distinct from int32_t and int64_t
+        //! @brief Windows: long is 32 bit
+        //! @brief Linux: int64_t is long and long long is separate
+		template <typename T>
+			requires (std::same_as<T, long> || std::same_as<T, long long>) &&
+				(!std::same_as<T, int32_t>) &&
+				(!std::same_as<T, int64_t>)
+		explicit JsonNumber(T _value) noexcept : JsonValue(static_cast<int64_t>(_value)) {};
 
 		explicit JsonNumber(uint64_t _value) noexcept : JsonValue(_value) {};
 
