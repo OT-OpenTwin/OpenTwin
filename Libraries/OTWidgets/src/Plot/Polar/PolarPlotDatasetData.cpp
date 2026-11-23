@@ -26,6 +26,6 @@ ot::PolarPlotDatasetData::PolarPlotDatasetData(PlotDatasetData* _data)
 
 QwtPointPolar ot::PolarPlotDatasetData::sample(size_t _index) const {
 	auto pt = PlotSeriesData<QwtPointPolar>::sample(_index);
-	pt.setAzimuth(Math::radToDeg(pt.azimuth()));
+	pt.setAzimuth(pt.azimuth());
 	return pt;
 }
