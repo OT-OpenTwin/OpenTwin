@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Plot1DCfg.h
 // 
 // License:
@@ -248,6 +248,8 @@ namespace ot {
 		void setSecondaryParameter(const std::list<std::string>& _secondaryParameter) { m_secondaryParameter = _secondaryParameter; };
 		const std::list<std::string>& getSecondaryParameter() const { return m_secondaryParameter; };
 
+		void setPhaseInDeg(bool _phaseInDeg) { m_phaseInDeg = _phaseInDeg; };
+
 	private:
 		bool invariant() const;
 
@@ -289,6 +291,8 @@ namespace ot {
 		DependencyLabelInfoList m_fixedDatasetLabelInfos;
 		std::string m_tupleType;
 		std::string m_tupleFormat;
+
+		bool m_phaseInDeg = true;
 
 	};
 }

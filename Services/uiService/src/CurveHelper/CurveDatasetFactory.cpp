@@ -29,6 +29,8 @@
 #include "OTCore/EntityName.h"
 #include "OTCore/Debugging/RuntimeTests.h"
 #include "OTCore/ContainerHelper.h"
+#include "OTCore/Units/SIUnits.h"
+
 
 #include "OTGui/Painter/PainterRainbowIterator.h"
 #include "OTGui/Painter/StyleRefPainter2D.h"
@@ -77,9 +79,13 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 		ot::WindowAPI::appendOutputMessage("Curve " + _curveCfg.getTitle() + " cannot be visualised since the query returned no data.\n");
 		return {};
 	}
-	
 	std::string xAxisUnit;
+
+	std::optional<ot::UnitDescriptor> foundUnit = ot::SIUnits::instance().getRegistry().findUnit(xAxisUnit);
+	foundUnit.has_value() && foundUnit.value().m_name == ot::SIUnits::getAngleUnitDegrees() ? _plotCfg.setPhaseInDeg(true) : _plotCfg.setPhaseInDeg(false);
+	
 	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments, xAxisUnit);
+	
 	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _curveCfg, xAxisUnit);
 	return dataSets;
 }
@@ -328,6 +334,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 		curveColourSetter.setPainter(localCfg, dataPoints.m_yData.size() == 1);
 		
 		ot::PlotDataset* dataset = new ot::PlotDataset(nullptr, localCfg, std::move(datasetData));
+		
 		dataset->setXAxisUnit(_xAxisUnit);
 		dataset->setDependencyInfos(dependencies);
 		dataset->setSecondaryDependencyInfos(curve.second.secondaryDependencies);

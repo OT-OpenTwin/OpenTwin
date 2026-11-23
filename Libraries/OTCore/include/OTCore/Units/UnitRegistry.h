@@ -1,14 +1,14 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <optional>
 #include <map>
 #include <vector>
 #include "OTCore/Units/Descriptors.h"
 #include "OTCore/Units/ResolvedComponent.h"
-
+#include "OTCore/CoreAPIExport.h"
 namespace ot
 {
-    class UnitRegistry
+    class OT_CORE_API_EXPORT UnitRegistry
     {
     public:
         void addUnit(UnitDescriptor&& _unitDescriptor);

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: Plot1DCfg.cpp
 // 
 // License:
@@ -135,6 +135,8 @@ void ot::Plot1DCfg::addToJsonObject(JsonValue& _object, JsonAllocator& _allocato
 
 	_object.AddMember("PolarDegreeOrigin", m_polarDegreeOrigin, _allocator);
 
+	_object.AddMember("PhaseInDeg", m_phaseInDeg, _allocator);
+
 	JsonArray fixedDatasetLabelInfosArr;
 	for (const auto& labelInfo : m_fixedDatasetLabelInfos)
 	{
@@ -195,6 +197,8 @@ void ot::Plot1DCfg::setFromJsonObject(const ConstJsonObject& _object) {
 		m_varyLineStyles = false;
 	}
 	m_curveLimit = json::getInt(_object, "NbCurveLimit");
+
+	m_phaseInDeg = json::getBool(_object, "PhaseInDeg");
 
 	m_polarDegreeOrigin = json::getDouble(_object, "PolarDegreeOrigin");
 

@@ -1,4 +1,4 @@
-﻿//@ otlicense
+//@ otlicense
 #pragma once
 #include <string>
 #include "OTCore/Units/UnitSystem.h"
@@ -10,10 +10,13 @@ namespace ot
 	public:
 		static SIUnits& instance();
 		std::string getSystemName() override { return "SI"; }
-        
+		const UnitRegistry& getRegistry() { return m_registry; }
+
 		static std::string getAngleUnitDegrees() { return "deg"; }
 		static std::string getAngleUnitRad() { return "rad"; }
 		static std::string getUnitDecibel() { return "dB"; }
+
+
     private:
 		SIUnits();
     };
