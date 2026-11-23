@@ -247,6 +247,10 @@ void ot::PlotBase::applyConfig()
 	this->setPlotType(m_config.getPlotType());
 
 	// Update quantities and scaling for all datasets
+	if (!m_config.getPhaseInDeg())
+	{
+		m_polarPlot->setScale(QwtPolar::Azimuth, 0.0, 2.0 * M_PI, M_PI / 6.0);  // fixed radian scale
+	}
 	const Plot1DAxisCfg::AxisQuantityComponent xAxisQuantityComponent = m_config.getXAxisQuantityComponent();
 	const Plot1DAxisCfg::AxisQuantityComponent yAxisQuantityComponent = m_config.getYAxisQuantityComponent();
 	const Plot1DAxisCfg::ValueScaling xValueScaling = m_config.getXAxis().getValueScaling();

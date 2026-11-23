@@ -249,7 +249,7 @@ namespace ot {
 		const std::list<std::string>& getSecondaryParameter() const { return m_secondaryParameter; };
 
 		void setPhaseInDeg(bool _phaseInDeg) { m_phaseInDeg = _phaseInDeg; };
-
+		const bool getPhaseInDeg() const { return m_phaseInDeg; };
 	private:
 		bool invariant() const;
 

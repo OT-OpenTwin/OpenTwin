@@ -80,11 +80,10 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createCurves(ot::Plot1DCfg& _pl
 		return {};
 	}
 	std::string xAxisUnit;
+	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments, xAxisUnit);
 
 	std::optional<ot::UnitDescriptor> foundUnit = ot::SIUnits::instance().getRegistry().findUnit(xAxisUnit);
-	foundUnit.has_value() && foundUnit.value().m_name == ot::SIUnits::getAngleUnitDegrees() ? _plotCfg.setPhaseInDeg(true) : _plotCfg.setPhaseInDeg(false);
-	
-	auto allCurvesByDependencies = createCurves(_plotCfg, _curveCfg, allMongoDocuments, xAxisUnit);
+	foundUnit.has_value() && foundUnit.value().m_symbol == ot::SIUnits::getAngleUnitDegrees() ? _plotCfg.setPhaseInDeg(true) : _plotCfg.setPhaseInDeg(false);
 	
 	auto dataSets =	createPlotDatasets(_plotCfg, std::move(allCurvesByDependencies), _curveCfg, xAxisUnit);
 	return dataSets;
