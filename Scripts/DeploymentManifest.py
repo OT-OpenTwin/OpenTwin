@@ -458,6 +458,7 @@ def create_frontend_installer(plan) -> None:
     plan.copy(r"%OSG_DLLR%\osgViewer.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
     plan.mkdir(r"%OPENTWIN_FRONTEND_DEPLOYMENT%\osgPlugins-3.6.3")
     plan.tree(r"%OSG_DLLR%\osgPlugins-3.6.3", r"%OPENTWIN_FRONTEND_DEPLOYMENT%\osgPlugins-3.6.3")
+    plan.copy(r"%OSG_DLLR%\zlib.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # OpenSSL
     plan.copy(r"%OPENSSL_DLL%\libcrypto-3-x64.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
