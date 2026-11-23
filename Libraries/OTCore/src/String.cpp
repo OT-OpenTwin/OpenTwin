@@ -26,6 +26,9 @@
 #include <zlib.h>
 #include <base64.h>
 
+#define BOOST_NOWIDE_NO_LIB
+#include <boost/nowide/convert.hpp>
+
 // std header
 #include <map>
 #include <locale>
@@ -33,44 +36,6 @@
 #include <memory>
 #include <cstring>
 #include <cwchar>
-
-#ifdef OT_OS_WINDOWS
-#include <Windows.h>
-#undef min
-#undef max
-#else
-#include <iconv.h>
-#endif
-
-#ifndef OT_OS_WINDOWS
-namespace {
-
-    //! @brief Converts the input bytes from _fromCode to _toCode encoding.
-    //! @return Number of bytes written or size_t(-1) on invalid input.
-    size_t iconvConvert(const char* _toCode, const char* _fromCode, const char* _in, size_t _inSize, char* _out, size_t _outCapacity)
-    {
-        iconv_t cd = iconv_open(_toCode, _fromCode);
-        if (cd == reinterpret_cast<iconv_t>(-1))
-        {
-            return static_cast<size_t>(-1);
-        }
-
-        char* in = const_cast<char*>(_in);
-        char* out = _out;
-        size_t outLeft = _outCapacity;
-        const size_t rc = iconv(cd, &in, &_inSize, &out, &outLeft);
-
-        iconv_close(cd);
-
-        if (rc == static_cast<size_t>(-1))
-        {
-            return rc;
-        }
-
-        return _outCapacity - outLeft;
-    }
-}
-#endif
 
 std::string ot::String::toString(DisplayNumberFormat _format)
 {
@@ -102,53 +67,12 @@ ot::String::DisplayNumberFormat ot::String::stringToDisplayNumberFormat(const st
 
 std::string ot::String::toString(const std::wstring& _string) {
 	if (_string.empty()) return {};
-
-#ifdef OT_OS_WINDOWS
-
-	// Get required buffer size
-	int sizeNeeded = WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0, nullptr, nullptr);
-	if (sizeNeeded <= 0) return {};
-
-	// Convert to UTF-8
-	std::string result(sizeNeeded - 1, '\0'); // Remove null terminator
-	WideCharToMultiByte(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded, nullptr, nullptr);
-	return result;
-#else
-    std::string result(_string.size() * 4, '\0');
-    const size_t written = iconvConvert("UTF-8", "WCHAR_T", reinterpret_cast<const char*>(_string.data()), _string.size() * sizeof(wchar_t), result.data(), result.size() );
-    if (written == static_cast<size_t>(-1)) {
-        return {};
-    }
-
-    result.resize(written);
-    return result;
-#endif
+    return boost::nowide::narrow(_string);
 }
 
 std::wstring ot::String::toWString(const std::string& _string) {
 	if (_string.empty()) return {};
-
-#ifdef OT_OS_WINDOWS
-
-	// Get required buffer size
-	int sizeNeeded = MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, nullptr, 0);
-	if (sizeNeeded <= 0) return {};
-
-	// Convert to wide string
-	std::wstring result(sizeNeeded - 1, L'\0'); // Remove null terminator
-	MultiByteToWideChar(CP_UTF8, 0, _string.c_str(), -1, result.data(), sizeNeeded);
-	return result;
-#else
-    std::wstring result(_string.size(), L'\0');
-    const size_t written = iconvConvert("WCHAR_T", "UTF-8", _string.data(), _string.size(), reinterpret_cast<char*>(result.data()), result.size() * sizeof(wchar_t));
-    if (written == static_cast<size_t>(-1))
-    {
-        return {};
-    }
-
-    result.resize(written / sizeof(wchar_t));
-    return result;
-#endif
+    return boost::nowide::widen(_string);
 }
 
  std::string ot::String::toLower(const std::string& _string)

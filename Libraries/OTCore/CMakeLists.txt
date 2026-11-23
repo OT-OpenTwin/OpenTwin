@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.20)
+cmake_minimum_required(VERSION 3.20)
 project(OTCore LANGUAGES CXX)
 
 include("$ENV{OT_CMAKE_DIR}/OTProject.cmake")
@@ -10,6 +10,7 @@ ot_add_dependency(OTCore
     ZLIB
     RJSON
     BASE64
+    BOOST
     WINLIB:Userenv
 )
 
