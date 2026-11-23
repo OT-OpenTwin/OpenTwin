@@ -136,6 +136,8 @@
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
 
+#include "akWidgets/aToolButtonWidget.h"
+
 // ADS header
 #include <ads/DockAreaWidget.h>
 
@@ -339,7 +341,7 @@ bool AppBase::logIn()
 
 	if (isNonInteractive())
 	{
-		mainWindow()->setEnabled(false);
+		//mainWindow()->setEnabled(false);
 	}
 
 	// Create UI
@@ -2830,6 +2832,30 @@ void AppBase::setTabToolBarTabOrder(const QStringList& _lst)
 void AppBase::activateToolBarTab(const QString& _tab)
 {
 	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
+}
+
+void AppBase::clickToolBarButton(const ot::ToolBarButtonCfg& _button)
+{
+	auto buttnID = uiAPI::object::getUidFromObjectUniqueName(QString::fromStdString(_button.getFullPath()));
+	if (buttnID == ak::invalidUID)
+	{
+		OT_LOG_E("Tool bar button not found: " + _button.getFullPath());
+		return;
+	}
+
+	ak::aToolButtonWidget* button = uiAPI::object::get<ak::aToolButtonWidget>(buttnID);
+	if (!button)
+	{
+		OT_LOG_E("Tool bar button object not found: " + _button.getFullPath());
+		return;
+	}
+
+	if (!button->isEnabled())
+	{
+		return;
+	}
+
+	button->click();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

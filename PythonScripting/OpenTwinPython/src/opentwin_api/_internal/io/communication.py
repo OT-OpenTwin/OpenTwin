@@ -29,6 +29,7 @@ class Communication(ICommunication):
                  ) -> None:
         
         self._initialized: bool = False
+        self._logCommunication: bool = False
         
         # Initialize TLS configuration
         self._ssl_context = self._create_ssl_context(ca_certificate_path)
@@ -104,6 +105,10 @@ class Communication(ICommunication):
     def is_initialized(self) -> bool:
         return self._initialized
 
+    @property
+    def log_communication(self) -> bool:
+        return self._logCommunication
+
     # ################################################################################################################################
 
     # General communication methods
@@ -146,7 +151,9 @@ class Communication(ICommunication):
             ConnectionError: If the connection fails.
         """
         request_body = json.dumps(request_data).encode("utf-8")
-        logger.debug(f"Sending request to {url}: {request_body.decode('utf-8')}")
+
+        if self._logCommunication:
+            logger.debug(f"Sending request to {url}: {request_body.decode('utf-8')}")
 
         endpoint = self._normalize_url(url) + "/execute-one-way-tls"
 
@@ -166,7 +173,8 @@ class Communication(ICommunication):
                 timeout=None # No timeout
             ) as response:
                 response_body = response.read().decode("utf-8")
-                logger.debug(f"Received response from {url}: {response_body}")
+                if self._logCommunication:
+                    logger.debug(f"Received response from {url}: {response_body}")
                 return response_body
 
         except HTTPError as error:

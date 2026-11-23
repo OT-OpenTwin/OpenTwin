@@ -269,6 +269,7 @@
 #define OT_ACTION_CMD_UI_CreateContextMenu "UI.CreateContextMenu"
 #define OT_ACTION_CMD_UI_CreateStaticContextMenu "UI.CreateStaticContextMenu"
 #define OT_ACTION_CMD_UI_ContextMenuTriggered "UI.ContextMenuTriggered"
+#define OT_ACTION_CMD_UI_ClickMenuButton "UI.ClickMenuButton"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
 #define OT_ACTION_CMD_UI_SS_COMMIT "StudioSuite.Commit"
@@ -495,7 +496,6 @@
 #define OT_ACTION_PARAM_SessionToken "Session.Token"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ExpandParents "ExpandParents"
-#define OT_ACTION_PARAM_GatewayAction "Gateway.Action"
 #define OT_ACTION_PARAM_CallbackAction "CallbackAction"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"

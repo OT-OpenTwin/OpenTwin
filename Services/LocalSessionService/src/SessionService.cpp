@@ -1416,7 +1416,7 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 	}
 
 	// Generate new gateway ticket
-	auto newGatewayTicketData = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::ticketLength());
+	auto newGatewayTicketData = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::inSessionTicketLength());
 	std::string newGatewayTicket = ot::String::toHexString(newGatewayTicketData);
 
 	session.setServiceAlive(gateway.getServiceID(), gatewayServiceInfo.getServiceURL(), true);

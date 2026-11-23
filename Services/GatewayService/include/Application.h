@@ -19,6 +19,9 @@
 
 #pragma once
 
+// Gateway header
+#include "GatewayTypes.h"
+
 // OpenTwin header
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Handler/ActionHandler.h"
@@ -31,6 +34,7 @@
 class Application : public ot::ApplicationBase, public ot::ActionHandler
 {
 public:
+	
 	static Application& instance();
 	~Application();
 
@@ -45,6 +49,16 @@ public:
 	virtual void runWithArgs(const std::map<std::string, std::string>& _args) override;
 
 private:
+
+	std::string m_requestTicket;
+
+	// ################################################################################################################################################################################################################################################################
+
+	// Private: Gateway action handling
+
+	ot::ReturnMessage handleGatewayAction(ot::JsonDocument& _document);
+
+	ot::ReturnMessage handleGatewayActionSendToService(ot::JsonDocument& _document, bool _queue);
 
 	// ################################################################################################################################################################################################################################################################
 

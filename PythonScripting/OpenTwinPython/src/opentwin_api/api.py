@@ -194,9 +194,12 @@ class OpenTwinAPI:
             general_communication=communication
         )
 
+        logger.info(f"Successfully connected to gateway for project \"{name}\".")
+
         project = Project(
             name=name,
-            id=project_id
+            id=project_id,
+            gateway=gateway_communication
         )
 
         return project

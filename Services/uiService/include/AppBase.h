@@ -52,6 +52,7 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGui/Widgets/TextEditorCfg.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetTypes.h"
@@ -561,6 +562,8 @@ public Q_SLOTS:
 
 	void setTabToolBarTabOrder(const QStringList& _lst);
 	void activateToolBarTab(const QString& _tab);
+
+	void clickToolBarButton(const ot::ToolBarButtonCfg& _button);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

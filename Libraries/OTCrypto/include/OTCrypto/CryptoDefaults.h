@@ -34,6 +34,10 @@ namespace ot
         static constexpr uint32_t challengeLength() { return 32; }
 		static constexpr uint32_t challengeIDLength() { return 16; }
 
+		// In Session Ticket Lenghts (bytes)
+
+		static constexpr uint32_t inSessionTicketLength() { return 32; }
+
     };
 
 }

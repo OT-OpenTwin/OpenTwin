@@ -26,3 +26,11 @@ def test_login_does_nothing():
     )
 
     assert project is not None
+
+    project.get_frontend().press_menu_button(
+        button_name="Test",
+        page_name="Debug",
+        group_name="Test"
+    )
+
+    #project.close()

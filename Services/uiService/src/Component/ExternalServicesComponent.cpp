@@ -71,6 +71,7 @@
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Widgets/Table.h"
@@ -298,6 +299,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_AddMenuLineEdit, this, &ExternalServicesComponent::handleAddMenuLineEdit);
 	connectAction(OT_ACTION_CMD_UI_ActivateToolbarTab, this, &ExternalServicesComponent::handleActivateToolbarTab);
 	connectAction(OT_ACTION_CMD_UI_SwitchMenuTab, this, &ExternalServicesComponent::handleSwitchMenuTab);
+	connectAction(OT_ACTION_CMD_UI_ClickMenuButton, this, &ExternalServicesComponent::handleClickMenuButton);
 
 	// Property Grid
 	connectAction(OT_ACTION_CMD_UI_FillPropertyGrid, this, &ExternalServicesComponent::handleFillPropertyGrid);
@@ -3975,6 +3977,21 @@ void ExternalServicesComponent::handleSwitchMenuTab(ot::JsonDocument& _document)
 	std::string pageName = ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName);
 	ot::serviceID_t serviceId = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	AppBase::instance()->switchToMenuTab(pageName);
+}
+
+void ExternalServicesComponent::handleClickMenuButton(ot::JsonDocument& _document)
+{
+	ot::ToolBarButtonCfg cfg;
+	cfg.setPage(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName));
+	cfg.setGroup(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName));
+
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName) && !_document[OT_ACTION_PARAM_UI_CONTROL_SubgroupName].IsNull())
+	{
+		cfg.setSubGroup(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName));
+	}
+	cfg.setButtonName(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName));
+
+	AppBase::instance()->clickToolBarButton(cfg);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
