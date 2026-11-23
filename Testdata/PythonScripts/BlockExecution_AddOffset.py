@@ -10,7 +10,7 @@ def __main__(this):
     offset = OpenTwin.GetPropertyValue(this,"Offset")
 
     portDataObjects = json.loads(portData)
-    for data in portDataObjects["Data"]:
+    for data in portDataObjects:
         data["Values"] = int(data["Values"]) + offset
     print("Done")
     print(type(portDataObjects))
