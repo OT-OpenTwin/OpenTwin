@@ -27,8 +27,7 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/DebugInfo/GDSDebugInfo.h"
 #include "OTCommunication/Data/ServiceInitData.h"
-#include "OTCommunication/Data/GatewayInitData.h"
-#include "OTCommunication/Data/GatewayConnectionInfo.h"
+#include "OTCommunication/Data/SyncServiceStartInfo.h"
 
 // std header
 #include <list>
@@ -63,14 +62,12 @@ public:
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
 	bool supportsService(const std::string& _serviceName) const;
 
-	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
+	std::optional<ot::SyncServiceStartInfo> requestToRunService(const ot::ServiceInitData& _serviceInfo);
 	bool requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
 
 	void sessionClosing(const std::string& _sessionID);
 	void sessionClosed(const std::string& _sessionID);
 	void serviceClosed(const std::string& _sessionID, ot::serviceID_t _serviceID);
-
-	std::optional<ot::GatewayConnectionInfo> requestToRunGatewayService(const ot::GatewayInitData& _iniData);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

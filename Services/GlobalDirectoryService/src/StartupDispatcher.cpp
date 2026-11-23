@@ -133,7 +133,7 @@ void StartupDispatcher::workerFunction() {
 				ot::ServiceInitData info(std::move(m_requestedServices.front()));
 				m_requestedServices.pop_front();
 
-				if (!Application::instance().requestToRunService(info)) {
+				if (!Application::instance().requestToRunServiceAsync(info)) {
 					this->serviceStartRequestFailed(info);
 				}
 			}

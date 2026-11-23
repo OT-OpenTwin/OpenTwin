@@ -94,8 +94,8 @@
 
 #define OT_ACTION_CMD_AuthorizeGateway "Gateway.Authorize"
 #define OT_ACTION_CMD_StartNewGateway "Gateway.New"
-#define OT_ACTION_CMD_CheckGatewayReady "Gateway.CheckReady"
-#define OT_ACTION_CMD_GatewayRun "Gateway.Run"
+
+#define OT_ACTION_CMD_RegisterGatewayClient "Gateway.RegisterClient"
 
 #define OT_ACTION_CMD_PerformGatewayAction "Gateway.PerformAction"
 
@@ -452,6 +452,7 @@
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Event "Event"
 #define OT_ACTION_PARAM_Graph "Graph"
+#define OT_ACTION_PARAM_Active "Active"
 #define OT_ACTION_PARAM_Ticket "Ticket"
 #define OT_ACTION_PARAM_Hidden "Hidden"
 #define OT_ACTION_PARAM_Prefix "Prefix"
@@ -487,12 +488,14 @@
 #define OT_ACTION_PARAM_IsSelected "IsSelected"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
+#define OT_ACTION_PARAM_Synchronous "Synchronous"
 #define OT_ACTION_PARAM_ChallengeID "ChallengeID"
 #define OT_ACTION_PARAM_ElementType "ElementType"
 #define OT_ACTION_PARAM_SessionName "Session.Name"
 #define OT_ACTION_PARAM_SessionToken "Session.Token"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ExpandParents "ExpandParents"
+#define OT_ACTION_PARAM_GatewayAction "Gateway.Action"
 #define OT_ACTION_PARAM_CallbackAction "CallbackAction"
 #define OT_ACTION_PARAM_ClearSelection "ClearSelection"
 #define OT_ACTION_PARAM_RequestCallback "RequestCallback"
@@ -501,7 +504,6 @@
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_VisualisationConfig "Visualization.Config"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
-#define OT_ACTION_PARAM_Active "Active"
 
 #define OT_ACTION_PARAM_Gateway_Action "Gateway.Action"
 #define OT_ACTION_PARAM_Gateway_Url "Gateway.Url"

@@ -59,7 +59,7 @@ public:
 
 	// Management
 
-	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
+	bool requestToRunServiceAsync(const ot::ServiceInitData& _serviceInfo);
 
 	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL);
 
@@ -71,7 +71,6 @@ public:
 	ot::ReturnMessage handleStartService(ot::JsonDocument& _jsonDocument);
 	ot::ReturnMessage handleStartServices(ot::JsonDocument& _jsonDocument);
 	ot::ReturnMessage handleStartRelayService(ot::JsonDocument& _jsonDocument);
-	ot::ReturnMessage handleStartGatewayService(ot::JsonDocument& _jsonDocument);
 	void handleServiceStopped(ot::JsonDocument& _jsonDocument);
 	void handleSessionClosing(ot::JsonDocument& _jsonDocument);
 	void handleSessionClosed(ot::JsonDocument& _jsonDocument);

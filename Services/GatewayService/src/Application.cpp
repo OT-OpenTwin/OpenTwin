@@ -62,20 +62,20 @@ void Application::initialize()
 	OT_LOG_T("Ini");
 }
 
+void Application::run()
+{
+	OT_LOG_E("Gateway service cannot be run without arguments.");
+	exit(ot::AppExitCode::ArgumentMissingError);
+}
+
+void Application::runWithArgs(const std::map<std::string, std::string>& _args)
+{
+
+}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Private: Action handler
-
-ot::ReturnMessage Application::handleCheckReady(ot::JsonDocument& _document)
-{
-	return ot::ReturnMessage::True;
-}
-
-ot::ReturnMessage Application::handleRunGateway(ot::JsonDocument& _document)
-{
-	return ot::ReturnMessage::ok("");
-}
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
@@ -90,6 +90,5 @@ Application::Application() :
 	)
 {
 	// Connect actions (except gateway actions)
-	this->connectAction(OT_ACTION_CMD_CheckGatewayReady, this, &Application::handleCheckReady, ot::SECURE_MESSAGE_TYPES);
-	this->connectAction(OT_ACTION_CMD_GatewayRun, this, &Application::handleRunGateway, ot::SECURE_MESSAGE_TYPES);
+	
 }

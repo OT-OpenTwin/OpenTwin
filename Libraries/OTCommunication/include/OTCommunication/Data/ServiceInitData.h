@@ -20,10 +20,8 @@
 #pragma once
 
 // OpenTwin header
-#include "OTCore/Logging/LogTypes.h"
-#include "OTCore/CoreTypes.h"
 #include "OTCore/Serializable.h"
-#include "OTCore/OTClassHelper.h"
+#include "OTCore/Logging/LogTypes.h"
 #include "OTCommunication/CommunicationAPIExport.h"
 
 namespace ot {
@@ -93,6 +91,9 @@ namespace ot {
 		void setUserCollection(const std::string& _userCollection) { m_userCollection = _userCollection; };
 		const std::string& getUserCollection() const { return m_userCollection; };
 
+		void setSynchronousLaunch(bool _requireConfirm) { m_synchronousLaunch = _requireConfirm; };
+		bool getSynchronousLaunch() const { return m_synchronousLaunch; };
+
 	private:
 		std::string     m_loggerUrl;
 		ot::LogFlags    m_logFlags;
@@ -114,5 +115,6 @@ namespace ot {
 		std::string     m_databasePassword;
 		std::string     m_userCollection;
 
+		bool m_synchronousLaunch;
 	};
 }

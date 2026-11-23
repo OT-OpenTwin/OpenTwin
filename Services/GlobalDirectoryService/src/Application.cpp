@@ -54,16 +54,25 @@ Application& Application::instance() {
 
 // Management
 
-bool Application::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
+bool Application::requestToRunServiceAsync(const ot::ServiceInitData& _serviceInfo)
+{
+	if (_serviceInfo.getSynchronousLaunch())
+	{
+		OT_LOG_E("[FATAL] Invalid GDS state. Requested synchronous service launch in asynchronous mode. Ingnoring...");
+		return false;
+	}
+
 	// Determine LDS
 	std::lock_guard<std::mutex> lock(m_mutex);
 	LocalDirectoryService* lds = leastLoadedDirectoryService(_serviceInfo.getServiceType());
 
-	if (lds) {
+	if (lds)
+	{
 		// Run service at lds, if failed erase all startup requests from the session with the given ID
-		return lds->requestToRunService(_serviceInfo);
+		return lds->requestToRunService(_serviceInfo).has_value();
 	}
-	else {
+	else
+	{
 		return false;
 	}
 }
@@ -186,16 +195,48 @@ ot::ReturnMessage Application::handleStartService(ot::JsonDocument& _jsonDocumen
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 
-	OT_LOG_D("Service start requested: { \"ID\": " + std::to_string(initData.getServiceID()) + ", \"Name\": " + initData.getServiceName() + 
-		"\", \"Type\": \"" + initData.getServiceType() + "\", \"SessionID\": \"" + initData.getSessionID() + "\", \"LssUrl\": \"" + initData.getSessionServiceURL() + "\" }");
+	OT_LOG_DS("Service start requested: { \"Synchronous\":" << initData.getSynchronousLaunch() << "\"ID\": " << initData.getServiceID() << ", \"Name\": " << initData.getServiceName() << "\", \"Type\": \"" << initData.getServiceType() <<
+		"\", \"SessionID\": \"" << initData.getSessionID() << "\", \"LssUrl\": \"" << initData.getSessionServiceURL() << "\" }");
+
+	// Determine LDS
+	std::lock_guard<std::mutex> lock(m_mutex);
 
 	if (!this->canStartService(initData)) {
 		OT_LOG_W("Service \"" + initData.getServiceName() + "\" of type \"" + initData.getServiceType() + "\" cannot be started.");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Service \"" + initData.getServiceName() + "\" of type \"" + initData.getServiceType() + "\" is not supported by any LDS");
 	}
-	
-	m_startupDispatcher.addRequest(std::move(initData));
-	return ot::ReturnMessage::Ok;
+
+	if (initData.getSynchronousLaunch())
+	{
+		LocalDirectoryService* lds = leastLoadedDirectoryService(initData.getServiceType());
+		if (lds == nullptr)
+		{
+			OT_LOG_E("No LDS available to start \"" + initData.getServiceType() + "\" service");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start \"" + initData.getServiceType() + "\" service");
+		}
+		
+		auto runResult = lds->requestToRunService(initData);
+
+		if (!runResult.has_value())
+		{
+			OT_LOG_E("Failed to start service \"" + initData.getServiceType() + "\"");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start service \"" + initData.getServiceType() + "\"");
+		}
+
+		const auto& result = runResult.value();
+		if (!result.isValid())
+		{
+			OT_LOG_E("Failed to start service \"" + initData.getServiceType() + "\": LDS returned invalid result");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start service \"" + initData.getServiceType() + "\": LDS returned invalid result");
+		}
+
+		return ot::ReturnMessage::ok(result.toJson());
+	}
+	else
+	{
+		m_startupDispatcher.addRequest(std::move(initData));
+		return ot::ReturnMessage::Ok;
+	}
 }
 
 ot::ReturnMessage Application::handleStartServices(ot::JsonDocument& _jsonDocument) {
@@ -263,32 +304,6 @@ ot::ReturnMessage Application::handleStartRelayService(ot::JsonDocument& _jsonDo
 	responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(websocketUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
-}
-
-ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _jsonDocument)
-{
-	ot::GatewayInitData cfg;
-	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
-
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	LocalDirectoryService* lds = leastLoadedDirectoryService(OT_INFO_SERVICE_TYPE_GatewayService);
-	if (lds == nullptr)
-	{
-		OT_LOG_E("No LDS available to start gateway service");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No LDS available to start gateway service");
-	}
-
-	auto gatewayInfo = lds->requestToRunGatewayService(cfg);
-
-	if (!gatewayInfo.has_value())
-	{
-		return ot::ReturnMessage::failed("Failed to request gateway start from LDS");
-	}
-	else
-	{
-		return ot::ReturnMessage::ok(gatewayInfo->toJson());
-	}
 }
 
 void Application::handleServiceStopped(ot::JsonDocument& _jsonDocument) {
@@ -443,7 +458,7 @@ LocalDirectoryService* Application::leastLoadedDirectoryService(const std::strin
 
 bool Application::canStartService(const ot::ServiceInitData& _info) const {
 	for (const LocalDirectoryService& lds : m_localDirectoryServices) {
-		if (lds.supportsService(_info.getServiceName())) {
+		if (lds.supportsService(_info.getServiceType())) {
 			return true;
 		}
 	}
@@ -460,7 +475,6 @@ Application::Application()
 	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartService);
 	connectAction(OT_ACTION_CMD_StartNewServices, this, &Application::handleStartServices);
 	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartRelayService);
-	connectAction(OT_ACTION_CMD_StartNewGateway, this, &Application::handleStartGatewayService);
 	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceStopped);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
 	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);

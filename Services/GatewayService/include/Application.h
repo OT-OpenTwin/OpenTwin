@@ -40,14 +40,11 @@ public:
 
 	virtual void initialize() override;
 
+	virtual void run() override;
+
+	virtual void runWithArgs(const std::map<std::string, std::string>& _args) override;
+
 private:
-
-	// ################################################################################################################################################################################################################################################################
-
-	// Private: Action handler
-
-	ot::ReturnMessage handleCheckReady(ot::JsonDocument& _document);
-	ot::ReturnMessage handleRunGateway(ot::JsonDocument& _document);
 
 	// ################################################################################################################################################################################################################################################################
 

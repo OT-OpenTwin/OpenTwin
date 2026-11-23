@@ -51,10 +51,13 @@
 #include <algorithm>
 #include <cctype>
 
-namespace ot {
-	namespace intern {
+namespace ot
+{
+	namespace intern
+	{
 
-		void sessionServiceHealthChecker(std::string _localSessionServiceURL) {
+		void sessionServiceHealthChecker(std::string _localSessionServiceURL)
+		{
 			OT_LOG_D("Starting Local Session Service health check (URL = \"" + _localSessionServiceURL + "\")");
 
 			// Create ping request
@@ -64,22 +67,27 @@ namespace ot {
 			std::string ping = pingDoc.toJson();
 
 			bool alive = true;
-			while (alive) {
+			while (alive)
+			{
 				// Wait for 20s
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(20s);
 
 				// Try to send message and check the response
 				std::string ret;
-				try {
-					if (!ot::msg::send("", _localSessionServiceURL, ot::EXECUTE, ping, ret)) {
+				try
+				{
+					if (!ot::msg::send("", _localSessionServiceURL, ot::EXECUTE, ping, ret))
+					{
 						alive = false;
 					}
-					else if (ret != OT_ACTION_CMD_Ping) {
+					else if (ret != OT_ACTION_CMD_Ping)
+					{
 						alive = false;
 					}
 				}
-				catch (const std::exception& _e) {
+				catch (const std::exception& _e)
+				{
 					OT_LOG_E(_e.what());
 					alive = false;
 				}
@@ -90,7 +98,8 @@ namespace ot {
 			exit(ot::AppExitCode::LSSNotRunning);
 		}
 
-		void exitWorker(int _exitCode) {
+		void exitWorker(int _exitCode)
+		{
 			using namespace std::chrono_literals;
 			std::this_thread::sleep_for(500ms);
 
@@ -103,19 +112,21 @@ namespace ot {
 }
 
 //! @brief This function ensures that the service will shutdown if no initialization call is received during startup
-void initChecker() {
+void initChecker()
+{
 	const int iniTimeout = (ot::msg::defaultTimeout * 5) / 1000;
 
 	std::this_thread::sleep_for(std::chrono::seconds(iniTimeout));
 
-	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready) {
+	if (ot::intern::ExternalServicesComponent::instance().componentState() != ot::intern::ExternalServicesComponent::Ready)
+	{
 		OT_LOG_E("The component was not initialized after " + std::to_string(iniTimeout) + " seconds. Shutting down service");
 		exit(ot::AppExitCode::InitializationTimeout);
 	}
 }
 
 ot::intern::ExternalServicesComponent::ExternalServicesComponent()
-	: m_application(nullptr), m_componentState(WaitForStartup) 
+	: m_application(nullptr), m_componentState(WaitForStartup)
 {
 	// Connect action handlers
 	m_actionHandler.connectAction(OT_ACTION_CMD_SetLogFlags, this, &ExternalServicesComponent::handleSetLogFlags, ot::SECURE_MESSAGE_TYPES);
@@ -134,23 +145,27 @@ ot::intern::ExternalServicesComponent::~ExternalServicesComponent()
 	m_application = nullptr;
 }
 
-ot::intern::ExternalServicesComponent& ot::intern::ExternalServicesComponent::instance() {
+ot::intern::ExternalServicesComponent& ot::intern::ExternalServicesComponent::instance()
+{
 	static ExternalServicesComponent g_component;
 	return g_component;
 }
 
 // ##########################################################################################################################################
 
-int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _application, const std::string& _ownURL) {
+int ot::intern::ExternalServicesComponent::startup(ApplicationBase* _application, const std::string& _ownURL)
+{
 	OT_LOG_D("Foundation startup...");
 
-	if (m_componentState != WaitForStartup) {
+	if (m_componentState != WaitForStartup)
+	{
 		OT_LOG_E("Component startup already performed");
 		return -30;
 	}
 
 	m_application = _application;
-	if (m_application == nullptr) {
+	if (m_application == nullptr)
+	{
 		OT_LOG_E("nullptr as application instance provided");
 		return -1;
 	}
@@ -173,15 +188,18 @@ int ot::intern::ExternalServicesComponent::startup(ApplicationBase * _applicatio
 }
 
 std::string ot::intern::ExternalServicesComponent::dispatchAction(
-	const std::string &					_json,
-	const std::string &					_sender,
+	const std::string& _json,
+	const std::string& _sender,
 	ot::MessageType						_messageType
-) {
-	if (m_application == nullptr) {
+)
+{
+	if (m_application == nullptr)
+	{
 		OT_LOG_E("Not initialized yet");
 		return ot::ReturnMessage::toJson(ot::ReturnMessage::Failed, "Not initialized yet");
 	}
-	try {
+	try
+	{
 		JsonDocument actionDoc;
 		actionDoc.fromJson(_json);
 
@@ -202,12 +220,14 @@ std::string ot::intern::ExternalServicesComponent::dispatchAction(
 			hasHandler = true;
 		}
 
-		if (!hasHandler) {
+		if (!hasHandler)
+		{
 			result = m_application->processActionWithModalCommands(action, actionDoc);
 		}
 		return result;
 	}
-	catch (const std::exception & e) {
+	catch (const std::exception& e)
+	{
 		std::string ex(OT_ACTION_RETURN_INDICATOR_Error);
 		ex.append(e.what());
 
@@ -271,7 +291,7 @@ void ot::intern::ExternalServicesComponent::getCPUAndMemoryLoad(double& globalCP
 	m_systemLoad.getCurrentProcessCPUAndMemoryLoad(processCPULoad, processMemoryLoad);
 }
 
-std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation() 
+std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation()
 {
 	double globalCpuLoad = 0, globalMemoryLoad = 0, processCpuLoad = 0, processMemoryLoad = 0;
 	getCPUAndMemoryLoad(globalCpuLoad, globalMemoryLoad, processCpuLoad, processMemoryLoad);
@@ -296,19 +316,22 @@ std::string ot::intern::ExternalServicesComponent::handleGetSystemInformation()
 
 // Private: Acition handler
 
-void ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleSetLogFlags(JsonDocument& _document)
+{
 	ConstJsonArray flags = json::getArray(_document, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(logFlagsFromJsonArray(flags));
 	m_application->logFlagsChanged(ot::LogDispatcher::instance().getLogFlags());
 }
 
-std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document) {
+std::string ot::intern::ExternalServicesComponent::handleInitialize(JsonDocument& _document)
+{
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_IniData));
 	return this->init(initData).toJson();
 }
 
-void ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument& _document)
+{
 	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 	std::string senderURL = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_URL);
 	std::string senderName = ot::json::getString(_document, OT_ACTION_PARAM_SERVICE_NAME);
@@ -317,40 +340,66 @@ void ot::intern::ExternalServicesComponent::handleServiceConnected(JsonDocument&
 	m_application->serviceConnectedPrivate(ot::ServiceBase(senderName, senderType, senderURL, senderID));
 }
 
-void ot::intern::ExternalServicesComponent::handleServiceDisconnected(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleServiceDisconnected(JsonDocument& _document)
+{
 	serviceID_t senderID = ot::json::getUInt(_document, OT_ACTION_PARAM_SERVICE_ID);
 
 	m_application->serviceDisconnectedPrivate(senderID);
 }
 
-void ot::intern::ExternalServicesComponent::handleShutdownRequestByService() {
+void ot::intern::ExternalServicesComponent::handleShutdownRequestByService()
+{
 	shutdown(false);
 }
 
-void ot::intern::ExternalServicesComponent::handleServiceShutdown() {
+void ot::intern::ExternalServicesComponent::handleServiceShutdown()
+{
 	shutdown(true);
 }
 
-void ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document) {
+void ot::intern::ExternalServicesComponent::handleRun(JsonDocument& _document)
+{
 	ot::ServiceRunData runData;
 	runData.setFromJsonObject(json::getObject(_document, OT_ACTION_PARAM_RunData));
 
-	for (const ot::ServiceBase& service : runData.getServices()) {
-		if (service.getServiceID() != m_application->getServiceID()) {
+	std::map<std::string, std::string> additionalParameter;
+	// Read additional parameters in json document
+	for (auto it = _document.MemberBegin(); it != _document.MemberEnd(); ++it)
+	{
+		std::string key = it->name.GetString();
+		if (key != OT_ACTION_MEMBER && key != OT_ACTION_PARAM_RunData)
+		{
+			additionalParameter[key] = ot::json::getString(_document, key);
+		}
+	}
+
+	for (const ot::ServiceBase& service : runData.getServices())
+	{
+		if (service.getServiceID() != m_application->getServiceID())
+		{
 			m_application->serviceConnectedPrivate(service);
 		}
 	}
 
 	OT_LOG_D("Running application...");
 
-	m_application->run();
+	if (!additionalParameter.empty())
+	{
+		m_application->runWithArgs(additionalParameter);
+	}
+	else
+	{
+		m_application->run();
+	}
 }
 
-void ot::intern::ExternalServicesComponent::handlePreShutdown() {
+void ot::intern::ExternalServicesComponent::handlePreShutdown()
+{
 	m_application->preShutdown();
 }
 
-void ot::intern::ExternalServicesComponent::handleEmergencyShutdown() {
+void ot::intern::ExternalServicesComponent::handleEmergencyShutdown()
+{
 	std::thread t(ot::intern::exitWorker, ot::AppExitCode::EmergencyShutdown);
 	t.detach();
 }
@@ -401,38 +450,54 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 
 	ot::DebugHelper::serviceSetupCompleted(*m_application);
 
-	// Register this service as a service in the session service
-	JsonDocument newServiceCommandDoc;
-	newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
-	newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+	std::optional<ot::ServiceRunData> runData;
 
-	// In debug mode add the process ID to the confirmation request
+	if (!_initData.getSynchronousLaunch())
+	{
+		// Register this service as a service in the session service
+		JsonDocument newServiceCommandDoc;
+		newServiceCommandDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ConfirmService, newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SESSION_ID, JsonString(m_application->getSessionID(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), newServiceCommandDoc.GetAllocator());
+		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_SERVICE_URL, JsonString(m_application->getServiceURL(), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
 
-	unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
-	if (handleID == 0)
-	{
-		OT_LOG_E("Failed to get current process id");
-	}
-	else
-	{
-		newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
-	}
+		// In debug mode add the process ID to the confirmation request
 
-	// Send request
-	std::string responseStr;
-	if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), responseStr))
-	{
-		OT_LOG_E("Failed to send http request to LSS at \"" + m_application->getSessionServiceURL() + "\"");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
-	}
+		unsigned long long handleID = ot::OperatingSystem::getCurrentProcessID();
+		if (handleID == 0)
+		{
+			OT_LOG_E("Failed to get current process id");
+		}
+		else
+		{
+			newServiceCommandDoc.AddMember(OT_ACTION_PARAM_PROCESS_ID, JsonString(std::to_string(handleID), newServiceCommandDoc.GetAllocator()), newServiceCommandDoc.GetAllocator());
+		}
 
-	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
-	if (response != ot::ReturnMessage::Ok)
-	{
-		OT_LOG_E("Failed to register service at LSS: " + response.getWhat());
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to register service at LSS");
+		// Send request
+
+		std::string responseStr;
+		if (!ot::msg::send(m_application->getServiceURL(), m_application->getSessionServiceURL(), ot::EXECUTE, newServiceCommandDoc.toJson(), responseStr))
+		{
+			OT_LOG_E("Failed to send http request to LSS at \"" + m_application->getSessionServiceURL() + "\"");
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to send register command to LSS");
+		}
+
+		ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
+		if (response != ot::ReturnMessage::Ok)
+		{
+			OT_LOG_E("Failed to register service at LSS: " + response.getWhat());
+			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to register service at LSS");
+		}
+
+		JsonDocument reply;
+		reply.fromJson(response.getWhat());
+
+		if (reply.HasMember(OT_ACTION_PARAM_RunData))
+		{
+			ot::ServiceRunData newRunData;
+			newRunData.setFromJsonObject(json::getObject(reply, OT_ACTION_PARAM_RunData));
+			runData = newRunData;
+		}
 	}
 
 	// Ensure database connection
@@ -458,9 +523,6 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 		" }"
 	);
 
-	JsonDocument reply;
-	reply.fromJson(response.getWhat());
-
 	m_componentState = Ready;
 
 	// Start session service health check
@@ -473,12 +535,9 @@ ot::ReturnMessage ot::intern::ExternalServicesComponent::init(const ot::ServiceI
 	m_application->initialize();
 
 	// Notify the application about all services currently connected to the session if provided
-	if (reply.HasMember(OT_ACTION_PARAM_RunData))
+	if (runData.has_value())
 	{
-		ot::ServiceRunData runData;
-		runData.setFromJsonObject(json::getObject(reply, OT_ACTION_PARAM_RunData));
-
-		for (const ot::ServiceBase& service : runData.getServices())
+		for (const ot::ServiceBase& service : runData->getServices())
 		{
 			m_application->serviceConnectedPrivate(service);
 		}

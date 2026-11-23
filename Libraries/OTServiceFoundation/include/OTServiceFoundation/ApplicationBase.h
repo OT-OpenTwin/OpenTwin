@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ApplicationBase.h
 // 
 // License:
@@ -296,7 +296,17 @@ namespace ot {
 		//! Will be called when the service was successfully started, 
 		//! the hppt and/or websocket connection is established,
 		//! all services in the session have connected and the service may start its work.
+		//! @warning If the service was started with additional arguments runWithArgs() will be called instead.
 		virtual void run() {};
+
+		//! @brief Run the service with additional arguments.
+		//! Will be called when the service was successfully started,
+		//! the hppt and/or websocket connection is established,
+		//! all services in the session have connected and the service may start its work.
+		//! @warning This function will be called instead of run() if the service was started with additional arguments.
+		//! @warning The default implementation of this function will exit the service with an error message.
+		//! @param _additionalParameters A map containing the additional parameters that were passed to the service.
+		virtual void runWithArgs(const std::map<std::string, std::string>& _additionalParameters);
 
 		//! @brief Will be called whenever a action should be processed. Core actions will be processed in the base and will not be forwarded to this function (see documentation).
 		//! @param _action The action that should be processed.

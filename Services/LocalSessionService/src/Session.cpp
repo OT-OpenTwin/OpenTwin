@@ -35,7 +35,7 @@ Session::Session(const std::string& _id, const std::string& _userName, const std
 {
 	OTAssert(!_id.empty(), "Session ID must not be empty");
 
-	OT_LOG_D("New session created { \"SessionID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" + 
+	OT_LOG_D("New session created { \"SessionID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" +
 		m_projectName + "\", \"CollectionName\": \"" + m_collectionName + "\", \"SessionType\": \"" + m_type + "\" }");
 }
 
@@ -45,47 +45,53 @@ Session::Session(Session&& _other) noexcept :
 	*this = std::move(_other);
 }
 
-Session::~Session() {
+Session::~Session()
+{
 	this->stopHealthCheck();
-	
-	if (!m_id.empty()) {
+
+	if (!m_id.empty())
+	{
 		OT_LOG_D("Session destroyed { \"SessionID\": \"" + m_id + "\", \"UserName\": \"" + m_userName + "\", \"ProjectName\": \"" +
 			m_projectName + "\", \"CollectionName\": \"" + m_collectionName + "\", \"SessionType\": \"" + m_type + "\" }");
 	}
 }
 
-Session& Session::operator=(Session&& _other) noexcept {
-	if (this != &_other) {
+Session& Session::operator=(Session&& _other) noexcept
+{
+	if (this != &_other)
+	{
 		// Stop health check if running
 		this->stopHealthCheck();
-		if (_other.m_healthCheckRunning) {
+		if (_other.m_healthCheckRunning)
+		{
 			m_healthCheckRunning = true;
 		}
 		_other.stopHealthCheck();
 
 		// Move
 		m_state = _other.m_state;
-		
+
 		m_id = std::move(_other.m_id);
 		m_userName = std::move(_other.m_userName);
 		m_projectName = std::move(_other.m_projectName);
 		m_collectionName = std::move(_other.m_collectionName);
 		m_type = std::move(_other.m_type);
-		
+
 		m_userCredentials = std::move(_other.m_userCredentials);
 		m_dbCredentials = std::move(_other.m_dbCredentials);
 		m_userCollection = std::move(_other.m_userCollection);
-		
+
 		m_services = std::move(_other.m_services);
 		m_serviceIdManager = std::move(_other.m_serviceIdManager);
-		
+
 		// Clear the other session
 		_other.m_id.clear();
 		_other.m_services.clear();
 		_other.m_state = Session::NoState;
 
 		// Start health check if it was running in the other session object
-		if (m_healthCheckRunning) {
+		if (m_healthCheckRunning)
+		{
 			m_healthCheckRunning = false;
 			this->startHealthCheck();
 		}
@@ -98,7 +104,8 @@ Session& Session::operator=(Session&& _other) noexcept {
 
 // Setter / Getter
 
-std::list<std::string> Session::getToolBarTabOrder() {
+std::list<std::string> Session::getToolBarTabOrder()
+{
 	std::list<std::string> tabOrder;
 
 	tabOrder.push_back("File");
@@ -112,15 +119,18 @@ std::list<std::string> Session::getToolBarTabOrder() {
 	tabOrder.push_back("ElmerFEM");
 	tabOrder.push_back("OpenEMS");
 	tabOrder.push_back("Post Processing");
-	
+
 	return tabOrder;
 }
 
-bool Session::hasRequestedServices(ot::serviceID_t _ignoredService) {
+bool Session::hasRequestedServices(ot::serviceID_t _ignoredService)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (const Service& service : m_services) {
-		if (service.getServiceID() != _ignoredService && service.isRequested()) {
+	for (const Service& service : m_services)
+	{
+		if (service.getServiceID() != _ignoredService && service.isRequested())
+		{
 			return true;
 		}
 	}
@@ -128,11 +138,14 @@ bool Session::hasRequestedServices(ot::serviceID_t _ignoredService) {
 	return false;
 }
 
-bool Session::hasAliveServices() {
+bool Session::hasAliveServices()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (const Service& service : m_services) {
-		if (service.isAlive()) {
+	for (const Service& service : m_services)
+	{
+		if (service.isAlive())
+		{
 			return true;
 		}
 	}
@@ -140,11 +153,14 @@ bool Session::hasAliveServices() {
 	return false;
 }
 
-bool Session::hasShuttingDownServices() {
+bool Session::hasShuttingDownServices()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (const Service& service : m_services) {
-		if (service.isShuttingDown()) {
+	for (const Service& service : m_services)
+	{
+		if (service.isShuttingDown())
+		{
 			return true;
 		}
 	}
@@ -152,7 +168,7 @@ bool Session::hasShuttingDownServices() {
 	return false;
 }
 
-bool Session::checkAllServicesAreRunning()
+bool Session::getAllServicesAreHealthy()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -163,7 +179,7 @@ bool Session::checkAllServicesAreRunning()
 
 	for (const Service& service : m_services)
 	{
-		if (service.isRequested() || !service.isRunning() || service.isShuttingDown())
+		if (!service.isAlive() || service.isRequested() || (!service.isRunning() && !service.isShuttingDown()))
 		{
 			return false;
 		}
@@ -203,7 +219,8 @@ ot::ServiceInitData Session::createServiceInitData(const Service& _service)
 	return initData;
 }
 
-ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
+ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	const Service& service = this->getServiceFromID(_serviceID);
 	OTAssert(service.getServiceID() == _serviceID, "Service ID mismatch");
@@ -211,7 +228,8 @@ ot::ServiceInitData Session::createServiceInitData(ot::serviceID_t _serviceID) {
 	return this->createServiceInitData(service);
 }
 
-ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID) {
+ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return this->createServiceRunDataImpl(_serviceID);
 }
@@ -220,7 +238,8 @@ ot::ServiceRunData Session::createServiceRunData(ot::serviceID_t _serviceID) {
 
 // Serialization
 
-void Session::getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info) {
+void Session::getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	_info.id = m_id;
@@ -239,25 +258,30 @@ void Session::getDebugInfo(ot::LSSDebugInfo::SessionInfo& _info) {
 	_info.isShuttingDown = m_state.has(Session::ShuttingDown);
 
 	_info.services.clear();
-	for (const Service& service : m_services) {
+	for (const Service& service : m_services)
+	{
 		ot::LSSDebugInfo::ServiceInfo serviceInfo;
 		service.getDebugInfo(serviceInfo);
 		_info.services.push_back(std::move(serviceInfo));
 	}
 }
 
-void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) {
+void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (m_healthCheckRunning) {
+	if (m_healthCheckRunning)
+	{
 		_jsonObject.AddMember("HealthCheckRunning", true, _allocator);
 	}
-	else {
+	else
+	{
 		_jsonObject.AddMember("HealthCheckRunning", false, _allocator);
 	}
 
 	ot::JsonArray stateArr;
-	if (m_state.has(Session::ShuttingDown)) {
+	if (m_state.has(Session::ShuttingDown))
+	{
 		stateArr.PushBack(ot::JsonString("ShuttingDown", _allocator), _allocator);
 	}
 	_jsonObject.AddMember("StateFlags", stateArr, _allocator);
@@ -271,7 +295,8 @@ void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _al
 	_jsonObject.AddMember(OT_PARAM_SETTINGS_USERCOLLECTION, ot::JsonString(m_userCollection, _allocator), _allocator);
 
 	ot::JsonArray servicesArr;
-	for (const Service& service : m_services) {
+	for (const Service& service : m_services)
+	{
 		ot::JsonObject serviceObj;
 		service.addToJsonObject(serviceObj, _allocator);
 		servicesArr.PushBack(serviceObj, _allocator);
@@ -283,10 +308,35 @@ void Session::addToJsonObject(ot::JsonValue& _jsonObject, ot::JsonAllocator& _al
 
 // Service management
 
-Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation) {
+Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
+	std::string newServiceName;
+
+	for (int ct = 0; newServiceName.empty(); ct++)
+	{
+		if (ct > 0)
+		{
+			newServiceName = _serviceInformation.getServiceName() + std::to_string(ct);
+		}
+		else
+		{
+			newServiceName = _serviceInformation.getServiceName();
+		}
+
+		for (const Service& service : m_services)
+		{
+			if (service.getServiceName() == newServiceName)
+			{
+				newServiceName.clear();
+				break;
+			}
+		}
+	}
+
 	Service newService(_serviceInformation, m_id);
+	newService.setServiceName(newServiceName);
 	newService.setRequested(true);
 	newService.setServiceID(this->generateNextServiceID());
 	return this->addService(std::move(newService));
@@ -294,49 +344,38 @@ Service& Session::addRequestedService(const ot::ServiceBase& _serviceInformation
 
 Service& Session::addGateway()
 {
-	std::lock_guard<std::mutex> lock(m_mutex);
-
-	std::string newGatewayName;
-	int ct = 0;
-	do
-	{
-		ct++;
-		newGatewayName = OT_INFO_SERVICE_TYPE_GatewayService + std::to_string(ct);
-
-		for (const Service& service : m_services) {
-			if (service.getServiceName() == newGatewayName) {
-				newGatewayName.clear();
-				break;
-			}
-		}
-	}
-	while (newGatewayName.empty());
-
-	ot::ServiceBase serviceInfo(newGatewayName, OT_INFO_SERVICE_TYPE_GatewayService);
-
-	Service newService(serviceInfo, m_id);
-	newService.setRequested(true);
-	newService.setServiceID(this->generateNextServiceID());
-	return this->addService(std::move(newService));
+	ot::ServiceBase serviceInfo(OT_INFO_SERVICE_TYPE_GatewayService, OT_INFO_SERVICE_TYPE_GatewayService);
+	Service& newService = this->addRequestedService(serviceInfo);
+	newService.setCustomRunHandling(true);
+	return newService;
 }
 
-void Session::setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers) {
-	_notifyOthers |= !this->hasRequestedServices(_serviceID);
+void Session::setServiceAlive(ot::serviceID_t _serviceID, bool _notifyOthers)
+{
+	if (this->hasRequestedServices(_serviceID))
+	{
+		_notifyOthers = false;
+	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	Service& service = this->getServiceFromID(_serviceID);
-	
+
 	service.setRequested(false);
 	service.setAlive(true);
 
-	if (_notifyOthers) {
+	if (_notifyOthers)
+	{
 		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
 }
 
-void Session::setServiceAlive(ot::serviceID_t _serviceID, const std::string& _serviceUrl, bool _notifyOthers) {
-	_notifyOthers |= !this->hasRequestedServices(_serviceID);
+void Session::setServiceAlive(ot::serviceID_t _serviceID, const std::string& _serviceUrl, bool _notifyOthers)
+{
+	if (this->hasRequestedServices(_serviceID))
+	{
+		_notifyOthers = false;
+	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -346,75 +385,94 @@ void Session::setServiceAlive(ot::serviceID_t _serviceID, const std::string& _se
 	service.setAlive(true);
 	service.setServiceURL(_serviceUrl);
 
-	if (_notifyOthers)  {
+	if (_notifyOthers)
+	{
 		this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
 }
 
-void Session::showService(ot::serviceID_t _serviceID) {
+void Session::showService(ot::serviceID_t _serviceID)
+{
 	std::thread t(&Session::showWorker, this, _serviceID);
 	t.detach();
 }
 
-ot::ServiceBase Session::getServiceInfo(ot::serviceID_t _serviceID) {
+ot::ServiceBase Session::getServiceInfo(ot::serviceID_t _serviceID)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return this->getServiceFromID(_serviceID);
 }
 
-void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID, ot::PortManager& _debugPortManager) {
+void Session::setServiceShutdownCompleted(ot::serviceID_t _serviceID, ot::PortManager& _debugPortManager)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (auto it = m_services.begin(); it != m_services.end(); ) {
-		if (it->getServiceID() == _serviceID) {
-			if (it->isDebug()) {
+	for (auto it = m_services.begin(); it != m_services.end(); )
+	{
+		if (it->getServiceID() == _serviceID)
+		{
+			if (it->isDebug())
+			{
 				// Free used debug ports
-				for (ot::port_t port : it->getPortNumbers()) {
+				for (ot::port_t port : it->getPortNumbers())
+				{
 					_debugPortManager.freePort(port);
 				}
 			}
 			it = m_services.erase(it);
 		}
-		else {
+		else
+		{
 			it++;
 		}
 	}
 }
 
-void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers, ot::PortManager& _debugPortManager) {
+void Session::serviceDisconnected(ot::serviceID_t _serviceID, bool _notifyOthers, ot::PortManager& _debugPortManager)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (auto it = m_services.begin(); it != m_services.end(); ) {
-		if (it->getServiceID() == _serviceID) {
+	for (auto it = m_services.begin(); it != m_services.end(); )
+	{
+		if (it->getServiceID() == _serviceID)
+		{
 			OT_LOG_D("Removing service from session { " + it->debugLogString(m_id) + " }");
 
 			// Update state
 			it->setAlive(false);
 			it->setShuttingDown(false);
 
-			if (_notifyOthers) {
+			if (_notifyOthers)
+			{
 				this->broadcastBasicAction(_serviceID, OT_ACTION_CMD_ServiceDisconnected, ot::EXECUTE, false);
 			}
 
-			if (it->isDebug()) {
+			if (it->isDebug())
+			{
 				// Free used debug ports
-				for (ot::port_t port : it->getPortNumbers()) {
+				for (ot::port_t port : it->getPortNumbers())
+				{
 					_debugPortManager.freePort(port);
 				}
 			}
 
 			it = m_services.erase(it);
 		}
-		else {
+		else
+		{
 			it++;
 		}
 	}
 }
 
-void Session::addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator) {
+void Session::addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocator& _allocator)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	for (const Service& service : m_services) {
-		if (service.isAlive() && !service.isHidden()) {
+	for (const Service& service : m_services)
+	{
+		if (service.isAlive() && !service.isHidden())
+		{
 			ot::JsonObject obj;
 			service.addToJsonObject(obj, _allocator);
 			_array.PushBack(obj, _allocator);
@@ -422,8 +480,10 @@ void Session::addAliveServicesToJsonArray(ot::JsonArray& _array, ot::JsonAllocat
 	}
 }
 
-void Session::startHealthCheck() {
-	if (m_healthCheckRunning) {
+void Session::startHealthCheck()
+{
+	if (m_healthCheckRunning)
+	{
 		OT_LOG_W("Health check already running { \"SessionID\": \"" + m_id + "\" }");
 		return;
 	}
@@ -432,30 +492,60 @@ void Session::startHealthCheck() {
 	m_healthCheckThread = std::thread(&Session::healthCheckWorker, this);
 }
 
-void Session::stopHealthCheck() {
-	if (!m_healthCheckRunning) {
+void Session::stopHealthCheck()
+{
+	if (!m_healthCheckRunning)
+	{
 		OT_LOG_D("Health check not running { \"SessionID\": \"" + m_id + "\" }");
 		return;
 	}
 
 	m_healthCheckRunning = false;
-	if (m_healthCheckThread.joinable()) {
+	if (m_healthCheckThread.joinable())
+	{
 		m_healthCheckThread.join();
 	}
 
 	OT_LOG_D("Health check stopped { \"SessionID\": \"" + m_id + "\" }");
 }
 
-void Session::sendRunCommand() {
+void Session::sendRunCommand()
+{
 	std::thread t(&Session::runWorker, this);
 	t.detach();
+}
+
+void Session::sendRunCommandToService(Service& _service, const std::map<std::string, std::string>& _additionalInformation)
+{
+	if (_service.isAlive() && !_service.isRunning() && !_service.isShuttingDown())
+	{
+		ot::JsonDocument runDoc;
+		runDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, runDoc.GetAllocator()), runDoc.GetAllocator());
+		runDoc.AddMember(OT_ACTION_PARAM_RunData, ot::JsonObject(this->createServiceRunDataImpl(_service.getServiceID()), runDoc.GetAllocator()), runDoc.GetAllocator());
+
+		for (const auto& [key, value] : _additionalInformation)
+		{
+			runDoc.AddMember(ot::JsonString(key, runDoc.GetAllocator()), ot::JsonString(value, runDoc.GetAllocator()), runDoc.GetAllocator());
+		}
+
+		std::string response;
+		if (!ot::msg::send("", _service.getServiceURL(), ot::EXECUTE, runDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+		{
+			OT_LOG_E("Failed to send run command to service { " + _service.debugLogString(m_id) + " }");
+		}
+		else
+		{
+			_service.setRunning();
+		}
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Session management
 
-void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::PortManager& _debugPortManager) {
+void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::PortManager& _debugPortManager)
+{
 	OT_LOG_D("Preparing session for shutdown { \"SessionID\": \"" + m_id + "\", \"RequestingServiceID\": " + std::to_string(_requestingService) + " }");
 
 	this->stopHealthCheck();
@@ -463,12 +553,16 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::
 	std::lock_guard<std::mutex> lock(m_mutex);
 	m_state.set(Session::ShuttingDown, true);
 
-	for (auto it = m_services.begin(); it != m_services.end(); ) {
+	for (auto it = m_services.begin(); it != m_services.end(); )
+	{
 		// Remove requested services
-		if (it->isRequested()) {
-			if (it->isDebug()) {
+		if (it->isRequested())
+		{
+			if (it->isDebug())
+			{
 				// Free used debug ports
-				for (ot::port_t port : it->getPortNumbers()) {
+				for (ot::port_t port : it->getPortNumbers())
+				{
 					_debugPortManager.freePort(port);
 				}
 			}
@@ -483,29 +577,33 @@ void Session::prepareSessionForShutdown(ot::serviceID_t _requestingService, ot::
 		it->setShuttingDown();
 
 		// Remove requesting service except when it has a relay service running
-		if (it->getServiceID() == _requestingService && !it->getWebsocketUrl().empty()) {
-			if (it->isDebug()) {
+		if (it->getServiceID() == _requestingService && !it->getWebsocketUrl().empty())
+		{
+			if (it->isDebug())
+			{
 				// Free used debug ports
-				for (ot::port_t port : it->getPortNumbers()) {
+				for (ot::port_t port : it->getPortNumbers())
+				{
 					_debugPortManager.freePort(port);
 				}
 			}
 
 			it = m_services.erase(it);
 		}
-		else {
+		else
+		{
 			it++;
 		}
 	}
-
-	
 }
 
-void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown, ot::PortManager& _debugPortManager) {
+void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyShutdown, ot::PortManager& _debugPortManager)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// In case of regular shutdown send pre shutdown command before shutting down the session.
-	if (!_emergencyShutdown) {
+	if (!_emergencyShutdown)
+	{
 		this->broadcastBasicAction(_senderServiceID, OT_ACTION_CMD_ServicePreShutdown, ot::EXECUTE, true);
 	}
 
@@ -513,54 +611,67 @@ void Session::shutdownSession(ot::serviceID_t _senderServiceID, bool _emergencyS
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SESSION_EXISTS, false, doc.GetAllocator());
 
-	if (_emergencyShutdown) {
+	if (_emergencyShutdown)
+	{
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceEmergencyShutdown, doc.GetAllocator()), doc.GetAllocator());
 	}
-	else {
+	else
+	{
 		doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_ServiceShutdown, doc.GetAllocator()), doc.GetAllocator());
 	}
-	
+
 	// Broadcast the shutdown document
 	this->broadcast(_senderServiceID, doc.toJson(), ot::EXECUTE, false, true);
 
 	// Remove debug services since the shutdown won't be detected by the LDS
-	for (auto it = m_services.begin(); it != m_services.end(); ) {
-		if (it->isDebug()) {
+	for (auto it = m_services.begin(); it != m_services.end(); )
+	{
+		if (it->isDebug())
+		{
 			// Free used debug ports
-			for (ot::port_t port : it->getPortNumbers()) {
+			for (ot::port_t port : it->getPortNumbers())
+			{
 				_debugPortManager.freePort(port);
 			}
 
 			// Remove service from session
 			it = m_services.erase(it);
 		}
-		else {
+		else
+		{
 			it++;
 		}
 	}
 }
 
-void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType) {
+void Session::sendBroadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	this->broadcast(_senderServiceID, _message, _messageType, false, false);
 }
 
-void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager) {
+void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortManager& _debugPortManager)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Perform health check
-	for (auto it = m_services.begin(); it != m_services.end(); ) {
-		if (it->getServiceID() == _failedServiceID) {
+	for (auto it = m_services.begin(); it != m_services.end(); )
+	{
+		if (it->getServiceID() == _failedServiceID)
+		{
 			OT_LOG_D("Removing failed service from session { " + it->debugLogString(m_id) + " }");
-			if (it->isDebug()) {
+			if (it->isDebug())
+			{
 				// Free used debug ports
-				for (ot::port_t port : it->getPortNumbers()) {
+				for (ot::port_t port : it->getPortNumbers())
+				{
 					_debugPortManager.freePort(port);
 				}
 			}
 			it = m_services.erase(it);
 		}
-		else {
+		else
+		{
 			it++;
 		}
 	}
@@ -570,18 +681,22 @@ void Session::removeFailedService(ot::serviceID_t _failedServiceID, ot::PortMana
 
 // Private: Messaging
 
-void Session::broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, ot::MessageType _messageType, bool _forceSend) {
+void Session::broadcastBasicAction(ot::serviceID_t _senderServiceID, const std::string& _action, ot::MessageType _messageType, bool _forceSend)
+{
 	ot::JsonDocument doc;
 	this->prepareBroadcastDocument(doc, _action, _senderServiceID);
 	this->broadcast(_senderServiceID, doc.toJson(), _messageType, false, _forceSend);
 }
 
-void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _async, bool _forceSend) {
-	if (_async) {
+void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _async, bool _forceSend)
+{
+	if (_async)
+	{
 		std::thread t(&Session::broadcastWorker, this, _senderServiceID, _message, _messageType, _forceSend);
 		t.detach();
 	}
-	else {
+	else
+	{
 		this->broadcastImpl(_senderServiceID, _message, _messageType, _forceSend);
 	}
 }
@@ -590,8 +705,10 @@ void Session::broadcast(ot::serviceID_t _senderServiceID, const std::string& _me
 
 // Private: Helper
 
-Service& Session::addService(Service&& _service) {
-	if (this->hasService(_service.getServiceID())) {
+Service& Session::addService(Service&& _service)
+{
+	if (this->hasService(_service.getServiceID()))
+	{
 		std::string msg = "Service already registered { " + _service.debugLogString(m_id) + " }";
 		OT_LOG_E(msg);
 		throw ot::Exception::ObjectAlreadyExists(msg);
@@ -601,9 +718,12 @@ Service& Session::addService(Service&& _service) {
 	return m_services.back();
 }
 
-bool Session::hasService(ot::serviceID_t _serviceID) const {
-	for (const Service& service : m_services) {
-		if (service.getServiceID() == _serviceID) {
+bool Session::hasService(ot::serviceID_t _serviceID) const
+{
+	for (const Service& service : m_services)
+	{
+		if (service.getServiceID() == _serviceID)
+		{
 			return true;
 		}
 	}
@@ -611,9 +731,12 @@ bool Session::hasService(ot::serviceID_t _serviceID) const {
 	return false;
 }
 
-Service& Session::getServiceFromID(ot::serviceID_t _serviceID) {
-	for (Service& service : m_services) {
-		if (service.getServiceID() == _serviceID) {
+Service& Session::getServiceFromID(ot::serviceID_t _serviceID)
+{
+	for (Service& service : m_services)
+	{
+		if (service.getServiceID() == _serviceID)
+		{
 			return service;
 		}
 	}
@@ -622,9 +745,12 @@ Service& Session::getServiceFromID(ot::serviceID_t _serviceID) {
 	throw ot::Exception::ObjectNotFound("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
 }
 
-const Service& Session::getServiceFromID(ot::serviceID_t _serviceID) const {
-	for (const Service& service : m_services) {
-		if (service.getServiceID() == _serviceID) {
+const Service& Session::getServiceFromID(ot::serviceID_t _serviceID) const
+{
+	for (const Service& service : m_services)
+	{
+		if (service.getServiceID() == _serviceID)
+		{
 			return service;
 		}
 	}
@@ -633,31 +759,39 @@ const Service& Session::getServiceFromID(ot::serviceID_t _serviceID) const {
 	throw ot::Exception::ObjectNotFound("Service not found { \"ServiceID\": " + std::to_string(_serviceID) + " }");
 }
 
-void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _forceSend) {
+void Session::broadcastImpl(ot::serviceID_t _senderServiceID, const std::string& _message, ot::MessageType _messageType, bool _forceSend)
+{
 	std::string lssUrl = SessionService::instance().getUrl();
 
-	for (const Service& service : m_services) {
-		if (!service.getServiceURL().empty() && (_forceSend || (service.isRunning() && !service.isShuttingDown())) && service.getServiceID() != _senderServiceID) {
+	for (const Service& service : m_services)
+	{
+		if (!service.getServiceURL().empty() && (_forceSend || (service.isRunning() && !service.isShuttingDown())) && service.getServiceID() != _senderServiceID)
+		{
 			std::string response;
-			if (!ot::msg::send(lssUrl, service.getServiceURL(), _messageType, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+			if (!ot::msg::send(lssUrl, service.getServiceURL(), _messageType, _message, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+			{
 				OT_LOG_E("Failed to send broadcast message to service { " + service.debugLogString(m_id) + " }");
 			}
 		}
 	}
 }
 
-void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string& _action, ot::serviceID_t _senderService) {
+void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string& _action, ot::serviceID_t _senderService)
+{
 	_doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(_action, _doc.GetAllocator()), _doc.GetAllocator());
-	
-	if (_senderService != ot::invalidServiceID) {
-		if (this->hasService(_senderService)) {
+
+	if (_senderService != ot::invalidServiceID)
+	{
+		if (this->hasService(_senderService))
+		{
 			Service& service = this->getServiceFromID(_senderService);
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, service.getServiceID(), _doc.GetAllocator());
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_URL, ot::JsonString(service.getServiceURL(), _doc.GetAllocator()), _doc.GetAllocator());
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(service.getServiceName(), _doc.GetAllocator()), _doc.GetAllocator());
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.getServiceType(), _doc.GetAllocator()), _doc.GetAllocator());
 		}
-		else {
+		else
+		{
 			// This may happen when the service was deregistered already
 			_doc.AddMember(OT_ACTION_PARAM_SERVICE_ID, _senderService, _doc.GetAllocator());
 		}
@@ -666,12 +800,15 @@ void Session::prepareBroadcastDocument(ot::JsonDocument& _doc, const std::string
 	_doc.AddMember(OT_ACTION_PARAM_SESSION_ID, ot::JsonString(m_id, _doc.GetAllocator()), _doc.GetAllocator());
 }
 
-ot::ServiceRunData Session::createServiceRunDataImpl(ot::serviceID_t _serviceID) {
+ot::ServiceRunData Session::createServiceRunDataImpl(ot::serviceID_t _serviceID)
+{
 	ot::ServiceRunData runData;
 
 	// Services
-	for (const Service& service : m_services) {
-		if (service.getServiceID() != _serviceID && service.isAlive() && !service.isHidden()) {
+	for (const Service& service : m_services)
+	{
+		if (service.getServiceID() != _serviceID && service.isAlive() && !service.isHidden())
+		{
 			runData.addService(service);
 		}
 	}
@@ -683,12 +820,14 @@ ot::ServiceRunData Session::createServiceRunDataImpl(ot::serviceID_t _serviceID)
 
 // Private: Worker
 
-void Session::broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, ot::MessageType _messageType, bool _forceSend) {
+void Session::broadcastWorker(ot::serviceID_t _senderServiceID, std::string _message, ot::MessageType _messageType, bool _forceSend)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	this->broadcastImpl(_senderServiceID, _message, _messageType, _forceSend);
 }
 
-void Session::healthCheckWorker() {
+void Session::healthCheckWorker()
+{
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, doc.GetAllocator()), doc.GetAllocator());
 	std::string msg = doc.toJson();
@@ -697,22 +836,27 @@ void Session::healthCheckWorker() {
 	bool failureDetected = false;
 	ot::serviceID_t failedServiceID = ot::invalidServiceID;
 
-	while (m_healthCheckRunning && !failureDetected) {
+	while (m_healthCheckRunning && !failureDetected)
+	{
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);
 
 			// Perform health check
-			for (auto it = m_services.begin(); it != m_services.end() && m_healthCheckRunning; it++) {
+			for (auto it = m_services.begin(); it != m_services.end() && m_healthCheckRunning; it++)
+			{
 				const Service& service = *it;
-				if (service.isAlive() && !service.isShuttingDown()) {
+				if (service.isAlive() && !service.isShuttingDown())
+				{
 					std::string response;
-					if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
+					if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, msg, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+					{
 						failureDetected = true;
 						failedServiceID = service.getServiceID();
 						OT_LOG_E("Service health check failed { " + service.debugLogString(m_id) + ", \"Reason\": \"Ping message could not be delivered\" }");
 						break;
 					}
-					else if (response != OT_ACTION_CMD_Ping) {
+					else if (response != OT_ACTION_CMD_Ping)
+					{
 						failureDetected = true;
 						failedServiceID = service.getServiceID();
 						OT_LOG_E("Service health check failed { " + service.debugLogString(m_id) + ", \"Reason\": \"Invalid ping response\", \"PingResponse\": \"" + response + "\" }");
@@ -722,57 +866,56 @@ void Session::healthCheckWorker() {
 			}
 		} // lock guard scope
 
-		if (failureDetected && m_healthCheckRunning) {
+		if (failureDetected && m_healthCheckRunning)
+		{
 			std::thread notificationThread(&Session::healthCheckFailedNotifier, m_id, failedServiceID);
 			notificationThread.detach();
 		}
-		else {
+		else
+		{
 			// Sleep for a while before the next health check
-			for(int i = 0 ; i < 3000 && m_healthCheckRunning; i++) {
+			for (int i = 0; i < 3000 && m_healthCheckRunning; i++)
+			{
 				std::this_thread::sleep_for(std::chrono::milliseconds(10));
 			}
 		}
 	}
 }
 
-void Session::runWorker() {
-	std::string lssUrl = SessionService::instance().getUrl();
-
+void Session::runWorker()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (m_state & Session::ShuttingDown) {
+	if (m_state & Session::ShuttingDown)
+	{
 		OT_LOG_W("Session is shutting down. Run command will not be sent { \"SessionID\": \"" + m_id + "\" }");
 		return;
 	}
 
 	// Send run command to all services that are alive but not yet running
-	for (Service& service : m_services) {
-		if (service.isAlive() && !service.isRunning() && !service.isShuttingDown()) {
-			ot::JsonDocument runDoc;
-			runDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Run, runDoc.GetAllocator()), runDoc.GetAllocator());
-			runDoc.AddMember(OT_ACTION_PARAM_RunData, ot::JsonObject(this->createServiceRunDataImpl(service.getServiceID()), runDoc.GetAllocator()), runDoc.GetAllocator());
-
-			std::string response;
-			if (!ot::msg::send(lssUrl, service.getServiceURL(), ot::EXECUTE, runDoc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				OT_LOG_E("Failed to send run command to service { " + service.debugLogString(m_id) + " }");
-			}
-			else {
-				service.setRunning();
-			}
+	for (Service& service : m_services)
+	{
+		if (!service.hasCustomRunHandling())
+		{
+			this->sendRunCommandToService(service);
 		}
 	}
 }
 
-void Session::showWorker(ot::serviceID_t _visibleService) {
-	try {
+void Session::showWorker(ot::serviceID_t _visibleService)
+{
+	try
+	{
 		std::lock_guard<std::mutex> lock(m_mutex);
-		if (m_state & Session::ShuttingDown) {
+		if (m_state & Session::ShuttingDown)
+		{
 			OT_LOG_W("Session is shutting down. Show command will not be processed { \"SessionID\": \"" + m_id + "\" }");
 			return;
 		}
 
 		Service& service = this->getServiceFromID(_visibleService);
-		if (!service.isHidden()) {
+		if (!service.isHidden())
+		{
 			OT_LOG_W("Service is not hidden { " + service.debugLogString(m_id) + " }");
 			return;
 		}
@@ -781,14 +924,16 @@ void Session::showWorker(ot::serviceID_t _visibleService) {
 
 		this->broadcastBasicAction(_visibleService, OT_ACTION_CMD_ServiceConnected, ot::EXECUTE, false);
 	}
-	catch (const std::exception& _e) {
-		OT_LOG_E("Show worker failed with exception { \"ServiceID\": " + std::to_string(_visibleService) + 
+	catch (const std::exception& _e)
+	{
+		OT_LOG_E("Show worker failed with exception { \"ServiceID\": " + std::to_string(_visibleService) +
 			", \"SessionID\": \"" + m_id + "\", \"Exception\": \"" + _e.what() + "\" }");
 
 		this->healthCheckFailedNotifier(m_id, _visibleService);
 	}
 }
 
-void Session::healthCheckFailedNotifier(std::string _sessionID, ot::serviceID_t _failedServiceID) {
+void Session::healthCheckFailedNotifier(std::string _sessionID, ot::serviceID_t _failedServiceID)
+{
 	SessionService::instance().serviceFailure(_sessionID, _failedServiceID);
 }

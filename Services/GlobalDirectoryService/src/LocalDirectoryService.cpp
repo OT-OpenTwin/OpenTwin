@@ -78,7 +78,7 @@ bool LocalDirectoryService::supportsService(const std::string& _serviceName) con
 	return false;
 }
 
-bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
+std::optional<ot::SyncServiceStartInfo> LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
@@ -86,16 +86,42 @@ bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serv
 	std::string responseStr;
 	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
-		return false;
+		return std::nullopt;
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 
-	bool success = (response == ot::ReturnMessage::Ok);
-	if (success) {
-		m_services.push_back(_serviceInfo);
+	if (!response.isOk()) {
+		OT_LOG_E("Service start failed at LDS: " + response.getWhat());
+		return std::nullopt;
 	}
-	return success;
+	
+	std::optional<ot::SyncServiceStartInfo> result;
+
+	if (_serviceInfo.getSynchronousLaunch())
+	{
+		ot::JsonDocument newServiceInfoDoc;
+		newServiceInfoDoc.fromJson(response.getWhat());
+
+		ot::SyncServiceStartInfo newServiceInfo;
+		newServiceInfo.setFromJsonObject(newServiceInfoDoc.getConstObject());
+
+		if (!newServiceInfo.isValid())
+		{
+			OT_LOG_E("Failed to start service \"" + _serviceInfo.getServiceName() + "\". Reason: LDS returned invalid information");
+			return std::nullopt;
+		}
+		
+		result = newServiceInfo;
+	}
+	else
+	{
+		result = ot::SyncServiceStartInfo();
+	}
+
+	m_services.push_back(_serviceInfo);
+
+	return result;
 }
 
 bool LocalDirectoryService::requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {
@@ -256,40 +282,6 @@ void LocalDirectoryService::serviceClosed(const std::string& _sessionID, ot::ser
 			} // if (it->first == _session && it->second == _service)
 		} // for (; it != m_services.end(); it++)
 	} // while (erased)
-}
-
-std::optional<ot::GatewayConnectionInfo> LocalDirectoryService::requestToRunGatewayService(const ot::GatewayInitData& _iniData)
-{
-	ot::JsonDocument doc;
-	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_iniData, doc.GetAllocator()), doc.GetAllocator());
-	
-	ot::ReturnMessage response;
-	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::MessageType::EXECUTE, doc.toJson(), response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
-	{
-		OT_LOG_E("Failed to start gateway service. Reason: Failed to send message to LDS");
-		return std::nullopt;
-	}
-
-	if (!response.isOk())
-	{
-		OT_LOG_E("Failed to start gateway service. Reson: LDS reported error: " + response.getWhat());
-		return std::nullopt;
-	}
-
-	ot::JsonDocument infoDoc;
-	infoDoc.fromJson(response.getWhat());
-	ot::GatewayConnectionInfo info;
-	info.setFromJsonObject(infoDoc.getConstObject());
-
-	if (!info.isValid())
-	{
-		OT_LOG_E("[FATAL] Gateway start by LDS reported success but returnd an invlid config");
-		return std::nullopt;
-	}
-
-	m_services.push_back(_iniData);
-	return info;
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

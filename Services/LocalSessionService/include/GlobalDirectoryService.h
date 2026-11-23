@@ -25,8 +25,8 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Data/ServiceInitData.h"
 #include "OTCommunication/CommunicationTypes.h"
-#include "OTCommunication/Data/GatewayInitData.h"
-#include "OTCommunication/Data/GatewayConnectionInfo.h"
+#include "OTCommunication/Data/ServiceInitData.h"
+#include "OTCommunication/Data/SyncServiceStartInfo.h"
 
 // std header
 #include <list>
@@ -64,13 +64,11 @@ public:
 	//! Will return true if the connection status is Connected, otherwise false.
 	bool isConnected();
 
-	//! @brief Requests the GDS to start a service.
-	//! The service start will be performed asynchronously.
-	//! @param _serviceInformation Information about the service to start.
-	//! @param _sessionID The ID of the session that requested the service start.
-	//! @param _lssUrl The URL of the LSS that requested the service to start.
-	//! @return Returns true if the service was successfully requested to start, false otherwise.
-	bool requestToStartService(const ot::ServiceInitData& _serviceInformation);
+	//! @brief Requests the GDS to start a single service..
+	//! @param _serviceInformation The information of the service to start.
+	//! If the service is requested to start synchronously, the function will return the information of the started service.
+	//! @return Return a non empty optional if the request was successful. If the service was requested to start synchronously, the optional will contain the information of the started service.
+	std::optional<ot::SyncServiceStartInfo> requestToStartService(const ot::ServiceInitData& _serviceInformation);
 
 	//! @brief Requests the GDS to start multiple services.
 	//! The service start will be performed asynchronously.
@@ -89,12 +87,6 @@ public:
 	//! @return Returns true if the relay service was successfully started, false otherwise.
 	bool startRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketURL);
 	
-	//! @brief Request the GDS to start a gateway service.
-	//! The gateway service start will be performed synchronously.
-	//! @param _startData The Gateway service start configuration.
-	//! @param _launchTicket The gateway launch ticket.
-	std::optional<ot::GatewayConnectionInfo> startGatewayService(const ot::GatewayInitData& _startData, const std::string& _launchTicket);
-
 	void notifySessionShuttingDown(const std::string& _sessionID);
 
 	std::string getServiceUrl();

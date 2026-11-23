@@ -32,8 +32,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCommunication/DebugInfo/LDSDebugInfo.h"
 #include "OTCommunication/Data/ServiceInitData.h"
-#include "OTCommunication/Data/GatewayInitData.h"
-#include "OTCommunication/Data/GatewayConnectionInfo.h"
+#include "OTCommunication/Data/SyncServiceStartInfo.h"
 
 // std header
 #include <map>
@@ -73,11 +72,9 @@ public:
 	//! @param _sessionInformation Information about the session where the service should be connected to
 	//! @param _serviceInformation Information about the service that should be started
 	//! @param _serviceURL The URL where the service will be running will be written here
-	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation);
+	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation, ot::SyncServiceStartInfo* _syncStartInfoResult);
 
 	RequestResult requestStartRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketUrl);
-
-	std::optional<ot::GatewayConnectionInfo> requestToStartGatewayService(const ot::GatewayInitData& _iniData);
 
 	//! @brief Will mark all services in the session as expected to shut down.
 	//! Services that are currently requested will be removed from the requested list.

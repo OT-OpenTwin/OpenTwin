@@ -189,11 +189,10 @@ class OpenTwinAPI:
         logger.info(f"Gateway launched for project \"{name}\". Establishing connection to gateway...")
 
         # Establish connection with gateway
-        #gateway_communication = GatewayCommunication.try_connect(
-        #    project_name=project_name,
-        #    gateway_ticket=LaunchTickets.gateway_launch_ticket,
-        #    communication=communication
-        #)
+        gateway_communication = GatewayCommunication(
+            connection_info=gateway_connection_info,
+            general_communication=communication
+        )
 
         project = Project(
             name=name,

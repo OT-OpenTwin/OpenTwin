@@ -35,6 +35,7 @@
 #include "OTServiceFoundation/IDManager.h"
 
 // std header
+#include <map>
 #include <list>
 #include <mutex>
 #include <string>
@@ -98,7 +99,10 @@ public:
 	//! @brief Returns true if any of the services in this session is shutting down.
 	bool hasShuttingDownServices();
 
-	bool checkAllServicesAreRunning();
+	//! @brief Returns true if all services in this session are alive and running.
+	//! Services that are shutting down are also considered healthy.
+	//! @return 
+	OT_DECL_NODISCARD bool getAllServicesAreHealthy();
 
 	constexpr bool isShuttingDown() const noexcept { return m_state.has(Session::ShuttingDown); };
 
@@ -142,6 +146,8 @@ public:
 	void stopHealthCheck();
 
 	void sendRunCommand();
+
+	void sendRunCommandToService(Service& _service, const std::map<std::string, std::string>& _additionalInformation = std::map<std::string, std::string>());
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

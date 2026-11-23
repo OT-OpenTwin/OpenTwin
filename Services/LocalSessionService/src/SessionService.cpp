@@ -37,7 +37,6 @@
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/ServiceLogNotifier.h"
 #include "OTCommunication/Token/UserSessionToken.h"
-#include "OTCommunication/Data/GatewayConnectionInfo.h"
 
 // std header
 #include <chrono>
@@ -266,9 +265,9 @@ std::list<std::string> SessionService::getSessionIDs()
 	return ot::ContainerHelper::getKeys(m_sessions);
 }
 
-bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName)
+bool SessionService::getIsServiceInDebugMode(const std::string& _serviceType)
 {
-	return m_debugServices.contains(_serviceName);
+	return m_debugServices.contains(_serviceType);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -566,13 +565,13 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 	}
 }
 
-bool SessionService::hasMandatoryService(const std::string& _serviceName) const
+bool SessionService::hasMandatoryService(const std::string& _serviceType) const
 {
 	for (const auto& it : m_mandatoryServicesMap)
 	{
 		for (const ot::ServiceBase& serviceInfo : it.second)
 		{
-			if (serviceInfo.getServiceName() == _serviceName)
+			if (serviceInfo.getServiceType() == _serviceType)
 			{
 				return true;
 			}
@@ -947,6 +946,11 @@ ot::ReturnMessage SessionService::handleConfirmService(ot::JsonDocument& _comman
 
 	Session& theSession = this->getSession(sessionID);
 
+	if (!theSession.getAllServicesAreHealthy())
+	{
+
+	}
+
 	// Set the service alive
 	if (_commandDoc.HasMember(OT_ACTION_PARAM_SERVICE_URL))
 	{
@@ -1078,16 +1082,16 @@ ot::ReturnMessage SessionService::handleEnableServiceDebug(ot::JsonDocument& _co
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
+	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
 
-	if (!this->hasMandatoryService(serviceName))
+	if (!this->hasMandatoryService(serviceType))
 	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The specified service is not contained in the mandatory services list");
 	}
 	else
 	{
-		m_debugServices.insert(serviceName);
-		OT_LOG_D("Enabled the debug mode for the service \"" + serviceName + "\"");
+		m_debugServices.insert(serviceType);
+		OT_LOG_D("Enabled the debug mode for the service \"" + serviceType + "\"");
 		return ot::ReturnMessage::Ok;
 	}
 }
@@ -1096,12 +1100,12 @@ ot::ReturnMessage SessionService::handleDisableServiceDebug(ot::JsonDocument& _c
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
-	auto it = m_debugServices.find(serviceName);
+	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
+	auto it = m_debugServices.find(serviceType);
 	if (it != m_debugServices.end())
 	{
 		m_debugServices.erase(it);
-		OT_LOG_D("Disabled the debug mode for the service \"" + serviceName + "\"");
+		OT_LOG_D("Disabled the debug mode for the service \"" + serviceType + "\"");
 		return ot::ReturnMessage::Ok;
 	}
 	else
@@ -1183,7 +1187,7 @@ ot::ReturnMessage SessionService::handleCheckSessionRunning(ot::JsonDocument& _c
 
 	Session& session = this->getSession(sessionID);
 
-	if (session.checkAllServicesAreRunning())
+	if (session.getAllServicesAreHealthy())
 	{
 		return ot::ReturnMessage::True;
 	}
@@ -1374,18 +1378,19 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 	}
 
 	// Ensure correct session state
-	if (!session.checkAllServicesAreRunning())
+	if (!session.getAllServicesAreHealthy())
 	{
-		OT_LOG_E("Not all services are running for session \"" + projectId + "\"");
+		OT_LOG_E("Session is in an unhealthy state for project \"" + projectId + "\".");
 		return ot::ReturnMessage::Failed;
 	}
 
-	// Registerr gateway at session (as requested service)
+	// Register gateway at session (as requested service)
 	Service& gateway = session.addGateway();
-	ot::GatewayInitData gatewayInitData(session.createServiceInitData(gateway));
+	ot::ServiceInitData gatewayInitData = session.createServiceInitData(gateway);
+	gatewayInitData.setSynchronousLaunch(true);
 
 	// Request the gateway start
-	auto gatewayInfo = m_gds.startGatewayService(gatewayInitData, launchTicket);
+	auto gatewayInfo = m_gds.requestToStartService(gatewayInitData);
 
 	if (!gatewayInfo.has_value())
 	{
@@ -1393,18 +1398,33 @@ ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument&
 		return ot::ReturnMessage::Failed;
 	}
 
+	const auto& gatewayServiceInfo = gatewayInfo.value().getServiceInfo();
+	if (gatewayServiceInfo.getServiceType() != OT_INFO_SERVICE_TYPE_GatewayService)
+	{
+		OT_LOG_E("Invalid service type returned for gateway service: " + gatewayServiceInfo.getServiceType());
+		return ot::ReturnMessage::Failed;
+	}
+	if (gatewayServiceInfo.getServiceURL().empty())
+	{
+		OT_LOG_E("Gateway service URL is empty for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+	if (gatewayServiceInfo.getServiceID() != gateway.getServiceID())
+	{
+		OT_LOG_E("Gateway service ID is invalid for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
 	// Generate new gateway ticket
 	auto newGatewayTicketData = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::ticketLength());
 	std::string newGatewayTicket = ot::String::toHexString(newGatewayTicketData);
 
-	// ...
+	session.setServiceAlive(gateway.getServiceID(), gatewayServiceInfo.getServiceURL(), true);
+	session.sendRunCommandToService(gateway, { {OT_ACTION_PARAM_Ticket, newGatewayTicket} });
 
-
-
-	ot::GatewayConnectionInfo& gatewayConnectionInfo = gatewayInfo.value();
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(newGatewayTicket, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_Gateway_Url, ot::JsonString(gatewayConnectionInfo.getGatewayServiceUrl(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Gateway_Url, ot::JsonString(gatewayServiceInfo.getServiceURL(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	return ot::ReturnMessage::ok(responseDoc.toJson());
 }
 

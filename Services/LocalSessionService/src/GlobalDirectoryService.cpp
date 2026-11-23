@@ -91,28 +91,55 @@ bool GlobalDirectoryService::isConnected()
 	return m_connectionStatus == Connected;
 }
 
-bool GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _serviceInformation)
+std::optional<ot::SyncServiceStartInfo> GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _serviceInformation)
 {
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-
+	
 	// Send request
-	std::string response;
+	std::string responseStr;
 	if (!this->ensureConnection())
 	{
 		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to establish connection to GDS.");
-		return false;
+		return std::nullopt;
 	}
-	else if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response))
+	else if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr))
 	{
 		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to send http request to GDS.");
-		return false;
+		return std::nullopt;
+	}
+
+	auto response = ot::ReturnMessage::fromJson(responseStr);
+
+	// Ensure success
+	if (!response.isOk())
+	{
+		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: " + response.getWhat());
+		return std::nullopt;
+	}
+
+	if (_serviceInformation.getSynchronousLaunch())
+	{
+		// On synchronous launch read the information
+		ot::JsonDocument newServiceInfoDoc;
+		newServiceInfoDoc.fromJson(response.getWhat());
+
+		ot::SyncServiceStartInfo newServiceInfo;
+		newServiceInfo.setFromJsonObject(newServiceInfoDoc.getConstObject());
+
+		if (!newServiceInfo.isValid())
+		{
+			OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: GDS returned invalid information");
+			return std::nullopt;
+		}
+		return newServiceInfo;
 	}
 	else
 	{
-		return ot::ReturnMessage::fromJson(response) == ot::ReturnMessage::Ok;
+		// On asynchronous launch return dummy information (success)
+		return ot::SyncServiceStartInfo();
 	}
 }
 
@@ -191,48 +218,6 @@ bool GlobalDirectoryService::startRelayService(const ot::ServiceInitData& _servi
 
 		return true;
 	}
-}
-
-std::optional<ot::GatewayConnectionInfo> GlobalDirectoryService::startGatewayService(const ot::GatewayInitData& _startData, const std::string& _launchTicket)
-{
-	ot::JsonDocument req;
-	auto& alloc = req.GetAllocator();
-	req.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewGateway, alloc), alloc);
-	req.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_startData, alloc), alloc);
-	req.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(_launchTicket, alloc), alloc);
-
-	if (!this->ensureConnection())
-	{
-		OT_LOG_E("Failed to start gateway. Reson: Failed to establish connection to GDS");
-		return std::nullopt;
-	}
-
-	ot::ReturnMessage response;
-	if (!this->sendMessage(ot::EXECUTE, req.toJson(), response))
-	{
-		OT_LOG_E("Failed to start gateway. Reason: Failed to send message to GDS.");
-		return std::nullopt;
-	}
-
-	if (!response.isOk())
-	{
-		OT_LOG_E("Failed to start gateway. Reason: GDS return error: " + response.getWhat());
-		return std::nullopt;
-	}
-
-	ot::JsonDocument gatewayInfoDoc;
-	gatewayInfoDoc.fromJson(response.getWhat());
-
-	ot::GatewayConnectionInfo newGatewayInfo;
-	newGatewayInfo.setFromJsonObject(gatewayInfoDoc.getConstObject());
-
-	if (!newGatewayInfo.isValid())
-	{
-		OT_LOG_E("Failed to start gateway. Reason: GDS returned invalid gateway connection information");
-		return std::nullopt;
-	}
-	
-	return newGatewayInfo;
 }
 
 void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessionID)

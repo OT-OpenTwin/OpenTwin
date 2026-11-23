@@ -31,8 +31,7 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
-#include "OTCommunication/Data/GatewayInitData.h"
-#include "OTCommunication/Data/GatewayConnectionInfo.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <thread>
@@ -105,12 +104,24 @@ ot::ReturnMessage Application::handleStartNewService(ot::JsonDocument& _jsonDocu
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
-	if (m_serviceManager.requestStartService(initData) != ServiceManager::RequestResult::Success) {
+	ot::SyncServiceStartInfo syncInfo;
+
+	if (m_serviceManager.requestStartService(initData, &syncInfo) != ServiceManager::RequestResult::Success)
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, m_serviceManager.lastError());
 	}
-	else {
-		return ot::ReturnMessage::Ok;
-	}
+	else
+	{
+		if (initData.getSynchronousLaunch())
+		{
+			return ot::ReturnMessage::ok(syncInfo.toJson());
+		}
+		else
+		{
+			return ot::ReturnMessage::Ok;
+		}
+		
+	}	
 }
 
 ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
@@ -120,7 +131,7 @@ ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jso
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	
-	auto supportedService = Configuration::instance().getSupportedService(initData.getServiceName());
+	auto supportedService = Configuration::instance().getSupportedService(initData.getServiceType());
 
 	if (!supportedService.has_value()) {
 		OT_LOG_E("The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");
@@ -148,43 +159,6 @@ ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jso
 
 	OT_LOG_E("Failed to start relay service: Maximum number of start attempts reached");
 	return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start relay service: Maximum number of start attempts reached");
-}
-
-ot::ReturnMessage Application::handleStartGatewayService(ot::JsonDocument& _jsonDocument)
-{
-	ot::GatewayInitData cfg;
-	cfg.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
-
-	// Ensure gateway is supported by this LDS
-	auto supportedService = Configuration::instance().getSupportedService(cfg.getServiceType());
-
-	if (!supportedService.has_value())
-	{
-		OT_LOG_E("The service type \"" + cfg.getServiceType() + "\" is not supported by this Local Directory Service");
-		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + cfg.getServiceType() + "\" is not supported by this Local Directory Service");
-	}
-
-	const unsigned int maxStartupRestarts = supportedService.value().getMaxStartupRestarts();
-
-	for (unsigned int attempt = 0; attempt < maxStartupRestarts; attempt++)
-	{
-		auto result = m_serviceManager.requestToStartGatewayService(cfg);
-
-		if (result.has_value())
-		{
-			const ot::GatewayConnectionInfo& newGatewayInfo = result.value();
-
-			OT_LOG_D("Gateway service started at \"" + newGatewayInfo.getGatewayServiceUrl() + "\"");
-
-			return ot::ReturnMessage::ok(newGatewayInfo.toJson());
-		}
-		else
-		{
-			OT_LOG_W("Gateway start failed on attempt " + std::to_string(attempt + 1) + "/" + std::to_string(maxStartupRestarts));
-		}
-	}
-
-	return ot::ReturnMessage::failed("Max startup attempts reached");
 }
 
 ot::ReturnMessage Application::handleSessionClosing(ot::JsonDocument& _jsonDocument) {
@@ -262,7 +236,6 @@ Application::Application() :
 
 	connectAction(OT_ACTION_CMD_StartNewService, this, &Application::handleStartNewService);
 	connectAction(OT_ACTION_CMD_StartNewRelayService, this, &Application::handleStartNewRelayService);
-	connectAction(OT_ACTION_CMD_StartNewGateway, this, &Application::handleStartGatewayService);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &Application::handleSessionClosing);
 	connectAction(OT_ACTION_CMD_ShutdownSessionCompleted, this, &Application::handleSessionClosed);
 	connectAction(OT_ACTION_CMD_ServiceDisconnected, this, &Application::handleServiceClosed);

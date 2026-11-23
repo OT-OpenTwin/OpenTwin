@@ -59,7 +59,6 @@ private:
 
 	ot::ReturnMessage handleStartNewService(ot::JsonDocument& _doc);
 	ot::ReturnMessage handleStartNewRelayService(ot::JsonDocument& _doc);
-	ot::ReturnMessage handleStartGatewayService(ot::JsonDocument& _jsonDocument);
 	ot::ReturnMessage handleSessionClosing(ot::JsonDocument& _doc);
 	ot::ReturnMessage handleSessionClosed(ot::JsonDocument& _doc);
 	ot::ReturnMessage handleServiceClosed(ot::JsonDocument& _doc);

@@ -216,9 +216,9 @@ void Configuration::importFromEnvironment() {
 	m_configurationImported = true;
 }
 
-std::optional<SupportedService> Configuration::getSupportedService(const std::string& _serviceName) const {
+std::optional<SupportedService> Configuration::getSupportedService(const std::string& _serviceType) const {
 	for (const SupportedService& s : m_supportedServices) {
-		if (s.getName() == _serviceName) {
+		if (s.getType() == _serviceType) {
 			return s;
 		}
 	}
