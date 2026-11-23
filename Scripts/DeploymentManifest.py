@@ -333,7 +333,7 @@ def create_deployment(plan) -> None:
     plan.copy(r"%MONGO_C_DLLR%\*.dll", "%OT_DEPLOYMENT_DIR%")
 
     # ZLib
-    plan.copy(r"%ZLIB_DLLPATHR%\zlib.dll", "%OT_DEPLOYMENT_DIR%")
+    plan.copy(r"%ZLIB_DLLPATHR%\libz.dll", "%OT_DEPLOYMENT_DIR%")
 
     # Embree
     plan.copy(r"%EMBREE_BIN%\embree3.dll", "%OT_DEPLOYMENT_DIR%")
@@ -504,7 +504,7 @@ def create_frontend_installer(plan) -> None:
     plan.copy(r"%QWT_LIB_DLLR%\qwt.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # ZLib
-    plan.copy(r"%ZLIB_DLLPATHR%\zlib.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
+    plan.copy(r"%ZLIB_DLLPATHR%\libz.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # Python
     plan.mkdir(r"%OPENTWIN_FRONTEND_DEPLOYMENT%\PythonEnvironments")

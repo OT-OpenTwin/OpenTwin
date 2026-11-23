@@ -52,7 +52,7 @@ CONFIGURATION_TOOLS = ("SetPermissions", "ConfigMongoDBNoAuth", "ConfigMongoDBWi
 
 BOOST_DLL = (r"boost\boost_1_86_0\lib64-msvc-14.3", "boost_filesystem-vc143-mt-x64-1_86.dll")
 MONGO_BINS = (r"MongoDb\mongo-cxx-driver-r3.10.0\x64\Release\bin", r"MongoDb\mongo-c-driver-1.27.3\x64\Release\bin")
-ZLIB_DLL = (r"zlib\zlib-1.2.11\x64\Release\bin", "zlib.dll")
+ZLIB_DLL = (r"zlib\zlib-1.4\windows\Release\bin", "libz.dll")
 
 LINE = "-" * 61
 FAIL_LINE = "-" * 45
