@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: CurveDatasetFactory.cpp
 // 
 // License:
@@ -125,13 +125,15 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 	
 	ot::JSONToVariableConverter jsonToVariableConverter;
 	int64_t naNCount = 0;
+	// Alternative is a plot of qunatity components. Such as magnitude vs phase.
+	bool plottingAgainstParameter = _plotCfg.getXAxis().getQuantityComponent() == ot::Plot1DAxisCfg::AxisQuantityComponent::XData;
 	for (uint32_t i = 0; i < numberOfDocuments; i++)
 	{
 		auto singleMongoDocument = ot::json::getObject(_allMongoDBDocuments, i);
 
 		const std::string temp = ot::json::toJson(singleMongoDocument);
 		// Document contains the quantity which the plot shall show
-		if (ot::json::exists(singleMongoDocument, displayParameterLabel))
+		if (plottingAgainstParameter && ot::json::exists(singleMongoDocument, displayParameterLabel) || !plottingAgainstParameter)
 		{
 			ot::DatasetDependencyInfos dependencies, secondaryParameterDependencies;
 			const std::string quantityName = singleMongoDocument[MetadataQuantity::getFieldName().c_str()].GetString();
@@ -246,19 +248,26 @@ CurveDatasetFactory::DependencyInfoList CurveDatasetFactory::createCurves(const 
 			ot::Variable quantityValue = jsonToVariableConverter(entryQuantityValue);
 			
 			// Get parameter value
-			const ot::JsonValue& entryParameterValue = singleMongoDocument[displayParameterLabel.c_str()];
-			
-			if (quantityValue.isNotANumber() || entryParameterValue.IsNull())
+			if (plottingAgainstParameter)
 			{
-				naNCount++;
+				const ot::JsonValue& entryParameterValue = singleMongoDocument[displayParameterLabel.c_str()];
+				double parameterValue = jsonToDouble(entryParameterValue);
+				curveDataInfo->dataPoints.m_xData.push_back(parameterValue);
+				if (quantityValue.isNotANumber() || entryParameterValue.IsNull())
+				{
+					naNCount++;
+				}
 			}
 			else
 			{
-				double parameterValue = jsonToDouble(entryParameterValue);
-				curveDataInfo->dataPoints.m_yData.push_back(quantityValue);
-				curveDataInfo->dataPoints.m_xData.push_back(parameterValue);
-				curveDataInfo->secondaryDependencies.push_back(secondaryParameterDependencies);
+				curveDataInfo->dataPoints.m_xData.push_back(0);
+				if (quantityValue.isNotANumber())
+				{
+					naNCount++;
+				}
 			}
+			curveDataInfo->dataPoints.m_yData.push_back(quantityValue);
+			curveDataInfo->secondaryDependencies.push_back(secondaryParameterDependencies);
 		}
 	}
 
@@ -305,6 +314,7 @@ std::list<ot::PlotDataset*> CurveDatasetFactory::createPlotDatasets(const ot::Pl
 		ot::PlotDatasetData datasetData;
 		if (dataPoints.m_yData.front().isComplex())
 		{
+			// Usually the complex data are internally only held as Re/Im. 
 			std::vector<std::complex<double>> complexData = toComplexVector(dataPoints.m_yData);
 			datasetData = ot::PlotDatasetData(std::move(dataPoints.m_xData), std::move(complexData), _plotCfg.getXAxisQuantityComponent(), _plotCfg.getYAxisQuantityComponent());
 		} 

@@ -312,14 +312,10 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	const int32_t maxNbOfCurves = PropertyHelper::getIntegerPropertyValue(this, "Max", "Curve limit");
 	const bool useCurveLimit = PropertyHelper::getBoolPropertyValue(this, "Number of curves", "Curve limit");
 
-	const std::string xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Parameter", getXAxisPropertyGroupName());
-
 	ot::Plot1DCfg config;
 	config.setEntityName(getName());
 	config.setEntityID(getEntityID());
 	config.setEntityVersion(getEntityStorageVersion());
-
-	config.setXAxisParameter(xAxisParameter);
 
 	config.setTitle(title);
 	config.setCollectionName(DataBase::instance().getCollectionName());
@@ -345,8 +341,12 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	// Y Axis Cartesian = Radius Axis Polar
 	ot::Plot1DAxisCfg yAxisCfg = config.getYAxis();
 
+	// Its actually not necessary the x-axis parameter. It is more the depending value inside the data subset. Either the x-axis parameter or the phi parameter. The data points are shown against that parameter.
+	std::string xAxisParameter;
+
 	if (config.getPlotType() == ot::Plot1DCfg::Cartesian)
 	{
+		xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Parameter", getXAxisPropertyGroupName());
 		setAxisFromProperties(getXAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getYAxisPropertyGroupName(), yAxisCfg);
 		const std::string yAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getYAxisPropertyGroupName());
@@ -358,6 +358,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 	}
 	else if (config.getPlotType() == ot::Plot1DCfg::Polar)
 	{
+		xAxisParameter = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
 		setAxisFromProperties(getAzimuthAxisPropertyGroupName(), xAxisCfg);
 		setAxisFromProperties(getRadiusAxisPropertyGroupName(), yAxisCfg);
 		const std::string phaseAxisComponent = PropertyHelper::getSelectionPropertyValue(this, "Quantity component", getAzimuthAxisPropertyGroupName());
@@ -396,6 +397,7 @@ const ot::Plot1DCfg EntityResult1DPlot::getPlot()
 
 	config.setXAxis(std::move(xAxisCfg));
 	config.setYAxis(std::move(yAxisCfg));
+	config.setXAxisParameter(xAxisParameter);
 
 	ot::Plot1DCfg::DependencyLabelInfoList fixedDatasetLabelInfos = {
 		{ MetadataSeries::getFieldName() },
