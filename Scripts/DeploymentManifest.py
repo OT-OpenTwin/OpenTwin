@@ -446,6 +446,7 @@ def create_frontend_installer(plan) -> None:
     plan.copy(r"%OC_DLLR%\TKMesh.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
     plan.copy(r"%OC_DLLR%\TKShHealing.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
     plan.copy(r"%OC_DLLR%\TKTopAlgo.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
+    plan.copy(r"%OC_DLLR%\TKPrim.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
 
     # OpenSceneGraph
     plan.copy(r"%OSG_DLLR%\OpenThreads.dll", "%OPENTWIN_FRONTEND_DEPLOYMENT%")
