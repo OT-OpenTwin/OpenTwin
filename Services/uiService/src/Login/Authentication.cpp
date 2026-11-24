@@ -168,6 +168,11 @@ void ot::Authentication::addAuthenticationData(const LoginData& _loginData, ot::
 	{
 		_doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), allocator), allocator);
 	}
+	else if (!_loginData.getEncryptedUserPassword().empty())
+	{
+		_doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, true, allocator);
+		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getEncryptedUserPassword(), allocator), allocator);
+	}
 	else if (_loginData.hasUserSessionToken())
 	{
 		const auto& token = _loginData.getUserSessionToken();
@@ -175,7 +180,6 @@ void ot::Authentication::addAuthenticationData(const LoginData& _loginData, ot::
 	}
 	else
 	{
-		_doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, true, allocator);
-		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getEncryptedUserPassword(), allocator), allocator);
+		OT_LOG_E("No valid authentication data available to add to the request.");
 	}
 }
