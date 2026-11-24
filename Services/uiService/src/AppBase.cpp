@@ -83,6 +83,7 @@
 
 // OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/BlockAndFilter/GlobalUserInputSignalBlocker.h"
 #include "OTWidgets/Dialog/CreateProjectDialog.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
 #include "OTWidgets/Dialog/MessageBoxManager.h"
@@ -341,7 +342,16 @@ bool AppBase::logIn()
 
 	if (isNonInteractive())
 	{
-		//mainWindow()->setEnabled(false);
+		auto* window = mainWindow();
+		auto* blocker = ot::GlobalUserInputSignalBlocker::instance().getBlocker();
+		QWidget* widget = window;
+		while (widget)
+		{
+			blocker->addToWhitelist(widget);
+			widget = widget->parentWidget();
+		}
+
+		ot::GlobalUserInputSignalBlocker::install();
 	}
 
 	// Create UI

@@ -51,7 +51,7 @@ class GatewayCommunication:
 
         if not isinstance(action, GatewayAction):
             raise TypeError("action must be an instance of GatewayAction")
-
+        
         action_request: dict[str, Any] = {
             OT_ACTION_MEMBER: OT_ACTION_CMD_PerformGatewayAction,
             OT_ACTION_PARAM_Ticket: self.info.gateway_ticket,

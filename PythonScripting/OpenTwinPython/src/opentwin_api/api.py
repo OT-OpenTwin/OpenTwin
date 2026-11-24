@@ -16,7 +16,7 @@ from opentwin_api._internal.io.gateway_communication import GatewayCommunication
 from opentwin_api._internal.default_config import DefaultConfig
 from opentwin_api._internal.launching.ui_launch_data import UiLaunchData
 from opentwin_api._internal.launching.launch_tickets import LaunchTickets
-from opentwin_api._internal.system.frontend_launcher import FrontendLauncher
+from opentwin_api._internal.launching.frontend_launcher import FrontendLauncher
 from opentwin_api._internal.service.lss_api import LSSAPI
 
 # OpenTwin internal
@@ -144,6 +144,8 @@ class OpenTwinAPI:
 
         # Determine the Local Session Service (LSS) URL for the project
         lss_url : str | None = None
+
+        logger.debug(f"Waiting for project \"{name}\" to become available in the GSS...")
 
         while time.monotonic() < deadline_time:
             lss_url = gss.determine_lss_for_project(project_id)

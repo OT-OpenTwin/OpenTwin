@@ -30,6 +30,7 @@
 #include "OTSystem/SingleSignOn/SingleSignOn_Client.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTWidgets/Positioning.h"
+#include "OTWidgets/BlockAndFilter/GlobalUserInputSignalBlocker.h"
 #include "OTWidgets/Style/IconManager.h"
 #include "OTWidgets/Widgets/Label.h"
 #include "OTWidgets/Widgets/CheckBox.h"
@@ -233,7 +234,17 @@ LogInDialog::LogInDialog()
 
 LogInDialog::~LogInDialog()
 {
-
+	if (m_state.has(LoginState::TicketMode))
+	{
+		auto* blocker = ot::GlobalUserInputSignalBlocker::instance().getBlocker();
+		QWidget* widget = this->getQWidget();
+		while (widget != nullptr)
+		{
+			blocker->removeFromWhitelist(widget);
+			widget = widget->parentWidget();
+		}
+		blocker->removeFromWhitelist(m_exitButton);
+	}
 }
 
 void LogInDialog::setControlsEnabled(bool _enabled)
@@ -309,8 +320,18 @@ void LogInDialog::initialize()
 		m_ticketLoginData = args.getLoginTicketData();
 		m_state.set(LoginState::TicketMode);
 
-		m_username->setEnabled(false);
 		m_username->setText(QString::fromStdString(m_ticketLoginData.getUsername()));
+
+		auto* blocker = ot::GlobalUserInputSignalBlocker::instance().getBlocker();
+		QWidget* widget = this->getQWidget();
+		while (widget != nullptr)
+		{
+			blocker->addToWhitelist(widget);
+			widget = widget->parentWidget();
+		}
+		blocker->addToWhitelist(m_exitButton);
+		ot::GlobalUserInputSignalBlocker::install();
+
 
 		// Apply GSS
 		LogInGSSEntry gss;

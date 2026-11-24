@@ -229,12 +229,13 @@ QString StartArgumentParser::createShareLink() const
 
 void StartArgumentParser::clear()
 {
-	m_debug = false;
 	m_nonInteractive = false;
+	m_debug = false;
 	m_checkGraphics = false;
 
 	m_loginData = std::nullopt;
 	m_loginGSS = std::nullopt;
+	m_loginTicketData = std::nullopt;
 
 	m_openProjectName = std::nullopt;
 	m_projectVersion.clear();
