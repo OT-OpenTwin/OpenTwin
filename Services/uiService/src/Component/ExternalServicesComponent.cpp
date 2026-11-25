@@ -4096,6 +4096,7 @@ void ExternalServicesComponent::handleCreateGraphicsEditor(ot::JsonDocument& _do
 
 	AppBase::instance()->addGraphicsPickerPackage(pckg);
 
+	// Run delayed focus handling because of many items during view open request, which can cause focus flickering if the view is set as active view
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView())
 	{
@@ -4117,6 +4118,7 @@ void ExternalServicesComponent::handleAddGraphicsItem(ot::JsonDocument& _documen
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
+	// Run delayed focus handling because of many items during view open request, which can cause focus flickering if the view is set as active view
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView())
 	{
@@ -4195,6 +4197,7 @@ void ExternalServicesComponent::handleAddGraphicsConnection(ot::JsonDocument& _d
 	ot::VisualisationCfg visualisationCfg;
 	visualisationCfg.setFromJsonObject(ot::json::getObject(_document, OT_ACTION_PARAM_VisualisationConfig));
 
+	// Run delayed focus handling because of many items during view open request, which can cause focus flickering if the view is set as active view
 	ot::WidgetView::InsertFlags insertFlags(ot::WidgetView::UpdateFocusDelayed);
 	if (!visualisationCfg.getSetAsActiveView())
 	{
