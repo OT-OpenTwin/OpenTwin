@@ -25,11 +25,12 @@
 
 // OpenTwin header
 #include "OTCore/JSON/JSON.h"
+#include "OTServiceFoundation/Encryption.h"
 
 // std header
 #include <sstream>
 
-std::string MongoSessionFunctions::createSession(std::string _username, mongocxx::client& _adminClient)
+std::string MongoSessionFunctions::createSession(const std::string& _username, const std::string& _sessionToken, mongocxx::client& _adminClient)
 {
 	std::string sessionName = generateUniqueSessionName(_username, _adminClient);
 	std::time_t currentTime = std::time(nullptr);
@@ -37,8 +38,11 @@ std::string MongoSessionFunctions::createSession(std::string _username, mongocxx
 	mongocxx::database secondaryDb = _adminClient.database(MongoConstants::USER_DB);
 	mongocxx::collection sessionsCollection = secondaryDb.collection(MongoConstants::SESSIONS_COLLECTION);
 
+	std::string encryptedSessionToken = ot::Encryption::encryptString(_sessionToken);
+
 	value session_value = document{}
 		<< "session_name" << sessionName
+		<< "session_token" << encryptedSessionToken
 		<< "time_stamp" << currentTime
 		<< finalize;
 
@@ -49,11 +53,9 @@ std::string MongoSessionFunctions::createSession(std::string _username, mongocxx
 
 std::string MongoSessionFunctions::generateUniqueSessionName(std::string username, mongocxx::client& adminClient)
 {
-	std::ostringstream sessionName;
+	std::string newSessionName;
 
-	bool done = false;
-
-	while (!done)
+	while (newSessionName.empty())
 	{
 		std::time_t currentTime = std::time(nullptr);
 
@@ -61,28 +63,29 @@ std::string MongoSessionFunctions::generateUniqueSessionName(std::string usernam
 		localtime_s(&currentDate, &currentTime);
 		int random = rand() % 100;
 
-		sessionName.clear();
-		sessionName << username << "-" << 1900 + currentDate.tm_year << currentDate.tm_mon + 1 << currentDate.tm_mday << "-"
+		std::ostringstream sessionNameStream;
+
+		sessionNameStream << username << "-" << 1900 + currentDate.tm_year << currentDate.tm_mon + 1 << currentDate.tm_mday << "-"
 			<< currentDate.tm_hour << currentDate.tm_min << currentDate.tm_sec << "-" << random;
 
-		done = true;
+		newSessionName = sessionNameStream.str();
 
 		mongocxx::database secondaryDb = adminClient.database(MongoConstants::USER_DB);
 		mongocxx::collection sessionsCollection = secondaryDb.collection(MongoConstants::SESSIONS_COLLECTION);
 
 		value find_session_query = document{}
-			<< "session_name" << sessionName.str()
+			<< "session_name" << newSessionName
 			<< finalize;
 
 		auto sessionOptional = sessionsCollection.find_one(find_session_query.view());
 
 		if (sessionOptional)
 		{
-			done = false;
+			newSessionName.clear();
 		}
 	}
 
-	return sessionName.str();
+	return newSessionName;
 }
 
 std::string MongoSessionFunctions::refreshSession(std::string sessionName, mongocxx::client& adminClient)

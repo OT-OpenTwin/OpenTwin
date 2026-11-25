@@ -19,19 +19,23 @@ UserSessionManager::UserSessionInfo UserSessionManager::createUserSession(const 
 {
 	ServiceBase& serviceBase = ServiceBase::instance();
 
-	// Create a new session name for the user
-	std::string sessionName = MongoSessionFunctions::createSession(_loggedInUsername, serviceBase.getAdminClient());
-
+	// Generate user session token
 	std::vector<uint8_t> randomBytes = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::userSessionTokenLength());
 	std::string sessionToken = ot::String::toHexString(randomBytes);
-
+	randomBytes.clear();
+		
+	// Create a new session name for the user
+	std::string sessionName = MongoSessionFunctions::createSession(_loggedInUsername, serviceBase.getAdminClient());
+	
+	// Generate a random user database password
 	randomBytes = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::userSessionPasswordLength());
-	std::string sessionPWD = ot::String::toHexString(randomBytes);
+	std::string sessionUserPWD = ot::String::toHexString(randomBytes);
 
+	// Read existing user data
 	User user = MongoUserFunctions::getUserDataThroughUsername(_loggedInUsername, serviceBase.getAdminClient());
 
 	// Create temporary user in the database for this session
-	auto newTmpUser = MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, serviceBase.getDatabaseURL(), serviceBase.getAdminClient());
+	auto newTmpUser = MongoUserFunctions::createTmpUser(sessionName, sessionUserPWD, user, serviceBase.getDatabaseURL(), serviceBase.getAdminClient());
 
 	// Store session information
 	UserSession newSession(sessionName, sessionToken, m_sessionValidityInSeconds);
