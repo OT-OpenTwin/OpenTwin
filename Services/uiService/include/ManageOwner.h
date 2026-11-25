@@ -40,7 +40,7 @@ public:
 
 	void addRow(const std::array<QTableWidgetItem *, 2> &_columns);
 
-	void Clear(void);
+	void Clear();
 
 	virtual void mouseMoveEvent(QMouseEvent * _event) override;
 
@@ -70,17 +70,17 @@ public:
 	virtual ~ManageOwner();
 
 public Q_SLOTS:
-	void slotShowGroupsWithAccessOnly(void);
-	void slotGroupsFilter(void);
-	void slotGroupsSelection(void);
+	void slotShowGroupsWithAccessOnly();
+	void slotGroupsFilter();
+	void slotGroupsSelection();
 	virtual void slotGroupCheckBoxChanged(bool state, int row) = 0;
 
 protected:
-	void fillOwnerList(void);
+	void fillOwnerList();
 	std::string tolower(std::string s);
 	bool hasSuccessful(const std::string &response);
 	bool hasError(const std::string &response);
-	void readUserList(void);
+	void readUserList();
 	
 	ot::LineEdit *								m_filterGroups;
 	ManageOwnerTable *							m_ownersList;

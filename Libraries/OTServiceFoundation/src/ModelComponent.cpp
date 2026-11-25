@@ -95,12 +95,12 @@ void ot::components::ModelComponent::facetAndStoreGeometryEntity(EntityGeometry 
 	addNewDataEntity(entityGeom->getFacets()->getEntityID(), entityGeom->getFacets()->getEntityStorageVersion(), entityGeom->getEntityID());
 }
 
-ot::UID ot::components::ModelComponent::createEntityUID(void)
+ot::UID ot::components::ModelComponent::createEntityUID()
 {
 	return getUniqueUIDGenerator()->getUID();
 }
 
-ot::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUIDGenerator(void)
+ot::UniqueUIDGenerator* ot::components::ModelComponent::getUniqueUIDGenerator()
 {
 	assert(uniqueUIDGenerator != nullptr);
 
@@ -134,7 +134,7 @@ bool  ot::components::ModelComponent::sendMessage(bool _queue, JsonDocument & _d
 	return m_application->sendMessage(_queue, OT_INFO_SERVICE_TYPE_MODEL, _doc, _response);
 }
 
-void ot::components::ModelComponent::clearNewEntityList(void)
+void ot::components::ModelComponent::clearNewEntityList()
 {
 	topologyEntityIDList.clear();
 	topologyEntityVersionList.clear();

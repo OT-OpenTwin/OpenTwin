@@ -19,12 +19,15 @@
 
 // LSS header
 #include "SessionService.h"
+#undef max
 
 // OpenTwin header
 #include "OTSystem/Exception.h"
 #include "OTSystem/PortManager.h"
 #include "OTSystem/AppExitCodes.h"
+#include "OTSystem/RandomNumber/RandomNumberProvider.h"
 #include "OTCore/Logging/Logger.h"
+#include "OTCrypto/CryptoDefaults.h"
 #include "OTCore/String.h"
 #include "OTCore/DebugHelper.h"
 #include "OTCore/ReturnMessage.h"
@@ -33,18 +36,23 @@
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/IpConverter.h"
 #include "OTCommunication/ServiceLogNotifier.h"
+#include "OTCommunication/Token/UserSessionToken.h"
 
 // std header
 #include <chrono>
 #include <fstream>
 
-SessionService& SessionService::instance(void) {
+
+SessionService& SessionService::instance()
+{
 	static SessionService g_instance;
 	return g_instance;
 }
 
-int SessionService::initialize(const std::string& _ownUrl, const std::string& _gssUrl) {
-	if (_ownUrl.empty()) {
+int SessionService::initialize(const std::string& _ownUrl, const std::string& _gssUrl)
+{
+	if (_ownUrl.empty())
+	{
 		OT_LOG_E("Uwn url may not be empty");
 		return ot::AppExitCode::ServiceUrlInvalid;
 	}
@@ -54,21 +62,24 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 
 	// Determine debug port ranges
 	size_t colonIndex = _ownUrl.rfind(':');
-	if (colonIndex == std::string::npos) {
+	if (colonIndex == std::string::npos)
+	{
 		OT_LOG_E("Unable to determine own port");
 		return ot::AppExitCode::FailedToConvertPort;
 	}
 
 	bool failed = false;
 	ot::port_t portFrom = ot::String::toNumber<ot::port_t>(_ownUrl.substr(colonIndex + 1), failed);
-	if (failed || portFrom == 0) {
+	if (failed || portFrom == 0)
+	{
 		OT_LOG_E("Invalid port number format");
 		return ot::AppExitCode::FailedToConvertPort;
 	}
 	lss.m_debugPortManager.addPortRange(portFrom + 1, portFrom + 79);
 
 	// Initialize connection to GSS
-	if (!lss.m_gss.connect(_gssUrl)) {
+	if (!lss.m_gss.connect(_gssUrl))
+	{
 		return ot::AppExitCode::GSSRegistrationFailed;
 	}
 	GSSRegistrationInfo regInfo = lss.m_gss.getRegistrationResult();
@@ -88,7 +99,8 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	ot::LogDispatcher::instance().setLogFlags(regInfo.getLogFlags());
 
 	// Initialize connection to GDS
-	if (!regInfo.getGdsURL().empty() && !lss.m_gds.connect(regInfo.getGdsURL(), true)) {
+	if (!regInfo.getGdsURL().empty() && !lss.m_gds.connect(regInfo.getGdsURL(), true))
+	{
 		return ot::AppExitCode::GDSRegistrationFailed;
 	}
 
@@ -100,7 +112,7 @@ int SessionService::initialize(const std::string& _ownUrl, const std::string& _g
 	return ot::AppExitCode::Success;
 }
 
-SessionService::SessionService() 
+SessionService::SessionService()
 	: m_id(ot::invalidServiceID), m_workerRunning(false), m_shutdownWorkerThread(nullptr)
 {
 	//
@@ -136,7 +148,7 @@ SessionService::SessionService()
 	HierarchicalSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_MODEL, OT_INFO_SERVICE_TYPE_MODEL));
 	HierarchicalSessionServices.push_back(ot::ServiceBase(OT_INFO_SERVICE_TYPE_HierarchicalProjectService, OT_INFO_SERVICE_TYPE_HierarchicalProjectService));
 	m_mandatoryServicesMap.insert_or_assign(OT_ACTION_PARAM_SESSIONTYPE_HIERARCHICAL, std::move(HierarchicalSessionServices));
-	
+
 	//
 	// File management services list (this contains all services relevant for a file management project)
 	//
@@ -213,6 +225,8 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_GetGlobalServicesUrl, this, &SessionService::handleGetGlobalServicesURL, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_CreateNewSession, this, &SessionService::handleCreateNewSession, ot::ALL_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_ShutdownSession, this, &SessionService::handleShutdownSession, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_CheckSessionRunning, this, &SessionService::handleCheckSessionRunning, ot::ALL_MESSAGE_TYPES);
+	connectAction(OT_ACTION_CMD_StartNewGateway, this, &SessionService::handleStartNewGatewayService, ot::ALL_MESSAGE_TYPES);
 
 	connectAction(OT_ACTION_CMD_GetSystemInformation, this, &SessionService::handleGetSystemInformation, ot::SECURE_MESSAGE_TYPES);
 	connectAction(OT_ACTION_CMD_GetMandatoryServices, this, &SessionService::handleGetMandatoryServices, ot::SECURE_MESSAGE_TYPES);
@@ -234,7 +248,8 @@ SessionService::SessionService()
 	connectAction(OT_ACTION_CMD_SetGlobalLogFlags, this, &SessionService::handleSetGlobalLogFlags, ot::SECURE_MESSAGE_TYPES);
 }
 
-SessionService::~SessionService() {
+SessionService::~SessionService()
+{
 	m_mutex.lock();
 	this->stopWorkerThreads();
 	m_mutex.unlock();
@@ -244,45 +259,55 @@ SessionService::~SessionService() {
 
 // Setter / Getter
 
-std::list<std::string> SessionService::getSessionIDs() {
+std::list<std::string> SessionService::getSessionIDs()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return ot::ContainerHelper::getKeys(m_sessions);
 }
 
-bool SessionService::getIsServiceInDebugMode(const std::string& _serviceName) {
-	return m_debugServices.contains(_serviceName);
+bool SessionService::getIsServiceInDebugMode(const std::string& _serviceType)
+{
+	return m_debugServices.contains(_serviceType);
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Management
 
-Session SessionService::createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType) {
-	if (_sessionID.length() == 0) {
+Session SessionService::createSession(const std::string& _sessionID, const std::string& _userName, const std::string& _projectName, const std::string& _collectionName, const std::string& _sessionType)
+{
+	if (_sessionID.length() == 0)
+	{
 		throw ot::Exception::InvalidArgument("Session ID must not be empty");
 	}
 
-	if (m_sessions.find(_sessionID) != m_sessions.end()) {
+	if (m_sessions.find(_sessionID) != m_sessions.end())
+	{
 		throw ot::Exception::ObjectAlreadyExists("Session \"" + _sessionID + "\" already exists");
 	}
 
 	return Session(_sessionID, _userName, _projectName, _collectionName, _sessionType);
 }
 
-Session& SessionService::getSession(const std::string& _sessionID) {
+Session& SessionService::getSession(const std::string& _sessionID)
+{
 	auto it = m_sessions.find(_sessionID);
-	if (it == m_sessions.end()) {
+	if (it == m_sessions.end())
+	{
 		OT_LOG_E("Session not found \"" + _sessionID + "\"");
 		throw ot::Exception::ObjectNotFound("Session \"" + _sessionID + "\" not found");
 	}
-	else {
+	else
+	{
 		return it->second;
 	}
 }
 
-bool SessionService::runMandatoryServices(Session& _session) {
+bool SessionService::runMandatoryServices(Session& _session)
+{
 	auto it = m_mandatoryServicesMap.find(_session.getType());
-	if (it == m_mandatoryServicesMap.end()) {
+	if (it == m_mandatoryServicesMap.end())
+	{
 		OT_LOG_E("No mandatory services registered for the session { \"SessionType\": \"" + _session.getType() + "\" }");
 		throw ot::Exception::ObjectNotFound("No mandatory services registered for the session { \"Type\": \"" + _session.getType() + "\" }");
 	}
@@ -293,23 +318,29 @@ bool SessionService::runMandatoryServices(Session& _session) {
 
 	ot::serviceID_t validServiceID = ot::invalidServiceID;
 
-	for (const ot::ServiceBase& serviceInfo : it->second) {
-		if (this->getIsServiceInDebugMode(serviceInfo.getServiceName())) {
+	for (const ot::ServiceBase& serviceInfo : it->second)
+	{
+		if (this->getIsServiceInDebugMode(serviceInfo.getServiceType()))
+		{
 			debugServices.push_back(serviceInfo);
 		}
-		else {
+		else
+		{
 			releaseServices.push_back(serviceInfo);
 		}
 	}
 
 	// Request the user to start the debug services
-	for (const ot::ServiceBase& serviceInfo : debugServices) {
+	for (const ot::ServiceBase& serviceInfo : debugServices)
+	{
 		this->runServiceInDebug(serviceInfo, _session);
 	}
 
 	// Send release mode services to the GDS
-	if (!releaseServices.empty()) {
-		for (ot::ServiceBase& serviceInfo : releaseServices) {
+	if (!releaseServices.empty())
+	{
+		for (ot::ServiceBase& serviceInfo : releaseServices)
+		{
 			Service& newService = _session.addRequestedService(serviceInfo);
 			serviceInfo.setServiceID(newService.getServiceID());
 		}
@@ -324,7 +355,8 @@ bool SessionService::runMandatoryServices(Session& _session) {
 	return true;
 }
 
-void SessionService::updateLogMode(const ot::LogFlags& _newData) {
+void SessionService::updateLogMode(const ot::LogFlags& _newData)
+{
 	ot::LogDispatcher::instance().setLogFlags(_newData);
 
 	ot::JsonDocument doc;
@@ -335,12 +367,14 @@ void SessionService::updateLogMode(const ot::LogFlags& _newData) {
 
 	std::string notificationMessage = doc.toJson();
 
-	for (auto& it : m_sessions) {
+	for (auto& it : m_sessions)
+	{
 		it.second.sendBroadcast(ot::invalidServiceID, notificationMessage, ot::EXECUTE);
 	}
 }
 
-void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID) {
+void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID_t _serviceID)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	OT_LOG_W("Handling service failure { \"ServiceID\"" + std::to_string(_serviceID) + ", \"SessionID\": \"" + _sessionID + "\" }");
@@ -350,10 +384,10 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 	// Prepare session information
 	session.removeFailedService(_serviceID, m_debugPortManager);
 	session.prepareSessionForShutdown(_serviceID, m_debugPortManager);
-	
+
 	// Notify the GDS about the shutdown
 	m_gds.notifySessionShuttingDown(_sessionID);
-	
+
 	m_shutdownQueue.push_back(std::make_pair(_sessionID, true));
 
 	this->startWorkerThreads();
@@ -369,13 +403,15 @@ void SessionService::serviceFailure(const std::string& _sessionID, ot::serviceID
 
 // Private: Helper
 
-Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session) {
+Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, Session& _session)
+{
 	OT_LOG_D("Starting service in debug mode { " + Service::debugLogString(_serviceInfo, _session.getID()) + "}");
 
 	// Get dev root path
 	char* buffer = nullptr;
 	size_t bufferSize = 0;
-	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr) {
+	if (_dupenv_s(&buffer, &bufferSize, "OPENTWIN_DEV_ROOT") != 0 || buffer == nullptr)
+	{
 		OT_LOG_E("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
 		throw ot::Exception::InvalidArgument("Please specify the environment variable \"OPENTWIN_DEV_ROOT\"");
 	}
@@ -390,7 +426,8 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 
 	// Create new service url
 	size_t colonIndex = m_url.rfind(':');
-	if (colonIndex == std::string::npos) {
+	if (colonIndex == std::string::npos)
+	{
 		std::string msg = "Unable to determine own port { \"Url\": \"" + m_url + "\" }";
 		OT_LOG_E(msg);
 		throw ot::Exception::InvalidArgument(msg);
@@ -414,9 +451,10 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 
 	ot::ServiceInitData iniData = _session.createServiceInitData(newDebugService.getServiceID());
 	statupParams.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(iniData, statupParams.GetAllocator()), statupParams.GetAllocator());
-	
+
 	// If the service is a relay service add websocket information
-	if (newDebugService.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
+	if (newDebugService.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService)
+	{
 		websocketPort = m_debugPortManager.determineAndBlockAvailablePort();
 		websocketURL.append(":").append(std::to_string(websocketPort));
 		newDebugService.setWebsocketUrl(websocketURL);
@@ -425,15 +463,17 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 
 	// Open config file for writing
 	std::ofstream stream(path);
-	
-	if (!stream.is_open()) {
+
+	if (!stream.is_open())
+	{
 		// Remove service from session
 		OT_LOG_E("Failed to open file stream for writing \"" + path + "\"");
 		_session.serviceDisconnected(newDebugService.getServiceID(), false, m_debugPortManager);
 
 		// Free the used debug ports
 		m_debugPortManager.freePort(servicePort);
-		if (websocketPort != ot::invalidPortNumber) {
+		if (websocketPort != ot::invalidPortNumber)
+		{
 			m_debugPortManager.freePort(websocketPort);
 		}
 
@@ -449,10 +489,12 @@ Service& SessionService::runServiceInDebug(const ot::ServiceBase& _serviceInfo, 
 	return newDebugService;
 }
 
-Service& SessionService::runRelayService(Session& _session, const std::string& _serviceName, const std::string& _serviceType) {
+Service& SessionService::runRelayService(Session& _session, const std::string& _serviceName, const std::string& _serviceType)
+{
 	ot::ServiceBase relayInfo(OT_INFO_SERVICE_TYPE_RelayService, OT_INFO_SERVICE_TYPE_RelayService);
 
-	if (this->getIsServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService)) {
+	if (this->getIsServiceInDebugMode(OT_INFO_SERVICE_TYPE_RelayService))
+	{
 		// Start relay in debug mode
 		Service& relay = this->runServiceInDebug(relayInfo, _session);
 		relay.setServiceName(_serviceName);
@@ -467,24 +509,30 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 		std::string checkCommandString = checkCommandDoc.toJson();
 
 		// Wait until the service is alive
-		while (true) {
+		while (true)
+		{
 			std::string response;
-			if (ot::msg::send("", relay.getServiceURL(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
-				if (response == OT_ACTION_RETURN_VALUE_TRUE) {
+			if (ot::msg::send("", relay.getServiceURL(), ot::EXECUTE, checkCommandString, response, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit))
+			{
+				if (response == OT_ACTION_RETURN_VALUE_TRUE)
+				{
 					OT_LOG_D("Relay service startup completed successfully");
 					break;
 				}
-				else if (response == OT_ACTION_RETURN_VALUE_FALSE) {
+				else if (response == OT_ACTION_RETURN_VALUE_FALSE)
+				{
 					using namespace std::chrono_literals;
 					std::this_thread::sleep_for(500ms);
 				}
-				else {
+				else
+				{
 					OT_LOG_E("Invalid response \"" + response + "\"");
 					using namespace std::chrono_literals;
 					std::this_thread::sleep_for(500ms);
 				}
 			}
-			else {
+			else
+			{
 				using namespace std::chrono_literals;
 				std::this_thread::sleep_for(500ms);
 			}
@@ -492,7 +540,8 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 
 		return relay;
 	}
-	else {
+	else
+	{
 		OT_LOG_D("Starting service \"" OT_INFO_SERVICE_TYPE_RelayService "\" via DirectoryService");
 
 		Service& relay = _session.addRequestedService(relayInfo);
@@ -502,7 +551,8 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 
 		ot::ServiceInitData iniData = _session.createServiceInitData(relay.getServiceID());
 
-		if (!m_gds.startRelayService(iniData, newServiceUrl, newWebsocketUrl)) {
+		if (!m_gds.startRelayService(iniData, newServiceUrl, newWebsocketUrl))
+		{
 			throw ot::Exception::ObjectNotFound("Failed to start relay service");
 		}
 
@@ -515,10 +565,14 @@ Service& SessionService::runRelayService(Session& _session, const std::string& _
 	}
 }
 
-bool SessionService::hasMandatoryService(const std::string& _serviceName) const {
-	for (const auto& it : m_mandatoryServicesMap) {
-		for (const ot::ServiceBase& serviceInfo : it.second) {
-			if (serviceInfo.getServiceName() == _serviceName) {
+bool SessionService::hasMandatoryService(const std::string& _serviceType) const
+{
+	for (const auto& it : m_mandatoryServicesMap)
+	{
+		for (const ot::ServiceBase& serviceInfo : it.second)
+		{
+			if (serviceInfo.getServiceType() == _serviceType)
+			{
 				return true;
 			}
 		}
@@ -530,8 +584,10 @@ bool SessionService::hasMandatoryService(const std::string& _serviceName) const 
 
 // Private: Worker
 
-void SessionService::startWorkerThreads() {
-	if (m_workerRunning) {
+void SessionService::startWorkerThreads()
+{
+	if (m_workerRunning)
+	{
 		return;
 	}
 
@@ -541,28 +597,34 @@ void SessionService::startWorkerThreads() {
 	m_shutdownWorkerThread = new std::thread(&SessionService::shutdownWorker, this);
 }
 
-void SessionService::stopWorkerThreads() {
-	if (!m_workerRunning) {
+void SessionService::stopWorkerThreads()
+{
+	if (!m_workerRunning)
+	{
 		return;
 	}
 
 	OTAssertNullptr(m_shutdownWorkerThread);
 
 	m_workerRunning = false;
-	
-	if (m_shutdownWorkerThread->joinable()) {
+
+	if (m_shutdownWorkerThread->joinable())
+	{
 		m_shutdownWorkerThread->join();
 	}
 	delete m_shutdownWorkerThread;
 	m_shutdownWorkerThread = nullptr;
 }
 
-void SessionService::shutdownWorker() {
-	while (m_workerRunning) {
+void SessionService::shutdownWorker()
+{
+	while (m_workerRunning)
+	{
 		bool matched = this->checkShuttingDown();
 		matched |= this->checkShutdownCompleted();
 
-		if (!matched) {
+		if (!matched)
+		{
 			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		}
 	}
@@ -570,10 +632,12 @@ void SessionService::shutdownWorker() {
 	OT_LOG_D("Shutdown session worker finished");
 }
 
-bool SessionService::checkShuttingDown() {
+bool SessionService::checkShuttingDown()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (m_shutdownQueue.empty()) {
+	if (m_shutdownQueue.empty())
+	{
 		return false;
 	}
 
@@ -581,7 +645,8 @@ bool SessionService::checkShuttingDown() {
 	m_shutdownQueue.pop_front();
 
 	auto it = m_sessions.find(shutdownInfo.first);
-	if (it == m_sessions.end()) {
+	if (it == m_sessions.end())
+	{
 		OT_LOG_E("Session not found \"" + shutdownInfo.first + "\"");
 		return false;
 	}
@@ -591,17 +656,20 @@ bool SessionService::checkShuttingDown() {
 	session.shutdownSession(ot::invalidServiceID, shutdownInfo.second, m_debugPortManager);
 
 	// If all services are in debug mode we can remove the session immediately
-	if (!session.hasShuttingDownServices()) {
+	if (!session.hasShuttingDownServices())
+	{
 		m_shutdownCompletedQueue.push_back(std::move(shutdownInfo.first));
 	}
 
 	return true;
 }
 
-bool SessionService::checkShutdownCompleted() {
+bool SessionService::checkShutdownCompleted()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (m_shutdownCompletedQueue.empty()) {
+	if (m_shutdownCompletedQueue.empty())
+	{
 		return false;
 	}
 
@@ -609,7 +677,8 @@ bool SessionService::checkShutdownCompleted() {
 	m_shutdownCompletedQueue.pop_front();
 
 	auto it = m_sessions.find(sessionID);
-	if (it == m_sessions.end()) {
+	if (it == m_sessions.end())
+	{
 		OT_LOG_E("Session not found \"" + sessionID + "\"");
 		return false;
 	}
@@ -627,47 +696,57 @@ bool SessionService::checkShutdownCompleted() {
 
 // Action handler
 
-ot::ReturnMessage SessionService::handleGetAuthURL() {
+ot::ReturnMessage SessionService::handleGetAuthURL()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
-	if (m_gss.isConnected()) {
+	if (m_gss.isConnected())
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, m_gss.getRegistrationResult().getAuthURL());
 	}
-	else {
+	else
+	{
 		OT_LOG_E("There is no active connection to the GSS");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No connection to global session service");
 	}
 }
 
-ot::ReturnMessage SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleGetGlobalServicesURL(ot::JsonDocument& _commandDoc)
+{
 	// The info message is only present if the request is done by the UI frontend upon startup
-	if (_commandDoc.HasMember(OT_ACTION_PARAM_MESSAGE)) {
-		if (ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE) == OT_INFO_MESSAGE_LogIn) {
+	if (_commandDoc.HasMember(OT_ACTION_PARAM_MESSAGE))
+	{
+		if (ot::json::getString(_commandDoc, OT_ACTION_PARAM_MESSAGE) == OT_INFO_MESSAGE_LogIn)
+		{
 			return ot::ReturnMessage(ot::ReturnMessage::Failed, "Invalid global session service URL");
 		}
 	}
 
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (m_gss.isConnected()) {
+	if (m_gss.isConnected())
+	{
 		GSSRegistrationInfo info = m_gss.getRegistrationResult();
 
 		ot::JsonDocument doc;
 		doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(info.getDataBaseURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(info.getAuthURL(), doc.GetAllocator()), doc.GetAllocator());
-		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_gds.getServiceUrl(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(info.getAuthURL(), doc.GetAllocator()), doc.GetAllocator());
+		doc.AddMember(OT_ACTION_PARAM_SERVICE_GDS_URL, ot::JsonString(m_gds.getServiceUrl(), doc.GetAllocator()), doc.GetAllocator());
 
 		return ot::ReturnMessage(ot::ReturnMessage::Ok, doc.toJson());
 	}
-	else {
+	else
+	{
 		OT_LOG_E("There is no active connection to the GSS");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No connection to global session service");
 	}
 }
 
-ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	if (!m_gds.isConnected()) {
+	if (!m_gds.isConnected())
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "No global directory service connected");
 	}
 
@@ -693,12 +772,14 @@ ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _comm
 
 	// Optional params
 	bool serviceInitiallyHidden = false;
-	if (_commandDoc.HasMember(OT_ACTION_PARAM_Hidden)) {
+	if (_commandDoc.HasMember(OT_ACTION_PARAM_Hidden))
+	{
 		serviceInitiallyHidden = ot::json::getBool(_commandDoc, OT_ACTION_PARAM_Hidden);
 	}
 
 	// Notify GSS that the session request was received (confirm session)
-	if (!m_gss.confirmSession(sessionID, userName)) {
+	if (!m_gss.confirmSession(sessionID, userName))
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to confirm session at GSS");
 	}
 
@@ -720,7 +801,8 @@ ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _comm
 	ot::JsonDocument responseDoc;
 
 	// Create a new service and store its information
-	if (shouldRunRelayService) {
+	if (shouldRunRelayService)
+	{
 		OT_LOG_D("Relay service requested by session creator");
 
 		Service& relayService = this->runRelayService(newSession, serviceName, serviceType);
@@ -734,7 +816,8 @@ ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _comm
 
 		responseDoc.AddMember(OT_ACTION_PARAM_WebsocketURL, ot::JsonString(relayService.getWebsocketUrl(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
-	else {
+	else
+	{
 		OT_LOG_D("Session created without relay service (for session creator)");
 
 		ot::ServiceBase requestingServiceInfo(serviceName, serviceType);
@@ -751,18 +834,21 @@ ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _comm
 		creatingServiceID = requestingService.getServiceID();
 	}
 
-	if (creatingServiceID == ot::invalidServiceID) {
+	if (creatingServiceID == ot::invalidServiceID)
+	{
 		OT_LOG_E("Failed to create the initial service for the session");
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to create the initial service for the session");
 	}
 
 	OT_LOG_D("Running mandatory services");
-	if (!this->runMandatoryServices(newSession)) {
+	if (!this->runMandatoryServices(newSession))
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to start mandatory services");
 	}
 
 	// Add response information
-	if (serviceType == OT_INFO_SERVICE_TYPE_UI) {
+	if (serviceType == OT_INFO_SERVICE_TYPE_UI)
+	{
 		OT_LOG_D("Adding ToolBar Tab order to the response document");
 		responseDoc.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(newSession.getToolBarTabOrder(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
 	}
@@ -783,7 +869,8 @@ ot::ReturnMessage SessionService::handleCreateNewSession(ot::JsonDocument& _comm
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc.toJson());
 }
 
-std::string SessionService::handleGetSystemInformation() {
+std::string SessionService::handleGetSystemInformation()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	double globalCpuLoad = 0, globalMemoryLoad = 0;
@@ -803,7 +890,8 @@ std::string SessionService::handleGetSystemInformation() {
 	// Now we add information about the session services
 	ot::JsonArray sessionInfo;
 
-	for (auto& session : m_sessions) {
+	for (auto& session : m_sessions)
+	{
 		ot::JsonValue info;
 		info.SetObject();
 
@@ -825,16 +913,19 @@ std::string SessionService::handleGetSystemInformation() {
 	return reply.toJson();
 }
 
-std::string SessionService::handleGetMandatoryServices() {
+std::string SessionService::handleGetMandatoryServices()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::JsonDocument doc(rapidjson::kArrayType);
-	for (const auto& session : m_mandatoryServicesMap) {
+	for (const auto& session : m_mandatoryServicesMap)
+	{
 		ot::JsonObject sessionObj;
 		sessionObj.AddMember(OT_ACTION_PARAM_SESSION_TYPE, ot::JsonString(session.first, doc.GetAllocator()), doc.GetAllocator());
-		
+
 		ot::JsonArray servicesArr;
-		for (const ot::ServiceBase& service : session.second) {
+		for (const ot::ServiceBase& service : session.second)
+		{
 			ot::JsonObject serviceObj;
 			serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_NAME, ot::JsonString(service.getServiceName(), doc.GetAllocator()), doc.GetAllocator());
 			serviceObj.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, ot::JsonString(service.getServiceType(), doc.GetAllocator()), doc.GetAllocator());
@@ -845,40 +936,50 @@ std::string SessionService::handleGetMandatoryServices() {
 	return doc.toJson();
 }
 
-ot::ReturnMessage SessionService::handleConfirmService(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleConfirmService(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Required params
 	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
 	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
-	
+
 	Session& theSession = this->getSession(sessionID);
-	
+
+	if (!theSession.getAllServicesAreHealthy())
+	{
+
+	}
+
 	// Set the service alive
-	if (_commandDoc.HasMember(OT_ACTION_PARAM_SERVICE_URL)) {
+	if (_commandDoc.HasMember(OT_ACTION_PARAM_SERVICE_URL))
+	{
 		std::string serviceUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_URL);
 		theSession.setServiceAlive(serviceID, serviceUrl, true);
 	}
-	else {
+	else
+	{
 		theSession.setServiceAlive(serviceID, true);
 	}
-	
+
 	ot::ServiceBase serviceInfo = theSession.getServiceInfo(serviceID);
 
 	// Create response document
 	ot::JsonDocument response;
 
 	// Add response information
-	if (serviceInfo.getServiceType() == OT_INFO_SERVICE_TYPE_UI) {
+	if (serviceInfo.getServiceType() == OT_INFO_SERVICE_TYPE_UI)
+	{
 		response.AddMember(OT_ACTION_PARAM_UI_ToolBarTabOrder, ot::JsonArray(theSession.getToolBarTabOrder(), response.GetAllocator()), response.GetAllocator());
 	}
-	
+
 	ot::JsonArray logArr;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), logArr, response.GetAllocator());
 	response.AddMember(OT_ACTION_PARAM_LogFlags, logArr, response.GetAllocator());
-	
+
 	// If all services are ready, add services information
-	if (!theSession.hasRequestedServices(serviceID)) {
+	if (!theSession.hasRequestedServices(serviceID))
+	{
 		ot::ServiceRunData runData = theSession.createServiceRunData(serviceID);
 		response.AddMember(OT_ACTION_PARAM_RunData, ot::JsonObject(runData, response.GetAllocator()), response.GetAllocator());
 
@@ -888,7 +989,8 @@ ot::ReturnMessage SessionService::handleConfirmService(ot::JsonDocument& _comman
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, response.toJson());
 }
 
-ot::ReturnMessage SessionService::handleShowService(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleShowService(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	// Required params
@@ -901,30 +1003,35 @@ ot::ReturnMessage SessionService::handleShowService(ot::JsonDocument& _commandDo
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage SessionService::handleGetSessionExists(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleGetSessionExists(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	auto itm = m_sessions.find(sessionID);
-	if (itm == m_sessions.end()) {
+	if (itm == m_sessions.end())
+	{
 		return ot::ReturnMessage::False;
 	}
-	else {
+	else
+	{
 		return ot::ReturnMessage::True;
 	}
 }
 
-void SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc) {
+void SessionService::handleServiceClosing(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
-	
+
 	Session& theSession = this->getSession(sessionID);
 	theSession.serviceDisconnected(serviceID, true, m_debugPortManager);
 }
 
-ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _commandDoc)
+{
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 
@@ -943,7 +1050,8 @@ ot::ReturnMessage SessionService::handleShutdownSession(ot::JsonDocument& _comma
 	return ot::ReturnMessage::Ok;
 }
 
-void SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
+void SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc)
+{
 	// Get information of the service that failed
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
 	ot::serviceID_t serviceID(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
@@ -953,7 +1061,8 @@ void SessionService::handleServiceFailure(ot::JsonDocument& _commandDoc) {
 	this->serviceFailure(sessionID, serviceID);
 }
 
-void SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _commandDoc) {
+void SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
@@ -962,43 +1071,51 @@ void SessionService::handleServiceShutdownCompleted(ot::JsonDocument& _commandDo
 	Session& theSession = this->getSession(sessionID);
 	theSession.setServiceShutdownCompleted(serviceID, m_debugPortManager);
 
-	if (!theSession.hasShuttingDownServices()) {
+	if (!theSession.hasShuttingDownServices())
+	{
 		m_shutdownCompletedQueue.push_back(sessionID);
 		this->startWorkerThreads();
 	}
 }
 
-ot::ReturnMessage SessionService::handleEnableServiceDebug(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleEnableServiceDebug(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
-	
-	if (!this->hasMandatoryService(serviceName)) {
+	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
+
+	if (!this->hasMandatoryService(serviceType))
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The specified service is not contained in the mandatory services list");
 	}
-	else {
-		m_debugServices.insert(serviceName);
-		OT_LOG_D("Enabled the debug mode for the service \"" + serviceName + "\"");
+	else
+	{
+		m_debugServices.insert(serviceType);
+		OT_LOG_D("Enabled the debug mode for the service \"" + serviceType + "\"");
 		return ot::ReturnMessage::Ok;
 	}
 }
 
-ot::ReturnMessage SessionService::handleDisableServiceDebug(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleDisableServiceDebug(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
-	std::string serviceName = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME);
-	auto it = m_debugServices.find(serviceName);
-	if (it != m_debugServices.end()) {
+	std::string serviceType = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE);
+	auto it = m_debugServices.find(serviceType);
+	if (it != m_debugServices.end())
+	{
 		m_debugServices.erase(it);
-		OT_LOG_D("Disabled the debug mode for the service \"" + serviceName + "\"");
+		OT_LOG_D("Disabled the debug mode for the service \"" + serviceType + "\"");
 		return ot::ReturnMessage::Ok;
 	}
-	else {
+	else
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The specified service was not in debug mode");
 	}
 }
 
-std::string SessionService::handleGetDebugInformation() {
+std::string SessionService::handleGetDebugInformation()
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::LSSDebugInfo info;
@@ -1017,10 +1134,12 @@ std::string SessionService::handleGetDebugInformation() {
 	info.setLMSUrl(m_lmsUrl);
 
 	info.setDebugServices(std::list<std::string>(m_debugServices.begin(), m_debugServices.end()));
-	
-	for (const auto& mandatory : m_mandatoryServicesMap) {
+
+	for (const auto& mandatory : m_mandatoryServicesMap)
+	{
 		std::list<std::string> serviceNames;
-		for (const ot::ServiceBase& serviceInfo : mandatory.second) {
+		for (const ot::ServiceBase& serviceInfo : mandatory.second)
+		{
 			serviceNames.push_back(serviceInfo.getServiceName());
 		}
 		info.addMandatoryService(mandatory.first, serviceNames);
@@ -1031,7 +1150,8 @@ std::string SessionService::handleGetDebugInformation() {
 
 	info.setBlockedPorts(m_debugPortManager.getBlockedPorts());
 
-	for (auto& session : m_sessions) {
+	for (auto& session : m_sessions)
+	{
 		ot::LSSDebugInfo::SessionInfo sessionInfo;
 		session.second.getDebugInfo(sessionInfo);
 		info.addSession(std::move(sessionInfo));
@@ -1040,7 +1160,8 @@ std::string SessionService::handleGetDebugInformation() {
 	return info.toJson();
 }
 
-ot::ReturnMessage SessionService::handleCheckStartupCompleted(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleCheckStartupCompleted(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
@@ -1048,15 +1169,36 @@ ot::ReturnMessage SessionService::handleCheckStartupCompleted(ot::JsonDocument& 
 
 	Session& session = this->getSession(sessionID);
 
-	if (session.hasRequestedServices(serviceID)) {
+	if (session.hasRequestedServices(serviceID))
+	{
 		return ot::ReturnMessage::False;
 	}
-	else {
+	else
+	{
 		return ot::ReturnMessage::True;
 	}
 }
 
-ot::ReturnMessage SessionService::handleAddMandatoryService(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleCheckSessionRunning(ot::JsonDocument& _commandDoc)
+{
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	std::string sessionID(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID));
+
+	Session& session = this->getSession(sessionID);
+
+	if (session.getAllServicesAreHealthy())
+	{
+		return ot::ReturnMessage::True;
+	}
+	else
+	{
+		return ot::ReturnMessage::False;
+	}
+}
+
+ot::ReturnMessage SessionService::handleAddMandatoryService(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string sessionType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_TYPE));
@@ -1066,10 +1208,12 @@ ot::ReturnMessage SessionService::handleAddMandatoryService(ot::JsonDocument& _c
 	// Locate current data
 	auto it = m_mandatoryServicesMap.find(sessionType);
 	std::list<ot::ServiceBase>* data = nullptr;
-	if (it == m_mandatoryServicesMap.end()) {
+	if (it == m_mandatoryServicesMap.end())
+	{
 		data = &m_mandatoryServicesMap.insert_or_assign(sessionType, std::list<ot::ServiceBase>()).first->second;
 	}
-	else {
+	else
+	{
 		data = &it->second;
 	}
 
@@ -1077,22 +1221,26 @@ ot::ReturnMessage SessionService::handleAddMandatoryService(ot::JsonDocument& _c
 
 	// Check for duplicates
 	bool found = false;
-	for (const ot::ServiceBase& existing : *data) {
-		if (ot::String::toLower(existing.getServiceName()) == ot::String::toLower(serviceName) && 
-			ot::String::toLower(existing.getServiceType()) == ot::String::toLower(serviceType)) {
+	for (const ot::ServiceBase& existing : *data)
+	{
+		if (ot::String::toLower(existing.getServiceName()) == ot::String::toLower(serviceName) &&
+			ot::String::toLower(existing.getServiceType()) == ot::String::toLower(serviceType))
+		{
 			found = true;
 			break;
 		}
 	}
-	if (found) {
+	if (found)
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "The service \"" + serviceName + "\" is already in the mandatory services list for the session type \"" + sessionType + "\"");
 	}
-	else {
+	else
+	{
 		ot::ServiceBase info(serviceName, serviceType);
 		data->push_back(std::move(info));
 
 		OT_LOG_D("Mandatory service for project type \"" + sessionType + "\": Added service \"" + serviceName + "\"");
-		
+
 		return ot::ReturnMessage::Ok;
 	}
 }
@@ -1103,7 +1251,7 @@ ot::ReturnMessage SessionService::handleRemoveMandatoryService(ot::JsonDocument&
 
 	std::string sessionType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_TYPE));
 	std::string serviceName(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_NAME));
-	std::string serviceType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE)); 
+	std::string serviceType(ot::json::getString(_commandDoc, OT_ACTION_PARAM_SERVICE_TYPE));
 
 	// Locate current data
 	auto it = m_mandatoryServicesMap.find(sessionType);
@@ -1119,17 +1267,17 @@ ot::ReturnMessage SessionService::handleRemoveMandatoryService(ot::JsonDocument&
 
 	OTAssertNullptr(data);
 	bool found = false;
-	for (auto it = data->begin(); it != data->end(); )
+	for (auto dataIt = data->begin(); dataIt != data->end(); )
 	{
-		if (ot::String::toLower(it->getServiceName()) == ot::String::toLower(serviceName) &&
-			ot::String::toLower(it->getServiceType()) == ot::String::toLower(serviceType))
+		if (ot::String::toLower(dataIt->getServiceName()) == ot::String::toLower(serviceName) &&
+			ot::String::toLower(dataIt->getServiceType()) == ot::String::toLower(serviceType))
 		{
-			it = data->erase(it);
+			dataIt = data->erase(dataIt);
 			found = true;
 		}
 		else
 		{
-			++it;
+			++dataIt;
 		}
 	}
 
@@ -1144,25 +1292,30 @@ ot::ReturnMessage SessionService::handleRemoveMandatoryService(ot::JsonDocument&
 	}
 }
 
-ot::ReturnMessage SessionService::handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleRegisterNewGlobalDirectoryService(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string serviceURL(ot::json::getString(_commandDoc, OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL));
 
-	if (m_gds.connect(serviceURL, false)) {
+	if (m_gds.connect(serviceURL, false))
+	{
 		m_gss.setGDSUrl(serviceURL);
 		return ot::ReturnMessage::Ok;
 	}
-	else {
+	else
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, "Failed to connect to GDS at \"" + serviceURL + "\"");
 	}
 }
 
-ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	std::string newLmsUrl = ot::json::getString(_commandDoc, OT_ACTION_PARAM_LIBRARYMANAGEMENT_SERVICE_URL);
-	if (m_lmsUrl == newLmsUrl) {
+	if (m_lmsUrl == newLmsUrl)
+	{
 		return ot::ReturnMessage::Failed;
 	}
 	m_lmsUrl = std::move(newLmsUrl);
@@ -1173,18 +1326,20 @@ ot::ReturnMessage SessionService::handleRegisterNewLibraryManagementService(ot::
 	const std::string message = doc.toJson();
 
 	// Notify all sessions about the new LMS
-	for (auto& session : m_sessions) {
+	for (auto& session : m_sessions)
+	{
 		session.second.sendBroadcast(ot::invalidServiceID, message, ot::QUEUE);
 	}
-	
+
 	return ot::ReturnMessage::Ok;
 }
 
-ot::ReturnMessage SessionService::handleServiceStartupFailed(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleServiceStartupFailed(ot::JsonDocument& _commandDoc)
+{
 	// Get information of the service that failed
 	ot::serviceID_t serviceID = static_cast<ot::serviceID_t>(ot::json::getUInt(_commandDoc, OT_ACTION_PARAM_SERVICE_ID));
 	std::string sessionID = ot::json::getString(_commandDoc, OT_ACTION_PARAM_SESSION_ID);
-	
+
 	OT_LOG_W("Service startup failed received { \"ServiceID\": " + std::to_string(serviceID) + ", \"SessionID\": \"" + sessionID + "\" }");
 
 	this->serviceFailure(sessionID, serviceID);
@@ -1192,7 +1347,89 @@ ot::ReturnMessage SessionService::handleServiceStartupFailed(ot::JsonDocument& _
 	return ot::ReturnMessage::Ok;
 }
 
-void SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc) {
+ot::ReturnMessage SessionService::handleStartNewGatewayService(ot::JsonDocument& _commandDoc)
+{
+	std::string projectId = ot::json::getString(_commandDoc, OT_ACTION_PARAM_Project);
+	ot::UserSessionToken token(ot::json::getObject(_commandDoc, OT_ACTION_PARAM_SessionToken));
+	std::string launchTicket = ot::json::getString(_commandDoc, OT_ACTION_PARAM_Ticket);
+
+	if (projectId.empty() || !token.isValid() || launchTicket.empty())
+	{
+		OT_LOG_E("Invalid parameters for starting new gateway service");
+		return ot::ReturnMessage::Failed;
+	}
+
+	std::lock_guard<std::mutex> lock(m_mutex);
+
+	// Find the session
+	auto sessionIt = m_sessions.find(projectId);
+	if (sessionIt == m_sessions.end())
+	{
+		OT_LOG_E("Session not found for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+	auto& session = sessionIt->second;
+
+	// Ensure correct user
+	if (session.getUserName() != token.getUserName())
+	{
+		OT_LOG_E("User name mismatch for session \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Ensure correct session state
+	if (!session.getAllServicesAreHealthy())
+	{
+		OT_LOG_E("Session is in an unhealthy state for project \"" + projectId + "\".");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Register gateway at session (as requested service)
+	Service& gateway = session.addGateway();
+	ot::ServiceInitData gatewayInitData = session.createServiceInitData(gateway);
+	gatewayInitData.setSynchronousLaunch(true);
+
+	// Request the gateway start
+	auto gatewayInfo = m_gds.requestToStartService(gatewayInitData);
+
+	if (!gatewayInfo.has_value())
+	{
+		OT_LOG_E("Failed to start gateway service for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	const auto& gatewayServiceInfo = gatewayInfo.value().getServiceInfo();
+	if (gatewayServiceInfo.getServiceType() != OT_INFO_SERVICE_TYPE_GatewayService)
+	{
+		OT_LOG_E("Invalid service type returned for gateway service: " + gatewayServiceInfo.getServiceType());
+		return ot::ReturnMessage::Failed;
+	}
+	if (gatewayServiceInfo.getServiceURL().empty())
+	{
+		OT_LOG_E("Gateway service URL is empty for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+	if (gatewayServiceInfo.getServiceID() != gateway.getServiceID())
+	{
+		OT_LOG_E("Gateway service ID is invalid for project \"" + projectId + "\"");
+		return ot::ReturnMessage::Failed;
+	}
+
+	// Generate new gateway ticket
+	auto newGatewayTicketData = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::inSessionTicketLength());
+	std::string newGatewayTicket = ot::String::toHexString(newGatewayTicketData);
+
+	session.setServiceAlive(gateway.getServiceID(), gatewayServiceInfo.getServiceURL(), true);
+	session.sendRunCommandToService(gateway, { {OT_ACTION_PARAM_Ticket, newGatewayTicket} });
+
+	ot::JsonDocument responseDoc;
+	responseDoc.AddMember(OT_ACTION_PARAM_Ticket, ot::JsonString(newGatewayTicket, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_Gateway_Url, ot::JsonString(gatewayServiceInfo.getServiceURL(), responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	return ot::ReturnMessage::ok(responseDoc.toJson());
+}
+
+void SessionService::handleSetGlobalLogFlags(ot::JsonDocument& _commandDoc)
+{
 	std::lock_guard<std::mutex> lock(m_mutex);
 
 	ot::LogFlags flags = ot::logFlagsFromJsonArray(ot::json::getArray(_commandDoc, OT_ACTION_PARAM_Flags));

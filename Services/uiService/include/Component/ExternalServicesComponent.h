@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ExternalServicesComponent.h
 // 
 // License:
@@ -337,6 +337,7 @@ public:
 	void handleAddMenuLineEdit(ot::JsonDocument& _document);
 	void handleActivateToolbarTab(ot::JsonDocument& _document);
 	void handleSwitchMenuTab(ot::JsonDocument& _document);
+	void handleClickMenuButton(ot::JsonDocument& _document);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

@@ -78,7 +78,7 @@ namespace ot
 		//! @brief Constructor
 		//! @param _status The status
 		//! @param _document The document that will be serialized and set as what()
-		ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document);
+		explicit ReturnMessage(ReturnMessageStatus _status, const ot::JsonDocument& _document);
 		
 		
 		ReturnMessage(const ReturnMessage& _other) = default;

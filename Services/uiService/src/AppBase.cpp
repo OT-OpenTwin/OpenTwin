@@ -83,6 +83,7 @@
 
 // OpenTwin Widgets header
 #include "OTWidgets/QtFactory.h"
+#include "OTWidgets/BlockAndFilter/GlobalUserInputSignalBlocker.h"
 #include "OTWidgets/Dialog/CreateProjectDialog.h"
 #include "OTWidgets/Dialog/MessageDialog.h"
 #include "OTWidgets/Dialog/MessageBoxManager.h"
@@ -135,6 +136,8 @@
 // OpenTwin Model Entities header
 #include "OTModelEntities/DataBase.h"
 #include "OTModelEntities/Properties/EntityPropertiesItems.h"
+
+#include "akWidgets/aToolButtonWidget.h"
 
 // ADS header
 #include <ads/DockAreaWidget.h>
@@ -334,8 +337,22 @@ bool AppBase::logIn()
 	// Create default UI
 	OT_LOG_D("Creating default GUI");
 	m_mainWindow = uiAPI::createWindow(m_uid);
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 	uiAPI::window::setWindowIcon(m_mainWindow, ot::IconManager::getApplicationIcon());
+
+	if (isNonInteractive())
+	{
+		auto* window = mainWindow();
+		auto* blocker = ot::GlobalUserInputSignalBlocker::instance().getBlocker();
+		QWidget* widget = window;
+		while (widget)
+		{
+			blocker->addToWhitelist(widget);
+			widget = widget->parentWidget();
+		}
+
+		ot::GlobalUserInputSignalBlocker::install();
+	}
 
 	// Create UI
 	this->createUi();
@@ -396,9 +413,9 @@ bool AppBase::logIn()
 	StartArgumentParser args;
 	if (args.parse())
 	{
-		if (args.getProjectInfoSet())
+		if (args.getProjectNameToOpenSet())
 		{
-			std::string projName = args.getProjectInfo().getProjectName();
+			std::string projName = args.getProjectNameToOpen();
 			std::string projVersion = args.getProjectVersion();
 			QMetaObject::invokeMethod(this, &AppBase::slotOpenSpecificProject, Qt::QueuedConnection, QString::fromStdString(projName), QString::fromStdString(projVersion));
 		}
@@ -426,11 +443,11 @@ void AppBase::setCurrentProjectIsModified(bool _isModified)
 	QString title(m_currentProjectInfo.getProjectName().c_str());
 	if (_isModified)
 	{
-		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - OpenTwin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" [modified] - " + getDefaultWindowTitle()));
 	}
 	else
 	{
-		uiAPI::window::setTitle(m_mainWindow, title.append(" - OpenTwin"));
+		uiAPI::window::setTitle(m_mainWindow, title.append(" - " + getDefaultWindowTitle()));
 	}
 	m_projectStateIsModified = _isModified;
 }
@@ -1623,7 +1640,7 @@ void AppBase::closeAllViewerTabs()
 void AppBase::clearSessionInformation()
 {
 	m_currentProjectInfo = ot::ProjectInformation();
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 }
 
 void AppBase::restoreSessionState()
@@ -1782,7 +1799,7 @@ bool AppBase::checkForContinue(const std::string& _title)
 		}
 	}
 
-	uiAPI::window::setTitle(m_mainWindow, "OpenTwin");
+	uiAPI::window::setTitle(m_mainWindow, getDefaultWindowTitle());
 	return true;
 }
 
@@ -1861,6 +1878,18 @@ void AppBase::focusPropertyGridItem(const std::string& _group, const std::string
 	OTAssertNullptr(m_propertyGrid);
 
 	m_propertyGrid->getPropertyGrid()->focusProperty(_group, _name);
+}
+
+QString AppBase::getDefaultWindowTitle() const
+{
+	if (isNonInteractive())
+	{
+		return "OpenTwin (Non-Interactive Mode)";
+	}
+	else
+	{
+		return "OpenTwin";
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -2430,7 +2459,7 @@ bool AppBase::openNewInstance(const ot::ProjectInformation& _projectInfo, const 
 
 	StartArgumentParser args;
 	args.setLoginData(m_loginData);
-	args.setProjectInfo(_projectInfo);
+	args.setProjectNameToOpen(_projectInfo.getProjectName());
 	args.setProjectVersion(_customVersion);
 	//args.setDebug();
 
@@ -2813,6 +2842,30 @@ void AppBase::setTabToolBarTabOrder(const QStringList& _lst)
 void AppBase::activateToolBarTab(const QString& _tab)
 {
 	uiAPI::window::activateToolBarTab(m_mainWindow, _tab);
+}
+
+void AppBase::clickToolBarButton(const ot::ToolBarButtonCfg& _button)
+{
+	auto buttnID = uiAPI::object::getUidFromObjectUniqueName(QString::fromStdString(_button.getFullPath()));
+	if (buttnID == ak::invalidUID)
+	{
+		OT_LOG_E("Tool bar button not found: " + _button.getFullPath());
+		return;
+	}
+
+	ak::aToolButtonWidget* button = uiAPI::object::get<ak::aToolButtonWidget>(buttnID);
+	if (!button)
+	{
+		OT_LOG_E("Tool bar button object not found: " + _button.getFullPath());
+		return;
+	}
+
+	if (!button->isEnabled())
+	{
+		return;
+	}
+
+	button->click();
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################

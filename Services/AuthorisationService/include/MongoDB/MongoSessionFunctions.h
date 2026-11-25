@@ -53,7 +53,7 @@ class MongoSessionFunctions
 {
 	OT_DECL_STATICONLY(MongoSessionFunctions)
 public:
-	static std::string createSession(std::string username, mongocxx::client& adminClient);
+	static std::string createSession(const std::string& _username, const std::string& _sessionToken, mongocxx::client& adminClient);
 	static std::string refreshSession(std::string sessionName, mongocxx::client& adminClient);
 	static void removeOldSessions(mongocxx::client& adminClient);
 

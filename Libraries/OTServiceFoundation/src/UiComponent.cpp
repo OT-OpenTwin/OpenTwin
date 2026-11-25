@@ -498,7 +498,7 @@ void ot::components::UiComponent::switchMenuTab(
 	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
-void ot::components::UiComponent::registerForModelEvents(void) const {
+void ot::components::UiComponent::registerForModelEvents() const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RegisterForModelEvents, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
@@ -507,7 +507,7 @@ void ot::components::UiComponent::registerForModelEvents(void) const {
 	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
-void ot::components::UiComponent::deregisterForModelEvents(void) const {
+void ot::components::UiComponent::deregisterForModelEvents() const {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_DeregisterForModelEvents, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	cmdDoc.AddMember(OT_ACTION_PARAM_SERVICE_ID, m_application->getServiceID(), cmdDoc.GetAllocator());
@@ -531,7 +531,7 @@ void ot::components::UiComponent::addIconSearchPath(const std::string& _iconPath
 #endif // _DEBUG
 }
 
-void ot::components::UiComponent::notifyUiSetupCompleted(void) {
+void ot::components::UiComponent::notifyUiSetupCompleted() {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_ServiceSetupCompleted, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
 	ot::ThisService::addIdToJsonDocument(cmdDoc);
@@ -639,7 +639,7 @@ void ot::components::UiComponent::setProgress(int percentage)
 	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
-void ot::components::UiComponent::closeProgressInformation(void)
+void ot::components::UiComponent::closeProgressInformation()
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_SetProgressVisibility, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -706,7 +706,7 @@ void ot::components::UiComponent::removeUIElements(const std::list<std::string> 
 	}
 }
 
-void ot::components::UiComponent::removeAllUIElements(void)
+void ot::components::UiComponent::removeAllUIElements()
 {
 	JsonDocument cmdDoc;
 	cmdDoc.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_UI_RemoveElements, cmdDoc.GetAllocator()), cmdDoc.GetAllocator());
@@ -824,7 +824,7 @@ void ot::components::UiComponent::refreshAllViews(UID _visualizationModelUID)
 	m_application->sendMessage(true, this->getServiceName(), cmdDoc, response);
 }
 
-void ot::components::UiComponent::sendUpdatedControlState(void)
+void ot::components::UiComponent::sendUpdatedControlState()
 {
 	// Determine which state needs to be changed
 	std::list<std::string> enabledControls, disabledControls;

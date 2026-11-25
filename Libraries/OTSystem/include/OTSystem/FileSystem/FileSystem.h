@@ -37,9 +37,9 @@ namespace ot {
 		//! @brief Reads the entire content of a file.
 		//! @param _filePath File path.
 		//! @param _outputContent Output content.
-		//! @param _fileSize Output file size in bytes.
+		//! @param _fileSize If not nullptr file size in bytes will be written here.
 		//! @param _exceptionMask Exception mask for file stream.
-		static bool readFile(const std::string& _filePath, std::string& _outputContent, uint64_t& _fileSize, std::ifstream::iostate _exceptionMask = std::ifstream::badbit);
+		static bool readFile(const std::string& _filePath, std::string& _outputContent, uint64_t* _fileSize = nullptr, std::ifstream::iostate _exceptionMask = std::ifstream::badbit);
 
 		//! @brief Returns the last modification time of the given file or directory.
 		//! @param _path Path to the file or directory.

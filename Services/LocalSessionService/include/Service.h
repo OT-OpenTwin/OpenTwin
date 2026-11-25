@@ -37,13 +37,14 @@ class Service : public ot::ServiceBase {
 	OT_DECL_NODEFAULT(Service)
 public:
 	enum ServiceStateFlag {
-		NoState      = 0 << 0,
-		IsDebug      = 1 << 0, //! @brief Service is in debug mode.
-		Requested    = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
-		Alive        = 1 << 2, //! @brief Service is registered in the session.
-		Running      = 1 << 3, //! @brief Service is running (received run command).
-		ShuttingDown = 1 << 4, //! @brief Service is shutting down, waiting for confirmation.
-		Hidden       = 1 << 5  //! @brief Service is invisible to other services in the session.s
+		NoState           = 0 << 0,
+		IsDebug           = 1 << 0, //! @brief Service is in debug mode.
+		Requested         = 1 << 1, //! @brief Service is requested by the session, but not yet registered.
+		Alive             = 1 << 2, //! @brief Service is registered in the session.
+		Running           = 1 << 3, //! @brief Service is running (received run command).
+		ShuttingDown      = 1 << 4, //! @brief Service is shutting down, waiting for confirmation.
+		Hidden            = 1 << 5, //! @brief Service is invisible to other services in the session.s
+		CustomRunHandling = 1 << 6  //! @brief Service requires custom run handling (e.g. the gateway must only be started explicitly and therefore requires additional handling in the start sequence).
 	};
 	typedef ot::Flags<ServiceStateFlag> ServiceState; //! @brief Flags used to describe the state of the service.
 
@@ -58,7 +59,7 @@ public:
 	// Setter / Getter
 
 	void setWebsocketUrl(const std::string& _websocketUrl) { m_websocketUrl = _websocketUrl; };
-	const std::string& getWebsocketUrl(void) const { return m_websocketUrl; };
+	const std::string& getWebsocketUrl() const { return m_websocketUrl; };
 
 	void setIsDebug(bool _isDebug = true) { m_state.set(Service::IsDebug, _isDebug); };
 	bool isDebug() const { return m_state & Service::IsDebug; };
@@ -78,8 +79,11 @@ public:
 	void setHidden(bool _hidden) { m_state.set(Service::Hidden, _hidden); };
 	bool isHidden() const { return m_state & Service::Hidden; };
 
+	void setCustomRunHandling(bool _customRunHandling) { m_state.set(Service::CustomRunHandling, _customRunHandling); };
+	bool hasCustomRunHandling() const { return m_state & Service::CustomRunHandling; };
+
 	//! @brief Will return the port numbers used by this service.
-	std::list<ot::port_t> getPortNumbers(void) const;
+	std::list<ot::port_t> getPortNumbers() const;
 
 	static std::string debugLogString(const ot::ServiceBase& _serviceInfo, const std::string& _sessionID);
 	std::string debugLogString(const std::string& _sessionID) const;

@@ -29,7 +29,7 @@ public:
 	virtual ~ServiceDataUi();
 
 	void setUiInitializationCompleted(bool _completed = true) { m_uiInitCompleted = _completed; };
-	bool isUiInitializationCompleted(void) const { return m_uiInitCompleted; };
+	bool isUiInitializationCompleted() const { return m_uiInitCompleted; };
 
 private:
 	bool m_uiInitCompleted;

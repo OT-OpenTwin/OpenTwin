@@ -49,20 +49,20 @@ class GlobalSessionService : public ot::ServiceBase, public ot::ActionHandler {
 	OT_DECL_NOMOVE(GlobalSessionService)
 public:
 	//! @brief Returns the global instance of the GlobalSessionService.
-	static GlobalSessionService& instance(void);
+	static GlobalSessionService& instance();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Setter / Getter
 
 	void setDatabaseUrl(const std::string& _url);
-	const std::string getDatabaseUrl(void) const { return m_databaseUrl; };
+	const std::string getDatabaseUrl() const { return m_databaseUrl; };
 
 	void setAuthorizationUrl(const std::string& _url) { m_authorizationUrl = _url; };
-	const std::string& getAuthorizationUrl(void) const { return m_authorizationUrl; };
+	const std::string& getAuthorizationUrl() const { return m_authorizationUrl; };
 
 	void setGlobalDirectoryUrl(const std::string& _url) { m_globalDirectoryUrl = _url; };
-	const std::string& getGlobalDirectoryUrl(void) const { return m_globalDirectoryUrl; };
+	const std::string& getGlobalDirectoryUrl() const { return m_globalDirectoryUrl; };
 
 	ot::GSSDebugInfo getDebugInformation();
 
@@ -120,7 +120,7 @@ private:
 
 	//! @brief Determins the least loaded LSS.
 	//! The load is determined by the number of sessions in the LSS.
-	LocalSessionService* determineLeastLoadedLSS(void);
+	LocalSessionService* determineLeastLoadedLSS();
 
 	//! @brief Returns the custom project templates accessible by the user.
 	//! @param _resultArray Results array to fill with the project templates.
@@ -140,17 +140,17 @@ private:
 	//! @brief Search for the installer and read the file.
 	//! First the installer will be searched at "<Current Path>/FrontendInstaller".
 	//! If not found, the installer will be searched at "%OPENTWIN_DEV_ROOT%/Deployment/FrontendInstaller".
-	void loadFrontendInstallerFile(void);
+	void loadFrontendInstallerFile();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Worker
 
 	//! @brief Worker that ensures all the registered LSS are alive.
-	void workerHealthCheck(void);
+	void workerHealthCheck();
 
 	//! @brief Worker ensuring all sessions are confirmed in time by the corresponding LSS.
-	void workerSessionIni(void);
+	void workerSessionIni();
 
 	std::string m_databaseUrl;                //! @brief Database url.
 	std::string m_authorizationUrl;           //! @brief Authorization Service url.

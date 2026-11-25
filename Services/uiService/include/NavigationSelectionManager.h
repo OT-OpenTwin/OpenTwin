@@ -43,20 +43,20 @@ namespace ot {
 		void addSelectedItem(UID _itemId);
 		void setSelectedItems(const UIDList& _itemIds);
 		void setSelectionInformation(const SelectionInformation& _info);
-		const SelectionInformation& getSelectionInformation(void) { return m_selectionInfo; };
-		const UIDList& getSelectedItems(void) const { return m_selectionInfo.getSelectedNavigationItems(); };
-		const SelectionInformation& getPreviousSelectionInformation(void) { return m_previousSelectionInfo; };
-		const UIDList& getPreviouslySelectedItems(void) const { return m_previousSelectionInfo.getSelectedNavigationItems(); };
-		SelectionOrigin getCurrentSelectionOrigin(void) const { return m_selectionOrigin; };
+		const SelectionInformation& getSelectionInformation() { return m_selectionInfo; };
+		const UIDList& getSelectedItems() const { return m_selectionInfo.getSelectedNavigationItems(); };
+		const SelectionInformation& getPreviousSelectionInformation() { return m_previousSelectionInfo; };
+		const UIDList& getPreviouslySelectedItems() const { return m_previousSelectionInfo.getSelectedNavigationItems(); };
+		SelectionOrigin getCurrentSelectionOrigin() const { return m_selectionOrigin; };
 
-		bool isSelectionHandlingRunning(void) const { return m_runCounter > 0; };
+		bool isSelectionHandlingRunning() const { return m_runCounter > 0; };
 
 	Q_SIGNALS:
 		void selectionHasChanged(SelectionHandlingResult* _result, SelectionOrigin _eventOrigin);
 
 	public Q_SLOTS:
-		void slotViewSelected(void);
-		void slotViewDeselected(void);
+		void slotViewSelected();
+		void slotViewDeselected();
 
 	private:
 		int m_runCounter;

@@ -53,18 +53,18 @@ ot::NavigationTreeView::~NavigationTreeView() {
 
 // Base class functions
 
-QWidget* ot::NavigationTreeView::getViewWidget(void) {
+QWidget* ot::NavigationTreeView::getViewWidget() {
 	return m_tree->widget();
 }
 
-void ot::NavigationTreeView::slotCopyRequested(void) {
+void ot::NavigationTreeView::slotCopyRequested() {
 	CopyInformation info;
 	info.setOriginViewInfo(this->getViewData());
 
 	Q_EMIT copyRequested(info);
 }
 
-void ot::NavigationTreeView::slotPasteRequested(void) {
+void ot::NavigationTreeView::slotPasteRequested() {
 	CopyInformation info;
 	info.setDestinationViewInfo(this->getViewData());
 

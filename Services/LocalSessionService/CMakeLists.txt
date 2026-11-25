@@ -9,6 +9,7 @@ ot_add_dependency(LocalSessionService
     OTSystem
     OTCore
     OTGui
+    OTCrypto
     OTCommunication
     OTGuiAPI
     OTServiceFoundation

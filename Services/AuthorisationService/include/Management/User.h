@@ -39,6 +39,18 @@ public:
 	explicit User(const std::string& _name);
 	explicit User(const bsoncxx::v_noabi::document::view& _userData);
 
+	inline bool operator==(const User& other) const
+	{
+		return m_id == other.m_id
+			&& m_name == other.m_name
+			&& m_settingsCollectionName == other.m_settingsCollectionName
+			&& m_roleName == other.m_roleName;
+	};
+
+	inline bool operator!=(const User& other) const { return !(*this == other); };
+
+	bool isValid() const;
+
 	inline const std::string& getID() const { return m_id; };
 	inline const std::string& getName() const { return m_name; };
 	inline const std::string& getSettingsCollectionName() const { return m_settingsCollectionName; };

@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ServiceBase.cpp
 // 
 // License:
@@ -143,72 +143,27 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_REGISTER) { return handleRegister(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_REFRESH_SESSION) { return handleRefreshSession(_actionDocument.GetObject()); }
 	else if (_action == OT_ACTION_CMD_SetGlobalLogFlags) { return handleSetGlobalLoggingMode(_actionDocument.GetObject()); }
+	else if (_action == OT_ACTION_CMD_AuthorizeGateway) { return handleAuthorizeGateway(_actionDocument.GetObject()).toJson(); }
 
 	//------------------------------------------------------------------------------------
 
-	// Checking whether the logged in user is the one that he claims to be. All the requests must include loggedInUsername and loggedInUserPassword
-	std::string loggedInUsername = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USERNAME);
-	bool passWordAuthentication = ot::json::exists(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
-	std::string loggedInUserPassword;
-	if (passWordAuthentication)
-	{
-		loggedInUserPassword = ot::json::getString(_actionDocument, OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD);
+	// Checking whether the logged in user is the one that he claims to be.
+	std::string loggedInUsername;
+	auto authResult = m_authProvider.authorizeAction(m_authContext, _action, loggedInUsername, _actionDocument.getConstObject());
 
-		// Check whether the provided password is encrypted and decrypt it if needed
-		bool pwEncrypted = false;
-		if (_actionDocument.HasMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD))
-		{
-			pwEncrypted = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_ENCRYPTED_PASSWORD);
-		}
-
-		if (pwEncrypted)
-		{
-			loggedInUserPassword = ot::UserCredentials::decryptString(loggedInUserPassword);
-		}
-	}
-	else
-	{
-		std::string sessionToken = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-		SSOUser* ssoUser =	m_ssoBuffer.getUser(sessionToken);
-		if (ssoUser == nullptr)
-		{
-			// Most likely a hacking attempt
-			assert(0);
-			throw std::runtime_error("The provided authentication token is invalid. Please logout and attempt to log in again.");
-		}
-		else
-		{
-			const std::string& token =	ssoUser->getSessionToken().getToken();
-			
-			if(!ssoUser->getSessionToken().tokenIsValid(false))
-			{
-				// Token is expired. Should have been validated before this request was send.
-				assert(0);
-				m_ssoBuffer.removeUser(token);
-				throw std::runtime_error("The provided authentication token is expired. Please logout and attempt to log in again.");
-			}
-			else
-			{
-				loggedInUserPassword = "";
-			}
-		}
+	if (!authResult.isAuthorized) {
+		OT_LOG_E("User \"" + loggedInUsername + "\" is not authorized to perform action \"" + _action + "\"." +
+			(authResult.reason.has_value() ? " Reason: " + authResult.reason.value() : std::string()));
+		return OT_ACTION_RETURN_INDICATOR_Error "User is not authorized to perform this action";
 	}
 
-	User loggedInUser(loggedInUsername);
-	
-	if (!isAdminUser(loggedInUser))
-	{
-		std::string originalUserName;
-		bool logInSuccessful = MongoUserFunctions::authenticateUser(loggedInUsername, loggedInUserPassword, m_databaseURL, m_adminClient, originalUserName);
-
-		if (!logInSuccessful)
-		{
-			assert(0);
-			throw std::runtime_error("The User could not be authenticated! Please logout and attempt to log in again!");
-		}
-
-		loggedInUser = MongoUserFunctions::getUserDataThroughUsername(originalUserName, m_adminClient);
+	if (!authResult.loggedInUser.has_value()) {
+		OT_LOG_E("User \"" + loggedInUsername + "\" is not authorized to perform action \"" + _action + "\". Reason: No logged in user returned from authorization provider.");
+		return OT_ACTION_RETURN_INDICATOR_Error "User is not authorized to perform this action";
 	}
+
+	auto& loggedInUser = authResult.loggedInUser.value();
+	std::string loggedInUserPassword = authResult.loggedInUserPassword.value_or("");
 
 	//------------ FUNCTIONS THAT NEED AUTHENTICATION ------------
 	if (_action == OT_ACTION_GET_USER_DATA) { return handleGetUserData(_actionDocument.GetObject()); } // Only UI, d
@@ -220,7 +175,9 @@ std::string ServiceBase::dispatchAction(const std::string& _action, const ot::Js
 	else if (_action == OT_ACTION_CHANGE_USERNAME) { return handleChangeUserNameByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
 	else if (_action == OT_ACTION_CHANGE_PASSWORD) { return handleChangeUserPasswordByAdmin(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // Not used
 	else if (_action == OT_ACTION_CMD_GetSystemInformation) { return handleGetSystemInformation(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword); } // OT Service foundation and central services. But they have own handlers that do not require euthentication
-	else if (_action == OT_ACTION_CMD_GenerateAccessToken) { return handleGenerateAccessToken(_actionDocument.GetObject(), loggedInUser, loggedInUserPassword).toJson(); }
+	else if (_action == OT_ACTION_CMD_GenerateAccessToken) { return handleGenerateAccessToken(_actionDocument.GetObject(), loggedInUser).toJson(); }
+	else if (_action == OT_ACTION_CMD_GenerateTickets) { return handleGenerateTickets(_actionDocument.GetObject(), loggedInUser).toJson(); }
+
 	//------------ Group FUNCTIONS ------------
 	else if (_action == OT_ACTION_CREATE_GROUP) { return handleCreateGroup(_actionDocument.GetObject(), loggedInUser); } // Only UI
 	else if (_action == OT_ACTION_GET_GROUP_DATA) { return handleGetGroupData(_actionDocument.GetObject()); } // Only UI
@@ -290,8 +247,8 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	enum class LoginMode
 	{
 		UsernamePassword,
-		SessionUsernamePassword,
 		SSO,
+		Ticket,
 		Token
 	};
 
@@ -305,13 +262,17 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	{
 		loginMode = LoginMode::UsernamePassword;
 	}
-	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Token))
+	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Ticket))
 	{
-		loginMode = LoginMode::Token;
+		loginMode = LoginMode::Ticket;
 	}
 	else if (ot::json::exists(_actionDocument, OT_PARAM_AUTH_SSO_Initial))
 	{
 		loginMode = LoginMode::SSO;
+	}
+	else if (ot::json::exists(_actionDocument, OT_ACTION_PARAM_Token))
+	{
+		loginMode = LoginMode::Token;
 	}
 	else
 	{
@@ -346,12 +307,14 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 
 	case LoginMode::SSO:
 	{
+		auto& ssoBuffer = m_authContext.getSSOBuffer();
+
 		// Here we execute the sso authentication process
 		bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
 		std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
 		std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
 		// Fills in some json fields depending on the state in the authentication sequence, or its failing reasons. It also sets the identified user name
-		authenticationSuccessfull = m_ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
+		authenticationSuccessfull = ssoBuffer.handleRequest(username, authenticationProcessID, token, initialToken, returnDoc);
 		if (!authenticationSuccessfull)
 		{
 			// Here we return if the sequnce is not done yet or it may have failed
@@ -364,31 +327,85 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 		break;
 
+	case LoginMode::Ticket:
+	{
+		auto& ticketManager = m_authContext.getTicketManager();
+
+		const std::string ticket = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Ticket);
+		username = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Username);
+
+		auto ticketValidationResult = ticketManager.consumeTicket(Ticket::TicketType::Login, ticket, username);
+		if (!ticketValidationResult)
+		{
+			authenticationSuccessfull = false;
+		}
+		else
+		{
+			authenticationSuccessfull = true;
+			password.clear();
+		}
+
+		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, authenticationSuccessfull, returnDoc.GetAllocator());
+	}
+		break;
+		
 	case LoginMode::Token:
 	{
-		password.clear();
-		auto result = m_accessTokenManager.handleLogin(_actionDocument, username, returnDoc);
-		switch (result)
-		{
-		case AccessTokenManager::AuthenticationResult::Success:
-			// Here we have a successful token authentication and retreived the credentials,
-			// but we still need to check the user in the database
-			authenticationSuccessfull = true;
-			break;
+		auto& accessTokenManager = m_authContext.getAccessTokenManager();
+		authenticationSuccessfull = false;
+		
+		// Perform token authentication and retrieve the associated username or challenge information
+		auto result = accessTokenManager.authenticateUser(_actionDocument);
 
-		case AccessTokenManager::AuthenticationResult::ChallengeRequired:
+		switch (result.status)
+		{
+		case AccessTokenManager::AuthenticationStatus::Success:
+		{
+			// Successful authentication
+
+			if (!result.user.has_value())
+			{
+				throw ot::Exception::IllegalState("Invalid authentication result (success but no user)");
+			}
+
+			authenticationSuccessfull = true;
+			username = result.user->getName();
+			password.clear();
+		}
+		// Proceed to session creation
+		break;
+
+		case AccessTokenManager::AuthenticationStatus::ChallengeRequired:
+			// Challenge required
+
+			if (!result.challenge.has_value() || !result.challengeID.has_value())
+			{
+				OT_LOG_E("Invalid authentication result (challenge but no challenge or id)");
+				return ot::ReturnMessage::failed("Invalid authentication result").toJson();
+			}
+			returnDoc.AddMember(OT_ACTION_PARAM_Challenge, ot::JsonString(result.challenge.value(), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+			returnDoc.AddMember(OT_ACTION_PARAM_ChallengeID, ot::JsonString(result.challengeID.value(), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+
+			// Return the challenge
 			return returnDoc.toJson();
 
-		case AccessTokenManager::AuthenticationResult::Failure:
+		case AccessTokenManager::AuthenticationStatus::Failure:
+			// Authentication failed
 			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
 			return returnDoc.toJson();
 
 		default:
-			OT_LOG_E("Unknown result from AccessTokenManager::handleLogin");
+			// Handle unexpected status
+			OT_LOG_E("Unknown authentication result");
+			returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, false, returnDoc.GetAllocator());
 			return returnDoc.toJson();
 		}
+
+		// At this point the user is successfully authenticated
+
+		OTAssert(result.status == AccessTokenManager::AuthenticationStatus::Success, "Unexpected status");
 	}
-		break;
+	break;
 
 	default:
 		OT_LOG_ES("Unknown login mode (" << static_cast<int32_t>(loginMode) << ")");
@@ -401,18 +418,16 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	if (authenticationSuccessfull)
 	{
 		returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, true, returnDoc.GetAllocator());
+		
+		auto& sessionManager = m_authContext.getUserSessionManager();
+		auto newSession = sessionManager.createUserSession(username);
 
-		// Now we are creating the session user and password. They are valid for the lifetime of a session.
-		std::string sessionName = MongoSessionFunctions::createSession(username, m_adminClient);
-		std::string sessionPWD = createRandomPassword();
+		returnDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(newSession.sessionToken.getUserName(), returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		returnDoc.AddMember(OT_ACTION_PARAM_SessionToken, ot::JsonObject(newSession.sessionToken, returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		returnDoc.AddMember(OT_PARAM_DB_USERNAME, ot::JsonString(newSession.sessionUserName, returnDoc.GetAllocator()), returnDoc.GetAllocator());
+		returnDoc.AddMember(OT_PARAM_DB_PASSWORD, ot::JsonString(newSession.sessionUserPWD, returnDoc.GetAllocator()), returnDoc.GetAllocator());
 
-		User user = MongoUserFunctions::getUserDataThroughUsername(username, m_adminClient);
-
-		// Fills in the fields about the session user in the mongodb document
-		MongoUserFunctions::createTmpUser(sessionName, sessionPWD, user, m_databaseURL, m_adminClient, returnDoc);
-
-
-		if (loginMode == LoginMode::UsernamePassword)
+		if (loginMode == LoginMode::UsernamePassword && !password.empty())
 		{
 			returnDoc.AddMember(OT_PARAM_AUTH_PASSWORD, ot::JsonString(ot::UserCredentials::encryptString(password), returnDoc.GetAllocator()), returnDoc.GetAllocator());
 		}
@@ -437,11 +452,12 @@ std::string ServiceBase::handleLogIn(const ot::ConstJsonObject& _actionDocument)
 	}
 
 	return returnDoc.toJson();
-
 }
 
 std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actionDocument)
 {
+	auto& ssoBuffer = m_authContext.getSSOBuffer();
+
 	bool initialToken = ot::json::getBool(_actionDocument, OT_PARAM_AUTH_SSO_Initial);
 	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
 	std::string authenticationProcessID = ot::json::getString(_actionDocument, OT_ACTION_PARAM_PROCESS_ID);
@@ -449,17 +465,19 @@ std::string ServiceBase::handleSSOTokenRefresh(const ot::ConstJsonObject& _actio
 	ot::JsonDocument returnDoc;
 	// Resets the buffered user. In this cause it also creates a new session token.
 	std::string determinedUserName;
-	m_ssoBuffer.handleRequest(determinedUserName,authenticationProcessID, token, initialToken, returnDoc);
+	ssoBuffer.handleRequest(determinedUserName, authenticationProcessID, token, initialToken, returnDoc);
 	return returnDoc.toJson();
 }
 
 std::string ServiceBase::handleSSOTokenValidate(const ot::ConstJsonObject& _actionDocument)
 {
+	auto& ssoBuffer = m_authContext.getSSOBuffer();
+
 	std::string token = ot::json::getString(_actionDocument, OT_PARAM_AUTH_Token);
-	bool tokenIsValid = m_ssoBuffer.validate(token);
+	bool tokenIsValid = ssoBuffer.validate(token);
 	if (!tokenIsValid)
 	{
-		m_ssoBuffer.removeUser(token); // Will be newly created with the TokenRefresh
+		ssoBuffer.removeUser(token); // Will be newly created with the TokenRefresh
 	}
 	ot::JsonDocument returnDoc;
 	returnDoc.AddMember(OT_ACTION_AUTH_SUCCESS, tokenIsValid, returnDoc.GetAllocator());
@@ -504,6 +522,23 @@ std::string ServiceBase::handleSetGlobalLoggingMode(const ot::ConstJsonObject& _
 	ot::ConstJsonArray flags = ot::json::getArray(_actionDocument, OT_ACTION_PARAM_Flags);
 	ot::LogDispatcher::instance().setLogFlags(ot::logFlagsFromJsonArray(flags));
 	return OT_ACTION_RETURN_VALUE_OK;
+}
+
+ot::ReturnMessage ServiceBase::handleAuthorizeGateway(const ot::ConstJsonObject& _actionDocument)
+{
+	auto& ticketManager = m_authContext.getTicketManager();
+
+	std::string launchTicket = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Ticket);
+	std::string username = ot::json::getString(_actionDocument, OT_ACTION_PARAM_Username);
+	
+	if (ticketManager.consumeTicket(Ticket::TicketType::Gateway, launchTicket, username))
+	{
+		return ot::ReturnMessage::True;
+	}
+	else
+	{
+		return ot::ReturnMessage::False;
+	}
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -615,7 +650,7 @@ std::string ServiceBase::handleGetSystemInformation(const ot::ConstJsonObject& _
 	return response;
 }
 
-ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, User& _loggedInUser, const std::string& _loggedInUserPassword)
+ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser)
 {
 	const int64_t maximumTokenValidity = 30ll * 24ll * 60ll * 60000ll;
 
@@ -639,6 +674,85 @@ ot::ReturnMessage ServiceBase::handleGenerateAccessToken(const ot::ConstJsonObje
 	tokenDoc.AddMember(OT_ACTION_PARAM_Expires, token.getExpirationDate(), tokenDoc.GetAllocator());
 	
 	return ot::ReturnMessage::ok(tokenDoc.toJson());
+}
+
+ot::ReturnMessage ServiceBase::handleGenerateTickets(const ot::ConstJsonObject& _actionDocument, const User& _loggedInUser)
+{
+	// Ensure that the request contains the ticket types to generate
+
+	std::list<std::string> ticketTypeStrings;
+
+	if (!_actionDocument.HasMember(OT_ACTION_PARAM_TicketType))
+	{
+		return ot::ReturnMessage::failed("Missing \"" OT_ACTION_PARAM_TicketType "\" parameter");
+	}
+
+	const auto& ticketTypesVal = _actionDocument[OT_ACTION_PARAM_TicketType];
+
+	if (ticketTypesVal.IsString())
+	{
+		// Single ticket type provided as a string
+		ticketTypeStrings.push_back(ticketTypesVal.GetString());
+	}
+	else if (ticketTypesVal.IsArray())
+	{
+		// Multiple ticket types provided as an array
+		ticketTypeStrings = ot::json::getStringList(_actionDocument, OT_ACTION_PARAM_TicketType);
+	}
+
+	if (ticketTypeStrings.empty())
+	{
+		return ot::ReturnMessage::failed("No ticket types specified to generate");
+	}
+
+	auto& ticketManager = m_authContext.getTicketManager();
+	std::unordered_map<std::string, std::list<std::string>> generatedTickets;
+
+	// Generate the requested tickets
+	for (const auto& ticketTypeString : ticketTypeStrings)
+	{
+		// Convert the ticket type string
+		Ticket::TicketType ticketType = Ticket::stringToTicketType(ticketTypeString);
+		if (ticketType == Ticket::TicketType::Invalid)
+		{
+			return ot::ReturnMessage::failed("Invalid ticket type: \"" + ticketTypeString + "\"");
+		}
+
+		// Find or create the list of generated tickets for this ticket type
+		auto generatedTicketsIt = generatedTickets.find(ticketTypeString);
+		if (generatedTicketsIt == generatedTickets.end())
+		{
+			generatedTicketsIt = generatedTickets.emplace(ticketTypeString, std::list<std::string>()).first;
+		}
+
+		// Generate the ticket
+		auto ticket = ticketManager.generateTicket(_loggedInUser, ticketType);
+
+		if (!ticket.has_value())
+		{
+			// If ticket generation fails, clear all previously generated tickets for this user
+			ticketManager.clearTicketsForUser(_loggedInUser);
+			return ot::ReturnMessage::failed("Failed to generate ticket \"" + ticketTypeString +
+				"\" (#" + std::to_string(generatedTicketsIt->second.size() + 1) + ")");
+		}
+
+		generatedTicketsIt->second.push_back(ticket.value());
+	}
+
+	// Build the response JSON with the generated tickets
+
+	ot::JsonDocument ticketsDoc;
+	for (const auto& [ticketType, tickets] : generatedTickets)
+	{
+		ot::JsonArray ticketArray;
+		for (const auto& ticket : tickets)
+		{
+			ticketArray.PushBack(ot::JsonString(ticket, ticketsDoc.GetAllocator()), ticketsDoc.GetAllocator());
+		}
+		ticketsDoc.AddMember(ot::JsonString(ticketType, ticketsDoc.GetAllocator()), ticketArray, ticketsDoc.GetAllocator());
+	}
+
+	return ot::ReturnMessage::ok(ticketsDoc.toJson());
 }
 
 // ###########################################################################################################################################################################################################################################################################################################################
@@ -1320,31 +1434,6 @@ inline bool ServiceBase::isAdminUser(const User& _loggedInUser) const {
 inline bool ServiceBase::isAdminUser(const std::string& _username) const
 {
 	return (_username == getAdminUserName());
-}
-
-std::string ServiceBase::createRandomPassword()
-{
-	const int length = 30;
-
-	// Define the list of possible characters
-	const std::string CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-
-	// Create a random number generator
-	std::random_device rd;
-	std::mt19937 generator(rd());
-
-	// Create a distribution to uniformly select from all
-	// characters
-	std::uniform_int_distribution<> distribution(0, (int) (CHARACTERS.size()) - 1);
-
-	// Generate the random string
-	std::string random_string;
-
-	for (int i = 0; i < length; ++i) {
-		random_string += CHARACTERS[distribution(generator)];
-	}
-
-	return random_string;
 }
 
 bool ServiceBase::removeOldSessionsWorker() {

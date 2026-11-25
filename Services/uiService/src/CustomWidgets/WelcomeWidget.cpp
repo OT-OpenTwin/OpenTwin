@@ -267,7 +267,7 @@ void WelcomeWidget::slotCreateShareLink()
 	const ot::ProjectInformation& project = projects.front();
 
 	StartArgumentParser parser;
-	parser.setProjectInfo(project);
+	parser.setProjectNameToOpen(project.getProjectName());
 	parser.setLoginGSS(gss);
 
 	QString url = parser.createShareLink();

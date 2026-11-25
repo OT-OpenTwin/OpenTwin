@@ -1,5 +1,5 @@
 import logging
-from opentwin.logging import logging_config
+from opentwin_api.logging import logging_config
 
 def ot_initialize_tests():
     # Ensure that initialization is done only once

@@ -62,7 +62,8 @@ extern "C" {
 		}
 	};
 
-	_declspec(dllexport) int init(const char* _ownUrl, const char* _unused1, const char* _unused2, const char* _unused3) {
-		return ot::foundation::init(_ownUrl, &Application::instance(), false);
+	_declspec(dllexport) int init(const char* _ownUrl, const char* _ownName, const char* _unused1, const char* _unused2)
+	{
+		return ot::foundation::init(_ownUrl, _ownName, _unused1, _unused2, &Application::instance(), false);
 	};
 }

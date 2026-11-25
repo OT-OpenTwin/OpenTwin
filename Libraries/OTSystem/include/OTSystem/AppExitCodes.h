@@ -169,6 +169,9 @@ namespace ot {
 			AssetError                 = 7706, //! @brief Asset error.
 			ComponentError             = 7707, //! @brief Component error.
 			GeneralTimeout		       = 7708, //! @brief General timeout.
+			ArgumentMissingError       = 7709, //! @brief Argument missing error.
+			InvalidArgumentError       = 7710, //! @brief Invalid argument error.
+			NotImplementedError        = 7711, //! @brief Not implemented error.
 
 			LogInError                 = 7800, //! @brief Log in error.
 			FailedToConvertPort        = 7801, //! @brief Failed to convert port.

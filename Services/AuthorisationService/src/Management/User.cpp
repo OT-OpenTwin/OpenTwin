@@ -42,3 +42,11 @@ User::User(const bsoncxx::v_noabi::document::view& _userData)
 	m_roleName = std::string(_userData["user_role_name"].get_utf8().value.data());
 	m_settingsCollectionName = std::string(_userData["settings_collection_name"].get_utf8().value.data());
 }
+
+bool User::isValid() const
+{
+	return !m_id.empty()
+		&& !m_name.empty()
+		&& !m_roleName.empty()
+		&& !m_settingsCollectionName.empty();
+}

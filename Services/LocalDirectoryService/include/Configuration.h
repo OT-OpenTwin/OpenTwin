@@ -62,7 +62,7 @@ public:
 	void importFromEnvironment();
 
 	//! @brief Returns the supported service information for the provided service name.
-	std::optional<SupportedService> getSupportedService(const std::string& _serviceName) const;
+	std::optional<SupportedService> getSupportedService(const std::string& _serviceType) const;
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

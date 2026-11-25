@@ -47,6 +47,8 @@ public:
 	explicit Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client& _userClient);
 	~Project() {};
 
+	bool isValid() const;
+
 	void setId(const bsoncxx::oid& _id) { m_id = _id; };
 	const bsoncxx::oid& getId() const { return m_id; };
 

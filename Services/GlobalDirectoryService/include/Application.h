@@ -53,13 +53,13 @@ public:
 
 	// Static methods
 
-	static Application& instance(void);
+	static Application& instance();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Management
 
-	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
+	bool requestToRunServiceAsync(const ot::ServiceInitData& _serviceInfo);
 
 	int initialize(const char* _siteID, const char* _ownURL, const char* _globalSessionServiceURL);
 
@@ -84,13 +84,9 @@ public:
 	// Private methods
 
 private:
-	const std::vector<LocalDirectoryService>& getLocalDirectoryServices(void) const { return m_localDirectoryServices; };
+	const std::vector<LocalDirectoryService>& getLocalDirectoryServices() const { return m_localDirectoryServices; };
 
-	//! @brief Determines the least loaded directory service that supports the given service.
-	//! @warning It is expected that the mutex is locked when calling this method.
-	//! @param _info Service information.
-	//! @return A pointer to the least loaded directory service that supports the given service, or nullptr if no such service exists.
-	LocalDirectoryService* leastLoadedDirectoryService(const ot::ServiceInitData& _info);
+	LocalDirectoryService* leastLoadedDirectoryService(const std::string _serviceType);
 
 	bool canStartService(const ot::ServiceInitData& _info) const;
 

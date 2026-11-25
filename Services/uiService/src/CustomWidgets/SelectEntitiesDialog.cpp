@@ -98,7 +98,7 @@ SelectEntitiesDialog::~SelectEntitiesDialog() {
 
 }
 
-bool SelectEntitiesDialog::selectionHasChanged(void) const {
+bool SelectEntitiesDialog::selectionHasChanged() const {
 	std::list<std::string> currentSelection = this->selectedItemPaths();
 	if (currentSelection.size() != m_initiallySelected.size()) return true;
 	for (const std::string& ini : m_initiallySelected) {

@@ -34,6 +34,14 @@ namespace ot {
 		OT_DECL_NOCOPY(JsonDocument)
 		OT_DECL_DEFMOVE(JsonDocument)
 	public:
+		enum JsonDocumentType
+		{
+			ObjectType,
+			ArrayType,
+			NullType
+		};
+		static constexpr rapidjson::Type getRapidJsonType(JsonDocumentType _type);
+
 		//! @brief Constructor
 		//! Set the document as object
 		JsonDocument();
@@ -41,6 +49,8 @@ namespace ot {
 		//! @brief Constructor
 		//! @param _type The type for the json document
 		explicit JsonDocument(rapidjson::Type _type);
+
+		explicit JsonDocument(JsonDocumentType _type);
 
 		~JsonDocument() {};
 

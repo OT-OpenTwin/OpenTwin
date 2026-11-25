@@ -20,7 +20,10 @@
 // OpenTwin header
 #include "OTCommunication/Data/ServiceInitData.h"
 
-ot::ServiceInitData::ServiceInitData() : m_serviceID(ot::invalidServiceID) {
+ot::ServiceInitData::ServiceInitData()
+	: m_serviceID(ot::invalidServiceID)
+	, m_synchronousLaunch(false)
+{
 
 }
 
@@ -50,6 +53,8 @@ void ot::ServiceInitData::addToJsonObject(JsonValue& _jsonObject, JsonAllocator&
 	_jsonObject.AddMember("DatabaseUsername", JsonString(m_databaseUsername, _allocator), _allocator);
 	_jsonObject.AddMember("DatabasePassword", JsonString(m_databasePassword, _allocator), _allocator);
 	_jsonObject.AddMember("UserCollection", JsonString(m_userCollection, _allocator), _allocator);
+
+	_jsonObject.AddMember("SynchronousLaunch", m_synchronousLaunch, _allocator);
 }
 
 void ot::ServiceInitData::setFromJsonObject(const ConstJsonObject& _jsonObject) {
@@ -72,4 +77,6 @@ void ot::ServiceInitData::setFromJsonObject(const ConstJsonObject& _jsonObject) 
 	m_databaseUsername = json::getString(_jsonObject, "DatabaseUsername");
 	m_databasePassword = json::getString(_jsonObject, "DatabasePassword");
 	m_userCollection = json::getString(_jsonObject, "UserCollection");
+
+	m_synchronousLaunch = json::getBool(_jsonObject, "SynchronousLaunch");
 }

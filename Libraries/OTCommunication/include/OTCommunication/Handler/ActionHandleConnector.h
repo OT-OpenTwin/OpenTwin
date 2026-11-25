@@ -84,12 +84,12 @@ namespace ot {
 
 		virtual std::string forwardDispatch(JsonDocument& _document);
 
-		const std::list<std::string>& actionNames(void) const { return m_actionNames; }
+		const std::list<std::string>& actionNames() const { return m_actionNames; }
 		
-		void removeFromDispatcher(void);
+		void removeFromDispatcher();
 
 	private:
-		void forgetActionDispatcher(void) { m_actionDispatcher = nullptr; };
+		void forgetActionDispatcher() { m_actionDispatcher = nullptr; };
 
 		friend class ActionDispatcherBase;
 		ActionDispatcherBase* m_actionDispatcher;

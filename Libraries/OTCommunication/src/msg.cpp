@@ -297,6 +297,17 @@ bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUr
 	}
 }
 
+bool ot::msg::send(const std::string& _senderUrl, const std::string& _receiverUrl, ot::MessageType _type, const std::string& _message, ReturnMessage& _response, int _timeout, const RequestFlags& _flags)
+{
+	std::string response;
+	if (!send(_senderUrl, _receiverUrl, _type, _message, response, _timeout, _flags)) {
+		return false;
+	}
+
+	_response = ot::ReturnMessage::fromJson(response);
+	return true;
+}
+
 void ot::msg::sendAsync(const std::string& _senderUrl, const std::string& _receiverIP, MessageType _type, std::string&& _message, int _timeout, const RequestFlags& _flags) {
 	std::list<std::string> receiverList{ _receiverIP };
 	std::thread t(ot::intern::sendAsyncWorker, _senderUrl, std::move(receiverList), _type, std::move(_message), _timeout, _flags);

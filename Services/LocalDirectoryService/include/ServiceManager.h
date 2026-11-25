@@ -32,6 +32,7 @@
 #include "OTCore/JSON/JSON.h"
 #include "OTCommunication/DebugInfo/LDSDebugInfo.h"
 #include "OTCommunication/Data/ServiceInitData.h"
+#include "OTCommunication/Data/SyncServiceStartInfo.h"
 
 // std header
 #include <map>
@@ -39,6 +40,7 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <optional>
 
 namespace std { class thread; }
 
@@ -70,7 +72,7 @@ public:
 	//! @param _sessionInformation Information about the session where the service should be connected to
 	//! @param _serviceInformation Information about the service that should be started
 	//! @param _serviceURL The URL where the service will be running will be written here
-	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation);
+	RequestResult requestStartService(const ot::ServiceInitData& _serviceInformation, ot::SyncServiceStartInfo* _syncStartInfoResult);
 
 	RequestResult requestStartRelayService(const ot::ServiceInitData& _serviceInformation, std::string& _relayServiceURL, std::string& _websocketUrl);
 

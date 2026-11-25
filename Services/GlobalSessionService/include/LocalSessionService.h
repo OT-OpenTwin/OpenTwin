@@ -98,7 +98,7 @@ public:
 
 	//! @brief Returns a list of all session ids assigned to this LSS.
 	//! The list will contain the session ids of all sessions in all containers.
-	std::list<std::string> getSessionIds(void) const;
+	std::list<std::string> getSessionIds() const;
 
 	ot::GSSDebugInfo::LSSData getDebugInformation() const;
 
@@ -111,21 +111,21 @@ public:
 	void setId(ot::serviceID_t _id) { m_id = _id; };
 
 	//! @brief Returns the LocalSessionService id.
-	ot::serviceID_t getId(void) const { return m_id; };
+	ot::serviceID_t getId() const { return m_id; };
 
 	//! @brief Set the LocalSessionService url.
 	//! @param _url Url to set.
 	void setUrl(const std::string& _url) { m_url = _url; };
 
 	//! @brief Returns the LocalSessionService url.
-	const std::string& getUrl(void) const { return m_url; };
+	const std::string& getUrl() const { return m_url; };
 
 	//! @brief Returns the total number of sessions assigned to this LSS.
 	//! The total number is the number of sessions in the initialize list and the active list.
-	size_t getTotalSessionCount(void) const;
+	size_t getTotalSessionCount() const;
 
 	//! @brief Clears all containers that hold sessions.
-	void clearSessions(void);
+	void clearSessions();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 

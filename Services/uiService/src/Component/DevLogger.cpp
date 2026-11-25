@@ -96,12 +96,12 @@ void ot::SimpleLogViewer::slotAppendLog(const ot::LogMessage& _message) {
 
 // #################################################################################################################################################################################################################
 
-ot::intern::UiDevLogger& ot::intern::UiDevLogger::instance(void) {
+ot::intern::UiDevLogger& ot::intern::UiDevLogger::instance() {
 	static ot::intern::UiDevLogger g_instance;
 	return g_instance;
 }
 
-void ot::intern::UiDevLogger::initialize(void) {
+void ot::intern::UiDevLogger::initialize() {
 	ot::intern::UiDevLogger& ref = instance();
 	ref.deleteLogNotifierLater();
 

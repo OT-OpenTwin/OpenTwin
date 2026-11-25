@@ -46,6 +46,12 @@ Project::Project(const bsoncxx::v_noabi::document::view& _view, mongocxx::client
 	}
 }
 
+bool Project::isValid() const {
+	return !m_name.empty()
+		&& !m_collectionName.empty()
+		&& m_creatingUser.isValid();
+}
+
 void Project::addUserGroup(const Group& _group) {
 	m_userGroups.push_back(_group);
 }

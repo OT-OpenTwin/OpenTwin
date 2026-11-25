@@ -55,7 +55,7 @@ public:
 
 	KeyboardCommandHandler * handlerFromKeySequence(const QString& _keySequence);
 
-	void clearViewerHandler(void);
+	void clearViewerHandler();
 
 private:
 
@@ -84,32 +84,32 @@ public:
 
 	static Qt::Key keyFromOpenTwin(ot::BasicKey _key);
 
-	bool isEnabled(void) const { return m_isEnabled; }
+	bool isEnabled() const { return m_isEnabled; }
 
-	bool isViewerHandler(void) const { return m_isViewerHandler; }
+	bool isViewerHandler() const { return m_isViewerHandler; }
 
-	ot::ServiceBase * creator(void) const { return m_creator; }
+	ot::ServiceBase * creator() const { return m_creator; }
 
-	ot::UID attatchedSender(void) const { return m_eventSender; }
+	ot::UID attatchedSender() const { return m_eventSender; }
 
-	ak::eventType eventType(void) const { return m_eventType; }
+	ak::eventType eventType() const { return m_eventType; }
 
-	const QString& keySequence(void) const { return m_sequence; }
+	const QString& keySequence() const { return m_sequence; }
 
 	// #################################################################################################
 
 	// Setter
 
-	void enable(void) { m_isEnabled = true; }
+	void enable() { m_isEnabled = true; }
 
-	void disable(void) { m_isEnabled = false; }
+	void disable() { m_isEnabled = false; }
 
 	void setAsViewerHandler(bool _isViewerHandler) { m_isViewerHandler = _isViewerHandler; }
 
 	void attachToEvent(ot::UID _sender, ak::eventType _event, int _info1 = 0, int _info2 = 0);
 
 private Q_SLOTS:
-	void slotActivated(void);
+	void slotActivated();
 
 private:
 

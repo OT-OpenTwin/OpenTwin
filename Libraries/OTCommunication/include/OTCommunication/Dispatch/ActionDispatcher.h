@@ -31,7 +31,7 @@ namespace ot {
 		OT_DECL_NOCOPY(ActionDispatcher)
 	public:
 		//! @brief Returns the global singleton instance
-		static ActionDispatcher& instance(void);
+		static ActionDispatcher& instance();
 
 	private:
 		ActionDispatcher() = default;

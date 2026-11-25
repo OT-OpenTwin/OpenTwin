@@ -69,6 +69,8 @@ public:
 
 	static std::string generateProjectCollectionName(mongocxx::client& adminClient);
 
+	static bool canAccessProject(const User& _user, const std::string& _projectName, mongocxx::client& _adminClient);
+
 	static Project getProject(bsoncxx::oid& projectId, mongocxx::client& userClient);
 
 	static Project getProject(std::string projectName, mongocxx::client& userClient);

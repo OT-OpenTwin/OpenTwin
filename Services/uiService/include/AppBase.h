@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: AppBase.h
 // 
 // License:
@@ -52,6 +52,7 @@
 #include "OTGui/Properties/PropertyGridCfg.h"
 #include "OTGui/Widgets/TableCfg.h"
 #include "OTGui/Widgets/TextEditorCfg.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/WidgetTypes.h"
@@ -288,6 +289,9 @@ public:
 
 	void renameEntity(const std::string& _fromPath, const std::string& _toPath);
 
+	void enableNonInteractiveMode() { m_state.set(AppState::NonInteractiveState); };
+	bool isNonInteractive() const { return m_state.has(AppState::NonInteractiveState); };
+
 	// ###########################################################################################################################################################################################################################################################################################################################
 
 	// Information gathering
@@ -349,6 +353,8 @@ public:
 
 	bool getVisible3D() const { return m_visible3D; }
 	bool getVisibleBlockPicker() const { return m_visibleBlockPicker; }
+
+	QString getDefaultWindowTitle() const;
 
 	// Info text output
 
@@ -556,6 +562,8 @@ public Q_SLOTS:
 
 	void setTabToolBarTabOrder(const QStringList& _lst);
 	void activateToolBarTab(const QString& _tab);
+
+	void clickToolBarButton(const ot::ToolBarButtonCfg& _button);
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -775,10 +783,11 @@ protected:
 
 private:
 	enum class AppState {
-		NoState                = 0x00,
-		RestoringSettingsState = 0x01,
-		LoggedInState          = 0x10,
-		ProjectOpenState       = 0x20
+		NoState                = 0 << 0,
+		RestoringSettingsState = 1 << 0,
+		LoggedInState          = 1 << 1,
+		ProjectOpenState       = 1 << 2,
+		NonInteractiveState    = 1 << 3
 	};
 	typedef ot::Flags<AppState> AppStateFlags;
 

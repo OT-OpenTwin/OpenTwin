@@ -24,10 +24,11 @@
 #include "OTCore/String.h"
 #include "OTSystem/DateTime.h"
 #include "OTSystem/RandomNumber/RandomNumberProvider.h"
+#include "OTCrypto/CryptoDefaults.h"
 
 AccessTokenChallenge AccessTokenChallenge::createNewChallenge(const std::string& _id, const std::string& _token)
 {
-	std::vector<uint8_t> challengeRaw = ot::RandomNumberProvider::createRandomBytes(32);
+	std::vector<uint8_t> challengeRaw = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::challengeLength());
 	std::string challenge = ot::String::toHexString(challengeRaw);
 	return AccessTokenChallenge(_id, _token, std::move(challenge));
 }

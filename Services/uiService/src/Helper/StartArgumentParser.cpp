@@ -73,6 +73,11 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 		args << toCommandLine(ArgumentKey::Debug);
 	}
 
+	if (m_nonInteractive)
+	{
+		args << toCommandLine(ArgumentKey::NonInteractive);
+	}
+
 	if (m_checkGraphics)
 	{
 		args << toCommandLine(ArgumentKey::CheckGraphics);
@@ -96,18 +101,23 @@ QStringList StartArgumentParser::createCommandLineArgs() const
 		args << toCommandLine(ArgumentKey::LogInGss) << QString::fromStdString(encoded);
 	}
 
-	if (getProjectInfoSet())
+	if (getLoginTicketDataSet())
 	{
 		ot::JsonDocument doc;
-		const auto& projectInfo = m_projectInfo.value();
-		projectInfo.addToJsonObject(doc, doc.GetAllocator());
+		const auto& loginTicketData = m_loginTicketData.value();
+		loginTicketData.addToJsonObject(doc, doc.GetAllocator());
 		std::string encoded = ot::String::toBase64Url(doc.toJson());
-		args << toCommandLine(ArgumentKey::OpenProject) << QString::fromStdString(encoded);
+		args << toCommandLine(ArgumentKey::LogInTicket) << QString::fromStdString(encoded);
 	}
 
-	if (!m_projectVersion.empty())
+	if (getProjectNameToOpenSet())
 	{
-		args << toCommandLine(ArgumentKey::ProjectVersion) << QString::fromStdString(m_projectVersion);
+		args << toCommandLine(ArgumentKey::OpenProject) << QString::fromStdString(m_openProjectName.value());
+
+		if (!m_projectVersion.empty())
+		{
+			args << toCommandLine(ArgumentKey::ProjectVersion) << QString::fromStdString(m_projectVersion);
+		}
 	}
 
 	if (!m_scriptFile.isEmpty())
@@ -144,10 +154,9 @@ QString StartArgumentParser::createFrontendUrlLink() const
 		loginGSS.addToQuery(query);
 	}
 
-	if (getProjectInfoSet())
+	if (getProjectNameToOpenSet())
 	{
-		const auto& projectInfo = m_projectInfo.value();
-		query.addQueryItem(toUrl(ArgumentKey::OpenProject), QString::fromStdString(projectInfo.getProjectName()));
+		query.addQueryItem(toUrl(ArgumentKey::OpenProject), QString::fromStdString(m_openProjectName.value()));
 
 		if (!m_projectVersion.empty())
 		{
@@ -220,13 +229,15 @@ QString StartArgumentParser::createShareLink() const
 
 void StartArgumentParser::clear()
 {
+	m_nonInteractive = false;
 	m_debug = false;
 	m_checkGraphics = false;
 
 	m_loginData = std::nullopt;
 	m_loginGSS = std::nullopt;
+	m_loginTicketData = std::nullopt;
 
-	m_projectInfo = std::nullopt;
+	m_openProjectName = std::nullopt;
 	m_projectVersion.clear();
 
 	m_scriptFile.clear();
@@ -267,6 +278,12 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 		m_debug = true;
 	}
 
+	// Non-interactive
+	if (query.hasQueryItem(toUrl(ArgumentKey::NonInteractive)))
+	{
+		m_nonInteractive = true;
+	}
+
 	// Check graphics
 	if (query.hasQueryItem(toUrl(ArgumentKey::CheckGraphics)))
 	{
@@ -294,14 +311,19 @@ bool StartArgumentParser::parseUrl(const QString& _url)
 		m_loginGSS = newEntry;
 	}
 
+	// Ticket login
+	if (query.hasQueryItem(toUrl(ArgumentKey::LogInTicket)))
+	{
+		OT_LOG_E("Ticket login data provided in URL");
+		return false;
+	}
+
 	// Open project
 	if (query.hasQueryItem(toUrl(ArgumentKey::OpenProject)))
 	{
 		const QString projectName = query.queryItemValue(toUrl(ArgumentKey::OpenProject));
 
-		ot::ProjectInformation newInfo;
-		newInfo.setProjectName(projectName.toStdString());
-		m_projectInfo = newInfo;
+		m_openProjectName = projectName.toStdString();
 
 		// Project version
 		if (query.hasQueryItem(toUrl(ArgumentKey::ProjectVersion)))
@@ -330,6 +352,9 @@ bool StartArgumentParser::parseCommandLine()
 	QCommandLineOption debugOption(toString(ArgumentKey::Debug), "Run test code.");
 	parser.addOption(debugOption);
 
+	QCommandLineOption nonInteractiveOption(toString(ArgumentKey::NonInteractive), "Run in non-interactive mode.");
+	parser.addOption(nonInteractiveOption);
+
 	QCommandLineOption checkGraphicsOption({ toString(ArgumentKey::CheckGraphicsShort), toString(ArgumentKey::CheckGraphics) }, "Check the graphics settings.");
 	parser.addOption(checkGraphicsOption);
 
@@ -345,9 +370,15 @@ bool StartArgumentParser::parseCommandLine()
 		"string");
 	parser.addOption(gssLoginOption);
 
+	QCommandLineOption ticketLoginOption(
+		toString(ArgumentKey::LogInTicket),
+		"Attempt to log in automatically using the provided login ticket.",
+		"string");
+	parser.addOption(ticketLoginOption);
+
 	QCommandLineOption openProjectOption(
 		toString(ArgumentKey::OpenProject),
-		"Open project with JSON data.",
+		"Open project by name.",
 		"string");
 	parser.addOption(openProjectOption);
 
@@ -370,6 +401,12 @@ bool StartArgumentParser::parseCommandLine()
 	if (parser.isSet(debugOption))
 	{
 		m_debug = true;
+	}
+
+	// Check for non-interactive option
+	if (parser.isSet(nonInteractiveOption))
+	{
+		m_nonInteractive = true;
 	}
 
 	// Check for graphics check option
@@ -427,26 +464,32 @@ bool StartArgumentParser::parseCommandLine()
 		m_loginData = newLoginData;
 	}
 
-	// Check for open project option
-	if (parser.isSet(openProjectOption))
+	// Check for ticket login option
+	if (parser.isSet(ticketLoginOption))
 	{
-		const QString projectDataStr = parser.value(openProjectOption);
-		std::string decoded = ot::String::fromBase64Url(projectDataStr.toStdString());
+		const QString ticketDataStr = parser.value(ticketLoginOption);
+		std::string decoded = ot::String::fromBase64Url(ticketDataStr.toStdString());
 		if (decoded.empty())
 		{
-			OT_LOG_E("Open project option set but no data provided");
+			OT_LOG_E("Ticket login option set but no data provided");
 			return false;
 		}
 		ot::JsonDocument doc;
 		if (!doc.fromJson(decoded))
 		{
-			OT_LOG_E("Failed to parse project data from command line argument");
+			OT_LOG_E("Failed to parse ticket login data from command line argument");
 			return false;
 		}
 
-		ot::ProjectInformation newProjectInfo;
-		newProjectInfo.setFromJsonObject(doc.getConstObject());
-		m_projectInfo = newProjectInfo;
+		LoginTicketData newLoginTicketData;
+		newLoginTicketData.setFromJsonObject(doc.getConstObject());
+		m_loginTicketData = newLoginTicketData;
+	}
+
+	// Check for open project option
+	if (parser.isSet(openProjectOption))
+	{
+		m_openProjectName = parser.value(openProjectOption).toStdString();
 
 		// Check for project version option
 		if (parser.isSet(projectVersionOption))
@@ -469,10 +512,12 @@ QString StartArgumentParser::toString(ArgumentKey _key) const
 	switch (_key)
 	{
 	case ArgumentKey::Debug: return "debug";
+	case ArgumentKey::NonInteractive: return "noninteractive";
 	case ArgumentKey::CheckGraphics: return "checkgraphics";
 	case ArgumentKey::CheckGraphicsShort: return "c";
-	case ArgumentKey::LogInData: return "login";
+	case ArgumentKey::LogInData	: return "login";
 	case ArgumentKey::LogInGss: return "autologin";
+	case ArgumentKey::LogInTicket: return "login-ticket";
 	case ArgumentKey::OpenProject: return "openproject";
 	case ArgumentKey::ProjectVersion: return "projversion";
 	case ArgumentKey::ScriptFile: return "script";

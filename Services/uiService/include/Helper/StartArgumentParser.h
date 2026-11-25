@@ -21,6 +21,7 @@
 
 // Frontend header
 #include "Login/LoginData.h"
+#include "Login/LoginTicketData.h"
 
 // OpenTwin header
 #include "OTCore/ProjectInformation.h"
@@ -68,6 +69,9 @@ public:
 	void setDebug(bool _debug = true) { m_debug = _debug; };
 	bool getDebug() const { return m_debug; };
 
+	void setNonInteractive(bool _nonInteractive = true) { m_nonInteractive = _nonInteractive; };
+	bool getNonInteractive() const { return m_nonInteractive; };
+
 	void setCheckGraphics(bool _check = true) { m_checkGraphics = _check; };
 	bool getCheckGraphics() const { return m_checkGraphics; };
 
@@ -82,9 +86,13 @@ public:
 	bool getLoginGSSSet() const { return m_loginGSS.has_value(); };
 	const LogInGSSEntry& getLoginGSS() const { return m_loginGSS.value(); };
 
-	void setProjectInfo(const ot::ProjectInformation& _info) { m_projectInfo = _info; };
-	bool getProjectInfoSet() const { return m_projectInfo.has_value(); };
-	const ot::ProjectInformation& getProjectInfo() const { return m_projectInfo.value(); };
+	void setLoginTicketData(const LoginTicketData& _data) { m_loginTicketData = _data; };
+	bool getLoginTicketDataSet() const { return m_loginTicketData.has_value(); };
+	const LoginTicketData& getLoginTicketData() const { return m_loginTicketData.value(); };
+
+	void setProjectNameToOpen(const std::string& _projectName) { m_openProjectName = _projectName; };
+	bool getProjectNameToOpenSet() const { return m_openProjectName.has_value(); };
+	const std::string& getProjectNameToOpen() const { return m_openProjectName.value(); };
 
 	void setProjectVersion(const std::string& _version) { m_projectVersion = _version; };
 	const std::string& getProjectVersion() const { return m_projectVersion; };
@@ -103,10 +111,12 @@ private:
 	enum class ArgumentKey
 	{
 		Debug,
+		NonInteractive,
 		CheckGraphics,
 		CheckGraphicsShort,
 		LogInData,
 		LogInGss,
+		LogInTicket,
 		OpenProject,
 		ProjectVersion,
 		ScriptFile
@@ -122,13 +132,15 @@ private:
 	static QString shareFrontendScheme() { return "opentwin"; };
 	static QString shareFrontendHost() { return "run"; };
 
+	bool m_nonInteractive = false;
 	bool m_debug = false;
 	bool m_checkGraphics = false;
 
 	std::optional<LoginData> m_loginData;
 	std::optional<LogInGSSEntry> m_loginGSS;
+	std::optional<LoginTicketData> m_loginTicketData;
 
-	std::optional<ot::ProjectInformation> m_projectInfo;
+	std::optional<std::string> m_openProjectName;
 	std::string m_projectVersion;
 
 	QString m_scriptFile;

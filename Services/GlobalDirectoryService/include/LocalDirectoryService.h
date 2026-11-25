@@ -27,10 +27,12 @@
 #include "OTCore/ServiceBase.h"
 #include "OTCommunication/DebugInfo/GDSDebugInfo.h"
 #include "OTCommunication/Data/ServiceInitData.h"
+#include "OTCommunication/Data/SyncServiceStartInfo.h"
 
 // std header
-#include <string>
 #include <list>
+#include <string>
+#include <optional>
 
 //! @brief The LocalDirectoryService holds information about the LDS.
 //! It is used to start services, gather information about services started by the LDS, as well as to provide information about the system load of the LDS.
@@ -48,8 +50,8 @@ public:
 
 	// Load information
 
-	const LoadInformation& loadInformation(void) const { return m_loadInformation; }
-	LoadInformation::load_t load(void) const;
+	const LoadInformation& loadInformation() const { return m_loadInformation; }
+	LoadInformation::load_t load() const;
 
 	bool updateSystemUsageValues(ot::JsonDocument& _jsonDocument);
 
@@ -60,7 +62,7 @@ public:
 	void setSupportedServices(const std::list<std::string>& _serviesNames) { m_supportedServices = _serviesNames; }
 	bool supportsService(const std::string& _serviceName) const;
 
-	bool requestToRunService(const ot::ServiceInitData& _serviceInfo);
+	std::optional<ot::SyncServiceStartInfo> requestToRunService(const ot::ServiceInitData& _serviceInfo);
 	bool requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL);
 
 	void sessionClosing(const std::string& _sessionID);

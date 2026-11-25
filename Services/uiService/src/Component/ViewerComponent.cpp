@@ -230,7 +230,7 @@ void ViewerComponent::setProgressBarValue(int _value) {
 
 // Tree
 
-void ViewerComponent::clearTree(void) {
+void ViewerComponent::clearTree() {
 	try {
 		try {
 			AppBase::instance()->clearNavigationTree();
@@ -357,7 +357,7 @@ void ViewerComponent::toggleTreeItemSelection(ot::UID treeItemID, bool considerC
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to toggle tree item selection.", _e.what()); }
 }
 
-void ViewerComponent::clearTreeSelection(void) {
+void ViewerComponent::clearTreeSelection() {
 	try {
 		try {
 			OT_UI_VIEWSEL_DBG("Clear item selection from viewer");
@@ -370,7 +370,7 @@ void ViewerComponent::clearTreeSelection(void) {
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to clear tree item selection.", _e.what()); }
 }
 
-void ViewerComponent::refreshSelection(void) {
+void ViewerComponent::refreshSelection() {
 	ot::SelectionData selectionData;
 	selectionData.setSelectionOrigin(ot::SelectionOrigin::Custom);
 	selectionData.setSelectedTreeItems(AppBase::instance()->getSelectedNavigationTreeItems().getSelectedNavigationItems());
@@ -513,15 +513,15 @@ void ViewerComponent::clearVisualizingEntitesFromView(const std::string& _entity
 	}
 }
 
-ot::WidgetView* ViewerComponent::getCurrentView(void) {
+ot::WidgetView* ViewerComponent::getCurrentView() {
 	return ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 }
 
-ot::WidgetView* ViewerComponent::getLastFocusedCentralView(void) {
+ot::WidgetView* ViewerComponent::getLastFocusedCentralView() {
 	return ot::GlobalWidgetViewManager::instance().getLastFocusedCentralView();
 }
 
-bool ViewerComponent::getCurrentViewIsModified(void) {
+bool ViewerComponent::getCurrentViewIsModified() {
 	ot::WidgetView* view = this->getCurrentView();
 	if (view) {
 		return view->getViewContentModified();
@@ -539,11 +539,11 @@ void ViewerComponent::setCurrentVisualizationTabFromTitle(const std::string& _ta
 	AppBase::instance()->setCurrentVisualizationTabFromTitle(_tabTitle);
 }
 
-std::string ViewerComponent::getCurrentVisualizationTabTitle(void) {
+std::string ViewerComponent::getCurrentVisualizationTabTitle() {
 	return AppBase::instance()->getCurrentVisualizationTabTitle();
 }
 
-void ViewerComponent::requestSaveForCurrentVisualizationTab(void) {
+void ViewerComponent::requestSaveForCurrentVisualizationTab() {
 	ot::WidgetView* view = ot::GlobalWidgetViewManager::instance().getCurrentlyFocusedView();
 	if (!view) {
 		OT_LOG_W("No view focused");
@@ -697,7 +697,7 @@ void ViewerComponent::setCurrentMenuPage(const std::string& _pageName) {
 	AppBase::instance()->switchToMenuTab(_pageName);
 }
 
-std::string ViewerComponent::getCurrentMenuPage(void) {
+std::string ViewerComponent::getCurrentMenuPage() {
 	return AppBase::instance()->getCurrentMenuTab();
 }
 
@@ -1048,7 +1048,7 @@ void ViewerComponent::setFontPath(const QString& _path) {
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to set font path.", _e.what()); }
 }
 
-ViewerUIDtype ViewerComponent::createModel(void) {
+ViewerUIDtype ViewerComponent::createModel() {
 	try {
 		try { return ViewerAPI::createModel(); }
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::createModel()"); }
@@ -1131,7 +1131,7 @@ void ViewerComponent::activateModel(ViewerUIDtype viewerUID) {
 	catch (const ak::aException& _e) { AppBase::instance()->slotShowErrorPrompt("Error", "Failed to activate model.", _e.what()); }
 }
 
-void ViewerComponent::deactivateCurrentlyActiveModel(void) {
+void ViewerComponent::deactivateCurrentlyActiveModel() {
 	try {
 		try { ViewerAPI::deactivateCurrentlyActiveModel(); }
 		catch (const ak::aException& e) { throw ak::aException(e, "ViewerComponent::activateModel()"); }

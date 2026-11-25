@@ -62,7 +62,7 @@ template <class T> ot::IDManager<T>::IDManager() :
 
 template <class T> ot::IDManager<T>::~IDManager() {}
 
-template <class T> T ot::IDManager<T>::nextID(void) {
+template <class T> T ot::IDManager<T>::nextID() {
 	T id = ++m_currentId;
 
 	// end is used to determine if the loop has already reached the end of the IDs

@@ -37,7 +37,7 @@ ViewStateCfg::ViewStateCfg(ViewStateCfg&& _other) noexcept :
 ViewStateCfg::~ViewStateCfg() {
 }
 
-std::string ViewStateCfg::toJson(void) const {
+std::string ViewStateCfg::toJson() const {
 	ot::JsonDocument doc;
 	doc.AddMember("Version", ot::JsonString(intern::c_viewConfigVersion, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember("ViewCfg", ot::JsonString(m_viewConfig, doc.GetAllocator()), doc.GetAllocator());

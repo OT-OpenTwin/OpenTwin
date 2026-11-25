@@ -71,6 +71,7 @@
 #include "OTGui/Graphics/GraphicsItemCfg.h"
 #include "OTGui/Graphics/GraphicsLayoutItemCfg.h"
 #include "OTGui/Properties/PropertyStringList.h"
+#include "OTGui/Widgets/ToolBarButtonCfg.h"
 
 // OpenTwin Widgets header
 #include "OTWidgets/Widgets/Table.h"
@@ -298,6 +299,7 @@ ExternalServicesComponent::ExternalServicesComponent(AppBase* _owner) :
 	connectAction(OT_ACTION_CMD_UI_AddMenuLineEdit, this, &ExternalServicesComponent::handleAddMenuLineEdit);
 	connectAction(OT_ACTION_CMD_UI_ActivateToolbarTab, this, &ExternalServicesComponent::handleActivateToolbarTab);
 	connectAction(OT_ACTION_CMD_UI_SwitchMenuTab, this, &ExternalServicesComponent::handleSwitchMenuTab);
+	connectAction(OT_ACTION_CMD_UI_ClickMenuButton, this, &ExternalServicesComponent::handleClickMenuButton);
 
 	// Property Grid
 	connectAction(OT_ACTION_CMD_UI_FillPropertyGrid, this, &ExternalServicesComponent::handleFillPropertyGrid);
@@ -1100,7 +1102,10 @@ bool ExternalServicesComponent::projectIsOpened(const std::string& projectName, 
 	ot::ReturnMessage msg = ot::ReturnMessage::fromJson(response);
 	if (msg == ot::ReturnMessage::True)
 	{
-		projectUser = msg.getWhat();
+		ot::JsonDocument infoDoc;
+		infoDoc.fromJson(msg.getWhat());
+				
+		projectUser = ot::json::getString(infoDoc, OT_ACTION_PARAM_Username);
 		return true;
 	}
 	else
@@ -1964,7 +1969,7 @@ bool ExternalServicesComponent::readFileContent(const std::string& fileName, std
 	*/
 
 	std::string uncompressedContent;
-	if (!ot::FileSystem::readFile(fileName, uncompressedContent, uncompressedDataLength))
+	if (!ot::FileSystem::readFile(fileName, uncompressedContent, &uncompressedDataLength))
 	{
 		OT_LOG_E("Failed to read file content: \"" + fileName + "\"");
 		return false;
@@ -2153,8 +2158,8 @@ std::vector<std::array<double, 3>> ExternalServicesComponent::getVectorDoubleArr
 void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::vector<Geometry::Node>& result)
 {
 	rapidjson::Value nodeList = doc[itemName.c_str()].GetArray();
-	int numberOfNodes = nodeList.Size() / 8;
-	for (unsigned int i = 0; i < numberOfNodes; i++)
+	uint32_t numberOfNodes = nodeList.Size() / 8;
+	for (uint32_t i = 0; i < numberOfNodes; i++)
 	{
 		Geometry::Node n;
 		n.setCoords(nodeList[i * 8].GetDouble(), nodeList[i * 8 + 1].GetDouble(), nodeList[i * 8 + 2].GetDouble());
@@ -2167,8 +2172,8 @@ void ExternalServicesComponent::getVectorNodeFromDocument(ot::JsonDocument& doc,
 void ExternalServicesComponent::getListTriangleFromDocument(ot::JsonDocument& doc, const std::string& itemName, std::list <Geometry::Triangle >& result)
 {
 	rapidjson::Value triangleList = doc[itemName.c_str()].GetArray();
-	int numberOfTriangles = triangleList.Size() / 4;
-	for (unsigned int i = 0; i < numberOfTriangles; i++)
+	uint32_t numberOfTriangles = triangleList.Size() / 4;
+	for (uint32_t i = 0; i < numberOfTriangles; i++)
 	{
 		Geometry::Triangle t(triangleList[i * 4].GetInt64(), triangleList[i * 4 + 1].GetInt64(), triangleList[i * 4 + 2].GetInt64(), triangleList[i * 4 + 3].GetInt64());
 
@@ -2364,13 +2369,13 @@ void ExternalServicesComponent::handleCompound(ot::JsonDocument& _document)
 
 	ScopedLockManagerLock uiLock(m_lockManager, AppBase::instance()->getBasicServiceInformation(), lockFlags);
 
-	std::list<std::pair<unsigned long long, unsigned long long>> prefetchIDs;
+	ot::UIDVersionPairList prefetchIDs;
 	size_t numberPrefetch = prefetchID.Size();
 	assert(prefetchVersion.Size() == numberPrefetch);
 
-	for (size_t i = 0; i < numberPrefetch; i++)
+	for (ot::JsonSizeType i = 0; i < static_cast<ot::JsonSizeType>(numberPrefetch); i++)
 	{
-		prefetchIDs.push_back(std::pair<unsigned long long, unsigned long long>(prefetchID[i].GetInt64(), prefetchVersion[i].GetInt64()));
+		prefetchIDs.push_back(ot::UIDVersionPair(static_cast<ot::UID>(prefetchID[i].GetInt64()), static_cast<ot::UID>(prefetchVersion[i].GetInt64())));
 	}
 
 	if (!prefetchIDs.empty())
@@ -3974,6 +3979,21 @@ void ExternalServicesComponent::handleSwitchMenuTab(ot::JsonDocument& _document)
 	AppBase::instance()->switchToMenuTab(pageName);
 }
 
+void ExternalServicesComponent::handleClickMenuButton(ot::JsonDocument& _document)
+{
+	ot::ToolBarButtonCfg cfg;
+	cfg.setPage(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_PageName));
+	cfg.setGroup(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_GroupName));
+
+	if (_document.HasMember(OT_ACTION_PARAM_UI_CONTROL_SubgroupName) && !_document[OT_ACTION_PARAM_UI_CONTROL_SubgroupName].IsNull())
+	{
+		cfg.setSubGroup(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_SubgroupName));
+	}
+	cfg.setButtonName(ot::json::getString(_document, OT_ACTION_PARAM_UI_CONTROL_ObjectName));
+
+	AppBase::instance()->clickToolBarButton(cfg);
+}
+
 // ###########################################################################################################################################################################################################################################################################################################################
 
 // Action handler: Property Grid
@@ -4998,9 +5018,9 @@ void ExternalServicesComponent::handleModelLibraryDialog(ot::JsonDocument& _docu
 		// Get the selected model with its collection name
 		const ot::LibraryModel* selectedModel = dia.getSelectedModel();
 		if (selectedModel != nullptr) {
-			std::string collectionName = selectedModel->getCollectionName();
-			if (!collectionName.empty()) {
-				responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(collectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+			const std::string& selectedCollectionName = selectedModel->getCollectionName();
+			if (!selectedCollectionName.empty()) {
+				responseDoc.AddMember(OT_ACTION_PARAM_COLLECTION_NAME, ot::JsonString(selectedCollectionName, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 			}
 			else {
 				OT_LOG_W("Selected model has no collection name");
@@ -5394,8 +5414,6 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 
 			QMetaObject::invokeMethod(AppBase::instance(), &AppBase::appendInfoMessage, Qt::QueuedConnection, QString::fromStdString(message));
 
-			DataStorageAPI::DocumentAPI db;
-
 			auto startTime = std::chrono::system_clock::now();
 			for (const QString& fileName : _filesToImport)
 			{
@@ -5422,7 +5440,6 @@ void ExternalServicesComponent::workerImportMultipleFiles(QStringList _filesToIm
 
 					// Upload the data to gridFS
 					DataStorageAPI::DocumentAPI db;
-
 					bsoncxx::types::value result = db.InsertBinaryDataUsingGridFs(reinterpret_cast<const uint8_t*>(fileContent.c_str()), fileContent.size(), info.getCollectionName());
 					info.setDocumentId(result.get_oid().value.to_string());
 

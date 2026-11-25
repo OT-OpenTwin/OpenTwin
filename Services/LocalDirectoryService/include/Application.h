@@ -35,7 +35,7 @@
 
 class Application : public ot::ServiceBase, public ot::ActionHandler {
 public:
-	static Application& instance(void);
+	static Application& instance();
 
 	// ###########################################################################################################################################################################################################################################################################################################################
 
@@ -45,11 +45,11 @@ public:
 
 	//! @brief Handle the crash of the global directory service.
 	//! @warning The crash of the GDS is not handled yet. The application will exit with the GDSNotRunning error code.
-	void globalDirectoryServiceCrashed(void);
+	void globalDirectoryServiceCrashed();
 	
-	ServiceManager& getServiceManager(void) { return m_serviceManager; }
+	ServiceManager& getServiceManager() { return m_serviceManager; }
 
-	std::list<std::string> getSupportedServices(void) const;
+	std::list<std::string> getSupportedServices() const;
 
 private:
 

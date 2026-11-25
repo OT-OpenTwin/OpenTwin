@@ -129,7 +129,7 @@ void ot::LogDispatcher::dispatch(const LogMessage& _message)
 		{
 			r->log(msg);
 		}
-		catch (const std::exception& _e)
+		catch (const std::exception&)
 		{
 			OTAssert(0, "Error occured while dispatching log message");
 		}
@@ -170,7 +170,7 @@ void ot::LogDispatcher::dispatchUserLog(const LogMessage& _message)
 		{
 			r->userLog(msg);
 		}
-		catch (const std::exception& _e)
+		catch (const std::exception&)
 		{
 			OTAssert(0, "Error occured while dispatching user log message");
 		}

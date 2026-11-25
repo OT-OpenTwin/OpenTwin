@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: LoginData.cpp
 // 
 // License:
@@ -34,7 +34,7 @@ void LoginData::setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject) 
 	m_sessionToken = ot::json::getString(_jsonObject, "SessionToken");
 }
 
-void LoginData::clear(void) {
+void LoginData::clear() {
 	m_gss.clear();
 	m_databaseUrl.clear();
 	m_authorizationUrl.clear();
@@ -44,9 +44,10 @@ void LoginData::clear(void) {
 	m_sessionUser.clear();
 	m_sessionPassword.clear();
 	m_sessionToken.clear();
+	clearUserSessionToken();
 }
 
-bool LoginData::isValid(void) const {
+bool LoginData::isValid() const {
 	bool valid = m_gss.isValid() &&
 		!m_databaseUrl.empty() &&
 		!m_authorizationUrl.empty() &&
@@ -57,10 +58,10 @@ bool LoginData::isValid(void) const {
 	{
 		valid &= !m_sessionToken.empty();
 	}
-	else
-	{
-		valid &= !m_encryptedUserPassword.empty();
-	}
+	//else
+	//{
+	//	valid &= !m_encryptedUserPassword.empty();
+	//}
 	return valid;
 }
 

@@ -73,7 +73,7 @@ RenameProjectDialog::~RenameProjectDialog() {
 
 }
 
-QString RenameProjectDialog::getProjectName(void) const { return m_edit->text(); }
+QString RenameProjectDialog::getProjectName() const { return m_edit->text(); }
 
 void RenameProjectDialog::slotConfirm() {
 	if (this->getProjectName() == m_projectToRename) {

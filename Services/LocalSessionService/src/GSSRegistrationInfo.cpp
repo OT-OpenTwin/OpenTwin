@@ -26,7 +26,7 @@ GSSRegistrationInfo::GSSRegistrationInfo() :
 	this->reset();
 }
 
-void GSSRegistrationInfo::reset(void) {
+void GSSRegistrationInfo::reset() {
 	m_serviceID = ot::invalidServiceID;
 	m_databaseURL.clear();
 	m_authURL.clear();

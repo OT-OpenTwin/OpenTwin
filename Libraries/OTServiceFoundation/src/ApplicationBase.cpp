@@ -355,6 +355,13 @@ void ot::ApplicationBase::sendMessageAsync(bool _queue, const std::string& _serv
 	ot::msg::sendAsync(this->getServiceURL(), destinationServiceInfo->getServiceURL(), (_queue ? QUEUE : EXECUTE), std::move(_doc.toJson()), 0, _requestFlags);
 }
 
+void ot::ApplicationBase::runWithArgs(const std::map<std::string, std::string>& _additionalParameters)
+{
+	OT_LOG_E("runWithArgs() is not implemented for this service. Please implement it in the derived class.");
+	OT_LOG_E("The service will now exit.");
+	exit(ot::AppExitCode::NotImplementedError);
+}
+
 void ot::ApplicationBase::addModalCommand(ot::ModalCommandBase *command)
 {
 	OTAssert(std::find(m_modalCommands.begin(), m_modalCommands.end(), command) == m_modalCommands.end(), "modal command is alreay in list"); // Ensure that the command is not yet in the list
@@ -521,7 +528,7 @@ bool ot::ApplicationBase::storeSettingToDataBase(const PropertyGridCfg& _config,
 
 				mongocxx::collection collection = DataStorageAPI::ConnectionAPI::getInstance().getCollection("UserSettings", _userCollection);
 
-				bsoncxx::stdx::optional<mongocxx::result::update> result = collection.update_many(doc_find.view(), doc_modify.view());
+				bsoncxx::stdx::optional<mongocxx::result::update> updateResult = collection.update_many(doc_find.view(), doc_modify.view());
 			}
 			catch (std::exception _e)
 			{

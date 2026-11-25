@@ -126,14 +126,17 @@ ot::RunResult Service::run(const std::string& _url, ot::port_t _port, ot::port_t
 	if (!path.empty()) {
 		path.append("\\");
 	}
-	path.append(m_initData.getServiceName()).append(".dll");
+	path.append(m_initData.getServiceType()).append(".dll");
 
-	std::string commandLine = "\"" + launcherName + "\" \"" + path + "\" \"" + m_url + "\" \"";
+	std::string commandLine = "\"" + launcherName +
+		"\" \"" + path + "\" \"" + 
+		m_url + "\" \"" +
+		m_initData.getServiceName() + "\" \"";
 
 	if (m_initData.getServiceType() == OT_INFO_SERVICE_TYPE_RelayService) {
 		commandLine.append(m_websocketUrl);
 	}
-	commandLine.append("\" \"\" \"\"");
+	commandLine.append("\" \"\"");
 	
 	OT_LOG_D("Starting \"" + launcherName + "\" with command line \"" + commandLine + "\"");
 	

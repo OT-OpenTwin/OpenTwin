@@ -71,6 +71,7 @@ SUPPORTED_SERVICES = [
     "HierarchicalProjectService",
     "FileManagementProjectService",
     "OpenEMSService",
+    "GatewayService",
 ]
 
 Environment = MutableMapping[str, str]

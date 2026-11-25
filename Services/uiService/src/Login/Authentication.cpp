@@ -1,4 +1,4 @@
-﻿#include "Login/Authentication.h"
+#include "Login/Authentication.h"
 #include "AppBase.h"
 #include "OTCommunication/ActionTypes.h"
 #include "OTCommunication/Msg.h"
@@ -160,15 +160,26 @@ bool ot::Authentication::validateAndRefreshToken(LoginData& _loginData)
 
 void ot::Authentication::addAuthenticationData(const LoginData& _loginData, ot::JsonDocument& _doc)
 {
-	_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(_loginData.getUserName(), _doc.GetAllocator()), _doc.GetAllocator());
+	ot::JsonAllocator& allocator = _doc.GetAllocator();
+
+	_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USERNAME, ot::JsonString(_loginData.getUserName(), allocator), allocator);
+
 	if (_loginData.loggedInViaSSO())
 	{
-		_doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), _doc.GetAllocator()), _doc.GetAllocator());
+		_doc.AddMember(OT_PARAM_AUTH_Token, ot::JsonString(_loginData.getSSOSessionToken(), allocator), allocator);
+	}
+	else if (!_loginData.getEncryptedUserPassword().empty())
+	{
+		_doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, true, allocator);
+		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getEncryptedUserPassword(), allocator), allocator);
+	}
+	else if (_loginData.hasUserSessionToken())
+	{
+		const auto& token = _loginData.getUserSessionToken();
+		_doc.AddMember(OT_ACTION_PARAM_SessionToken, ot::JsonObject(token, allocator), allocator);
 	}
 	else
 	{
-		_doc.AddMember(OT_PARAM_AUTH_ENCRYPTED_PASSWORD, true, _doc.GetAllocator());
-		_doc.AddMember(OT_PARAM_AUTH_LOGGED_IN_USER_PASSWORD, ot::JsonString(_loginData.getEncryptedUserPassword(), _doc.GetAllocator()), _doc.GetAllocator());
+		OT_LOG_E("No valid authentication data available to add to the request.");
 	}
 }
-

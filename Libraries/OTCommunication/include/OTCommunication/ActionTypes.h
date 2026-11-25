@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: ActionTypes.h
 // 
 // License:
@@ -71,6 +71,7 @@
 #define OT_ACTION_CMD_Message "Message"
 #define OT_ACTION_CMD_Compound "Compound"
 #define OT_ACTION_CMD_GetFilter "GetFilter"
+
 #define OT_ACTION_CMD_ConfirmService "Service.Confirm"
 #define OT_ACTION_CMD_ServiceClosing "Service.Closing"
 #define OT_ACTION_CMD_RegisterNewService "Service.Register"
@@ -78,16 +79,25 @@
 #define OT_ACTION_CMD_StartNewService "Service.Start.Single"
 #define OT_ACTION_CMD_StartNewServices "Service.Start.Multiple"
 #define OT_ACTION_CMD_StartNewRelayService "Service.Start.Relay"
-#define OT_ACTION_CMD_CreateNewSession "Session.New"
-#define OT_ACTION_CMD_ConfirmSession "Session.Confirm"
-#define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
-#define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
+
 #define OT_ACTION_CMD_RegisterNewSessionService "SessionService.New"
 #define OT_ACTION_CMD_RegisterNewGlobalDirecotoryService "GlobalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLocalDirecotoryService "LocalDirectoryService.New"
 #define OT_ACTION_CMD_RegisterNewLibraryManagementService "LibraryManagementSerivce.New"
 #define OT_ACTION_CMD_UpdateSystemLoad "SystemLoad.Update"
+
+#define OT_ACTION_CMD_CreateNewSession "Session.New"
+#define OT_ACTION_CMD_ConfirmSession "Session.Confirm"
+#define OT_ACTION_CMD_GetListOfProjectTemplates "GetProjectTemplates"
+#define OT_ACTION_CMD_IsProjectOpen "Check.ProjectOpen"
 #define OT_ACTION_CMD_GetSystemInformation "System.GetInformation"
+
+#define OT_ACTION_CMD_AuthorizeGateway "Gateway.Authorize"
+#define OT_ACTION_CMD_StartNewGateway "Gateway.New"
+
+#define OT_ACTION_CMD_RegisterGatewayClient "Gateway.RegisterClient"
+
+#define OT_ACTION_CMD_PerformGatewayAction "Gateway.PerformAction"
 
 #define OT_ACTION_CMD_GetSessionExists "Session.GetExists"
 #define OT_ACTION_CMD_ShutdownSession "Session.Shutdown"
@@ -109,6 +119,7 @@
 #define OT_ACTION_CMD_EditProjectInformation "Project.EditInformation"
 
 #define OT_ACTION_CMD_GenerateAccessToken "Token.Generate"
+#define OT_ACTION_CMD_GenerateTickets "Ticket.GenerateMultiple"
 
 #define OT_ACTION_CMD_Log "Log"
 #define OT_ACTION_CMD_SetGlobalLogFlags "Logger.SetGlobal"
@@ -126,6 +137,7 @@
 #define OT_ACTION_CMD_ServiceEnableDebug "Service.DebugEnable"
 #define OT_ACTION_CMD_ServiceDisableDebug "Service.DebugDisable"
 #define OT_ACTION_CMD_CheckStartupCompleted "Service.CheckStartupCompleted"
+#define OT_ACTION_CMD_CheckSessionRunning "Session.CheckRunning"
 #define OT_ACTION_CMD_CheckRelayStartupCompleted "Relay.CheckStartupCompleted"
 #define OT_ACTION_CMD_ServiceShutdown "Shutdown"
 #define OT_ACTION_CMD_ServiceShutdownCompleted "ShutdownCompleted"
@@ -257,6 +269,7 @@
 #define OT_ACTION_CMD_UI_CreateContextMenu "UI.CreateContextMenu"
 #define OT_ACTION_CMD_UI_CreateStaticContextMenu "UI.CreateStaticContextMenu"
 #define OT_ACTION_CMD_UI_ContextMenuTriggered "UI.ContextMenuTriggered"
+#define OT_ACTION_CMD_UI_ClickMenuButton "UI.ClickMenuButton"
 
 #define OT_ACTION_CMD_UI_SS_IMPORT "StudioSuite.Import"
 #define OT_ACTION_CMD_UI_SS_COMMIT "StudioSuite.Commit"
@@ -440,6 +453,8 @@
 #define OT_ACTION_PARAM_Color "Color"
 #define OT_ACTION_PARAM_Event "Event"
 #define OT_ACTION_PARAM_Graph "Graph"
+#define OT_ACTION_PARAM_Active "Active"
+#define OT_ACTION_PARAM_Ticket "Ticket"
 #define OT_ACTION_PARAM_Hidden "Hidden"
 #define OT_ACTION_PARAM_Prefix "Prefix"
 #define OT_ACTION_PARAM_Suffix "Suffix"
@@ -462,6 +477,7 @@
 #define OT_ACTION_PARAM_Detailed "Detailed"
 #define OT_ACTION_PARAM_Sessions "Sessions"
 #define OT_ACTION_PARAM_LogFlags "LogFlags"
+#define OT_ACTION_PARAM_Username "Username"
 #define OT_ACTION_PARAM_TreeItem "Tree.Item"
 #define OT_ACTION_PARAM_RequestID "RequestID"
 #define OT_ACTION_PARAM_Requested "Requested"
@@ -469,11 +485,15 @@
 #define OT_ACTION_PARAM_ModelInfo "ModelInfo"
 #define OT_ACTION_PARAM_Challenge "Challenge"
 #define OT_ACTION_PARAM_Signature "Signature"
+#define OT_ACTION_PARAM_TicketType "TicketType"
 #define OT_ACTION_PARAM_IsSelected "IsSelected"
 #define OT_ACTION_PARAM_ObjectName "ObjectName"
 #define OT_ACTION_PARAM_IsShutdown "IsShutdown"
+#define OT_ACTION_PARAM_Synchronous "Synchronous"
 #define OT_ACTION_PARAM_ChallengeID "ChallengeID"
 #define OT_ACTION_PARAM_ElementType "ElementType"
+#define OT_ACTION_PARAM_SessionName "Session.Name"
+#define OT_ACTION_PARAM_SessionToken "Session.Token"
 #define OT_ACTION_PARAM_WebsocketURL "Websocket.URL"
 #define OT_ACTION_PARAM_ExpandParents "ExpandParents"
 #define OT_ACTION_PARAM_CallbackAction "CallbackAction"
@@ -484,7 +504,9 @@
 #define OT_ACTION_PARAM_ClearSelectionAfter "ClearSelectionAfter"
 #define OT_ACTION_PARAM_VisualisationConfig "Visualization.Config"
 #define OT_ACTION_PARAM_KeepCurrentEntitySelection "KeepCurrentEntitySelection"
-#define OT_ACTION_PARAM_Active "Active"
+
+#define OT_ACTION_PARAM_Gateway_Action "Gateway.Action"
+#define OT_ACTION_PARAM_Gateway_Url "Gateway.Url"
 
 #define OT_ACTION_PARAM_MESSAGE "Msg"
 #define OT_ACTION_PARAM_ICON "Icon"
@@ -588,8 +610,34 @@
 #define OT_ACTION_PARAM_SERVICE_TYPE "Service.Type"
 #define OT_ACTION_PARAM_SERVICE_ID "Service.ID"
 #define OT_ACTION_PARAM_SERVICE_DBURL "Service.DbUrl"
-#define OT_ACTION_PARAM_SERVICE_AUTHURL "Service.AuthUrl"
-#define OT_ACTION_PARAM_SERVICE_GDSURL "Service.GdsUrl"
+
+#define OT_ACTION_PARAM_SERVICE_LOGGER_Host "Service.Logger.Host"
+#define OT_ACTION_PARAM_SERVICE_LOGGER_Port "Service.Logger.Port"
+#define OT_ACTION_PARAM_SERVICE_LOGGER_URL "Service.Logger.URL"
+#define OT_ACTION_PARAM_SERVICE_AUTH_Host "Service.Auth.Host"
+#define OT_ACTION_PARAM_SERVICE_AUTH_Port "Service.Auth.Port"
+#define OT_ACTION_PARAM_SERVICE_AUTH_URL "Service.AuthUrl" // Ensure Admin Panel usage before adjusting syntax
+#define OT_ACTION_PARAM_SERVICE_GSS_Host "Service.GSS.Host"
+#define OT_ACTION_PARAM_SERVICE_GSS_Port "Service.GSS.Port"
+#define OT_ACTION_PARAM_SERVICE_GSS_URL "Service.GSS.URL"
+#define OT_ACTION_PARAM_SERVICE_LSS_Host "Service.LSS.Host"
+#define OT_ACTION_PARAM_SERVICE_LSS_Port "Service.LSS.Port"
+#define OT_ACTION_PARAM_SERVICE_LSS_URL "Service.LSS.URL"
+#define OT_ACTION_PARAM_SERVICE_GDS_Host "Service.GDS.Host"
+#define OT_ACTION_PARAM_SERVICE_GDS_Port "Service.GDS.Port"
+#define OT_ACTION_PARAM_SERVICE_GDS_URL "Service.GdsUrl" // Ensure Admin Panel usage before adjusting syntax
+#define OT_ACTION_PARAM_SERVICE_LDS_Host "Service.LDS.Host"
+#define OT_ACTION_PARAM_SERVICE_LDS_Port "Service.LDS.Port"
+#define OT_ACTION_PARAM_SERVICE_LDS_URL "Service.LDS.URL"
+#define OT_ACTION_PARAM_SERVICE_LMS_Host "Service.LMS.Host"
+#define OT_ACTION_PARAM_SERVICE_LMS_Port "Service.LMS.Port"
+#define OT_ACTION_PARAM_SERVICE_LMS_URL "Service.LMS.URL"
+#define OT_ACTION_PARAM_SERVICE_RELAY_Host "Service.Relay.Host"
+#define OT_ACTION_PARAM_SERVICE_RELAY_Port "Service.Relay.Port"
+#define OT_ACTION_PARAM_SERVICE_RELAY_URL "Service.Relay.URL"
+#define OT_ACTION_PARAM_SERVICE_GATEWAY_Host "Service.Gateway.Host"
+#define OT_ACTION_PARAM_SERVICE_GATEWAY_Port "Service.Gateway.Port"
+#define OT_ACTION_PARAM_SERVICE_GATEWAY_URL "Service.Gateway.URL"
 
 #define OT_ACTION_PARAM_SESSION_ID "Session.ID"
 #define OT_ACTION_PARAM_SESSION_COUNT "Session.Count"
@@ -842,6 +890,8 @@
 #define OT_INFO_SERVICE_TYPE_DataBase "Database"
 #define OT_INFO_SERVICE_TYPE_LOGGER "LoggerService"
 #define OT_INFO_SERVICE_TYPE_AuthorisationService "AuthorisationService"
+#define OT_INFO_SERVICE_TYPE_RelayService "RelayService"
+#define OT_INFO_SERVICE_TYPE_GatewayService "GatewayService"
 #define OT_INFO_SERVICE_TYPE_PHREEC "PHREECService"
 #define OT_INFO_SERVICE_TYPE_FITTD "FITTDService"
 #define OT_INFO_SERVICE_TYPE_KRIGING "KrigingService"
@@ -853,7 +903,6 @@
 #define OT_INFO_SERVICE_TYPE_TetMeshService "TetMeshService"
 #define OT_INFO_SERVICE_TYPE_LocalDirectoryService "LocalDirectoryService"
 #define OT_INFO_SERVICE_TYPE_GlobalDirectoryService "GlobalDirectoryService"
-#define OT_INFO_SERVICE_TYPE_RelayService "RelayService"
 #define OT_INFO_SERVICE_TYPE_ImportParameterizedDataService "ImportParameterizedDataService"
 #define OT_INFO_SERVICE_TYPE_DataProcessingService "DataProcessingService"
 #define OT_INFO_SERVICE_TYPE_GETDP "GetDPService"
@@ -978,3 +1027,5 @@
 
 
 
+#define OT_TICKET_TYPE_Login "Ticket.Type.Login"
+#define OT_TICKET_TYPE_Gateway "Ticket.Type.Gateway"

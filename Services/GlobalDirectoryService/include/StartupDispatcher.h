@@ -71,13 +71,13 @@ public:
 
 private:
 	//! @brief Run the worker thread if it is not already running.
-	void run(void);
+	void run();
 	
 	//! @brief Stop the worker thread and wait for it to finish.
-	void stop(void);
+	void stop();
 
 	//! @brief The worker function that processes service start requests.
-	void workerFunction(void);
+	void workerFunction();
 
 	//! @brief Remove all service start requests associated with the given session ID.
 	void removeRequestedServices(const std::string& _sessionID);

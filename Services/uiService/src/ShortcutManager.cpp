@@ -89,7 +89,7 @@ KeyboardCommandHandler * ShortcutManager::handlerFromKeySequence(const QString& 
 	return nullptr;
 }
 
-void ShortcutManager::clearViewerHandler(void) {
+void ShortcutManager::clearViewerHandler() {
 	auto handler = m_handler.find(nullptr);
 	if (handler != m_handler.end()) {
 		bool erased{ true };
@@ -214,7 +214,7 @@ void KeyboardCommandHandler::attachToEvent(ot::UID _sender, ak::eventType _event
 
 // Slots
 
-void KeyboardCommandHandler::slotActivated(void) {
+void KeyboardCommandHandler::slotActivated() {
 	if (!m_isEnabled) { return; }
 	if (m_eventSender == invalidUID) {
 		if (m_isViewerHandler) {

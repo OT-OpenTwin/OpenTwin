@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: LoginData.h
 // 
 // License:
@@ -24,20 +24,22 @@
 
 // OpenTwin header
 #include "OTCore/Serializable.h"
+#include "OTCommunication/Token/UserSessionToken.h"
 
 // std header
 #include <string>
+#include <optional>
 
 class LoginData {
 	OT_DECL_DEFCOPY(LoginData)
 	OT_DECL_DEFMOVE(LoginData)
 public:
-	LoginData() {};
+	explicit LoginData() {};
 	~LoginData() {};
 
 	void addRequiredDataToJson(ot::JsonValue& _jsonObject, ot::JsonAllocator& _allocator) const;
 	void setFromRequiredDataJson(const ot::ConstJsonObject& _jsonObject);
-
+	
 	void setGss(const LogInGSSEntry& _gss) { m_gss = _gss; };
 	const LogInGSSEntry& getGss() const { return m_gss; };
 
@@ -65,24 +67,32 @@ public:
 	void setSSOSessionToken(const std::string& _token) { m_sessionToken = _token; }
 	const std::string& getSSOSessionToken() const { return m_sessionToken; }
 
+	void setUserSessionToken(ot::UserSessionToken&& _token) { m_userSessionToken = std::move(_token); };
+	const ot::UserSessionToken& getUserSessionToken() const { return m_userSessionToken.value(); }
+	bool hasUserSessionToken() const { return m_userSessionToken.has_value(); }
+	void clearUserSessionToken() { m_userSessionToken.reset(); }
+
 	void clear();
 
 	bool isValid() const;
 
 	bool loggedInViaSSO() const;
+
 private:
 	LogInGSSEntry m_gss;
 
 	std::string m_databaseUrl;
 	std::string m_authorizationUrl;
-	std::string m_username;
 	std::string m_sessionUser;
 	std::string m_sessionPassword;
 
 	// For user/password login
+	std::string m_username;
 	std::string m_userPassword;
 	std::string m_encryptedUserPassword;
 
 	// For SSO
 	std::string m_sessionToken;
+
+	std::optional<ot::UserSessionToken> m_userSessionToken;
 };

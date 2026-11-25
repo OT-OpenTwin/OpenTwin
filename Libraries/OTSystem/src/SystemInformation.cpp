@@ -21,6 +21,7 @@
 #include "OTSystem/SystemProcess.h"
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/SystemInformation.h"
+#include "OTSystem/Internal/SystemInformationPrivate.h"
 
 // std header
 #include <thread>
@@ -35,62 +36,74 @@
 #include <sys/times.h>
 #endif
 
-ot::SystemInformation::SystemInformation() :
-	m_initialized(false)
-#if defined(OT_OS_WINDOWS)
-	, m_cpuQuery(0),
-	m_cpuTotal(0),
-	m_numProcessors(0),
-	m_self(0),
-	m_lastCPU({0}),
-	m_lastSysCPU({0}),
-	m_lastUserCPU({0})
-#elif defined(OT_OS_LINUX)
-	, m_lastTotalTicks(0),
-	m_lastIdleTicks(0),
-	m_lastCPU(0),
-	m_lastSysCPU(0),
-	m_lastUserCPU(0),
-	m_numProcessors(0)
-#endif
-{
+ot::SystemInformation::SystemInformation()
+	: m_data(new SystemInformationPrivate()) {}
 
+ot::SystemInformation::SystemInformation(const SystemInformation& _other)
+	: m_data(new SystemInformationPrivate(*_other.m_data))
+{}
+
+ot::SystemInformation::SystemInformation(SystemInformation && _other) noexcept
+	: m_data(std::move(_other.m_data))
+{
+	_other.m_data.reset();;
 }
 
 ot::SystemInformation::~SystemInformation()
+{}
+
+ot::SystemInformation& ot::SystemInformation::operator=(const SystemInformation& _other)
 {
+	if (this != &_other)
+	{
+		m_data.reset(new SystemInformationPrivate(*_other.m_data));
+	}
+	return *this;
+}
+
+ot::SystemInformation& ot::SystemInformation::operator=(SystemInformation&& _other) noexcept
+{
+	if (this != &_other)
+	{
+		m_data = std::move(_other.m_data);
+		_other.m_data.reset();
+	}
+	return *this;
 }
 
 #if defined(OT_OS_WINDOWS)
 void ot::SystemInformation::initialize()
 {
+	OTAssertNullptr(m_data);
+
 	// Initialize information for current process data
 	SYSTEM_INFO sysInfo;
 	FILETIME ftime, fsys, fuser;
 
 	GetSystemInfo(&sysInfo);
-	m_numProcessors = sysInfo.dwNumberOfProcessors;
+	m_data->numProcessors = sysInfo.dwNumberOfProcessors;
 
 	GetSystemTimeAsFileTime(&ftime);
-	memcpy(&m_lastCPU, &ftime, sizeof(FILETIME));
+	memcpy(&m_data->lastCPU, &ftime, sizeof(FILETIME));
 
-	m_self = GetCurrentProcess();
-	GetProcessTimes(m_self, &ftime, &ftime, &fsys, &fuser);
-	memcpy(&m_lastSysCPU, &fsys, sizeof(FILETIME));
-	memcpy(&m_lastUserCPU, &fuser, sizeof(FILETIME));
+	m_data->self = GetCurrentProcess();
+	GetProcessTimes(m_data->self, &ftime, &ftime, &fsys, &fuser);
+	memcpy(&m_data->lastSysCPU, &fsys, sizeof(FILETIME));
+	memcpy(&m_data->lastUserCPU, &fuser, sizeof(FILETIME));
 
 	// Initialize global information
-	PdhOpenQuery(NULL, NULL, &m_cpuQuery);
+	PdhOpenQuery(NULL, NULL, &m_data->cpuQuery);
 	// You can also use L"\\Processor(*)\\% Processor Time" and get individual CPU values with PdhGetFormattedCounterArray()
-	PdhAddEnglishCounter(m_cpuQuery, L"\\Processor(_Total)\\% Processor Time", NULL, &m_cpuTotal);
-	PdhCollectQueryData(m_cpuQuery);
+	PdhAddEnglishCounter(m_data->cpuQuery, L"\\Processor(_Total)\\% Processor Time", NULL, &m_data->cpuTotal);
+	PdhCollectQueryData(m_data->cpuQuery);
 
-	m_initialized = true;
+	m_data->initialized = true;
 }
 
 void ot::SystemInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
-	if (!m_initialized)
+	OTAssertNullptr(m_data);
+	if (!m_data->initialized)
 	{
 		initialize();
 	}
@@ -115,30 +128,30 @@ void ot::SystemInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, d
 	GetSystemTimeAsFileTime(&ftime);
 	memcpy(&now, &ftime, sizeof(FILETIME));
 
-	GetProcessTimes(m_self, &ftime, &ftime, &fsys, &fuser);
+	GetProcessTimes(m_data->self, &ftime, &ftime, &fsys, &fuser);
 	memcpy(&sys, &fsys, sizeof(FILETIME));
 	memcpy(&user, &fuser, sizeof(FILETIME));
-	percent = 1.0 * (sys.QuadPart - m_lastSysCPU.QuadPart) + (user.QuadPart - m_lastUserCPU.QuadPart);
-	if (now.QuadPart != m_lastCPU.QuadPart)
+	percent = 1.0 * (sys.QuadPart - m_data->lastSysCPU.QuadPart) + (user.QuadPart - m_data->lastUserCPU.QuadPart);
+	if (now.QuadPart != m_data->lastCPU.QuadPart)
 	{
-		percent /= (now.QuadPart - m_lastCPU.QuadPart);
+		percent /= (now.QuadPart - m_data->lastCPU.QuadPart);
 	}
 	else
 	{
 		percent = 0;
 	}
 
-	percent /= m_numProcessors;
-	m_lastCPU = now;
-	m_lastUserCPU = user;
-	m_lastSysCPU = sys;
+	percent /= m_data->numProcessors;
+	m_data->lastCPU = now;
+	m_data->lastUserCPU = user;
+	m_data->lastSysCPU = sys;
 
 	cpuLoad = percent * 100;
 }
 
 void ot::SystemInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
-	if (!m_initialized)
+	if (!m_data->initialized)
 	{
 		initialize();
 	}
@@ -156,8 +169,8 @@ void ot::SystemInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& m
 	// Determine the global processor load
 	PDH_FMT_COUNTERVALUE counterVal;
 
-	PdhCollectQueryData(m_cpuQuery);
-	PdhGetFormattedCounterValue(m_cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
+	PdhCollectQueryData(m_data->cpuQuery);
+	PdhGetFormattedCounterValue(m_data->cpuTotal, PDH_FMT_DOUBLE, NULL, &counterVal);
 	cpuLoad = counterVal.doubleValue;
 }
 
@@ -181,20 +194,21 @@ void ot::SystemInformation::initialize()
 {
 	// Initialize information for current process data
 	struct tms timeSample;
-	m_lastCPU = static_cast<long>(times(&timeSample));
-	m_lastSysCPU = static_cast<long>(timeSample.tms_stime);
-	m_lastUserCPU = static_cast<long>(timeSample.tms_utime);
+	m_data->lastCPU = static_cast<long>(times(&timeSample));
+	m_data->lastSysCPU = static_cast<long>(timeSample.tms_stime);
+	m_data->lastUserCPU = static_cast<long>(timeSample.tms_utime);
 	const long processors = sysconf(_SC_NPROCESSORS_ONLN);
-	m_numProcessors = processors > 0 ? static_cast<int>(processors) : 1;
+	m_data->numProcessors = processors > 0 ? static_cast<int>(processors) : 1;
 
-	readProcessorTicks(m_lastTotalTicks, m_lastIdleTicks);
+	readProcessorTicks(m_data->lastTotalTicks, m_data->lastIdleTicks);
 
-	m_initialized = true;
+	m_data->initialized = true;
 }
 
 void ot::SystemInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
-	if (!m_initialized)
+	OTAssertNullptr(m_data);
+	if (!m_data->initialized)
 	{
 		initialize();
 	}
@@ -212,27 +226,28 @@ void ot::SystemInformation::getCurrentProcessCPUAndMemoryLoad(double& cpuLoad, d
 	const long now = static_cast<long>(times(&timeSample));
 	const long sys = static_cast<long>(timeSample.tms_stime);
 	const long user = static_cast<long>(timeSample.tms_utime);
-	double percent = 1.0 * (sys - m_lastSysCPU) + (user - m_lastUserCPU);
-	if (now != m_lastCPU)
+	double percent = 1.0 * (sys - m_data->lastSysCPU) + (user - m_data->lastUserCPU);
+	if (now != m_data->lastCPU)
 	{
-		percent /= (now - m_lastCPU);
+		percent /= (now - m_data->lastCPU);
 	}
 	else
 	{
 		percent = 0;
 	}
 
-	percent /= m_numProcessors;
-	m_lastCPU = now;
-	m_lastUserCPU = user;
-	m_lastSysCPU = sys;
+	percent /= m_data->numProcessors;
+	m_data->lastCPU = now;
+	m_data->lastUserCPU = user;
+	m_data->lastSysCPU = sys;
 
 	cpuLoad = percent * 100;
 }
 
 void ot::SystemInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& memoryLoad)
 {
-	if (!m_initialized)
+	OTAssertNullptr(m_data);
+	if (!m_data->initialized)
 	{
 		initialize();
 	}
@@ -245,16 +260,16 @@ void ot::SystemInformation::getGlobalCPUAndMemoryLoad(double& cpuLoad, double& m
 	memoryLoad = totalPhysMem > 0 ? 100.0 * physMemUsed / totalPhysMem : 0.0;
 
 	unsigned long long total = 0, idle = 0;
-	if (readProcessorTicks(total, idle) && total != m_lastTotalTicks)
+	if (readProcessorTicks(total, idle) && total != m_data->lastTotalTicks)
 	{
-		cpuLoad = 100.0 * ((total - m_lastTotalTicks) - (idle - m_lastIdleTicks)) / (total - m_lastTotalTicks);
+		cpuLoad = 100.0 * ((total - m_data->lastTotalTicks) - (idle - m_data->lastIdleTicks)) / (total - m_data->lastTotalTicks);
 	}
 	else
 	{
 		cpuLoad = 0.0;
 	}
-	m_lastTotalTicks = total;
-	m_lastIdleTicks = idle;
+	m_data->lastTotalTicks = total;
+	m_data->lastIdleTicks = idle;
 }
 
 #endif

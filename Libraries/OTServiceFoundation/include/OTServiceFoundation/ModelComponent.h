@@ -51,7 +51,7 @@ namespace ot {
 			ModelComponent(const ot::ServiceBase& _serviceInfo, ApplicationBase* _application);
 			virtual ~ModelComponent();
 
-			UID createEntityUID(void);
+			UID createEntityUID();
 
 			// Convenience wrapper
 			EntityResultText *addResultTextEntity(const std::string &name, const std::string &text);
@@ -61,7 +61,7 @@ namespace ot {
 		
 			bool sendMessage(bool _queue, JsonDocument& _doc, std::string& _response);
 
-			void clearNewEntityList(void);
+			void clearNewEntityList();
 			void addNewTopologyEntity(UID entityID, UID entityVersion, bool forceVisible);
 			void addNewDataEntity(UID entityID, UID entityVersion, UID entityParentID);
 			void storeNewEntities(const std::string &description, bool askForBranchCreation = true, bool storeModel = true);

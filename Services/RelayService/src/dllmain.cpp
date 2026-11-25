@@ -109,7 +109,7 @@ void mainApplicationThread(std::string _websocketIp, unsigned int _websocketPort
 
 extern "C"
 {
-	_declspec(dllexport) int init(const char * _ownUrl, const char * _websocketUrl, const char * _unused1, const char * _unused2)
+	_declspec(dllexport) int init(const char * _ownUrl, const char * _ownServiceName, const char * _websocketUrl, const char * _unused2)
 	{
 		try {
 			std::string logUrl = ot::OperatingSystem::getEnvironmentVariableString("OPEN_TWIN_LOGGING_URL");

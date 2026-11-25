@@ -40,19 +40,19 @@ namespace ot {
 
 		// Base class functions
 
-		virtual QWidget* getViewWidget(void) override;
+		virtual QWidget* getViewWidget() override;
 
 		// ###########################################################################################################################################################################################################################################################################################################################
 
-		ak::aTreeWidget* getTree(void) const { return m_tree; };
+		ak::aTreeWidget* getTree() const { return m_tree; };
 
 	Q_SIGNALS:
 		void copyRequested(const ot::CopyInformation& _info);
 		void pasteRequested(const ot::CopyInformation& _info);
 
 	private Q_SLOTS:
-		void slotCopyRequested(void);
-		void slotPasteRequested(void);
+		void slotCopyRequested();
+		void slotPasteRequested();
 
 	private:
 		ak::aTreeWidget* m_tree;

@@ -50,7 +50,7 @@ public:
 	void setDataBaseURL(const std::string &url);
 	void setAuthServerURL(const std::string &url);
 
-	bool InitializeConnection(void);
+	bool InitializeConnection();
 
 	ot::ProjectFilterData getProjectFilterData() const;
 	bool createProject(const std::string &projectName, const std::string& projectType, const std::string &userName, const std::string &defaultSettingTemplate);
@@ -66,7 +66,7 @@ public:
 	ot::ProjectInformation getProjectInformation(const std::string& _projectName);
 	bool readProjectsInfo(std::list<std::string>& _projects);
 	bool copyProject(const std::string &sourceProjectName, const std::string &destinationProjectName, const std::string &userName);
-	std::vector<std::string> getDefaultTemplateList(void);
+	std::vector<std::string> getDefaultTemplateList();
 	bool canAccessProject(const std::string &projectCollection);
 
 	std::string getProjectType(const std::string& projectName);

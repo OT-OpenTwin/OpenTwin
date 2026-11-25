@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: SSOBuffer.h
 // 
 // License:
@@ -35,12 +35,18 @@
 
 class SSOBuffer
 {
+	OT_DECL_NOCOPY(SSOBuffer)
+	OT_DECL_NOMOVE(SSOBuffer)
 public:
+	SSOBuffer() = default;
+	~SSOBuffer() = default;
+
 	bool handleRequest(std::string& _determinedUsername, const std::string& _authenticationProcessID, const std::string& _receivedToken, bool _initialToken, ot::JsonDocument& _returnMessage);
 	SSOUser* getUser (const std::string& _token);
 	void removeUser(const std::string& _token);
 	void clearExpiredProcessIDs();
 	bool validate(const std::string& _token);
+
 private:
 	//! @brief Here we keep the current state of the SSO authentication process per username.
 	std::unordered_map<ot::SSOAuthenticationProcessID, std::unique_ptr<ot::SingleSignOn_Server>> m_serverSignOnByProcessID;

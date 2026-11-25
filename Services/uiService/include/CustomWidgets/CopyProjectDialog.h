@@ -35,10 +35,10 @@ public:
 	explicit CopyProjectDialog(const QString& _projectToCopy, ProjectManagement &projectManager, QWidget* _parent);
 	virtual ~CopyProjectDialog();
 
-	QString getProjectName(void) const;
+	QString getProjectName() const;
 
 private Q_SLOTS:
-	void slotConfirm(void);
+	void slotConfirm();
 	
 private:
 	QString       m_projectToCopy;

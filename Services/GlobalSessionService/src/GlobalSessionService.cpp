@@ -28,6 +28,7 @@
 // OpenTwin header
 #include "OTSystem/OperatingSystem.h"
 #include "OTSystem/SystemInformation.h"
+#include "OTSystem/OperatingSystem.h"
 #include "OTCore/Logging/Logger.h"
 #include "OTCore/ReturnMessage.h"
 #include "OTCore/ContainerHelper.h"
@@ -52,7 +53,7 @@
 #include <iostream>
 #include <filesystem>
 
-GlobalSessionService& GlobalSessionService::instance(void) {
+GlobalSessionService& GlobalSessionService::instance() {
 	static GlobalSessionService g_instance;
 	return g_instance;
 }
@@ -99,8 +100,8 @@ ot::GSSDebugInfo GlobalSessionService::getDebugInformation() {
 ot::ReturnMessage GlobalSessionService::handleGetGlobalServicesURL() {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
-	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDSURL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, doc.GetAllocator()), doc.GetAllocator());
+	doc.AddMember(OT_ACTION_PARAM_SERVICE_GDS_URL, ot::JsonString(m_globalDirectoryUrl, doc.GetAllocator()), doc.GetAllocator());
 
 	ot::JsonArray flagsArr;
 	ot::addLogFlagsToJsonArray(ot::LogDispatcher::instance().getLogFlags(), flagsArr, doc.GetAllocator());
@@ -223,7 +224,14 @@ ot::ReturnMessage GlobalSessionService::handleCheckProjectOpen(ot::JsonDocument&
 	else {
 		try {
 			// Get user (may throw if not found...)
-			return ot::ReturnMessage(ot::ReturnMessage::True, this->getLssFromSessionId(projectName).getSessionUser(projectName));
+			auto& lss = this->getLssFromSessionId(projectName);
+			std::string username = lss.getSessionUser(projectName);
+
+			ot::JsonDocument infoDoc;
+			infoDoc.AddMember(OT_ACTION_PARAM_Username, ot::JsonString(username, infoDoc.GetAllocator()), infoDoc.GetAllocator());
+			infoDoc.AddMember(OT_ACTION_PARAM_LSS_URL, ot::JsonString(lss.getUrl(), infoDoc.GetAllocator()), infoDoc.GetAllocator());
+
+			return ot::ReturnMessage(ot::ReturnMessage::True, infoDoc.toJson());
 		}
 		catch (const std::exception& _e) {
 			OT_LOG_E(_e.what());
@@ -491,7 +499,7 @@ ot::ReturnMessage GlobalSessionService::handleRegisterSessionService(ot::JsonDoc
 	ot::JsonDocument reply;
 	reply.AddMember(OT_ACTION_PARAM_SERVICE_ID, newId, reply.GetAllocator());
 	reply.AddMember(OT_ACTION_PARAM_DATABASE_URL, ot::JsonString(m_databaseUrl, reply.GetAllocator()), reply.GetAllocator());
-	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
+	reply.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, reply.GetAllocator()), reply.GetAllocator());
 	if (!m_globalDirectoryUrl.empty()) {
 		reply.AddMember(OT_ACTION_PARAM_GLOBALDIRECTORY_SERVICE_URL, ot::JsonString(m_globalDirectoryUrl, reply.GetAllocator()), reply.GetAllocator());
 	}
@@ -540,7 +548,7 @@ ot::ReturnMessage GlobalSessionService::handleRegisterLibraryManagementService(o
 	// Send DBUrl and AuthUrl
 	ot::JsonDocument responseDoc;
 	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_DBURL, ot::JsonString(m_databaseUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
-	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_AUTHURL, ot::JsonString(m_authorizationUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
+	responseDoc.AddMember(OT_ACTION_PARAM_SERVICE_AUTH_URL, ot::JsonString(m_authorizationUrl, responseDoc.GetAllocator()), responseDoc.GetAllocator());
 
 	// Send Return
 	return ot::ReturnMessage(ot::ReturnMessage::Ok, responseDoc);
@@ -791,7 +799,7 @@ const LocalSessionService& GlobalSessionService::getLssFromSessionId(const std::
 	return lss->second;
 }
 
-LocalSessionService* GlobalSessionService::determineLeastLoadedLSS(void) {
+LocalSessionService* GlobalSessionService::determineLeastLoadedLSS() {
 	LocalSessionService* leastLoadedSessionService{ nullptr };
 	size_t minLoad{ UINT64_MAX };
 	for (auto& it : m_lssMap) {
@@ -936,29 +944,11 @@ void GlobalSessionService::readFileContent(const std::string& fileName, std::str
 }
 
 void GlobalSessionService::loadFrontendInstallerFile() {
-	std::string relPath;
+	std::string relPath = ot::OperatingSystem::getCurrentExecutableDirectory();
 
-#ifdef OT_OS_WINDOWS
-	char path[MAX_PATH] = { 0 };
-	GetModuleFileNameA(NULL, path, MAX_PATH);
-	relPath = path;
-#else
-	char path[PATH_MAX];
-	ssize_t pathSize = readlink("/proc/self/exe", path, PATH_MAX);
-	relPath = std::string(path, (pathSize > 0) ? pathSize : 0);
-#endif
-
-	// First check if the installer can be found relative to the current path
-	size_t ix = relPath.rfind('\\');
-	
-	if (ix != std::string::npos) {
-		// Create path relative to the current path
-		relPath = relPath.substr(0, ix);
-		relPath += "\\FrontendInstaller\\Install_OpenTwin_Frontend.exe";
-	}
-	else {
-		// Failed to find path separator
-		OT_LOG_W("Could not find path separator in current path: \"" + relPath + "\"");
+	if (!relPath.empty())
+	{
+		relPath += "/FrontendInstaller/Install_OpenTwin_Frontend.exe";
 	}
 
 	if (std::filesystem::exists(relPath)) {
@@ -967,7 +957,7 @@ void GlobalSessionService::loadFrontendInstallerFile() {
 	}
 	else {
 		// Could not find relative, try to find installer from dev env
-		OT_LOG_D("Could not find installer relative to current path. Trying environment... Tested path: \"" + relPath + "\"");
+		OT_LOG_W("Could not find installer relative to current path. Trying environment... Tested path: \"" + relPath + "\"");
 
 		// Get the development root environment variable and build the path to the deployment cert file
 		std::string devPath = ot::OperatingSystem::getEnvironmentVariableString("OPENTWIN_DEV_ROOT");
@@ -989,7 +979,7 @@ void GlobalSessionService::loadFrontendInstallerFile() {
 
 // Worker
 
-void GlobalSessionService::workerHealthCheck(void) {
+void GlobalSessionService::workerHealthCheck() {
 	const static int limit{ 60 }; // 1 min
 	int counter{ 0 };
 
@@ -1050,7 +1040,7 @@ void GlobalSessionService::workerHealthCheck(void) {
 	}
 }
 
-void GlobalSessionService::workerSessionIni(void) {
+void GlobalSessionService::workerSessionIni() {
 	while (m_workerRunning) {
 		{
 			std::lock_guard<std::mutex> lock(m_mutex);

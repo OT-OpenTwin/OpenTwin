@@ -32,7 +32,7 @@
 #include <thread>
 #include <chrono>
 
-GlobalDirectoryService::GlobalDirectoryService(void)
+GlobalDirectoryService::GlobalDirectoryService()
 	: ot::ServiceBase(OT_INFO_SERVICE_TYPE_GlobalDirectoryService, OT_INFO_SERVICE_TYPE_GlobalDirectoryService, "", ot::invalidServiceID, "0"),
 	m_connectionStatus(Disconnected), m_isShuttingDown(false)
 {
@@ -60,7 +60,7 @@ void GlobalDirectoryService::connect(const std::string& _url) {
 
 // Worker functions
 
-void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
+void GlobalDirectoryService::registerAtGlobalDirectoryService() {
 	Application& app = Application::instance();
 
 	ot::JsonDocument registerDoc;
@@ -119,7 +119,7 @@ void GlobalDirectoryService::registerAtGlobalDirectoryService(void) {
 	this->healthCheck();
 }
 
-void GlobalDirectoryService::healthCheck(void) {
+void GlobalDirectoryService::healthCheck() {
 	OT_LOG_I("Starting Global Directory Service health check");
 
 	Application& app = Application::instance();

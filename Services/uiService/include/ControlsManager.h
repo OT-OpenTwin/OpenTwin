@@ -120,7 +120,7 @@ public:
 	std::string getDebugInformationString() const;
 
 private:
-	std::map<ot::LockType, int> * generateDefaultLockMap(void) const;
+	std::map<ot::LockType, int> * generateDefaultLockMap() const;
 	LockManagerElement * uiElement(ot::UID _uid);
 	std::map<ot::LockType, int> * serviceLockLevel(const ot::BasicServiceInformation& _serviceInfo);
 	std::map<ot::UID, int> * serviceEnabledLevel(const ot::BasicServiceInformation& _serviceInfo);
@@ -147,7 +147,7 @@ public:
 	~ScopedLockManagerLock();
 
 	//! @brief If set the lock flags won't be unset when destroying.
-	void setNoUnlock(void);
+	void setNoUnlock();
 
 private:
 	bool m_skipUnlock;
@@ -172,12 +172,12 @@ public:
 	void lock(int _value, ot::LockType _lockType);
 	void unlock(int _value, ot::LockType _lockType);
 
-	ak::aTreeWidget* getTree(void) const { return m_tree; };
-	ot::PropertyGrid* getProp(void) const { return m_prop; };
-	ot::GraphicsView* getGraphics(void) const { return m_graphics; };
-	ot::TextEditor* getText(void) const { return m_text; };
-	ot::WidgetView* getView(void) const { return m_view; };
-	LockableWidget* getLockable(void) const { return m_lockable; };
+	ak::aTreeWidget* getTree() const { return m_tree; };
+	ot::PropertyGrid* getProp() const { return m_prop; };
+	ot::GraphicsView* getGraphics() const { return m_graphics; };
+	ot::TextEditor* getText() const { return m_text; };
+	ot::WidgetView* getView() const { return m_view; };
+	LockableWidget* getLockable() const { return m_lockable; };
 
 	void getDebugInformation(ot::JsonObject& _object, ot::JsonAllocator& _allocator) const;
 

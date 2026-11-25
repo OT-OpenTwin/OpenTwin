@@ -33,16 +33,16 @@ namespace ot {
 	public:
 
 		//! @brief Returns the total physical memory of the current machine in bytes.
-		static unsigned long long getTotalPhysicalMemory(void);
+		static unsigned long long getTotalPhysicalMemory();
 
 		//! @brief Returns the available physical memory of the current machine in bytes.
-		static unsigned long long getAvailablePhysicalMemory(void);
+		static unsigned long long getAvailablePhysicalMemory();
 
 		//! @brief Returns the total virtual memory of the current machine in bytes.
-		static unsigned long long getTotalVirtualMemory(void);
+		static unsigned long long getTotalVirtualMemory();
 
 		//! @brief Returns the available virtual memory of the current machine in bytes.
-		static unsigned long long getAvailableVirtualMemory(void);
+		static unsigned long long getAvailableVirtualMemory();
 
 		//! @param _variableName Name of the variable.
 		//! @return Null if variable is not found otherwise the caller takes ownership of the pointer.

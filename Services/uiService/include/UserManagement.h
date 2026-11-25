@@ -1,4 +1,4 @@
-﻿// @otlicense
+// @otlicense
 // File: UserManagement.h
 // 
 // License:
@@ -21,6 +21,7 @@
 
 // Frontend header
 #include "Login/LoginData.h"
+#include "Login/LoginTicketData.h"
 
 // std header
 #include <string>
@@ -39,10 +40,10 @@ public:
 
 	void setAuthServerURL(const std::string &url);
 	void setDatabaseURL(const std::string &url);
-	bool checkConnection(void) const;
-	bool checkConnectionAuthorizationService(void) const;
+	bool checkConnection() const;
+	bool checkConnectionAuthorizationService() const;
 	bool checkConnectionDataBase(const std::string &userName, const std::string &password) const;
-	void initializeNewSession(void);
+	void initializeNewSession();
 
 	bool addUser(const std::string &userName, const std::string &password) const;
 	bool deleteUser(const std::string &userName) const;
@@ -50,7 +51,7 @@ public:
 
 	bool checkUserName(const std::string &userName) const;
 	bool checkPassword(const std::string &userName, const std::string &password, bool isEncryptedPassword, std::string& sessionUser, std::string& sessionPassword, std::string &validEncryptedPassword) const;
-
+	bool loginWithTicket(const LoginTicketData& _ticket, ot::UserSessionToken& _userSessionToken, std::string& sessionUser, std::string& sessionPassword) const;
 
 	bool storeSetting(const std::string &settingName, const std::string &settingString);
 	std::string restoreSetting(const std::string &settingName);
@@ -59,14 +60,14 @@ public:
 	bool removeRecentProject(const std::string &projectName);
 	void getListOfRecentProjects(std::list<std::string> &recentProjectList);
 
-	std::string getUserSettingsCollection(void);
+	std::string getUserSettingsCollection();
 
 	const std::string& getAuthorisationServerURL() const { return m_authServerURL; }
 private:
 	bool hasError(const std::string& _response) const;
 	bool hasSuccessful(const std::string& _response) const;
-	bool initializeDatabaseConnection(void);
-	bool ensureSettingsCollectionCanBeAccessed(void);
+	bool initializeDatabaseConnection();
+	bool ensureSettingsCollectionCanBeAccessed();
 	bool storeListOfRecentProjects(std::list<std::string> &recentProjectList);
 
 	const int m_maxNumberRecentProjects;

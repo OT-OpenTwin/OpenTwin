@@ -123,7 +123,7 @@ extern "C"
 		return ot::ActionDispatcher::instance().dispatchWrapper(_json, _senderIP, ot::QUEUE);
 	};
 
-	_declspec(dllexport) const char *getServiceURL(void)
+	_declspec(dllexport) const char *getServiceURL()
 	{
 		char * returnValue = nullptr;
 

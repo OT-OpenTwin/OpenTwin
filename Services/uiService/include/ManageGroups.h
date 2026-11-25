@@ -39,7 +39,7 @@ public:
 
 	void addRow(const std::array<QTableWidgetItem *, 2>& _columns);
 
-	void Clear(void);
+	void Clear();
 
 	virtual void mouseMoveEvent(QMouseEvent* _event) override;
 
@@ -69,7 +69,7 @@ public:
 	AddGroupDialog(const std::string &authServerURL, QWidget* _parent);
 	virtual ~AddGroupDialog();
 
-	QString groupName(void) const;
+	QString groupName() const;
 
 private Q_SLOTS:
 	void slotConfirm();
@@ -90,10 +90,10 @@ public:
 	RenameGroupDialog(const std::string &groupName, const std::string &authServerURL, QWidget* _parent);
 	virtual ~RenameGroupDialog();
 
-	QString groupName(void) const;
+	QString groupName() const;
 
 Q_SIGNALS:
-	void isClosing(void);
+	void isClosing();
 
 private Q_SLOTS:
 	void slotConfirm();
@@ -120,16 +120,16 @@ public:
 	virtual ~ManageGroups();
 
 public Q_SLOTS:
-	void slotAddGroup(void);
-	void slotRenameGroup(void);
-	void slotChangeGroupOwner(void);
-	void slotDeleteGroup(void);
+	void slotAddGroup();
+	void slotRenameGroup();
+	void slotChangeGroupOwner();
+	void slotDeleteGroup();
 	void slotMemberCheckBoxChanged(bool state, int row);
-	void slotFillGroupsList(void);
-	void slotFillMembersList(void);
+	void slotFillGroupsList();
+	void slotFillMembersList();
 
 private:
-	void readUserList(void);
+	void readUserList();
 	bool hasSuccessful(const std::string &response);
 
 	ot::LineEdit*								m_filterGroups;

@@ -237,7 +237,7 @@ std::string LocalSessionService::getSessionUser(const std::string& _sessionId) c
 	}
 }
 
-std::list<std::string> LocalSessionService::getSessionIds(void) const {
+std::list<std::string> LocalSessionService::getSessionIds() const {
 	std::list<std::string> result;
 
 	for (const IniSessionType& s : m_iniSessions) {
@@ -254,11 +254,11 @@ std::list<std::string> LocalSessionService::getSessionIds(void) const {
 
 // Setter / Getter
 
-size_t LocalSessionService::getTotalSessionCount(void) const {
+size_t LocalSessionService::getTotalSessionCount() const {
 	return m_iniSessions.size() + m_activeSessions.size();
 }
 
-void LocalSessionService::clearSessions(void) {
+void LocalSessionService::clearSessions() {
 	m_activeSessions.clear();
 	m_iniSessions.clear();
 }

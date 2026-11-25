@@ -40,7 +40,7 @@ bool ot::PortManager::isPortInUse(ot::port_t _portNumber) const {
 	return m_portsInUse.find(_portNumber) != m_portsInUse.end();
 }
 
-ot::port_t ot::PortManager::determineAndBlockAvailablePort(void) {
+ot::port_t ot::PortManager::determineAndBlockAvailablePort() {
 	// Ensure that there are port ranges defined
 	if (m_ranges.empty()) {
 		OTAssert(0, "PortManager has no port ranges defined. Please add a port range before calling determineAndBlockAvailablePort().");

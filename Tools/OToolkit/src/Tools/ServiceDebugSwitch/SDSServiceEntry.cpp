@@ -71,7 +71,7 @@ void SDSServiceEntry::debugToggled(bool _checked) {
 		request.AddMember(OT_ACTION_MEMBER, JsonString(OT_ACTION_CMD_ServiceDisableDebug, request.GetAllocator()), request.GetAllocator());
 	}
 
-	request.AddMember(OT_ACTION_PARAM_SERVICE_NAME, JsonString(m_name, request.GetAllocator()), request.GetAllocator());
+	request.AddMember(OT_ACTION_PARAM_SERVICE_TYPE, JsonString(m_name, request.GetAllocator()), request.GetAllocator());
 
 	std::string responseStr;
 	if (!msg::send("", m_lssUrl, ot::EXECUTE, request.toJson(), responseStr, 0, msg::DefaultFlagsNoExit)) {

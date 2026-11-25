@@ -85,34 +85,61 @@ bool GlobalDirectoryService::connect(const std::string& _url, bool _waitForConne
 	return true;
 }
 
-bool GlobalDirectoryService::isConnected(void)
+bool GlobalDirectoryService::isConnected()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 	return m_connectionStatus == Connected;
 }
 
-bool GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _serviceInformation)
+std::optional<ot::SyncServiceStartInfo> GlobalDirectoryService::requestToStartService(const ot::ServiceInitData& _serviceInformation)
 {
 	// Create request
 	ot::JsonDocument requestDoc;
 	requestDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, requestDoc.GetAllocator()), requestDoc.GetAllocator());
 	requestDoc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInformation, requestDoc.GetAllocator()), requestDoc.GetAllocator());
-
+	
 	// Send request
-	std::string response;
+	std::string responseStr;
 	if (!this->ensureConnection())
 	{
 		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to establish connection to GDS.");
-		return false;
+		return std::nullopt;
 	}
-	else if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), response))
+	else if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr))
 	{
 		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: Failed to send http request to GDS.");
-		return false;
+		return std::nullopt;
+	}
+
+	auto response = ot::ReturnMessage::fromJson(responseStr);
+
+	// Ensure success
+	if (!response.isOk())
+	{
+		OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: " + response.getWhat());
+		return std::nullopt;
+	}
+
+	if (_serviceInformation.getSynchronousLaunch())
+	{
+		// On synchronous launch read the information
+		ot::JsonDocument newServiceInfoDoc;
+		newServiceInfoDoc.fromJson(response.getWhat());
+
+		ot::SyncServiceStartInfo newServiceInfo;
+		newServiceInfo.setFromJsonObject(newServiceInfoDoc.getConstObject());
+
+		if (!newServiceInfo.isValid())
+		{
+			OT_LOG_E("Failed to start service \"" + _serviceInformation.getServiceName() + "\". Reason: GDS returned invalid information");
+			return std::nullopt;
+		}
+		return newServiceInfo;
 	}
 	else
 	{
-		return ot::ReturnMessage::fromJson(response) == ot::ReturnMessage::Ok;
+		// On asynchronous launch return dummy information (success)
+		return ot::SyncServiceStartInfo();
 	}
 }
 
@@ -204,10 +231,12 @@ void GlobalDirectoryService::notifySessionShuttingDown(const std::string& _sessi
 	if (!this->ensureConnection())
 	{
 		OT_LOG_E("Failed to start services. Reason: Failed to establish connection to GDS");
+		return;
 	}
 	if (!this->sendMessage(ot::EXECUTE, requestDoc.toJson(), responseStr))
 	{
 		OT_LOG_E("Failed to start services. Reason: Failed to send http request to GDS");
+		return;
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
@@ -264,7 +293,7 @@ void GlobalDirectoryService::addToJsonObject(ot::JsonValue& _jsonObject, ot::Jso
 
 // Private
 
-void GlobalDirectoryService::startHealthCheck(void)
+void GlobalDirectoryService::startHealthCheck()
 {
 	std::lock_guard<std::mutex> lock(m_mutex);
 
@@ -308,7 +337,7 @@ void GlobalDirectoryService::stopHealthCheck()
 	}
 }
 
-void GlobalDirectoryService::healthCheck(void)
+void GlobalDirectoryService::healthCheck()
 {
 	ot::JsonDocument pingDoc;
 	pingDoc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_Ping, pingDoc.GetAllocator()), pingDoc.GetAllocator());
@@ -398,4 +427,16 @@ bool GlobalDirectoryService::sendMessage(ot::MessageType _messageType, const std
 	{
 		return true;
 	}
+}
+
+bool GlobalDirectoryService::sendMessage(ot::MessageType _messageType, const std::string& _message, ot::ReturnMessage& _response)
+{
+	std::string responseStr;
+	if (!this->sendMessage(_messageType, _message, responseStr))
+	{
+		return false;
+	}
+
+	_response = ot::ReturnMessage::fromJson(responseStr);
+	return true;
 }

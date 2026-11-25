@@ -56,7 +56,7 @@ LocalDirectoryService& LocalDirectoryService::operator=(LocalDirectoryService&& 
 
 // Load information
 
-LoadInformation::load_t LocalDirectoryService::load(void) const {
+LoadInformation::load_t LocalDirectoryService::load() const {
 	return m_loadInformation.load();
 }
 
@@ -78,7 +78,7 @@ bool LocalDirectoryService::supportsService(const std::string& _serviceName) con
 	return false;
 }
 
-bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
+std::optional<ot::SyncServiceStartInfo> LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serviceInfo) {
 	ot::JsonDocument doc;
 	doc.AddMember(OT_ACTION_MEMBER, ot::JsonString(OT_ACTION_CMD_StartNewService, doc.GetAllocator()), doc.GetAllocator());
 	doc.AddMember(OT_ACTION_PARAM_IniData, ot::JsonObject(_serviceInfo, doc.GetAllocator()), doc.GetAllocator());
@@ -86,16 +86,42 @@ bool LocalDirectoryService::requestToRunService(const ot::ServiceInitData& _serv
 	std::string responseStr;
 	if (!ot::msg::send(Application::instance().getServiceURL(), this->getServiceURL(), ot::EXECUTE, doc.toJson(), responseStr, ot::msg::defaultTimeout, ot::msg::DefaultFlagsNoExit)) {
 		OT_LOG_E("Failed to send request to LDS at \"" + this->getServiceURL() + "\"");
-		return false;
+		return std::nullopt;
 	}
 
 	ot::ReturnMessage response = ot::ReturnMessage::fromJson(responseStr);
 
-	bool success = (response == ot::ReturnMessage::Ok);
-	if (success) {
-		m_services.push_back(_serviceInfo);
+	if (!response.isOk()) {
+		OT_LOG_E("Service start failed at LDS: " + response.getWhat());
+		return std::nullopt;
 	}
-	return success;
+	
+	std::optional<ot::SyncServiceStartInfo> result;
+
+	if (_serviceInfo.getSynchronousLaunch())
+	{
+		ot::JsonDocument newServiceInfoDoc;
+		newServiceInfoDoc.fromJson(response.getWhat());
+
+		ot::SyncServiceStartInfo newServiceInfo;
+		newServiceInfo.setFromJsonObject(newServiceInfoDoc.getConstObject());
+
+		if (!newServiceInfo.isValid())
+		{
+			OT_LOG_E("Failed to start service \"" + _serviceInfo.getServiceName() + "\". Reason: LDS returned invalid information");
+			return std::nullopt;
+		}
+		
+		result = newServiceInfo;
+	}
+	else
+	{
+		result = ot::SyncServiceStartInfo();
+	}
+
+	m_services.push_back(_serviceInfo);
+
+	return result;
 }
 
 bool LocalDirectoryService::requestToRunRelayService(const ot::ServiceInitData& _serviceInfo, std::string& _websocketURL, std::string& _relayServiceURL) {

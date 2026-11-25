@@ -31,13 +31,14 @@
 #include "OTCore/ReturnMessage.h"
 #include "OTCommunication/Msg.h"
 #include "OTCommunication/ActionTypes.h"
+#include "OTCommunication/Data/ServiceInitData.h"
 
 // std header
 #include <thread>
 #include <cstdlib>
 #include <iostream>
 
-Application& Application::instance(void) {
+Application& Application::instance() {
 	static Application g_instance;
 	return g_instance;
 }
@@ -82,12 +83,12 @@ int Application::initialize(const char* _ownURL, const char* _globalDirectorySer
 	return ot::AppExitCode::Success;
 }
 
-void Application::globalDirectoryServiceCrashed(void) {
+void Application::globalDirectoryServiceCrashed() {
 	OT_LOG_E("GDS crash not handled yet");
 	exit(ot::AppExitCode::GDSNotRunning);
 }
 
-std::list<std::string> Application::getSupportedServices(void) const {
+std::list<std::string> Application::getSupportedServices() const {
 	std::list<std::string> lst;
 	for (auto& s : Configuration::instance().getSupportedServices()) {
 		lst.push_back(s.getName());
@@ -103,12 +104,24 @@ ot::ReturnMessage Application::handleStartNewService(ot::JsonDocument& _jsonDocu
 	ot::ServiceInitData initData;
 	initData.setFromJsonObject(ot::json::getObject(_jsonDocument, OT_ACTION_PARAM_IniData));
 	
-	if (m_serviceManager.requestStartService(initData) != ServiceManager::RequestResult::Success) {
+	ot::SyncServiceStartInfo syncInfo;
+
+	if (m_serviceManager.requestStartService(initData, &syncInfo) != ServiceManager::RequestResult::Success)
+	{
 		return ot::ReturnMessage(ot::ReturnMessage::Failed, m_serviceManager.lastError());
 	}
-	else {
-		return ot::ReturnMessage::Ok;
-	}
+	else
+	{
+		if (initData.getSynchronousLaunch())
+		{
+			return ot::ReturnMessage::ok(syncInfo.toJson());
+		}
+		else
+		{
+			return ot::ReturnMessage::Ok;
+		}
+		
+	}	
 }
 
 ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jsonDocument) {
@@ -118,7 +131,7 @@ ot::ReturnMessage Application::handleStartNewRelayService(ot::JsonDocument& _jso
 	std::string relayServiceURL;
 	std::string websocketUrl;
 	
-	auto supportedService = Configuration::instance().getSupportedService(initData.getServiceName());
+	auto supportedService = Configuration::instance().getSupportedService(initData.getServiceType());
 
 	if (!supportedService.has_value()) {
 		OT_LOG_E("The service \"" + initData.getServiceName() + "\" is not supported by this Local Directory Service");

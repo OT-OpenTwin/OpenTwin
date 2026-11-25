@@ -180,12 +180,19 @@ void initializeCrypto() {
 	QCoreApplication::setApplicationName(appNameTmp);
 }
 
-void initializeAppBase() {
+AppBase* initializeAppBase(StartArgumentParser& _startArgs) {
 	AppBase* app = AppBase::instance();
 	app->setSiteID(0);
+
+	if (_startArgs.getNonInteractive())
+	{
+		app->enableNonInteractiveMode();
+	}
+
+	return app;
 }
 
-bool initializeOpenGL(bool checkGraphics) {
+bool initializeOpenGL(AppBase* _app, bool checkGraphics) {
 	// Check for a sufficient OpenGL version
 	QOffscreenSurface surf;
 	surf.create();
@@ -229,9 +236,9 @@ bool initializeOpenGL(bool checkGraphics) {
 			std::filesystem::copy_file(sourceFile, destFile);
 		}
 
-		//OT_LOG_E(errorString);  This does not worl if OpenGL is not properly initialized due to the HTML styling
+		//OT_LOG_E(errorString);  This does not work if OpenGL is not properly initialized due to the HTML styling
 
-		if (!checkGraphics)
+		if (!checkGraphics && !_app->isNonInteractive())
 		{
 			QMessageBox msgBox(QMessageBox::Critical, "OpenGL error", QString::fromStdString(errorString), QMessageBox::Ok);
 			msgBox.exec();
@@ -243,7 +250,7 @@ bool initializeOpenGL(bool checkGraphics) {
 	}
 }
 
-bool initializeAssets() {
+bool initializeAssets(AppBase* _app) {
 	int iconPathCounter = 0;
 	int stylePathCounter = 0;
 	int graphicsPathCounter = 0;
@@ -274,24 +281,35 @@ bool initializeAssets() {
 	if (iconPathCounter == 0) {
 		OTAssert(0, "No icon path was found!");
 		OT_LOG_E("No icon path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application.", QMessageBox::Ok);
-		msgBox.exec();
+
+		if (!_app->isNonInteractive())
+		{
+			QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No icon path was found. Try to reinstall the application.", QMessageBox::Ok);
+			msgBox.exec();
+		}
 		return false;
 	}
 
 	// Check if at least one style directory was found
 	if (stylePathCounter == 0) {
 		OT_LOG_E("No color style path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application.", QMessageBox::Ok);
-		msgBox.exec();
+
+		if (!_app->isNonInteractive())
+		{
+			QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No color style path was found. Try to reinstall the application.", QMessageBox::Ok);
+			msgBox.exec();
+		}
 		return false;
 	}
 
 	// Check if at least one graphics item directory was found
 	if (graphicsPathCounter == 0) {
 		OT_LOG_E("No graphics item path found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application.", QMessageBox::Ok);
-		msgBox.exec();
+		if (!_app->isNonInteractive())
+		{
+			QMessageBox msgBox(QMessageBox::Critical, "Assets error", "No graphics item path was found. Try to reinstall the application.", QMessageBox::Ok);
+			msgBox.exec();
+		}
 		return false;
 	}
 
@@ -306,8 +324,11 @@ bool initializeAssets() {
 	}
 	else {
 		OT_LOG_E("Bright style not found");
-		QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application.", QMessageBox::Ok);
-		msgBox.exec();
+		if (!_app->isNonInteractive())
+		{
+			QMessageBox msgBox(QMessageBox::Critical, "Assets error", "Default " + QString::fromStdString(ot::toString(ot::ColorStyleName::BrightStyle)) + " color style is missing. Try to reinstall the application.", QMessageBox::Ok);
+			msgBox.exec();
+		}
 		return false;
 	}
 
@@ -345,16 +366,16 @@ int main(int _argc, char *_argv[])
 
 		initializeLogging();
 
-		QApplication* app = initializeQt(_argc, _argv);
+		QApplication* qtApp = initializeQt(_argc, _argv);
 		
 		StartArgumentParser argsParser;
 		argsParser.parse();
 
 		bool checkGraphics = argsParser.getCheckGraphics();
 
-		initializeAppBase();
+		AppBase* app = initializeAppBase(argsParser);
 
-		if (!initializeOpenGL(checkGraphics)) {
+		if (!initializeOpenGL(app, checkGraphics)) {
 			return ot::AppExitCode::OpenGLError;
 		}
 
@@ -362,7 +383,7 @@ int main(int _argc, char *_argv[])
 			return ot::AppExitCode::Success;
 		}
 
-		if (!initializeAssets()) {
+		if (!initializeAssets(app)) {
 			return ot::AppExitCode::AssetError;
 		}
 
@@ -372,25 +393,25 @@ int main(int _argc, char *_argv[])
 			return ot::AppExitCode::ComponentError;
 		}
 
-		if (!AppBase::instance()->initialize()) {
+		if (!app->initialize()) {
 			return ot::AppExitCode::GeneralError;
 		}
 
 		// Check if script was set
 		if (!argsParser.getScriptFile().isEmpty()) {
-			AppBase::instance()->runJSScriptFromFile(argsParser.getScriptFile());
+			app->runJSScriptFromFile(argsParser.getScriptFile());
 		}
 
 		// LogIn
-		if (!AppBase::instance()->logIn()) {
+		if (!app->logIn()) {
 			return ot::AppExitCode::Success;
 		}
 
 		// Run Main Event Loop
-		int status = app->exec();
+		int status = qtApp->exec();
 
 		// Cleanup
-		ExternalServicesComponent * extComp = AppBase::instance()->getExternalServicesComponent();
+		ExternalServicesComponent * extComp = app->getExternalServicesComponent();
 		if (extComp != nullptr) {
 			extComp->shutdown(); 
 		}

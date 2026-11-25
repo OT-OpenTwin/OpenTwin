@@ -1,0 +1,12 @@
+{
+    "editor.semanticTokenColorCustomizations": {
+        "rules": {
+            "variable.readonly:python": {
+                "foreground": "#D2A8FF"
+            },
+            "selfParameter:python": {
+                "foreground": "#81afd5"
+            }
+        }
+    }
+}

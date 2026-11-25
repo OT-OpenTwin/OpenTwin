@@ -43,7 +43,7 @@ namespace ot {
 		virtual void userLog(const LogMessage& _message) override;
 
 		void setFlags(ot::LogFlags _flags) { m_flags = _flags; }
-		const ot::LogFlags& getFlags(void) const { return m_flags; }
+		const ot::LogFlags& getFlags() const { return m_flags; }
 
 	private:
 		ApplicationBase* m_app;
