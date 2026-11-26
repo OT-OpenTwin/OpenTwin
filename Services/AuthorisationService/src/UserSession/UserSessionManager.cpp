@@ -25,7 +25,7 @@ UserSessionManager::UserSessionInfo UserSessionManager::createUserSession(const 
 	randomBytes.clear();
 		
 	// Create a new session name for the user
-	std::string sessionName = MongoSessionFunctions::createSession(_loggedInUsername, serviceBase.getAdminClient());
+	std::string sessionName = MongoSessionFunctions::createSession(_loggedInUsername, sessionToken, serviceBase.getAdminClient());
 	
 	// Generate a random user database password
 	randomBytes = ot::RandomNumberProvider::createRandomBytes(ot::CryptoDefaults::userSessionPasswordLength());
