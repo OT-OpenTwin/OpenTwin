@@ -306,6 +306,8 @@ namespace ot {
 
 		void handleViewCloseRequest(WidgetView* _view);
 
+		void handleViewFocusChanged(ads::CDockWidget* _prevFocus, ads::CDockWidget* _nextFocus, bool _enforce);
+
 		void updateCentralViewTitles();
 
 		OT_DECL_NODISCARD ot::FunctionRAII beginMultiClose();

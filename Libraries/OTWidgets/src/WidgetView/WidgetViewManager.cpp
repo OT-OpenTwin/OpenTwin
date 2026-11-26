@@ -835,31 +835,7 @@ void ot::WidgetViewManager::getDebugInformation(JsonObject& _object, JsonAllocat
 
 void ot::WidgetViewManager::slotViewFocused(ads::CDockWidget* _prevFocus, ads::CDockWidget* _nextFocus)
 {
-	OT_WIDGETS_VIEW_DBG("View focus changed: "
-		<< (_prevFocus ? _prevFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_prevFocus) << ") -> "
-		<< (_nextFocus ? _nextFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_nextFocus) << ")\n\nNew Focus object:\n"
-		<< WidgetDebugHelper::objectHierarchyString(_nextFocus) << "\n\nAplication focus object:\n"
-		<< WidgetDebugHelper::objectHierarchyString(QApplication::focusWidget()) << "\n\nApplication active window:\n"
-		<< WidgetDebugHelper::objectHierarchyString(QApplication::activeWindow())
-	);
-
-	if (m_focusChangeData.nextFocus != _nextFocus)
-	{
-		m_focusChangeData.nextFocus = _nextFocus;
-
-		if (!m_focusChangeData.requestQueued)
-		{
-			m_focusChangeData.prevFocus = _prevFocus;
-			m_focusChangeData.requestQueued = true;
-			//QTimer::singleShot(0, this, &WidgetViewManager::slotViewFocusedImpl);
-			this->slotViewFocusedImpl();
-		}
-		else
-		{
-			OT_WIDGETS_VIEW_DBG("Focus change request already queued. Skipping queue");
-		}
-		
-	}
+	handleViewFocusChanged(_prevFocus, _nextFocus,false);
 }
 
 void ot::WidgetViewManager::slotViewFocusedImpl()
@@ -1011,7 +987,7 @@ void ot::WidgetViewManager::slotUpdateViewFocus()
 	if (currentFocus != lastFocus)
 	{
 		OT_WIDGETS_VIEW_DBG("Calling view focused trough update view focus");
-		slotViewFocused(lastFocus, currentFocus);
+		handleViewFocusChanged(lastFocus, currentFocus,true);
 	}
 }
 
@@ -1260,6 +1236,36 @@ void ot::WidgetViewManager::handleViewCloseRequest(WidgetView* _view)
 	else
 	{
 		Q_EMIT viewCloseRequested(_view);
+	}
+}
+
+void ot::WidgetViewManager::handleViewFocusChanged(ads::CDockWidget* _prevFocus, ads::CDockWidget* _nextFocus, bool _enforce)
+{
+
+	OT_WIDGETS_VIEW_DBG("View focus changed: "
+		<< (_prevFocus ? _prevFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_prevFocus) << ") -> "
+		<< (_nextFocus ? _nextFocus->windowTitle().toStdString() : std::string("< null >")) << " (" << LogMsgPtr(_nextFocus) << ")\n\nNew Focus object:\n"
+		<< WidgetDebugHelper::objectHierarchyString(_nextFocus) << "\n\nAplication focus object:\n"
+		<< WidgetDebugHelper::objectHierarchyString(QApplication::focusWidget()) << "\n\nApplication active window:\n"
+		<< WidgetDebugHelper::objectHierarchyString(QApplication::activeWindow())
+	);
+
+	if (_enforce || m_focusChangeData.nextFocus != _nextFocus)
+	{
+		m_focusChangeData.nextFocus = _nextFocus;
+
+		if (!m_focusChangeData.requestQueued)
+		{
+			m_focusChangeData.prevFocus = _prevFocus;
+			m_focusChangeData.requestQueued = true;
+			//QTimer::singleShot(0, this, &WidgetViewManager::slotViewFocusedImpl);
+			this->slotViewFocusedImpl();
+		}
+		else
+		{
+			OT_WIDGETS_VIEW_DBG("Focus change request already queued. Skipping queue");
+		}
+
 	}
 }
 
